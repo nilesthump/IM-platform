@@ -8,7 +8,13 @@ Current Gate: S0
 
 S0 Gate Status: NOT YET PASSED
 
-Current Task: LOOP1-CTRL-002 (next; activation pending repository bootstrap)
+Current Task: GitHub repository bootstrap (BLOCKED_EXTERNAL_ACCESS); next LOOP1-CTRL-002
+
+Repository: not created
+
+Remote: none
+
+Main: local only; not pushed
 
 ## Completed
 
@@ -23,15 +29,16 @@ Current Task: LOOP1-CTRL-002 (next; activation pending repository bootstrap)
 
 ## In Progress
 
-- Create the initial stable commit and bootstrap the private GitHub repository before activating LOOP1-CTRL-002.
+- GitHub private repository bootstrap is paused at the external-access boundary before repository creation.
 
 ## Blocked
 
-none
+- `BLOCKED_EXTERNAL_ACCESS`: GitHub CLI is not installed and no GitHub API/connector is available in this task. Repository creation and push cannot be authenticated.
+- Failure-point local HEAD: `e3b70e539d82fcfc0b84310c3eda9b79f67f962e`.
 
 ## Next Exact Action
 
-Create the initial stable commit, record its SHA in this file and the latest checkpoint, create the private `IM-platform` GitHub repository without remote starter files, configure and push `origin/main`, then activate LOOP1-CTRL-002 on `task/LOOP1-CTRL-002`.
+Install and authenticate GitHub CLI or provide an authorized GitHub API connection. Then create private repository `IM-platform` without starter files, configure `origin`, push `main`, verify local/remote HEAD equality, and only then activate LOOP1-CTRL-002 on `task/LOOP1-CTRL-002`.
 
 ## Last Known Good Commit
 
@@ -43,5 +50,5 @@ Create the initial stable commit, record its SHA in this file and the latest che
 
 ## Uncommitted Changes
 
-- None expected after the checkpoint metadata commit.
+- None expected after committing this external-access blocker record.
 - No prior user or other-Agent changes were present.
