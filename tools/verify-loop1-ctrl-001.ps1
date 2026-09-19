@@ -65,7 +65,22 @@ foreach ($field in $taskFields) {
 }
 
 $expectedTasks = @('LOOP1-CTRL-002', 'LOOP1-CONTRACT-001', 'LOOP1-CONTRACT-002', 'LOOP1-CONTRACT-003', 'LOOP1-DB-001', 'LOOP1-INFRA-001', 'LOOP1-CI-001')
-foreach ($taskId in $expectedTasks) { Require-Path "spec/tasks/backlog/$taskId.md" 'Leaf' }
+foreach ($taskId in $expectedTasks) {
+    $matches = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'spec/tasks') -Recurse -File -Filter "$taskId.md")
+    if ($matches.Count -ne 1) {
+        $failures.Add("Expected exactly one Task Spec for $taskId across all task queues; found $($matches.Count).")
+        continue
+    }
+    $declaredStatusMatch = Select-String -LiteralPath $matches[0].FullName -Pattern '^status:\s*(\w+)' | Select-Object -First 1
+    if (-not $declaredStatusMatch) {
+        $failures.Add("Task Spec has no status field: $taskId")
+        continue
+    }
+    $declaredStatus = $declaredStatusMatch.Matches[0].Groups[1].Value
+    if ($declaredStatus -ne $matches[0].Directory.Name) {
+        $failures.Add("Task queue/status mismatch for ${taskId}: directory=$($matches[0].Directory.Name), status=$declaredStatus")
+    }
+}
 
 $architectureFiles = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'spec/architecture') -File -Recurse | ForEach-Object { $_.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') })
 $unexpectedArchitectureFiles = @($architectureFiles | Where-Object { $_ -notin @('spec/architecture/README.md', 'spec/architecture/decisions/.gitkeep') })
@@ -86,5 +101,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "PASS: LOOP1-CTRL-001 repository structure and governance checks succeeded ($($requiredFiles.Count) files, $($requiredDirectories.Count) directories, $($expectedTasks.Count) queued S0 tasks)."
-
+Write-Output "PASS: LOOP1-CTRL-001 repository structure and governance checks succeeded ($($requiredFiles.Count) files, $($requiredDirectories.Count) directories, $($expectedTasks.Count) tracked S0 tasks)."

@@ -8,7 +8,7 @@ Current Gate: S0
 
 S0 Gate Status: NOT YET PASSED
 
-Current Task: LOOP1-CTRL-002 (ready for activation after repository metadata is committed)
+Current Task: LOOP1-CTRL-002 (active)
 
 Repository: `https://github.com/nilesthump/IM-platform`
 
@@ -29,10 +29,13 @@ Main: pushed; upstream `origin/main`
 - Private GitHub repository `nilesthump/IM-platform` created without remote starter files.
 - `origin/main` created and verified equal to local `main` at `db89ab0db080813ea709cd9d73ed0a3df99594ef` before this metadata update.
 - Required control-plane files are present remotely; `.github/workflows/` remains absent.
+- Repository-bootstrap metadata committed and pushed; local `main` and `origin/main` verified equal at `53815faf92f80d425f1bd1e286d653c87f8a1087`.
+- Created branch `task/LOOP1-CTRL-002` from the remote-verified main and activated LOOP1-CTRL-002 through the required queue states.
+- Optional private-repository branch protection was not enabled because the GitHub account plan returned HTTP 403; no required checks were configured.
 
 ## In Progress
 
-- Commit and push the repository-bootstrap success metadata, then activate LOOP1-CTRL-002.
+- LOOP1-CTRL-002 is active. PLAN, implementation, and local verification are complete; REVIEW/HANDOFF is next.
 
 ## Blocked
 
@@ -40,11 +43,11 @@ none
 
 ## Next Exact Action
 
-Commit and push this repository-bootstrap metadata on `main`, verify local `main` equals `origin/main`, create branch `task/LOOP1-CTRL-002`, move LOOP1-CTRL-002 through `ready` to `active`, and begin its PLAN phase.
+Review the LOOP1-CTRL-002 diff against its allowed paths and acceptance, complete handoff evidence, and move it to `review/` only if the review remains clean. Do not claim S0 Gate PASS.
 
 ## Last Known Good Commit
 
-`db89ab0db080813ea709cd9d73ed0a3df99594ef`
+`53815faf92f80d425f1bd1e286d653c87f8a1087`
 
 ## Latest Checkpoint
 
@@ -52,5 +55,5 @@ Commit and push this repository-bootstrap metadata on `main`, verify local `main
 
 ## Uncommitted Changes
 
-- Repository-bootstrap success metadata is owned by this continuation and will be committed before task activation.
+- None expected after the current LOOP1-CTRL-002 task-branch commit.
 - No prior user or other-Agent changes were present.
