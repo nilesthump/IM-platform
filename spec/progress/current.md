@@ -8,7 +8,7 @@ Current Gate: S0
 
 S0 Gate Status: NOT YET PASSED
 
-Current Task: LOOP1-CTRL-002 (active)
+Current Task: LOOP1-CTRL-002 (review)
 
 Repository: `https://github.com/nilesthump/IM-platform`
 
@@ -32,18 +32,38 @@ Main: pushed; upstream `origin/main`
 - Repository-bootstrap metadata committed and pushed; local `main` and `origin/main` verified equal at `53815faf92f80d425f1bd1e286d653c87f8a1087`.
 - Created branch `task/LOOP1-CTRL-002` from the remote-verified main and activated LOOP1-CTRL-002 through the required queue states.
 - Optional private-repository branch protection was not enabled because the GitHub account plan returned HTTP 403; no required checks were configured.
+- LOOP1-CTRL-002 implementation, local verification, and branch-diff review completed; the Task Spec moved to `review/` without claiming Gate PASS.
 
 ## In Progress
 
-- LOOP1-CTRL-002 is active. PLAN, implementation, and local verification are complete; REVIEW/HANDOFF is next.
+- LOOP1-CTRL-002 is in review awaiting independent acceptance; no implementation task is active.
 
 ## Blocked
 
 none
 
+## Verification Evidence
+
+- `& .\tools\verify-loop1-ctrl-001.ps1`: exit code 0; PASS for 6 control files, 44 directories, and 7 tracked S0 tasks.
+- `& .\tools\verify-loop1-ctrl-002.ps1`: exit code 0; all six recovery steps PASS across 8 Task Specs and 5 queues.
+- Branch review against `main`: all changed paths are within LOOP1-CTRL-002 `allowed_paths`; no product implementation, public contract, Frozen Architecture, or CI workflow change is present.
+
+## Changed Files / Migrations
+
+- Updated `tools/verify-loop1-ctrl-001.ps1` to accept valid task queue transitions while enforcing one Task Spec and matching queue/status per tracked S0 task.
+- Added `tools/verify-loop1-ctrl-002.ps1` for the clean-context recovery dry-run and review-handoff state validation.
+- Updated this current-state record and the LOOP1-CTRL-002 Task Spec; moved no migrations and changed no contracts.
+
+## Known Failures / Risks / Assumptions
+
+- No blocking failure or architecture conflict is known.
+- The Frozen Architecture PDF is an owner-supplied external authority referenced by `spec/architecture/README.md`; it is not copied into the repository.
+- Minimal private-repository branch protection remains unavailable on the current GitHub plan; no required checks are configured.
+- Local verification is evidence only and does not constitute independent CI Gate PASS.
+
 ## Next Exact Action
 
-Review the LOOP1-CTRL-002 diff against its allowed paths and acceptance, complete handoff evidence, and move it to `review/` only if the review remains clean. Do not claim S0 Gate PASS.
+Run independent review/CI acceptance for LOOP1-CTRL-002; move it to `done/` only after PASS and accepted review. Do not claim S0 Gate PASS.
 
 ## Last Known Good Commit
 
@@ -55,5 +75,6 @@ Review the LOOP1-CTRL-002 diff against its allowed paths and acceptance, complet
 
 ## Uncommitted Changes
 
-- None expected after the current LOOP1-CTRL-002 task-branch commit.
+- None expected after the LOOP1-CTRL-002 review-handoff commit.
+- Review-hardening and queue-transition work is owned by the current LOOP1-CTRL-002 continuation.
 - No prior user or other-Agent changes were present.

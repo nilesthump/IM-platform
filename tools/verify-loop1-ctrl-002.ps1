@@ -53,7 +53,6 @@ $requiredFiles = @(
     'spec/handoff/agent-context.md',
     'spec/progress/current.md',
     'spec/tasks/TASK_TEMPLATE.md',
-    'spec/tasks/active/LOOP1-CTRL-002.md',
     'spec/tasks/done/LOOP1-CTRL-001.md',
     'tools/verify-loop1-ctrl-001.ps1'
 )
@@ -87,10 +86,13 @@ if ($failures.Count -eq 0) {
         'Current Stage:',
         'Current Gate:',
         'S0 Gate Status: NOT YET PASSED',
-        'Current Task: LOOP1-CTRL-002 (active)',
+        'Current Task: LOOP1-CTRL-002',
         '## Completed',
         '## In Progress',
         '## Blocked',
+        '## Verification Evidence',
+        '## Changed Files / Migrations',
+        '## Known Failures / Risks / Assumptions',
         '## Next Exact Action',
         '## Last Known Good Commit',
         '## Latest Checkpoint',
@@ -122,17 +124,6 @@ if ($failures.Count -eq 0) {
         '# Forbidden', '# Verification', '# Evidence', '# Handoff', '# Next Action'
     ) 'spec/tasks/TASK_TEMPLATE.md'
 
-    $activeTask = Get-Content -Raw (Join-Path $repoRoot 'spec/tasks/active/LOOP1-CTRL-002.md')
-    Require-Content $activeTask @(
-        'task_id: LOOP1-CTRL-002',
-        'status: active',
-        'owner: loop1-control-agent',
-        '# Goal', '# Inputs', '# Dependencies', '# Allowed Paths', '# Acceptance',
-        '# Forbidden', '# Verification', '# Evidence', '# Handoff', '# Next Action',
-        'LOOP1-CTRL-001 done',
-        'tools/**'
-    ) 'active LOOP1-CTRL-002 Task Spec'
-
     $claudeExpected = @'
 Before doing any work in this repository, read and follow `./AGENTS.md`.
 
@@ -147,8 +138,37 @@ $taskFiles = foreach ($queue in $queueNames) {
     Get-ChildItem -LiteralPath (Join-Path $repoRoot "spec/tasks/$queue") -File | Where-Object { $_.Name -ne '.gitkeep' }
 }
 $activeTasks = @($taskFiles | Where-Object { $_.Directory.Name -eq 'active' })
-if ($activeTasks.Count -ne 1 -or $activeTasks[0].Name -ne 'LOOP1-CTRL-002.md') {
-    Add-Failure 'Exactly one active task is required, and it must be LOOP1-CTRL-002.'
+$currentTaskMatch = [regex]::Match($current, '(?m)^Current Task:\s*LOOP1-CTRL-002\s*\((active|review)\)\s*$')
+if (-not $currentTaskMatch.Success) {
+    Add-Failure 'Current Task must identify LOOP1-CTRL-002 in active or review state.'
+    $currentTaskState = 'active'
+} else {
+    $currentTaskState = $currentTaskMatch.Groups[1].Value
+}
+
+$currentTaskFiles = @($taskFiles | Where-Object { $_.Name -eq 'LOOP1-CTRL-002.md' })
+if ($currentTaskFiles.Count -ne 1) {
+    Add-Failure "Expected exactly one LOOP1-CTRL-002 Task Spec across all task queues; found $($currentTaskFiles.Count)."
+} elseif ($currentTaskFiles[0].Directory.Name -ne $currentTaskState) {
+    Add-Failure "Current-state/task-queue mismatch for LOOP1-CTRL-002: current=$currentTaskState, queue=$($currentTaskFiles[0].Directory.Name)"
+} else {
+    $currentTask = Get-Content -Raw $currentTaskFiles[0].FullName
+    Require-Content $currentTask @(
+        'task_id: LOOP1-CTRL-002',
+        "status: $currentTaskState",
+        'owner: loop1-control-agent',
+        '# Goal', '# Inputs', '# Dependencies', '# Allowed Paths', '# Acceptance',
+        '# Forbidden', '# Verification', '# Evidence', '# Handoff', '# Next Action',
+        'LOOP1-CTRL-001 done',
+        'tools/**'
+    ) "$currentTaskState LOOP1-CTRL-002 Task Spec"
+}
+
+if ($currentTaskState -eq 'active' -and ($activeTasks.Count -ne 1 -or $activeTasks[0].Name -ne 'LOOP1-CTRL-002.md')) {
+    Add-Failure 'The active recovery state requires exactly one active task: LOOP1-CTRL-002.'
+}
+if ($currentTaskState -eq 'review' -and $activeTasks.Count -ne 0) {
+    Add-Failure 'The review handoff state must not retain an active task.'
 }
 
 foreach ($taskFile in $taskFiles) {
@@ -180,10 +200,9 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Output 'DRY-RUN 1/6 PASS: read spec/handoff/agent-context.md for long-lived rules.'
-Write-Output 'DRY-RUN 2/6 PASS: read spec/progress/current.md and located Loop 1 / S0 / LOOP1-CTRL-002.'
-Write-Output 'DRY-RUN 3/6 PASS: found exactly one active Task Spec and recovered goal, dependencies, allowed paths, acceptance, forbidden work, verification, and next action.'
+Write-Output "DRY-RUN 2/6 PASS: read spec/progress/current.md and located Loop 1 / S0 / LOOP1-CTRL-002 ($currentTaskState)."
+Write-Output 'DRY-RUN 3/6 PASS: found exactly one current Task Spec and recovered goal, dependencies, allowed paths, acceptance, forbidden work, verification, and next action.'
 Write-Output 'DRY-RUN 4/6 PASS: resolved the referenced repository authority inputs without treating implementation as authority.'
 Write-Output 'DRY-RUN 5/6 PASS: repository recovery sequence requires status, diff, and recent commits before implementation.'
 Write-Output 'DRY-RUN 6/6 PASS: minimum CTRL-001 baseline verification is present and CTRL-002 recovery verification completed.'
 Write-Output "PASS: LOOP1-CTRL-002 Agent recovery control-plane checks succeeded ($($taskFiles.Count) task files, $($queueNames.Count) task queues)."
-

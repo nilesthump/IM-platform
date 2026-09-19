@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CTRL-002
 title: Validate and harden Agent recovery context, current state, and Task schema
-status: active
+status: review
 owner: loop1-control-agent
 stage: S0
 gate: S0
@@ -61,6 +61,7 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 - `& .\tools\verify-loop1-ctrl-001.ps1`: final exit code 0; PASS for 6 control files, 44 directories, and 7 tracked S0 tasks.
 - `& .\tools\verify-loop1-ctrl-002.ps1`: exit code 0; all six clean-context recovery steps PASS across 8 Task Specs and 5 queues.
 - The initial CTRL-001 baseline run exposed a stale assumption that every follow-up S0 task must remain in `backlog/`; the verifier now requires each task to exist exactly once across the five queues with matching declared status.
+- Review exposed and corrected a second stale assumption: the CTRL-002 verifier now validates both its active recovery state and its review handoff state instead of failing when the Task Spec follows its prescribed queue transition.
 - No business implementation, public contract, Frozen Architecture, or `.github/workflows/` change was introduced.
 
 # Handoff
@@ -68,11 +69,14 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 - Activated on branch `task/LOOP1-CTRL-002` from remote-verified main `53815faf92f80d425f1bd1e286d653c87f8a1087`.
 - Added `tools/verify-loop1-ctrl-002.ps1` for the documented clean-context recovery dry-run.
 - Hardened `tools/verify-loop1-ctrl-001.ps1` so legitimate task queue transitions do not invalidate the repository baseline.
+- Hardened `spec/progress/current.md` with exact verification, changed-file/migration, risk/assumption, and uncommitted-change ownership evidence required for handoff.
 - Changed no migrations, contracts, architecture decisions, business implementation, or CI workflows.
 - Known non-blocking limitation: minimal private-repository branch protection is unavailable on the current GitHub plan; no required checks were configured.
 - Last known good main commit: `53815faf92f80d425f1bd1e286d653c87f8a1087`.
+- Latest checkpoint remains `spec/progress/checkpoints/2026-09-19-loop1-ctrl-001-local-review.md`; no new Gate, contract/schema transition, or release recovery point was created in this Task.
 - Current branch changes are owned by `loop1-control-agent`; architecture conflicts or ACP/ADR required: none.
+- Local branch-diff review found no remaining acceptance, scope, or forbidden-work issue after correcting review-state validation and handoff evidence; this is local evidence, not independent CI Gate PASS.
 
 # Next Action
 
-- Review the CTRL-002 diff against its allowed paths and acceptance, complete handoff evidence, and move the task to `review/` only if the review remains clean.
+- Run independent review/CI acceptance; move LOOP1-CTRL-002 to `done/` only after PASS and accepted review, without claiming S0 Gate PASS.
