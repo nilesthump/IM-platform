@@ -16,11 +16,19 @@ Database Migration Level: none established
 
 Artifact / Fixture Versions: none established
 
-Remote Bootstrap: `BLOCKED_EXTERNAL_ACCESS`
+Remote Bootstrap: complete
 
-Remote: none
+Repository: `https://github.com/nilesthump/IM-platform`
+
+Visibility: private
+
+Remote: `origin` (`https://github.com/nilesthump/IM-platform.git`)
+
+Main: pushed; upstream `origin/main`
 
 Failure-point Local HEAD: `e3b70e539d82fcfc0b84310c3eda9b79f67f962e`
+
+Remote-verified Main before success metadata: `db89ab0db080813ea709cd9d73ed0a3df99594ef`
 
 ## Stable Recovery State
 
@@ -31,8 +39,10 @@ Failure-point Local HEAD: `e3b70e539d82fcfc0b84310c3eda9b79f67f962e`
 - LOOP1-CTRL-001 final review closure is accepted and its Task Spec is in `done/`.
 - All follow-up S0 Tasks remain in `backlog` until repository bootstrap completes and LOOP1-CTRL-002 is activated.
 - No S1 or product business implementation exists.
-- GitHub repository creation was not attempted because no GitHub CLI or authorized API/connector is available.
-- LOOP1-CTRL-002 remains in `backlog`; it was not activated because remote bootstrap did not succeed.
+- Private GitHub repository `nilesthump/IM-platform` exists with default branch `main`.
+- Local `main` and `origin/main` matched at `db89ab0db080813ea709cd9d73ed0a3df99594ef` before this metadata update.
+- Required control-plane files were verified in the remote tree and `.github/workflows/` was absent.
+- LOOP1-CTRL-002 remains in `backlog` until this success metadata is committed and pushed.
 
 ## Verification Evidence
 
@@ -49,8 +59,8 @@ Failure-point Local HEAD: `e3b70e539d82fcfc0b84310c3eda9b79f67f962e`
 - The CI skeleton is a later S0 task; this checkpoint contains local evidence only.
 - In this managed Windows host, launching a nested Windows PowerShell process to run the verifier crossed a ConstrainedLanguage boundary and failed before assertions ran. Direct execution in the controlled session passed.
 - `git status` emits a non-blocking permission warning for the user-level Git exclude file; repository status is still reported correctly.
-- External blocker: GitHub CLI is not installed and no GitHub API/connector is available, so private repository creation and push cannot be authenticated.
+- The previous `BLOCKED_EXTERNAL_ACCESS` condition is resolved; GitHub CLI authentication for account `nilesthump` was verified before repository creation.
 
 ## Recovery Action
 
-Install and authenticate GitHub CLI or provide an authorized GitHub API connection. Create private repository `IM-platform` without starter files, configure and push `origin/main`, verify local/remote HEAD equality, then activate LOOP1-CTRL-002 without claiming S0 Gate PASS.
+Commit and push the bootstrap-success metadata, verify local `main` equals `origin/main`, then activate LOOP1-CTRL-002 on its task branch without claiming S0 Gate PASS.
