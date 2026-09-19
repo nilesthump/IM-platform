@@ -1,208 +1,222 @@
 [CmdletBinding()]
-param()
+param(
+    [ValidateSet('Acceptance', 'Development')]
+    [string]$Mode = 'Acceptance'
+)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $failures = [System.Collections.Generic.List[string]]::new()
+$queueNames = @('backlog', 'ready', 'active', 'review', 'done')
 
 function Add-Failure([string]$message) {
     $failures.Add($message)
 }
 
 function Require-File([string]$relativePath) {
-    $path = Join-Path $repoRoot $relativePath
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $relativePath) -PathType Leaf)) {
         Add-Failure "Missing required file: $relativePath"
+        return $false
     }
+    return $true
 }
 
-function Require-Directory([string]$relativePath) {
-    $path = Join-Path $repoRoot $relativePath
-    if (-not (Test-Path -LiteralPath $path -PathType Container)) {
-        Add-Failure "Missing required directory: $relativePath"
-    }
+function Get-Section([string]$content, [string]$heading) {
+    $pattern = "(?ms)^# $([regex]::Escape($heading))\s*\r?\n(.*?)(?=^# |\z)"
+    $match = [regex]::Match($content, $pattern)
+    if (-not $match.Success) { return '' }
+    return $match.Groups[1].Value
 }
 
-function Require-Content([string]$content, [string[]]$requiredValues, [string]$sourceName) {
-    foreach ($value in $requiredValues) {
-        if (-not $content.Contains($value)) {
-            Add-Failure "$sourceName is missing required content: $value"
-        }
+function Invoke-Git([string[]]$arguments, [string]$purpose) {
+    $output = @(& git -C $repoRoot -c core.excludesFile=.git/info/exclude @arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        Add-Failure "Unable to inspect git $purpose (exit $LASTEXITCODE): $($output -join ' ')"
     }
+    return $output
 }
 
-function Require-OrderedContent([string]$content, [string[]]$orderedValues, [string]$sourceName) {
-    $lastIndex = -1
-    foreach ($value in $orderedValues) {
-        $index = $content.IndexOf($value)
-        if ($index -lt 0) {
-            Add-Failure "$sourceName is missing startup step: $value"
-            continue
-        }
-        if ($index -le $lastIndex) {
-            Add-Failure "$sourceName has an out-of-order startup step: $value"
-        }
-        $lastIndex = $index
-    }
-}
-
-$requiredFiles = @(
+$coreFiles = @(
     'AGENTS.md',
-    'CLAUDE.md',
-    'spec/architecture/README.md',
     'spec/handoff/agent-context.md',
     'spec/progress/current.md',
     'spec/tasks/TASK_TEMPLATE.md',
-    'spec/tasks/done/LOOP1-CTRL-001.md',
-    'tools/verify-loop1-ctrl-001.ps1'
+    'spec/architecture/README.md'
 )
-$requiredFiles | ForEach-Object { Require-File $_ }
-
-$queueNames = @('backlog', 'ready', 'active', 'review', 'done')
-$queueNames | ForEach-Object { Require-Directory "spec/tasks/$_" }
-
-if ($failures.Count -eq 0) {
-    $agentRules = Get-Content -Raw (Join-Path $repoRoot 'AGENTS.md')
-    Require-OrderedContent $agentRules @(
-        'spec/handoff/agent-context.md',
-        'spec/progress/current.md',
-        'spec/tasks/active/',
-        'Every architecture document',
-        'git status',
-        'current diff',
-        'Recent commits',
-        'baseline verification'
-    ) 'AGENTS.md'
-    Require-Content $agentRules @(
-        'spec/tasks/ready/',
-        'allowed_paths',
-        'BLOCKED_BY_ARCHITECTURE',
-        'CI is the independent acceptance judge'
-    ) 'AGENTS.md'
-
-    $current = Get-Content -Raw (Join-Path $repoRoot 'spec/progress/current.md')
-    Require-Content $current @(
-        'Current Loop:',
-        'Current Stage:',
-        'Current Gate:',
-        'S0 Gate Status: NOT YET PASSED',
-        'Current Task: LOOP1-CTRL-002',
-        '## Completed',
-        '## In Progress',
-        '## Blocked',
-        '## Verification Evidence',
-        '## Changed Files / Migrations',
-        '## Known Failures / Risks / Assumptions',
-        '## Next Exact Action',
-        '## Last Known Good Commit',
-        '## Latest Checkpoint',
-        '## Uncommitted Changes'
-    ) 'spec/progress/current.md'
-
-    $context = Get-Content -Raw (Join-Path $repoRoot 'spec/handoff/agent-context.md')
-    Require-Content $context @(
-        'milestone-gated',
-        'Frozen Architecture',
-        'contracts/',
-        'allowed_paths',
-        'CI is an independent judge',
-        'completed work',
-        'changed files or migrations',
-        'verification command and result',
-        'known failures/risks/assumptions',
-        'next exact action',
-        'last known good commit',
-        'uncommitted-change ownership',
-        'architecture conflict',
-        'checkpoint'
-    ) 'spec/handoff/agent-context.md'
-
-    $template = Get-Content -Raw (Join-Path $repoRoot 'spec/tasks/TASK_TEMPLATE.md')
-    Require-Content $template @(
-        'task_id:', 'title:', 'status:', 'owner:', 'stage:', 'gate:',
-        '# Goal', '# Inputs', '# Dependencies', '# Allowed Paths', '# Acceptance',
-        '# Forbidden', '# Verification', '# Evidence', '# Handoff', '# Next Action'
-    ) 'spec/tasks/TASK_TEMPLATE.md'
-
-    $claudeExpected = @'
-Before doing any work in this repository, read and follow `./AGENTS.md`.
-
-`AGENTS.md` is the authoritative repository-level instruction entrypoint. Do not maintain a separate copy of repository rules in `CLAUDE.md`.
-'@.Trim()
-    if ((Get-Content -Raw (Join-Path $repoRoot 'CLAUDE.md')).Trim() -cne $claudeExpected) {
-        Add-Failure 'CLAUDE.md is not the approved minimal route to AGENTS.md.'
+$coreFiles | ForEach-Object { [void](Require-File $_) }
+foreach ($queue in $queueNames) {
+    if (-not (Test-Path -LiteralPath (Join-Path $repoRoot "spec/tasks/$queue") -PathType Container)) {
+        Add-Failure "Missing task queue: spec/tasks/$queue"
     }
 }
 
-$taskFiles = foreach ($queue in $queueNames) {
-    Get-ChildItem -LiteralPath (Join-Path $repoRoot "spec/tasks/$queue") -File | Where-Object { $_.Name -ne '.gitkeep' }
+$agents = if (Test-Path -LiteralPath (Join-Path $repoRoot 'AGENTS.md')) { Get-Content -Raw (Join-Path $repoRoot 'AGENTS.md') } else { '' }
+$orderedRules = @(
+    'spec/handoff/agent-context.md',
+    'spec/progress/current.md',
+    'Current Task',
+    'spec/tasks/{review,active,ready,backlog,done}/',
+    'Every architecture document',
+    'git status',
+    'current diff',
+    'Recent commits',
+    'baseline verification'
+)
+$lastRuleIndex = -1
+foreach ($rule in $orderedRules) {
+    $ruleIndex = $agents.IndexOf($rule)
+    if ($ruleIndex -lt 0) {
+        Add-Failure "AGENTS.md is missing recovery rule: $rule"
+    } elseif ($ruleIndex -le $lastRuleIndex) {
+        Add-Failure "AGENTS.md recovery rule is out of order: $rule"
+    } else {
+        $lastRuleIndex = $ruleIndex
+    }
 }
-$activeTasks = @($taskFiles | Where-Object { $_.Directory.Name -eq 'active' })
-$currentTaskMatch = [regex]::Match($current, '(?m)^Current Task:\s*LOOP1-CTRL-002\s*\((active|review)\)\s*$')
-if (-not $currentTaskMatch.Success) {
-    Add-Failure 'Current Task must identify LOOP1-CTRL-002 in active or review state.'
-    $currentTaskState = 'active'
-} else {
-    $currentTaskState = $currentTaskMatch.Groups[1].Value
-}
-
-$currentTaskFiles = @($taskFiles | Where-Object { $_.Name -eq 'LOOP1-CTRL-002.md' })
-if ($currentTaskFiles.Count -ne 1) {
-    Add-Failure "Expected exactly one LOOP1-CTRL-002 Task Spec across all task queues; found $($currentTaskFiles.Count)."
-} elseif ($currentTaskFiles[0].Directory.Name -ne $currentTaskState) {
-    Add-Failure "Current-state/task-queue mismatch for LOOP1-CTRL-002: current=$currentTaskState, queue=$($currentTaskFiles[0].Directory.Name)"
-} else {
-    $currentTask = Get-Content -Raw $currentTaskFiles[0].FullName
-    Require-Content $currentTask @(
-        'task_id: LOOP1-CTRL-002',
-        "status: $currentTaskState",
-        'owner: loop1-control-agent',
-        '# Goal', '# Inputs', '# Dependencies', '# Allowed Paths', '# Acceptance',
-        '# Forbidden', '# Verification', '# Evidence', '# Handoff', '# Next Action',
-        'LOOP1-CTRL-001 done',
-        'tools/**'
-    ) "$currentTaskState LOOP1-CTRL-002 Task Spec"
+foreach ($requiredRule in @('review', 'active', 'ready', 'backlog', 'done', 'Never select work merely because `active/` is empty', 'spec/architecture/README.md', 'Development-mode output and self-review are never acceptance evidence')) {
+    if (-not $agents.Contains($requiredRule)) { Add-Failure "AGENTS.md is missing required governance: $requiredRule" }
 }
 
-if ($currentTaskState -eq 'active' -and ($activeTasks.Count -ne 1 -or $activeTasks[0].Name -ne 'LOOP1-CTRL-002.md')) {
-    Add-Failure 'The active recovery state requires exactly one active task: LOOP1-CTRL-002.'
+$currentPath = Join-Path $repoRoot 'spec/progress/current.md'
+$current = if (Test-Path -LiteralPath $currentPath) { Get-Content -Raw $currentPath } else { '' }
+$taskIdMatch = [regex]::Match($current, '(?m)^Current Task:\s*`?([A-Z][A-Z0-9-]+)`?\s*$')
+$taskStateMatch = [regex]::Match($current, '(?m)^Current Task State:\s*`?(backlog|ready|active|review|done)`?\s*$')
+if (-not $taskIdMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task ID.' }
+if (-not $taskStateMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task State.' }
+
+$taskFiles = @()
+foreach ($queue in $queueNames) {
+    $queuePath = Join-Path $repoRoot "spec/tasks/$queue"
+    if (Test-Path -LiteralPath $queuePath) {
+        $taskFiles += @(Get-ChildItem -LiteralPath $queuePath -File -Filter '*.md')
+    }
 }
-if ($currentTaskState -eq 'review' -and $activeTasks.Count -ne 0) {
-    Add-Failure 'The review handoff state must not retain an active task.'
+
+$currentTaskFile = $null
+$currentTaskContent = ''
+if ($taskIdMatch.Success) {
+    $taskId = $taskIdMatch.Groups[1].Value
+    $matches = @($taskFiles | Where-Object { $_.BaseName -eq $taskId })
+    if ($matches.Count -ne 1) {
+        Add-Failure "Current Task $taskId must resolve exactly once across all five queues; found $($matches.Count)."
+    } else {
+        $currentTaskFile = $matches[0]
+        $currentTaskContent = Get-Content -Raw $currentTaskFile.FullName
+        $declaredStatus = [regex]::Match($currentTaskContent, '(?m)^status:\s*(backlog|ready|active|review|done)\s*$')
+        if (-not $declaredStatus.Success) {
+            Add-Failure "Current Task $taskId has no valid status field."
+        } else {
+            $queueState = $currentTaskFile.Directory.Name
+            if ($declaredStatus.Groups[1].Value -ne $queueState) { Add-Failure "Current Task status/queue mismatch: declared=$($declaredStatus.Groups[1].Value), queue=$queueState" }
+            if ($taskStateMatch.Success -and $taskStateMatch.Groups[1].Value -ne $queueState) { Add-Failure "current.md/task queue mismatch: current=$($taskStateMatch.Groups[1].Value), queue=$queueState" }
+        }
+    }
 }
 
 foreach ($taskFile in $taskFiles) {
-    $declaredStatusMatch = Select-String -LiteralPath $taskFile.FullName -Pattern '^status:\s*(\w+)' | Select-Object -First 1
-    if (-not $declaredStatusMatch) {
-        Add-Failure "Task has no status field: $($taskFile.FullName)"
-        continue
-    }
-    $declaredStatus = $declaredStatusMatch.Matches[0].Groups[1].Value
-    if ($declaredStatus -ne $taskFile.Directory.Name) {
-        Add-Failure "Task queue/status mismatch: $($taskFile.Name) is in $($taskFile.Directory.Name) but declares $declaredStatus"
+    $content = Get-Content -Raw $taskFile.FullName
+    $idMatch = [regex]::Match($content, '(?m)^task_id:\s*([A-Z][A-Z0-9-]+)\s*$')
+    $statusMatch = [regex]::Match($content, '(?m)^status:\s*(backlog|ready|active|review|done)\s*$')
+    if (-not $idMatch.Success -or $idMatch.Groups[1].Value -ne $taskFile.BaseName) { Add-Failure "Task ID/file mismatch: $($taskFile.FullName)" }
+    if (-not $statusMatch.Success -or $statusMatch.Groups[1].Value -ne $taskFile.Directory.Name) { Add-Failure "Task queue/status mismatch: $($taskFile.FullName)" }
+}
+
+$architectureIndexPath = Join-Path $repoRoot 'spec/architecture/README.md'
+if (Test-Path -LiteralPath $architectureIndexPath) {
+    $architectureIndex = Get-Content -Raw $architectureIndexPath
+    $manifestLink = [regex]::Match($architectureIndex, '\[baseline manifest\]\(([^)]+)\)')
+    if (-not $manifestLink.Success) {
+        Add-Failure 'Architecture index does not resolve a baseline manifest.'
+    } else {
+        $manifestPath = [IO.Path]::GetFullPath((Join-Path (Split-Path $architectureIndexPath) $manifestLink.Groups[1].Value))
+        if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+            Add-Failure "Architecture baseline manifest is missing: $manifestPath"
+        } else {
+            $manifest = Get-Content -Raw $manifestPath
+            $artifactMatch = [regex]::Match($manifest, '(?m)^- repository_path:\s*`([^`]+)`\s*$')
+            $hashMatch = [regex]::Match($manifest, '(?m)^- sha256:\s*`([0-9a-fA-F]{64})`\s*$')
+            if (-not $artifactMatch.Success -or -not $hashMatch.Success) {
+                Add-Failure 'Architecture manifest must contain repository_path and SHA-256.'
+            } else {
+                $artifactRelative = $artifactMatch.Groups[1].Value
+                $artifactPath = Join-Path $repoRoot $artifactRelative
+                if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+                    Add-Failure "Frozen Architecture artifact is missing: $artifactRelative"
+                } else {
+                    $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash.ToLowerInvariant()
+                    if ($actualHash -ne $hashMatch.Groups[1].Value.ToLowerInvariant()) { Add-Failure "Frozen Architecture hash mismatch: $artifactRelative" }
+                    [void](Invoke-Git @('ls-files', '--error-unmatch', '--', $artifactRelative) 'tracked Frozen Architecture artifact')
+                    [void](Invoke-Git @('cat-file', '-e', ":$artifactRelative") 'staged/committed Frozen Architecture blob')
+                    $trackedPdfs = @(Invoke-Git @('ls-files', '--', '*.pdf') 'tracked PDF authority inventory')
+                    if ($trackedPdfs.Count -ne 1 -or $trackedPdfs[0] -ne $artifactRelative) { Add-Failure "Expected exactly one tracked architecture PDF ($artifactRelative); found: $($trackedPdfs -join ', ')" }
+                }
+            }
+        }
     }
 }
 
-$activeS1Tasks = @($activeTasks | Where-Object {
-    (Get-Content -Raw $_.FullName) -match '(?m)^stage:\s*S1\s*$'
-})
-if ($activeS1Tasks.Count -gt 0) {
-    Add-Failure 'An S1 task is active before S0 Gate PASS.'
+if ($currentTaskFile) {
+    $requiredHeadings = @('Goal', 'Inputs', 'Dependencies', 'Allowed Paths', 'Acceptance', 'Forbidden', 'Verification', 'Evidence', 'Handoff', 'Next Action')
+    foreach ($heading in $requiredHeadings) {
+        if ([string]::IsNullOrWhiteSpace((Get-Section $currentTaskContent $heading))) { Add-Failure "Current Task is missing a non-empty # $heading section." }
+    }
+
+    $inputs = Get-Section $currentTaskContent 'Inputs'
+    $inputPaths = [regex]::Matches($inputs, '`([^`]+)`')
+    foreach ($pathMatch in $inputPaths) {
+        $inputPath = $pathMatch.Groups[1].Value
+        if ($inputPath -match '[/\\]' -or $inputPath -match '\.[A-Za-z0-9]+$') {
+            $resolvedInput = Join-Path $repoRoot $inputPath
+            if (-not (Test-Path -LiteralPath $resolvedInput)) { Add-Failure "Unresolved Current Task input: $inputPath" }
+        }
+    }
+    if ($inputs -match 'Architecture Baseline' -and $inputs -notmatch 'spec/architecture/README\.md') {
+        Add-Failure 'Architecture inputs must resolve through spec/architecture/README.md.'
+    }
+
+    $dependencies = Get-Section $currentTaskContent 'Dependencies'
+    foreach ($dependencyMatch in [regex]::Matches($dependencies, '([A-Z][A-Z0-9-]+)\s+done')) {
+        $dependencyId = $dependencyMatch.Groups[1].Value
+        $dependencyFiles = @($taskFiles | Where-Object { $_.BaseName -eq $dependencyId -and $_.Directory.Name -eq 'done' })
+        if ($dependencyFiles.Count -ne 1) { Add-Failure "Unresolved completed dependency: $dependencyId" }
+    }
+
+    $verification = Get-Section $currentTaskContent 'Verification'
+    $entryPoints = @([regex]::Matches($verification, '`(?:&\s+)?(?:\.\\)?(tools[\\/][^`\s]+)') | ForEach-Object { $_.Groups[1].Value.Replace('\', '/') })
+    if ($entryPoints.Count -eq 0) {
+        Add-Failure 'Current Task verification exposes no discoverable tools/ entry point.'
+    } else {
+        foreach ($entryPoint in $entryPoints) {
+            if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $entryPoint) -PathType Leaf)) { Add-Failure "Missing verification entry point: $entryPoint" }
+        }
+    }
+}
+
+$branch = Invoke-Git @('rev-parse', '--abbrev-ref', 'HEAD') 'branch'
+$status = Invoke-Git @('status', '--porcelain=v1', '--untracked-files=all') 'status'
+$diff = Invoke-Git @('diff', '--stat', 'HEAD') 'current diff'
+$recent = Invoke-Git @('log', '--oneline', '--decorate', '-n', '5') 'recent commits'
+if ($Mode -eq 'Acceptance' -and @($status).Count -gt 0) {
+    Add-Failure 'Acceptance mode requires a clean worktree and index. Re-run only from a clean committed checkout or isolated worktree.'
+}
+if ($Mode -eq 'Development') {
+    Write-Output 'NON-ACCEPTANCE DEVELOPMENT MODE: dirty worktree is permitted; this output MUST NOT be used as acceptance evidence.'
 }
 
 if (Test-Path -LiteralPath (Join-Path $repoRoot '.github/workflows') -PathType Container) {
-    Add-Failure '.github/workflows must not be created before LOOP1-CI-001.'
+    $ciTask = @($taskFiles | Where-Object { $_.BaseName -eq 'LOOP1-CI-001' })
+    if ($ciTask.Count -ne 1 -or $ciTask[0].Directory.Name -in @('backlog', 'ready')) {
+        Add-Failure '.github/workflows exists before LOOP1-CI-001 is active.'
+    }
 }
 
 if ($failures.Count -gt 0) {
-    $failures | ForEach-Object { Write-Error $_ }
+    Write-Output "FAIL: recovery verification found $($failures.Count) issue(s)."
+    $failures | ForEach-Object { Write-Output " - $_" }
     exit 1
 }
 
-Write-Output 'DRY-RUN 1/6 PASS: read spec/handoff/agent-context.md for long-lived rules.'
-Write-Output "DRY-RUN 2/6 PASS: read spec/progress/current.md and located Loop 1 / S0 / LOOP1-CTRL-002 ($currentTaskState)."
-Write-Output 'DRY-RUN 3/6 PASS: found exactly one current Task Spec and recovered goal, dependencies, allowed paths, acceptance, forbidden work, verification, and next action.'
-Write-Output 'DRY-RUN 4/6 PASS: resolved the referenced repository authority inputs without treating implementation as authority.'
-Write-Output 'DRY-RUN 5/6 PASS: repository recovery sequence requires status, diff, and recent commits before implementation.'
-Write-Output 'DRY-RUN 6/6 PASS: minimum CTRL-001 baseline verification is present and CTRL-002 recovery verification completed.'
-Write-Output "PASS: LOOP1-CTRL-002 Agent recovery control-plane checks succeeded ($($taskFiles.Count) task files, $($queueNames.Count) task queues)."
+$resolvedTask = if ($taskIdMatch.Success) { $taskIdMatch.Groups[1].Value } else { '<unresolved>' }
+$resolvedState = if ($taskStateMatch.Success) { $taskStateMatch.Groups[1].Value } else { '<unresolved>' }
+Write-Output "PASS: generic repository recovery verified task=$resolvedTask state=$resolvedState mode=$Mode queues=$($queueNames.Count) task_specs=$($taskFiles.Count)."
+Write-Output "GIT: branch=$($branch -join '') status_entries=$(@($status).Count) diff_lines=$(@($diff).Count) recent_commits=$(@($recent).Count)."

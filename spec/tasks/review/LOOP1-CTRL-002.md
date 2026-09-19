@@ -13,8 +13,9 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 
 # Inputs
 
-- Architecture Baseline v1.0 chapters 10, 12, 13, 19 and 21.
+- Architecture Baseline v1.0 chapters 10, 12, 13, 19 and 21, resolved through `spec/architecture/README.md`.
 - `AGENTS.md`
+- `.gitattributes`
 - `spec/handoff/agent-context.md`
 - `spec/progress/current.md`
 - `spec/tasks/TASK_TEMPLATE.md`
@@ -26,17 +27,25 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 # Allowed Paths
 
 - `AGENTS.md`
+- `scalable-distributed-im-architecture.pdf` (track the architect-supplied bytes unchanged)
+- `spec/architecture/**`
+- `spec/batches/**`
 - `spec/handoff/agent-context.md`
-- `spec/progress/current.md`
+- `spec/progress/**`
 - `spec/tasks/TASK_TEMPLATE.md`
-- `spec/tasks/**/LOOP1-CTRL-002.md`
+- `spec/tasks/**/*.md`
 - `tools/**`
 - `tests/**`
+
+The architect's 2026-09-19 batch-orchestration instruction explicitly authorizes this CTRL-002 recovery to expand `allowed_paths` for the control-plane repair, architecture baseline registration, bootstrap acceptance ADR, batch manifest, durable evidence, verifier correction, and minimum missing S0 spec-producer Task Specs/dependency edges. This authorization does not permit changing the PDF bytes, Frozen business architecture, public contract semantics, or product behavior.
 
 # Acceptance
 
 - A clean-context Agent dry-run finds the current task, its authority inputs, allowed paths, verification, and next exact action in the required order.
 - Handoff and current-state fields cover every chapter 13 requirement without copying the architecture baseline.
+- Default acceptance verification rejects a dirty worktree; explicit development mode is labeled non-acceptance.
+- The immutable repository architecture artifact resolves through the index/manifest and its SHA-256 verifies.
+- Prior review failure and subsequent runs use durable evidence under `spec/progress/evidence/LOOP1-CTRL-002/`.
 
 # Forbidden
 
@@ -46,7 +55,9 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 
 # Verification
 
-- Run the repository control-plane lint and a documented clean-context recovery dry-run.
+- Development only: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
+- Baseline: `& .\tools\verify-loop1-ctrl-001.ps1`
+- Independent acceptance from a clean committed checkout: `& .\tools\verify-loop1-ctrl-002.ps1`
 
 # Plan
 
@@ -57,26 +68,21 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 
 # Evidence
 
-- Dependency evidence: LOOP1-CTRL-001 is in `done/` with final review-closure PASS.
-- `& .\tools\verify-loop1-ctrl-001.ps1`: final exit code 0; PASS for 6 control files, 44 directories, and 7 tracked S0 tasks.
-- `& .\tools\verify-loop1-ctrl-002.ps1`: exit code 0; all six clean-context recovery steps PASS across 8 Task Specs and 5 queues.
-- The initial CTRL-001 baseline run exposed a stale assumption that every follow-up S0 task must remain in `backlog/`; the verifier now requires each task to exist exactly once across the five queues with matching declared status.
-- Review exposed and corrected a second stale assumption: the CTRL-002 verifier now validates both its active recovery state and its review handoff state instead of failing when the Task Spec follows its prescribed queue transition.
-- No business implementation, public contract, Frozen Architecture, or `.github/workflows/` change was introduced.
+- Dependency evidence: LOOP1-CTRL-001 is in `done/`.
+- Permanent prior independent FAIL: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-independent-review-fail.md`.
+- Fix-Agent development verification: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-fix-development-verification.md` (not acceptance evidence).
+- Fresh independent acceptance evidence: pending.
 
 # Handoff
 
-- Activated on branch `task/LOOP1-CTRL-002` from remote-verified main `53815faf92f80d425f1bd1e286d653c87f8a1087`.
-- Added `tools/verify-loop1-ctrl-002.ps1` for the documented clean-context recovery dry-run.
-- Hardened `tools/verify-loop1-ctrl-001.ps1` so legitimate task queue transitions do not invalidate the repository baseline.
-- Hardened `spec/progress/current.md` with exact verification, changed-file/migration, risk/assumption, and uncommitted-change ownership evidence required for handoff.
-- Changed no migrations, contracts, architecture decisions, business implementation, or CI workflows.
-- Known non-blocking limitation: minimal private-repository branch protection is unavailable on the current GitHub plan; no required checks were configured.
-- Last known good main commit: `53815faf92f80d425f1bd1e286d653c87f8a1087`.
-- Latest checkpoint remains `spec/progress/checkpoints/2026-09-19-loop1-ctrl-001-local-review.md`; no new Gate, contract/schema transition, or release recovery point was created in this Task.
-- Current branch changes are owned by `loop1-control-agent`; architecture conflicts or ACP/ADR required: none.
-- Local branch-diff review found no remaining acceptance, scope, or forbidden-work issue after correcting review-state validation and handoff evidence; this is local evidence, not independent CI Gate PASS.
+- Review repair covers every inherited finding: generic cross-queue recovery, real input/index/hash/git verification, clean acceptance mode, durable evidence, concise current state, repository-resident architecture resolution, bootstrap CI ADR, S0 batch manifest, and the missing spec-producer dependency.
+- `tools/verify-loop1-ctrl-001.ps1` now accepts the legal PDF/index/manifest/ADR and additional Task Spec without treating them as duplicate authority; `.gitattributes` keeps the immutable PDF binary in Git tooling.
+- Frozen Architecture bytes are unchanged from the architect-supplied asset; no public contract, domain semantics, migration, product implementation, or `.github/workflows/` was created.
+- Known non-blocking limitation: desired private-repository branch protection is unavailable on the current GitHub plan.
+- Last known good accepted commit: `53815faf92f80d425f1bd1e286d653c87f8a1087`.
+- Latest checkpoint: `spec/progress/checkpoints/2026-09-19-loop1-ctrl-002-repair-candidate.md`.
+- All repair changes are owned by the fresh LOOP1-CTRL-002 Fix Agent. Architecture conflict requiring human action: none.
 
 # Next Action
 
-- Run independent review/CI acceptance; move LOOP1-CTRL-002 to `done/` only after PASS and accepted review, without claiming S0 Gate PASS.
+- Commit this repair, then run a fresh independent acceptance review from a clean isolated checkout. Move LOOP1-CTRL-002 to `done/` only after PASS; do not claim S0 Gate PASS.

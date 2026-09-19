@@ -1,6 +1,9 @@
-# Architecture Sources
+# Architecture Index
 
-This file is a pointer, not an independent architecture specification.
+This file is a resolver, not an independent architecture specification.
 
-The project owner's `scalable-distributed-im-architecture.pdf`, Architecture Baseline v1.0 dated 2026-09-19, is the Frozen Architecture execution baseline for Loop 1. Approved architecture changes belong in `spec/architecture/decisions/` and require the documented approval process. Do not copy or silently reinterpret the baseline here.
+1. Read the [baseline manifest](./baseline.md).
+2. Resolve and hash-check the immutable repository artifact named by that manifest.
+3. Apply approved decisions in [`decisions/`](./decisions/) through the documented architecture process.
 
+The manifest and this index contain discovery metadata only. They do not summarize, replace, or silently reinterpret the Frozen Architecture.

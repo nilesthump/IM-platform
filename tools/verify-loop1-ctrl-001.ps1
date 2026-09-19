@@ -12,16 +12,22 @@ function Require-Path([string]$relativePath, [string]$kind = 'Any') {
 }
 
 $requiredFiles = @(
+    '.gitattributes',
     'AGENTS.md',
     'CLAUDE.md',
     'README.md',
+    'scalable-distributed-im-architecture.pdf',
+    'spec/architecture/README.md',
+    'spec/architecture/baseline.md',
+    'spec/architecture/decisions/ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md',
+    'spec/batches/LOOP1-S0.md',
     'spec/handoff/agent-context.md',
     'spec/progress/current.md',
     'spec/tasks/TASK_TEMPLATE.md'
 )
 $requiredDirectories = @(
     'spec/architecture', 'spec/architecture/decisions', 'spec/domain', 'spec/invariants', 'spec/acceptance',
-    'spec/progress/checkpoints', 'spec/tasks/backlog', 'spec/tasks/ready', 'spec/tasks/active', 'spec/tasks/review', 'spec/tasks/done',
+    'spec/batches', 'spec/progress/checkpoints', 'spec/progress/evidence', 'spec/tasks/backlog', 'spec/tasks/ready', 'spec/tasks/active', 'spec/tasks/review', 'spec/tasks/done',
     'contracts', 'contracts/http', 'contracts/websocket', 'contracts/errors', 'contracts/database', 'contracts/plugin-api', 'contracts/fixtures',
     'backend/go/gateway', 'backend/go/core', 'backend/go/plugin-host', 'backend/go/tests',
     'backend/java/gateway', 'backend/java/core', 'backend/java/plugin-host', 'backend/java/tests',
@@ -50,9 +56,9 @@ if ($readme -notmatch 'AI / coding agents must read \[AGENTS\.md\]\(\./AGENTS\.m
 
 $agentRules = Get-Content -Raw (Join-Path $repoRoot 'AGENTS.md')
 $agentRulePatterns = @(
-    'spec/handoff/agent-context\.md', 'spec/progress/current\.md', 'spec/tasks/active/', 'spec/tasks/ready/',
+    'spec/handoff/agent-context\.md', 'spec/progress/current\.md', 'spec/tasks/\{review,active,ready,backlog,done\}/',
     'git status', 'current diff', 'Recent commits', 'baseline verification', 'allowed_paths', 'contracts/',
-    'BLOCKED_BY_ARCHITECTURE', 'CI is the independent acceptance judge', 'spec/progress/current\.md', 'checkpoint'
+    'BLOCKED_BY_ARCHITECTURE', 'CI is the independent acceptance judge', 'spec/architecture/README\.md', 'checkpoint'
 )
 foreach ($pattern in $agentRulePatterns) {
     if ($agentRules -notmatch $pattern) { $failures.Add("AGENTS.md is missing required rule pattern: $pattern") }
@@ -64,7 +70,7 @@ foreach ($field in $taskFields) {
     if (-not $taskTemplate.Contains($field)) { $failures.Add("Task template is missing: $field") }
 }
 
-$expectedTasks = @('LOOP1-CTRL-002', 'LOOP1-CONTRACT-001', 'LOOP1-CONTRACT-002', 'LOOP1-CONTRACT-003', 'LOOP1-DB-001', 'LOOP1-INFRA-001', 'LOOP1-CI-001')
+$expectedTasks = @('LOOP1-CTRL-002', 'LOOP1-SPEC-001', 'LOOP1-CONTRACT-001', 'LOOP1-CONTRACT-002', 'LOOP1-CONTRACT-003', 'LOOP1-DB-001', 'LOOP1-INFRA-001', 'LOOP1-CI-001')
 foreach ($taskId in $expectedTasks) {
     $matches = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'spec/tasks') -Recurse -File -Filter "$taskId.md")
     if ($matches.Count -ne 1) {
@@ -83,9 +89,29 @@ foreach ($taskId in $expectedTasks) {
 }
 
 $architectureFiles = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'spec/architecture') -File -Recurse | ForEach-Object { $_.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') })
-$unexpectedArchitectureFiles = @($architectureFiles | Where-Object { $_ -notin @('spec/architecture/README.md', 'spec/architecture/decisions/.gitkeep') })
+$unexpectedArchitectureFiles = @($architectureFiles | Where-Object {
+    $_ -notin @('spec/architecture/README.md', 'spec/architecture/baseline.md', 'spec/architecture/decisions/.gitkeep') -and
+    $_ -notmatch '^spec/architecture/decisions/ADR-[0-9]{4}-.+\.md$'
+})
 if ($unexpectedArchitectureFiles.Count -gt 0) {
-    $failures.Add("Unexpected independent architecture document(s): $($unexpectedArchitectureFiles -join ', ')")
+    $failures.Add("Unexpected architecture authority file(s): $($unexpectedArchitectureFiles -join ', ')")
+}
+
+$manifest = Get-Content -Raw (Join-Path $repoRoot 'spec/architecture/baseline.md')
+$manifestPathMatch = [regex]::Match($manifest, '(?m)^- repository_path:\s*`([^`]+)`\s*$')
+$manifestHashMatch = [regex]::Match($manifest, '(?m)^- sha256:\s*`([0-9a-fA-F]{64})`\s*$')
+if (-not $manifestPathMatch.Success -or -not $manifestHashMatch.Success) {
+    $failures.Add('Architecture baseline manifest is not machine-resolvable.')
+} else {
+    $baselinePath = Join-Path $repoRoot $manifestPathMatch.Groups[1].Value
+    if (-not (Test-Path -LiteralPath $baselinePath -PathType Leaf)) {
+        $failures.Add("Frozen Architecture artifact is missing: $($manifestPathMatch.Groups[1].Value)")
+    } else {
+        $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $baselinePath).Hash.ToLowerInvariant()
+        if ($actualHash -ne $manifestHashMatch.Groups[1].Value.ToLowerInvariant()) { $failures.Add('Frozen Architecture artifact hash does not match the baseline manifest.') }
+        & git -C $repoRoot -c core.excludesFile=.git/info/exclude ls-files --error-unmatch -- $manifestPathMatch.Groups[1].Value *> $null
+        if ($LASTEXITCODE -ne 0) { $failures.Add('Frozen Architecture artifact is not tracked by Git.') }
+    }
 }
 
 $implementationRoots = @('backend', 'clients', 'plugins')

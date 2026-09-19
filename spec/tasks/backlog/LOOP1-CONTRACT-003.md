@@ -13,12 +13,17 @@ Define canonical user cursor, per-conversation sequence Sync, and Plugin API v1 
 
 # Inputs
 
-- Architecture Baseline v1.0 chapters 2, 6, 8, 9, 11, 19 and appendix B.
-- Approved ADRs/frozen decisions and relevant domain, invariant, acceptance, HTTP, WSS, and error contracts.
+- Architecture Baseline v1.0 chapters 2, 6, 8, 9, 11, 19 and appendix B, resolved through `spec/architecture/README.md`.
+- Approved ADRs/frozen decisions in `spec/architecture/decisions/`.
+- `spec/domain/sync-plugin.md`
+- `spec/invariants/sync-plugin.md`
+- `spec/acceptance/s0-sync-plugin.md`
+- Approved HTTP, WSS, and error contracts from LOOP1-CONTRACT-001 and LOOP1-CONTRACT-002.
 
 # Dependencies
 
 - LOOP1-CONTRACT-002 done.
+- LOOP1-SPEC-001 done.
 
 # Allowed Paths
 

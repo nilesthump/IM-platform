@@ -23,6 +23,7 @@ Create the path-aware diff classifier and Go, Java, client, shared-contract, dep
 # Allowed Paths
 
 - `ci/**`
+- `.github/workflows/**` (only after this task becomes `active`)
 - CI verification tests under `tests/**`
 - Minimal CI entry files at repository root if explicitly added to this Task Spec before activation
 - `spec/tasks/**/LOOP1-CI-001.md`

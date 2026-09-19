@@ -13,14 +13,16 @@ Define the canonical HTTP Auth/User/Friend OpenAPI contract, shared errors, and 
 
 # Inputs
 
-- Architecture Baseline v1.0 chapters 2, 4, 7, 11, 19 and appendix B.
+- Architecture Baseline v1.0 chapters 2, 4, 7, 11, 19 and appendix B, resolved through `spec/architecture/README.md`.
 - Approved ADRs/frozen decisions in `spec/architecture/decisions/`.
-- Relevant domain, invariant, and S0 acceptance documents.
+- `spec/domain/auth-user-friend.md`
+- `spec/invariants/auth-user-friend.md`
+- `spec/acceptance/s0-auth-user-friend.md`
 
 # Dependencies
 
 - LOOP1-CTRL-002 done.
-- Required Auth/User/Friend domain, invariant, and acceptance inputs complete.
+- LOOP1-SPEC-001 done.
 
 # Allowed Paths
 

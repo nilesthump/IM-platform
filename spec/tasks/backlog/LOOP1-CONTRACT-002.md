@@ -13,12 +13,17 @@ Define canonical WSS envelopes and auth.bind/ack, message.send/ack/created, and 
 
 # Inputs
 
-- Architecture Baseline v1.0 chapters 2, 4, 5, 7, 11, 19 and appendix B.
-- Approved ADRs/frozen decisions and relevant domain, invariant, acceptance, error, and HTTP contract inputs.
+- Architecture Baseline v1.0 chapters 2, 4, 5, 7, 11, 19 and appendix B, resolved through `spec/architecture/README.md`.
+- Approved ADRs/frozen decisions in `spec/architecture/decisions/`.
+- `spec/domain/messaging.md`
+- `spec/invariants/messaging.md`
+- `spec/acceptance/s0-messaging.md`
+- Approved error and HTTP contracts from LOOP1-CONTRACT-001.
 
 # Dependencies
 
 - LOOP1-CONTRACT-001 done.
+- LOOP1-SPEC-001 done.
 
 # Allowed Paths
 
