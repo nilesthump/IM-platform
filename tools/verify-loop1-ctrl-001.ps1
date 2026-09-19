@@ -1,0 +1,90 @@
+[CmdletBinding()]
+param()
+
+$ErrorActionPreference = 'Stop'
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$failures = [System.Collections.Generic.List[string]]::new()
+
+function Require-Path([string]$relativePath, [string]$kind = 'Any') {
+    $path = Join-Path $repoRoot $relativePath
+    $exists = if ($kind -eq 'Container') { Test-Path -LiteralPath $path -PathType Container } elseif ($kind -eq 'Leaf') { Test-Path -LiteralPath $path -PathType Leaf } else { Test-Path -LiteralPath $path }
+    if (-not $exists) { $failures.Add("Missing $kind path: $relativePath") }
+}
+
+$requiredFiles = @(
+    'AGENTS.md',
+    'CLAUDE.md',
+    'README.md',
+    'spec/handoff/agent-context.md',
+    'spec/progress/current.md',
+    'spec/tasks/TASK_TEMPLATE.md'
+)
+$requiredDirectories = @(
+    'spec/architecture', 'spec/architecture/decisions', 'spec/domain', 'spec/invariants', 'spec/acceptance',
+    'spec/progress/checkpoints', 'spec/tasks/backlog', 'spec/tasks/ready', 'spec/tasks/active', 'spec/tasks/review', 'spec/tasks/done',
+    'contracts', 'contracts/http', 'contracts/websocket', 'contracts/errors', 'contracts/database', 'contracts/plugin-api', 'contracts/fixtures',
+    'backend/go/gateway', 'backend/go/core', 'backend/go/plugin-host', 'backend/go/tests',
+    'backend/java/gateway', 'backend/java/core', 'backend/java/plugin-host', 'backend/java/tests',
+    'clients/shared/protocol-sdk', 'clients/shared/plugin-sdk', 'clients/shared/ui', 'clients/web', 'clients/desktop', 'clients/mobile',
+    'plugins/fixtures/echo', 'plugins/fixtures/poll',
+    'tests/contract', 'tests/integration', 'tests/e2e', 'tests/compatibility', 'tests/load',
+    'deploy/compose', 'deploy/proxy', 'deploy/observability', 'ci', 'tools'
+)
+
+$requiredFiles | ForEach-Object { Require-Path $_ 'Leaf' }
+$requiredDirectories | ForEach-Object { Require-Path $_ 'Container' }
+
+$claudeExpected = @'
+Before doing any work in this repository, read and follow `./AGENTS.md`.
+
+`AGENTS.md` is the authoritative repository-level instruction entrypoint. Do not maintain a separate copy of repository rules in `CLAUDE.md`.
+'@.Trim()
+if ((Get-Content -Raw (Join-Path $repoRoot 'CLAUDE.md')).Trim() -cne $claudeExpected) {
+    $failures.Add('CLAUDE.md must contain only the approved AGENTS.md routing text.')
+}
+
+$readme = Get-Content -Raw (Join-Path $repoRoot 'README.md')
+if ($readme -notmatch 'AI / coding agents must read \[AGENTS\.md\]\(\./AGENTS\.md\) first\.') {
+    $failures.Add('README.md does not direct AI/coding agents to AGENTS.md first.')
+}
+
+$agentRules = Get-Content -Raw (Join-Path $repoRoot 'AGENTS.md')
+$agentRulePatterns = @(
+    'spec/handoff/agent-context\.md', 'spec/progress/current\.md', 'spec/tasks/active/', 'spec/tasks/ready/',
+    'git status', 'current diff', 'Recent commits', 'baseline verification', 'allowed_paths', 'contracts/',
+    'BLOCKED_BY_ARCHITECTURE', 'CI is the independent acceptance judge', 'spec/progress/current\.md', 'checkpoint'
+)
+foreach ($pattern in $agentRulePatterns) {
+    if ($agentRules -notmatch $pattern) { $failures.Add("AGENTS.md is missing required rule pattern: $pattern") }
+}
+
+$taskTemplate = Get-Content -Raw (Join-Path $repoRoot 'spec/tasks/TASK_TEMPLATE.md')
+$taskFields = @('task_id', 'title', 'status', 'owner', 'stage', 'gate', '# Goal', '# Inputs', '# Dependencies', '# Allowed Paths', '# Acceptance', '# Forbidden', '# Verification', '# Evidence', '# Handoff', '# Next Action')
+foreach ($field in $taskFields) {
+    if (-not $taskTemplate.Contains($field)) { $failures.Add("Task template is missing: $field") }
+}
+
+$expectedTasks = @('LOOP1-CTRL-002', 'LOOP1-CONTRACT-001', 'LOOP1-CONTRACT-002', 'LOOP1-CONTRACT-003', 'LOOP1-DB-001', 'LOOP1-INFRA-001', 'LOOP1-CI-001')
+foreach ($taskId in $expectedTasks) { Require-Path "spec/tasks/backlog/$taskId.md" 'Leaf' }
+
+$architectureFiles = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'spec/architecture') -File -Recurse | ForEach-Object { $_.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') })
+$unexpectedArchitectureFiles = @($architectureFiles | Where-Object { $_ -notin @('spec/architecture/README.md', 'spec/architecture/decisions/.gitkeep') })
+if ($unexpectedArchitectureFiles.Count -gt 0) {
+    $failures.Add("Unexpected independent architecture document(s): $($unexpectedArchitectureFiles -join ', ')")
+}
+
+$implementationRoots = @('backend', 'clients', 'plugins')
+$prematureFiles = foreach ($root in $implementationRoots) {
+    Get-ChildItem -LiteralPath (Join-Path $repoRoot $root) -File -Recurse | Where-Object { $_.Name -ne '.gitkeep' }
+}
+if (@($prematureFiles).Count -gt 0) {
+    $failures.Add("Premature S1/product implementation files found: $((@($prematureFiles).FullName | ForEach-Object { $_.Substring($repoRoot.Length + 1) }) -join ', ')")
+}
+
+if ($failures.Count -gt 0) {
+    $failures | ForEach-Object { Write-Error $_ }
+    exit 1
+}
+
+Write-Output "PASS: LOOP1-CTRL-001 repository structure and governance checks succeeded ($($requiredFiles.Count) files, $($requiredDirectories.Count) directories, $($expectedTasks.Count) queued S0 tasks)."
+
