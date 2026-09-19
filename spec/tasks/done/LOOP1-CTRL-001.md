@@ -66,6 +66,7 @@ Create the Loop 1 repository skeleton and the minimum authoritative Agent contro
 - Final review closure: PASS - all 15 acceptance groups and the no-workflow condition passed.
 - Product implementation scan: PASS; no non-placeholder files exist under `backend/`, `clients/`, or `plugins/`.
 - Architecture/contract scope scan: PASS; no frozen architecture document or machine-verifiable contract semantics were added or changed.
+- Initial stable control-plane commit: `bc982a330ab52d7f79d4e7865bb4dd80f0b25eb7`.
 - Evidence checkpoint: `spec/progress/checkpoints/2026-09-19-loop1-ctrl-001-local-review.md`.
 - S0 Gate result: NOT YET PASSED; remaining S0 Contract, DB, Infra, and CI tasks are incomplete.
 
@@ -74,11 +75,10 @@ Create the Loop 1 repository skeleton and the minimum authoritative Agent contro
 - Completed the repository skeleton, authoritative Agent entrypoint, compatibility route, project README, long-lived handoff context, current execution state, Task template, and first S0 Task Specs.
 - Added one PowerShell verifier; added no migrations, contracts, infrastructure definitions, GitHub workflows, or product implementation.
 - Review closure accepted under the user-authorized bootstrap procedure on 2026-09-19.
-- Initial stable commit and GitHub repository bootstrap are the immediate closure actions after this status transition.
-- All uncommitted files remain owned by LOOP1-CTRL-001 until the stable commit is created; there was no prior work to overwrite.
+- The initial stable commit was created on `main`; GitHub repository bootstrap is the remaining closure action before activating LOOP1-CTRL-002.
+- No prior user or other-Agent work was overwritten.
 - Architecture conflicts or ACP/ADR required: none.
 
 # Next Action
 
-- Create the initial stable commit, record its SHA in progress/checkpoint, bootstrap the private GitHub repository, push `main`, then activate LOOP1-CTRL-002 without claiming S0 Gate PASS.
-
+- Bootstrap the private GitHub repository, push `main`, then activate LOOP1-CTRL-002 without claiming S0 Gate PASS.

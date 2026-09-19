@@ -8,7 +8,7 @@ Stage / Gate: S0 / S0
 
 Task State: LOOP1-CTRL-001 done
 
-Commit: none
+Commit: `bc982a330ab52d7f79d4e7865bb4dd80f0b25eb7`
 
 Contract Version: none established
 
@@ -37,11 +37,11 @@ Artifact / Fixture Versions: none established
 
 ## Known Limitations
 
-- The initial stable commit has not yet been created, so there is no Last Known Good Commit at this checkpoint revision.
+- Initial stable control-plane commit: `bc982a330ab52d7f79d4e7865bb4dd80f0b25eb7`.
 - The CI skeleton is a later S0 task; this checkpoint contains local evidence only.
 - In this managed Windows host, launching a nested Windows PowerShell process to run the verifier crossed a ConstrainedLanguage boundary and failed before assertions ran. Direct execution in the controlled session passed.
 - `git status` emits a non-blocking permission warning for the user-level Git exclude file; repository status is still reported correctly.
 
 ## Recovery Action
 
-Create the initial stable commit, record its SHA here and in `spec/progress/current.md`, bootstrap and verify the private GitHub repository, then activate LOOP1-CTRL-002 without claiming S0 Gate PASS.
+Bootstrap and verify the private GitHub repository from the stable commit, then activate LOOP1-CTRL-002 without claiming S0 Gate PASS.

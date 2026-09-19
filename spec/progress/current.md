@@ -35,7 +35,7 @@ Create the initial stable commit, record its SHA in this file and the latest che
 
 ## Last Known Good Commit
 
-none
+`bc982a330ab52d7f79d4e7865bb4dd80f0b25eb7`
 
 ## Latest Checkpoint
 
@@ -43,5 +43,5 @@ none
 
 ## Uncommitted Changes
 
-- All repository files remain uncommitted and owned by LOOP1-CTRL-001 until the initial stable commit is created.
+- None expected after the checkpoint metadata commit.
 - No prior user or other-Agent changes were present.
