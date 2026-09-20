@@ -64,13 +64,19 @@ Materialize the minimum repository-native domain, invariant, and executable acce
 - Recovery verification: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`, exit `0`, elapsed `465.0543 ms`; explicitly non-acceptance development output.
 - Whitespace verification: `git diff --check e324e74b028ecb08f019ab2dccc2c377ea72f7d6`, exit `0`, elapsed `42.7957 ms`.
 - Durable fix evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-fix-development-10aaba0-pass.md`.
+- Fresh independent Review Agent `/root/spec001_review3` reviewed `85069032c137cce6e526e0e329b6e93178515274` from a clean detached disposable clone and returned FAIL because changing chapter 8.2 `entry-point checks` to `import checks` still passed the verifier; all other review areas passed.
+- Permanent review evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-8506903-fail.md`.
+- Fresh Fix Agent `/root/spec001_fix2` strengthened the verifier at content commit `3cecd6ffd1dbfdeb57adee53b8aef60597f7aeb0`: `SP-D-009` and `SP-A-008` are now checked by exact rule ID and required renderer-validation semantics, `import checks` are explicitly rejected, and all prior Action guards remain in force.
+- Fix verification on clean content commit `3cecd6ffd1dbfdeb57adee53b8aef60597f7aeb0`: materialization verifier PASS, exit `0`, elapsed `141.9375 ms`; CTRL-002 Development PASS, exit `0`, elapsed `487.6677 ms`; baseline diff check PASS, exit `0`, elapsed `45.6821 ms`.
+- Regression mutations of `SP-D-009` and `SP-A-008` from `entry-point checks` to `import checks` were independently rejected with exit `1`; the Action-to-rate-limiting mutation also remained rejected with exit `1`.
+- Durable fix evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-fix-development-3cecd6f-pass.md`.
 - S0 remains NOT YET PASSED.
 
 # Handoff
 
-- Fresh Implementation Agent `/root/spec001_impl` materialized the original inputs; fresh Fix Agent `/root/spec001_fix` repaired the independent review findings. Neither agent has self-accepted the task.
+- Fresh Implementation Agent `/root/spec001_impl` materialized the original inputs; fresh Fix Agents `/root/spec001_fix` and `/root/spec001_fix2` repaired successive independent review findings. None has self-accepted the task.
 - The task remains in `review` and is ready for a new fresh independent Review Agent under ADR-0001. Last known good accepted commit remains `e324e74b028ecb08f019ab2dccc2c377ea72f7d6`; latest accepted checkpoint remains `spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-accepted.md`. Architecture conflict: none.
 
 # Next Action
 
-- Delegate a new fresh independent Review Agent to review the final committed fix handoff from a clean isolated checkout, recheck the prior findings, run `& .\spec\acceptance\verify-s0-spec-materialization.ps1`, `& .\tools\verify-loop1-ctrl-002.ps1`, and `git diff --check e324e74b028ecb08f019ab2dccc2c377ea72f7d6`, and record ADR-0001 evidence as PASS or FAIL.
+- Delegate a new fresh independent Review Agent to review the final committed `3cecd6ffd1dbfdeb57adee53b8aef60597f7aeb0` repair handoff from a clean isolated checkout, recheck both permanent FAIL findings, run `& .\spec\acceptance\verify-s0-spec-materialization.ps1`, `& .\tools\verify-loop1-ctrl-002.ps1`, the entry-point-to-import negative controls, and `git diff --check e324e74b028ecb08f019ab2dccc2c377ea72f7d6`, and record ADR-0001 evidence as PASS or FAIL.
