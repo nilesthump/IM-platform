@@ -12,7 +12,7 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CONTRACT-001
 
-Current Task State: active
+Current Task State: review
 
 ## Immediately Relevant Completed Work
 
@@ -21,14 +21,23 @@ Current Task State: active
 - The independent review passed the 9-file/84-rule materialization verifier, CTRL-002 Acceptance mode, and baseline diff check; all eight disposable negative controls were rejected.
 - Durable acceptance evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
 - Accepted checkpoint: `spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md`.
-- `LOOP1-CONTRACT-001` dependencies and all three repository-native Auth/User/Friend inputs are satisfied; it is active on `task/LOOP1-CONTRACT-001` and assigned to fresh Implementation Agent identity `loop1-contract-001-implementation-agent`.
+- `LOOP1-CONTRACT-001` implementation is complete at candidate commit `acfe36c4846bc2ac55832bdece4073ed41f2a833` and is awaiting fresh independent review.
+- The candidate defines 8 canonical Auth/User/Friend HTTP operations, 15 shared error codes, 5 positive and 12 negative dual-profile golden scenarios, and a deterministic verifier.
 
 ## Current Blockers
 
-- None for the fresh Implementation Agent to begin `LOOP1-CONTRACT-001` within its allowed contract scope.
+- None. The next action is independent review, not further implementation in this context.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
+
+- Command: `& .\contracts\http\verify-auth-user-friend.ps1`
+  - Result: development PASS on clean committed candidate `acfe36c4846bc2ac55832bdece4073ed41f2a833`, exit `0`, elapsed `210.5651 ms`; 8 paths, 8 operations, 15 error codes, 5 positive and 12 negative fixtures, both profiles.
+- Command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: development PASS, exit `0`, elapsed `439.4688 ms`; explicitly non-acceptance evidence.
+- Command: `git diff --check main..HEAD`
+  - Result: development PASS, exit `0`, elapsed `36.7182 ms` at implementation commit.
+- Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-development-acfe36c-pass.md`.
 
 - Command: `& .\spec\acceptance\verify-s0-spec-materialization.ps1`
   - Result: independent PASS, exit `0`, elapsed `133.8927 ms`; 9 files and 84 unique cited rules.
@@ -45,12 +54,18 @@ Current Task State: active
 
 ## Changed Files or Migrations
 
+- `contracts/http/auth-user-friend.openapi.json` is the canonical OpenAPI 3.1 Auth/User/Friend contract; `contracts/http/verify-auth-user-friend.ps1` is its deterministic verifier.
+- `contracts/errors/http-errors.schema.json` defines the shared HTTP error envelope and stable codes.
+- `contracts/fixtures/auth-user-friend/` defines the fixture schema plus dual-profile positive and negative golden scenarios.
+- No database migrations, product implementation, WSS/Sync/Plugin contract, or frozen architecture changes were introduced by `LOOP1-CONTRACT-001`.
 - `LOOP1-SPEC-001` added three domain inputs, three invariant inputs, three executable S0 contract-check inputs, and their deterministic verifier; the accepted closure adds durable review evidence and a stable checkpoint.
-- No database migrations, machine-verifiable public contract files, product implementation, container images, or fixture versions were introduced.
+- The earlier `LOOP1-SPEC-001` closure introduced no database migrations, machine-verifiable public contract files, product implementation, container images, or fixture versions.
 - `.github/workflows/` remains absent. Frozen Architecture PDF bytes remain unchanged.
 
 ## Known Failures, Risks, and Assumptions
 
+- `acfe36c4846bc2ac55832bdece4073ed41f2a833` has only implementer development verification and is not accepted until a fresh independent reviewer passes it under ADR-0001.
+- OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a Secure HttpOnly WEB refresh cookie, native refresh-token bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
 - The independent reviews of `74134bd306cbf0a1546f500bc46c45a1217b2d58` and `85069032c137cce6e526e0e329b6e93178515274` remain permanent FAIL records; accepted commit `aef6497d6216d9a8251250d157935e7af418d86b` supersedes them for task acceptance.
 - ADR-0001 remains active until `LOOP1-CI-001` is operational and `done`.
 - S0 remains NOT YET PASSED; the three Contract tasks, DB, Infra, and CI remain incomplete.
@@ -58,11 +73,11 @@ Current Task State: active
 
 ## Next Exact Action
 
-Delegate implementation to a fresh `LOOP1-CONTRACT-001` Implementation Agent on the current task branch. It must define only the canonical HTTP Auth/User/Friend contract, shared errors, and positive/negative golden fixtures, add deterministic task verification within the authorized paths, and hand off for fresh independent review. Do not claim S0 Gate PASS.
+Delegate `LOOP1-CONTRACT-001` to a fresh independent Review Agent. It must review implementation commit `acfe36c4846bc2ac55832bdece4073ed41f2a833` plus the current review-handoff HEAD from a clean detached isolated checkout, run the task verifier, CTRL-002 default Acceptance mode, and the baseline diff check from `e5482b135a2ab7451c24c29c7517e1a8f19ce420`, then record durable PASS/FAIL evidence. Do not claim S0 Gate PASS.
 
 ## Last Known Good Commit
 
-`aef6497d6216d9a8251250d157935e7af418d86b`
+`e5482b135a2ab7451c24c29c7517e1a8f19ce420` (last independently accepted recovery line); review candidate `acfe36c4846bc2ac55832bdece4073ed41f2a833` is development-verified only.
 
 ## Latest Checkpoint
 
@@ -70,8 +85,8 @@ Delegate implementation to a fresh `LOOP1-CONTRACT-001` Implementation Agent on 
 
 ## Uncommitted Changes / Ownership
 
-- No uncommitted changes remain at activation handoff; no unexplained user or other-Agent changes are known.
-- The committed activation transition is owned by Coordinator transition writer `/root/spec001_close`; subsequent implementation ownership belongs only to the fresh `LOOP1-CONTRACT-001` Implementation Agent.
+- No uncommitted changes are expected after the review-handoff commit; no implementation work remains owned by the implementer.
+- No unexplained user or other-Agent changes are known.
 
 ## Architecture Conflicts / ACP / ADR
 

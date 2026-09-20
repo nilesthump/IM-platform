@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CONTRACT-001
 title: Freeze HTTP Auth, User, and Friend contracts
-status: active
-owner: loop1-contract-001-implementation-agent
+status: review
+owner: unassigned-independent-review-agent
 stage: S0
 gate: S0
 ---
@@ -58,11 +58,19 @@ Define the canonical HTTP Auth/User/Friend OpenAPI contract, shared errors, and 
 - Dependency `LOOP1-SPEC-001` is `done` with independent acceptance evidence at `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
 - Required inputs `spec/domain/auth-user-friend.md`, `spec/invariants/auth-user-friend.md`, and `spec/acceptance/s0-auth-user-friend.md` are present and were independently accepted as part of reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b`.
 - Activated from local `main` closure commit `e5482b135a2ab7451c24c29c7517e1a8f19ce420` on dedicated branch `task/LOOP1-CONTRACT-001` after dependency and input validation.
+- Implementation commit: `acfe36c4846bc2ac55832bdece4073ed41f2a833`.
+- Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-development-acfe36c-pass.md`.
+- The task verifier passed on the clean committed implementation with 8 paths, 8 operations, 15 stable error codes, 5 positive fixtures, and 12 negative fixtures for both `go` and `java` profiles.
+- `LOOP1-CTRL-002` passed in explicitly non-acceptance Development mode; `git diff --check main..HEAD` passed.
 
 # Handoff
 
-- Active and assigned to fresh Implementation Agent identity `loop1-contract-001-implementation-agent`; no contract implementation has started at activation handoff.
+- Implementation is complete and committed at `acfe36c4846bc2ac55832bdece4073ed41f2a833`.
+- Canonical deliverables are `contracts/http/auth-user-friend.openapi.json`, `contracts/errors/http-errors.schema.json`, dual-profile golden fixtures under `contracts/fixtures/auth-user-friend/`, and deterministic verifier `contracts/http/verify-auth-user-friend.ps1`.
+- The contract fixes wire-level endpoint and schema choices while preserving the frozen session slot/epoch, refresh-token hashing and revocation, token transport, normalized friendship, unique DIRECT conversation, two-member atomic transaction, immediate friendship, authorization, and error semantics.
+- No backend, WSS envelope/message schema, Sync, Plugin API, database schema, or frozen architecture was changed.
+- Development verification is not acceptance evidence. A fresh independent Review Agent must review the committed diff from a clean isolated checkout under ADR-0001.
 
 # Next Action
 
-- A fresh Implementation Agent must read all declared authority inputs, then define only the HTTP Auth/User/Friend contracts, shared errors, and positive/negative golden fixtures within `allowed_paths`; prepare deterministic schema lint and fixture verification before review.
+- Delegate to a fresh independent Review Agent. Review implementation commit `acfe36c4846bc2ac55832bdece4073ed41f2a833` plus the current review-handoff HEAD from a clean detached isolated checkout, run `& .\contracts\http\verify-auth-user-friend.ps1`, default Acceptance mode of `& .\tools\verify-loop1-ctrl-002.ps1`, and `git diff --check e5482b135a2ab7451c24c29c7517e1a8f19ce420..HEAD`; record PASS/FAIL under this task's evidence directory. Do not accept from the implementation context.
