@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CONTRACT-001
 title: Freeze HTTP Auth, User, and Friend contracts
-status: backlog
+status: ready
 owner: unassigned
 stage: S0
 gate: S0
@@ -48,16 +48,19 @@ Define the canonical HTTP Auth/User/Friend OpenAPI contract, shared errors, and 
 
 # Verification
 
+- While editing, run `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`; run default Acceptance mode only from a clean committed review checkout.
 - Run schema lint and all positive/negative fixture checks defined by this task.
 
 # Evidence
 
-- Pending.
+- Dependency `LOOP1-CTRL-002` is `done` with independent acceptance evidence at `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-d86bf17-pass.md`.
+- Dependency `LOOP1-SPEC-001` is `done` with independent acceptance evidence at `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
+- Required inputs `spec/domain/auth-user-friend.md`, `spec/invariants/auth-user-friend.md`, and `spec/acceptance/s0-auth-user-friend.md` are present and were independently accepted as part of reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b`.
 
 # Handoff
 
-- Unassigned; no changes yet.
+- Ready and unassigned; no contract implementation has started.
 
 # Next Action
 
-- Promote only after all dependencies and inputs are complete.
+- Activate on a dedicated task branch with a fresh Implementation Agent, then define only the HTTP Auth/User/Friend contracts, shared errors, and positive/negative golden fixtures within `allowed_paths`.
