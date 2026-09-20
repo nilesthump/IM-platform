@@ -3,7 +3,7 @@
 - Date: 2026-09-20 (Asia/Shanghai)
 - Agent role: fresh Implementation Agent `loop1-contract-001-implementation-agent`
 - Branch: `task/LOOP1-CONTRACT-001`
-- Implementation commit: `acfe36c4846bc2ac55832bdece4073ed41f2a833`
+- Implementation commit: `acfe36c2040e749ee508485ee8b577dc76604961`
 - Baseline: local `main` / activation parent `e5482b135a2ab7451c24c29c7517e1a8f19ce420`
 - Clean-state result before committed verification: `git status --short --branch` reported only `## task/LOOP1-CONTRACT-001`.
 - Result: DEVELOPMENT PASS; this is not independent acceptance evidence.
