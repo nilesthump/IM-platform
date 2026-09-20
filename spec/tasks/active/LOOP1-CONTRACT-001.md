@@ -34,6 +34,7 @@ Define the canonical HTTP Auth/User/Friend OpenAPI contract, shared errors, and 
 - `spec/acceptance/**`
 - `spec/tasks/**/LOOP1-CONTRACT-001.md`
 - `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-CONTRACT-001/**`
 
 # Acceptance
 

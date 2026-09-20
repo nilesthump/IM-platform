@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/errors/http-errors.schema.json",
+  "title": "Canonical HTTP error contract",
+  "$defs": {
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "VALIDATION_FAILED",
+        "AUTH_REQUIRED",
+        "AUTH_INVALID_CREDENTIALS",
+        "AUTH_TOKEN_INVALID",
+        "AUTH_TOKEN_EXPIRED",
+        "AUTH_SESSION_REVOKED",
+        "AUTH_SESSION_EPOCH_STALE",
+        "AUTH_CLIENT_TYPE_MISMATCH",
+        "AUTH_REFRESH_REVOKED",
+        "AUTHORIZATION_DENIED",
+        "PROTOCOL_VERSION_UNSUPPORTED",
+        "USERNAME_ALREADY_EXISTS",
+        "USER_NOT_FOUND",
+        "FRIEND_SELF_NOT_ALLOWED",
+        "FRIENDSHIP_STATE_CONFLICT"
+      ]
+    },
+    "FieldViolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "reason"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error", "requestId"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "$ref": "#/$defs/ErrorCode" },
+            "message": { "type": "string", "minLength": 1 },
+            "violations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/FieldViolation" }
+            }
+          }
+        },
+        "requestId": { "type": "string", "minLength": 1 }
+      },
+      "description": "Messages and violations must never contain passwords, access tokens, refresh tokens, cookies, or other authentication material."
+    }
+  },
+  "$ref": "#/$defs/ErrorResponse"
+}

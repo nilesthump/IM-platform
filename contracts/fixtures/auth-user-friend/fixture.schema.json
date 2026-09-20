@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Auth/User/Friend golden fixture collection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixtureVersion", "contractVersion", "profiles", "polarity", "scenarios"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "fixtureVersion": { "const": "1.0" },
+    "contractVersion": { "const": "1.0.0" },
+    "profiles": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "enum": ["go", "java"] } },
+    "polarity": { "enum": ["positive", "negative"] },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "rules", "preconditions", "steps", "stateAssertions", "forbiddenObservations"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "rules": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^AUF-[DIA]-[0-9]{3}$" } },
+          "preconditions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "steps": {
+            "type": "array", "minItems": 1,
+            "items": {
+              "type": "object", "additionalProperties": false, "required": ["request", "expected"],
+              "properties": {
+                "request": {
+                  "type": "object", "additionalProperties": false, "required": ["method", "path"],
+                  "properties": {
+                    "method": { "enum": ["GET", "POST", "PUT"] }, "path": { "type": "string", "pattern": "^/v1/" },
+                    "headers": { "type": "object" }, "query": { "type": "object" }, "body": { "type": "object" }
+                  }
+                },
+                "expected": {
+                  "type": "object", "additionalProperties": false, "required": ["status"],
+                  "properties": { "status": { "type": "integer", "minimum": 200, "maximum": 499 }, "errorCode": { "type": "string" }, "body": { "type": "object" } }
+                }
+              }
+            }
+          },
+          "stateAssertions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "forbiddenObservations": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    }
+  }
+}

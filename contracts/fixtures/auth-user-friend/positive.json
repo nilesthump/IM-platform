@@ -1,0 +1,63 @@
+{
+  "$schema": "./fixture.schema.json",
+  "fixtureVersion": "1.0",
+  "contractVersion": "1.0.0",
+  "profiles": ["go", "java"],
+  "polarity": "positive",
+  "scenarios": [
+    {
+      "id": "registration-and-authorized-user-search",
+      "rules": ["AUF-D-009", "AUF-I-007"],
+      "preconditions": ["username alice does not exist"],
+      "steps": [
+        { "request": { "method": "POST", "path": "/v1/auth/register", "body": { "username": "Alice", "password": "fixture-password-not-a-real-secret", "displayName": "Alice" } }, "expected": { "status": 201, "body": { "user": { "userId": "10000000-0000-4000-8000-000000000001", "username": "alice", "displayName": "Alice" } } } },
+        { "request": { "method": "GET", "path": "/v1/users/search", "headers": { "Authorization": "Bearer <access-token>" }, "query": { "username": "ALICE" } }, "expected": { "status": 200, "body": { "users": [{ "userId": "10000000-0000-4000-8000-000000000001", "username": "alice", "displayName": "Alice" }] } } }
+      ],
+      "stateAssertions": ["username canonicalizes to alice and remains unique"],
+      "forbiddenObservations": ["password or token appears in structured logs"]
+    },
+    {
+      "id": "same-slot-login-replaces-only-that-slot",
+      "rules": ["AUF-D-001", "AUF-D-002", "AUF-D-003", "AUF-I-001", "AUF-I-002", "AUF-A-001", "AUF-A-003"],
+      "preconditions": ["alice exists", "no active sessions"],
+      "steps": [
+        { "request": { "method": "POST", "path": "/v1/auth/login", "body": { "username": "alice", "password": "fixture-password-not-a-real-secret", "clientType": "WEB", "deviceId": "browser-1", "clientVersion": "1.0.0", "protocolVersion": "1" } }, "expected": { "status": 200, "body": { "clientType": "WEB", "sessionEpoch": 1, "replacedExistingSession": false } } },
+        { "request": { "method": "POST", "path": "/v1/auth/login", "body": { "username": "alice", "password": "fixture-password-not-a-real-secret", "clientType": "DESKTOP", "deviceId": "desktop-1", "clientVersion": "1.0.0", "protocolVersion": "1" } }, "expected": { "status": 200, "body": { "clientType": "DESKTOP", "sessionEpoch": 1, "replacedExistingSession": false } } },
+        { "request": { "method": "POST", "path": "/v1/auth/login", "body": { "username": "alice", "password": "fixture-password-not-a-real-secret", "clientType": "WEB", "deviceId": "browser-2", "clientVersion": "1.0.1", "protocolVersion": "1" } }, "expected": { "status": 200, "body": { "clientType": "WEB", "sessionEpoch": 2, "replacedExistingSession": true } } },
+        { "request": { "method": "GET", "path": "/v1/users/me", "headers": { "Authorization": "Bearer <new-web-token-epoch-2>" } }, "expected": { "status": 200 } },
+        { "request": { "method": "GET", "path": "/v1/users/me", "headers": { "Authorization": "Bearer <desktop-token-epoch-1>" } }, "expected": { "status": 200 } }
+      ],
+      "stateAssertions": ["exactly one WEB session is ACTIVE", "the former WEB session is REVOKED before epoch 2 is returned", "the DESKTOP session remains ACTIVE", "the old WEB connection observes session.revoked before close"],
+      "forbiddenObservations": ["two ACTIVE sessions for alice and WEB", "revocation of the DESKTOP slot"]
+    },
+    {
+      "id": "refresh-rotates-current-session-credential",
+      "rules": ["AUF-D-001", "AUF-D-009", "AUF-I-002", "AUF-I-007"],
+      "preconditions": ["alice has an ACTIVE MOBILE session at epoch 4 with refresh token R1"],
+      "steps": [
+        { "request": { "method": "POST", "path": "/v1/auth/refresh", "body": { "refreshToken": "<refresh-R1>", "clientType": "MOBILE", "clientVersion": "1.0.0", "protocolVersion": "1" } }, "expected": { "status": 200, "body": { "clientType": "MOBILE", "sessionEpoch": 4, "refreshToken": "<refresh-R2>" } } }
+      ],
+      "stateAssertions": ["R1 is revoked atomically when R2 is issued", "the session remains MOBILE epoch 4"],
+      "forbiddenObservations": ["R1 appears in logs or traces", "token lifetime is fixed by the contract"]
+    },
+    {
+      "id": "logout-revokes-session-refresh-and-connection",
+      "rules": ["AUF-D-008", "AUF-A-006"],
+      "preconditions": ["alice has an ACTIVE DESKTOP session with refresh token and WSS connection"],
+      "steps": [{ "request": { "method": "POST", "path": "/v1/auth/logout", "headers": { "Authorization": "Bearer <desktop-access-token>" } }, "expected": { "status": 204 } }],
+      "stateAssertions": ["session is REVOKED", "all refresh tokens for the session are revoked", "the WSS connection receives the revocation effect then closes"],
+      "forbiddenObservations": ["local SQLite or client history is deleted"]
+    },
+    {
+      "id": "friend-add-normalizes-and-reuses-direct",
+      "rules": ["AUF-D-005", "AUF-D-006", "AUF-D-007", "AUF-I-005", "AUF-I-006", "AUF-A-004", "AUF-A-005"],
+      "preconditions": ["users A and B exist and are distinct", "no A/B friendship exists"],
+      "steps": [
+        { "request": { "method": "PUT", "path": "/v1/friends/20000000-0000-4000-8000-000000000002", "headers": { "Authorization": "Bearer <user-A-access-token>" } }, "expected": { "status": 201, "body": { "friendshipId": "30000000-0000-4000-8000-000000000003", "lowUserId": "10000000-0000-4000-8000-000000000001", "highUserId": "20000000-0000-4000-8000-000000000002", "directConversationId": "40000000-0000-4000-8000-000000000004", "created": true } } },
+        { "request": { "method": "PUT", "path": "/v1/friends/10000000-0000-4000-8000-000000000001", "headers": { "Authorization": "Bearer <user-B-access-token>" } }, "expected": { "status": 200, "body": { "friendshipId": "30000000-0000-4000-8000-000000000003", "lowUserId": "10000000-0000-4000-8000-000000000001", "highUserId": "20000000-0000-4000-8000-000000000002", "directConversationId": "40000000-0000-4000-8000-000000000004", "created": false } } }
+      ],
+      "stateAssertions": ["one normalized friendship exists", "one DIRECT conversation exists", "exactly two distinct memberships exist", "friendship conversation memberships sync events and outbox effects share one commit outcome"],
+      "forbiddenObservations": ["PENDING friendship state", "a second friendship", "a second DIRECT conversation"]
+    }
+  ]
+}
