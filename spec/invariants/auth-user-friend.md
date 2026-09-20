@@ -1,0 +1,13 @@
+# Auth, User, and Friend Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| AUF-I-001 | A contract MUST make it impossible to represent more than one valid Session for the same user and client type. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-I-002 | Same-slot relogin MUST invalidate the old epoch before the new Session is accepted; an old token MUST NOT reconnect successfully. | Architecture Baseline v1.0, chapters 4.1, 7.2, and 7.3, and appendix B (Session). |
+| AUF-I-003 | WSS MUST remain UNAUTHENTICATED until auth.bind succeeds and MUST permit only auth.bind plus ping/pong in that state. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-004 | Authenticated WSS state MUST bind user, Session, and client type, and a same-slot revocation MUST produce session.revoked before connection close. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-005 | Friendship identity MUST be order-independent, and one normalized pair MUST map to one friendship and one DIRECT Conversation. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-I-006 | Friendship creation, DIRECT Conversation creation or reuse, both memberships, Sync events, and Outbox effects MUST form one atomic outcome. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-I-007 | Authentication secrets MUST NOT be exposed through query parameters, logs, traces, or error responses. | Architecture Baseline v1.0, chapter 7.4. |

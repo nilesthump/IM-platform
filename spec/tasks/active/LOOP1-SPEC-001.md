@@ -45,7 +45,7 @@ Materialize the minimum repository-native domain, invariant, and executable acce
 # Verification
 
 - While editing, run `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`; run `& .\tools\verify-loop1-ctrl-002.ps1` only from a clean committed review checkout.
-- Run a traceability check that every materialized rule cites the baseline chapter or approved ADR source.
+- Run `& .\spec\acceptance\verify-s0-spec-materialization.ps1`; it deterministically requires all nine area/layer inputs, unique rule identifiers, a normative keyword and exact baseline citation on every rule, and absence of implementation/schema leakage patterns.
 
 # Evidence
 
