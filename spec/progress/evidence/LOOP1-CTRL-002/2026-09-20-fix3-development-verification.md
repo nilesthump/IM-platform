@@ -33,6 +33,9 @@
 6. Commands: `git hash-object scalable-distributed-im-architecture.pdf`; `git rev-parse :scalable-distributed-im-architecture.pdf`
    - Exit code: `0` for both
    - Result: working-tree and indexed blobs both remain `17f7883b20dc75077f7491d2cb91049c9a53a75b`.
+7. Final metadata-candidate rerun after the exact checkpoint and references were added:
+   - `& .\tools\verify-loop1-ctrl-001.ps1`: exit code `0`, elapsed `213.7895 ms`, PASS.
+   - `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`: exit code `0`, elapsed `334.2208 ms`, PASS and explicitly non-acceptance.
 
 ## Scope and State
 

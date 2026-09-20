@@ -40,7 +40,7 @@ Current Task State: review
 
 ## Changed Files or Migrations
 
-- The complete fixed-point inventory from `67bb82b1cd3880090095425384d52c933f0518fb` covers governance/context (`AGENTS.md`, `spec/handoff/agent-context.md`); the immutable PDF plus architecture index/manifest/ADR; the S0 batch; current state, both CTRL-002 checkpoints, evidence index, and all six CTRL-002 evidence records; the SPEC-001, three Contract, CI-001, and CTRL-002 Task Specs; and both CTRL verifiers. `spec/tasks/TASK_TEMPLATE.md` was verified and remains unchanged in this diff.
+- The complete fixed-point inventory from `67bb82b1cd3880090095425384d52c933f0518fb` covers governance/context (`AGENTS.md`, `spec/handoff/agent-context.md`); immutable architecture (`scalable-distributed-im-architecture.pdf`, `spec/architecture/README.md`, `spec/architecture/baseline.md`, `spec/architecture/decisions/ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md`); batch (`spec/batches/LOOP1-S0.md`); recovery (`spec/progress/current.md`, `spec/progress/checkpoints/2026-09-19-loop1-ctrl-002-repair-candidate.md`, `spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-fix-candidate.md`, `spec/progress/evidence/README.md`, and all six CTRL-002 evidence records named in the CTRL-002 Task's Evidence section); Task Specs (`spec/tasks/backlog/LOOP1-SPEC-001.md`, `LOOP1-CONTRACT-001.md`, `LOOP1-CONTRACT-002.md`, `LOOP1-CONTRACT-003.md`, `LOOP1-CI-001.md`, and `spec/tasks/review/LOOP1-CTRL-002.md`); and verifiers (`tools/verify-loop1-ctrl-001.ps1`, `tools/verify-loop1-ctrl-002.ps1`). `spec/tasks/TASK_TEMPLATE.md` was verified and remains unchanged in this diff.
 - Database migrations: none. Machine-verifiable public contract files: none. Product implementation: none. `.github/workflows/`: absent. Frozen Architecture PDF bytes are unchanged.
 
 ## Known Failures, Risks, and Assumptions
@@ -60,7 +60,7 @@ Delegate a fresh independent reviewer to inspect the committed fix and run CTRL-
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-19-loop1-ctrl-002-repair-candidate.md`
+`spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-fix-candidate.md`
 
 ## Uncommitted Changes / Ownership
 
