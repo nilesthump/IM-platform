@@ -12,7 +12,7 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-SPEC-001
 
-Current Task State: ready
+Current Task State: active
 
 ## Immediately Relevant Completed Work
 
@@ -20,11 +20,11 @@ Current Task State: ready
 - `LOOP1-CTRL-002` is `done`; fresh independent Review Agent `/root/ctrl002_review3` accepted reviewed commit `d86bf1727b46b6b4f782d1ec7ad156ba35d8b2e7` from a clean detached isolated worktree under ADR-0001.
 - The CTRL-002 acceptance run passed CTRL-001 and CTRL-002 acceptance mode, rejected all six negative controls, and independently verified the immutable architecture PDF and manifest hash.
 - Durable acceptance evidence: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-d86bf17-pass.md`.
-- `LOOP1-SPEC-001` dependencies and declared inputs are satisfied, so it has moved from `backlog` to `ready`.
+- `LOOP1-SPEC-001` dependencies and declared inputs are satisfied and the task is active on `task/LOOP1-SPEC-001` under fresh Implementation Agent `/root/spec001_impl`.
 
 ## Current Blockers
 
-- None for activating `LOOP1-SPEC-001`.
+- None for implementing `LOOP1-SPEC-001`.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
@@ -39,11 +39,11 @@ Current Task State: ready
 - Command: `& .\tools\verify-loop1-ctrl-001.ps1`
   - Result: PASS, exit `0`; local transition validation, not independent acceptance evidence.
 - Command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: PASS for `LOOP1-SPEC-001` in `ready`, exit `0`; explicitly non-acceptance development output.
+  - Result: PASS for `LOOP1-SPEC-001` in `ready` before activation, exit `0`, elapsed `453.618 ms`; explicitly non-acceptance development output.
 
 ## Changed Files or Migrations
 
-- CTRL-002 closure adds its independent PASS evidence and accepted checkpoint, moves its Task Spec from `review` to `done`, promotes `LOOP1-SPEC-001` from `backlog` to `ready`, records its exact existing verifier entry point, and updates this recovery state.
+- `LOOP1-SPEC-001` is activated on branch `task/LOOP1-SPEC-001`; no specification content has been materialized yet.
 - Database migrations: none. Machine-verifiable public contract files: none. Product implementation: none. `.github/workflows/`: absent. Frozen Architecture PDF bytes are unchanged.
 
 ## Known Failures, Risks, and Assumptions
@@ -57,7 +57,7 @@ Current Task State: ready
 
 ## Next Exact Action
 
-Create `task/LOOP1-SPEC-001` from updated `main`, move the Task Spec from `ready` to `active`, assign owner `loop1-spec-implementation-agent`, then delegate a fresh implementation context to implement only that Task Spec.
+Read the exact Frozen Architecture inputs, then materialize only the minimum repository-native Auth/User/Friend, Messaging, and Sync/Plugin domain, invariant, acceptance, and traceability verifier artifacts allowed by `LOOP1-SPEC-001`.
 
 ## Last Known Good Commit
 
@@ -69,8 +69,8 @@ Create `task/LOOP1-SPEC-001` from updated `main`, move the Task Spec from `ready
 
 ## Uncommitted Changes / Ownership
 
-- The current transition edits are owned by the CTRL-002 closure writer and will be committed together; no unexplained user or other-Agent changes are known.
-- The repository must be clean after the closure and activation commits before handoff.
+- The activation transition edits are owned by `loop1-spec-implementation-agent`; no unexplained user or other-Agent changes are known.
+- The repository must be clean after the activation commit before specification implementation continues.
 
 ## Architecture Conflicts / ACP / ADR
 
