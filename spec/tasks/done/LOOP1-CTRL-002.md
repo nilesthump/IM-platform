@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CTRL-002
 title: Validate and harden Agent recovery context, current state, and Task schema
-status: review
+status: done
 owner: loop1-control-agent
 stage: S0
 gate: S0
@@ -74,7 +74,7 @@ The architect's 2026-09-19 batch-orchestration instruction explicitly authorizes
 - Post-`841b669` Fix-Agent development verification and reduced-current negative control: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-fix2-development-verification.md` (not acceptance evidence).
 - Permanent independent review FAIL for `b65a9a8`: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-b65a9a8-fail.md`.
 - Post-`b65a9a8` Fix-Agent development verification, including the clean committed S1-before-S0 negative control: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-fix3-development-verification.md` (not acceptance evidence).
-- Fresh independent acceptance evidence: pending.
+- Fresh independent acceptance evidence: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-d86bf17-pass.md`.
 
 # Handoff
 
@@ -82,11 +82,13 @@ The architect's 2026-09-19 batch-orchestration instruction explicitly authorizes
 - The complete fixed-point change inventory from `67bb82b1cd3880090095425384d52c933f0518fb` is: governance/context (`AGENTS.md`, `spec/handoff/agent-context.md`); immutable architecture (`scalable-distributed-im-architecture.pdf`, `spec/architecture/README.md`, `spec/architecture/baseline.md`, `spec/architecture/decisions/ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md`); batch (`spec/batches/LOOP1-S0.md`); recovery/checkpoints/evidence (`spec/progress/current.md`, `spec/progress/checkpoints/2026-09-19-loop1-ctrl-002-repair-candidate.md`, `spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-fix-candidate.md`, `spec/progress/evidence/README.md`, and all six CTRL-002 evidence records named above); Task Specs (`spec/tasks/backlog/LOOP1-SPEC-001.md`, the three Contract Task Specs, `spec/tasks/backlog/LOOP1-CI-001.md`, and this CTRL-002 Task Spec); and both control verifiers (`tools/verify-loop1-ctrl-001.ps1`, `tools/verify-loop1-ctrl-002.ps1`). `spec/tasks/TASK_TEMPLATE.md` was verified as the governing schema and is unchanged in this fixed-point diff.
 - Database migrations: none. Machine-verifiable public contract files: none. Product implementation: none. `.github/workflows/`: absent. Frozen Architecture PDF bytes: unchanged, SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
 - Development verification passed CTRL-001 and CTRL-002 Development mode; disposable reduced-current and clean committed S1-before-S0 controls were rejected as required. Exact commands, exit codes, and elapsed times are in the 2026-09-20 fix3 development evidence. This is not acceptance evidence.
+- Fresh independent Review Agent `/root/ctrl002_review3` accepted commit `d86bf1727b46b6b4f782d1ec7ad156ba35d8b2e7` from a clean detached isolated worktree. CTRL-001 and CTRL-002 acceptance mode passed, all six negative controls were rejected, and the architecture PDF hash and inspection facts matched the manifest. Durable evidence: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-d86bf17-pass.md`.
+- CTRL-002 is complete under ADR-0001. S0 remains NOT YET PASSED; real CI and the remaining S0 tasks are still incomplete.
 - Known non-blocking limitation: desired private-repository branch protection is unavailable on the current GitHub plan.
-- Last known good accepted commit: `53815faf92f80d425f1bd1e286d653c87f8a1087`.
-- Latest checkpoint: `spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-fix-candidate.md`; it designates exact stable recovery commit `abfea7beaf74812755471c21dea4541658a47d14` and records explicit contract, migration, image-digest, and fixture states.
-- No uncommitted changes are expected after this Fix Agent commits the repair; any later dirty state must be identified before work continues. Architecture conflict requiring human action: none.
+- Last known good accepted commit: `d86bf1727b46b6b4f782d1ec7ad156ba35d8b2e7`.
+- Latest accepted checkpoint: `spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-accepted.md`.
+- No uncommitted changes are owned by CTRL-002 after its closure commit. Architecture conflict requiring human action: none.
 
 # Next Action
 
-- Delegate a new fresh independent reviewer to inspect the fix commit and run CTRL-001 plus CTRL-002 in default acceptance mode from a clean isolated checkout. Move LOOP1-CTRL-002 to `done/` only after PASS; do not claim S0 Gate PASS.
+- Complete: `LOOP1-SPEC-001` may now activate from `ready` on its dedicated task branch; do not claim S0 Gate PASS or enter S1.
