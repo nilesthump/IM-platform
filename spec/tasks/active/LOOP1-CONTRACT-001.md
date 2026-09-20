@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CONTRACT-001
 title: Freeze HTTP Auth, User, and Friend contracts
-status: ready
-owner: unassigned
+status: active
+owner: loop1-contract-001-implementation-agent
 stage: S0
 gate: S0
 ---
@@ -56,11 +56,12 @@ Define the canonical HTTP Auth/User/Friend OpenAPI contract, shared errors, and 
 - Dependency `LOOP1-CTRL-002` is `done` with independent acceptance evidence at `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-d86bf17-pass.md`.
 - Dependency `LOOP1-SPEC-001` is `done` with independent acceptance evidence at `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
 - Required inputs `spec/domain/auth-user-friend.md`, `spec/invariants/auth-user-friend.md`, and `spec/acceptance/s0-auth-user-friend.md` are present and were independently accepted as part of reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b`.
+- Activated from local `main` closure commit `e5482b135a2ab7451c24c29c7517e1a8f19ce420` on dedicated branch `task/LOOP1-CONTRACT-001` after dependency and input validation.
 
 # Handoff
 
-- Ready and unassigned; no contract implementation has started.
+- Active and assigned to fresh Implementation Agent identity `loop1-contract-001-implementation-agent`; no contract implementation has started at activation handoff.
 
 # Next Action
 
-- Activate on a dedicated task branch with a fresh Implementation Agent, then define only the HTTP Auth/User/Friend contracts, shared errors, and positive/negative golden fixtures within `allowed_paths`.
+- A fresh Implementation Agent must read all declared authority inputs, then define only the HTTP Auth/User/Friend contracts, shared errors, and positive/negative golden fixtures within `allowed_paths`; prepare deterministic schema lint and fixture verification before review.

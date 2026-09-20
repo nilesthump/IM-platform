@@ -12,7 +12,7 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CONTRACT-001
 
-Current Task State: ready
+Current Task State: active
 
 ## Immediately Relevant Completed Work
 
@@ -21,11 +21,11 @@ Current Task State: ready
 - The independent review passed the 9-file/84-rule materialization verifier, CTRL-002 Acceptance mode, and baseline diff check; all eight disposable negative controls were rejected.
 - Durable acceptance evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
 - Accepted checkpoint: `spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md`.
-- `LOOP1-CONTRACT-001` dependencies and all three repository-native Auth/User/Friend inputs are satisfied, so it is `ready`.
+- `LOOP1-CONTRACT-001` dependencies and all three repository-native Auth/User/Friend inputs are satisfied; it is active on `task/LOOP1-CONTRACT-001` and assigned to fresh Implementation Agent identity `loop1-contract-001-implementation-agent`.
 
 ## Current Blockers
 
-- None for activating `LOOP1-CONTRACT-001` with a fresh Implementation Agent.
+- None for the fresh Implementation Agent to begin `LOOP1-CONTRACT-001` within its allowed contract scope.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
@@ -58,7 +58,7 @@ Current Task State: ready
 
 ## Next Exact Action
 
-Create `task/LOOP1-CONTRACT-001` from the accepted local `main`, move `LOOP1-CONTRACT-001` from `ready` to `active`, assign a fresh Implementation Agent, and implement only its authorized contract scope. Do not claim S0 Gate PASS.
+Delegate implementation to a fresh `LOOP1-CONTRACT-001` Implementation Agent on the current task branch. It must define only the canonical HTTP Auth/User/Friend contract, shared errors, and positive/negative golden fixtures, add deterministic task verification within the authorized paths, and hand off for fresh independent review. Do not claim S0 Gate PASS.
 
 ## Last Known Good Commit
 
@@ -70,8 +70,8 @@ Create `task/LOOP1-CONTRACT-001` from the accepted local `main`, move `LOOP1-CON
 
 ## Uncommitted Changes / Ownership
 
-- Closure-state edits are owned by Coordinator transition writer `/root/spec001_close` until committed.
-- No unexplained user or other-Agent changes are known.
+- No uncommitted changes remain at activation handoff; no unexplained user or other-Agent changes are known.
+- The committed activation transition is owned by Coordinator transition writer `/root/spec001_close`; subsequent implementation ownership belongs only to the fresh `LOOP1-CONTRACT-001` Implementation Agent.
 
 ## Architecture Conflicts / ACP / ADR
 
