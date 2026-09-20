@@ -57,13 +57,20 @@ Materialize the minimum repository-native domain, invariant, and executable acce
 - Clean implementation verification: `& .\spec\acceptance\verify-s0-spec-materialization.ps1`, exit `0`, elapsed `108.4403 ms`; 9 files and 83 unique, cited rules verified.
 - Clean recovery verification: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`, exit `0`, elapsed `367.5828 ms`; explicitly development evidence, not acceptance.
 - Durable development evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-development-8dbe190-pass.md`.
+- Fresh independent Review Agent `/root/spec001_review2` reviewed `74134bd306cbf0a1546f500bc46c45a1217b2d58` from a clean detached isolated worktree and returned FAIL. Permanent evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-74134bd-fail.md`.
+- The FAIL identified invented Plugin Action rate limiting, missing Action idempotency/repeated-Action coverage, `import checks` instead of chapter 8.2 `entry-point checks`, and EOF whitespace in all three domain plus all three acceptance inputs.
+- Fresh Fix Agent `/root/spec001_fix` repaired those findings at content commit `10aaba0750bc38031589fc2821c6b6cec567a7e6`: chapter 8.1 Action semantics are now re-authorization, idempotency, and audit; `SP-A-013` checks repeated-Action idempotent convergence without defining wire fields; Renderer validation uses `entry-point checks`; and all reported EOF whitespace is removed.
+- Fix verification: `& .\spec\acceptance\verify-s0-spec-materialization.ps1`, exit `0`, elapsed `128.4595 ms`; 9 files and 84 unique cited rules verified.
+- Recovery verification: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`, exit `0`, elapsed `465.0543 ms`; explicitly non-acceptance development output.
+- Whitespace verification: `git diff --check e324e74b028ecb08f019ab2dccc2c377ea72f7d6`, exit `0`, elapsed `42.7957 ms`.
+- Durable fix evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-fix-development-10aaba0-pass.md`.
 - S0 remains NOT YET PASSED.
 
 # Handoff
 
-- Fresh Implementation Agent `/root/spec001_impl` materialized all nine required domain/invariant/acceptance inputs and the deterministic verifier without changing contracts, migrations, product code, workflows, or Frozen Architecture bytes.
-- The task is ready for a fresh independent Review Agent under ADR-0001. The implementer has not self-accepted it. Last known good accepted commit remains `d86bf1727b46b6b4f782d1ec7ad156ba35d8b2e7`; latest accepted checkpoint remains `spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-accepted.md`. Architecture conflict: none.
+- Fresh Implementation Agent `/root/spec001_impl` materialized the original inputs; fresh Fix Agent `/root/spec001_fix` repaired the independent review findings. Neither agent has self-accepted the task.
+- The task remains in `review` and is ready for a new fresh independent Review Agent under ADR-0001. Last known good accepted commit remains `e324e74b028ecb08f019ab2dccc2c377ea72f7d6`; latest accepted checkpoint remains `spec/progress/checkpoints/2026-09-20-loop1-ctrl-002-accepted.md`. Architecture conflict: none.
 
 # Next Action
 
-- Delegate a fresh independent Review Agent to review the committed handoff from a clean checkout, run `& .\spec\acceptance\verify-s0-spec-materialization.ps1` and `& .\tools\verify-loop1-ctrl-002.ps1`, and record ADR-0001 evidence as PASS or FAIL.
+- Delegate a new fresh independent Review Agent to review the final committed fix handoff from a clean isolated checkout, recheck the prior findings, run `& .\spec\acceptance\verify-s0-spec-materialization.ps1`, `& .\tools\verify-loop1-ctrl-002.ps1`, and `git diff --check e324e74b028ecb08f019ab2dccc2c377ea72f7d6`, and record ADR-0001 evidence as PASS or FAIL.
