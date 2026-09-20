@@ -82,6 +82,9 @@ foreach ($relativePath in $syncPluginPaths) {
     if ($content -match '(?i)Action[^\r\n|]*rate[- ]limit') {
         $failures += "invented Action rate-limiting requirement: $relativePath"
     }
+    if ($content -match '(?i)\bimport[- ]checks?\b') {
+        $failures += "incorrect renderer import-check requirement: $relativePath"
+    }
 }
 
 $syncPluginDomain = Get-Content -LiteralPath (Join-Path $repoRoot 'spec/domain/sync-plugin.md') -Raw
@@ -95,6 +98,62 @@ if ($syncPluginInvariants -notmatch '(?m)^\| SP-I-006 \| .*each Action MUST be r
 }
 if ($syncPluginAcceptance -notmatch '(?m)^\| SP-A-013 \| .*repeated execution of the same Action.*one idempotent observable outcome.*no duplicate side effect.*audit evidence') {
     $failures += 'missing repeated-Action idempotent-outcome acceptance requirement: spec/acceptance/s0-sync-plugin.md SP-A-013'
+}
+
+function Test-RuleSemantics {
+    param(
+        [string]$Content,
+        [string]$RuleId,
+        [string[]]$RequiredPatterns
+    )
+
+    $ruleRows = @($Content -split "`r?`n" | Where-Object { $_ -match "^\| $([regex]::Escape($RuleId)) \|" })
+    if ($ruleRows.Count -ne 1) {
+        return $false
+    }
+
+    foreach ($pattern in $RequiredPatterns) {
+        if ($ruleRows[0] -notmatch $pattern) {
+            return $false
+        }
+    }
+    return $true
+}
+
+$rendererDomainPatterns = @(
+    '(?i)custom renderer',
+    '(?i)MUST pass',
+    '(?i)package hash',
+    '(?i)signature',
+    '(?i)manifest[- ]schema',
+    '(?i)API[- ]compatibility',
+    '(?i)permission',
+    '(?i)resource[- ]size',
+    '(?i)CSP',
+    '(?i)entry[- ]point checks?',
+    '(?i)before loading',
+    '(?i)MUST run.*UI sandbox'
+)
+if (-not (Test-RuleSemantics -Content $syncPluginDomain -RuleId 'SP-D-009' -RequiredPatterns $rendererDomainPatterns)) {
+    $failures += 'incomplete chapter 8.2 renderer validation semantics: spec/domain/sync-plugin.md SP-D-009'
+}
+
+$rendererAcceptancePatterns = @(
+    '(?i)renderer-negative fixtures',
+    '(?i)MUST reject failures',
+    '(?i)hash',
+    '(?i)signature',
+    '(?i)manifest[- ]schema',
+    '(?i)API[- ]compatibility',
+    '(?i)permission',
+    '(?i)resource[- ]size',
+    '(?i)CSP',
+    '(?i)entry[- ]point checks?',
+    '(?i)runtime probes',
+    '(?i)MUST verify.*UI sandbox boundary'
+)
+if (-not (Test-RuleSemantics -Content $syncPluginAcceptance -RuleId 'SP-A-008' -RequiredPatterns $rendererAcceptancePatterns)) {
+    $failures += 'incomplete chapter 8.2 renderer-negative acceptance semantics: spec/acceptance/s0-sync-plugin.md SP-A-008'
 }
 
 $duplicates = @($allRuleIds | Group-Object | Where-Object Count -gt 1 | Select-Object -ExpandProperty Name)
