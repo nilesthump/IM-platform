@@ -101,6 +101,8 @@ foreach ($field in $currentFieldPatterns.Keys) {
 }
 $taskIdMatch = [regex]::Match($current, '(?m)^Current Task:\s*`?([A-Z][A-Z0-9-]+)`?\s*$')
 $taskStateMatch = [regex]::Match($current, '(?m)^Current Task State:\s*`?(backlog|ready|active|review|done)`?\s*$')
+$currentGateMatch = [regex]::Match($current, '(?m)^Current Gate:\s*`?([^`\r\n]+)`?\s*$')
+$gateStatusMatch = [regex]::Match($current, '(?m)^Gate Status:\s*`?([^`\r\n]+)`?\s*$')
 if (-not $taskIdMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task ID.' }
 if (-not $taskStateMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task State.' }
 
@@ -188,6 +190,19 @@ foreach ($taskFile in $taskFiles) {
     $statusMatch = [regex]::Match($content, '(?m)^status:\s*(backlog|ready|active|review|done)\s*$')
     if (-not $idMatch.Success -or $idMatch.Groups[1].Value -ne $taskFile.BaseName) { Add-Failure "Task ID/file mismatch: $($taskFile.FullName)" }
     if (-not $statusMatch.Success -or $statusMatch.Groups[1].Value -ne $taskFile.Directory.Name) { Add-Failure "Task queue/status mismatch: $($taskFile.FullName)" }
+}
+
+if ($currentGateMatch.Success -and $gateStatusMatch.Success) {
+    $currentGate = $currentGateMatch.Groups[1].Value.Trim()
+    $gateStatus = $gateStatusMatch.Groups[1].Value.Trim()
+    $activeS1Tasks = @($taskFiles | Where-Object {
+        $_.Directory.Name -eq 'active' -and
+        (Get-Content -Raw $_.FullName) -match '(?m)^stage:\s*S1\s*$'
+    })
+    if ($currentGate -eq 'S0' -and $gateStatus -ne 'PASS' -and $activeS1Tasks.Count -gt 0) {
+        $activeS1Ids = @($activeS1Tasks | ForEach-Object { $_.BaseName })
+        Add-Failure "S1 task(s) active before S0 Gate PASS: $($activeS1Ids -join ', ')"
+    }
 }
 
 $architectureIndexPath = Join-Path $repoRoot 'spec/architecture/README.md'

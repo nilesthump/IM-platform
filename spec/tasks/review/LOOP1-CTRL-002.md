@@ -21,7 +21,7 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 
 # Dependencies
 
-- LOOP1-CTRL-001 done with independent CI acceptance.
+- LOOP1-CTRL-001 done with accepted bootstrap closure recorded in its Task/checkpoint.
 
 # Allowed Paths
 
@@ -72,19 +72,19 @@ The architect's 2026-09-19 batch-orchestration instruction explicitly authorizes
 - Permanent independent review FAIL for `841b669`: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-independent-review-841b669-fail.md`.
 - Fix-Agent development verification: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-fix-development-verification.md` (not acceptance evidence).
 - Post-`841b669` Fix-Agent development verification and reduced-current negative control: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-fix2-development-verification.md` (not acceptance evidence).
+- Permanent independent review FAIL for `b65a9a8`: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-b65a9a8-fail.md`.
+- Post-`b65a9a8` Fix-Agent development verification, including the clean committed S1-before-S0 negative control: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-fix3-development-verification.md` (not acceptance evidence).
 - Fresh independent acceptance evidence: pending.
 
 # Handoff
 
-- Review repair covers every inherited finding: generic cross-queue recovery, real input/index/hash/git verification, clean acceptance mode, durable evidence, concise current state, repository-resident architecture resolution, bootstrap CI ADR, S0 batch manifest, and the missing spec-producer dependency.
-- `tools/verify-loop1-ctrl-001.ps1` accepts the legal PDF/index/manifest/ADR and additional Task Spec without treating them as duplicate authority; the PDF remains tracked with its original bytes.
-- Independent review of `841b669` failed because current-state chapter 13 fields were not structurally verified, `.gitattributes` was outside `allowed_paths`, and recovery handoff text was stale. This fix removes that file and makes all required current-state fields non-empty and machine-checked in both modes.
-- Changed files: `.gitattributes` (removed), `tools/verify-loop1-ctrl-001.ps1`, `tools/verify-loop1-ctrl-002.ps1`, `spec/progress/current.md`, this Task Spec, and the two durable review/fix evidence files. Database migrations: none.
-- Fix verification passed CTRL-001 and CTRL-002 Development mode; a disposable reduced-current negative control failed as required. Exact commands, exit codes, and elapsed times are in the 2026-09-20 durable development evidence. This is not acceptance evidence.
-- Frozen Architecture bytes are unchanged from the architect-supplied asset; no public contract, domain semantics, migration, product implementation, or `.github/workflows/` was created.
+- Review repair covers generic cross-queue recovery, real input/index/hash/git verification, clean acceptance mode, chapter 13 fields, durable evidence, repository-resident architecture resolution, bootstrap CI ADR, the S0 batch, the missing spec-producer dependency, and generic rejection of active S1 tasks before S0 Gate PASS.
+- The complete fixed-point change inventory from `67bb82b1cd3880090095425384d52c933f0518fb` is: governance/context (`AGENTS.md`, `spec/handoff/agent-context.md`); immutable architecture (`scalable-distributed-im-architecture.pdf`, `spec/architecture/README.md`, `spec/architecture/baseline.md`, `spec/architecture/decisions/ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md`); batch (`spec/batches/LOOP1-S0.md`); recovery/checkpoints/evidence (`spec/progress/current.md`, both CTRL-002 checkpoint files, `spec/progress/evidence/README.md`, and all six CTRL-002 evidence records); Task Specs (`spec/tasks/backlog/LOOP1-SPEC-001.md`, the three Contract Task Specs, `spec/tasks/backlog/LOOP1-CI-001.md`, and this CTRL-002 Task Spec); and both control verifiers (`tools/verify-loop1-ctrl-001.ps1`, `tools/verify-loop1-ctrl-002.ps1`). `spec/tasks/TASK_TEMPLATE.md` was verified as the governing schema and is unchanged in this fixed-point diff.
+- Database migrations: none. Machine-verifiable public contract files: none. Product implementation: none. `.github/workflows/`: absent. Frozen Architecture PDF bytes: unchanged, SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
+- Development verification passed CTRL-001 and CTRL-002 Development mode; disposable reduced-current and clean committed S1-before-S0 controls were rejected as required. Exact commands, exit codes, and elapsed times are in the 2026-09-20 fix3 development evidence. This is not acceptance evidence.
 - Known non-blocking limitation: desired private-repository branch protection is unavailable on the current GitHub plan.
 - Last known good accepted commit: `53815faf92f80d425f1bd1e286d653c87f8a1087`.
-- Latest checkpoint: `spec/progress/checkpoints/2026-09-19-loop1-ctrl-002-repair-candidate.md`.
+- Latest checkpoint metadata will be finalized in a second commit after the exact first repair commit is known; until then, recovery still points to `spec/progress/checkpoints/2026-09-19-loop1-ctrl-002-repair-candidate.md`.
 - No uncommitted changes are expected after this Fix Agent commits the repair; any later dirty state must be identified before work continues. Architecture conflict requiring human action: none.
 
 # Next Action
