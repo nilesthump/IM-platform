@@ -12,7 +12,6 @@ function Require-Path([string]$relativePath, [string]$kind = 'Any') {
 }
 
 $requiredFiles = @(
-    '.gitattributes',
     'AGENTS.md',
     'CLAUDE.md',
     'README.md',

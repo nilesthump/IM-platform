@@ -28,6 +28,13 @@ function Get-Section([string]$content, [string]$heading) {
     return $match.Groups[1].Value
 }
 
+function Get-CurrentSection([string]$content, [string]$heading) {
+    $pattern = "(?ms)^## $([regex]::Escape($heading))\s*\r?\n(.*?)(?=^## |\z)"
+    $match = [regex]::Match($content, $pattern)
+    if (-not $match.Success) { return '' }
+    return $match.Groups[1].Value
+}
+
 function Invoke-Git([string[]]$arguments, [string]$purpose) {
     $output = @(& git -C $repoRoot -c core.excludesFile=.git/info/exclude @arguments 2>&1)
     if ($LASTEXITCODE -ne 0) {
@@ -79,10 +86,72 @@ foreach ($requiredRule in @('review', 'active', 'ready', 'backlog', 'done', 'Nev
 
 $currentPath = Join-Path $repoRoot 'spec/progress/current.md'
 $current = if (Test-Path -LiteralPath $currentPath) { Get-Content -Raw $currentPath } else { '' }
+$currentFieldPatterns = @{
+    'Current Loop' = '(?m)^Current Loop:\s*\S.+$'
+    'Current Stage' = '(?m)^Current Stage:\s*\S.+$'
+    'Current Gate' = '(?m)^Current Gate:\s*\S.+$'
+    'Gate Status' = '(?m)^Gate Status:\s*\S.+$'
+    'Current Batch' = '(?m)^Current Batch:\s*\S.+$'
+}
+if ($current -notmatch '(?m)^# Current Execution State\s*$') {
+    Add-Failure 'current.md is missing the Current Execution State heading.'
+}
+foreach ($field in $currentFieldPatterns.Keys) {
+    if ($current -notmatch $currentFieldPatterns[$field]) { Add-Failure "current.md is missing non-empty field: $field" }
+}
 $taskIdMatch = [regex]::Match($current, '(?m)^Current Task:\s*`?([A-Z][A-Z0-9-]+)`?\s*$')
 $taskStateMatch = [regex]::Match($current, '(?m)^Current Task State:\s*`?(backlog|ready|active|review|done)`?\s*$')
 if (-not $taskIdMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task ID.' }
 if (-not $taskStateMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task State.' }
+
+$requiredCurrentSections = @(
+    'Immediately Relevant Completed Work',
+    'Current Blockers',
+    'Verification',
+    'Changed Files or Migrations',
+    'Known Failures, Risks, and Assumptions',
+    'Next Exact Action',
+    'Last Known Good Commit',
+    'Latest Checkpoint',
+    'Uncommitted Changes / Ownership',
+    'Architecture Conflicts / ACP / ADR'
+)
+foreach ($heading in $requiredCurrentSections) {
+    if ([string]::IsNullOrWhiteSpace((Get-CurrentSection $current $heading))) {
+        Add-Failure "current.md is missing a non-empty ## $heading section."
+    }
+}
+
+$currentVerification = Get-CurrentSection $current 'Verification'
+if ($currentVerification -notmatch '(?m)^- Command:\s*`[^`]+`\s*$') { Add-Failure 'current.md Verification is missing an exact command.' }
+if ($currentVerification -notmatch '(?m)^\s+- Result:\s*\S.+$') { Add-Failure 'current.md Verification is missing a non-empty result.' }
+$currentEvidenceMatches = [regex]::Matches($currentVerification, '(?m)^\s+- Evidence:\s*`([^`]+)`\s*$')
+if ($currentEvidenceMatches.Count -eq 0) {
+    Add-Failure 'current.md Verification is missing a durable evidence path.'
+} else {
+    foreach ($evidenceMatch in $currentEvidenceMatches) {
+        $evidencePath = $evidenceMatch.Groups[1].Value
+        if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $evidencePath) -PathType Leaf)) {
+            Add-Failure "current.md Verification evidence does not exist: $evidencePath"
+        }
+    }
+}
+
+$lastKnownGoodSection = Get-CurrentSection $current 'Last Known Good Commit'
+$lastKnownGoodMatch = [regex]::Match($lastKnownGoodSection, '`([0-9a-fA-F]{40})`')
+if (-not $lastKnownGoodMatch.Success) {
+    Add-Failure 'current.md Last Known Good Commit is missing a full commit SHA.'
+} else {
+    [void](Invoke-Git @('cat-file', '-e', "$($lastKnownGoodMatch.Groups[1].Value)^{commit}") 'Last Known Good Commit')
+}
+
+$checkpointSection = Get-CurrentSection $current 'Latest Checkpoint'
+$checkpointMatch = [regex]::Match($checkpointSection, '`(spec/progress/checkpoints/[^`]+\.md)`')
+if (-not $checkpointMatch.Success) {
+    Add-Failure 'current.md Latest Checkpoint is missing a repository checkpoint path.'
+} elseif (-not (Test-Path -LiteralPath (Join-Path $repoRoot $checkpointMatch.Groups[1].Value) -PathType Leaf)) {
+    Add-Failure "current.md Latest Checkpoint does not exist: $($checkpointMatch.Groups[1].Value)"
+}
 
 $taskFiles = @()
 foreach ($queue in $queueNames) {

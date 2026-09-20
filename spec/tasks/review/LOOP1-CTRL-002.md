@@ -15,7 +15,6 @@ Validate and harden the handoff context, current-state document, and Task Spec s
 
 - Architecture Baseline v1.0 chapters 10, 12, 13, 19 and 21, resolved through `spec/architecture/README.md`.
 - `AGENTS.md`
-- `.gitattributes`
 - `spec/handoff/agent-context.md`
 - `spec/progress/current.md`
 - `spec/tasks/TASK_TEMPLATE.md`
@@ -70,19 +69,24 @@ The architect's 2026-09-19 batch-orchestration instruction explicitly authorizes
 
 - Dependency evidence: LOOP1-CTRL-001 is in `done/`.
 - Permanent prior independent FAIL: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-independent-review-fail.md`.
+- Permanent independent review FAIL for `841b669`: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-independent-review-841b669-fail.md`.
 - Fix-Agent development verification: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-fix-development-verification.md` (not acceptance evidence).
+- Post-`841b669` Fix-Agent development verification and reduced-current negative control: `spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-fix2-development-verification.md` (not acceptance evidence).
 - Fresh independent acceptance evidence: pending.
 
 # Handoff
 
 - Review repair covers every inherited finding: generic cross-queue recovery, real input/index/hash/git verification, clean acceptance mode, durable evidence, concise current state, repository-resident architecture resolution, bootstrap CI ADR, S0 batch manifest, and the missing spec-producer dependency.
-- `tools/verify-loop1-ctrl-001.ps1` now accepts the legal PDF/index/manifest/ADR and additional Task Spec without treating them as duplicate authority; `.gitattributes` keeps the immutable PDF binary in Git tooling.
+- `tools/verify-loop1-ctrl-001.ps1` accepts the legal PDF/index/manifest/ADR and additional Task Spec without treating them as duplicate authority; the PDF remains tracked with its original bytes.
+- Independent review of `841b669` failed because current-state chapter 13 fields were not structurally verified, `.gitattributes` was outside `allowed_paths`, and recovery handoff text was stale. This fix removes that file and makes all required current-state fields non-empty and machine-checked in both modes.
+- Changed files: `.gitattributes` (removed), `tools/verify-loop1-ctrl-001.ps1`, `tools/verify-loop1-ctrl-002.ps1`, `spec/progress/current.md`, this Task Spec, and the two durable review/fix evidence files. Database migrations: none.
+- Fix verification passed CTRL-001 and CTRL-002 Development mode; a disposable reduced-current negative control failed as required. Exact commands, exit codes, and elapsed times are in the 2026-09-20 durable development evidence. This is not acceptance evidence.
 - Frozen Architecture bytes are unchanged from the architect-supplied asset; no public contract, domain semantics, migration, product implementation, or `.github/workflows/` was created.
 - Known non-blocking limitation: desired private-repository branch protection is unavailable on the current GitHub plan.
 - Last known good accepted commit: `53815faf92f80d425f1bd1e286d653c87f8a1087`.
 - Latest checkpoint: `spec/progress/checkpoints/2026-09-19-loop1-ctrl-002-repair-candidate.md`.
-- All repair changes are owned by the fresh LOOP1-CTRL-002 Fix Agent. Architecture conflict requiring human action: none.
+- No uncommitted changes are expected after this Fix Agent commits the repair; any later dirty state must be identified before work continues. Architecture conflict requiring human action: none.
 
 # Next Action
 
-- Commit this repair, then run a fresh independent acceptance review from a clean isolated checkout. Move LOOP1-CTRL-002 to `done/` only after PASS; do not claim S0 Gate PASS.
+- Delegate a new fresh independent reviewer to inspect the fix commit and run CTRL-001 plus CTRL-002 in default acceptance mode from a clean isolated checkout. Move LOOP1-CTRL-002 to `done/` only after PASS; do not claim S0 Gate PASS.
