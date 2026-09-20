@@ -5,207 +5,1023 @@
     "version": "1.0.0",
     "description": "Canonical Loop 1 HTTP contract. Production transport is HTTPS only. Authentication material is never accepted in URL query parameters and must not be logged or returned in errors. PostgreSQL-backed session and friendship transactions are authoritative."
   },
-  "servers": [{ "url": "https://api.example.invalid" }],
+  "servers": [
+    {
+      "url": "https://api.example.invalid"
+    }
+  ],
   "tags": [
-    { "name": "Auth" },
-    { "name": "Users" },
-    { "name": "Friends" }
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Friends"
+    }
   ],
   "paths": {
     "/v1/auth/register": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "operationId": "registerUser",
         "security": [],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RegisterRequest" } } } },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
         "responses": {
-          "201": { "description": "User registered", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponse" } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "409": { "$ref": "#/components/responses/Conflict" }
+          "201": {
+            "description": "User registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict",
+            "x-error-codes": [
+              "USERNAME_ALREADY_EXISTS"
+            ]
+          }
         }
       }
     },
     "/v1/auth/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "operationId": "login",
         "security": [],
         "description": "A successful login atomically revokes any active session in the same user/clientType slot, increments that slot's sessionEpoch, creates the replacement session, and only then returns it. Other clientType slots remain valid.",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } } },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "Login committed", "headers": { "Set-Cookie": { "description": "For WEB, a Secure HttpOnly SameSite cookie carries the refresh token; its value is intentionally unspecified.", "schema": { "type": "string" } } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResult" } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "426": { "$ref": "#/components/responses/UnsupportedProtocol" }
-        }
-      }
-    },
-    "/v1/auth/refresh": {
-      "post": {
-        "tags": ["Auth"],
-        "operationId": "refreshSession",
-        "security": [{ "refreshCookie": [] }, {}],
-        "description": "WEB supplies the refresh credential only in the Secure HttpOnly cookie. DESKTOP and MOBILE supply it only in the JSON body. A valid refresh belongs to the declared clientType and current session epoch. A successful refresh rotates and independently revokes the presented refresh token.",
-        "requestBody": { "required": false, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RefreshRequest" } } } },
-        "responses": {
-          "200": { "description": "Refresh committed", "headers": { "Set-Cookie": { "description": "Rotated WEB refresh cookie when clientType is WEB.", "schema": { "type": "string" } } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResult" } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "426": { "$ref": "#/components/responses/UnsupportedProtocol" }
+          "200": {
+            "description": "Login committed",
+            "headers": {
+              "Set-Cookie": {
+                "description": "For WEB only, __Host-im_refresh is emitted with Secure, HttpOnly, Path=/, and SameSite=Strict attributes; native clients never receive this cookie.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_INVALID_CREDENTIALS"
+            ]
+          },
+          "426": {
+            "$ref": "#/components/responses/UnsupportedProtocol",
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ]
+          }
         }
       }
     },
     "/v1/auth/logout": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "operationId": "logout",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Atomically revokes the bound session and every refresh token issued for it. The service then emits the session revocation effect and closes its WSS connection. Local client history is not deleted.",
         "responses": {
-          "204": { "description": "Session and refresh credentials revoked; no response body" },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "204": {
+            "description": "Session and refresh credentials revoked; no response body"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
         }
       }
     },
     "/v1/users/me": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "operationId": "getCurrentUser",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Current user", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponse" } } } },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "200": {
+            "description": "Current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
         }
       }
     },
     "/v1/users/search": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "operationId": "searchUsers",
-        "security": [{ "bearerAuth": [] }],
-        "parameters": [{ "name": "username", "in": "query", "required": true, "schema": { "$ref": "#/components/schemas/Username" } }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Username"
+            }
+          }
+        ],
         "responses": {
-          "200": { "description": "Exact normalized username match or an empty list", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": false, "required": ["users"], "properties": { "users": { "type": "array", "maxItems": 1, "items": { "$ref": "#/components/schemas/PublicUser" } } } } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "200": {
+            "description": "Exact normalized username match or an empty list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "users"
+                  ],
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "items": {
+                        "$ref": "#/components/schemas/PublicUser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
         }
       }
     },
     "/v1/friends": {
       "get": {
-        "tags": ["Friends"],
+        "tags": [
+          "Friends"
+        ],
         "operationId": "listFriends",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Current bidirectional friendships", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": false, "required": ["friends"], "properties": { "friends": { "type": "array", "items": { "$ref": "#/components/schemas/FriendView" } } } } } } },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "200": {
+            "description": "Current bidirectional friendships",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "friends"
+                  ],
+                  "properties": {
+                    "friends": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FriendView"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
         }
       }
     },
     "/v1/friends/{friendUserId}": {
       "put": {
-        "tags": ["Friends"],
+        "tags": [
+          "Friends"
+        ],
         "operationId": "addFriend",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Idempotently establishes an immediate bidirectional friendship. The normalized friendship, the pair's single DIRECT conversation, exactly two memberships, user sync events, and outbox effects commit atomically. There is no pending or approval state. Reversing caller and target returns the same friendshipId and directConversationId.",
-        "parameters": [{ "name": "friendUserId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Id" } }],
+        "parameters": [
+          {
+            "name": "friendUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
         "responses": {
-          "200": { "description": "Existing normalized friendship returned", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FriendshipResult" } } } },
-          "201": { "description": "Friendship and DIRECT conversation atomically created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FriendshipResult" } } } },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" },
-          "409": { "$ref": "#/components/responses/Conflict" },
-          "422": { "$ref": "#/components/responses/Unprocessable" }
+          "200": {
+            "description": "Existing normalized friendship returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FriendshipResult"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Friendship and DIRECT conversation atomically created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FriendshipResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "x-error-codes": [
+              "AUTHORIZATION_DENIED"
+            ]
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "x-error-codes": [
+              "USER_NOT_FOUND"
+            ]
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict",
+            "x-error-codes": [
+              "FRIENDSHIP_STATE_CONFLICT"
+            ]
+          },
+          "422": {
+            "$ref": "#/components/responses/Unprocessable",
+            "x-error-codes": [
+              "FRIEND_SELF_NOT_ALLOWED"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/auth/refresh/web": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "refreshWebSession",
+        "security": [
+          {
+            "refreshCookie": []
+          }
+        ],
+        "description": "WEB must present the refresh credential only in the __Host-im_refresh Secure HttpOnly cookie. The required body supplies client metadata but cannot carry a refresh token. A successful refresh rotates and independently revokes the presented refresh token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebRefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "WEB refresh committed",
+            "headers": {
+              "Set-Cookie": {
+                "description": "The rotated __Host-im_refresh cookie is emitted with Secure, HttpOnly, Path=/, and SameSite=Strict attributes.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH",
+              "AUTH_REFRESH_REVOKED"
+            ]
+          },
+          "426": {
+            "$ref": "#/components/responses/UnsupportedProtocol",
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/auth/refresh/native": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "refreshNativeSession",
+        "security": [],
+        "description": "DESKTOP and MOBILE must present a nonempty refresh token together with clientType, deviceId, clientVersion, and protocolVersion in the required JSON body. WEB is not representable on this operation. A successful refresh rotates and independently revokes the presented refresh token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NativeRefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Native refresh committed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH",
+              "AUTH_REFRESH_REVOKED"
+            ]
+          },
+          "426": {
+            "$ref": "#/components/responses/UnsupportedProtocol",
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ]
+          }
         }
       }
     }
   },
   "components": {
     "securitySchemes": {
-      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT", "description": "Short-lived access token carrying user_id, session_id, client_type, session_epoch, iat, and exp claims. It is accepted only from the Authorization header." },
-      "refreshCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-im_refresh", "description": "Long-lived WEB refresh token. The server persists only its hash and can revoke it independently." }
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Short-lived access token carrying user_id, session_id, client_type, session_epoch, iat, and exp claims. It is accepted only from the Authorization header."
+      },
+      "refreshCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-im_refresh",
+        "description": "Long-lived WEB refresh token received only as a Secure HttpOnly SameSite cookie. The server persists only its hash and can revoke it independently."
+      }
     },
     "schemas": {
-      "Id": { "type": "string", "format": "uuid" },
-      "Username": { "type": "string", "minLength": 3, "maxLength": 64, "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$", "description": "Uniqueness is evaluated using the server's canonical lowercase normalization." },
-      "Password": { "type": "string", "format": "password", "minLength": 12, "maxLength": 256, "writeOnly": true },
-      "ClientType": { "type": "string", "enum": ["WEB", "DESKTOP", "MOBILE"] },
-      "SessionStatus": { "type": "string", "enum": ["ACTIVE", "REVOKED"] },
-      "RegisterRequest": {
-        "type": "object", "additionalProperties": false, "required": ["username", "password", "displayName"],
-        "properties": { "username": { "$ref": "#/components/schemas/Username" }, "password": { "$ref": "#/components/schemas/Password" }, "displayName": { "type": "string", "minLength": 1, "maxLength": 128 } }
+      "Id": {
+        "type": "string",
+        "format": "uuid"
       },
-      "LoginRequest": {
-        "type": "object", "additionalProperties": false, "required": ["username", "password", "clientType", "deviceId", "clientVersion", "protocolVersion"],
-        "properties": {
-          "username": { "$ref": "#/components/schemas/Username" }, "password": { "$ref": "#/components/schemas/Password" }, "clientType": { "$ref": "#/components/schemas/ClientType" },
-          "deviceId": { "type": "string", "minLength": 1, "maxLength": 256 }, "clientVersion": { "type": "string", "minLength": 1, "maxLength": 64 }, "protocolVersion": { "type": "string", "const": "1" }
-        }
+      "Username": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 64,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+        "description": "Uniqueness is evaluated using the server's canonical lowercase normalization."
       },
-      "RefreshRequest": {
-        "type": "object", "additionalProperties": false, "required": ["clientType", "clientVersion", "protocolVersion"],
-        "properties": {
-          "refreshToken": { "type": "string", "minLength": 1, "writeOnly": true, "description": "Required for DESKTOP and MOBILE and forbidden for WEB; WEB uses the Secure HttpOnly cookie." },
-          "clientType": { "$ref": "#/components/schemas/ClientType" }, "clientVersion": { "type": "string", "minLength": 1, "maxLength": 64 }, "protocolVersion": { "type": "string", "const": "1" }
-        },
-        "allOf": [
-          { "if": { "properties": { "clientType": { "const": "WEB" } }, "required": ["clientType"] }, "then": { "not": { "required": ["refreshToken"] } }, "else": { "required": ["refreshToken"] } }
+      "Password": {
+        "type": "string",
+        "format": "password",
+        "minLength": 12,
+        "maxLength": 256,
+        "writeOnly": true
+      },
+      "ClientType": {
+        "type": "string",
+        "enum": [
+          "WEB",
+          "DESKTOP",
+          "MOBILE"
         ]
       },
+      "SessionStatus": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "REVOKED"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "username",
+          "password",
+          "displayName"
+        ],
+        "properties": {
+          "username": {
+            "$ref": "#/components/schemas/Username"
+          },
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "username",
+          "password",
+          "clientType",
+          "deviceId",
+          "clientVersion",
+          "protocolVersion"
+        ],
+        "properties": {
+          "username": {
+            "$ref": "#/components/schemas/Username"
+          },
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "clientType": {
+            "$ref": "#/components/schemas/ClientType"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "clientVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "protocolVersion": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
       "PublicUser": {
-        "type": "object", "additionalProperties": false, "required": ["userId", "username", "displayName"],
-        "properties": { "userId": { "$ref": "#/components/schemas/Id" }, "username": { "$ref": "#/components/schemas/Username" }, "displayName": { "type": "string" } }
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "userId",
+          "username",
+          "displayName"
+        ],
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "username": {
+            "$ref": "#/components/schemas/Username"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        }
       },
       "UserResponse": {
-        "type": "object", "additionalProperties": false, "required": ["user"],
-        "properties": { "user": { "$ref": "#/components/schemas/PublicUser" } }
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "user"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/PublicUser"
+          }
+        }
       },
       "Session": {
-        "type": "object", "additionalProperties": false, "required": ["sessionId", "userId", "clientType", "sessionEpoch", "status"],
-        "properties": { "sessionId": { "$ref": "#/components/schemas/Id" }, "userId": { "$ref": "#/components/schemas/Id" }, "clientType": { "$ref": "#/components/schemas/ClientType" }, "sessionEpoch": { "type": "integer", "minimum": 1 }, "status": { "$ref": "#/components/schemas/SessionStatus" } }
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId",
+          "userId",
+          "clientType",
+          "sessionEpoch",
+          "status"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "clientType": {
+            "$ref": "#/components/schemas/ClientType"
+          },
+          "sessionEpoch": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus"
+          }
+        }
       },
       "WebTokens": {
-        "type": "object", "additionalProperties": false, "required": ["accessToken", "accessTokenExpiresInSeconds", "refreshTokenDelivery"],
-        "properties": { "accessToken": { "type": "string", "minLength": 1 }, "accessTokenExpiresInSeconds": { "type": "integer", "minimum": 1 }, "refreshTokenDelivery": { "const": "HTTP_ONLY_SECURE_COOKIE" } }
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accessToken",
+          "accessTokenExpiresInSeconds",
+          "refreshTokenDelivery"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accessTokenExpiresInSeconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "refreshTokenDelivery": {
+            "const": "HTTP_ONLY_SECURE_COOKIE"
+          }
+        }
       },
       "NativeTokens": {
-        "type": "object", "additionalProperties": false, "required": ["accessToken", "accessTokenExpiresInSeconds", "refreshToken", "refreshTokenExpiresInSeconds", "refreshTokenDelivery"],
-        "properties": { "accessToken": { "type": "string", "minLength": 1 }, "accessTokenExpiresInSeconds": { "type": "integer", "minimum": 1 }, "refreshToken": { "type": "string", "minLength": 1 }, "refreshTokenExpiresInSeconds": { "type": "integer", "minimum": 1 }, "refreshTokenDelivery": { "const": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE" } }
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accessToken",
+          "accessTokenExpiresInSeconds",
+          "refreshToken",
+          "refreshTokenExpiresInSeconds",
+          "refreshTokenDelivery"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accessTokenExpiresInSeconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "refreshTokenExpiresInSeconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "refreshTokenDelivery": {
+            "const": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+          }
+        }
       },
       "AuthResult": {
-        "type": "object", "additionalProperties": false, "required": ["session", "tokens", "replacedExistingSession"],
-        "properties": { "session": { "$ref": "#/components/schemas/Session" }, "tokens": {}, "replacedExistingSession": { "type": "boolean" } },
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "session",
+          "tokens",
+          "replacedExistingSession"
+        ],
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/Session"
+          },
+          "tokens": {},
+          "replacedExistingSession": {
+            "type": "boolean"
+          }
+        },
         "oneOf": [
-          { "properties": { "session": { "allOf": [{ "$ref": "#/components/schemas/Session" }, { "properties": { "clientType": { "const": "WEB" } } }] }, "tokens": { "$ref": "#/components/schemas/WebTokens" } } },
-          { "properties": { "session": { "allOf": [{ "$ref": "#/components/schemas/Session" }, { "properties": { "clientType": { "enum": ["DESKTOP", "MOBILE"] } } }] }, "tokens": { "$ref": "#/components/schemas/NativeTokens" } } }
+          {
+            "properties": {
+              "session": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Session"
+                  },
+                  {
+                    "properties": {
+                      "clientType": {
+                        "const": "WEB"
+                      }
+                    }
+                  }
+                ]
+              },
+              "tokens": {
+                "$ref": "#/components/schemas/WebTokens"
+              }
+            }
+          },
+          {
+            "properties": {
+              "session": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Session"
+                  },
+                  {
+                    "properties": {
+                      "clientType": {
+                        "enum": [
+                          "DESKTOP",
+                          "MOBILE"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "tokens": {
+                "$ref": "#/components/schemas/NativeTokens"
+              }
+            }
+          }
         ]
       },
       "NormalizedUserPair": {
-        "type": "object", "additionalProperties": false, "required": ["lowUserId", "highUserId"],
-        "properties": { "lowUserId": { "$ref": "#/components/schemas/Id" }, "highUserId": { "$ref": "#/components/schemas/Id" } },
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lowUserId",
+          "highUserId"
+        ],
+        "properties": {
+          "lowUserId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "highUserId": {
+            "$ref": "#/components/schemas/Id"
+          }
+        },
         "description": "lowUserId and highUserId are the deterministic ascending ordering of the two distinct user IDs."
       },
       "FriendshipResult": {
-        "type": "object", "additionalProperties": false, "required": ["friendshipId", "normalizedPair", "directConversationId", "memberUserIds", "created"],
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "friendshipId",
+          "normalizedPair",
+          "directConversationId",
+          "memberUserIds",
+          "created"
+        ],
         "properties": {
-          "friendshipId": { "$ref": "#/components/schemas/Id" }, "normalizedPair": { "$ref": "#/components/schemas/NormalizedUserPair" }, "directConversationId": { "$ref": "#/components/schemas/Id" },
-          "memberUserIds": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "$ref": "#/components/schemas/Id" } }, "created": { "type": "boolean" }
+          "friendshipId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "normalizedPair": {
+            "$ref": "#/components/schemas/NormalizedUserPair"
+          },
+          "directConversationId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "memberUserIds": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          "created": {
+            "type": "boolean"
+          }
         }
       },
       "FriendView": {
-        "type": "object", "additionalProperties": false, "required": ["user", "friendshipId", "directConversationId"],
-        "properties": { "user": { "$ref": "#/components/schemas/PublicUser" }, "friendshipId": { "$ref": "#/components/schemas/Id" }, "directConversationId": { "$ref": "#/components/schemas/Id" } }
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "user",
+          "friendshipId",
+          "directConversationId"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/PublicUser"
+          },
+          "friendshipId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "directConversationId": {
+            "$ref": "#/components/schemas/Id"
+          }
+        }
+      },
+      "NativeClientType": {
+        "type": "string",
+        "enum": [
+          "DESKTOP",
+          "MOBILE"
+        ]
+      },
+      "WebRefreshRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clientType",
+          "deviceId",
+          "clientVersion",
+          "protocolVersion"
+        ],
+        "properties": {
+          "clientType": {
+            "const": "WEB"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "clientVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "protocolVersion": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "NativeRefreshRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "refreshToken",
+          "clientType",
+          "deviceId",
+          "clientVersion",
+          "protocolVersion"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true
+          },
+          "clientType": {
+            "$ref": "#/components/schemas/NativeClientType"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "clientVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "protocolVersion": {
+            "type": "string",
+            "const": "1"
+          }
+        }
       }
     },
     "responses": {
-      "BadRequest": { "description": "Malformed or semantically invalid request", "content": { "application/json": { "schema": { "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse" } } } },
-      "Unauthorized": { "description": "Authentication failed, expired, revoked, stale, or mismatched", "headers": { "WWW-Authenticate": { "schema": { "type": "string" } } }, "content": { "application/json": { "schema": { "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse" } } } },
-      "Forbidden": { "description": "Authenticated principal is not authorized", "content": { "application/json": { "schema": { "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse" } } } },
-      "NotFound": { "description": "Resource not found", "content": { "application/json": { "schema": { "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse" } } } },
-      "Conflict": { "description": "Unique identity or canonical state conflict", "content": { "application/json": { "schema": { "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse" } } } },
-      "Unprocessable": { "description": "Well-formed request violates a domain rule", "content": { "application/json": { "schema": { "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse" } } } },
-      "UnsupportedProtocol": { "description": "The requested protocol version is unsupported", "content": { "application/json": { "schema": { "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse" } } } }
+      "BadRequest": {
+        "description": "Malformed or semantically invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication failed, expired, revoked, stale, or mismatched",
+        "headers": {
+          "WWW-Authenticate": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Authenticated principal is not authorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Unique identity or canonical state conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unprocessable": {
+        "description": "Well-formed request violates a domain rule",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "UnsupportedProtocol": {
+        "description": "The requested protocol version is unsupported",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      }
     }
   }
 }

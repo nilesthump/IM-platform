@@ -1,21 +1,1371 @@
 {
   "$schema": "./fixture.schema.json",
-  "fixtureVersion": "1.0",
+  "fixtureVersion": "1.1",
   "contractVersion": "1.0.0",
-  "profiles": ["go", "java"],
+  "profiles": [
+    "go",
+    "java"
+  ],
   "polarity": "negative",
   "scenarios": [
-    { "id": "invalid-credentials", "rules": ["AUF-D-009", "AUF-I-007"], "preconditions": ["alice exists"], "steps": [{ "request": { "method": "POST", "path": "/v1/auth/login", "body": { "username": "alice", "password": "wrong-password-value", "clientType": "WEB", "deviceId": "browser-1", "clientVersion": "1.0.0", "protocolVersion": "1" } }, "expected": { "status": 401, "errorCode": "AUTH_INVALID_CREDENTIALS" } }], "stateAssertions": ["no session is created"], "forbiddenObservations": ["password or token appears in response logs or traces"] },
-    { "id": "token-in-query-rejected", "rules": ["AUF-D-009", "AUF-I-007", "AUF-A-007"], "preconditions": [], "steps": [{ "request": { "method": "GET", "path": "/v1/users/me?access_token=forbidden" }, "expected": { "status": 400, "errorCode": "VALIDATION_FAILED" } }], "stateAssertions": ["request is rejected before authentication"], "forbiddenObservations": ["query credential is logged or traced"] },
-    { "id": "invalid-client-type", "rules": ["AUF-D-001", "AUF-I-001"], "preconditions": ["alice exists"], "steps": [{ "request": { "method": "POST", "path": "/v1/auth/login", "body": { "username": "alice", "password": "fixture-password-not-a-real-secret", "clientType": "TABLET", "deviceId": "tablet-1", "clientVersion": "1.0.0", "protocolVersion": "1" } }, "expected": { "status": 400, "errorCode": "VALIDATION_FAILED" } }], "stateAssertions": ["no fourth login slot is representable"], "forbiddenObservations": ["TABLET session created"] },
-    { "id": "refresh-client-type-mismatch", "rules": ["AUF-D-001", "AUF-I-002"], "preconditions": ["refresh token belongs to alice WEB epoch 2"], "steps": [{ "request": { "method": "POST", "path": "/v1/auth/refresh", "body": { "refreshToken": "<web-refresh-token>", "clientType": "MOBILE", "clientVersion": "1.0.0", "protocolVersion": "1" } }, "expected": { "status": 401, "errorCode": "AUTH_CLIENT_TYPE_MISMATCH" } }], "stateAssertions": ["no token is issued and WEB remains unchanged"], "forbiddenObservations": ["credential crosses clientType slots"] },
-    { "id": "unsupported-protocol-version", "rules": ["AUF-A-008"], "preconditions": ["server supports protocol version 1"], "steps": [{ "request": { "method": "POST", "path": "/v1/auth/login", "body": { "username": "alice", "password": "fixture-password-not-a-real-secret", "clientType": "DESKTOP", "deviceId": "desktop-1", "clientVersion": "1.0.0", "protocolVersion": "999" } }, "expected": { "status": 426, "errorCode": "PROTOCOL_VERSION_UNSUPPORTED" } }], "stateAssertions": ["no session is created"], "forbiddenObservations": ["silent version downgrade"] },
-    { "id": "missing-authentication", "rules": ["AUF-D-009"], "preconditions": [], "steps": [{ "request": { "method": "GET", "path": "/v1/friends" }, "expected": { "status": 401, "errorCode": "AUTH_REQUIRED" } }], "stateAssertions": ["no user data is disclosed"], "forbiddenObservations": ["friend list returned"] },
-    { "id": "authorization-binding-mismatch", "rules": ["AUF-D-004", "AUF-D-009"], "preconditions": ["access token subject is user A", "resolved session binding belongs to user B"], "steps": [{ "request": { "method": "GET", "path": "/v1/users/me", "headers": { "Authorization": "Bearer <mismatched-binding-token>" } }, "expected": { "status": 403, "errorCode": "AUTHORIZATION_DENIED" } }], "stateAssertions": ["no user profile is disclosed"], "forbiddenObservations": ["client-selected identity overrides the authenticated binding"] },
-    { "id": "friend-self-rejected", "rules": ["AUF-D-005", "AUF-I-005"], "preconditions": ["authenticated user ID is 10000000-0000-4000-8000-000000000001"], "steps": [{ "request": { "method": "PUT", "path": "/v1/friends/10000000-0000-4000-8000-000000000001", "headers": { "Authorization": "Bearer <user-A-access-token>" } }, "expected": { "status": 422, "errorCode": "FRIEND_SELF_NOT_ALLOWED" } }], "stateAssertions": ["no friendship conversation membership sync event or outbox effect is written"], "forbiddenObservations": ["self friendship"] },
-    { "id": "duplicate-friendship-divergence-rejected", "rules": ["AUF-D-005", "AUF-D-006", "AUF-I-005", "AUF-A-004"], "preconditions": ["normalized A/B friendship and DIRECT conversation already exist"], "steps": [{ "request": { "method": "PUT", "path": "/v1/friends/20000000-0000-4000-8000-000000000002", "headers": { "Authorization": "Bearer <user-A-access-token>" } }, "expected": { "status": 200, "body": { "friendshipId": "30000000-0000-4000-8000-000000000003", "directConversationId": "40000000-0000-4000-8000-000000000004", "created": false } } }], "stateAssertions": ["the original canonical relationship is returned unchanged"], "forbiddenObservations": ["second friendship or second DIRECT conversation commits"] },
-    { "id": "non-normalized-pair-divergence-rejected", "rules": ["AUF-D-005", "AUF-I-005", "AUF-A-004"], "preconditions": ["normalized A/B friendship exists", "authenticated caller is the high ordered user B"], "steps": [{ "request": { "method": "PUT", "path": "/v1/friends/10000000-0000-4000-8000-000000000001", "headers": { "Authorization": "Bearer <user-B-access-token>" } }, "expected": { "status": 200, "body": { "lowUserId": "10000000-0000-4000-8000-000000000001", "highUserId": "20000000-0000-4000-8000-000000000002", "created": false } } }], "stateAssertions": ["the same ascending normalized pair is returned regardless of caller direction"], "forbiddenObservations": ["non-normalized or ordered duplicate pair commits"] },
-    { "id": "stale-session-epoch-rejected", "rules": ["AUF-D-003", "AUF-I-002", "AUF-A-001"], "preconditions": ["WEB slot current epoch is 8", "token carries epoch 7"], "steps": [{ "request": { "method": "GET", "path": "/v1/users/me", "headers": { "Authorization": "Bearer <stale-web-token-epoch-7>" } }, "expected": { "status": 401, "errorCode": "AUTH_SESSION_EPOCH_STALE" } }], "stateAssertions": ["no authenticated request context is created"], "forbiddenObservations": ["old token reconnects or reads data"] },
-    { "id": "revoked-refresh-token-rejected", "rules": ["AUF-D-008", "AUF-I-002"], "preconditions": ["refresh token was revoked by rotation or logout"], "steps": [{ "request": { "method": "POST", "path": "/v1/auth/refresh", "body": { "refreshToken": "<revoked-refresh-token>", "clientType": "MOBILE", "clientVersion": "1.0.0", "protocolVersion": "1" } }, "expected": { "status": 401, "errorCode": "AUTH_REFRESH_REVOKED" } }], "stateAssertions": ["no access or refresh token is issued"], "forbiddenObservations": ["revoked credential is restored"] }
+    {
+      "id": "invalid-credentials",
+      "rules": [
+        "AUF-D-009",
+        "AUF-I-007"
+      ],
+      "preconditions": [
+        "alice exists"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/login",
+            "body": {
+              "username": "alice",
+              "password": "wrong-password-value",
+              "clientType": "WEB",
+              "deviceId": "browser-1",
+              "clientVersion": "1.0.0",
+              "protocolVersion": "1"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_INVALID_CREDENTIALS",
+            "body": {
+              "error": {
+                "code": "AUTH_INVALID_CREDENTIALS",
+                "message": "Credentials are invalid."
+              },
+              "requestId": "negative-01"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_INVALID_CREDENTIALS",
+                "body": {
+                  "error": {
+                    "code": "AUTH_INVALID_CREDENTIALS",
+                    "message": "Credentials are invalid."
+                  },
+                  "requestId": "negative-01"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_INVALID_CREDENTIALS",
+                "body": {
+                  "error": {
+                    "code": "AUTH_INVALID_CREDENTIALS",
+                    "message": "Credentials are invalid."
+                  },
+                  "requestId": "negative-01"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no session is created"
+      ],
+      "forbiddenObservations": [
+        "password or token appears in response logs or traces"
+      ]
+    },
+    {
+      "id": "token-in-query-rejected",
+      "rules": [
+        "AUF-D-009",
+        "AUF-I-007",
+        "AUF-A-007"
+      ],
+      "preconditions": [],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/users/me?access_token=forbidden"
+          },
+          "expected": {
+            "status": 400,
+            "errorCode": "VALIDATION_FAILED",
+            "body": {
+              "error": {
+                "code": "VALIDATION_FAILED",
+                "message": "Authentication material is forbidden in query parameters."
+              },
+              "requestId": "negative-02"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 400,
+                "errorCode": "VALIDATION_FAILED",
+                "body": {
+                  "error": {
+                    "code": "VALIDATION_FAILED",
+                    "message": "Authentication material is forbidden in query parameters."
+                  },
+                  "requestId": "negative-02"
+                }
+              },
+              "java": {
+                "status": 400,
+                "errorCode": "VALIDATION_FAILED",
+                "body": {
+                  "error": {
+                    "code": "VALIDATION_FAILED",
+                    "message": "Authentication material is forbidden in query parameters."
+                  },
+                  "requestId": "negative-02"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "request is rejected before authentication"
+      ],
+      "forbiddenObservations": [
+        "query credential is logged or traced"
+      ]
+    },
+    {
+      "id": "invalid-client-type",
+      "rules": [
+        "AUF-D-001",
+        "AUF-I-001"
+      ],
+      "preconditions": [
+        "alice exists"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/login",
+            "body": {
+              "username": "alice",
+              "password": "fixture-password-not-a-real-secret",
+              "clientType": "TABLET",
+              "deviceId": "tablet-1",
+              "clientVersion": "1.0.0",
+              "protocolVersion": "1"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "errorCode": "VALIDATION_FAILED",
+            "body": {
+              "error": {
+                "code": "VALIDATION_FAILED",
+                "message": "clientType is invalid."
+              },
+              "requestId": "negative-03"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 400,
+                "errorCode": "VALIDATION_FAILED",
+                "body": {
+                  "error": {
+                    "code": "VALIDATION_FAILED",
+                    "message": "clientType is invalid."
+                  },
+                  "requestId": "negative-03"
+                }
+              },
+              "java": {
+                "status": 400,
+                "errorCode": "VALIDATION_FAILED",
+                "body": {
+                  "error": {
+                    "code": "VALIDATION_FAILED",
+                    "message": "clientType is invalid."
+                  },
+                  "requestId": "negative-03"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no fourth login slot is representable"
+      ],
+      "forbiddenObservations": [
+        "TABLET session created"
+      ]
+    },
+    {
+      "id": "refresh-client-type-mismatch",
+      "rules": [
+        "AUF-D-001",
+        "AUF-I-002"
+      ],
+      "preconditions": [
+        "refresh token belongs to alice WEB epoch 2"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/refresh/native",
+            "body": {
+              "refreshToken": "<web-refresh-token>",
+              "clientType": "MOBILE",
+              "deviceId": "mobile-1",
+              "clientVersion": "1.0.0",
+              "protocolVersion": "1"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_CLIENT_TYPE_MISMATCH",
+            "body": {
+              "error": {
+                "code": "AUTH_CLIENT_TYPE_MISMATCH",
+                "message": "Refresh credential does not belong to the declared client type."
+              },
+              "requestId": "negative-04"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_CLIENT_TYPE_MISMATCH",
+                "body": {
+                  "error": {
+                    "code": "AUTH_CLIENT_TYPE_MISMATCH",
+                    "message": "Refresh credential does not belong to the declared client type."
+                  },
+                  "requestId": "negative-04"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_CLIENT_TYPE_MISMATCH",
+                "body": {
+                  "error": {
+                    "code": "AUTH_CLIENT_TYPE_MISMATCH",
+                    "message": "Refresh credential does not belong to the declared client type."
+                  },
+                  "requestId": "negative-04"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no token is issued and WEB remains unchanged"
+      ],
+      "forbiddenObservations": [
+        "credential crosses clientType slots"
+      ]
+    },
+    {
+      "id": "unsupported-protocol-version",
+      "rules": [
+        "AUF-A-008"
+      ],
+      "preconditions": [
+        "server supports protocol version 1"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/login",
+            "body": {
+              "username": "alice",
+              "password": "fixture-password-not-a-real-secret",
+              "clientType": "DESKTOP",
+              "deviceId": "desktop-1",
+              "clientVersion": "1.0.0",
+              "protocolVersion": "999"
+            }
+          },
+          "expected": {
+            "status": 426,
+            "errorCode": "PROTOCOL_VERSION_UNSUPPORTED",
+            "body": {
+              "error": {
+                "code": "PROTOCOL_VERSION_UNSUPPORTED",
+                "message": "Protocol version is unsupported."
+              },
+              "requestId": "negative-05"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 426,
+                "errorCode": "PROTOCOL_VERSION_UNSUPPORTED",
+                "body": {
+                  "error": {
+                    "code": "PROTOCOL_VERSION_UNSUPPORTED",
+                    "message": "Protocol version is unsupported."
+                  },
+                  "requestId": "negative-05"
+                }
+              },
+              "java": {
+                "status": 426,
+                "errorCode": "PROTOCOL_VERSION_UNSUPPORTED",
+                "body": {
+                  "error": {
+                    "code": "PROTOCOL_VERSION_UNSUPPORTED",
+                    "message": "Protocol version is unsupported."
+                  },
+                  "requestId": "negative-05"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no session is created"
+      ],
+      "forbiddenObservations": [
+        "silent version downgrade"
+      ]
+    },
+    {
+      "id": "missing-authentication",
+      "rules": [
+        "AUF-D-009"
+      ],
+      "preconditions": [],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/friends"
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_REQUIRED",
+            "body": {
+              "error": {
+                "code": "AUTH_REQUIRED",
+                "message": "Authentication is required."
+              },
+              "requestId": "negative-06"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_REQUIRED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_REQUIRED",
+                    "message": "Authentication is required."
+                  },
+                  "requestId": "negative-06"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_REQUIRED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_REQUIRED",
+                    "message": "Authentication is required."
+                  },
+                  "requestId": "negative-06"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no user data is disclosed"
+      ],
+      "forbiddenObservations": [
+        "friend list returned"
+      ]
+    },
+    {
+      "id": "authorization-binding-mismatch",
+      "rules": [
+        "AUF-D-004",
+        "AUF-D-009"
+      ],
+      "preconditions": [
+        "access token subject is user A",
+        "resolved session binding belongs to user B"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/users/me",
+            "headers": {
+              "Authorization": "Bearer <mismatched-binding-token>"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_TOKEN_INVALID",
+            "body": {
+              "error": {
+                "code": "AUTH_TOKEN_INVALID",
+                "message": "Access token and session binding disagree."
+              },
+              "requestId": "negative-07"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_TOKEN_INVALID",
+                "body": {
+                  "error": {
+                    "code": "AUTH_TOKEN_INVALID",
+                    "message": "Access token and session binding disagree."
+                  },
+                  "requestId": "negative-07"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_TOKEN_INVALID",
+                "body": {
+                  "error": {
+                    "code": "AUTH_TOKEN_INVALID",
+                    "message": "Access token and session binding disagree."
+                  },
+                  "requestId": "negative-07"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no user profile is disclosed"
+      ],
+      "forbiddenObservations": [
+        "client-selected identity overrides the authenticated binding"
+      ]
+    },
+    {
+      "id": "invalid-access-token",
+      "rules": [
+        "AUF-D-009",
+        "AUF-I-007"
+      ],
+      "preconditions": [
+        "presented access token signature is invalid"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/users/me",
+            "headers": {
+              "Authorization": "Bearer <invalid-signature-token>"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_TOKEN_INVALID",
+            "body": {
+              "error": {
+                "code": "AUTH_TOKEN_INVALID",
+                "message": "Access token is invalid."
+              },
+              "requestId": "negative-08"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_TOKEN_INVALID",
+                "body": {
+                  "error": {
+                    "code": "AUTH_TOKEN_INVALID",
+                    "message": "Access token is invalid."
+                  },
+                  "requestId": "negative-08"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_TOKEN_INVALID",
+                "body": {
+                  "error": {
+                    "code": "AUTH_TOKEN_INVALID",
+                    "message": "Access token is invalid."
+                  },
+                  "requestId": "negative-08"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no authenticated request context is created"
+      ],
+      "forbiddenObservations": [
+        "token material appears in response"
+      ]
+    },
+    {
+      "id": "expired-access-token",
+      "rules": [
+        "AUF-D-009",
+        "AUF-I-002"
+      ],
+      "preconditions": [
+        "presented access token exp is in the past"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/users/me",
+            "headers": {
+              "Authorization": "Bearer <expired-token>"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_TOKEN_EXPIRED",
+            "body": {
+              "error": {
+                "code": "AUTH_TOKEN_EXPIRED",
+                "message": "Access token has expired."
+              },
+              "requestId": "negative-09"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_TOKEN_EXPIRED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_TOKEN_EXPIRED",
+                    "message": "Access token has expired."
+                  },
+                  "requestId": "negative-09"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_TOKEN_EXPIRED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_TOKEN_EXPIRED",
+                    "message": "Access token has expired."
+                  },
+                  "requestId": "negative-09"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no authenticated request context is created"
+      ],
+      "forbiddenObservations": [
+        "expired token reads user data"
+      ]
+    },
+    {
+      "id": "revoked-session-token",
+      "rules": [
+        "AUF-D-003",
+        "AUF-I-002"
+      ],
+      "preconditions": [
+        "presented access token names a revoked session"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/users/me",
+            "headers": {
+              "Authorization": "Bearer <revoked-session-token>"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_SESSION_REVOKED",
+            "body": {
+              "error": {
+                "code": "AUTH_SESSION_REVOKED",
+                "message": "Session has been revoked."
+              },
+              "requestId": "negative-10"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_SESSION_REVOKED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_SESSION_REVOKED",
+                    "message": "Session has been revoked."
+                  },
+                  "requestId": "negative-10"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_SESSION_REVOKED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_SESSION_REVOKED",
+                    "message": "Session has been revoked."
+                  },
+                  "requestId": "negative-10"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no authenticated request context is created"
+      ],
+      "forbiddenObservations": [
+        "revoked session reads user data"
+      ]
+    },
+    {
+      "id": "username-already-exists",
+      "rules": [
+        "AUF-D-009"
+      ],
+      "preconditions": [
+        "canonical username alice already exists"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/register",
+            "body": {
+              "username": "Alice",
+              "password": "fixture-password-not-a-real-secret",
+              "displayName": "Other Alice"
+            }
+          },
+          "expected": {
+            "status": 409,
+            "errorCode": "USERNAME_ALREADY_EXISTS",
+            "body": {
+              "error": {
+                "code": "USERNAME_ALREADY_EXISTS",
+                "message": "Username already exists."
+              },
+              "requestId": "negative-11"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 409,
+                "errorCode": "USERNAME_ALREADY_EXISTS",
+                "body": {
+                  "error": {
+                    "code": "USERNAME_ALREADY_EXISTS",
+                    "message": "Username already exists."
+                  },
+                  "requestId": "negative-11"
+                }
+              },
+              "java": {
+                "status": 409,
+                "errorCode": "USERNAME_ALREADY_EXISTS",
+                "body": {
+                  "error": {
+                    "code": "USERNAME_ALREADY_EXISTS",
+                    "message": "Username already exists."
+                  },
+                  "requestId": "negative-11"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no duplicate user is created"
+      ],
+      "forbiddenObservations": [
+        "password appears in response"
+      ]
+    },
+    {
+      "id": "friend-target-not-found",
+      "rules": [
+        "AUF-D-005",
+        "AUF-D-006"
+      ],
+      "preconditions": [
+        "authenticated user A exists",
+        "target user does not exist"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "PUT",
+            "path": "/v1/friends/90000000-0000-4000-8000-000000000009",
+            "headers": {
+              "Authorization": "Bearer <user-A-access-token>"
+            }
+          },
+          "expected": {
+            "status": 404,
+            "errorCode": "USER_NOT_FOUND",
+            "body": {
+              "error": {
+                "code": "USER_NOT_FOUND",
+                "message": "Target user was not found."
+              },
+              "requestId": "negative-12"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 404,
+                "errorCode": "USER_NOT_FOUND",
+                "body": {
+                  "error": {
+                    "code": "USER_NOT_FOUND",
+                    "message": "Target user was not found."
+                  },
+                  "requestId": "negative-12"
+                }
+              },
+              "java": {
+                "status": 404,
+                "errorCode": "USER_NOT_FOUND",
+                "body": {
+                  "error": {
+                    "code": "USER_NOT_FOUND",
+                    "message": "Target user was not found."
+                  },
+                  "requestId": "negative-12"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no friendship or conversation effects are written"
+      ],
+      "forbiddenObservations": [
+        "phantom target relationship"
+      ]
+    },
+    {
+      "id": "friendship-state-conflict",
+      "rules": [
+        "AUF-D-005",
+        "AUF-D-006",
+        "AUF-I-005"
+      ],
+      "preconditions": [
+        "a canonical friendship row exists but its DIRECT conversation identity conflicts"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "PUT",
+            "path": "/v1/friends/20000000-0000-4000-8000-000000000002",
+            "headers": {
+              "Authorization": "Bearer <user-A-access-token>"
+            }
+          },
+          "expected": {
+            "status": 409,
+            "errorCode": "FRIENDSHIP_STATE_CONFLICT",
+            "body": {
+              "error": {
+                "code": "FRIENDSHIP_STATE_CONFLICT",
+                "message": "Canonical friendship state conflicts."
+              },
+              "requestId": "negative-13"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 409,
+                "errorCode": "FRIENDSHIP_STATE_CONFLICT",
+                "body": {
+                  "error": {
+                    "code": "FRIENDSHIP_STATE_CONFLICT",
+                    "message": "Canonical friendship state conflicts."
+                  },
+                  "requestId": "negative-13"
+                }
+              },
+              "java": {
+                "status": 409,
+                "errorCode": "FRIENDSHIP_STATE_CONFLICT",
+                "body": {
+                  "error": {
+                    "code": "FRIENDSHIP_STATE_CONFLICT",
+                    "message": "Canonical friendship state conflicts."
+                  },
+                  "requestId": "negative-13"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "the conflicting state is not duplicated or partially rewritten"
+      ],
+      "forbiddenObservations": [
+        "second friendship or DIRECT conversation commits"
+      ]
+    },
+    {
+      "id": "friend-add-authorization-denied",
+      "rules": [
+        "AUF-D-009"
+      ],
+      "preconditions": [
+        "authenticated principal is not permitted to mutate user A's relationship"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "PUT",
+            "path": "/v1/friends/20000000-0000-4000-8000-000000000002",
+            "headers": {
+              "Authorization": "Bearer <insufficient-scope-token>"
+            }
+          },
+          "expected": {
+            "status": 403,
+            "errorCode": "AUTHORIZATION_DENIED",
+            "body": {
+              "error": {
+                "code": "AUTHORIZATION_DENIED",
+                "message": "Principal is not authorized for this operation."
+              },
+              "requestId": "negative-14"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 403,
+                "errorCode": "AUTHORIZATION_DENIED",
+                "body": {
+                  "error": {
+                    "code": "AUTHORIZATION_DENIED",
+                    "message": "Principal is not authorized for this operation."
+                  },
+                  "requestId": "negative-14"
+                }
+              },
+              "java": {
+                "status": 403,
+                "errorCode": "AUTHORIZATION_DENIED",
+                "body": {
+                  "error": {
+                    "code": "AUTHORIZATION_DENIED",
+                    "message": "Principal is not authorized for this operation."
+                  },
+                  "requestId": "negative-14"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no friendship effects are written"
+      ],
+      "forbiddenObservations": [
+        "authorization is inferred from client UI"
+      ]
+    },
+    {
+      "id": "web-refresh-missing-cookie",
+      "rules": [
+        "AUF-D-009",
+        "AUF-I-007"
+      ],
+      "preconditions": [
+        "WEB refresh request has client metadata but no refresh cookie"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/refresh/web",
+            "body": {
+              "clientType": "WEB",
+              "deviceId": "browser-1",
+              "clientVersion": "1.0.0",
+              "protocolVersion": "1"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_REQUIRED",
+            "body": {
+              "error": {
+                "code": "AUTH_REQUIRED",
+                "message": "WEB refresh cookie is required."
+              },
+              "requestId": "negative-15"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_REQUIRED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_REQUIRED",
+                    "message": "WEB refresh cookie is required."
+                  },
+                  "requestId": "negative-15"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_REQUIRED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_REQUIRED",
+                    "message": "WEB refresh cookie is required."
+                  },
+                  "requestId": "negative-15"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no token is issued"
+      ],
+      "forbiddenObservations": [
+        "credentialless refresh succeeds"
+      ]
+    },
+    {
+      "id": "native-refresh-missing-token",
+      "rules": [
+        "AUF-D-009",
+        "AUF-I-007"
+      ],
+      "preconditions": [
+        "native refresh request omits its refresh token"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/refresh/native",
+            "body": {
+              "clientType": "MOBILE",
+              "deviceId": "mobile-1",
+              "clientVersion": "1.0.0",
+              "protocolVersion": "1"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "errorCode": "VALIDATION_FAILED",
+            "body": {
+              "error": {
+                "code": "VALIDATION_FAILED",
+                "message": "refreshToken is required."
+              },
+              "requestId": "negative-16"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 400,
+                "errorCode": "VALIDATION_FAILED",
+                "body": {
+                  "error": {
+                    "code": "VALIDATION_FAILED",
+                    "message": "refreshToken is required."
+                  },
+                  "requestId": "negative-16"
+                }
+              },
+              "java": {
+                "status": 400,
+                "errorCode": "VALIDATION_FAILED",
+                "body": {
+                  "error": {
+                    "code": "VALIDATION_FAILED",
+                    "message": "refreshToken is required."
+                  },
+                  "requestId": "negative-16"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no token is issued"
+      ],
+      "forbiddenObservations": [
+        "credentialless refresh succeeds"
+      ]
+    },
+    {
+      "id": "friend-self-rejected",
+      "rules": [
+        "AUF-D-005",
+        "AUF-I-005"
+      ],
+      "preconditions": [
+        "authenticated user ID is 10000000-0000-4000-8000-000000000001"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "PUT",
+            "path": "/v1/friends/10000000-0000-4000-8000-000000000001",
+            "headers": {
+              "Authorization": "Bearer <user-A-access-token>"
+            }
+          },
+          "expected": {
+            "status": 422,
+            "errorCode": "FRIEND_SELF_NOT_ALLOWED",
+            "body": {
+              "error": {
+                "code": "FRIEND_SELF_NOT_ALLOWED",
+                "message": "A user cannot befriend itself."
+              },
+              "requestId": "negative-17"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 422,
+                "errorCode": "FRIEND_SELF_NOT_ALLOWED",
+                "body": {
+                  "error": {
+                    "code": "FRIEND_SELF_NOT_ALLOWED",
+                    "message": "A user cannot befriend itself."
+                  },
+                  "requestId": "negative-17"
+                }
+              },
+              "java": {
+                "status": 422,
+                "errorCode": "FRIEND_SELF_NOT_ALLOWED",
+                "body": {
+                  "error": {
+                    "code": "FRIEND_SELF_NOT_ALLOWED",
+                    "message": "A user cannot befriend itself."
+                  },
+                  "requestId": "negative-17"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no friendship conversation membership sync event or outbox effect is written"
+      ],
+      "forbiddenObservations": [
+        "self friendship"
+      ]
+    },
+    {
+      "id": "duplicate-friendship-divergence-rejected",
+      "rules": [
+        "AUF-D-005",
+        "AUF-D-006",
+        "AUF-I-005",
+        "AUF-A-004"
+      ],
+      "preconditions": [
+        "normalized A/B friendship and DIRECT conversation already exist"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "PUT",
+            "path": "/v1/friends/20000000-0000-4000-8000-000000000002",
+            "headers": {
+              "Authorization": "Bearer <user-A-access-token>"
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "friendshipId": "30000000-0000-4000-8000-000000000003",
+              "normalizedPair": {
+                "lowUserId": "10000000-0000-4000-8000-000000000001",
+                "highUserId": "20000000-0000-4000-8000-000000000002"
+              },
+              "directConversationId": "40000000-0000-4000-8000-000000000004",
+              "memberUserIds": [
+                "10000000-0000-4000-8000-000000000001",
+                "20000000-0000-4000-8000-000000000002"
+              ],
+              "created": false
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 200,
+                "body": {
+                  "friendshipId": "30000000-0000-4000-8000-000000000003",
+                  "normalizedPair": {
+                    "lowUserId": "10000000-0000-4000-8000-000000000001",
+                    "highUserId": "20000000-0000-4000-8000-000000000002"
+                  },
+                  "directConversationId": "40000000-0000-4000-8000-000000000004",
+                  "memberUserIds": [
+                    "10000000-0000-4000-8000-000000000001",
+                    "20000000-0000-4000-8000-000000000002"
+                  ],
+                  "created": false
+                }
+              },
+              "java": {
+                "status": 200,
+                "body": {
+                  "friendshipId": "30000000-0000-4000-8000-000000000003",
+                  "normalizedPair": {
+                    "lowUserId": "10000000-0000-4000-8000-000000000001",
+                    "highUserId": "20000000-0000-4000-8000-000000000002"
+                  },
+                  "directConversationId": "40000000-0000-4000-8000-000000000004",
+                  "memberUserIds": [
+                    "10000000-0000-4000-8000-000000000001",
+                    "20000000-0000-4000-8000-000000000002"
+                  ],
+                  "created": false
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "the original canonical relationship is returned unchanged"
+      ],
+      "forbiddenObservations": [
+        "second friendship or second DIRECT conversation commits"
+      ]
+    },
+    {
+      "id": "non-normalized-pair-divergence-rejected",
+      "rules": [
+        "AUF-D-005",
+        "AUF-I-005",
+        "AUF-A-004"
+      ],
+      "preconditions": [
+        "normalized A/B friendship exists",
+        "authenticated caller is the high ordered user B"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "PUT",
+            "path": "/v1/friends/10000000-0000-4000-8000-000000000001",
+            "headers": {
+              "Authorization": "Bearer <user-B-access-token>"
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "friendshipId": "30000000-0000-4000-8000-000000000003",
+              "normalizedPair": {
+                "lowUserId": "10000000-0000-4000-8000-000000000001",
+                "highUserId": "20000000-0000-4000-8000-000000000002"
+              },
+              "directConversationId": "40000000-0000-4000-8000-000000000004",
+              "memberUserIds": [
+                "10000000-0000-4000-8000-000000000001",
+                "20000000-0000-4000-8000-000000000002"
+              ],
+              "created": false
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 200,
+                "body": {
+                  "friendshipId": "30000000-0000-4000-8000-000000000003",
+                  "normalizedPair": {
+                    "lowUserId": "10000000-0000-4000-8000-000000000001",
+                    "highUserId": "20000000-0000-4000-8000-000000000002"
+                  },
+                  "directConversationId": "40000000-0000-4000-8000-000000000004",
+                  "memberUserIds": [
+                    "10000000-0000-4000-8000-000000000001",
+                    "20000000-0000-4000-8000-000000000002"
+                  ],
+                  "created": false
+                }
+              },
+              "java": {
+                "status": 200,
+                "body": {
+                  "friendshipId": "30000000-0000-4000-8000-000000000003",
+                  "normalizedPair": {
+                    "lowUserId": "10000000-0000-4000-8000-000000000001",
+                    "highUserId": "20000000-0000-4000-8000-000000000002"
+                  },
+                  "directConversationId": "40000000-0000-4000-8000-000000000004",
+                  "memberUserIds": [
+                    "10000000-0000-4000-8000-000000000001",
+                    "20000000-0000-4000-8000-000000000002"
+                  ],
+                  "created": false
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "the same ascending normalized pair is returned regardless of caller direction"
+      ],
+      "forbiddenObservations": [
+        "non-normalized or ordered duplicate pair commits"
+      ]
+    },
+    {
+      "id": "stale-session-epoch-rejected",
+      "rules": [
+        "AUF-D-003",
+        "AUF-I-002",
+        "AUF-A-001"
+      ],
+      "preconditions": [
+        "WEB slot current epoch is 8",
+        "token carries epoch 7"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/users/me",
+            "headers": {
+              "Authorization": "Bearer <stale-web-token-epoch-7>"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_SESSION_EPOCH_STALE",
+            "body": {
+              "error": {
+                "code": "AUTH_SESSION_EPOCH_STALE",
+                "message": "Access token carries a stale session epoch."
+              },
+              "requestId": "negative-18"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_SESSION_EPOCH_STALE",
+                "body": {
+                  "error": {
+                    "code": "AUTH_SESSION_EPOCH_STALE",
+                    "message": "Access token carries a stale session epoch."
+                  },
+                  "requestId": "negative-18"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_SESSION_EPOCH_STALE",
+                "body": {
+                  "error": {
+                    "code": "AUTH_SESSION_EPOCH_STALE",
+                    "message": "Access token carries a stale session epoch."
+                  },
+                  "requestId": "negative-18"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no authenticated request context is created"
+      ],
+      "forbiddenObservations": [
+        "old token reconnects or reads data"
+      ]
+    },
+    {
+      "id": "revoked-refresh-token-rejected",
+      "rules": [
+        "AUF-D-008",
+        "AUF-I-002"
+      ],
+      "preconditions": [
+        "refresh token was revoked by rotation or logout"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "POST",
+            "path": "/v1/auth/refresh/native",
+            "body": {
+              "refreshToken": "<revoked-refresh-token>",
+              "clientType": "MOBILE",
+              "deviceId": "mobile-1",
+              "clientVersion": "1.0.0",
+              "protocolVersion": "1"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_REFRESH_REVOKED",
+            "body": {
+              "error": {
+                "code": "AUTH_REFRESH_REVOKED",
+                "message": "Refresh token has been revoked."
+              },
+              "requestId": "negative-19"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_REFRESH_REVOKED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_REFRESH_REVOKED",
+                    "message": "Refresh token has been revoked."
+                  },
+                  "requestId": "negative-19"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_REFRESH_REVOKED",
+                "body": {
+                  "error": {
+                    "code": "AUTH_REFRESH_REVOKED",
+                    "message": "Refresh token has been revoked."
+                  },
+                  "requestId": "negative-19"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no access or refresh token is issued"
+      ],
+      "forbiddenObservations": [
+        "revoked credential is restored"
+      ]
+    }
   ]
 }

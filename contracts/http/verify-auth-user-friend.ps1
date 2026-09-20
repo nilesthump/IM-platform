@@ -1,146 +1,506 @@
 [CmdletBinding()]
-param()
+param(
+    [string]$RepoRoot
+)
 
 $ErrorActionPreference = 'Stop'
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$openApiPath = Join-Path $repoRoot 'contracts/http/auth-user-friend.openapi.json'
-$errorPath = Join-Path $repoRoot 'contracts/errors/http-errors.schema.json'
-$fixtureRoot = Join-Path $repoRoot 'contracts/fixtures/auth-user-friend'
+if (-not $RepoRoot) {
+    $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+} else {
+    $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+
+$openApiPath = Join-Path $RepoRoot 'contracts/http/auth-user-friend.openapi.json'
+$errorPath = Join-Path $RepoRoot 'contracts/errors/http-errors.schema.json'
+$fixtureRoot = Join-Path $RepoRoot 'contracts/fixtures/auth-user-friend'
 $fixtureSchemaPath = Join-Path $fixtureRoot 'fixture.schema.json'
 $positivePath = Join-Path $fixtureRoot 'positive.json'
 $negativePath = Join-Path $fixtureRoot 'negative.json'
 $failures = @()
 
-foreach ($path in @($openApiPath, $errorPath, $fixtureSchemaPath, $positivePath, $negativePath)) {
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        $failures += "missing required contract file: $path"
+function Test-HasProperty {
+    param($Value, [string]$Name)
+    return @($Value.PSObject.Properties | Where-Object { $_.Name -ceq $Name }).Count -eq 1
+}
+
+function Get-PropertyValue {
+    param($Value, [string]$Name)
+    $property = @($Value.PSObject.Properties | Where-Object { $_.Name -ceq $Name })
+    if ($property.Count -eq 1) {
+        if ($property[0].Value -is [array]) { Write-Output -NoEnumerate $property[0].Value; return }
+        return $property[0].Value
     }
-}
-if ($failures.Count -gt 0) {
-    $failures | ForEach-Object { Write-Error $_ }
-    exit 1
+    return $null
 }
 
-try { $openApiRaw = Get-Content -LiteralPath $openApiPath -Raw; $openApi = $openApiRaw | ConvertFrom-Json -Depth 100 }
-catch { $failures += "OpenAPI JSON parse failed: $($_.Exception.Message)" }
-try { $errorRaw = Get-Content -LiteralPath $errorPath -Raw; $errors = $errorRaw | ConvertFrom-Json -Depth 100 }
-catch { $failures += "error schema JSON parse failed: $($_.Exception.Message)" }
-try { $positiveRaw = Get-Content -LiteralPath $positivePath -Raw; $positive = $positiveRaw | ConvertFrom-Json -Depth 100 }
-catch { $failures += "positive fixtures JSON parse failed: $($_.Exception.Message)" }
-try { $negativeRaw = Get-Content -LiteralPath $negativePath -Raw; $negative = $negativeRaw | ConvertFrom-Json -Depth 100 }
-catch { $failures += "negative fixtures JSON parse failed: $($_.Exception.Message)" }
-
-if ($failures.Count -eq 0) {
-    foreach ($fixturePath in @($positivePath, $negativePath)) {
-        try {
-            $valid = Get-Content -LiteralPath $fixturePath -Raw | Test-Json -SchemaFile $fixtureSchemaPath -ErrorAction Stop
-            if (-not $valid) { $failures += "fixture schema validation returned false: $fixturePath" }
-        } catch { $failures += "fixture schema validation failed: $fixturePath $($_.Exception.Message)" }
+function Resolve-Pointer {
+    param($Root, [string]$Pointer)
+    if (-not $Pointer.StartsWith('#/')) { return $null }
+    $node = $Root
+    foreach ($segment in @($Pointer.Substring(2) -split '/')) {
+        $decoded = $segment.Replace('~1','/').Replace('~0','~')
+        $property = @($node.PSObject.Properties | Where-Object { $_.Name -ceq $decoded })
+        if ($property.Count -ne 1) { return $null }
+        $node = $property[0].Value
     }
+    return $node
 }
 
-if ($openApi.openapi -ne '3.1.0') { $failures += 'OpenAPI version must be 3.1.0' }
-if ($openApi.info.version -ne '1.0.0') { $failures += 'contract version must be 1.0.0' }
-$expectedPaths = @('/v1/auth/register','/v1/auth/login','/v1/auth/refresh','/v1/auth/logout','/v1/users/me','/v1/users/search','/v1/friends','/v1/friends/{friendUserId}')
-$actualPaths = @($openApi.paths.PSObject.Properties.Name)
-foreach ($path in $expectedPaths) { if ($path -notin $actualPaths) { $failures += "missing canonical path: $path" } }
-foreach ($path in $actualPaths) {
-    if ($path -match '(?i)(websocket|wss|sync|plugin|message|group|database)') { $failures += "forbidden out-of-scope path: $path" }
+function Resolve-Schema {
+    param($Schema, $OpenApi, $Errors)
+    if ($null -eq $Schema -or -not (Test-HasProperty $Schema '$ref')) { return $Schema }
+    $ref = [string](Get-PropertyValue $Schema '$ref')
+    if ($ref.StartsWith('#/')) {
+        $resolved = Resolve-Pointer $OpenApi $ref
+        if ($null -eq $resolved) { $resolved = Resolve-Pointer $Errors $ref }
+        return $resolved
+    }
+    if ($ref -eq '../errors/http-errors.schema.json#/$defs/ErrorResponse') {
+        return Resolve-Pointer $Errors '#/$defs/ErrorResponse'
+    }
+    return $null
 }
 
-$operationIds = @()
-foreach ($pathProperty in $openApi.paths.PSObject.Properties) {
-    foreach ($methodProperty in $pathProperty.Value.PSObject.Properties) {
-        if ($methodProperty.Name -notin @('get','post','put','delete','patch')) { continue }
-        $operation = $methodProperty.Value
-        if (-not $operation.operationId) { $failures += "missing operationId: $($methodProperty.Name.ToUpper()) $($pathProperty.Name)" }
-        else { $operationIds += $operation.operationId }
-        foreach ($parameter in @($operation.parameters)) {
-            if ($parameter.in -eq 'query' -and $parameter.name -match '(?i)(token|password|secret|credential)') {
-                $failures += "authentication material declared in query: $($pathProperty.Name) $($parameter.name)"
+function ConvertTo-CanonicalJson {
+    param($Value)
+    if ($null -eq $Value) { return 'null' }
+    if ($Value -is [string]) { return ($Value | ConvertTo-Json -Compress) }
+    if ($Value -is [bool]) { if ($Value) { return 'true' }; return 'false' }
+    if ($Value -is [array]) {
+        $items = @($Value | ForEach-Object { ConvertTo-CanonicalJson $_ })
+        return '[' + ($items -join ',') + ']'
+    }
+    if ($Value -is [System.Collections.IDictionary]) {
+        $pairs = @()
+        foreach ($key in @($Value.Keys | Sort-Object)) {
+            $pairs += (($key | ConvertTo-Json -Compress) + ':' + (ConvertTo-CanonicalJson $Value[$key]))
+        }
+        return '{' + ($pairs -join ',') + '}'
+    }
+    if (@($Value.PSObject.Properties).Count -gt 0 -and -not ($Value -is [System.ValueType])) {
+        $pairs = @()
+        foreach ($property in @($Value.PSObject.Properties | Sort-Object Name)) {
+            $pairs += (($property.Name | ConvertTo-Json -Compress) + ':' + (ConvertTo-CanonicalJson $property.Value))
+        }
+        return '{' + ($pairs -join ',') + '}'
+    }
+    return ($Value | ConvertTo-Json -Compress)
+}
+
+function Get-SchemaErrors {
+    param($Value, $Schema, $OpenApi, $Errors, [string]$Location)
+    $result = @()
+    $resolved = Resolve-Schema $Schema $OpenApi $Errors
+    if ($null -eq $resolved) {
+        $result += "$Location has an unresolved schema reference"
+        return $result
+    }
+    $Schema = $resolved
+
+    if (Test-HasProperty $Schema 'allOf') {
+        foreach ($part in @($Schema.allOf)) {
+            $result += @(Get-SchemaErrors $Value $part $OpenApi $Errors $Location)
+        }
+    }
+    if (Test-HasProperty $Schema 'oneOf') {
+        $matchCount = 0
+        $branchIndex = 0
+        $branchDiagnostics = @()
+        foreach ($part in @($Schema.oneOf)) {
+            $branchErrors = @(Get-SchemaErrors $Value $part $OpenApi $Errors $Location)
+            if ($branchErrors.Count -eq 0) { $matchCount++ }
+            else { $branchDiagnostics += "branch ${branchIndex}: $($branchErrors -join '; ')" }
+            $branchIndex++
+        }
+        if ($matchCount -ne 1) { $result += "$Location must match exactly one oneOf branch; matches=$matchCount ($($branchDiagnostics -join ' | '))" }
+    }
+    if (Test-HasProperty $Schema 'not') {
+        if (@(Get-SchemaErrors $Value $Schema.not $OpenApi $Errors $Location).Count -eq 0) {
+            $result += "$Location matches a forbidden schema"
+        }
+    }
+
+    if (Test-HasProperty $Schema 'const') {
+        if ((ConvertTo-CanonicalJson $Value) -cne (ConvertTo-CanonicalJson $Schema.const)) {
+            $result += "$Location differs from const"
+        }
+    }
+    if (Test-HasProperty $Schema 'enum') {
+        $actual = ConvertTo-CanonicalJson $Value
+        $matches = @($Schema.enum | Where-Object { (ConvertTo-CanonicalJson $_) -ceq $actual })
+        if ($matches.Count -eq 0) { $result += "$Location is outside enum" }
+    }
+
+    $type = if (Test-HasProperty $Schema 'type') { [string]$Schema.type } else { '' }
+    if ($type -eq 'object' -and $null -ne $Value -and ($Value -is [array] -or $Value -is [string] -or $Value -is [System.ValueType])) {
+        $result += "$Location must be an object"
+        return $result
+    }
+    if ($type -eq 'array' -and -not ($Value -is [array])) {
+        $result += "$Location must be an array"
+        return $result
+    }
+    if ($type -eq 'string' -and -not ($Value -is [string])) {
+        $result += "$Location must be a string"
+        return $result
+    }
+    if ($type -eq 'integer' -and -not (($Value -is [int]) -or ($Value -is [long]))) {
+        $result += "$Location must be an integer"
+        return $result
+    }
+    if ($type -eq 'boolean' -and -not ($Value -is [bool])) {
+        $result += "$Location must be a boolean"
+        return $result
+    }
+
+    if ($Value -is [string]) {
+        if ((Test-HasProperty $Schema 'minLength') -and $Value.Length -lt [int]$Schema.minLength) { $result += "$Location is shorter than minLength" }
+        if ((Test-HasProperty $Schema 'maxLength') -and $Value.Length -gt [int]$Schema.maxLength) { $result += "$Location is longer than maxLength" }
+        if ((Test-HasProperty $Schema 'pattern') -and $Value -notmatch [string]$Schema.pattern) { $result += "$Location does not match pattern" }
+        if ((Test-HasProperty $Schema 'format') -and $Schema.format -eq 'uuid' -and $Value -notmatch '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$') {
+            $result += "$Location is not a UUID"
+        }
+    }
+    if ((($Value -is [int]) -or ($Value -is [long])) -and (Test-HasProperty $Schema 'minimum') -and $Value -lt [long]$Schema.minimum) {
+        $result += "$Location is below minimum"
+    }
+    if ($Value -is [array]) {
+        if ((Test-HasProperty $Schema 'minItems') -and $Value.Count -lt [int]$Schema.minItems) { $result += "$Location has too few items" }
+        if ((Test-HasProperty $Schema 'maxItems') -and $Value.Count -gt [int]$Schema.maxItems) { $result += "$Location has too many items" }
+        if ((Test-HasProperty $Schema 'uniqueItems') -and $Schema.uniqueItems) {
+            $canonicalItems = @($Value | ForEach-Object { ConvertTo-CanonicalJson $_ })
+            if (@($canonicalItems | Group-Object | Where-Object Count -gt 1).Count -gt 0) { $result += "$Location has duplicate items" }
+        }
+        if (Test-HasProperty $Schema 'items') {
+            for ($index = 0; $index -lt $Value.Count; $index++) {
+                $result += @(Get-SchemaErrors $Value[$index] $Schema.items $OpenApi $Errors "$Location[$index]")
             }
         }
     }
-}
-$duplicates = @($operationIds | Group-Object | Where-Object Count -gt 1 | Select-Object -ExpandProperty Name)
-if ($duplicates.Count -gt 0) { $failures += "duplicate operationId: $($duplicates -join ', ')" }
 
-$clientTypes = @($openApi.components.schemas.ClientType.enum)
-if (($clientTypes -join ',') -ne 'WEB,DESKTOP,MOBILE') { $failures += "client type slots must be exactly WEB,DESKTOP,MOBILE; actual=$($clientTypes -join ',')" }
-foreach ($schemaName in @('LoginRequest','RefreshRequest','Session','AuthResult','NormalizedUserPair','FriendshipResult')) {
-    if ($schemaName -notin @($openApi.components.schemas.PSObject.Properties.Name)) { $failures += "missing semantic schema: $schemaName" }
-}
-foreach ($field in @('username','password','clientType','deviceId','clientVersion','protocolVersion')) {
-    if ($field -notin @($openApi.components.schemas.LoginRequest.required)) { $failures += "LoginRequest missing required field: $field" }
-}
-if ($openApi.components.schemas.Session.properties.sessionEpoch.type -ne 'integer') { $failures += 'Session.sessionEpoch must be an integer' }
-if (@($openApi.components.schemas.RefreshRequest.allOf).Count -ne 1) { $failures += 'RefreshRequest must machine-enforce WEB cookie versus native body delivery' }
-if (@($openApi.components.schemas.AuthResult.oneOf).Count -ne 2) { $failures += 'AuthResult must machine-enforce WEB versus native token delivery' }
-if ($openApi.components.schemas.FriendshipResult.properties.memberUserIds.minItems -ne 2 -or $openApi.components.schemas.FriendshipResult.properties.memberUserIds.maxItems -ne 2) { $failures += 'FriendshipResult must require exactly two members' }
-$bearerDescription = [string]$openApi.components.securitySchemes.bearerAuth.description
-foreach ($claim in @('user_id','session_id','client_type','session_epoch','iat','exp')) {
-    if ($bearerDescription -notmatch [regex]::Escape($claim)) { $failures += "access token contract missing claim: $claim" }
-}
-$refreshDescription = [string]$openApi.components.securitySchemes.refreshCookie.description
-if ($refreshDescription -notmatch 'only its hash' -or $refreshDescription -notmatch 'independently') { $failures += 'refresh token hash-only and independent-revocation semantics are missing' }
-$friendDescription = [string]$openApi.paths.'/v1/friends/{friendUserId}'.put.description
-foreach ($term in @('Idempotently','normalized','single DIRECT','exactly two','atomically','no pending')) {
-    if ($friendDescription -notmatch [regex]::Escape($term)) { $failures += "friend transaction description missing: $term" }
-}
-$loginDescription = [string]$openApi.paths.'/v1/auth/login'.post.description
-foreach ($term in @('atomically revokes','increments','Other clientType slots remain valid')) {
-    if ($loginDescription -notmatch [regex]::Escape($term)) { $failures += "login replacement description missing: $term" }
-}
-
-$refMatches = [regex]::Matches($openApiRaw, '"\$ref"\s*:\s*"([^"]+)"')
-foreach ($match in $refMatches) {
-    $ref = $match.Groups[1].Value
-    if ($ref.StartsWith('#/')) {
-        $segments = @($ref.Substring(2) -split '/')
-        $node = $openApi
-        foreach ($segment in $segments) {
-            $decoded = $segment.Replace('~1','/').Replace('~0','~')
-            $properties = @($node.PSObject.Properties | Where-Object { $_.Name -eq $decoded })
-            if ($properties.Count -ne 1) { $failures += "unresolved internal reference: $ref"; break }
-            $node = $properties[0].Value
+    $hasObjectRules = (Test-HasProperty $Schema 'properties') -or (Test-HasProperty $Schema 'required') -or (Test-HasProperty $Schema 'additionalProperties')
+    if ($hasObjectRules -and $null -ne $Value -and -not ($Value -is [array]) -and -not ($Value -is [string]) -and -not ($Value -is [System.ValueType])) {
+        $actualNames = @($Value.PSObject.Properties.Name)
+        if (Test-HasProperty $Schema 'required') {
+            foreach ($requiredName in @($Schema.required)) {
+                if ($requiredName -notin $actualNames) { $result += "$Location missing required property $requiredName" }
+            }
         }
-    } elseif ($ref -notmatch '^\.\./errors/http-errors\.schema\.json#/\$defs/ErrorResponse$') {
-        $failures += "unexpected external reference: $ref"
+        if ((Test-HasProperty $Schema 'additionalProperties') -and $Schema.additionalProperties -eq $false) {
+            $allowedNames = @($Schema.properties.PSObject.Properties.Name)
+            foreach ($actualName in $actualNames) {
+                if ($actualName -notin $allowedNames) { $result += "$Location has undeclared property $actualName" }
+            }
+        }
+        if (Test-HasProperty $Schema 'properties') {
+            foreach ($property in @($Schema.properties.PSObject.Properties)) {
+                if ($property.Name -in $actualNames) {
+                    $result += @(Get-SchemaErrors (Get-PropertyValue $Value $property.Name) $property.Value $OpenApi $Errors "$Location.$($property.Name)")
+                }
+            }
+        }
     }
+    return $result
 }
 
-$expectedErrorCodes = @('VALIDATION_FAILED','AUTH_REQUIRED','AUTH_INVALID_CREDENTIALS','AUTH_TOKEN_INVALID','AUTH_TOKEN_EXPIRED','AUTH_SESSION_REVOKED','AUTH_SESSION_EPOCH_STALE','AUTH_CLIENT_TYPE_MISMATCH','AUTH_REFRESH_REVOKED','AUTHORIZATION_DENIED','PROTOCOL_VERSION_UNSUPPORTED','USERNAME_ALREADY_EXISTS','USER_NOT_FOUND','FRIEND_SELF_NOT_ALLOWED','FRIENDSHIP_STATE_CONFLICT')
-$actualErrorCodes = @($errors.'$defs'.ErrorCode.enum)
-if (($actualErrorCodes -join ',') -ne ($expectedErrorCodes -join ',')) { $failures += 'shared error code registry differs from the canonical ordered set' }
-if ($errorRaw -match '(?i)"(accessToken|refreshToken|password|cookie)"\s*:') { $failures += 'error response schema exposes authentication material fields' }
-
-$requiredPositive = @('registration-and-authorized-user-search','same-slot-login-replaces-only-that-slot','refresh-rotates-current-session-credential','logout-revokes-session-refresh-and-connection','friend-add-normalizes-and-reuses-direct')
-$requiredNegative = @('invalid-credentials','token-in-query-rejected','invalid-client-type','refresh-client-type-mismatch','unsupported-protocol-version','missing-authentication','authorization-binding-mismatch','friend-self-rejected','duplicate-friendship-divergence-rejected','non-normalized-pair-divergence-rejected','stale-session-epoch-rejected','revoked-refresh-token-rejected')
-if ($positive.polarity -ne 'positive') { $failures += 'positive fixture polarity is incorrect' }
-if ($negative.polarity -ne 'negative') { $failures += 'negative fixture polarity is incorrect' }
-foreach ($fixture in @($positive, $negative)) {
-    if ((@($fixture.profiles) -join ',') -ne 'go,java') { $failures += "$($fixture.polarity) fixtures must target both go and java profiles" }
+function Get-OperationMatch {
+    param($OpenApi, [string]$Method, [string]$RequestPath)
+    $pathOnly = @($RequestPath -split '\?')[0]
+    foreach ($pathProperty in @($OpenApi.paths.PSObject.Properties)) {
+        $isMatch = $pathOnly -ceq $pathProperty.Name
+        if (-not $isMatch -and $pathProperty.Name -eq '/v1/friends/{friendUserId}') {
+            $isMatch = $pathOnly -match '^/v1/friends/[^/]+$'
+        }
+        if (-not $isMatch) { continue }
+        $methodProperty = @($pathProperty.Value.PSObject.Properties | Where-Object { $_.Name -ceq $Method.ToLowerInvariant() })
+        if ($methodProperty.Count -eq 1) {
+            return [pscustomobject]@{ Template = $pathProperty.Name; Operation = $methodProperty[0].Value }
+        }
+    }
+    return $null
 }
-$positiveIds = @($positive.scenarios.id)
-$negativeIds = @($negative.scenarios.id)
-foreach ($id in $requiredPositive) { if ($id -notin $positiveIds) { $failures += "missing positive fixture: $id" } }
-foreach ($id in $requiredNegative) { if ($id -notin $negativeIds) { $failures += "missing negative fixture: $id" } }
-$allIds = @($positiveIds + $negativeIds)
-$duplicateFixtureIds = @($allIds | Group-Object | Where-Object Count -gt 1 | Select-Object -ExpandProperty Name)
-if ($duplicateFixtureIds.Count -gt 0) { $failures += "duplicate fixture IDs: $($duplicateFixtureIds -join ', ')" }
-foreach ($scenario in @($negative.scenarios)) {
-    foreach ($step in @($scenario.steps)) {
-        if ($step.expected.errorCode -and $step.expected.errorCode -notin $actualErrorCodes) { $failures += "fixture uses unknown error code: $($scenario.id) $($step.expected.errorCode)" }
+
+function Resolve-ResponseObject {
+    param($Response, $OpenApi)
+    if (-not (Test-HasProperty $Response '$ref')) { return $Response }
+    return Resolve-Pointer $OpenApi ([string](Get-PropertyValue $Response '$ref'))
+}
+
+function Get-ModelFailures {
+    param($OpenApi, $Errors, $Positive, $Negative)
+    $issues = @()
+    $expectedPaths = @('/v1/auth/register','/v1/auth/login','/v1/auth/refresh/web','/v1/auth/refresh/native','/v1/auth/logout','/v1/users/me','/v1/users/search','/v1/friends','/v1/friends/{friendUserId}')
+    $actualPaths = @($OpenApi.paths.PSObject.Properties.Name)
+    if ($OpenApi.openapi -ne '3.1.0') { $issues += 'OpenAPI version must be 3.1.0' }
+    if ($OpenApi.info.version -ne '1.0.0') { $issues += 'contract version must be 1.0.0' }
+    if ((($actualPaths | Sort-Object) -join ',') -cne (($expectedPaths | Sort-Object) -join ',')) { $issues += 'canonical HTTP path set differs from the expected Auth/User/Friend scope' }
+    foreach ($path in $actualPaths) {
+        if ($path -match '(?i)(websocket|wss|sync|plugin|message|group|database)') { $issues += "forbidden out-of-scope path: $path" }
+    }
+
+    $operationIds = @()
+    $globalCodes = @($Errors.'$defs'.ErrorCode.enum)
+    foreach ($pathProperty in @($OpenApi.paths.PSObject.Properties)) {
+        foreach ($methodProperty in @($pathProperty.Value.PSObject.Properties)) {
+            if ($methodProperty.Name -notin @('get','post','put','delete','patch')) { continue }
+            $operation = $methodProperty.Value
+            if (-not $operation.operationId) { $issues += "missing operationId: $($methodProperty.Name.ToUpper()) $($pathProperty.Name)" } else { $operationIds += $operation.operationId }
+            foreach ($parameter in @($operation.parameters)) {
+                if ($parameter.in -eq 'query' -and $parameter.name -match '(?i)(token|password|secret|credential)') { $issues += "authentication material declared in query: $($pathProperty.Name) $($parameter.name)" }
+            }
+            foreach ($responseProperty in @($operation.responses.PSObject.Properties)) {
+                if ($responseProperty.Name -notmatch '^[45][0-9][0-9]$') { continue }
+                $codes = @((Get-PropertyValue $responseProperty.Value 'x-error-codes'))
+                if ($codes.Count -eq 0) { $issues += "$($operation.operationId) status $($responseProperty.Name) lacks x-error-codes" }
+                foreach ($code in $codes) {
+                    if ($code -notin $globalCodes) { $issues += "$($operation.operationId) status $($responseProperty.Name) permits unknown error code $code" }
+                }
+                $resolvedResponse = Resolve-ResponseObject $responseProperty.Value $OpenApi
+                $schema = $resolvedResponse.content.'application/json'.schema
+                if ([string](Get-PropertyValue $schema '$ref') -ne '../errors/http-errors.schema.json#/$defs/ErrorResponse') {
+                    $issues += "$($operation.operationId) status $($responseProperty.Name) must use the shared ErrorResponse"
+                }
+            }
+        }
+    }
+    $duplicates = @($operationIds | Group-Object | Where-Object Count -gt 1 | Select-Object -ExpandProperty Name)
+    if ($duplicates.Count -gt 0) { $issues += "duplicate operationId: $($duplicates -join ', ')" }
+
+    $expectedCodes = @('VALIDATION_FAILED','AUTH_REQUIRED','AUTH_INVALID_CREDENTIALS','AUTH_TOKEN_INVALID','AUTH_TOKEN_EXPIRED','AUTH_SESSION_REVOKED','AUTH_SESSION_EPOCH_STALE','AUTH_CLIENT_TYPE_MISMATCH','AUTH_REFRESH_REVOKED','AUTHORIZATION_DENIED','PROTOCOL_VERSION_UNSUPPORTED','USERNAME_ALREADY_EXISTS','USER_NOT_FOUND','FRIEND_SELF_NOT_ALLOWED','FRIENDSHIP_STATE_CONFLICT')
+    if (($globalCodes -join ',') -cne ($expectedCodes -join ',')) { $issues += 'shared error code registry differs from the canonical ordered set' }
+
+    if ((@($OpenApi.components.schemas.ClientType.enum) -join ',') -cne 'WEB,DESKTOP,MOBILE') { $issues += 'client type slots must be exactly WEB,DESKTOP,MOBILE' }
+    foreach ($schemaName in @('LoginRequest','WebRefreshRequest','NativeRefreshRequest','Session','AuthResult','NormalizedUserPair','FriendshipResult')) {
+        if ($schemaName -notin @($OpenApi.components.schemas.PSObject.Properties.Name)) { $issues += "missing semantic schema: $schemaName" }
+    }
+    foreach ($field in @('username','password','clientType','deviceId','clientVersion','protocolVersion')) {
+        if ($field -notin @($OpenApi.components.schemas.LoginRequest.required)) { $issues += "LoginRequest missing required field: $field" }
+    }
+    if (@($OpenApi.components.schemas.AuthResult.oneOf).Count -ne 2) { $issues += 'AuthResult must machine-enforce WEB versus native token delivery' }
+    if ($OpenApi.components.schemas.FriendshipResult.properties.memberUserIds.minItems -ne 2 -or $OpenApi.components.schemas.FriendshipResult.properties.memberUserIds.maxItems -ne 2) { $issues += 'FriendshipResult must require exactly two members' }
+
+    $webRefresh = $OpenApi.paths.'/v1/auth/refresh/web'.post
+    $nativeRefresh = $OpenApi.paths.'/v1/auth/refresh/native'.post
+    $webSecurityNames = if (@($webRefresh.security).Count -eq 1) { @($webRefresh.security[0].PSObject.Properties.Name) } else { @() }
+    if (@($webRefresh.security).Count -ne 1 -or ($webSecurityNames -join ',') -cne 'refreshCookie') { $issues += 'WEB refresh must require only the refreshCookie security scheme with no anonymous alternative' }
+    if ($webRefresh.requestBody.required -ne $true) { $issues += 'WEB refresh metadata body must be required' }
+    foreach ($field in @('clientType','deviceId','clientVersion','protocolVersion')) {
+        if ($field -notin @($OpenApi.components.schemas.WebRefreshRequest.required)) { $issues += "WebRefreshRequest missing required field: $field" }
+    }
+    if ('refreshToken' -in @($OpenApi.components.schemas.WebRefreshRequest.properties.PSObject.Properties.Name)) { $issues += 'WebRefreshRequest must not represent a body refresh token' }
+    if ($nativeRefresh.requestBody.required -ne $true) { $issues += 'native refresh credential body must be required' }
+    foreach ($field in @('refreshToken','clientType','deviceId','clientVersion','protocolVersion')) {
+        if ($field -notin @($OpenApi.components.schemas.NativeRefreshRequest.required)) { $issues += "NativeRefreshRequest missing required field: $field" }
+    }
+    if ((@($OpenApi.components.schemas.NativeClientType.enum) -join ',') -cne 'DESKTOP,MOBILE') { $issues += 'native refresh clientType must exclude WEB' }
+    $cookieDescription = [string]$OpenApi.components.securitySchemes.refreshCookie.description
+    if ($cookieDescription -notmatch 'Secure' -or $cookieDescription -notmatch 'HttpOnly' -or $cookieDescription -notmatch 'only its hash' -or $cookieDescription -notmatch 'independently') {
+        $issues += 'WEB refresh cookie security, hash-only storage, or independent-revocation semantics are missing'
+    }
+    $setCookieDescription = [string]$webRefresh.responses.'200'.headers.'Set-Cookie'.description
+    foreach ($term in @('Secure','HttpOnly','SameSite')) {
+        if ($setCookieDescription -notmatch $term) { $issues += "WEB refresh Set-Cookie contract missing $term" }
+    }
+
+    $bearerDescription = [string]$OpenApi.components.securitySchemes.bearerAuth.description
+    foreach ($claim in @('user_id','session_id','client_type','session_epoch','iat','exp')) {
+        if ($bearerDescription -notmatch [regex]::Escape($claim)) { $issues += "access token contract missing claim: $claim" }
+    }
+    $friendDescription = [string]$OpenApi.paths.'/v1/friends/{friendUserId}'.put.description
+    foreach ($term in @('Idempotently','normalized','single DIRECT','exactly two','atomically','no pending')) {
+        if ($friendDescription -notmatch [regex]::Escape($term)) { $issues += "friend transaction description missing: $term" }
+    }
+    $loginDescription = [string]$OpenApi.paths.'/v1/auth/login'.post.description
+    foreach ($term in @('atomically revokes','increments','Other clientType slots remain valid')) {
+        if ($loginDescription -notmatch [regex]::Escape($term)) { $issues += "login replacement description missing: $term" }
+    }
+
+    $requiredPositive = @('registration-and-authorized-user-search','same-slot-login-replaces-only-that-slot','native-refresh-rotates-current-session-credential','web-refresh-rotates-secure-cookie','logout-revokes-session-refresh-and-connection','friend-add-normalizes-and-reuses-direct')
+    $requiredNegative = @('invalid-credentials','token-in-query-rejected','invalid-client-type','refresh-client-type-mismatch','unsupported-protocol-version','missing-authentication','authorization-binding-mismatch','invalid-access-token','expired-access-token','revoked-session-token','username-already-exists','friend-target-not-found','friendship-state-conflict','friend-add-authorization-denied','web-refresh-missing-cookie','native-refresh-missing-token','friend-self-rejected','duplicate-friendship-divergence-rejected','non-normalized-pair-divergence-rejected','stale-session-epoch-rejected','revoked-refresh-token-rejected')
+    if ($Positive.fixtureVersion -ne '1.1' -or $Negative.fixtureVersion -ne '1.1') { $issues += 'fixture version must be 1.1' }
+    if ($Positive.polarity -ne 'positive' -or $Negative.polarity -ne 'negative') { $issues += 'fixture polarity is incorrect' }
+    foreach ($fixture in @($Positive,$Negative)) {
+        if ((@($fixture.profiles) -join ',') -cne 'go,java') { $issues += "$($fixture.polarity) fixtures must target both go and java profiles" }
+    }
+    $positiveIds = @($Positive.scenarios.id)
+    $negativeIds = @($Negative.scenarios.id)
+    foreach ($id in $requiredPositive) { if ($id -notin $positiveIds) { $issues += "missing positive fixture: $id" } }
+    foreach ($id in $requiredNegative) { if ($id -notin $negativeIds) { $issues += "missing negative fixture: $id" } }
+    $duplicateIds = @(($positiveIds + $negativeIds) | Group-Object | Where-Object Count -gt 1 | Select-Object -ExpandProperty Name)
+    if ($duplicateIds.Count -gt 0) { $issues += "duplicate fixture IDs: $($duplicateIds -join ', ')" }
+
+    $coveredCodes = @()
+    foreach ($fixture in @($Positive,$Negative)) {
+        foreach ($scenario in @($fixture.scenarios)) {
+            foreach ($step in @($scenario.steps)) {
+                $match = Get-OperationMatch $OpenApi $step.request.method $step.request.path
+                if ($null -eq $match) {
+                    $issues += "$($scenario.id) references undeclared operation $($step.request.method) $($step.request.path)"
+                    continue
+                }
+                $operation = $match.Operation
+                $statusName = [string]$step.expected.status
+                $responseProperty = @($operation.responses.PSObject.Properties | Where-Object { $_.Name -ceq $statusName })
+                if ($responseProperty.Count -ne 1) {
+                    $issues += "$($scenario.id) expects undeclared status $statusName from $($operation.operationId)"
+                    continue
+                }
+                $responseWrapper = $responseProperty[0].Value
+                $response = Resolve-ResponseObject $responseWrapper $OpenApi
+
+                $hasRequestBody = Test-HasProperty $step.request 'body'
+                if (Test-HasProperty $operation 'requestBody') {
+                    if ($operation.requestBody.required -eq $true -and -not $hasRequestBody) { $issues += "$($scenario.id) omits required request body" }
+                    if ($hasRequestBody) {
+                        $requestSchema = $operation.requestBody.content.'application/json'.schema
+                        $requestErrors = @(Get-SchemaErrors $step.request.body $requestSchema $OpenApi $Errors "$($scenario.id).request.body")
+                        $expectsSchemaRejection = ($step.expected.status -in @(400,426)) -and ($step.expected.errorCode -in @('VALIDATION_FAILED','PROTOCOL_VERSION_UNSUPPORTED'))
+                        if ($requestErrors.Count -gt 0) {
+                            if (-not $expectsSchemaRejection) { $issues += $requestErrors }
+                        } elseif ($expectsSchemaRejection) {
+                            $issues += "$($scenario.id) expects schema rejection but its request body conforms"
+                        }
+                    }
+                } elseif ($hasRequestBody) {
+                    $issues += "$($scenario.id) supplies a body to an operation without requestBody"
+                }
+
+                $hasExpectedBody = Test-HasProperty $step.expected 'body'
+                $responseSchema = $null
+                if ($null -ne $response -and $null -ne $response.content -and $null -ne $response.content.'application/json') {
+                    $responseSchema = $response.content.'application/json'.schema
+                }
+                if ($null -ne $responseSchema -and -not $hasExpectedBody) { $issues += "$($scenario.id) omits the declared response body for status $statusName" }
+                if ($null -eq $responseSchema -and $hasExpectedBody) { $issues += "$($scenario.id) supplies a body for bodyless status $statusName" }
+                if ($hasExpectedBody -and $null -ne $responseSchema) {
+                    $issues += @(Get-SchemaErrors $step.expected.body $responseSchema $OpenApi $Errors "$($scenario.id).expected.body")
+                }
+
+                if (Test-HasProperty $step.expected 'headers') {
+                    foreach ($headerName in @($step.expected.headers.PSObject.Properties.Name)) {
+                        if ($headerName -notin @($response.headers.PSObject.Properties.Name)) { $issues += "$($scenario.id) expects undeclared response header $headerName" }
+                        if ($headerName -ceq 'Set-Cookie') {
+                            $headerValue = [string](Get-PropertyValue $step.expected.headers $headerName)
+                            foreach ($term in @('Secure','HttpOnly','SameSite')) {
+                                if ($headerValue -notmatch $term) { $issues += "$($scenario.id) Set-Cookie expectation missing $term" }
+                            }
+                        }
+                    }
+                }
+
+                if (Test-HasProperty $step.expected 'errorCode') {
+                    $code = [string]$step.expected.errorCode
+                    $coveredCodes += $code
+                    if ($code -notin $globalCodes) { $issues += "$($scenario.id) uses unknown error code $code" }
+                    $permitted = @((Get-PropertyValue $responseWrapper 'x-error-codes'))
+                    if ($code -notin $permitted) { $issues += "$($scenario.id) uses $code, not permitted for $($operation.operationId) status $statusName" }
+                    if (-not $hasExpectedBody -or $step.expected.body.error.code -cne $code) { $issues += "$($scenario.id) errorCode must equal response body error.code" }
+                } elseif ([int]$step.expected.status -ge 400) {
+                    $issues += "$($scenario.id) error response lacks errorCode"
+                }
+
+                $canonical = $step.expected | Select-Object -Property * -ExcludeProperty normalizedOutputs
+                $canonicalJson = ConvertTo-CanonicalJson $canonical
+                foreach ($profile in @('go','java')) {
+                    $profileOutput = Get-PropertyValue $step.expected.normalizedOutputs $profile
+                    if ((ConvertTo-CanonicalJson $profileOutput) -cne $canonicalJson) {
+                        $issues += "$($scenario.id) $profile normalized output differs from canonical expected"
+                    }
+                }
+            }
+        }
+    }
+    foreach ($code in $expectedCodes) {
+        if ($code -notin $coveredCodes) { $issues += "negative fixture coverage missing shared error code $code" }
+    }
+
+    $allRefs = [regex]::Matches(($OpenApi | ConvertTo-Json -Depth 100), '"\$ref"\s*:\s*"([^"]+)"')
+    foreach ($refMatch in $allRefs) {
+        $ref = $refMatch.Groups[1].Value
+        if ($ref.StartsWith('#/')) {
+            if ($null -eq (Resolve-Pointer $OpenApi $ref)) { $issues += "unresolved internal reference: $ref" }
+        } elseif ($ref -ne '../errors/http-errors.schema.json#/$defs/ErrorResponse') {
+            $issues += "unexpected external reference: $ref"
+        }
+    }
+
+    return $issues
+}
+
+foreach ($path in @($openApiPath,$errorPath,$fixtureSchemaPath,$positivePath,$negativePath)) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { $failures += "missing required contract file: $path" }
+}
+if ($failures.Count -eq 0) {
+    try { $openApi = Get-Content -LiteralPath $openApiPath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "OpenAPI JSON parse failed: $($_.Exception.Message)" }
+    try { $errors = Get-Content -LiteralPath $errorPath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "error schema JSON parse failed: $($_.Exception.Message)" }
+    try { $positive = Get-Content -LiteralPath $positivePath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "positive fixtures JSON parse failed: $($_.Exception.Message)" }
+    try { $negative = Get-Content -LiteralPath $negativePath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "negative fixtures JSON parse failed: $($_.Exception.Message)" }
+}
+if ($failures.Count -eq 0) {
+    foreach ($fixturePath in @($positivePath,$negativePath)) {
+        try {
+            if (-not (Get-Content -LiteralPath $fixturePath -Raw | Test-Json -SchemaFile $fixtureSchemaPath -ErrorAction Stop)) { $failures += "fixture schema validation returned false: $fixturePath" }
+        } catch { $failures += "fixture schema validation failed: $fixturePath $($_.Exception.Message)" }
     }
 }
-if ($negativeRaw -notmatch 'token-in-query-rejected' -or $negativeRaw -notmatch 'password or token appears') { $failures += 'security negative coverage is incomplete' }
-if ($positiveRaw -notmatch 'one normalized friendship exists' -or $positiveRaw -notmatch 'exactly two distinct memberships exist') { $failures += 'friend atomic-normalization assertions are incomplete' }
-if ($positiveRaw -notmatch 'local SQLite or client history is deleted') { $failures += 'logout local-history non-semantics are not explicit' }
+if ($failures.Count -eq 0) {
+    $failures += @(Get-ModelFailures $openApi $errors $positive $negative)
+}
+
+if ($failures.Count -eq 0) {
+    function Copy-JsonModel {
+        param($Value)
+        return ($Value | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100)
+    }
+    $mutations = @()
+
+    $mutatedPositive = Copy-JsonModel $positive
+    $mutatedPositive.scenarios[0].steps[0].expected.body = [pscustomobject]@{ arbitrary = 'not-a-contract-body' }
+    $mutations += [pscustomobject]@{ Name='body-mismatch'; OpenApi=$openApi; Positive=$mutatedPositive; Negative=$negative }
+
+    $mutatedNegative = Copy-JsonModel $negative
+    $target = @($mutatedNegative.scenarios | Where-Object id -eq 'invalid-credentials')[0].steps[0].expected
+    $target.status = 418; $target.normalizedOutputs.go.status = 418; $target.normalizedOutputs.java.status = 418
+    $mutations += [pscustomobject]@{ Name='undeclared-status'; OpenApi=$openApi; Positive=$positive; Negative=$mutatedNegative }
+
+    $mutatedNegative = Copy-JsonModel $negative
+    $target = @($mutatedNegative.scenarios | Where-Object id -eq 'invalid-credentials')[0].steps[0].expected
+    $target.errorCode = 'AUTHORIZATION_DENIED'; $target.body.error.code = 'AUTHORIZATION_DENIED'
+    $target.normalizedOutputs.go.errorCode = 'AUTHORIZATION_DENIED'; $target.normalizedOutputs.go.body.error.code = 'AUTHORIZATION_DENIED'
+    $target.normalizedOutputs.java.errorCode = 'AUTHORIZATION_DENIED'; $target.normalizedOutputs.java.body.error.code = 'AUTHORIZATION_DENIED'
+    $mutations += [pscustomobject]@{ Name='undeclared-error-code'; OpenApi=$openApi; Positive=$positive; Negative=$mutatedNegative }
+
+    $mutatedPositive = Copy-JsonModel $positive
+    $mutatedPositive.scenarios[0].steps[0].expected.normalizedOutputs.java.status = 202
+    $mutations += [pscustomobject]@{ Name='missing-profile-parity'; OpenApi=$openApi; Positive=$mutatedPositive; Negative=$negative }
+
+    $mutatedNegative = Copy-JsonModel $negative
+    $mutatedNegative.scenarios = @($mutatedNegative.scenarios | Where-Object id -ne 'expired-access-token')
+    $mutations += [pscustomobject]@{ Name='missing-error-coverage'; OpenApi=$openApi; Positive=$positive; Negative=$mutatedNegative }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.paths.'/v1/auth/refresh/web'.post.security = @([pscustomobject]@{})
+    $mutatedOpenApi.paths.'/v1/auth/refresh/web'.post.requestBody.required = $false
+    $mutations += [pscustomobject]@{ Name='credentialless-refresh'; OpenApi=$mutatedOpenApi; Positive=$positive; Negative=$negative }
+
+    foreach ($mutation in $mutations) {
+        $mutationFailures = @(Get-ModelFailures $mutation.OpenApi $errors $mutation.Positive $mutation.Negative)
+        if ($mutationFailures.Count -eq 0) { $failures += "mutation regression was not rejected: $($mutation.Name)" }
+    }
+}
 
 if ($failures.Count -gt 0) {
-    $failures | ForEach-Object { Write-Error $_ }
+    $failures | Sort-Object -Unique | ForEach-Object { Write-Host "ERROR: $_" }
     exit 1
 }
 
-Write-Host "PASS: Auth/User/Friend OpenAPI, shared errors, refs, and golden fixtures verified paths=$($actualPaths.Count) operations=$($operationIds.Count) error_codes=$($actualErrorCodes.Count) positive=$($positiveIds.Count) negative=$($negativeIds.Count) profiles=go,java."
+$pathCount = @($openApi.paths.PSObject.Properties).Count
+$operationCount = 0
+foreach ($path in @($openApi.paths.PSObject.Properties)) {
+    $operationCount += @($path.Value.PSObject.Properties | Where-Object Name -in @('get','post','put','delete','patch')).Count
+}
+$positiveCount = @($positive.scenarios).Count
+$negativeCount = @($negative.scenarios).Count
+$errorCount = @($errors.'$defs'.ErrorCode.enum).Count
+Write-Host "PASS: Auth/User/Friend contracts verified paths=$pathCount operations=$operationCount error_codes=$errorCount positive=$positiveCount negative=$negativeCount profiles=go,java mutation_regressions=6."
 exit 0
