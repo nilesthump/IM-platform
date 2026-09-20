@@ -9,7 +9,7 @@ These invariants constrain future contracts without prescribing wire shape or pe
 | SP-I-003 | Local materialized data and its corresponding cursor or contiguous-sequence advance MUST commit atomically. | Architecture Baseline v1.0, chapter 6.3. |
 | SP-I-004 | User-level cursor input MUST NOT contain Message events. | Architecture Baseline v1.0, chapter 6.4. |
 | SP-I-005 | Plugin capability or permission denial MUST prevent the Event subscription, Query, Action, or UI behavior without granting an alternate direct access path. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
-| SP-I-006 | Query operations MUST NOT mutate state; Action authorization and rate limits MUST be reevaluated at execution and the Action MUST be auditable. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-I-006 | Query operations MUST NOT mutate state; each Action MUST be re-authorized at execution, MUST be idempotent, and MUST be auditable. | Architecture Baseline v1.0, chapter 8.1. |
 | SP-I-007 | A changed package, backend, or renderer hash under an existing plugin version MUST be rejected. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
 | SP-I-008 | WASM and custom-renderer execution MUST remain sandboxed with least privilege and MUST NOT directly reach host-sensitive resources. | Architecture Baseline v1.0, chapters 8.2 and 8.3, and appendix B (Plugin). |
 | SP-I-009 | Upgrade MUST NOT split backend and renderer versions and MUST leave the previous version serviceable until atomic switch; any failed step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |

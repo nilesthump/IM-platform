@@ -13,4 +13,3 @@ This document supplies semantic input to `LOOP1-CONTRACT-001`. Names used below 
 | AUF-D-007 | Loop 1 MUST NOT introduce a friend-request approval flow. | Architecture Baseline v1.0, chapter 4.2. |
 | AUF-D-008 | A successful explicit logout MUST revoke the Session and Refresh Token and close its WSS connection; it MUST NOT be specified as deletion of local client history. | Architecture Baseline v1.0, chapter 7.1. |
 | AUF-D-009 | Production authentication transport MUST use HTTPS/WSS/TLS; tokens MUST NOT be accepted from a URL query or written to logs or traces, and error responses MUST NOT reveal token material. | Architecture Baseline v1.0, chapter 7.4. |
-
