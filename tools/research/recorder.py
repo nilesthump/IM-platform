@@ -34,6 +34,15 @@ SECRET_PATTERNS = [
     re.compile(r"\b(?:ghp|github_pat|sk)-[A-Za-z0-9_-]{12,}\b"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 ]
+SENSITIVE_KEY_NAMES = {
+    "password", "passwd", "pwd", "secret", "apikey", "token", "accesstoken",
+    "refreshtoken", "authorization", "rawauthheaders", "authheader", "authheaders",
+    "credential", "credentials", "clientsecret", "privatekey", "signingkey",
+}
+CI_EVIDENCE_FIELDS = {
+    "provider", "ci_run_id", "commit_sha", "job_name", "result", "failed_checks",
+    "duration_ms", "evidence_reference",
+}
 
 
 class RecorderError(RuntimeError):
@@ -50,6 +59,15 @@ def canonical(value: object) -> bytes:
 
 def sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+def portable_text_bytes(path: Path) -> bytes:
+    """Return Git's LF-canonical text bytes, independent of checkout autocrlf."""
+    return path.read_bytes().replace(b"\r\n", b"\n")
+
+
+def portable_text_sha256(path: Path) -> str:
+    return sha256_bytes(portable_text_bytes(path))
 
 
 def read_json(path: Path) -> dict:
@@ -74,6 +92,15 @@ def write_json(path: Path, value: object) -> None:
 
 
 def redact(text: str) -> tuple[str, bool]:
+    try:
+        structured = json.loads(text)
+    except json.JSONDecodeError:
+        structured = None
+    if isinstance(structured, (dict, list)):
+        safe_structured, structured_changed = redact_value(structured)
+        if structured_changed:
+            text = canonical(safe_structured).decode("utf-8")
+
     changed = False
     for pattern in SECRET_PATTERNS:
         def replacement(match: re.Match[str]) -> str:
@@ -82,7 +109,16 @@ def redact(text: str) -> tuple[str, bool]:
             prefix = match.group(1) if match.lastindex else ""
             return prefix + "[REDACTED]"
         text = pattern.sub(replacement, text)
-    return text, changed
+    return text, changed or (isinstance(structured, (dict, list)) and structured_changed)
+
+
+def sensitive_key(key: object) -> bool:
+    if not isinstance(key, str):
+        return False
+    normalized = re.sub(r"[^a-z0-9]", "", key.casefold())
+    return normalized in SENSITIVE_KEY_NAMES or any(
+        normalized.endswith(name) for name in SENSITIVE_KEY_NAMES if len(name) >= 6
+    )
 
 
 def redact_value(value: object) -> tuple[object, bool]:
@@ -98,7 +134,10 @@ def redact_value(value: object) -> tuple[object, bool]:
     if isinstance(value, dict):
         output, changed = {}, False
         for key, item in value.items():
-            safe, item_changed = redact_value(item)
+            if sensitive_key(key):
+                safe, item_changed = "[REDACTED]", item != "[REDACTED]"
+            else:
+                safe, item_changed = redact_value(item)
             output[key] = safe
             changed = changed or item_changed
         return output, changed
@@ -272,16 +311,18 @@ def append_event(root: Path, run_id: str, event_type: str, data: dict, *, allow_
 
 def cmd_register_prompt(args: argparse.Namespace, repo: Path, root: Path) -> int:
     if args.file:
-        content = Path(args.file).read_bytes().decode("utf-8")
+        content = Path(args.file).read_text(encoding="utf-8")
     elif args.stdin_base64:
         content = base64.b64decode(sys.stdin.buffer.read(), validate=True).decode("utf-8")
     else:
         content = sys.stdin.read()
+    content = content.replace("\r\n", "\n").replace("\r", "\n")
     safe, was_redacted = redact(content)
+    persisted = safe.encode("utf-8")
     prompt_id = args.prompt_id or f"P-{uuid.uuid4()}"
     if not re.fullmatch(r"P-[A-Za-z0-9_.:-]+", prompt_id):
         raise RecorderError("invalid prompt_id")
-    digest = sha256_bytes(safe.encode("utf-8"))
+    digest = sha256_bytes(persisted)
     metadata = {"recorder_schema_version": SCHEMA_VERSION, "prompt_id": prompt_id, "prompt_sha256": digest,
                 "prompt_capture": "redacted" if was_redacted else "full", "prompt_source": args.source,
                 "template_version": args.template_version or "unavailable", "task_id": args.task_id,
@@ -291,7 +332,7 @@ def cmd_register_prompt(args: argparse.Namespace, repo: Path, root: Path) -> int
     if directory.exists():
         raise RecorderError(f"prompt already exists: {prompt_id}")
     directory.mkdir(parents=True)
-    (directory / "prompt.txt").write_text(safe, encoding="utf-8", newline="\n")
+    (directory / "prompt.txt").write_bytes(persisted)
     write_json(directory / "metadata.json", metadata)
     if args.run_id:
         append_event(root, args.run_id, "prompt_registered", {"prompt_id": prompt_id, "prompt_sha256": digest,
@@ -417,12 +458,29 @@ def cmd_human_decision(args: argparse.Namespace, repo: Path, root: Path) -> int:
 
 def cmd_ingest_ci(args: argparse.Namespace, repo: Path, root: Path) -> int:
     evidence = read_json(Path(args.evidence))
-    required = {"provider", "ci_run_id", "commit_sha", "job_name", "result", "failed_checks", "duration_ms", "evidence_reference"}
-    missing = required - set(evidence)
-    if missing or evidence.get("result") not in {"PASS", "FAIL"}:
-        raise RecorderError(f"invalid CI evidence; missing={sorted(missing)}")
-    evidence["observed_evidence_sha256"] = sha256_bytes(Path(args.evidence).read_bytes())
-    append_event(root, args.run_id, "ci_finished", evidence)
+    missing = CI_EVIDENCE_FIELDS - set(evidence)
+    extra = set(evidence) - CI_EVIDENCE_FIELDS
+    valid_types = (
+        isinstance(evidence.get("provider"), str) and bool(evidence.get("provider"))
+        and isinstance(evidence.get("ci_run_id"), str) and bool(evidence.get("ci_run_id"))
+        and isinstance(evidence.get("commit_sha"), str)
+        and re.fullmatch(r"[0-9a-f]{40}", evidence.get("commit_sha", "")) is not None
+        and isinstance(evidence.get("job_name"), str) and bool(evidence.get("job_name"))
+        and evidence.get("result") in {"PASS", "FAIL"}
+        and isinstance(evidence.get("failed_checks"), list)
+        and all(isinstance(item, str) for item in evidence.get("failed_checks", []))
+        and isinstance(evidence.get("duration_ms"), (int, float))
+        and not isinstance(evidence.get("duration_ms"), bool)
+        and evidence.get("duration_ms", -1) >= 0
+        and isinstance(evidence.get("evidence_reference"), str)
+    )
+    if missing or extra or not valid_types:
+        raise RecorderError(f"invalid CI evidence; missing={sorted(missing)}; extra={sorted(extra)}")
+    safe_evidence, redacted = redact_value(evidence)
+    safe_evidence["observed_evidence_sha256"] = sha256_bytes(Path(args.evidence).read_bytes())
+    if redacted:
+        safe_evidence["secret_redaction_applied"] = True
+    append_event(root, args.run_id, "ci_finished", safe_evidence)
     return 0
 
 
@@ -455,10 +513,10 @@ def cmd_finish_run(args: argparse.Namespace, repo: Path, root: Path) -> int:
     summary = {"recorder_schema_version": SCHEMA_VERSION, "run_id": args.run_id, "status": "finished",
                "result": args.result, "event_count": len(records), "first_event_hash": records[0]["event_hash"],
                "final_event_hash": records[-1]["event_hash"], "manifest_hash": "unavailable"}
-    manifest_inputs = {"metadata": metadata, "initial_state_sha256": sha256_bytes((directory / "initial_state.json").read_bytes()),
-                       "final_state_sha256": sha256_bytes((directory / "final_state.json").read_bytes()),
-                       "diff_sha256": sha256_bytes((directory / "diff.patch").read_bytes()),
-                       "events_sha256": sha256_bytes((directory / "events.jsonl").read_bytes())}
+    manifest_inputs = {"metadata": metadata, "initial_state_sha256": portable_text_sha256(directory / "initial_state.json"),
+                       "final_state_sha256": portable_text_sha256(directory / "final_state.json"),
+                       "diff_sha256": portable_text_sha256(directory / "diff.patch"),
+                       "events_sha256": portable_text_sha256(directory / "events.jsonl")}
     summary["manifest_hash"] = sha256_bytes(canonical(manifest_inputs))
     write_json(directory / "summary.json", summary)
     write_json(directory / "metadata.json", metadata)
@@ -485,10 +543,10 @@ def validate_run(root: Path, run_id: str, require_finished: bool = True) -> dict
             raise RecorderError("finished run does not end with run_finished")
         summary = read_json(directory / "summary.json")
         manifest_inputs = {"metadata": metadata,
-                           "initial_state_sha256": sha256_bytes((directory / "initial_state.json").read_bytes()),
-                           "final_state_sha256": sha256_bytes((directory / "final_state.json").read_bytes()),
-                           "diff_sha256": sha256_bytes((directory / "diff.patch").read_bytes()),
-                           "events_sha256": sha256_bytes((directory / "events.jsonl").read_bytes())}
+                           "initial_state_sha256": portable_text_sha256(directory / "initial_state.json"),
+                           "final_state_sha256": portable_text_sha256(directory / "final_state.json"),
+                           "diff_sha256": portable_text_sha256(directory / "diff.patch"),
+                           "events_sha256": portable_text_sha256(directory / "events.jsonl")}
         if summary.get("manifest_hash") != sha256_bytes(canonical(manifest_inputs)):
             raise RecorderError("finished run manifest hash mismatch")
     elif require_finished:
@@ -508,6 +566,33 @@ def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) ->
     for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
         try:
             validate_run(root, directory.name, not args.allow_partial)
+        except RecorderError as exc:
+            failures.append(f"{directory.name}: {exc}")
+    prompt_metadata: dict[str, dict] = {}
+    for directory in sorted((root / "prompts").glob("P-*")) if (root / "prompts").exists() else []:
+        try:
+            metadata = read_json(directory / "metadata.json")
+            prompt_id = directory.name
+            if metadata.get("prompt_id") != prompt_id:
+                raise RecorderError("prompt_id does not match directory")
+            if metadata.get("prompt_sha256") != portable_text_sha256(directory / "prompt.txt"):
+                raise RecorderError("prompt content hash mismatch")
+            associated = metadata.get("associated_run_id", "unavailable")
+            if associated != "unavailable":
+                run_metadata = read_json(run_dir(root, validated_run_id(associated)) / "metadata.json")
+                if run_metadata.get("prompt_id") != prompt_id:
+                    raise RecorderError("prompt/run cross-link mismatch")
+            prompt_metadata[prompt_id] = metadata
+        except RecorderError as exc:
+            failures.append(f"{directory.name}: {exc}")
+    for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
+        try:
+            metadata = read_json(directory / "metadata.json")
+            prompt_id = metadata.get("prompt_id", "unavailable")
+            if prompt_id != "unavailable":
+                prompt = prompt_metadata.get(prompt_id)
+                if prompt is None or prompt.get("associated_run_id") != directory.name:
+                    raise RecorderError("run/prompt cross-link mismatch")
         except RecorderError as exc:
             failures.append(f"{directory.name}: {exc}")
     epoch = root / "INSTRUMENTATION_EPOCH.json"

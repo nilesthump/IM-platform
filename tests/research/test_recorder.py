@@ -90,13 +90,30 @@ Current Task State: active
         self.assertEqual("1.0.0", metadata["recorder_schema_version"])
 
     def test_prompt_hash_link_and_system_prompt_unavailable(self):
-        prompt_id = self.prompt("stable prompt\n")
+        source = self.repo / "prompt-input.txt"
+        source.write_bytes(b"stable prompt\r\nsecond line\r\n")
+        recorder.cmd_register_prompt(self.ns(file=str(source), prompt_id=None, task_id="TEST-001",
+                                     source="human", template_version=None, run_id=None), self.repo, self.root)
+        prompt_id = next((self.root / "prompts").iterdir()).name
         meta = recorder.read_json(self.root / "prompts" / prompt_id / "metadata.json")
-        self.assertEqual(recorder.sha256_bytes((self.repo / "prompt-input.txt").read_bytes()), meta["prompt_sha256"])
+        prompt_path = self.root / "prompts" / prompt_id / "prompt.txt"
+        self.assertEqual(b"stable prompt\nsecond line\n", prompt_path.read_bytes())
+        self.assertEqual(recorder.sha256_bytes(prompt_path.read_bytes()), meta["prompt_sha256"])
         self.assertEqual("unavailable", meta["system_prompt_capture"])
         run_id = self.start(prompt_id=prompt_id)
         self.assertEqual(prompt_id, recorder.read_json(self.root / "runs" / run_id / "metadata.json")["prompt_id"])
         self.assertEqual(run_id, recorder.read_json(self.root / "prompts" / prompt_id / "metadata.json")["associated_run_id"])
+        recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
+        recorder.cmd_validate_repository(self.ns(allow_partial=False), self.repo, self.root)
+
+    def test_prompt_registry_rejects_hash_and_cross_link_tampering(self):
+        prompt_id = self.prompt("stable prompt\n")
+        run_id = self.start(prompt_id=prompt_id)
+        recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
+        prompt_path = self.root / "prompts" / prompt_id / "prompt.txt"
+        prompt_path.write_bytes(b"tampered\n")
+        with self.assertRaisesRegex(recorder.RecorderError, "prompt content hash mismatch"):
+            recorder.cmd_validate_repository(self.ns(allow_partial=False), self.repo, self.root)
 
     def test_git_capture_dirty_without_modification(self):
         self.write("dirty.txt", "unchanged by capture")
@@ -171,6 +188,15 @@ Current Task State: active
         with self.assertRaisesRegex(recorder.RecorderError, "manifest hash mismatch"):
             recorder.validate_run(self.root, run_id)
 
+    def test_finished_manifest_is_portable_across_crlf_checkout(self):
+        run_id = self.start()
+        recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
+        directory = self.root / "runs" / run_id
+        for name in ("metadata.json", "initial_state.json", "final_state.json", "events.jsonl", "diff.patch", "summary.json"):
+            path = directory / name
+            path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+        self.assertEqual("finished", recorder.validate_run(self.root, run_id)["status"])
+
     def test_human_decision_fixture_explicit(self):
         run_id = self.start(role="human")
         args = self.ns(run_id=run_id, decision_id=None, question="choose", alternatives_json='["A","B"]',
@@ -200,6 +226,22 @@ Current Task State: active
         self.assertEqual("ci_finished", event["event_type"])
         self.assertEqual("FAIL", event["data"]["result"])
 
+    def test_ci_ingestion_rejects_extra_secret_fields_without_persisting(self):
+        run_id = self.start(role="ci")
+        evidence_path = self.repo / "ci-secret-evidence.json"
+        secret = "SYNTHETIC_CI_SECRET_VALUE"
+        evidence = {"provider": "fixture", "ci_run_id": "fixture-1", "commit_sha": "0" * 40,
+                    "job_name": "fixture", "result": "FAIL", "failed_checks": ["unit"],
+                    "duration_ms": 12, "evidence_reference": "fixture://ci/1",
+                    "password": secret, "raw_auth_headers": {"Authorization": secret}}
+        evidence_path.write_text(json.dumps(evidence), encoding="utf-8")
+        before = (self.root / "runs" / run_id / "events.jsonl").read_bytes()
+        with self.assertRaisesRegex(recorder.RecorderError, "extra"):
+            recorder.cmd_ingest_ci(self.ns(run_id=run_id, evidence=str(evidence_path)), self.repo, self.root)
+        events_path = self.root / "runs" / run_id / "events.jsonl"
+        self.assertEqual(before, events_path.read_bytes())
+        self.assertNotIn(secret, events_path.read_text(encoding="utf-8"))
+
     def test_prospective_resume_trace_flags(self):
         run_id = self.start(capture="prospective_resume", pre=True)
         value = recorder.read_json(self.root / "runs" / run_id / "metadata.json")
@@ -225,6 +267,37 @@ Current Task State: active
         self.assertNotIn("hunter2", durable)
         metadata = (self.root / "runs" / run_id / "metadata.json").read_text(encoding="utf-8")
         self.assertNotIn("environment", metadata.lower())
+
+    def test_structured_secret_keys_and_quoted_json_prompt_are_redacted(self):
+        secrets = ["SYNTHETIC_PASSWORD", "SYNTHETIC_API", "SYNTHETIC_TOKEN",
+                   "SYNTHETIC_ACCESS", "SYNTHETIC_REFRESH", "SYNTHETIC_AUTH",
+                   "SYNTHETIC_HEADERS"]
+        structured = {"password": secrets[0], "api_key": secrets[1], "token": secrets[2],
+                      "nested": {"ACCESS_TOKEN": secrets[3], "refresh-token": secrets[4],
+                      "Authorization": secrets[5], "raw_auth_headers": secrets[6]}}
+        safe, changed = recorder.redact_value(structured)
+        self.assertTrue(changed)
+        self.assertNotIn("SYNTHETIC_", json.dumps(safe))
+
+        prompt_id = self.prompt(json.dumps(structured))
+        prompt_dir = self.root / "prompts" / prompt_id
+        prompt_text = (prompt_dir / "prompt.txt").read_text(encoding="utf-8")
+        metadata = recorder.read_json(prompt_dir / "metadata.json")
+        self.assertEqual("redacted", metadata["prompt_capture"])
+        self.assertTrue(metadata["secret_redaction_applied"])
+        for secret in secrets:
+            self.assertNotIn(secret, prompt_text)
+
+        run_id = self.start()
+        recorder.cmd_record_event(self.ns(run_id=run_id, event_type="finding_created",
+                                  data_json=json.dumps(structured)), self.repo, self.root)
+        durable = (self.root / "runs" / run_id / "events.jsonl").read_text(encoding="utf-8")
+        for secret in secrets:
+            self.assertNotIn(secret, durable)
+
+    def test_committed_repository_artifacts_validate(self):
+        actual = Path(__file__).resolve().parents[2]
+        recorder.cmd_validate_repository(self.ns(allow_partial=False), actual, actual / "research")
 
     def test_repository_safety_in_real_checkout(self):
         actual = Path(__file__).resolve().parents[2]
