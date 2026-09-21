@@ -28,11 +28,23 @@ Current Task State: review
 
 ## Current Blockers
 
-- None for Recorder implementation. Instrumentation Epoch creation remains prohibited until a fresh independent reviewer accepts the committed Recorder candidate.
+- `LOOP1-RESEARCH-001` candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` failed fresh independent review. The committed bootstrap run fails default repository validation; structured secret keys and quoted JSON prompts bypass redaction; CI ingestion accepts secret-bearing extra fields; and the committed prompt content hash does not match metadata.
+- Instrumentation Epoch creation and paused-product-task resume remain prohibited until a fresh Fix Agent repairs these findings and a new fresh independent reviewer accepts the replacement candidate.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
+- Independent command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
+  - Result: PASS, exit `0`; 17 tests in `12.078s`, but the suite did not detect the committed-artifact and structured-secret failures below.
+- Independent command: `& .\tools\research\recorder.ps1 validate-repository`
+  - Result: FAIL, exit `2`; committed bootstrap run manifest hash mismatch.
+- Independent command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+  - Result: PASS, exit `0`, after removing only reviewer-generated `__pycache__` and re-confirming a clean isolated checkout.
+- Independent command: `git diff --check 1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc..HEAD -- . ':(exclude)research/runs/**/diff.patch'`
+  - Result: PASS, exit `0`.
+- Independent negative controls: structured `password`/`api_key`/`token` events, quoted JSON prompt, and secret-bearing CI extra fields.
+  - Result: FAIL; all synthetic secret-like values were retained in durable artifacts. The committed prompt file SHA-256 also differs from its metadata.
+  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`.
 - Command: `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- <python3> -m unittest discover -s tests/research -v`
   - Result: Development PASS, exit `0`; 17 tests. An earlier FAIL and subsequent repair remain preserved in the append-only bootstrap stream. This is not acceptance.
   - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`
@@ -63,6 +75,9 @@ Current Task State: review
 
 ## Known Failures, Risks, and Assumptions
 
+- Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` is rejected and must not be used to establish the Instrumentation Epoch. Its independent FAIL evidence is permanent.
+- Existing positive tests are insufficient for Secret Handling because they do not cover sensitive JSON/dictionary keys or CI evidence with additional secret-bearing fields.
+- Repository validation currently does not validate the Prompt Registry content hash/cross-link and rejects the one committed finished run for a manifest mismatch.
 - `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
 - `12c566f71da9b038764ecb7a5303b116e77ca32f` has only Fix-Agent development verification and is not accepted until a fresh independent reviewer passes it under ADR-0001; the task remains `review` and S0 remains NOT YET PASSED.
 - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
@@ -74,7 +89,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate `LOOP1-RESEARCH-001` at the committed review handoff to a fresh independent Review Agent in a clean detached isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance. After independent PASS, establish the Epoch at the accepted commit and restore `LOOP1-CONTRACT-001` as Current Task, preserving its state and ownership.
+Delegate `LOOP1-RESEARCH-001` to a fresh Fix Agent to repair the four findings in `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`, then submit a new committed candidate to a new fresh independent Review Agent under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance.
 
 ## Last Known Good Commit
 
@@ -86,7 +101,7 @@ Delegate `LOOP1-RESEARCH-001` at the committed review handoff to a fresh indepen
 
 ## Uncommitted Changes / Ownership
 
-- After the final review-handoff commit, no uncommitted Recorder changes should remain. `/root/recorder_impl` owns only the pending handoff metadata before that commit.
+- `/root/recorder_review` owns only the independent FAIL closure changes until their commit. After that closure commit, no uncommitted review changes should remain; implementation ownership is not assumed by the reviewer.
 - The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
 

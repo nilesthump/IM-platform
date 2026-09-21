@@ -2,7 +2,7 @@
 task_id: LOOP1-RESEARCH-001
 title: Insert Research Recorder control plane
 status: review
-owner: unassigned-independent-review-agent
+owner: unassigned-fix-agent
 stage: S0
 gate: S0
 ---
@@ -70,6 +70,8 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 - Final implementation test run: 17 tests PASS. CTRL-002 Development verifier and diff whitespace check PASS. Exact command results and the preserved earlier FAIL are in the bootstrap event stream and development evidence.
 - Bootstrap run finished with 17 events, final observed HEAD `0a406aef9ecac899556ac6bad8145d8c01127e73`, manifest hash `0a29742a25dd9158d91125506b57ad966fb4847d8f56bb92fef8049619d48f1d`, and `pre_recorder_trace_complete=false`. Its result is development evidence, not acceptance.
 - The archived `diff.patch` intentionally preserves observed patch whitespace and is excluded from repository whitespace lint; the artifact remains hash-protected and unmodified after finish.
+- Fresh independent Review Agent `/root/recorder_review` reviewed commit `96fc13d5e953a8a926a9295dd82847789ed222fc` from a clean detached isolated checkout and returned FAIL. Durable evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`.
+- Blocking findings: the committed bootstrap run fails default repository validation with a manifest hash mismatch; structured secret keys and quoted JSON prompt values are persisted without redaction; CI ingestion accepts and persists secret-bearing extra fields; and the committed bootstrap prompt bytes do not match their recorded SHA-256.
 
 # Handoff
 
@@ -80,4 +82,4 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 
 # Next Action
 
-- Delegate a fresh independent Review Agent from a clean detached isolated checkout at the final handoff commit. It must run all Recorder tests, default `validate-repository`, CTRL-002 Acceptance mode, scope/secret/pyc checks, and diff checks. On PASS, record durable independent evidence, establish the Instrumentation Epoch at the accepted commit, then restore `LOOP1-CONTRACT-001` as Current Task without transferring ownership. On FAIL, use a fresh Fix Agent and repeat review.
+- Delegate a fresh Fix Agent for the four findings in `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`. Add regressions for exact committed-artifact validation and structured/quoted/CI secret inputs, commit a new candidate, then delegate a new fresh independent Review Agent. Do not establish an Instrumentation Epoch or resume product work before PASS.
