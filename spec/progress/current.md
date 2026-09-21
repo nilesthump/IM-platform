@@ -74,7 +74,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Commit the Recorder review handoff, then delegate `LOOP1-RESEARCH-001` to a fresh independent Review Agent in a clean detached isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance. After independent PASS, establish the Epoch at the accepted commit and restore `LOOP1-CONTRACT-001` as Current Task, preserving its state and ownership.
+Delegate `LOOP1-RESEARCH-001` at the committed review handoff to a fresh independent Review Agent in a clean detached isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance. After independent PASS, establish the Epoch at the accepted commit and restore `LOOP1-CONTRACT-001` as Current Task, preserving its state and ownership.
 
 ## Last Known Good Commit
 
@@ -86,7 +86,7 @@ Commit the Recorder review handoff, then delegate `LOOP1-RESEARCH-001` to a fres
 
 ## Uncommitted Changes / Ownership
 
-- `/root/recorder_impl` owns only Recorder control-plane changes in the isolated research worktree on `task/LOOP1-RESEARCH-001`.
+- After the final review-handoff commit, no uncommitted Recorder changes should remain. `/root/recorder_impl` owns only the pending handoff metadata before that commit.
 - The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
 

@@ -1,0 +1,3125 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 85f17fe..f153524 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -50,6 +50,12 @@ Before ending work, update both the current Task Spec and `spec/progress/current
+ 
+ Create a checkpoint in `spec/progress/checkpoints/` at a Gate, a stable vertical slice, a contract or schema transition, a release recovery point, or another important stable recovery point. `current.md` points to the latest checkpoint rather than duplicating it.
+ 
++## Research Recorder instrumentation
++
++After `LOOP1-RESEARCH-001` is independently accepted and its Instrumentation Epoch exists, prospective Agent work MUST use the file-based Research Recorder described in `research/README.md`: register the visible task prompt, start a run, route commands/tests/verifiers through the command recorder where possible, record only necessary public semantic events, and finish and validate the run. Recorder failure MUST be exposed and MUST NOT be silently skipped.
++
++The Recorder is research instrumentation, not product architecture authority. It MUST NOT change contracts, ACK semantics, security boundaries, compatibility rules, or business invariants. Research evidence and product acceptance evidence are distinct: Recorder PASS is not Task PASS, and Task PASS is not Stage Gate PASS. An Agent MUST NOT edit Recorder evidence to make its own work pass. Paused or pre-Recorder activity may only be represented as explicitly marked backfill with unavailable facts left unavailable; it must never be presented as a complete prospective trace.
++
+ ## Batch Orchestration Protocol
+ 
+ - A Coordinator may execute a named batch or current Stage. It recovers repository state, resolves dependencies, delegates fresh task contexts, waits for results, progresses task queues, updates progress/evidence/checkpoints, and evaluates the Stage Gate.
+diff --git a/research/README.md b/research/README.md
+new file mode 100644
+index 0000000..e5e8927
+--- /dev/null
++++ b/research/README.md
+@@ -0,0 +1,48 @@
++# Research Recorder v1
++
++Schema version: `1.0.0`.
++
++This directory is a non-product research control plane. It records observable facts about Agent runs; it is not Frozen Product Architecture, does not define contract semantics, and never decides Task or Stage acceptance. Recorder PASS means only that Recorder artifacts are structurally valid.
++
++## Workflow
++
++The implementation uses only the Python 3 standard library. On Windows use `tools/research/recorder.ps1`; on other platforms invoke `python3 tools/research/recorder.py` with the same subcommands:
++
++```text
++tools/research/recorder.ps1 register-prompt --task-id TASK --file prompt.txt
++tools/research/recorder.ps1 start-run --task-id TASK --role implementation --capture-mode prospective --prompt-id P-ID --experiment-group full_governance
++tools/research/recorder.ps1 run-command --run-id R-ID -- command arg
++tools/research/recorder.ps1 record-event --run-id R-ID --event-type architecture_conflict --data-json '{"decision":"...","reason":"..."}'
++tools/research/recorder.ps1 record-human-decision --run-id R-ID --question "..." --alternatives-json '["A","B"]' --selected B --reason "..."
++tools/research/recorder.ps1 finish-run --run-id R-ID --result PASS
++tools/research/recorder.ps1 validate-run --run-id R-ID
++```
++
++`register-prompt` stores the visible Human prompt and SHA-256 before dispatch. It never claims access to platform-internal system prompts. `start-run` captures Git/task/authority state without reading untracked file contents. `run-command` executes the real argv, records timestamps, duration, raw-output hashes and redacted output blobs, and propagates the real exit code. Semantic events are reserved for facts scripts cannot infer.
++
++Review, fix, and implementation are separate runs connected with `parent_run_id` or `related_run_id`. A review is independent only when the observed actor/context establishes that fact; the Recorder never promotes self-review. CI evidence is ingested with `ingest-ci` from an externally produced evidence object matching `schema/ci-ingestion.schema.json`; Recorder does not manufacture CI outcomes and no GitHub workflow is installed by this task.
++
++## Capture modes and history
++
++- `prospective`: complete observation begins at run start.
++- `prospective_resume`: resumed pre-Recorder work; requires `pre_recorder_work=true` and records `pre_recorder_trace_complete=false`.
++- `retrospective_backfill`: derived only from durable repository evidence. Unknown prompt/model/tool/timing/token/cost fields are `unavailable`.
++- `bootstrap_partial`: Recorder construction itself; excluded from the primary prospective quantitative dataset.
++
++`backfill` creates explicitly marked metadata. It does not replay history. A running run is partial; default validation fails it. Finished raw event streams are immutable through normal commands. JSONL sequence and the event hash chain detect malformed, partial, duplicate, reordered, or edited events.
++
++## Secrets and unavailable facts
++
++The Recorder never dumps the process environment. Prompt, argv, stdout, stderr, and semantic payloads are checked for common credential forms and redacted before durable storage. Do not pass `.env`, credentials, raw auth headers, signing keys, or secret-bearing files. Redaction is defense in depth, not authorization to submit secrets.
++
++Hidden chain-of-thought, private reasoning traces, platform-internal prompts, and unavailable token/cost/context metadata are never inferred. A short public decision summary is allowed.
++
++## Instrumentation Epoch
++
++`INSTRUMENTATION_EPOCH.json` is intentionally absent until a fresh independent review accepts the Recorder candidate under repository governance. After acceptance it records timestamp, schema version, accepted commit, task, durable acceptance evidence, and the exact prospective trace start. Earlier artifacts remain pilot/backfill/bootstrap data and must not be mixed into the primary prospective dataset without their capture-mode labels.
++
++## Export and analysis
++
++Each run uses `runs/<run_id>/metadata.json`, `events.jsonl`, `initial_state.json`, `final_state.json`, `diff.patch`, `summary.json`, and optional redacted `blobs/`. JSON and JSONL are the stable export formats. Join runs by `run_id`, `task_id`, `parent_run_id`, and `related_run_id`; group experiments by `experiment_group`, with optional future `baseline_id`, `replicate_id`, `mutation_id`, `model_condition`, and `budget_condition` fields.
++
++Research evidence and product acceptance evidence remain distinct. Recorder validation is not Task PASS; Task PASS is not Stage Gate PASS. Agents must expose Recorder failures, must not silently skip instrumentation, and must not edit evidence to make their own run pass.
+diff --git a/research/backfill/LOOP1-CONTRACT-001.json b/research/backfill/LOOP1-CONTRACT-001.json
+new file mode 100644
+index 0000000..2b904d3
+--- /dev/null
++++ b/research/backfill/LOOP1-CONTRACT-001.json
+@@ -0,0 +1,33 @@
++{
++  "backfilled": true,
++  "collection_mode": "retrospective_backfill",
++  "context_size": "unavailable",
++  "cost": "unavailable",
++  "exact_timing": "unavailable",
++  "generated_at": "2026-09-21T01:44:00.871687Z",
++  "model_calls": "unavailable",
++  "prompt": "unavailable",
++  "reasoning": "unavailable",
++  "recorder_schema_version": "1.0.0",
++  "sources": {
++    "commits_mentioned": [
++      "12c566f71da9b038764ecb7a5303b116e77ca32f",
++      "1c2637cb253dc6eece0393c229fe77cd5934160e",
++      "47d97b9b81c522c6a1331d8d83c50e4ad5c9a272",
++      "7ce56ff59c1cd6cc3c83d2d040911f2e1fba7e5b",
++      "acfe36c2040e749ee508485ee8b577dc76604961",
++      "aef6497d6216d9a8251250d157935e7af418d86b",
++      "e5482b135a2ab7451c24c29c7517e1a8f19ce420"
++    ],
++    "durable_evidence": [
++      "spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-development-acfe36c-pass.md",
++      "spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-fix-12c566f-pass.md",
++      "spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-independent-review-1c2637c-fail.md",
++      "spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-metadata-sha-correction.md"
++    ],
++    "task_spec": "spec/tasks/review/LOOP1-CONTRACT-001.md"
++  },
++  "task_id": "LOOP1-CONTRACT-001",
++  "token_usage": "unavailable",
++  "tool_calls": "unavailable"
++}
+diff --git a/research/backfill/LOOP1-CTRL-001.json b/research/backfill/LOOP1-CTRL-001.json
+new file mode 100644
+index 0000000..b6525d0
+--- /dev/null
++++ b/research/backfill/LOOP1-CTRL-001.json
+@@ -0,0 +1,22 @@
++{
++  "backfilled": true,
++  "collection_mode": "retrospective_backfill",
++  "context_size": "unavailable",
++  "cost": "unavailable",
++  "exact_timing": "unavailable",
++  "generated_at": "2026-09-21T01:43:58.565393Z",
++  "model_calls": "unavailable",
++  "prompt": "unavailable",
++  "reasoning": "unavailable",
++  "recorder_schema_version": "1.0.0",
++  "sources": {
++    "commits_mentioned": [
++      "bc982a330ab52d7f79d4e7865bb4dd80f0b25eb7"
++    ],
++    "durable_evidence": [],
++    "task_spec": "spec/tasks/done/LOOP1-CTRL-001.md"
++  },
++  "task_id": "LOOP1-CTRL-001",
++  "token_usage": "unavailable",
++  "tool_calls": "unavailable"
++}
+diff --git a/research/backfill/LOOP1-CTRL-002.json b/research/backfill/LOOP1-CTRL-002.json
+new file mode 100644
+index 0000000..348291e
+--- /dev/null
++++ b/research/backfill/LOOP1-CTRL-002.json
+@@ -0,0 +1,31 @@
++{
++  "backfilled": true,
++  "collection_mode": "retrospective_backfill",
++  "context_size": "unavailable",
++  "cost": "unavailable",
++  "exact_timing": "unavailable",
++  "generated_at": "2026-09-21T01:43:59.667437Z",
++  "model_calls": "unavailable",
++  "prompt": "unavailable",
++  "reasoning": "unavailable",
++  "recorder_schema_version": "1.0.0",
++  "sources": {
++    "commits_mentioned": [
++      "67bb82b1cd3880090095425384d52c933f0518fb",
++      "d86bf1727b46b6b4f782d1ec7ad156ba35d8b2e7"
++    ],
++    "durable_evidence": [
++      "spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-fix-development-verification.md",
++      "spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-independent-review-841b669-fail.md",
++      "spec/progress/evidence/LOOP1-CTRL-002/2026-09-19-independent-review-fail.md",
++      "spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-fix2-development-verification.md",
++      "spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-fix3-development-verification.md",
++      "spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-b65a9a8-fail.md",
++      "spec/progress/evidence/LOOP1-CTRL-002/2026-09-20-independent-review-d86bf17-pass.md"
++    ],
++    "task_spec": "spec/tasks/done/LOOP1-CTRL-002.md"
++  },
++  "task_id": "LOOP1-CTRL-002",
++  "token_usage": "unavailable",
++  "tool_calls": "unavailable"
++}
+diff --git a/research/backfill/LOOP1-SPEC-001.json b/research/backfill/LOOP1-SPEC-001.json
+new file mode 100644
+index 0000000..7bee9ca
+--- /dev/null
++++ b/research/backfill/LOOP1-SPEC-001.json
+@@ -0,0 +1,36 @@
++{
++  "backfilled": true,
++  "collection_mode": "retrospective_backfill",
++  "context_size": "unavailable",
++  "cost": "unavailable",
++  "exact_timing": "unavailable",
++  "generated_at": "2026-09-21T01:43:59.785789Z",
++  "model_calls": "unavailable",
++  "prompt": "unavailable",
++  "reasoning": "unavailable",
++  "recorder_schema_version": "1.0.0",
++  "sources": {
++    "commits_mentioned": [
++      "10aaba0750bc38031589fc2821c6b6cec567a7e6",
++      "3cecd6ffd1dbfdeb57adee53b8aef60597f7aeb0",
++      "74134bd306cbf0a1546f500bc46c45a1217b2d58",
++      "85069032c137cce6e526e0e329b6e93178515274",
++      "8dbe190e2137833fca9dfda3e54e3530a75f2f0e",
++      "aef6497d6216d9a8251250d157935e7af418d86b",
++      "d86bf1727b46b6b4f782d1ec7ad156ba35d8b2e7",
++      "e324e74b028ecb08f019ab2dccc2c377ea72f7d6"
++    ],
++    "durable_evidence": [
++      "spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-development-8dbe190-pass.md",
++      "spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-fix-development-10aaba0-pass.md",
++      "spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-fix-development-3cecd6f-pass.md",
++      "spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-74134bd-fail.md",
++      "spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-8506903-fail.md",
++      "spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md"
++    ],
++    "task_spec": "spec/tasks/done/LOOP1-SPEC-001.md"
++  },
++  "task_id": "LOOP1-SPEC-001",
++  "token_usage": "unavailable",
++  "tool_calls": "unavailable"
++}
+diff --git a/research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/metadata.json b/research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/metadata.json
+new file mode 100644
+index 0000000..20d6b49
+--- /dev/null
++++ b/research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/metadata.json
+@@ -0,0 +1,13 @@
++{
++  "associated_run_id": "R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL",
++  "prompt_capture": "full",
++  "prompt_id": "P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1",
++  "prompt_sha256": "ae27c414cddd31fb0a12659d93fc0f859fb0b87cd6fb213e7d76d6bee4c543a6",
++  "prompt_source": "human_session_export",
++  "recorder_schema_version": "1.0.0",
++  "registered_at": "2026-09-21T01:42:00.121377Z",
++  "secret_redaction_applied": false,
++  "system_prompt_capture": "unavailable",
++  "task_id": "LOOP1-RESEARCH-001",
++  "template_version": "unavailable"
++}
+diff --git a/research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt b/research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt
+new file mode 100644
+index 0000000..601b46b
+--- /dev/null
++++ b/research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt
+@@ -0,0 +1,1188 @@
++你现在进入仓库 `IM-platform`。
++
++这是 Human Architect 明确授权的一次“Research Instrumentation / Recorder Control-Plane Insertion”。
++
++你的唯一目标：
++
++为后续 AI Agent 自动开发过程建立一个自动、结构化、可审计、可用于学术研究的数据记录层（Research Recorder）。
++
++你不得继续当前暂停中的产品/Spec/Contract 实现任务。
++你不得实现任何 IM 产品功能。
++你不得替当前暂停 Agent 完成工作。
++你不得修改 Frozen Product Architecture、公共协议、ACK 语义、数据库业务不变量或插件安全边界。
++
++\============================================================
++0\. 当前特殊状态
++==========
++
++当前已经存在另一个 Agent。
++
++它因为额度限制暂时暂停。
++
++注意：
++
++- 它没有完成任务；
++- 它没有放弃任务；
++- 它仍然拥有自己已经产生的工作；
++- 不得因为它暂停，就把它的 Current Task 当成无人拥有；
++- 不得接管其实现；
++- 不得修改、格式化、stash、reset、clean、移动、覆盖它的未提交内容；
++- 不得把它的 Task 标记为 done；
++- 不得制造“它已经被新 Agent 替代”的假象。
++
++Human 现在只是暂时冻结它的执行，让你插入 Recorder 控制层。
++
++Recorder 完成并独立验收后，原 Agent 将恢复原任务。
++
++\============================================================
++
++1. 开始前必须恢复真实仓库状态
++   \============================================================
++
++在做任何修改之前，严格执行仓库现有治理规则。
++
++至少：
++
++1. 阅读 `AGENTS.md`
++2. 阅读 `spec/handoff/agent-context.md`
++3. 阅读 `spec/progress/current.md`
++4. 精确定位 Current Task
++5. 检查它所在 queue / status / owner
++6. 阅读 Current Task 的 inputs、allowed\_paths、acceptance、forbidden
++7. 阅读其引用的 Frozen Architecture / ADR / invariant / acceptance
++8. `git status`
++9. 当前 diff
++10. recent commits
++11. Last Known Good Commit
++12. Latest Checkpoint
++13. 判断暂停 Agent 是否存在：
++
++- 未提交修改
++- 独立 branch
++- worktree
++- ownership 标记
++- evidence
++- checkpoint
++
++真实仓库状态优先于本 Prompt 中的假设。
++
++如果发现来源不明或属于暂停 Agent 的修改：
++
++DO NOT TOUCH.
++
++如果需要实际写入 Recorder：
++
++优先使用独立 branch / isolated worktree，
++从一个可信、clean、committed 的状态开始。
++
++不得为了方便 Recorder 而破坏暂停 Agent 的现场。
++
++\============================================================
++2\. 治理要求
++========
++
++本工作是 Human 明确授权的控制面插入任务。
++
++但是仍然必须服从现有 repository governance。
++
++如果现有 Task State Machine 不允许在保留原 paused task 的情况下插入控制面任务：
++
++不要静默绕过。
++
++应：
++
++1. 明确报告冲突；
++
++2. 选择最小治理修改；
++
++3. 必要时创建一个独立 Control/Research Task，例如：
++
++   LOOP1-RESEARCH-001
++
++   或符合当前命名规范的等价 ID；
++
++4. 明确记录：
++
++   - 原 paused task 未完成；
++   - ownership 未转移；
++   - 本任务只是 temporary control-plane insertion；
++   - Recorder 完成后恢复原 task。
++
++如需要 Task Spec，其 allowed\_paths 应尽量限定为：
++
++- `research/**`
++- `tools/research/**`
++- 与 Recorder 直接相关的测试
++- 本 Research Task Spec
++- 必需的 `spec/progress/**`
++- 必需的 repository Agent instruction / handoff 文档
++
++不得借此扩大到产品代码。
++
++如果 `.github/workflows/**` 根据当前 S0 治理仍禁止修改：
++
++不要提前创建 GitHub Actions。
++
++只设计 CI ingestion schema / adapter interface，
++等待正式 CI Task 激活后再接入。
++
++\============================================================
++3\. Research Recorder 的基本原则
++===========================
++
++Recorder 的核心必须是：
++
++脚本 / runner / wrapper / hook。
++
++不是：
++
++让被观察 Agent 在任务结束以后自己回忆并写“我刚才做了什么”。
++
++原则：
++
++Agent 是被观察对象。
++Recorder 是观察仪器。
++
++目标比例：
++
++约 80%～90% 事实应由脚本自动获得，例如：
++
++- timestamps
++- Git SHA
++- branch
++- dirty/clean
++- diff
++- changed paths
++- command
++- exit code
++- duration
++- verifier result
++- test result
++- Review verdict
++- CI result
++- file hash
++
++只有脚本无法理解的语义事件才允许 Agent 显式报告，例如：
++
++- architecture\_conflict
++- external\_blocker
++- 简短 decision rationale
++
++不得依赖 Agent 自述来判断：
++
++PASS / FAIL / CI success / test success。
++
++\============================================================
++4\. 禁止记录隐藏推理
++============
++
++禁止：
++
++- hidden chain-of-thought
++- private reasoning trace
++- 猜测模型内部推理
++- 要求 Agent 暴露内部 CoT
++
++允许：
++
++结构化、简短、公开的 decision summary，例如：
++
++{
++"decision": "use existing contract fixture",
++"reason": "changing the public contract is outside task scope"
++}
++
++这只是公开理由摘要，不是模型隐藏思维链。
++
++\============================================================
++5\. Instrumentation Epoch
++=========================
++
++Recorder 正式通过独立验收后，必须建立一个明确的：
++
++INSTRUMENTATION\_EPOCH
++
++至少记录：
++
++- timestamp
++- recorder schema version
++- accepted recorder commit SHA
++- recorder task ID
++- acceptance evidence
++- exact point from which prospective traces are considered complete
++
++定义：
++
++Instrumentation Epoch 之前：
++retrospective / pilot / backfill evidence
++
++Instrumentation Epoch 之后：
++prospective instrumented data
++
++未来论文中的主要定量结果应优先使用 Epoch 之后的数据。
++
++不得把 Epoch 之前的数据伪装成完整 prospective trace。
++
++\============================================================
++6\. 已经完成的历史 Agent
++=================
++
++对于已经完成的 Agent / Task，例如 CTRL-001、CTRL-002：
++
++不得伪造：
++
++- model calls
++- token usage
++- tool calls
++- exact prompt
++- exact timing
++- reasoning
++- context size
++- cost
++
++除非当时已有真实 durable evidence。
++
++允许从以下来源 backfill：
++
++- Git commits
++- Git diff
++- Task Spec
++- checkpoint
++- durable review evidence
++- verifier output
++- CI evidence（若当时存在）
++- progress/current
++- repository logs
++
++所有 retrospective 数据必须明确：
++
++{
++"collection\_mode": "retrospective\_backfill",
++"backfilled": true
++}
++
++无法证明的字段：
++
++"unavailable"
++
++禁止猜测。
++
++建议为已有完成任务生成 backfill metadata，
++至少覆盖当前已有重要 bootstrap/control-plane tasks。
++
++这些历史数据主要用于：
++
++- pilot study
++- workflow evolution
++- early failure modes
++- mutation benchmark design
++
++不要和未来 prospective dataset 无标记混合统计。
++
++\============================================================
++7\. 当前暂停中的 Agent
++================
++
++当前 paused Agent 是特殊情况。
++
++它的任务可能已经进行了一部分，
++但这一部分没有 Recorder。
++
++恢复后必须建立新的 Run：
++
++capture\_mode = "prospective\_resume"
++
++必须标记：
++
++{
++"pre\_recorder\_work": true,
++"pre\_recorder\_trace\_complete": false
++}
++
++Recorder 激活时应捕获：
++
++- 当前 commit
++- 当前 branch
++- 当前 dirty state
++- 当前 diff
++- current task
++- task state
++- task ownership
++- relevant hashes
++- checkpoint
++
++暂停前能够从 durable evidence 恢复的内容只能：
++
++backfill = true
++
++暂停前无法观测的信息：
++
++unavailable
++
++从 Recorder 激活以后，
++才开始记录真实 prospective trace。
++
++不得假装这个 Task 从第一秒开始都有完整 Recorder。
++
++\============================================================
++8\. Recorder 构建 Agent 自身
++========================
++
++你现在正在构建 Recorder。
++
++因此 Recorder 不可能完整记录你自己的整个执行过程。
++
++你自己的 Run 必须标记为：
++
++capture\_mode = "bootstrap\_partial"
++
++不得进入未来主要 quantitative experimental dataset。
++
++但是请尽可能保留：
++
++- 本 Human Prompt 的准确文本
++- Prompt hash
++- 起始 commit
++- 最终 commit
++- diff
++- verifier/test evidence
++- review result
++- timestamps（从可以可靠捕获的时点开始）
++
++这属于 Recorder bootstrap evidence，
++不是正式 prospective run。
++
++\============================================================
++9\. Prompt 必须纳入记录
++=================
++
++未来每个 Agent Run 应尽可能记录 Human 提交给 Agent 的实际 task prompt。
++
++设计一个 Prompt Registry。
++
++例如：
++
++research/
++prompts/
++...
++
++或者 content-addressed equivalent。
++
++每个 prompt 至少产生：
++
++- prompt\_id
++- prompt\_sha256
++- capture mode
++- source
++- template version（若有）
++- task\_id
++- associated run\_id
++
++对于普通、非敏感 Human Prompt：
++
++优先保存完整内容。
++
++例如：
++
++{
++"prompt\_id": "P-...",
++"prompt\_sha256": "...",
++"prompt\_capture": "full",
++"prompt\_source": "human"
++}
++
++如果 Agent UI / harness 无法被 Runner 直接启动：
++
++提供一个：
++
++register-prompt
++
++入口。
++
++使用流程：
++
++1. Human / Coordinator 先注册 prompt；
++2. Recorder 固定内容与 SHA-256；
++3. 再把同一 prompt 发送给 Agent；
++4. Run 关联 prompt\_id。
++
++不得声称能记录平台内部不可见的 system prompt。
++
++对于 harness-controlled / platform internal prompt：
++
++如果不可观察：
++
++{
++"system\_prompt\_capture": "unavailable"
++}
++
++可以记录可见的 repository instructions，例如：
++
++- AGENTS.md hash
++- Task Spec hash
++- handoff hash
++- relevant contract hash
++
++禁止猜测 OpenAI / Codex / Claude 等平台内部隐藏 Prompt。
++
++\============================================================
++10\. Secret Handling
++====================
++
++绝对禁止记录：
++
++- API key
++- password
++- token
++- `.env`
++- credentials
++- private signing data
++- raw auth headers
++
++Recorder 不得 dump 整个 environment。
++
++Prompt / command / stdout / stderr 记录必须考虑 secret redaction。
++
++如果发现疑似 secret：
++
++- 拒绝直接持久化敏感值；
++- 记录 redaction / instrumentation warning；
++- 不把 secret 写进研究 artifact。
++
++不得为了“实验完整性”降低安全要求。
++
++\============================================================
++11\. Run 数据模型
++=============
++
++每一次执行必须拥有唯一：
++
++run\_id
++
++至少记录：
++
++- recorder\_schema\_version
++- run\_id
++- task\_id
++- role
++- parent\_run\_id / related\_run\_id
++- experiment\_group
++- capture\_mode
++
++role 至少支持：
++
++- implementation
++- review
++- fix
++- coordinator
++- human
++- ci
++- bootstrap
++
++建议结构：
++
++research/
++README.md
++protocol/
++schema/
++prompts/
++runs/
++backfill/
++blobs/
++
++每一个 prospective run 建议：
++
++research/runs/\<run\_id>/
++metadata.json
++events.jsonl
++initial\_state.json
++final\_state.json
++diff.patch
++summary.json
++
++没有真实数据时：
++
++不要生成虚假内容来凑齐文件。
++
++\============================================================
++12\. Event Stream
++=================
++
++`events.jsonl` 应设计为 append-only event stream。
++
++每条至少：
++
++{
++"schema\_version": "...",
++"seq": 1,
++"timestamp": "...",
++"run\_id": "...",
++"task\_id": "...",
++"role": "...",
++"event\_type": "...",
++"data": {}
++}
++
++至少允许这些事件：
++
++- run\_started
++- run\_finished
++- prompt\_registered
++- task\_state\_observed
++- git\_state\_observed
++- command\_started
++- command\_finished
++- verification\_result
++- test\_result
++- review\_started
++- review\_finished
++- finding\_created
++- repair\_started
++- repair\_finished
++- ci\_started
++- ci\_finished
++- architecture\_conflict
++- human\_decision
++- external\_blocker
++- model\_metadata
++- instrumentation\_warning
++
++注意：
++
++“支持某个 event type”
++不等于
++“必须制造一个对应事件”。
++
++只记录真实发生的事件。
++
++\============================================================
++13\. 数据完整性
++==========
++
++Recorder 应提供基本完整性保护。
++
++至少：
++
++- seq 单调递增；
++- run\_id 一致；
++- schema validation；
++- finished run 默认不得通过普通命令修改历史 raw events；
++- 对 malformed JSON / partial write / interrupted run 有检测；
++- 能检测 duplicate sequence。
++
++如实现成本合理，可加入：
++
++- event hash
++- previous event hash
++- final manifest hash
++
++形成简单 hash chain。
++
++不要为了 cryptographic sophistication 过度设计。
++
++Git 历史 + deterministic validation + hashes 已经是主要证据。
++
++\============================================================
++14\. Initial State
++==================
++
++Run 开始时自动捕获：
++
++Repository：
++
++- repo identifier
++- branch
++- HEAD SHA
++- clean/dirty
++- changed paths
++- current Task
++- task queue
++- task status
++- task owner
++- Last Known Good Commit
++- Latest Checkpoint
++
++Authority snapshot：
++
++优先保存 hash，而不是复制大量文本：
++
++- AGENTS.md hash
++- Task Spec hash
++- Frozen Architecture artifact hash
++- applicable ADR hashes
++- applicable domain/invariant/acceptance hashes
++- relevant contract manifest/hash
++
++如果某项当时不存在：
++
++明确记录 absent，
++不要制造 placeholder authority。
++
++\============================================================
++15\. Agent / Model Metadata
++===========================
++
++只记录真正能观察到的数据。
++
++例如：
++
++- agent harness
++- model name
++- model version
++- public reasoning mode / config（如果可见）
++- fresh context yes/no（如果可靠可知）
++- explicit token budget
++- context mode
++
++Token usage：
++
++只有 API / harness 真实提供时才记录。
++
++Cost：
++
++只有有可靠 token / pricing basis 时才计算。
++
++否则：
++
++unavailable
++
++不得让 Agent 自己估算 token usage 充当事实。
++
++\============================================================
++16\. Command Recorder
++=====================
++
++实现最小命令 wrapper。
++
++例如：
++
++tools/research/run-command
++
++或平台适合的等价入口。
++
++它必须：
++
++1. 接收真实 command；
++2. 写 command\_started；
++3. 记录 start timestamp；
++4. 真正执行命令；
++5. 获取真实 exit code；
++6. 获取 duration；
++7. 必要时安全保存 stdout/stderr 或其 hash；
++8. 写 command\_finished；
++9. 原样传播 command exit code。
++
++关键原则：
++
++如果真实 command exit 1：
++
++Recorder 不得把它变成 PASS。
++
++例如未来：
++
++research-run-command pytest ...
++
++必须由脚本真正执行 pytest。
++
++禁止：
++
++Agent 说“pytest 通过”
++→ Recorder 就写 PASS。
++
++\============================================================
++17\. Git 自动捕获
++=============
++
++Git facts 应由 Recorder 自己采集。
++
++不要让 Agent填写。
++
++至少：
++
++- git rev-parse HEAD
++- branch
++- git status --porcelain
++- diff stat
++- changed files
++- final HEAD
++
++完成时生成：
++
++- final\_state
++- diff.patch（适用时）
++
++不得篡改暂停 Agent worktree 来获得干净状态。
++
++\============================================================
++18\. Human Decision Recorder
++============================
++
++提供一个简单入口，例如：
++
++tools/research/record-human-decision
++
++Human 不需要手改 JSON。
++
++至少支持：
++
++- decision\_id
++- timestamp
++- task\_id
++- run\_id
++- question
++- alternatives
++- selected
++- reason
++- affected\_authority
++- human\_actor = true
++
++例如：
++
++{
++"decision\_id": "HD-...",
++"question": "...",
++"alternatives": ["A", "B"],
++"selected": "B",
++"reason": "...",
++"human\_actor": true
++}
++
++测试时可以使用 fixture：
++
++fixture = true
++
++不得把测试 decision 冒充真实 Human Decision。
++
++\============================================================
++19\. Review / Fix Run Graph
++===========================
++
++Recorder 必须能表示：
++
++Implementation Run
++↓
++Independent Review Run
++↓ FAIL
++Fix Run
++↓
++New Independent Review Run
++↓ PASS
++
++通过：
++
++parent\_run\_id
++related\_run\_id
++task\_id
++role
++
++等方式建立关系。
++
++未来必须能机器统计：
++
++- first-pass acceptance rate
++- finding count
++- repair iteration count
++- time to acceptance
++- human intervention count
++- architecture conflict count
++
++Implementer self-review：
++
++不得标记为 independent review。
++
++Recorder 只记录事实，
++不得自行把 self-review 升级成 independent acceptance。
++
++\============================================================
++20\. CI Recorder
++================
++
++CI 是独立事实裁判。
++
++Recorder 只是记录 CI。
++
++Recorder 不是 CI。
++
++未来 schema 至少支持：
++
++- provider
++- CI run id
++- commit SHA
++- job name
++- PASS / FAIL
++- failed checks
++- duration
++- artifact/evidence reference
++
++如果当前真实 CI 尚未 operational：
++
++只实现 schema / ingestion interface / fixture tests。
++
++不要伪造：
++
++CI PASS。
++
++不要为了 Recorder 提前违反 LOOP1-CI-001 的治理边界。
++
++\============================================================
++21\. Future Research / Ablation Fields
++======================================
++
++现在不要运行论文 ablation。
++
++但 schema 为未来预留：
++
++experiment\_group:
++
++- vanilla
++- spec\_only
++- full\_governance
++
++以及：
++
++- baseline\_id
++- replicate\_id
++- mutation\_id
++- model\_condition
++- budget\_condition
++
++未来目标指标包括：
++
++- contract violation rate
++- architecture violation rate
++- mutation detection rate
++- first-pass acceptance
++- repair iterations
++- human intervention count
++- wall-clock time
++- token usage
++- monetary cost
++- cross-backend semantic divergence
++- regression rate
++
++本次任务只做 instrumentation。
++
++不制造实验结果。
++
++\============================================================
++22\. Workflow Integration
++=========================
++
++Recorder 完成后，未来 Agent 推荐流程应成为：
++
++register prompt
++↓
++start run
++↓
++capture initial state
++↓
++Agent executes normal task
++↓
++commands/tests/verifiers go through recorder where possible
++↓
++semantic events only when necessary
++↓
++capture final state
++↓
++finish run
++↓
++independent review / CI linked as separate runs
++
++优先提供简单入口，例如：
++
++start-run
++register-prompt
++run-command
++record-event
++record-human-decision
++finish-run
++validate-run
++
++具体 CLI 名字由你根据仓库环境决定。
++
++优先：
++
++- Python standard library
++- deterministic behavior
++- cross-platform
++- 少依赖
++
++必要时可提供 PowerShell wrapper，
++但不要无必要引入大型基础设施。
++
++不要引入：
++
++- database server
++- Kafka
++- Redis
++- dashboard
++- web UI
++- message queue
++
++Recorder v1 使用文件即可。
++
++\============================================================
++23\. Repository Instructions
++============================
++
++在不改变 Frozen Product Architecture 的情况下，
++更新最少量 repository-level Agent instructions，
++让未来 Agent 明确知道：
++
++1. Research Recorder 是 mandatory instrumentation；
++2. Recorder 不属于 product architecture authority；
++3. Recorder 不能修改 contract semantics；
++4. Recorder failure 必须显式暴露；
++5. 不得静默跳过 Recorder；
++6. research evidence 与 product acceptance evidence 必须区分；
++7. Recorder PASS ≠ Task PASS；
++8. Task PASS ≠ Stage Gate PASS；
++9. Agent 不得修改 recorder evidence 来让自己通过；
++10. paused/pre-recorder historical activity只能 backfill。
++
++如果这需要修改 Frozen Architecture：
++
++不要自行修改。
++
++优先作为 non-product governance / research instrumentation 处理。
++
++如果确实冲突：
++
++BLOCKED\_BY\_ARCHITECTURE
++
++并提出最小决策问题。
++
++\============================================================
++24\. 已暂停 Agent 的恢复协议
++====================
++
++Recorder 完成后，需要为原 paused Agent 留下一段明确 resume instruction。
++
++恢复时它必须：
++
++1. 继续原来的 Task，而不是重新选 Task；
++2. 保留之前 ownership；
++3. 不重写暂停前历史；
++4. 初始化一个新的 research run；
++5. capture\_mode = prospective\_resume；
++6. 标记 pre\_recorder\_work = true；
++7. 捕获恢复时 Git / Task / diff 状态；
++8. 从恢复后的第一条可观察操作开始记录；
++9. 暂停前的信息仅能 backfill；
++10. 不得伪造之前 token / model call / tool trace。
++
++最终 Handoff 必须告诉 Human：
++
++原 Agent 是否可以安全恢复；
++从哪个 commit/worktree/task 继续；
++Recorder 从哪个时间点开始有真实 trace。
++
++\============================================================
++25\. 最低测试要求
++===========
++
++Recorder 至少必须有自动测试证明：
++
++A.
++start-run：
++
++- 生成唯一 run\_id
++- metadata/schema 正确
++
++B.
++Prompt Registry：
++
++- 完整 prompt 能稳定计算 SHA-256
++- run 能关联 prompt\_id
++- unavailable system prompt 不被猜测
++
++C.
++Git capture：
++
++- 正确捕获 HEAD
++- 正确捕获 dirty state
++- 不修改被观察 worktree
++
++D.
++events.jsonl：
++
++- append 正常
++- seq 正常
++- duplicate seq 被拒绝
++- malformed event 被拒绝
++
++E.
++run-command：
++
++- command 被真正执行
++- exit 0 正确记录
++- exit non-zero 正确记录
++- 原 exit code 被传播
++- 不把失败写成 PASS
++
++F.
++finish-run：
++
++- final state 捕获
++- duration 可得
++- diff 可得
++- finished run 状态正确
++
++G.
++interrupted/partial run：
++
++- 可检测
++- 不把 partial run 当 complete
++
++H.
++Human Decision：
++
++- synthetic fixture 可记录
++- fixture 明确标记
++- 不冒充真实 Human Decision
++
++I.
++Backfill：
++
++- backfilled=true
++- unavailable 字段不会被猜测
++
++J.
++Prospective Resume：
++
++- pre\_recorder\_work=true
++- trace completeness 正确标记
++
++K.
++Secret safety：
++
++- 不 dump environment
++- secret-like input 不应明文进入 durable research log
++
++L.
++Repository safety：
++
++- existing governance verifier 仍然通过
++- 不存在任何 IM 产品实现变更
++- 原 paused Task 没有被标记完成
++- 原 ownership 未被错误转移
++
++\============================================================
++26\. 本次严格禁止
++===========
++
++禁止：
++
++- Auth 实现
++- User 实现
++- Friend 实现
++- Messaging 实现
++- Sync 实现
++- Plugin 实现
++- Go backend 实现
++- Java backend 实现
++- Client 产品实现
++- 数据库业务 schema 设计
++- 新业务 contract
++- 修改 ACK semantics
++- 修改 public protocol
++- 修改业务 invariant
++- 修改 Plugin security boundary
++- 为了 Recorder 重构产品代码
++- 接管 paused Agent
++- 重跑历史然后冒充原始 trace
++- 伪造历史 prompt
++- 伪造 token
++- 伪造 CI
++- 伪造 Reviewer independence
++- 伪造 Human Decision
++- 记录 hidden chain-of-thought
++
++\============================================================
++27\. Documentation
++==================
++
++增加简洁、机器友好的 Recorder 文档。
++
++至少说明：
++
++- schema version
++- Instrumentation Epoch
++- start-run
++- prompt registration
++- command recording
++- semantic event
++- human decision
++- finish-run
++- review/fix relationship
++- CI ingestion
++- retrospective backfill
++- prospective resume
++- bootstrap\_partial
++- unavailable metadata
++- secret handling
++- export / analysis format
++
++不要写论文。
++
++不要做营销文档。
++
++不要做 dashboard。
++
++\============================================================
++28\. Acceptance / Review
++========================
++
++实现完成后：
++
++先运行本 Task 所需本地 verification。
++
++但：
++
++Local PASS ≠ accepted.
++
++必须遵循仓库现有 independent review 规则。
++
++如果可以真实委派 fresh independent Review Agent：
++
++执行独立 review。
++
++如果 reviewer FAIL：
++
++进入正常 fix → fresh review 循环。
++
++如果当前环境无法提供真正独立 reviewer：
++
++停在 review / handoff。
++
++不得伪造 PASS。
++
++不得让本 Recorder Implementation Agent 自己接受自己的工作。
++
++\============================================================
++29\. 最终 Handoff 给 Human
++=======================
++
++最终只需要给 Human 一个清晰摘要：
++
++1. Recorder 是否完成；
++2. Instrumentation Epoch 是否已经建立；
++3. accepted commit SHA；
++4. Recorder schema version；
++5. 新增/修改了哪些控制面文件；
++6. 未来如何：
++   - register prompt
++   - start run
++   - run command
++   - record human decision
++   - finish run
++7. 历史 completed tasks 如何 backfill；
++8. 当前 paused Agent 如何 resume；
++9. 哪些字段当前 harness 无法观察；
++10. test / review / acceptance 结果；
++11. 是否存在 architecture/governance blocker；
++12. Human 是否还需要做任何决策。
++
++然后停止。
++
++DO NOT CONTINUE PRODUCT IMPLEMENTATION.
+diff --git a/research/protocol/paused-agent-resume.md b/research/protocol/paused-agent-resume.md
+new file mode 100644
+index 0000000..f52b4c4
+--- /dev/null
++++ b/research/protocol/paused-agent-resume.md
+@@ -0,0 +1,7 @@
++# Paused Agent Resume Protocol
++
++After Recorder independent acceptance, resume `LOOP1-CONTRACT-001` in its existing review cycle. Do not select a replacement task, transfer ownership, mark it done, rewrite its earlier history, or touch unknown paused-Agent work.
++
++Before the first resumed operation, register the actual Human/Coordinator resume prompt and start a new run with role `review` (or the actual resumed role), capture mode `prospective_resume`, and `--pre-recorder-work`. The resulting metadata must keep `pre_recorder_work=true` and `pre_recorder_trace_complete=false`. Initial capture records the then-current Git/task/diff/checkpoint facts. Pre-Recorder facts may be added only as marked backfill from durable evidence; unavailable prompt, model-call, token, tool-trace, timing, reasoning, context, and cost facts remain `unavailable`.
++
++At control-plane insertion observation, the paused task was `LOOP1-CONTRACT-001`, queue/state `review`, owner `unassigned-independent-review-agent`. The original worktree was `H:\IM-platform`, branch `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with untracked `contracts/http/schema-lint/` treated as unknown/paused-Agent-owned. This is an activation snapshot, not a prospective run start. Re-observe real state at resume; do not assume it remained unchanged.
+diff --git a/research/resume/LOOP1-CONTRACT-001-activation.json b/research/resume/LOOP1-CONTRACT-001-activation.json
+new file mode 100644
+index 0000000..98fd253
+--- /dev/null
++++ b/research/resume/LOOP1-CONTRACT-001-activation.json
+@@ -0,0 +1,27 @@
++{
++  "recorder_schema_version": "1.0.0",
++  "record_type": "paused_task_activation_snapshot",
++  "observed_at": "2026-09-21T01:44:10.0668529Z",
++  "task_id": "LOOP1-CONTRACT-001",
++  "task_queue": "review",
++  "task_status": "review",
++  "task_owner": "unassigned-independent-review-agent",
++  "observed_repository": {
++    "branch": "task/LOOP1-CONTRACT-001",
++    "head_sha": "1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc",
++    "clean": false,
++    "changed_paths": [
++      "contracts/http/schema-lint/"
++    ],
++    "untracked_content_inspected": false
++  },
++  "last_known_good_commit": "e5482b135a2ab7451c24c29c7517e1a8f19ce420",
++  "latest_checkpoint": "spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md",
++  "collection_mode": "retrospective_backfill",
++  "backfilled": true,
++  "capture_mode_on_resume": "prospective_resume",
++  "pre_recorder_work": true,
++  "pre_recorder_trace_complete": false,
++  "prospective_run_started": false,
++  "note": "Control-plane insertion observation only; not a prospective run start. Re-observe state when the paused Agent actually resumes."
++}
+diff --git a/research/resume/LOOP1-CONTRACT-001-start-run.example.json b/research/resume/LOOP1-CONTRACT-001-start-run.example.json
+new file mode 100644
+index 0000000..78fba5f
+--- /dev/null
++++ b/research/resume/LOOP1-CONTRACT-001-start-run.example.json
+@@ -0,0 +1,13 @@
++{
++  "task_id": "LOOP1-CONTRACT-001",
++  "role": "review",
++  "capture_mode": "prospective_resume",
++  "pre_recorder_work": true,
++  "pre_recorder_trace_complete": false,
++  "prompt_id": "register-the-actual-resume-prompt-first",
++  "parent_run_id": "unavailable",
++  "related_run_id": "unavailable",
++  "experiment_group": "full_governance",
++  "fixture": true,
++  "instruction": "Template only. Do not treat this file as a real run or Human Decision. Start a new run after Recorder acceptance and re-observe repository state."
++}
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-46e0f98c-32db-4629-b9f4-4fec40e23e7f.stderr.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-46e0f98c-32db-4629-b9f4-4fec40e23e7f.stderr.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-46e0f98c-32db-4629-b9f4-4fec40e23e7f.stdout.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-46e0f98c-32db-4629-b9f4-4fec40e23e7f.stdout.txt
+new file mode 100644
+index 0000000..868e356
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-46e0f98c-32db-4629-b9f4-4fec40e23e7f.stdout.txt
+@@ -0,0 +1,3 @@
++NON-ACCEPTANCE DEVELOPMENT MODE: dirty worktree is permitted; this output MUST NOT be used as acceptance evidence.
++PASS: generic repository recovery verified task=LOOP1-RESEARCH-001 state=active mode=Development queues=5 task_specs=10.
++GIT: branch=task/LOOP1-RESEARCH-001 status_entries=29 diff_lines=7 recent_commits=5.
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-4965d0d3-7577-48c0-a7a1-d143b6f129a6.stderr.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-4965d0d3-7577-48c0-a7a1-d143b6f129a6.stderr.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-4965d0d3-7577-48c0-a7a1-d143b6f129a6.stdout.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-4965d0d3-7577-48c0-a7a1-d143b6f129a6.stdout.txt
+new file mode 100644
+index 0000000..4e7f16f
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-4965d0d3-7577-48c0-a7a1-d143b6f129a6.stdout.txt
+@@ -0,0 +1,3 @@
++NON-ACCEPTANCE DEVELOPMENT MODE: dirty worktree is permitted; this output MUST NOT be used as acceptance evidence.
++PASS: generic repository recovery verified task=LOOP1-RESEARCH-001 state=review mode=Development queues=5 task_specs=10.
++GIT: branch=task/LOOP1-RESEARCH-001 status_entries=34 diff_lines=7 recent_commits=5.
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stderr.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stderr.txt
+new file mode 100644
+index 0000000..47cc9b9
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stderr.txt
+@@ -0,0 +1,22 @@
++test_backfill_marks_unknowns_unavailable (test_recorder.RecorderTest.test_backfill_marks_unknowns_unavailable) ... ok
++test_bootstrap_partial_is_never_trace_complete (test_recorder.RecorderTest.test_bootstrap_partial_is_never_trace_complete) ... ok
++test_ci_ingestion_records_external_observation_only (test_recorder.RecorderTest.test_ci_ingestion_records_external_observation_only) ... ok
++test_event_append_seq_hash_and_duplicate_rejected (test_recorder.RecorderTest.test_event_append_seq_hash_and_duplicate_rejected) ... ok
++test_finish_captures_final_diff_duration_and_locks_history (test_recorder.RecorderTest.test_finish_captures_final_diff_duration_and_locks_history) ... ok
++test_finished_manifest_tamper_detected (test_recorder.RecorderTest.test_finished_manifest_tamper_detected) ... ok
++test_git_capture_dirty_without_modification (test_recorder.RecorderTest.test_git_capture_dirty_without_modification) ... ok
++test_human_decision_fixture_explicit (test_recorder.RecorderTest.test_human_decision_fixture_explicit) ... ok
++test_malformed_and_partial_jsonl_rejected (test_recorder.RecorderTest.test_malformed_and_partial_jsonl_rejected) ... ok
++test_partial_run_detected (test_recorder.RecorderTest.test_partial_run_detected) ... ok
++test_prompt_hash_link_and_system_prompt_unavailable (test_recorder.RecorderTest.test_prompt_hash_link_and_system_prompt_unavailable) ... ok
++test_prospective_resume_trace_flags (test_recorder.RecorderTest.test_prospective_resume_trace_flags) ... ok
++test_repository_safety_in_real_checkout (test_recorder.RecorderTest.test_repository_safety_in_real_checkout) ... ok
++test_run_command_executes_and_propagates_zero (test_recorder.RecorderTest.test_run_command_executes_and_propagates_zero) ... ok
++test_run_command_propagates_failure_and_records_fail (test_recorder.RecorderTest.test_run_command_propagates_failure_and_records_fail) ... ok
++test_secret_redaction_and_no_environment_dump (test_recorder.RecorderTest.test_secret_redaction_and_no_environment_dump) ... ok
++test_start_run_unique_and_schema (test_recorder.RecorderTest.test_start_run_unique_and_schema) ... ok
++
++----------------------------------------------------------------------
++Ran 17 tests in 11.689s
++
++OK
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stdout.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stdout.txt
+new file mode 100644
+index 0000000..61db28f
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stdout.txt
+@@ -0,0 +1,21 @@
++TEST-001
++R-20260921T015214Z-aa63d6be-f69e-43c4-bf30-89111e7c090b
++R-20260921T015214Z-685b1466-0f5b-49c5-ae19-ac4c9fc13746
++R-20260921T015215Z-032c2015-2fe2-4155-b979-f17f1cc4e24e
++R-20260921T015215Z-a131c9f1-522c-42ec-8306-d0f903d25514
++{"event_count": 4, "final_event_hash": "826847cc687202c3f1a69b564fa07d364a0d119625d5326f993c0124cfd9fa6d", "first_event_hash": "57bf23238b6ef7660cf5a8aa7ca1f6c9774374644fcf03beff860440899a0ce3", "manifest_hash": "c36221f5708e5eb6c4d63d08ec61a4d4710941a3754efd913dfb1c4873999abe", "recorder_schema_version": "1.0.0", "result": "PASS", "run_id": "R-20260921T015215Z-a131c9f1-522c-42ec-8306-d0f903d25514", "status": "finished"}
++R-20260921T015216Z-f80ac1ba-6bdb-43ca-9f21-e46f1d0327bc
++{"event_count": 4, "final_event_hash": "e15a092a435f09e6008206ee5b5339ae286fb7da7c97c7cfef072d4e116620ef", "first_event_hash": "63e7478350bb4734d40bdf11ba8849b7ceca2a8c7e526897cbcefa7623e7f805", "manifest_hash": "f638db32cfabee1697f264eea3ff4a6e78f29140422ff78fa0b07d004faba647", "recorder_schema_version": "1.0.0", "result": "PASS", "run_id": "R-20260921T015216Z-f80ac1ba-6bdb-43ca-9f21-e46f1d0327bc", "status": "finished"}
++R-20260921T015217Z-f4be9e18-23a4-4ec6-8558-da223e370247
++HD-30570c01-b0a8-44ee-86b7-5e32494347c1
++R-20260921T015217Z-84fdd23e-1c07-4174-8cf4-722eb6b32e8b
++R-20260921T015218Z-980c3723-55c7-4960-adad-6105da5d678e
++{"associated_run_id": "unavailable", "prompt_capture": "full", "prompt_id": "P-bc8ddf88-5b23-4387-ad65-f49e1a9f88f1", "prompt_sha256": "8b7b019fbca42da85e5be29e2f9aa50edd5450b514910437bb77b2569e15362f", "prompt_source": "human", "recorder_schema_version": "1.0.0", "registered_at": "2026-09-21T01:52:18.846915Z", "secret_redaction_applied": false, "system_prompt_capture": "unavailable", "task_id": "TEST-001", "template_version": "unavailable"}
++R-20260921T015218Z-96259475-8f63-4e68-8536-837ede0ea2ae
++R-20260921T015219Z-b37777ca-feae-45b4-819e-0c39505cc024
++R-20260921T015219Z-f533298f-ae40-4596-8f19-e5a7ef022987
++R-20260921T015221Z-1c2d576b-6bfa-4329-a429-21978b41aafa
++{"associated_run_id": "unavailable", "prompt_capture": "redacted", "prompt_id": "P-1ec8f6a2-46a0-4c8a-b759-0a29c431c3db", "prompt_sha256": "346c942a4c0d18f751c3198310f6e5d86a880e64b9dd857e381527654a131666", "prompt_source": "human", "recorder_schema_version": "1.0.0", "registered_at": "2026-09-21T01:52:23.511921Z", "secret_redaction_applied": true, "system_prompt_capture": "unavailable", "task_id": "TEST-001", "template_version": "unavailable"}
++R-20260921T015223Z-354e6023-7a48-4ea0-894a-f17f6a88fd6d
++R-20260921T015225Z-511206df-6162-44a3-b570-f1ccce2e8d33
++R-20260921T015225Z-2cc56624-9d10-4087-ad8a-2e419d5b6cf3
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stderr.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stderr.txt
+new file mode 100644
+index 0000000..c1cb476
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stderr.txt
+@@ -0,0 +1,32 @@
++test_backfill_marks_unknowns_unavailable (test_recorder.RecorderTest.test_backfill_marks_unknowns_unavailable) ... ok
++test_ci_ingestion_records_external_observation_only (test_recorder.RecorderTest.test_ci_ingestion_records_external_observation_only) ... ok
++test_event_append_seq_hash_and_duplicate_rejected (test_recorder.RecorderTest.test_event_append_seq_hash_and_duplicate_rejected) ... ok
++test_finish_captures_final_diff_duration_and_locks_history (test_recorder.RecorderTest.test_finish_captures_final_diff_duration_and_locks_history) ... ok
++test_finished_manifest_tamper_detected (test_recorder.RecorderTest.test_finished_manifest_tamper_detected) ... ok
++test_git_capture_dirty_without_modification (test_recorder.RecorderTest.test_git_capture_dirty_without_modification) ... ok
++test_human_decision_fixture_explicit (test_recorder.RecorderTest.test_human_decision_fixture_explicit) ... ok
++test_malformed_and_partial_jsonl_rejected (test_recorder.RecorderTest.test_malformed_and_partial_jsonl_rejected) ... ok
++test_partial_run_detected (test_recorder.RecorderTest.test_partial_run_detected) ... ok
++test_prompt_hash_link_and_system_prompt_unavailable (test_recorder.RecorderTest.test_prompt_hash_link_and_system_prompt_unavailable) ... FAIL
++test_prospective_resume_trace_flags (test_recorder.RecorderTest.test_prospective_resume_trace_flags) ... ok
++test_repository_safety_in_real_checkout (test_recorder.RecorderTest.test_repository_safety_in_real_checkout) ... ok
++test_run_command_executes_and_propagates_zero (test_recorder.RecorderTest.test_run_command_executes_and_propagates_zero) ... ok
++test_run_command_propagates_failure_and_records_fail (test_recorder.RecorderTest.test_run_command_propagates_failure_and_records_fail) ... ok
++test_secret_redaction_and_no_environment_dump (test_recorder.RecorderTest.test_secret_redaction_and_no_environment_dump) ... ok
++test_start_run_unique_and_schema (test_recorder.RecorderTest.test_start_run_unique_and_schema) ... ok
++
++======================================================================
++FAIL: test_prompt_hash_link_and_system_prompt_unavailable (test_recorder.RecorderTest.test_prompt_hash_link_and_system_prompt_unavailable)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "H:\.codex\worktrees\research-recorder\IM-platform\tests\research\test_recorder.py", line 95, in test_prompt_hash_link_and_system_prompt_unavailable
++    self.assertEqual(recorder.sha256_bytes(b"stable prompt\n"), meta["prompt_sha256"])
++AssertionError: '62fe4142101948638d16623134cb7efbe04c90dbd550eaf6a8f25bf18505ac94' != '8b7b019fbca42da85e5be29e2f9aa50edd5450b514910437bb77b2569e15362f'
++- 62fe4142101948638d16623134cb7efbe04c90dbd550eaf6a8f25bf18505ac94
+++ 8b7b019fbca42da85e5be29e2f9aa50edd5450b514910437bb77b2569e15362f
++
++
++----------------------------------------------------------------------
++Ran 16 tests in 12.503s
++
++FAILED (failures=1)
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stdout.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stdout.txt
+new file mode 100644
+index 0000000..33f91be
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stdout.txt
+@@ -0,0 +1,19 @@
++TEST-001
++R-20260921T014653Z-ff93346f-20b2-4d14-a0f9-615dc36fba09
++R-20260921T014654Z-0901962a-f826-406a-a03f-c384df488b5a
++R-20260921T014654Z-0b5248bd-5457-4f26-81e4-efd9a5e5e2de
++{"event_count": 4, "final_event_hash": "3b4e19cee4274d2d5e5975914d9edcbc527f5988c91c1f05fa8b60ca6723901a", "first_event_hash": "c9111b00763e33d9f83d3ad0acaa029cb51dfc31601fa755e495ca196b1c2a15", "manifest_hash": "722cf1915f67d0f45c3a9d0f8da78e137908b5c5bbec2ad6aaff58d11c442185", "recorder_schema_version": "1.0.0", "result": "PASS", "run_id": "R-20260921T014654Z-0b5248bd-5457-4f26-81e4-efd9a5e5e2de", "status": "finished"}
++R-20260921T014655Z-b46e610f-4576-4665-ba77-d07f40027dd7
++{"event_count": 4, "final_event_hash": "bfc5398ba3e5bc45e293e60f03e00b9cbc48dc58c9cb7a89259cc7aa1a3b5dfc", "first_event_hash": "45be84eca04ce779fd0e7027b17f17184eb3f95d4b53011a82e9d89e8c5ad61c", "manifest_hash": "27032f74215a54d5182fd9e57b16b7a0f26a147efa4b56fdca9ea9ea8fcb4940", "recorder_schema_version": "1.0.0", "result": "PASS", "run_id": "R-20260921T014655Z-b46e610f-4576-4665-ba77-d07f40027dd7", "status": "finished"}
++R-20260921T014656Z-538d9bde-c5f5-4408-a036-6e5575c4e3d2
++HD-e1ff99cd-de54-4b9c-a54a-c0cddaf769f8
++R-20260921T014657Z-c61cad86-2d37-44b3-b699-430bca3a716b
++R-20260921T014657Z-993ab762-9a88-48d4-b962-3f67605fe800
++{"associated_run_id": "unavailable", "prompt_capture": "full", "prompt_id": "P-77f84b74-b446-48bf-9ce9-84b7c3cf21de", "prompt_sha256": "8b7b019fbca42da85e5be29e2f9aa50edd5450b514910437bb77b2569e15362f", "prompt_source": "human", "recorder_schema_version": "1.0.0", "registered_at": "2026-09-21T01:46:58.469165Z", "secret_redaction_applied": false, "system_prompt_capture": "unavailable", "task_id": "TEST-001", "template_version": "unavailable"}
++R-20260921T014658Z-f16ec826-0ef4-4ede-86eb-d6e2316c8e1a
++R-20260921T014659Z-7712ad06-9d4a-42ed-9e70-a431d4a0ce0d
++R-20260921T014701Z-865470d0-6b3e-4dd4-9a32-f8eeda999d61
++{"associated_run_id": "unavailable", "prompt_capture": "redacted", "prompt_id": "P-45bae825-b3c9-4c59-9a8e-7e9ef2482be4", "prompt_sha256": "346c942a4c0d18f751c3198310f6e5d86a880e64b9dd857e381527654a131666", "prompt_source": "human", "recorder_schema_version": "1.0.0", "registered_at": "2026-09-21T01:47:03.374981Z", "secret_redaction_applied": true, "system_prompt_capture": "unavailable", "task_id": "TEST-001", "template_version": "unavailable"}
++R-20260921T014703Z-f94d4f0a-5cb5-4562-aafc-e4d8a9863893
++R-20260921T014705Z-0d71aa32-8403-4f7f-89b2-8b3e75e549ee
++R-20260921T014705Z-3f97cdba-b820-406f-ac3f-ad4699d0ba1d
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stderr.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stderr.txt
+new file mode 100644
+index 0000000..56d3c61
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stderr.txt
+@@ -0,0 +1,21 @@
++test_backfill_marks_unknowns_unavailable (test_recorder.RecorderTest.test_backfill_marks_unknowns_unavailable) ... ok
++test_ci_ingestion_records_external_observation_only (test_recorder.RecorderTest.test_ci_ingestion_records_external_observation_only) ... ok
++test_event_append_seq_hash_and_duplicate_rejected (test_recorder.RecorderTest.test_event_append_seq_hash_and_duplicate_rejected) ... ok
++test_finish_captures_final_diff_duration_and_locks_history (test_recorder.RecorderTest.test_finish_captures_final_diff_duration_and_locks_history) ... ok
++test_finished_manifest_tamper_detected (test_recorder.RecorderTest.test_finished_manifest_tamper_detected) ... ok
++test_git_capture_dirty_without_modification (test_recorder.RecorderTest.test_git_capture_dirty_without_modification) ... ok
++test_human_decision_fixture_explicit (test_recorder.RecorderTest.test_human_decision_fixture_explicit) ... ok
++test_malformed_and_partial_jsonl_rejected (test_recorder.RecorderTest.test_malformed_and_partial_jsonl_rejected) ... ok
++test_partial_run_detected (test_recorder.RecorderTest.test_partial_run_detected) ... ok
++test_prompt_hash_link_and_system_prompt_unavailable (test_recorder.RecorderTest.test_prompt_hash_link_and_system_prompt_unavailable) ... ok
++test_prospective_resume_trace_flags (test_recorder.RecorderTest.test_prospective_resume_trace_flags) ... ok
++test_repository_safety_in_real_checkout (test_recorder.RecorderTest.test_repository_safety_in_real_checkout) ... ok
++test_run_command_executes_and_propagates_zero (test_recorder.RecorderTest.test_run_command_executes_and_propagates_zero) ... ok
++test_run_command_propagates_failure_and_records_fail (test_recorder.RecorderTest.test_run_command_propagates_failure_and_records_fail) ... ok
++test_secret_redaction_and_no_environment_dump (test_recorder.RecorderTest.test_secret_redaction_and_no_environment_dump) ... ok
++test_start_run_unique_and_schema (test_recorder.RecorderTest.test_start_run_unique_and_schema) ... ok
++
++----------------------------------------------------------------------
++Ran 16 tests in 12.843s
++
++OK
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stdout.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stdout.txt
+new file mode 100644
+index 0000000..5b694e1
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stdout.txt
+@@ -0,0 +1,20 @@
++TEST-001
++R-20260921T014743Z-2c59af69-3753-43ea-95c7-356f4a813c01
++R-20260921T014743Z-6ba2bdcd-19be-4b65-943e-1f021bfc6564
++R-20260921T014744Z-e548c20e-13f4-420c-8575-2c51579f9749
++{"event_count": 4, "final_event_hash": "81622bad50dc4b9514cc6b83b4158e601d62a0ba1044e8b14f811123c7cecf3d", "first_event_hash": "5aa65b8ac6e802075584247f0ab6b738c5a9c9ab42556e842e2f01a91c647269", "manifest_hash": "9943369640b1b02c2645a8119383c2fd754faf44ec6c9b255d4a9b340b4c7cd5", "recorder_schema_version": "1.0.0", "result": "PASS", "run_id": "R-20260921T014744Z-e548c20e-13f4-420c-8575-2c51579f9749", "status": "finished"}
++R-20260921T014744Z-cb019c0f-c924-4824-a532-7192478f2529
++{"event_count": 4, "final_event_hash": "1fae69501d185002c1125d21169add97a5390376fd86855e8039d152dbca33b2", "first_event_hash": "d072702882242256fc97f53726d7c6219a0c5f772187cf2db0d70aa551da8193", "manifest_hash": "528bb04ac85758db8fe756c1d058c62418b82663afa0f72d8258820155dd8645", "recorder_schema_version": "1.0.0", "result": "PASS", "run_id": "R-20260921T014744Z-cb019c0f-c924-4824-a532-7192478f2529", "status": "finished"}
++R-20260921T014746Z-43b82b8d-92eb-45be-99f6-6d8443f497cc
++HD-3898ddc7-12e9-4c2a-9de0-eb92127be207
++R-20260921T014746Z-e8e73413-e9d5-49bb-99d6-779ac257b154
++R-20260921T014747Z-43a4a2df-d550-4fbf-9b53-b8cdddc871c1
++{"associated_run_id": "unavailable", "prompt_capture": "full", "prompt_id": "P-55f6c532-db23-4067-8f9b-3e731d38ef17", "prompt_sha256": "8b7b019fbca42da85e5be29e2f9aa50edd5450b514910437bb77b2569e15362f", "prompt_source": "human", "recorder_schema_version": "1.0.0", "registered_at": "2026-09-21T01:47:47.775108Z", "secret_redaction_applied": false, "system_prompt_capture": "unavailable", "task_id": "TEST-001", "template_version": "unavailable"}
++R-20260921T014747Z-e80f8e3f-e2fc-4963-8b55-fc1399db90e4
++R-20260921T014748Z-e8a078d5-59dc-4481-b45e-edb17deb117f
++R-20260921T014749Z-65443148-0d5c-4553-ab0f-d19dc448b635
++R-20260921T014751Z-170b5904-ce8d-4c29-88ce-6be47fc587f7
++{"associated_run_id": "unavailable", "prompt_capture": "redacted", "prompt_id": "P-b81ef054-e804-408c-b15b-b53aabc460d2", "prompt_sha256": "346c942a4c0d18f751c3198310f6e5d86a880e64b9dd857e381527654a131666", "prompt_source": "human", "recorder_schema_version": "1.0.0", "registered_at": "2026-09-21T01:47:52.906857Z", "secret_redaction_applied": true, "system_prompt_capture": "unavailable", "task_id": "TEST-001", "template_version": "unavailable"}
++R-20260921T014752Z-554013b5-195b-438e-b00b-fa1875c2f98a
++R-20260921T014754Z-bd4553d5-6eda-4cdc-a311-5c01a03dc512
++R-20260921T014755Z-b314635e-d11e-4dc7-a47a-750ee19a6c6f
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-c16547a6-ec41-40c1-9e4d-c4035228f410.stderr.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-c16547a6-ec41-40c1-9e4d-c4035228f410.stderr.txt
+new file mode 100644
+index 0000000..8a3705a
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-c16547a6-ec41-40c1-9e4d-c4035228f410.stderr.txt
+@@ -0,0 +1,3 @@
++warning: in the working copy of 'AGENTS.md', LF will be replaced by CRLF the next time Git touches it
++warning: in the working copy of 'spec/handoff/agent-context.md', LF will be replaced by CRLF the next time Git touches it
++warning: in the working copy of 'spec/progress/current.md', LF will be replaced by CRLF the next time Git touches it
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-c16547a6-ec41-40c1-9e4d-c4035228f410.stdout.txt b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/blobs/C-c16547a6-ec41-40c1-9e4d-c4035228f410.stdout.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/events.jsonl b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/events.jsonl
+new file mode 100644
+index 0000000..e0ef0c0
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/events.jsonl
+@@ -0,0 +1,16 @@
++{"data":{"capture_mode":"bootstrap_partial","pre_recorder_trace_complete":true,"pre_recorder_work":false,"prompt_id":"P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1"},"event_hash":"320d0acfa04fbfbbdaaa0af7910fe1c4320363b079d96586152fcd661af37025","event_type":"run_started","previous_event_hash":"0000000000000000000000000000000000000000000000000000000000000000","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":1,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:45:02.472912Z"}
++{"data":{"last_known_good_commit":"e5482b135a2ab7451c24c29c7517e1a8f19ce420","latest_checkpoint":"spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md","path":"spec/progress/current.md","presence":"present","task_id":"LOOP1-RESEARCH-001","task_owner":"/root/recorder_impl","task_queue":"active","task_state":"active"},"event_hash":"323d7b52f85c25b4b3796c5303b6328e227abfcc5efc98eefb18ee7e3223b3ad","event_type":"task_state_observed","previous_event_hash":"320d0acfa04fbfbbdaaa0af7910fe1c4320363b079d96586152fcd661af37025","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":2,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:45:02.474354Z"}
++{"data":{"branch":"task/LOOP1-RESEARCH-001","changed_paths":["AGENTS.md","spec/handoff/agent-context.md","spec/progress/current.md","research/README.md","research/backfill/LOOP1-CONTRACT-001.json","research/backfill/LOOP1-CTRL-001.json","research/backfill/LOOP1-CTRL-002.json","research/backfill/LOOP1-SPEC-001.json","research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/metadata.json","research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt","research/protocol/paused-agent-resume.md","research/resume/LOOP1-CONTRACT-001-activation.json","research/resume/LOOP1-CONTRACT-001-start-run.example.json","research/schema/ci-ingestion.schema.json","research/schema/event.schema.json","research/schema/run-metadata.schema.json","spec/tasks/active/LOOP1-RESEARCH-001.md","tests/research/__pycache__/test_recorder.cpython-312.pyc","tests/research/test_recorder.py","tools/research/__pycache__/recorder.cpython-312.pyc","tools/research/recorder.py"],"clean":false,"diff_stat":[" AGENTS.md                     |  6 ++++++"," spec/handoff/agent-context.md |  2 ++"," spec/progress/current.md      | 16 +++++++++-------"," 3 files changed, 17 insertions(+), 7 deletions(-)"],"head_sha":"1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc","repo_identifier":"IM-platform","status_porcelain":[" M AGENTS.md"," M spec/handoff/agent-context.md"," M spec/progress/current.md","?? research/README.md","?? research/backfill/LOOP1-CONTRACT-001.json","?? research/backfill/LOOP1-CTRL-001.json","?? research/backfill/LOOP1-CTRL-002.json","?? research/backfill/LOOP1-SPEC-001.json","?? research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/metadata.json","?? research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt","?? research/protocol/paused-agent-resume.md","?? research/resume/LOOP1-CONTRACT-001-activation.json","?? research/resume/LOOP1-CONTRACT-001-start-run.example.json","?? research/schema/ci-ingestion.schema.json","?? research/schema/event.schema.json","?? research/schema/run-metadata.schema.json","?? spec/tasks/active/LOOP1-RESEARCH-001.md","?? tests/research/__pycache__/test_recorder.cpython-312.pyc","?? tests/research/test_recorder.py","?? tools/research/__pycache__/recorder.cpython-312.pyc","?? tools/research/recorder.py"]},"event_hash":"64f99bb3af866f6be1d2b1ac68a6bad2ffec944cfb8fe0a5c4525a78de33a6d5","event_type":"git_state_observed","previous_event_hash":"323d7b52f85c25b4b3796c5303b6328e227abfcc5efc98eefb18ee7e3223b3ad","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":3,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:45:02.475355Z"}
++{"data":{"argv":["C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe","-m","unittest","discover","-s","tests/research","-v"],"command_id":"C-81e58c81-8d78-4d72-bfcc-de77d3174daf","cwd":".","secret_redaction_applied":false},"event_hash":"4939080286603fc27a3297d1e7a17588d84b697ea82776473cfcc9af2fc0570c","event_type":"command_started","previous_event_hash":"64f99bb3af866f6be1d2b1ac68a6bad2ffec944cfb8fe0a5c4525a78de33a6d5","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":4,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:46:53.021582Z"}
++{"data":{"command_id":"C-81e58c81-8d78-4d72-bfcc-de77d3174daf","duration_ms":12687.0,"exit_code":1,"result":"FAIL","secret_redaction_applied":false,"stderr_blob":"blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stderr.txt","stderr_sha256":"eaa1236d84432b8dd67303e447b4bda9ddbd99a9538f190ef6a90793f45f127b","stdout_blob":"blobs/C-81e58c81-8d78-4d72-bfcc-de77d3174daf.stdout.txt","stdout_sha256":"cf5dfd8e9979a2f9feaf445fcbc85e0edbcfc3d8e53fba7bbed918d4e4a26c99"},"event_hash":"67f0102cb8f187746672ef43cf2a9779bfe2e425ad243c63fb8b74988e3a149e","event_type":"command_finished","previous_event_hash":"4939080286603fc27a3297d1e7a17588d84b697ea82776473cfcc9af2fc0570c","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":5,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:47:05.722672Z"}
++{"data":{"argv":["C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe","-m","unittest","discover","-s","tests/research","-v"],"command_id":"C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da","cwd":".","secret_redaction_applied":false},"event_hash":"d5751d3402063373aed1389d3b8a525fc5f55e3b542a0dc7886ef3068f835c70","event_type":"command_started","previous_event_hash":"67f0102cb8f187746672ef43cf2a9779bfe2e425ad243c63fb8b74988e3a149e","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":6,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:47:42.361909Z"}
++{"data":{"command_id":"C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da","duration_ms":13031.0,"exit_code":0,"result":"PASS","secret_redaction_applied":false,"stderr_blob":"blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stderr.txt","stderr_sha256":"d78111c2492b6cf9dbab58d5662ca98080aaec1b977a899dfbd6e25bb5d52b07","stdout_blob":"blobs/C-bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stdout.txt","stdout_sha256":"c70884fa748f49b8ff30840041875f95e26d6e98ab0cc25360bea75ed927f56d"},"event_hash":"28cb0924377de951bd0287c9300da0dd61cd6082eed85e0bd0319a6353556503","event_type":"command_finished","previous_event_hash":"d5751d3402063373aed1389d3b8a525fc5f55e3b542a0dc7886ef3068f835c70","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":7,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:47:55.385067Z"}
++{"data":{"argv":["pwsh","-NoProfile","-File","tools/verify-loop1-ctrl-002.ps1","-Mode","Development"],"command_id":"C-46e0f98c-32db-4629-b9f4-4fec40e23e7f","cwd":".","secret_redaction_applied":false},"event_hash":"6f767b8ae25014a056b4ab87eb4aa73e8fa6c948f4d66f48d7d52f1351013a36","event_type":"command_started","previous_event_hash":"28cb0924377de951bd0287c9300da0dd61cd6082eed85e0bd0319a6353556503","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":8,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:49:32.637108Z"}
++{"data":{"command_id":"C-46e0f98c-32db-4629-b9f4-4fec40e23e7f","duration_ms":1012.6988,"exit_code":0,"result":"PASS","secret_redaction_applied":false,"stderr_blob":"blobs/C-46e0f98c-32db-4629-b9f4-4fec40e23e7f.stderr.txt","stderr_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","stdout_blob":"blobs/C-46e0f98c-32db-4629-b9f4-4fec40e23e7f.stdout.txt","stdout_sha256":"53ba7fd4f1bf01fdb75844b983ce87a62e19d862272de28eae1573474588cf0c"},"event_hash":"30c1f3fa68c60cae9a1ed7dc00e05adab454aa00fc83a080735463090d72c94c","event_type":"command_finished","previous_event_hash":"6f767b8ae25014a056b4ab87eb4aa73e8fa6c948f4d66f48d7d52f1351013a36","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":9,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:49:33.652555Z"}
++{"data":{"argv":["git","diff","--check"],"command_id":"C-c16547a6-ec41-40c1-9e4d-c4035228f410","cwd":".","secret_redaction_applied":false},"event_hash":"7a55194e381e3cf3f491b583e25650352948141e79ae4f2bfec045514212d48e","event_type":"command_started","previous_event_hash":"30c1f3fa68c60cae9a1ed7dc00e05adab454aa00fc83a080735463090d72c94c","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":10,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:50:14.831259Z"}
++{"data":{"command_id":"C-c16547a6-ec41-40c1-9e4d-c4035228f410","duration_ms":39.4908,"exit_code":0,"result":"PASS","secret_redaction_applied":false,"stderr_blob":"blobs/C-c16547a6-ec41-40c1-9e4d-c4035228f410.stderr.txt","stderr_sha256":"5411ff39883f6423785bf0b3b67a7566f1480c213907d6819302db25e3cceb2e","stdout_blob":"blobs/C-c16547a6-ec41-40c1-9e4d-c4035228f410.stdout.txt","stdout_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},"event_hash":"a513761acedb785cc1e542156902e006fb3da411d9348cae346dc2847d801e7d","event_type":"command_finished","previous_event_hash":"7a55194e381e3cf3f491b583e25650352948141e79ae4f2bfec045514212d48e","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":11,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:50:14.872842Z"}
++{"data":{"correction":"bootstrap_partial is incomplete by definition; finish-run will set metadata false and later analysis must use capture_mode","observed_issue":"run_started initially emitted pre_recorder_trace_complete=true for bootstrap_partial","raw_event_preserved":true},"event_hash":"63f17dd8454aace2a32b4b09e6504577cbadfc62f198d0729856e24023042de8","event_type":"instrumentation_warning","previous_event_hash":"a513761acedb785cc1e542156902e006fb3da411d9348cae346dc2847d801e7d","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":12,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:51:20.099928Z"}
++{"data":{"argv":["C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe","-m","unittest","discover","-s","tests/research","-v"],"command_id":"C-49c9f1a5-d758-42eb-b761-e071baca4b1d","cwd":".","secret_redaction_applied":false},"event_hash":"94cdfa2c8b0538f0fb82a161d0d840357d673156fdf06b06cd9331e755a478e3","event_type":"command_started","previous_event_hash":"63f17dd8454aace2a32b4b09e6504577cbadfc62f198d0729856e24023042de8","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":13,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:52:13.821792Z"}
++{"data":{"command_id":"C-49c9f1a5-d758-42eb-b761-e071baca4b1d","duration_ms":11846.8105,"exit_code":0,"result":"PASS","secret_redaction_applied":false,"stderr_blob":"blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stderr.txt","stderr_sha256":"130876d413f56068c10bfac4bd066c27f06ca1b8af6c46cf7c36903cebf4742b","stdout_blob":"blobs/C-49c9f1a5-d758-42eb-b761-e071baca4b1d.stdout.txt","stdout_sha256":"eaa21c66feceae60d58bfee09b8fa8293e00f647f1aa88c7ea204fca4acb3b1c"},"event_hash":"1d1db7a9a7b95b24d51c5c647a304048f43abb5129ca364f5b6030a0846da271","event_type":"command_finished","previous_event_hash":"94cdfa2c8b0538f0fb82a161d0d840357d673156fdf06b06cd9331e755a478e3","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":14,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:52:25.671678Z"}
++{"data":{"argv":["pwsh","-NoProfile","-File","tools/verify-loop1-ctrl-002.ps1","-Mode","Development"],"command_id":"C-4965d0d3-7577-48c0-a7a1-d143b6f129a6","cwd":".","secret_redaction_applied":false},"event_hash":"0358de56ec3c4de7d058eccdc4b9cde210b7d34dbb006b6156fc91c5231cf2d4","event_type":"command_started","previous_event_hash":"1d1db7a9a7b95b24d51c5c647a304048f43abb5129ca364f5b6030a0846da271","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":15,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:54:27.068110Z"}
++{"data":{"command_id":"C-4965d0d3-7577-48c0-a7a1-d143b6f129a6","duration_ms":905.2674,"exit_code":0,"result":"PASS","secret_redaction_applied":false,"stderr_blob":"blobs/C-4965d0d3-7577-48c0-a7a1-d143b6f129a6.stderr.txt","stderr_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","stdout_blob":"blobs/C-4965d0d3-7577-48c0-a7a1-d143b6f129a6.stdout.txt","stdout_sha256":"d9288ae94cf7323ccfcbc36e874f9edf8f1cdb13f7e9481841c64e2c8a075654"},"event_hash":"04500700a1e193627c30a0fac8d274865a45bdd618656aab49622038a2bfd632","event_type":"command_finished","previous_event_hash":"0358de56ec3c4de7d058eccdc4b9cde210b7d34dbb006b6156fc91c5231cf2d4","role":"bootstrap","run_id":"R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL","schema_version":"1.0.0","seq":16,"task_id":"LOOP1-RESEARCH-001","timestamp":"2026-09-21T01:54:27.975834Z"}
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/initial_state.json b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/initial_state.json
+new file mode 100644
+index 0000000..22bc928
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/initial_state.json
+@@ -0,0 +1,201 @@
++{
++  "authority_snapshot": {
++    "files": {
++      "AGENTS.md": {
++        "presence": "present",
++        "sha256": "f2b265bf75e6c82dffcc9a01fdffc69f20ccb6d3f03ce2e87db4d40ed1c19ef9"
++      },
++      "contracts/database/.gitkeep": {
++        "presence": "present",
++        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
++      },
++      "contracts/errors/http-errors.schema.json": {
++        "presence": "present",
++        "sha256": "0995a6335da6360c918fac532f5c3c9abb567494b8c4cd2669ae64f1dcdeca63"
++      },
++      "contracts/fixtures/auth-user-friend/fixture.schema.json": {
++        "presence": "present",
++        "sha256": "6c2a2724ddbba550e941b8e69c0bd2f8bd0532bf526eede0beb35a69e8b56a45"
++      },
++      "contracts/fixtures/auth-user-friend/negative.json": {
++        "presence": "present",
++        "sha256": "efb59f88517142d8f713c7f180d570645348026ba16d11aee6ac12fb7eb033cc"
++      },
++      "contracts/fixtures/auth-user-friend/positive.json": {
++        "presence": "present",
++        "sha256": "8bece5f68b0eebc26276bb1945a0630a3a7e15c6fecc50865a94e63d247c7da0"
++      },
++      "contracts/http/auth-user-friend.openapi.json": {
++        "presence": "present",
++        "sha256": "173fd41d379869a73b55c084b8b4e7dcbfb1aa2c1701c30df7fb8cf8435b696f"
++      },
++      "contracts/http/verify-auth-user-friend.ps1": {
++        "presence": "present",
++        "sha256": "40bdc07e60930edcad70b471769f108e5d86093f02520690928a67870c7bea5c"
++      },
++      "contracts/plugin-api/.gitkeep": {
++        "presence": "present",
++        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
++      },
++      "contracts/websocket/.gitkeep": {
++        "presence": "present",
++        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
++      },
++      "scalable-distributed-im-architecture.pdf": {
++        "presence": "present",
++        "sha256": "546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510"
++      },
++      "spec/acceptance/.gitkeep": {
++        "presence": "present",
++        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
++      },
++      "spec/acceptance/s0-auth-user-friend.md": {
++        "presence": "present",
++        "sha256": "447322997f4325434120f086948620b2720e49d0caa851b79b01bfde1ef6fe7d"
++      },
++      "spec/acceptance/s0-messaging.md": {
++        "presence": "present",
++        "sha256": "cd5f979bb2486961718134f148ef77f5d0d9375873312e8431f621663d4a2611"
++      },
++      "spec/acceptance/s0-sync-plugin.md": {
++        "presence": "present",
++        "sha256": "b04c2e397d3d014aa1292e3e8c0170e82a18e2ae7f7649c20ad026d389eeee88"
++      },
++      "spec/acceptance/verify-s0-spec-materialization.ps1": {
++        "presence": "present",
++        "sha256": "3ed42a744743ef8a387dff23ebd39c09b7002c5a4ff1be11bd77eda8a6facbae"
++      },
++      "spec/architecture/README.md": {
++        "presence": "present",
++        "sha256": "acb2a00ce5b77702359fee6dd6ec69746586618b0633165b470728abb65ae346"
++      },
++      "spec/architecture/baseline.md": {
++        "presence": "present",
++        "sha256": "4dddd4bd69e5902c08e5dbbb7bcaad3dca5c25c5a77f357d1ad5ef4c07cb9a9e"
++      },
++      "spec/architecture/decisions/.gitkeep": {
++        "presence": "present",
++        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
++      },
++      "spec/architecture/decisions/ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md": {
++        "presence": "present",
++        "sha256": "9d18489b5dd5081c97d0f6fee2d60694c06341d6b6b06e938fa8521eab97353f"
++      },
++      "spec/domain/.gitkeep": {
++        "presence": "present",
++        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
++      },
++      "spec/domain/auth-user-friend.md": {
++        "presence": "present",
++        "sha256": "f87229b628ec7d9d51e0cff247076691e2361b4814da31d045859dc9bb6bf180"
++      },
++      "spec/domain/messaging.md": {
++        "presence": "present",
++        "sha256": "ec10f46534609b66bd86609e3233159a69c6741e0d8d6d6802a0e29163759872"
++      },
++      "spec/domain/sync-plugin.md": {
++        "presence": "present",
++        "sha256": "19c8e97b4de938808bc2a47fccf189ad42ff2a4826fbf99095329b6729fcde61"
++      },
++      "spec/handoff/agent-context.md": {
++        "presence": "present",
++        "sha256": "48eb0adb951fa81912eae207edbdae2eff566da694b5cda0c0653b9b13344458"
++      },
++      "spec/invariants/.gitkeep": {
++        "presence": "present",
++        "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
++      },
++      "spec/invariants/auth-user-friend.md": {
++        "presence": "present",
++        "sha256": "358f6e102acb3196a138d2db91edde61890d3b7c4f9dda02258308629108035f"
++      },
++      "spec/invariants/messaging.md": {
++        "presence": "present",
++        "sha256": "e5f3da8845cf3839850cab8d92c7494d41e48365e5ac2a14a942ca29e5d19e78"
++      },
++      "spec/invariants/sync-plugin.md": {
++        "presence": "present",
++        "sha256": "42190c9e6150ddd766fe5aba852695bc9cb3d4ec65cd5ce32d7f6047c63166aa"
++      },
++      "spec/progress/current.md": {
++        "presence": "present",
++        "sha256": "1677ecbf402cf8c40409adb9e028388750e8eed81eea3d3afc8611b34cfa29a7"
++      },
++      "spec/tasks/active/LOOP1-RESEARCH-001.md": {
++        "presence": "present",
++        "sha256": "67598a0a2fe078c183248f00be18ff86c6601e79ec4c6a4a97e1fc0d3318b086"
++      }
++    },
++    "hash_algorithm": "sha256"
++  },
++  "captured_at": "2026-09-21T01:45:02.213300Z",
++  "git": {
++    "branch": "task/LOOP1-RESEARCH-001",
++    "changed_paths": [
++      "AGENTS.md",
++      "spec/handoff/agent-context.md",
++      "spec/progress/current.md",
++      "research/README.md",
++      "research/backfill/LOOP1-CONTRACT-001.json",
++      "research/backfill/LOOP1-CTRL-001.json",
++      "research/backfill/LOOP1-CTRL-002.json",
++      "research/backfill/LOOP1-SPEC-001.json",
++      "research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/metadata.json",
++      "research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt",
++      "research/protocol/paused-agent-resume.md",
++      "research/resume/LOOP1-CONTRACT-001-activation.json",
++      "research/resume/LOOP1-CONTRACT-001-start-run.example.json",
++      "research/schema/ci-ingestion.schema.json",
++      "research/schema/event.schema.json",
++      "research/schema/run-metadata.schema.json",
++      "spec/tasks/active/LOOP1-RESEARCH-001.md",
++      "tests/research/__pycache__/test_recorder.cpython-312.pyc",
++      "tests/research/test_recorder.py",
++      "tools/research/__pycache__/recorder.cpython-312.pyc",
++      "tools/research/recorder.py"
++    ],
++    "clean": false,
++    "diff_stat": [
++      " AGENTS.md                     |  6 ++++++",
++      " spec/handoff/agent-context.md |  2 ++",
++      " spec/progress/current.md      | 16 +++++++++-------",
++      " 3 files changed, 17 insertions(+), 7 deletions(-)"
++    ],
++    "head_sha": "1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc",
++    "repo_identifier": "IM-platform",
++    "status_porcelain": [
++      " M AGENTS.md",
++      " M spec/handoff/agent-context.md",
++      " M spec/progress/current.md",
++      "?? research/README.md",
++      "?? research/backfill/LOOP1-CONTRACT-001.json",
++      "?? research/backfill/LOOP1-CTRL-001.json",
++      "?? research/backfill/LOOP1-CTRL-002.json",
++      "?? research/backfill/LOOP1-SPEC-001.json",
++      "?? research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/metadata.json",
++      "?? research/prompts/P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt",
++      "?? research/protocol/paused-agent-resume.md",
++      "?? research/resume/LOOP1-CONTRACT-001-activation.json",
++      "?? research/resume/LOOP1-CONTRACT-001-start-run.example.json",
++      "?? research/schema/ci-ingestion.schema.json",
++      "?? research/schema/event.schema.json",
++      "?? research/schema/run-metadata.schema.json",
++      "?? spec/tasks/active/LOOP1-RESEARCH-001.md",
++      "?? tests/research/__pycache__/test_recorder.cpython-312.pyc",
++      "?? tests/research/test_recorder.py",
++      "?? tools/research/__pycache__/recorder.cpython-312.pyc",
++      "?? tools/research/recorder.py"
++    ]
++  },
++  "recorder_schema_version": "1.0.0",
++  "task": {
++    "last_known_good_commit": "e5482b135a2ab7451c24c29c7517e1a8f19ce420",
++    "latest_checkpoint": "spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md",
++    "path": "spec/progress/current.md",
++    "presence": "present",
++    "task_id": "LOOP1-RESEARCH-001",
++    "task_owner": "/root/recorder_impl",
++    "task_queue": "active",
++    "task_state": "active"
++  }
++}
+diff --git a/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/metadata.json b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/metadata.json
+new file mode 100644
+index 0000000..a92c307
+--- /dev/null
++++ b/research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/metadata.json
+@@ -0,0 +1,22 @@
++{
++  "agent_harness": "codex-desktop",
++  "capture_mode": "bootstrap_partial",
++  "experiment_group": "full_governance",
++  "finished_at": "unavailable",
++  "model_name": "unavailable",
++  "model_version": "unavailable",
++  "monetary_cost": "unavailable",
++  "parent_run_id": "unavailable",
++  "pre_recorder_trace_complete": true,
++  "pre_recorder_work": false,
++  "prompt_id": "P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1",
++  "recorder_schema_version": "1.0.0",
++  "related_run_id": "unavailable",
++  "role": "bootstrap",
++  "run_id": "R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL",
++  "started_at": "2026-09-21T01:45:02.213300Z",
++  "status": "running",
++  "system_prompt_capture": "unavailable",
++  "task_id": "LOOP1-RESEARCH-001",
++  "token_usage": "unavailable"
++}
+diff --git a/research/schema/ci-ingestion.schema.json b/research/schema/ci-ingestion.schema.json
+new file mode 100644
+index 0000000..520c732
+--- /dev/null
++++ b/research/schema/ci-ingestion.schema.json
+@@ -0,0 +1,16 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "urn:im-platform:research-recorder:ci-ingestion:1.0.0",
++  "type": "object",
++  "required": ["provider", "ci_run_id", "commit_sha", "job_name", "result", "failed_checks", "duration_ms", "evidence_reference"],
++  "properties": {
++    "provider": {"type": "string"},
++    "ci_run_id": {"type": "string"},
++    "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
++    "job_name": {"type": "string"},
++    "result": {"enum": ["PASS", "FAIL"]},
++    "failed_checks": {"type": "array", "items": {"type": "string"}},
++    "duration_ms": {"type": "number", "minimum": 0},
++    "evidence_reference": {"type": "string"}
++  }
++}
+diff --git a/research/schema/event.schema.json b/research/schema/event.schema.json
+new file mode 100644
+index 0000000..cb00074
+--- /dev/null
++++ b/research/schema/event.schema.json
+@@ -0,0 +1,18 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "urn:im-platform:research-recorder:event:1.0.0",
++  "additionalProperties": false,
++  "required": ["schema_version", "seq", "timestamp", "run_id", "task_id", "role", "event_type", "data", "previous_event_hash", "event_hash"],
++  "properties": {
++    "schema_version": {"const": "1.0.0"},
++    "seq": {"type": "integer", "minimum": 1},
++    "timestamp": {"type": "string"},
++    "run_id": {"type": "string", "pattern": "^R-"},
++    "task_id": {"type": "string"},
++    "role": {"enum": ["implementation", "review", "fix", "coordinator", "human", "ci", "bootstrap"]},
++    "event_type": {"type": "string"},
++    "data": {"type": "object"},
++    "previous_event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
++    "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
++  }
++}
+diff --git a/research/schema/run-metadata.schema.json b/research/schema/run-metadata.schema.json
+new file mode 100644
+index 0000000..0c4eb26
+--- /dev/null
++++ b/research/schema/run-metadata.schema.json
+@@ -0,0 +1,12 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "urn:im-platform:research-recorder:run-metadata:1.0.0",
++  "type": "object",
++  "required": ["recorder_schema_version", "run_id", "task_id", "role", "parent_run_id", "related_run_id", "experiment_group", "capture_mode", "status", "pre_recorder_work", "pre_recorder_trace_complete"],
++  "properties": {
++    "recorder_schema_version": {"const": "1.0.0"},
++    "capture_mode": {"enum": ["prospective", "prospective_resume", "retrospective_backfill", "bootstrap_partial"]},
++    "experiment_group": {"enum": ["vanilla", "spec_only", "full_governance", "unassigned"]},
++    "status": {"enum": ["running", "finished"]}
++  }
++}
+diff --git a/spec/handoff/agent-context.md b/spec/handoff/agent-context.md
+index b289b34..ebd8d16 100644
+--- a/spec/handoff/agent-context.md
++++ b/spec/handoff/agent-context.md
+@@ -18,6 +18,8 @@ This repository implements **Scalable Distributed Instant Messaging Platform for
+ 
+ Before yielding, update the current Task Spec and `spec/progress/current.md`. Record current task/stage/gate, completed work, changed files or migrations, exact verification command and result, durable evidence location, known failures/risks/assumptions, next exact action, last known good commit, uncommitted-change ownership, and any architecture conflict requiring ACP/ADR. Keep run history in `spec/progress/evidence/`, not in `current.md`.
+ 
++After the independently accepted Research Recorder Instrumentation Epoch, register the visible prompt and create a Recorder run before prospective work. Use `prospective_resume` plus incomplete pre-Recorder-trace markers when resuming older work. Recorder artifacts are research evidence only; they neither replace acceptance evidence nor authorize changes to product authority.
++
+ ## Checkpoints
+ 
+ Create a checkpoint for a stable Gate, important vertical slice, contract/schema version transition, release recovery point, or other important stable recovery state. A checkpoint records the commit (or `none` before the first commit), contract and migration versions when applicable, fixture/artifact versions when applicable, verified Gate state, and known limitations. `spec/progress/current.md` points to the latest checkpoint.
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 1706717..1a3cd00 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -10,12 +10,13 @@ Gate Status: NOT YET PASSED
+ 
+ Current Batch: LOOP1-S0
+ 
+-Current Task: LOOP1-CONTRACT-001
++Current Task: LOOP1-RESEARCH-001
+ 
+ Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
++- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.
+ - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
+ - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
+ - The independent review passed the 9-file/84-rule materialization verifier, CTRL-002 Acceptance mode, and baseline diff check; all eight disposable negative controls were rejected.
+@@ -27,11 +28,17 @@ Current Task State: review
+ 
+ ## Current Blockers
+ 
+-- None. The next action after the metadata handoff commit is a fresh independent review; the Fix Agent cannot accept its own work.
++- None for Recorder implementation. Instrumentation Epoch creation remains prohibited until a fresh independent reviewer accepts the committed Recorder candidate.
+ - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
+ 
+ ## Verification
+ 
++- Command: `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- <python3> -m unittest discover -s tests/research -v`
++  - Result: Development PASS, exit `0`; 17 tests. An earlier FAIL and subsequent repair remain preserved in the append-only bootstrap stream. This is not acceptance.
++  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`
++- Command: `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
++  - Result: Development PASS, exit `0`; recovery resolved `LOOP1-RESEARCH-001` and checked all queues. This is not acceptance.
++  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`
+ - Command: `& .\contracts\http\verify-auth-user-friend.ps1`
+   - Result: Fix Agent development PASS on clean committed candidate `12c566f71da9b038764ecb7a5303b116e77ca32f`, exit `0`, elapsed `5280.2464 ms`; 9 paths, 9 operations, 15 error codes, 6 positive and 21 negative scenarios, both profiles, and 6 mutation regressions.
+ - Command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
+@@ -44,6 +51,7 @@ Current Task State: review
+ 
+ ## Changed Files or Migrations
+ 
++- Added only the Research Recorder control plane under `research/**`, `tools/research/**`, `tests/research/**`, the Research Task/evidence, and minimum `AGENTS.md`, handoff, and current-state governance text.
+ - `contracts/http/auth-user-friend.openapi.json` is the canonical OpenAPI 3.1 Auth/User/Friend contract with separate credential-bound WEB/native refresh operations and operation/status-specific error codes; `contracts/http/verify-auth-user-friend.ps1` cross-validates it with fixtures and runs mutation regressions.
+ - `contracts/errors/http-errors.schema.json` defines the shared HTTP error envelope and stable codes.
+ - `contracts/fixtures/auth-user-friend/` defines constrained fixture schema `1.1` plus exact canonical/Go/Java positive and negative golden scenarios.
+@@ -66,7 +74,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Commit this repair handoff metadata, then delegate `LOOP1-CONTRACT-001` to a fresh independent Review Agent. It must review the repaired candidate and handoff commit from a clean detached isolated checkout, run the task verifier, CTRL-002 default Acceptance mode, and the baseline diff check from `e5482b135a2ab7451c24c29c7517e1a8f19ce420`, then record durable PASS/FAIL evidence. Do not accept from the Fix Agent context, and do not claim S0 Gate PASS.
++Commit the Recorder review handoff, then delegate `LOOP1-RESEARCH-001` to a fresh independent Review Agent in a clean detached isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance. After independent PASS, establish the Epoch at the accepted commit and restore `LOOP1-CONTRACT-001` as Current Task, preserving its state and ownership.
+ 
+ ## Last Known Good Commit
+ 
+@@ -78,9 +86,10 @@ Commit this repair handoff metadata, then delegate `LOOP1-CONTRACT-001` to a fre
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-- Until the review-handoff commit, only `/root/contract001_fix` owns the Task Spec, current-state, and Fix-Agent evidence changes. No contract changes remain uncommitted.
+-- No unexplained user or other-Agent changes are known.
++- `/root/recorder_impl` owns only Recorder control-plane changes in the isolated research worktree on `task/LOOP1-RESEARCH-001`.
++- The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
++- Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-- None. ADR-0001 remains the approved temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.
++- None. Recorder is a non-product research/governance control plane and does not alter Frozen Product Architecture. ADR-0001 remains the approved temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.
+diff --git a/spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md b/spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md
+new file mode 100644
+index 0000000..6b8415b
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md
+@@ -0,0 +1,42 @@
++# LOOP1-RESEARCH-001 Development Evidence
++
++Date: 2026-09-21
++
++Mode: implementation-agent development evidence only; not independent acceptance.
++
++## Baseline and isolation
++
++- Isolated worktree: `H:\.codex\worktrees\research-recorder\IM-platform`.
++- Branch: `task/LOOP1-RESEARCH-001`.
++- Start commit: `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`.
++- Frozen Architecture SHA-256 matched manifest: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
++- Pre-insertion `contracts/http/verify-auth-user-friend.ps1`: PASS, exit `0`.
++- Original worktree and paused-Agent-owned untracked content were not modified, copied, stashed, cleaned, or claimed.
++
++## Recorder evidence
++
++- Bootstrap run: `research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/`.
++- Capture mode: `bootstrap_partial`; it is excluded from the future primary quantitative dataset.
++- Human prompt: exact unique `role=user` session export match, stored as `P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1`, SHA-256 `ae27c414cddd31fb0a12659d93fc0f859fb0b87cd6fb213e7d76d6bee4c543a6`; saved content was byte-decoded and compared equal to the source string. Session path and other session records were not persisted.
++- The event stream preserves a test FAIL followed by repair and PASS; no failure was rewritten as success.
++- An `instrumentation_warning` preserves the bootstrap run's initial trace-completeness flag defect; raw history was not rewritten, and finish metadata corrects bootstrap completeness to false.
++
++## Verification
++
++- Command: Recorder `run-command` executing Python 3 `-m unittest discover -s tests/research -v`.
++  - Initial recorded result after later test additions: FAIL, exit `1`, elapsed `12687.0 ms`; one Windows newline expectation failed.
++  - Repair: hash the exact prompt input bytes rather than assuming LF bytes.
++  - Final result: PASS, exit `0`, elapsed recorded in the bootstrap event stream; 17 tests cover unique run IDs/schema, prompt hashes/linkage/unavailable system prompt, non-mutating Git capture, JSONL sequence/hash/malformed/duplicate checks, real zero/nonzero command propagation, finish/diff/duration/immutability, partial detection, manifest tamper detection, fixture Human Decision, CI ingestion, backfill unavailable facts, prospective resume, bootstrap partial completeness, secret safety/no environment dump, and repository/product safety.
++- Command: Recorder `run-command` executing `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`.
++  - Result: PASS, exit `0`, elapsed `1012.6988 ms`; task `LOOP1-RESEARCH-001` resolved once in `active`, 10 Task Specs checked. Explicitly non-acceptance.
++- Command: Recorder `run-command` executing `git diff --check`.
++  - Result: PASS, exit `0`, elapsed `39.4908 ms`; only line-ending warnings were emitted.
++- Command: `tools/research/recorder.ps1 validate-repository --allow-partial`.
++  - Result: PASS while the bootstrap run remained intentionally partial.
++
++## Scope and acceptance status
++
++- No product implementation, contract, architecture artifact/manifest/ADR, domain, invariant, acceptance, ACK, compatibility, database business schema, plugin boundary, or `.github/workflows/**` change exists.
++- `LOOP1-CONTRACT-001` remains in `review`, owner `unassigned-independent-review-agent`, and is not marked done.
++- No Instrumentation Epoch exists. This implementation Agent cannot accept its own work.
++- Required next action: committed clean-checkout review by a fresh independent Review Agent under ADR-0001; on FAIL, fresh fix and review cycle; only independent PASS may establish the Instrumentation Epoch.
+diff --git a/spec/tasks/review/LOOP1-RESEARCH-001.md b/spec/tasks/review/LOOP1-RESEARCH-001.md
+new file mode 100644
+index 0000000..a246625
+--- /dev/null
++++ b/spec/tasks/review/LOOP1-RESEARCH-001.md
+@@ -0,0 +1,81 @@
++---
++task_id: LOOP1-RESEARCH-001
++title: Insert Research Recorder control plane
++status: review
++owner: unassigned-independent-review-agent
++stage: S0
++gate: S0
++---
++
++# Goal
++
++Add a file-based, auditable Research Recorder control plane for future Agent runs without implementing product behavior or changing product architecture or contracts.
++
++# Inputs
++
++- Human Architect's 2026-09-21 Research Instrumentation / Recorder Control-Plane Insertion authorization.
++- `AGENTS.md`
++- `spec/handoff/agent-context.md`
++- `spec/progress/current.md`
++- Frozen Architecture governance chapters 2, 10, 12 through 14, 19 and 21, resolved through `spec/architecture/README.md`.
++- Approved ADRs in `spec/architecture/decisions/`.
++
++# Dependencies
++
++- `LOOP1-CTRL-001`, `LOOP1-CTRL-002`, and `LOOP1-SPEC-001` are done.
++- `LOOP1-CONTRACT-001` remains paused in review; its ownership does not transfer to this task.
++
++# Allowed Paths
++
++- `research/**`
++- `tools/research/**`
++- `tests/research/**`
++- `spec/tasks/**/LOOP1-RESEARCH-001.md`
++- `spec/progress/current.md`
++- `spec/progress/evidence/LOOP1-RESEARCH-001/**`
++- `AGENTS.md`
++- `spec/handoff/agent-context.md`
++
++# Acceptance
++
++- Recorder v1 provides deterministic standard-library entry points for prompt registration, run start/finish, command execution, semantic events, human decisions, CI evidence ingestion, retrospective backfill, and validation.
++- Automatic capture covers observable Git and authority facts, append-only event sequencing and hash chaining, final state and diff, true command exit propagation, partial-run detection, immutable finished runs, and secret redaction.
++- Tests cover requirements A through L in the Human authorization, including preservation of the paused task and absence of product changes.
++- Bootstrap evidence is marked `bootstrap_partial`; backfills are explicitly retrospective; paused-task resume metadata is `prospective_resume` with incomplete pre-recorder trace.
++- Fresh independent review and ADR-0001 acceptance are required before an Instrumentation Epoch may be established.
++
++# Forbidden
++
++- Implement any IM product feature or change product code, public contracts, ACK semantics, database business invariants, compatibility rules, or plugin security boundaries.
++- Modify, move, clean, stash, or claim ownership of paused-Agent work.
++- Create `.github/workflows/**` before the CI task permits it.
++- Record or infer hidden reasoning, unavailable platform prompts, token usage, cost, CI success, or reviewer independence.
++- Establish an Instrumentation Epoch before fresh independent acceptance.
++
++# Verification
++
++- `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- python3 -m unittest discover -s tests/research -v` (or the resolved Python 3 executable as the recorded command)
++- `& .\tools\research\recorder.ps1 validate-repository --allow-partial`
++- `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
++- `git diff --check 1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc..HEAD`
++- Independent acceptance from a clean committed checkout repeats the tests and repository verifier under ADR-0001.
++
++# Evidence
++
++- Baseline worktree was clean and detached at `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc` before branch creation.
++- Frozen Architecture SHA-256 matched the manifest: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
++- Pre-insertion Auth/User/Friend contract verification passed with exit `0`.
++- Development verification and candidate commit will be recorded before handoff. This task cannot self-accept.
++- Development evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`.
++- Final implementation test run: 17 tests PASS. CTRL-002 Development verifier and diff whitespace check PASS. Exact command results and the preserved earlier FAIL are in the bootstrap event stream and development evidence.
++
++# Handoff
++
++- Original paused task: `LOOP1-CONTRACT-001`, state `review`, owner `unassigned-independent-review-agent`, original worktree `H:\IM-platform`, branch `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc` at insertion observation. Its untracked `contracts/http/schema-lint/` is unknown/paused-Agent-owned and must not be touched.
++- Recorder work is isolated at `H:\.codex\worktrees\research-recorder\IM-platform` on `task/LOOP1-RESEARCH-001`.
++- No Instrumentation Epoch exists until fresh independent review accepts a committed candidate.
++- Implementation is complete but unaccepted. The Implementation Agent has not declared PASS or created an Epoch.
++
++# Next Action
++
++- Commit the review handoff, then delegate a fresh independent Review Agent from a clean detached isolated checkout. It must run all Recorder tests, default `validate-repository`, CTRL-002 Acceptance mode, scope/secret/pyc checks, and diff checks. On PASS, record durable independent evidence, establish the Instrumentation Epoch at the accepted commit, then restore `LOOP1-CONTRACT-001` as Current Task without transferring ownership. On FAIL, use a fresh Fix Agent and repeat review.
+diff --git a/tests/research/test_recorder.py b/tests/research/test_recorder.py
+new file mode 100644
+index 0000000..1541215
+--- /dev/null
++++ b/tests/research/test_recorder.py
+@@ -0,0 +1,242 @@
++from __future__ import annotations
++
++import argparse
++import importlib.util
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++MODULE_PATH = Path(__file__).resolve().parents[2] / "tools" / "research" / "recorder.py"
++SPEC = importlib.util.spec_from_file_location("research_recorder", MODULE_PATH)
++recorder = importlib.util.module_from_spec(SPEC)
++assert SPEC.loader
++SPEC.loader.exec_module(recorder)
++
++
++class RecorderTest(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.repo = Path(self.temp.name) / "repo"
++        self.repo.mkdir()
++        self.root = self.repo / "research"
++        subprocess.run(["git", "init", "-q", str(self.repo)], check=True)
++        subprocess.run(["git", "-C", str(self.repo), "config", "user.email", "fixture@example.invalid"], check=True)
++        subprocess.run(["git", "-C", str(self.repo), "config", "user.name", "Fixture"], check=True)
++        self.write("AGENTS.md", "fixture authority\n")
++        self.write("spec/handoff/agent-context.md", "fixture handoff\n")
++        self.write("spec/progress/current.md", """# Current Execution State
++Current Task: TEST-001
++Current Task State: active
++## Last Known Good Commit
++`0000000000000000000000000000000000000000`
++## Latest Checkpoint
++`unavailable`
++""")
++        self.write("spec/tasks/active/TEST-001.md", "---\ntask_id: TEST-001\nstatus: active\nowner: fixture\n---\n")
++        self.write("spec/architecture/README.md", "fixture\n")
++        self.write("spec/architecture/baseline.md", "fixture\n")
++        subprocess.run(["git", "-C", str(self.repo), "add", "."], check=True)
++        subprocess.run(["git", "-C", str(self.repo), "commit", "-qm", "fixture"], check=True)
++
++    def tearDown(self):
++        self.temp.cleanup()
++
++    def write(self, relative: str, content: str):
++        path = self.repo / relative
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_text(content, encoding="utf-8")
++
++    def ns(self, **kwargs):
++        return argparse.Namespace(**kwargs)
++
++    def prompt(self, content="human task"):
++        source = self.repo / "prompt-input.txt"
++        source.write_text(content, encoding="utf-8")
++        args = self.ns(file=str(source), prompt_id=None, task_id="TEST-001", source="human",
++                       template_version=None, run_id=None)
++        recorder.cmd_register_prompt(args, self.repo, self.root)
++        return next((self.root / "prompts").iterdir()).name
++
++    def start(self, capture="prospective", pre=False, role="implementation", prompt_id=None):
++        args = self.ns(role=role, capture_mode=capture, experiment_group="full_governance",
++                       pre_recorder_work=pre, run_id=None, task_id="TEST-001", prompt_id=prompt_id,
++                       parent_run_id=None, related_run_id=None, agent_harness="fixture", model_name="unavailable",
++                       fresh_context="unavailable", explicit_token_budget="unavailable", context_mode="unavailable",
++                       public_reasoning_mode="unavailable", baseline_id="unavailable", replicate_id="unavailable",
++                       mutation_id="unavailable", model_condition="unavailable", budget_condition="unavailable")
++        recorder.cmd_start_run(args, self.repo, self.root)
++        return next((self.root / "runs").iterdir()).name
++
++    def cli(self, *args):
++        return subprocess.run([sys.executable, str(MODULE_PATH), args[0], "--repo", str(self.repo),
++                               "--research-root", str(self.root), *args[1:]], capture_output=True, text=True)
++
++    def test_start_run_unique_and_schema(self):
++        first = self.start()
++        second_args = self.ns(role="review", capture_mode="prospective", experiment_group="unassigned",
++                              pre_recorder_work=False, run_id=None, task_id="TEST-001", prompt_id=None,
++                              parent_run_id=first, related_run_id=first, agent_harness="fixture", model_name="unavailable",
++                              fresh_context="yes", explicit_token_budget="unavailable", context_mode="fresh",
++                              public_reasoning_mode="unavailable", baseline_id="unavailable", replicate_id="unavailable",
++                              mutation_id="unavailable", model_condition="unavailable", budget_condition="unavailable")
++        recorder.cmd_start_run(second_args, self.repo, self.root)
++        runs = sorted((self.root / "runs").iterdir())
++        self.assertEqual(2, len(runs))
++        self.assertNotEqual(runs[0].name, runs[1].name)
++        metadata = recorder.read_json(runs[0] / "metadata.json")
++        self.assertEqual("1.0.0", metadata["recorder_schema_version"])
++
++    def test_prompt_hash_link_and_system_prompt_unavailable(self):
++        prompt_id = self.prompt("stable prompt\n")
++        meta = recorder.read_json(self.root / "prompts" / prompt_id / "metadata.json")
++        self.assertEqual(recorder.sha256_bytes((self.repo / "prompt-input.txt").read_bytes()), meta["prompt_sha256"])
++        self.assertEqual("unavailable", meta["system_prompt_capture"])
++        run_id = self.start(prompt_id=prompt_id)
++        self.assertEqual(prompt_id, recorder.read_json(self.root / "runs" / run_id / "metadata.json")["prompt_id"])
++        self.assertEqual(run_id, recorder.read_json(self.root / "prompts" / prompt_id / "metadata.json")["associated_run_id"])
++
++    def test_git_capture_dirty_without_modification(self):
++        self.write("dirty.txt", "unchanged by capture")
++        before = (self.repo / "dirty.txt").read_bytes()
++        state = recorder.capture_git(self.repo)
++        self.assertFalse(state["clean"])
++        self.assertIn("dirty.txt", state["changed_paths"])
++        self.assertEqual(before, (self.repo / "dirty.txt").read_bytes())
++        self.assertEqual(40, len(state["head_sha"]))
++
++    def test_event_append_seq_hash_and_duplicate_rejected(self):
++        run_id = self.start()
++        recorder.append_event(self.root, run_id, "finding_created", {"finding": "x"})
++        records = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)
++        self.assertEqual(list(range(1, len(records) + 1)), [e["seq"] for e in records])
++        records[-1]["seq"] = records[-2]["seq"]
++        path = self.root / "runs" / run_id / "events.jsonl"
++        path.write_text("".join(json.dumps(x, separators=(",", ":")) + "\n" for x in records), encoding="utf-8")
++        with self.assertRaisesRegex(recorder.RecorderError, "duplicate or non-monotonic"):
++            recorder.validate_events(path, run_id)
++
++    def test_malformed_and_partial_jsonl_rejected(self):
++        run_id = self.start()
++        path = self.root / "runs" / run_id / "events.jsonl"
++        with path.open("a", encoding="utf-8") as stream:
++            stream.write("{")
++        with self.assertRaisesRegex(recorder.RecorderError, "partial JSONL"):
++            recorder.validate_events(path, run_id)
++
++    def test_run_command_executes_and_propagates_zero(self):
++        run_id = self.start()
++        result = self.cli("run-command", "--run-id", run_id, "--", sys.executable, "-c", "print('ok')")
++        self.assertEqual(0, result.returncode)
++        events = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)
++        self.assertEqual(0, events[-1]["data"]["exit_code"])
++        self.assertEqual("PASS", events[-1]["data"]["result"])
++
++    def test_run_command_propagates_failure_and_records_fail(self):
++        run_id = self.start()
++        result = self.cli("run-command", "--run-id", run_id, "--", sys.executable, "-c", "raise SystemExit(7)")
++        self.assertEqual(7, result.returncode)
++        events = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)
++        self.assertEqual(7, events[-1]["data"]["exit_code"])
++        self.assertEqual("FAIL", events[-1]["data"]["result"])
++
++    def test_finish_captures_final_diff_duration_and_locks_history(self):
++        run_id = self.start()
++        self.write("change.txt", "change\n")
++        recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
++        directory = self.root / "runs" / run_id
++        self.assertTrue((directory / "final_state.json").exists())
++        self.assertIn("change.txt", (directory / "diff.patch").read_text(encoding="utf-8"))
++        metadata = recorder.read_json(directory / "metadata.json")
++        self.assertEqual("finished", metadata["status"])
++        self.assertGreaterEqual(metadata["duration_ms"], 0)
++        with self.assertRaisesRegex(recorder.RecorderError, "immutable"):
++            recorder.append_event(self.root, run_id, "finding_created", {})
++
++    def test_partial_run_detected(self):
++        run_id = self.start()
++        with self.assertRaisesRegex(recorder.RecorderError, "partial/interrupted"):
++            recorder.validate_run(self.root, run_id)
++        self.assertEqual("running", recorder.validate_run(self.root, run_id, require_finished=False)["status"])
++
++    def test_finished_manifest_tamper_detected(self):
++        run_id = self.start()
++        recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
++        metadata_path = self.root / "runs" / run_id / "metadata.json"
++        metadata = recorder.read_json(metadata_path)
++        metadata["task_id"] = "TAMPERED"
++        recorder.write_json(metadata_path, metadata)
++        with self.assertRaisesRegex(recorder.RecorderError, "manifest hash mismatch"):
++            recorder.validate_run(self.root, run_id)
++
++    def test_human_decision_fixture_explicit(self):
++        run_id = self.start(role="human")
++        args = self.ns(run_id=run_id, decision_id=None, question="choose", alternatives_json='["A","B"]',
++                       selected="B", reason="fixture reason", affected_authority=None, fixture=True)
++        recorder.cmd_human_decision(args, self.repo, self.root)
++        event = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)[-1]
++        self.assertTrue(event["data"]["human_actor"])
++        self.assertTrue(event["data"]["fixture"])
++
++    def test_backfill_marks_unknowns_unavailable(self):
++        recorder.cmd_backfill(self.ns(task_id="TEST-001"), self.repo, self.root)
++        value = recorder.read_json(self.root / "backfill" / "TEST-001.json")
++        self.assertTrue(value["backfilled"])
++        self.assertEqual("retrospective_backfill", value["collection_mode"])
++        for field in ("prompt", "model_calls", "token_usage", "tool_calls", "exact_timing", "reasoning", "context_size", "cost"):
++            self.assertEqual("unavailable", value[field])
++
++    def test_ci_ingestion_records_external_observation_only(self):
++        run_id = self.start(role="ci")
++        evidence_path = self.repo / "ci-evidence.json"
++        evidence = {"provider": "fixture", "ci_run_id": "fixture-1", "commit_sha": "0" * 40,
++                    "job_name": "fixture", "result": "FAIL", "failed_checks": ["unit"],
++                    "duration_ms": 12, "evidence_reference": "fixture://ci/1"}
++        evidence_path.write_text(json.dumps(evidence), encoding="utf-8")
++        recorder.cmd_ingest_ci(self.ns(run_id=run_id, evidence=str(evidence_path)), self.repo, self.root)
++        event = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)[-1]
++        self.assertEqual("ci_finished", event["event_type"])
++        self.assertEqual("FAIL", event["data"]["result"])
++
++    def test_prospective_resume_trace_flags(self):
++        run_id = self.start(capture="prospective_resume", pre=True)
++        value = recorder.read_json(self.root / "runs" / run_id / "metadata.json")
++        self.assertTrue(value["pre_recorder_work"])
++        self.assertFalse(value["pre_recorder_trace_complete"])
++        with self.assertRaisesRegex(recorder.RecorderError, "requires"):
++            self.start(capture="prospective_resume", pre=False)
++
++    def test_bootstrap_partial_is_never_trace_complete(self):
++        run_id = self.start(capture="bootstrap_partial", role="bootstrap")
++        value = recorder.read_json(self.root / "runs" / run_id / "metadata.json")
++        self.assertFalse(value["pre_recorder_trace_complete"])
++
++    def test_secret_redaction_and_no_environment_dump(self):
++        prompt_id = self.prompt("API_KEY[REDACTED]
++        prompt_text = (self.root / "prompts" / prompt_id / "prompt.txt").read_text(encoding="utf-8")
++        self.assertNotIn("supersecretvalue", prompt_text)
++        self.assertIn("[REDACTED]", prompt_text)
++        run_id = self.start()
++        result = self.cli("run-command", "--run-id", run_id, "--", sys.executable, "-c", "print('password[REDACTED]
++        self.assertEqual(0, result.returncode)
++        durable = "".join(p.read_text(encoding="utf-8") for p in (self.root / "runs" / run_id).rglob("*.txt"))
++        self.assertNotIn("hunter2", durable)
++        metadata = (self.root / "runs" / run_id / "metadata.json").read_text(encoding="utf-8")
++        self.assertNotIn("environment", metadata.lower())
++
++    def test_repository_safety_in_real_checkout(self):
++        actual = Path(__file__).resolve().parents[2]
++        changed = subprocess.run(["git", "-C", str(actual), "diff", "--name-only", "1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc", "--"], capture_output=True, text=True, check=True).stdout.splitlines()
++        forbidden = [p for p in changed if p.startswith(("backend/", "clients/", "plugins/", "contracts/", "spec/architecture/", "spec/domain/", "spec/invariants/", "spec/acceptance/"))]
++        self.assertEqual([], forbidden)
++        paused = actual / "spec/tasks/review/LOOP1-CONTRACT-001.md"
++        self.assertTrue(paused.exists())
++        text = paused.read_text(encoding="utf-8")
++        self.assertIn("status: review", text)
++        self.assertIn("owner: unassigned-independent-review-agent", text)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/research/recorder.ps1 b/tools/research/recorder.ps1
+new file mode 100644
+index 0000000..4b88b12
+--- /dev/null
++++ b/tools/research/recorder.ps1
+@@ -0,0 +1,46 @@
++[CmdletBinding()]
++param(
++    [Parameter(ValueFromRemainingArguments = $true)]
++    [string[]]$RecorderArguments
++)
++
++$ErrorActionPreference = 'Stop'
++$script = Join-Path $PSScriptRoot 'recorder.py'
++$python = $null
++$prefix = @()
++
++foreach ($name in @('python3', 'python')) {
++    $candidate = Get-Command $name -ErrorAction SilentlyContinue
++    if ($candidate) {
++        $version = & $candidate.Source --version 2>&1
++        if ($version -match '^Python 3\.') {
++            $python = $candidate.Source
++            break
++        }
++    }
++}
++
++if (-not $python) {
++    $launcher = Get-Command py -ErrorAction SilentlyContinue
++    if ($launcher) {
++        $version = & $launcher.Source -3 --version 2>&1
++        if ($version -match '^Python 3\.') {
++            $python = $launcher.Source
++            $prefix = @('-3')
++        }
++    }
++}
++
++if (-not $python) {
++    $bundled = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
++    if (Test-Path -LiteralPath $bundled -PathType Leaf) {
++        $python = $bundled
++    }
++}
++
++if (-not $python) {
++    throw 'Research Recorder requires Python 3. No compatible interpreter was found.'
++}
++
++& $python @prefix $script @RecorderArguments
++exit $LASTEXITCODE
+diff --git a/tools/research/recorder.py b/tools/research/recorder.py
+new file mode 100644
+index 0000000..06f9c95
+--- /dev/null
++++ b/tools/research/recorder.py
+@@ -0,0 +1,579 @@
++#!/usr/bin/env python3
++"""File-based Research Recorder v1. Records observable facts, never hidden reasoning."""
++
++from __future__ import annotations
++
++import argparse
++import base64
++import datetime as dt
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import subprocess
++import sys
++import time
++import uuid
++
++SCHEMA_VERSION = "1.0.0"
++EVENT_TYPES = {
++    "run_started", "run_finished", "prompt_registered", "task_state_observed",
++    "git_state_observed", "command_started", "command_finished",
++    "verification_result", "test_result", "review_started", "review_finished",
++    "finding_created", "repair_started", "repair_finished", "ci_started",
++    "ci_finished", "architecture_conflict", "human_decision", "external_blocker",
++    "model_metadata", "instrumentation_warning",
++}
++ROLES = {"implementation", "review", "fix", "coordinator", "human", "ci", "bootstrap"}
++CAPTURE_MODES = {"prospective", "prospective_resume", "retrospective_backfill", "bootstrap_partial"}
++EXPERIMENT_GROUPS = {"vanilla", "spec_only", "full_governance", "unassigned"}
++SECRET_PATTERNS = [
++    re.compile(r"(?i)(authorization\s*:\s*(?:bearer\s+)?)[^\s]+"),
++    re.compile(r"(?i)\b(api[_-]?key|password|passwd|secret|access[_-]?token|refresh[_-]?token)\b\s*[:=]\s*[^\s,;]+"),
++    re.compile(r"\b(?:ghp|github_pat|sk)-[A-Za-z0-9_-]{12,}\b"),
++    re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
++]
++
++
++class RecorderError(RuntimeError):
++    pass
++
++
++def now() -> str:
++    return dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
++
++
++def canonical(value: object) -> bytes:
++    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
++
++
++def sha256_bytes(value: bytes) -> str:
++    return hashlib.sha256(value).hexdigest()
++
++
++def read_json(path: Path) -> dict:
++    try:
++        value = json.loads(path.read_text(encoding="utf-8"))
++    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
++        raise RecorderError(f"invalid JSON at {path}: {exc}") from exc
++    if not isinstance(value, dict):
++        raise RecorderError(f"expected JSON object at {path}")
++    return value
++
++
++def write_json(path: Path, value: object) -> None:
++    path.parent.mkdir(parents=True, exist_ok=True)
++    temp = path.with_name(path.name + f".tmp-{uuid.uuid4().hex}")
++    with temp.open("x", encoding="utf-8", newline="\n") as stream:
++        json.dump(value, stream, ensure_ascii=False, sort_keys=True, indent=2)
++        stream.write("\n")
++        stream.flush()
++        os.fsync(stream.fileno())
++    os.replace(temp, path)
++
++
++def redact(text: str) -> tuple[str, bool]:
++    changed = False
++    for pattern in SECRET_PATTERNS:
++        def replacement(match: re.Match[str]) -> str:
++            nonlocal changed
++            changed = True
++            prefix = match.group(1) if match.lastindex else ""
++            return prefix + "[REDACTED]"
++        text = pattern.sub(replacement, text)
++    return text, changed
++
++
++def redact_value(value: object) -> tuple[object, bool]:
++    if isinstance(value, str):
++        return redact(value)
++    if isinstance(value, list):
++        output, changed = [], False
++        for item in value:
++            safe, item_changed = redact_value(item)
++            output.append(safe)
++            changed = changed or item_changed
++        return output, changed
++    if isinstance(value, dict):
++        output, changed = {}, False
++        for key, item in value.items():
++            safe, item_changed = redact_value(item)
++            output[key] = safe
++            changed = changed or item_changed
++        return output, changed
++    return value, False
++
++
++def repo_root(explicit: str | None) -> Path:
++    root = Path(explicit).resolve() if explicit else Path(__file__).resolve().parents[2]
++    if not (root / ".git").exists():
++        probe = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
++        if probe.returncode != 0:
++            raise RecorderError(f"not a Git repository: {root}")
++        root = Path(probe.stdout.strip()).resolve()
++    return root
++
++
++def research_root(repo: Path, explicit: str | None) -> Path:
++    return Path(explicit).resolve() if explicit else repo / "research"
++
++
++def git(repo: Path, *args: str, binary: bool = False) -> str | bytes:
++    result = subprocess.run(["git", "-C", str(repo), "-c", "core.excludesFile=.git/info/exclude", *args], capture_output=True)
++    if result.returncode != 0:
++        raise RecorderError(f"git {' '.join(args)} failed ({result.returncode}): {result.stderr.decode('utf-8', 'replace').strip()}")
++    return result.stdout if binary else result.stdout.decode("utf-8", "replace")
++
++
++def parse_current(repo: Path) -> dict:
++    path = repo / "spec/progress/current.md"
++    if not path.exists():
++        return {"presence": "absent"}
++    text = path.read_text(encoding="utf-8")
++    result: dict[str, object] = {"presence": "present", "path": "spec/progress/current.md"}
++    fields = {
++        "task_id": r"(?m)^Current Task:\s*`?([^`\r\n]+)`?\s*$",
++        "task_state": r"(?m)^Current Task State:\s*`?([^`\r\n]+)`?\s*$",
++        "last_known_good_commit": r"(?ms)^## Last Known Good Commit\s*.*?`([0-9a-f]{40})`",
++        "latest_checkpoint": r"(?ms)^## Latest Checkpoint\s*.*?`([^`]+)`",
++    }
++    for key, pattern in fields.items():
++        match = re.search(pattern, text)
++        result[key] = match.group(1).strip() if match else "unavailable"
++    task_id = result["task_id"]
++    matches = list((repo / "spec/tasks").glob(f"*/{task_id}.md")) if task_id != "unavailable" else []
++    if len(matches) == 1:
++        task_text = matches[0].read_text(encoding="utf-8")
++        owner = re.search(r"(?m)^owner:\s*(.+?)\s*$", task_text)
++        result.update({"task_queue": matches[0].parent.name, "task_owner": owner.group(1) if owner else "unavailable"})
++    else:
++        result.update({"task_queue": "unavailable", "task_owner": "unavailable"})
++    return result
++
++
++def capture_git(repo: Path) -> dict:
++    status_text = str(git(repo, "status", "--porcelain=v1", "--untracked-files=all"))
++    changed = []
++    for line in status_text.splitlines():
++        name = line[3:]
++        if " -> " in name:
++            name = name.split(" -> ", 1)[1]
++        changed.append(name)
++    branch = str(git(repo, "branch", "--show-current")).strip() or "detached"
++    return {
++        "repo_identifier": Path(str(git(repo, "rev-parse", "--show-toplevel")).strip()).name,
++        "head_sha": str(git(repo, "rev-parse", "HEAD")).strip(),
++        "branch": branch,
++        "clean": not bool(status_text),
++        "changed_paths": changed,
++        "status_porcelain": status_text.splitlines(),
++        "diff_stat": str(git(repo, "diff", "--stat", "HEAD")).splitlines(),
++    }
++
++
++def authority_snapshot(repo: Path, task_id: str) -> dict:
++    candidates = ["AGENTS.md", "spec/handoff/agent-context.md", "spec/progress/current.md",
++                  "spec/architecture/README.md", "spec/architecture/baseline.md", "scalable-distributed-im-architecture.pdf"]
++    candidates += str(git(repo, "ls-files", "spec/architecture/decisions", "spec/domain", "spec/invariants", "spec/acceptance", "contracts")).splitlines()
++    candidates += [p.relative_to(repo).as_posix() for p in (repo / "spec/tasks").glob(f"*/{task_id}.md")]
++    files = {}
++    for relative in sorted(set(candidates)):
++        path = repo / relative
++        if path.is_file():
++            files[relative] = {"presence": "present", "sha256": sha256_bytes(path.read_bytes())}
++        else:
++            files[relative] = {"presence": "absent"}
++    return {"hash_algorithm": "sha256", "files": files}
++
++
++def run_dir(root: Path, run_id: str) -> Path:
++    return root / "runs" / run_id
++
++
++def validated_run_id(run_id: str) -> str:
++    if not re.fullmatch(r"R-[A-Za-z0-9_.:-]+", run_id):
++        raise RecorderError("invalid run_id")
++    return run_id
++
++
++def event_records(path: Path) -> list[dict]:
++    if not path.exists():
++        raise RecorderError(f"missing event stream: {path}")
++    records = []
++    with path.open("r", encoding="utf-8") as stream:
++        for number, line in enumerate(stream, 1):
++            if not line.endswith("\n"):
++                raise RecorderError(f"partial JSONL write at line {number}")
++            try:
++                value = json.loads(line)
++            except json.JSONDecodeError as exc:
++                raise RecorderError(f"malformed JSONL at line {number}: {exc}") from exc
++            if not isinstance(value, dict):
++                raise RecorderError(f"event line {number} is not an object")
++            records.append(value)
++    return records
++
++
++def validate_events(path: Path, run_id: str) -> list[dict]:
++    records = event_records(path)
++    previous = "0" * 64
++    for expected, item in enumerate(records, 1):
++        required = {"schema_version", "seq", "timestamp", "run_id", "task_id", "role", "event_type", "data", "previous_event_hash", "event_hash"}
++        if set(item) != required:
++            raise RecorderError(f"event {expected} fields do not match schema")
++        if item["seq"] != expected:
++            raise RecorderError(f"duplicate or non-monotonic sequence: expected {expected}, got {item['seq']}")
++        if item["run_id"] != run_id:
++            raise RecorderError(f"event {expected} run_id mismatch")
++        if item["schema_version"] != SCHEMA_VERSION or item["event_type"] not in EVENT_TYPES or item["role"] not in ROLES or not isinstance(item["data"], dict):
++            raise RecorderError(f"event {expected} contains invalid enum or data")
++        if item["previous_event_hash"] != previous:
++            raise RecorderError(f"event {expected} hash chain predecessor mismatch")
++        unsigned = dict(item)
++        actual = unsigned.pop("event_hash")
++        expected_hash = sha256_bytes(canonical(unsigned))
++        if actual != expected_hash:
++            raise RecorderError(f"event {expected} hash mismatch")
++        previous = actual
++    return records
++
++
++def append_event(root: Path, run_id: str, event_type: str, data: dict, *, allow_finished: bool = False) -> dict:
++    if event_type not in EVENT_TYPES:
++        raise RecorderError(f"unsupported event_type: {event_type}")
++    directory = run_dir(root, validated_run_id(run_id))
++    metadata = read_json(directory / "metadata.json")
++    if metadata.get("status") == "finished" and not allow_finished:
++        raise RecorderError("finished runs are immutable")
++    path = directory / "events.jsonl"
++    lock = directory / ".events.lock"
++    try:
++        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
++        os.close(fd)
++    except FileExistsError as exc:
++        raise RecorderError("event stream is locked; interrupted writer may require inspection") from exc
++    try:
++        records = validate_events(path, run_id)
++        seq = len(records) + 1
++        previous = records[-1]["event_hash"] if records else "0" * 64
++        event = {"schema_version": SCHEMA_VERSION, "seq": seq, "timestamp": now(), "run_id": run_id,
++                 "task_id": metadata["task_id"], "role": metadata["role"], "event_type": event_type,
++                 "data": data, "previous_event_hash": previous}
++        event["event_hash"] = sha256_bytes(canonical(event))
++        with path.open("a", encoding="utf-8", newline="\n") as stream:
++            stream.write(canonical(event).decode("utf-8") + "\n")
++            stream.flush()
++            os.fsync(stream.fileno())
++        return event
++    finally:
++        lock.unlink(missing_ok=True)
++
++
++def cmd_register_prompt(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    if args.file:
++        content = Path(args.file).read_bytes().decode("utf-8")
++    elif args.stdin_base64:
++        content = base64.b64decode(sys.stdin.buffer.read(), validate=True).decode("utf-8")
++    else:
++        content = sys.stdin.read()
++    safe, was_redacted = redact(content)
++    prompt_id = args.prompt_id or f"P-{uuid.uuid4()}"
++    if not re.fullmatch(r"P-[A-Za-z0-9_.:-]+", prompt_id):
++        raise RecorderError("invalid prompt_id")
++    digest = sha256_bytes(safe.encode("utf-8"))
++    metadata = {"recorder_schema_version": SCHEMA_VERSION, "prompt_id": prompt_id, "prompt_sha256": digest,
++                "prompt_capture": "redacted" if was_redacted else "full", "prompt_source": args.source,
++                "template_version": args.template_version or "unavailable", "task_id": args.task_id,
++                "associated_run_id": args.run_id or "unavailable", "registered_at": now(),
++                "system_prompt_capture": "unavailable", "secret_redaction_applied": was_redacted}
++    directory = root / "prompts" / prompt_id
++    if directory.exists():
++        raise RecorderError(f"prompt already exists: {prompt_id}")
++    directory.mkdir(parents=True)
++    (directory / "prompt.txt").write_text(safe, encoding="utf-8", newline="\n")
++    write_json(directory / "metadata.json", metadata)
++    if args.run_id:
++        append_event(root, args.run_id, "prompt_registered", {"prompt_id": prompt_id, "prompt_sha256": digest,
++                     "prompt_capture": metadata["prompt_capture"], "prompt_source": args.source})
++    print(json.dumps(metadata, ensure_ascii=False, sort_keys=True))
++    return 0
++
++
++def cmd_start_run(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    if args.role not in ROLES or args.capture_mode not in CAPTURE_MODES or args.experiment_group not in EXPERIMENT_GROUPS:
++        raise RecorderError("invalid role, capture_mode, or experiment_group")
++    if args.capture_mode == "prospective_resume" and not args.pre_recorder_work:
++        raise RecorderError("prospective_resume requires --pre-recorder-work")
++    run_id = args.run_id or f"R-{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4()}"
++    directory = run_dir(root, validated_run_id(run_id))
++    current = parse_current(repo)
++    task_id = args.task_id or str(current.get("task_id", "unavailable"))
++    prompt_id = args.prompt_id or "unavailable"
++    if prompt_id != "unavailable":
++        prompt_meta_path = root / "prompts" / prompt_id / "metadata.json"
++        prompt_meta = read_json(prompt_meta_path)
++        if prompt_meta["task_id"] != task_id:
++            raise RecorderError("prompt task_id does not match run task_id")
++        associated = prompt_meta.get("associated_run_id", "unavailable")
++        if associated not in {"unavailable", run_id}:
++            raise RecorderError(f"prompt is already associated with run {associated}")
++    directory.mkdir(parents=True, exist_ok=False)
++    metadata = {"recorder_schema_version": SCHEMA_VERSION, "run_id": run_id, "task_id": task_id,
++                "role": args.role, "parent_run_id": args.parent_run_id or "unavailable",
++                "related_run_id": args.related_run_id or "unavailable", "experiment_group": args.experiment_group,
++                "capture_mode": args.capture_mode, "prompt_id": prompt_id, "status": "running", "started_at": now(),
++                "finished_at": "unavailable", "pre_recorder_work": bool(args.pre_recorder_work),
++                "pre_recorder_trace_complete": args.capture_mode == "prospective" and not bool(args.pre_recorder_work), "agent_harness": args.agent_harness,
++                "model_name": args.model_name, "model_version": "unavailable", "token_usage": "unavailable",
++                "monetary_cost": "unavailable", "system_prompt_capture": "unavailable"}
++    metadata.update({"fresh_context": args.fresh_context, "explicit_token_budget": args.explicit_token_budget,
++                     "context_mode": args.context_mode, "public_reasoning_mode": args.public_reasoning_mode,
++                     "baseline_id": args.baseline_id, "replicate_id": args.replicate_id,
++                     "mutation_id": args.mutation_id, "model_condition": args.model_condition,
++                     "budget_condition": args.budget_condition})
++    initial = {"recorder_schema_version": SCHEMA_VERSION, "captured_at": now(), "git": capture_git(repo),
++               "task": current, "authority_snapshot": authority_snapshot(repo, task_id)}
++    write_json(directory / "metadata.json", metadata)
++    write_json(directory / "initial_state.json", initial)
++    (directory / "events.jsonl").touch(exist_ok=False)
++    if prompt_id != "unavailable":
++        prompt_meta["associated_run_id"] = run_id
++        write_json(prompt_meta_path, prompt_meta)
++    append_event(root, run_id, "run_started", {"capture_mode": args.capture_mode, "prompt_id": prompt_id,
++                 "pre_recorder_work": bool(args.pre_recorder_work),
++                 "pre_recorder_trace_complete": args.capture_mode == "prospective" and not bool(args.pre_recorder_work)})
++    append_event(root, run_id, "task_state_observed", current)
++    append_event(root, run_id, "git_state_observed", initial["git"])
++    print(run_id)
++    return 0
++
++
++def command_data(argv: list[str]) -> tuple[list[str], bool]:
++    safe, changed = redact("\n".join(argv))
++    return safe.split("\n"), changed
++
++
++def cmd_run_command(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    argv = list(args.command)
++    if argv and argv[0] == "--":
++        argv = argv[1:]
++    if not argv:
++        raise RecorderError("command is required")
++    safe_argv, command_redacted = command_data(argv)
++    command_id = f"C-{uuid.uuid4()}"
++    append_event(root, args.run_id, "command_started", {"command_id": command_id, "argv": safe_argv,
++                 "cwd": ".", "secret_redaction_applied": command_redacted})
++    started = time.monotonic_ns()
++    result = subprocess.run(argv, cwd=repo, capture_output=True)
++    duration_ms = (time.monotonic_ns() - started) / 1_000_000
++    stdout_text = result.stdout.decode("utf-8", "replace")
++    stderr_text = result.stderr.decode("utf-8", "replace")
++    sys.stdout.write(stdout_text)
++    sys.stderr.write(stderr_text)
++    safe_out, out_redacted = redact(stdout_text)
++    safe_err, err_redacted = redact(stderr_text)
++    blob_dir = run_dir(root, args.run_id) / "blobs"
++    blob_dir.mkdir(exist_ok=True)
++    (blob_dir / f"{command_id}.stdout.txt").write_text(safe_out, encoding="utf-8", newline="\n")
++    (blob_dir / f"{command_id}.stderr.txt").write_text(safe_err, encoding="utf-8", newline="\n")
++    append_event(root, args.run_id, "command_finished", {"command_id": command_id, "exit_code": result.returncode,
++                 "duration_ms": duration_ms, "result": "PASS" if result.returncode == 0 else "FAIL",
++                 "stdout_sha256": sha256_bytes(result.stdout), "stderr_sha256": sha256_bytes(result.stderr),
++                 "stdout_blob": f"blobs/{command_id}.stdout.txt", "stderr_blob": f"blobs/{command_id}.stderr.txt",
++                 "secret_redaction_applied": command_redacted or out_redacted or err_redacted})
++    return result.returncode
++
++
++def cmd_record_event(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    data = json.loads(args.data_json)
++    if not isinstance(data, dict):
++        raise RecorderError("event data must be a JSON object")
++    safe_data, redacted = redact_value(data)
++    if args.event_type in {"verification_result", "test_result", "review_finished", "ci_finished"} and "result" not in safe_data:
++        raise RecorderError(f"{args.event_type} requires an observed result")
++    if redacted:
++        safe_data["secret_redaction_applied"] = True
++    event = append_event(root, args.run_id, args.event_type, safe_data)
++    print(json.dumps(event, ensure_ascii=False, sort_keys=True))
++    return 0
++
++
++def cmd_human_decision(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    alternatives = json.loads(args.alternatives_json)
++    if not isinstance(alternatives, list) or not alternatives:
++        raise RecorderError("alternatives must be a non-empty JSON list")
++    data = {"decision_id": args.decision_id or f"HD-{uuid.uuid4()}", "question": args.question,
++            "alternatives": alternatives, "selected": args.selected, "reason": args.reason,
++            "affected_authority": args.affected_authority or "unavailable", "human_actor": True,
++            "fixture": bool(args.fixture)}
++    data, changed = redact_value(data)
++    if changed:
++        data["secret_redaction_applied"] = True
++    append_event(root, args.run_id, "human_decision", data)
++    print(data["decision_id"])
++    return 0
++
++
++def cmd_ingest_ci(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    evidence = read_json(Path(args.evidence))
++    required = {"provider", "ci_run_id", "commit_sha", "job_name", "result", "failed_checks", "duration_ms", "evidence_reference"}
++    missing = required - set(evidence)
++    if missing or evidence.get("result") not in {"PASS", "FAIL"}:
++        raise RecorderError(f"invalid CI evidence; missing={sorted(missing)}")
++    evidence["observed_evidence_sha256"] = sha256_bytes(Path(args.evidence).read_bytes())
++    append_event(root, args.run_id, "ci_finished", evidence)
++    return 0
++
++
++def cmd_finish_run(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    directory = run_dir(root, validated_run_id(args.run_id))
++    metadata = read_json(directory / "metadata.json")
++    if metadata.get("status") == "finished":
++        raise RecorderError("run is already finished")
++    final = {"recorder_schema_version": SCHEMA_VERSION, "captured_at": now(), "git": capture_git(repo),
++             "task": parse_current(repo), "authority_snapshot": authority_snapshot(repo, metadata["task_id"])}
++    initial = read_json(directory / "initial_state.json")
++    diff_bytes = git(repo, "diff", "--binary", initial["git"]["head_sha"], "--", binary=True)
++    diff_text = diff_bytes.decode("utf-8", "replace")
++    untracked = [line[3:] for line in final["git"]["status_porcelain"] if line.startswith("?? ")]
++    if untracked:
++        diff_text += "\n# Untracked paths observed; content intentionally not captured\n"
++        diff_text += "".join(f"# ?? {path}\n" for path in untracked)
++    diff_text, redacted = redact(diff_text)
++    (directory / "diff.patch").write_text(diff_text, encoding="utf-8", newline="\n")
++    write_json(directory / "final_state.json", final)
++    append_event(root, args.run_id, "run_finished", {"result": args.result, "final_head_sha": final["git"]["head_sha"],
++                 "diff_sha256": sha256_bytes(diff_text.encode("utf-8")), "secret_redaction_applied": redacted})
++    records = validate_events(directory / "events.jsonl", args.run_id)
++    finished_at = now()
++    started = dt.datetime.fromisoformat(metadata["started_at"].replace("Z", "+00:00"))
++    finished = dt.datetime.fromisoformat(finished_at.replace("Z", "+00:00"))
++    metadata.update({"status": "finished", "finished_at": finished_at,
++                     "duration_ms": (finished - started).total_seconds() * 1000,
++                     "pre_recorder_trace_complete": metadata["capture_mode"] == "prospective" and not metadata.get("pre_recorder_work", False)})
++    summary = {"recorder_schema_version": SCHEMA_VERSION, "run_id": args.run_id, "status": "finished",
++               "result": args.result, "event_count": len(records), "first_event_hash": records[0]["event_hash"],
++               "final_event_hash": records[-1]["event_hash"], "manifest_hash": "unavailable"}
++    manifest_inputs = {"metadata": metadata, "initial_state_sha256": sha256_bytes((directory / "initial_state.json").read_bytes()),
++                       "final_state_sha256": sha256_bytes((directory / "final_state.json").read_bytes()),
++                       "diff_sha256": sha256_bytes((directory / "diff.patch").read_bytes()),
++                       "events_sha256": sha256_bytes((directory / "events.jsonl").read_bytes())}
++    summary["manifest_hash"] = sha256_bytes(canonical(manifest_inputs))
++    write_json(directory / "summary.json", summary)
++    write_json(directory / "metadata.json", metadata)
++    print(json.dumps(summary, sort_keys=True))
++    return 0
++
++
++def validate_run(root: Path, run_id: str, require_finished: bool = True) -> dict:
++    directory = run_dir(root, validated_run_id(run_id))
++    metadata = read_json(directory / "metadata.json")
++    required_meta = {"recorder_schema_version", "run_id", "task_id", "role", "experiment_group", "capture_mode", "status"}
++    if missing := required_meta - set(metadata):
++        raise RecorderError(f"metadata missing fields: {sorted(missing)}")
++    if metadata["run_id"] != run_id or metadata["role"] not in ROLES or metadata["capture_mode"] not in CAPTURE_MODES:
++        raise RecorderError("invalid run metadata")
++    records = validate_events(directory / "events.jsonl", run_id)
++    if not records or records[0]["event_type"] != "run_started":
++        raise RecorderError("run has no valid run_started event")
++    if metadata["status"] == "finished":
++        for name in ("final_state.json", "diff.patch", "summary.json"):
++            if not (directory / name).exists():
++                raise RecorderError(f"finished run missing {name}")
++        if records[-1]["event_type"] != "run_finished":
++            raise RecorderError("finished run does not end with run_finished")
++        summary = read_json(directory / "summary.json")
++        manifest_inputs = {"metadata": metadata,
++                           "initial_state_sha256": sha256_bytes((directory / "initial_state.json").read_bytes()),
++                           "final_state_sha256": sha256_bytes((directory / "final_state.json").read_bytes()),
++                           "diff_sha256": sha256_bytes((directory / "diff.patch").read_bytes()),
++                           "events_sha256": sha256_bytes((directory / "events.jsonl").read_bytes())}
++        if summary.get("manifest_hash") != sha256_bytes(canonical(manifest_inputs)):
++            raise RecorderError("finished run manifest hash mismatch")
++    elif require_finished:
++        raise RecorderError("partial/interrupted run: status is not finished")
++    if metadata["capture_mode"] == "prospective_resume" and (not metadata.get("pre_recorder_work") or metadata.get("pre_recorder_trace_complete") is not False):
++        raise RecorderError("invalid prospective_resume trace completeness")
++    return {"run_id": run_id, "status": metadata["status"], "event_count": len(records)}
++
++
++def cmd_validate_run(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    print(json.dumps(validate_run(root, args.run_id, not args.allow_partial), sort_keys=True))
++    return 0
++
++
++def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    failures = []
++    for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
++        try:
++            validate_run(root, directory.name, not args.allow_partial)
++        except RecorderError as exc:
++            failures.append(f"{directory.name}: {exc}")
++    epoch = root / "INSTRUMENTATION_EPOCH.json"
++    if epoch.exists():
++        value = read_json(epoch)
++        required = {"timestamp", "recorder_schema_version", "accepted_recorder_commit_sha", "recorder_task_id", "acceptance_evidence", "prospective_trace_start"}
++        if missing := required - set(value):
++            failures.append(f"Instrumentation Epoch missing {sorted(missing)}")
++    if failures:
++        raise RecorderError("repository validation failed: " + "; ".join(failures))
++    print("PASS: Research Recorder repository artifacts validated.")
++    return 0
++
++
++def cmd_backfill(args: argparse.Namespace, repo: Path, root: Path) -> int:
++    task_paths = list((repo / "spec/tasks").glob(f"*/{args.task_id}.md"))
++    if len(task_paths) != 1:
++        raise RecorderError("backfill task must resolve exactly once")
++    task_path = task_paths[0]
++    text = task_path.read_text(encoding="utf-8")
++    commits = sorted(set(re.findall(r"\b[0-9a-f]{40}\b", text)))
++    evidence = [p.relative_to(repo).as_posix() for p in (repo / "spec/progress/evidence" / args.task_id).glob("*.md")]
++    value = {"recorder_schema_version": SCHEMA_VERSION, "task_id": args.task_id,
++             "collection_mode": "retrospective_backfill", "backfilled": True, "generated_at": now(),
++             "sources": {"task_spec": task_path.relative_to(repo).as_posix(), "durable_evidence": sorted(evidence), "commits_mentioned": commits},
++             "prompt": "unavailable", "model_calls": "unavailable", "token_usage": "unavailable", "tool_calls": "unavailable",
++             "exact_timing": "unavailable", "reasoning": "unavailable", "context_size": "unavailable", "cost": "unavailable"}
++    write_json(root / "backfill" / f"{args.task_id}.json", value)
++    print(args.task_id)
++    return 0
++
++
++def parser() -> argparse.ArgumentParser:
++    common = argparse.ArgumentParser(add_help=False)
++    common.add_argument("--repo")
++    common.add_argument("--research-root")
++    top = argparse.ArgumentParser(description=__doc__)
++    sub = top.add_subparsers(dest="subcommand", required=True)
++    p = sub.add_parser("register-prompt", parents=[common]); p.add_argument("--task-id", required=True); p.add_argument("--file"); p.add_argument("--stdin-base64", action="store_true"); p.add_argument("--source", default="human"); p.add_argument("--template-version"); p.add_argument("--run-id"); p.add_argument("--prompt-id")
++    p = sub.add_parser("start-run", parents=[common]); p.add_argument("--task-id"); p.add_argument("--role", required=True); p.add_argument("--capture-mode", required=True); p.add_argument("--experiment-group", default="unassigned"); p.add_argument("--prompt-id"); p.add_argument("--parent-run-id"); p.add_argument("--related-run-id"); p.add_argument("--run-id"); p.add_argument("--pre-recorder-work", action="store_true"); p.add_argument("--agent-harness", default="unavailable"); p.add_argument("--model-name", default="unavailable"); p.add_argument("--fresh-context", default="unavailable"); p.add_argument("--explicit-token-budget", default="unavailable"); p.add_argument("--context-mode", default="unavailable"); p.add_argument("--public-reasoning-mode", default="unavailable"); p.add_argument("--baseline-id", default="unavailable"); p.add_argument("--replicate-id", default="unavailable"); p.add_argument("--mutation-id", default="unavailable"); p.add_argument("--model-condition", default="unavailable"); p.add_argument("--budget-condition", default="unavailable")
++    p = sub.add_parser("run-command", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("command", nargs=argparse.REMAINDER)
++    p = sub.add_parser("record-event", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--event-type", required=True); p.add_argument("--data-json", required=True)
++    p = sub.add_parser("record-human-decision", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--decision-id"); p.add_argument("--question", required=True); p.add_argument("--alternatives-json", required=True); p.add_argument("--selected", required=True); p.add_argument("--reason", required=True); p.add_argument("--affected-authority"); p.add_argument("--fixture", action="store_true")
++    p = sub.add_parser("ingest-ci", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--evidence", required=True)
++    p = sub.add_parser("finish-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--result", choices=["PASS", "FAIL", "BLOCKED", "CANCELLED"], required=True)
++    p = sub.add_parser("validate-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--allow-partial", action="store_true")
++    p = sub.add_parser("validate-repository", parents=[common]); p.add_argument("--allow-partial", action="store_true")
++    p = sub.add_parser("backfill", parents=[common]); p.add_argument("--task-id", required=True)
++    return top
++
++
++def main(argv: list[str] | None = None) -> int:
++    args = parser().parse_args(argv)
++    try:
++        repo = repo_root(args.repo)
++        root = research_root(repo, args.research_root)
++        root.mkdir(parents=True, exist_ok=True)
++        commands = {"register-prompt": cmd_register_prompt, "start-run": cmd_start_run, "run-command": cmd_run_command,
++                    "record-event": cmd_record_event, "record-human-decision": cmd_human_decision, "ingest-ci": cmd_ingest_ci,
++                    "finish-run": cmd_finish_run, "validate-run": cmd_validate_run,
++                    "validate-repository": cmd_validate_repository, "backfill": cmd_backfill}
++        return commands[args.subcommand](args, repo, root)
++    except (RecorderError, OSError, ValueError, json.JSONDecodeError) as exc:
++        print(f"ERROR: {exc}", file=sys.stderr)
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

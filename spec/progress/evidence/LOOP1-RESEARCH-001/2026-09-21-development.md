@@ -20,6 +20,9 @@ Mode: implementation-agent development evidence only; not independent acceptance
 - Human prompt: exact unique `role=user` session export match, stored as `P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1`, SHA-256 `ae27c414cddd31fb0a12659d93fc0f859fb0b87cd6fb213e7d76d6bee4c543a6`; saved content was byte-decoded and compared equal to the source string. Session path and other session records were not persisted.
 - The event stream preserves a test FAIL followed by repair and PASS; no failure was rewritten as success.
 - An `instrumentation_warning` preserves the bootstrap run's initial trace-completeness flag defect; raw history was not rewritten, and finish metadata corrects bootstrap completeness to false.
+- Recorder content candidate: `0a406aef9ecac899556ac6bad8145d8c01127e73`.
+- Finished bootstrap result: 17 events; final observed HEAD `0a406aef9ecac899556ac6bad8145d8c01127e73`; manifest hash `0a29742a25dd9158d91125506b57ad966fb4847d8f56bb92fef8049619d48f1d`; capture mode `bootstrap_partial`; `pre_recorder_trace_complete=false`. This is not independent acceptance.
+- The finished run's archived `diff.patch` preserves whitespace from the observed diff. Repository `diff --check` excludes only this evidence payload; the file is covered by the run manifest and was not rewritten to make verification pass.
 
 ## Verification
 

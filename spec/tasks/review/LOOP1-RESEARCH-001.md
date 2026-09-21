@@ -57,7 +57,7 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 - `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- python3 -m unittest discover -s tests/research -v` (or the resolved Python 3 executable as the recorded command)
 - `& .\tools\research\recorder.ps1 validate-repository --allow-partial`
 - `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
-- `git diff --check 1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc..HEAD`
+- `git diff --check 1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc..HEAD -- . ':(exclude)research/runs/**/diff.patch'` (archived patches preserve observed whitespace as evidence)
 - Independent acceptance from a clean committed checkout repeats the tests and repository verifier under ADR-0001.
 
 # Evidence
@@ -65,9 +65,11 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 - Baseline worktree was clean and detached at `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc` before branch creation.
 - Frozen Architecture SHA-256 matched the manifest: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
 - Pre-insertion Auth/User/Friend contract verification passed with exit `0`.
-- Development verification and candidate commit will be recorded before handoff. This task cannot self-accept.
+- Recorder content candidate commit: `0a406aef9ecac899556ac6bad8145d8c01127e73`; this task cannot self-accept.
 - Development evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`.
 - Final implementation test run: 17 tests PASS. CTRL-002 Development verifier and diff whitespace check PASS. Exact command results and the preserved earlier FAIL are in the bootstrap event stream and development evidence.
+- Bootstrap run finished with 17 events, final observed HEAD `0a406aef9ecac899556ac6bad8145d8c01127e73`, manifest hash `0a29742a25dd9158d91125506b57ad966fb4847d8f56bb92fef8049619d48f1d`, and `pre_recorder_trace_complete=false`. Its result is development evidence, not acceptance.
+- The archived `diff.patch` intentionally preserves observed patch whitespace and is excluded from repository whitespace lint; the artifact remains hash-protected and unmodified after finish.
 
 # Handoff
 
@@ -78,4 +80,4 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 
 # Next Action
 
-- Commit the review handoff, then delegate a fresh independent Review Agent from a clean detached isolated checkout. It must run all Recorder tests, default `validate-repository`, CTRL-002 Acceptance mode, scope/secret/pyc checks, and diff checks. On PASS, record durable independent evidence, establish the Instrumentation Epoch at the accepted commit, then restore `LOOP1-CONTRACT-001` as Current Task without transferring ownership. On FAIL, use a fresh Fix Agent and repeat review.
+- Delegate a fresh independent Review Agent from a clean detached isolated checkout at the final handoff commit. It must run all Recorder tests, default `validate-repository`, CTRL-002 Acceptance mode, scope/secret/pyc checks, and diff checks. On PASS, record durable independent evidence, establish the Instrumentation Epoch at the accepted commit, then restore `LOOP1-CONTRACT-001` as Current Task without transferring ownership. On FAIL, use a fresh Fix Agent and repeat review.
