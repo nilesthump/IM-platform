@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.example.invalid/http/auth-user-friend.openapi.structure.schema.json",
+  "title": "OpenAPI 3.1 structural lint for the Auth/User/Friend contract",
+  "type": "object",
+  "required": [
+    "openapi",
+    "info",
+    "paths"
+  ],
+  "properties": {
+    "openapi": {
+      "const": "3.1.0"
+    },
+    "info": {
+      "$ref": "#/$defs/info"
+    },
+    "servers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/server"
+      }
+    },
+    "paths": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^/"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/pathItem"
+      }
+    },
+    "components": {
+      "type": "object"
+    },
+    "security": {
+      "type": "array"
+    },
+    "tags": {
+      "type": "array"
+    },
+    "externalDocs": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "info": {
+      "type": "object",
+      "required": [
+        "title",
+        "version"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "termsOfService": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "contact": {
+          "type": "object"
+        },
+        "license": {
+          "type": "object"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "server": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object"
+        }
+      }
+    },
+    "pathItem": {
+      "type": "object",
+      "properties": {
+        "$ref": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "servers": {
+          "type": "array"
+        },
+        "parameters": {
+          "type": "array"
+        },
+        "get": {
+          "$ref": "#/$defs/operation"
+        },
+        "put": {
+          "$ref": "#/$defs/operation"
+        },
+        "post": {
+          "$ref": "#/$defs/operation"
+        },
+        "delete": {
+          "$ref": "#/$defs/operation"
+        },
+        "options": {
+          "$ref": "#/$defs/operation"
+        },
+        "head": {
+          "$ref": "#/$defs/operation"
+        },
+        "patch": {
+          "$ref": "#/$defs/operation"
+        },
+        "trace": {
+          "$ref": "#/$defs/operation"
+        }
+      },
+      "anyOf": [
+        { "required": ["$ref"] },
+        { "required": ["get"] },
+        { "required": ["put"] },
+        { "required": ["post"] },
+        { "required": ["delete"] },
+        { "required": ["options"] },
+        { "required": ["head"] },
+        { "required": ["patch"] },
+        { "required": ["trace"] }
+      ]
+    },
+    "operation": {
+      "type": "object",
+      "required": [
+        "responses"
+      ],
+      "properties": {
+        "responses": {
+          "type": "object",
+          "minProperties": 1
+        }
+      }
+    }
+  }
+}

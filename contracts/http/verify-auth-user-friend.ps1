@@ -11,6 +11,7 @@ if (-not $RepoRoot) {
 }
 
 $openApiPath = Join-Path $RepoRoot 'contracts/http/auth-user-friend.openapi.json'
+$openApiSchemaPath = Join-Path $RepoRoot 'contracts/http/auth-user-friend.openapi.structure.schema.json'
 $errorPath = Join-Path $RepoRoot 'contracts/errors/http-errors.schema.json'
 $fixtureRoot = Join-Path $RepoRoot 'contracts/fixtures/auth-user-friend'
 $fixtureSchemaPath = Join-Path $fixtureRoot 'fixture.schema.json'
@@ -220,6 +221,19 @@ function Get-OperationMatch {
     return $null
 }
 
+function Get-OpenApiStructureErrors {
+    param($Value, [string]$SchemaPath, [string]$Location)
+    try {
+        $json = $Value | ConvertTo-Json -Depth 100
+        if (-not ($json | Test-Json -SchemaFile $SchemaPath -ErrorAction Stop)) {
+            return @("$Location does not conform to the repository OpenAPI 3.1 structural schema")
+        }
+    } catch {
+        return @("$Location OpenAPI 3.1 structural schema validation failed: $($_.Exception.Message)")
+    }
+    return @()
+}
+
 function Resolve-ResponseObject {
     param($Response, $OpenApi)
     if (-not (Test-HasProperty $Response '$ref')) { return $Response }
@@ -427,7 +441,7 @@ function Get-ModelFailures {
     return $issues
 }
 
-foreach ($path in @($openApiPath,$errorPath,$fixtureSchemaPath,$positivePath,$negativePath)) {
+foreach ($path in @($openApiPath,$openApiSchemaPath,$errorPath,$fixtureSchemaPath,$positivePath,$negativePath)) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { $failures += "missing required contract file: $path" }
 }
 if ($failures.Count -eq 0) {
@@ -435,6 +449,9 @@ if ($failures.Count -eq 0) {
     try { $errors = Get-Content -LiteralPath $errorPath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "error schema JSON parse failed: $($_.Exception.Message)" }
     try { $positive = Get-Content -LiteralPath $positivePath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "positive fixtures JSON parse failed: $($_.Exception.Message)" }
     try { $negative = Get-Content -LiteralPath $negativePath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "negative fixtures JSON parse failed: $($_.Exception.Message)" }
+}
+if ($failures.Count -eq 0) {
+    $failures += @(Get-OpenApiStructureErrors $openApi $openApiSchemaPath 'OpenAPI document')
 }
 if ($failures.Count -eq 0) {
     foreach ($fixturePath in @($positivePath,$negativePath)) {
@@ -483,6 +500,12 @@ if ($failures.Count -eq 0) {
     $mutatedOpenApi.paths.'/v1/auth/refresh/web'.post.requestBody.required = $false
     $mutations += [pscustomobject]@{ Name='credentialless-refresh'; OpenApi=$mutatedOpenApi; Positive=$positive; Negative=$negative }
 
+    $missingInfoTitle = Copy-JsonModel $openApi
+    $missingInfoTitle.info.PSObject.Properties.Remove('title')
+    if (@(Get-OpenApiStructureErrors $missingInfoTitle $openApiSchemaPath 'missing-info-title mutation').Count -eq 0) {
+        $failures += 'OpenAPI schema-lint regression was not rejected: missing-info-title'
+    }
+
     foreach ($mutation in $mutations) {
         $mutationFailures = @(Get-ModelFailures $mutation.OpenApi $errors $mutation.Positive $mutation.Negative)
         if ($mutationFailures.Count -eq 0) { $failures += "mutation regression was not rejected: $($mutation.Name)" }
@@ -502,5 +525,5 @@ foreach ($path in @($openApi.paths.PSObject.Properties)) {
 $positiveCount = @($positive.scenarios).Count
 $negativeCount = @($negative.scenarios).Count
 $errorCount = @($errors.'$defs'.ErrorCode.enum).Count
-Write-Host "PASS: Auth/User/Friend contracts verified paths=$pathCount operations=$operationCount error_codes=$errorCount positive=$positiveCount negative=$negativeCount profiles=go,java mutation_regressions=6."
+Write-Host "PASS: Auth/User/Friend contracts verified paths=$pathCount operations=$operationCount error_codes=$errorCount positive=$positiveCount negative=$negativeCount profiles=go,java schema_lint=OpenAPI-3.1 mutation_regressions=7."
 exit 0
