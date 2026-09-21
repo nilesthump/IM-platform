@@ -10,13 +10,14 @@ Gate Status: NOT YET PASSED
 
 Current Batch: LOOP1-S0
 
-Current Task: LOOP1-RESEARCH-001
+Current Task: LOOP1-CONTRACT-001
 
 Current Task State: review
 
 ## Immediately Relevant Completed Work
 
 - Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.
+- `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
 - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
 - The independent review passed the 9-file/84-rule materialization verifier, CTRL-002 Acceptance mode, and baseline diff check; all eight disposable negative controls were rejected.
@@ -28,12 +29,16 @@ Current Task State: review
 
 ## Current Blockers
 
-- `LOOP1-RESEARCH-001` candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` permanently failed fresh independent review. Fresh Fix Agent `/root/recorder_fix1` repaired all four findings at content commit `1d850cf8cbe6c9aeec94e43f7395b8901bcb5f78`; development verification passes, but a new fresh independent review is still required.
-- Instrumentation Epoch creation and paused-product-task resume remain prohibited until a new fresh independent reviewer accepts the replacement candidate.
+- `LOOP1-CONTRACT-001` remains unfinished in `review`. Its repaired candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` has development verification only and still requires a fresh independent review under ADR-0001.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
+- Fresh independent Recorder review command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
+  - Result: Acceptance PASS, exit `0`; 22 tests in `21.520s`.
+- Fresh independent commands: default `validate-repository`, CTRL-002 Acceptance, diff/scope/generated-artifact checks, and disposable negative controls for all four permanent blocker classes.
+  - Result: Acceptance PASS; structured and quoted synthetic secrets produced zero durable secret hits, CI extra-secret evidence was rejected without event append, clean committed copy validated, and prompt hash/cross-link tampering was rejected.
+  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - Fresh Fix Agent command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
   - Result: Development PASS, exit `0`; 22 tests in `15.305s`, including exact committed-artifact, CRLF manifest portability, prompt hash/cross-link, structured/quoted secret, and CI extra-secret negative regressions.
 - Fresh Fix Agent command: `& .\tools\research\recorder.ps1 validate-repository`
@@ -78,13 +83,14 @@ Current Task State: review
 - `LOOP1-SPEC-001` added three domain inputs, three invariant inputs, three executable S0 contract-check inputs, and their deterministic verifier; the accepted closure adds durable review evidence and a stable checkpoint.
 - The earlier `LOOP1-SPEC-001` closure introduced no database migrations, machine-verifiable public contract files, product implementation, container images, or fixture versions.
 - `.github/workflows/` remains absent. Frozen Architecture PDF bytes remain unchanged.
-- The repair adds durable independent-FAIL and Fix-Agent development evidence. No checkpoint is created because the repaired candidate has not yet passed independent review.
+- The repair retains durable independent-FAIL and Fix-Agent development evidence; the accepted closure adds the stable Recorder checkpoint.
 - Recorder repair adds LF-canonical manifest/prompt handling, key-aware recursive redaction, strict CI evidence allowlisting, prompt registry validation, and focused regressions only; it changes no product or contract path.
+- Independent closure adds only the Research Instrumentation Epoch, durable PASS evidence, accepted checkpoint, Research Task transition to `done`, and recovery-state updates.
 
 ## Known Failures, Risks, and Assumptions
 
-- Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` is rejected and must not be used to establish the Instrumentation Epoch. Its independent FAIL evidence is permanent.
-- The previous 17-test suite missed structured secrets and committed-artifact portability; the repaired 22-test suite now covers those regressions. Independent confirmation remains pending.
+- Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
+- All activity before the Instrumentation Epoch is bootstrap, retrospective backfill, or pilot evidence and must not be represented as complete prospective trace data.
 - `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
 - `12c566f71da9b038764ecb7a5303b116e77ca32f` has only Fix-Agent development verification and is not accepted until a fresh independent reviewer passes it under ADR-0001; the task remains `review` and S0 remains NOT YET PASSED.
 - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
@@ -96,19 +102,19 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate `LOOP1-RESEARCH-001` to a new fresh independent Review Agent to review the final committed repair candidate from a clean isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance.
+Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Recorder acceptance closure without overwriting its Agent-owned untracked `contracts/http/schema-lint/`. Then restore the same task and ownership, register the actual resume prompt, start a `prospective_resume` Recorder run with `pre_recorder_work=true` and incomplete prior trace, and continue its fresh independent review. Do not select another product task.
 
 ## Last Known Good Commit
 
-`e5482b135a2ab7451c24c29c7517e1a8f19ce420` (last independently accepted recovery line); repaired review candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is development-verified only.
+`ab3b507241cf51822af79cbcb63dfdf40e273359` (independently accepted Recorder content); `LOOP1-CONTRACT-001` candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` remains development-verified only.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md`
+`spec/progress/checkpoints/2026-09-21-loop1-research-001-accepted.md`
 
 ## Uncommitted Changes / Ownership
 
-- The Fix Agent will hand off a clean committed candidate; task ownership is `unassigned-independent-review-agent`.
+- Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
 - The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
 

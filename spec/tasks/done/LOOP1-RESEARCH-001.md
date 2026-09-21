@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-RESEARCH-001
 title: Insert Research Recorder control plane
-status: review
-owner: unassigned-independent-review-agent
+status: done
+owner: accepted-independent-review
 stage: S0
 gate: S0
 ---
@@ -74,14 +74,17 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 - Blocking findings: the committed bootstrap run fails default repository validation with a manifest hash mismatch; structured secret keys and quoted JSON prompt values are persisted without redaction; CI ingestion accepts and persists secret-bearing extra fields; and the committed bootstrap prompt bytes do not match their recorded SHA-256.
 - Fresh Fix Agent `/root/recorder_fix1` repaired all four findings at content commit `1d850cf8cbe6c9aeec94e43f7395b8901bcb5f78`; 22 tests, default repository validation, CTRL-002 Development mode, prompt blob/hash comparison, diff/scope and generated-file checks pass. This is development evidence, not acceptance.
 - Fix evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-fix-1d850cf-development.md`.
+- Fresh independent Review Agent `/root/recorder_review2` accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` from a clean detached isolated checkout under ADR-0001 after repeating all 22 A-L tests, default repository validation, CTRL-002 Acceptance, scope checks, and the four prior-blocker negative controls.
+- Durable PASS evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
+- Instrumentation Epoch: `research/INSTRUMENTATION_EPOCH.json`; schema `1.0.0`. Earlier bootstrap/backfill/pilot evidence is not complete prospective trace data.
 
 # Handoff
 
 - Original paused task: `LOOP1-CONTRACT-001`, state `review`, owner `unassigned-independent-review-agent`, original worktree `H:\IM-platform`, branch `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc` at insertion observation. Its untracked `contracts/http/schema-lint/` is unknown/paused-Agent-owned and must not be touched.
 - Recorder repair is isolated at `H:\.codex\worktrees\research-recorder-fix\IM-platform` on `fix/LOOP1-RESEARCH-001-1`.
-- No Instrumentation Epoch exists until fresh independent review accepts a committed candidate.
-- Repair is complete but unaccepted. The Fix Agent has not declared acceptance or created an Epoch.
+- The Recorder is independently accepted at candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`, and the Instrumentation Epoch is established by the independent acceptance closure.
+- Resume `LOOP1-CONTRACT-001` without transferring ownership or rewriting its pre-Recorder history. Before the first resumed operation, safely fast-forward the paused branch to include this acceptance closure, register the actual resume prompt, and start a new `prospective_resume` run with `pre_recorder_work=true` and `pre_recorder_trace_complete=false`.
 
 # Next Action
 
-- Delegate a new fresh independent Review Agent to review the committed repair candidate from a clean isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before independent PASS.
+- Resume the existing paused `LOOP1-CONTRACT-001` review from its owned worktree only after safely incorporating the Recorder acceptance closure, then begin prospective instrumentation at the first post-resume observable operation. Do not select or implement another product task.
