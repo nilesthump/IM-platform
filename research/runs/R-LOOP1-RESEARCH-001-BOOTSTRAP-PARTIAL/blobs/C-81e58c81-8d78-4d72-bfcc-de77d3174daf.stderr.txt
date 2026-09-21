@@ -1,0 +1,32 @@
+test_backfill_marks_unknowns_unavailable (test_recorder.RecorderTest.test_backfill_marks_unknowns_unavailable) ... ok
+test_ci_ingestion_records_external_observation_only (test_recorder.RecorderTest.test_ci_ingestion_records_external_observation_only) ... ok
+test_event_append_seq_hash_and_duplicate_rejected (test_recorder.RecorderTest.test_event_append_seq_hash_and_duplicate_rejected) ... ok
+test_finish_captures_final_diff_duration_and_locks_history (test_recorder.RecorderTest.test_finish_captures_final_diff_duration_and_locks_history) ... ok
+test_finished_manifest_tamper_detected (test_recorder.RecorderTest.test_finished_manifest_tamper_detected) ... ok
+test_git_capture_dirty_without_modification (test_recorder.RecorderTest.test_git_capture_dirty_without_modification) ... ok
+test_human_decision_fixture_explicit (test_recorder.RecorderTest.test_human_decision_fixture_explicit) ... ok
+test_malformed_and_partial_jsonl_rejected (test_recorder.RecorderTest.test_malformed_and_partial_jsonl_rejected) ... ok
+test_partial_run_detected (test_recorder.RecorderTest.test_partial_run_detected) ... ok
+test_prompt_hash_link_and_system_prompt_unavailable (test_recorder.RecorderTest.test_prompt_hash_link_and_system_prompt_unavailable) ... FAIL
+test_prospective_resume_trace_flags (test_recorder.RecorderTest.test_prospective_resume_trace_flags) ... ok
+test_repository_safety_in_real_checkout (test_recorder.RecorderTest.test_repository_safety_in_real_checkout) ... ok
+test_run_command_executes_and_propagates_zero (test_recorder.RecorderTest.test_run_command_executes_and_propagates_zero) ... ok
+test_run_command_propagates_failure_and_records_fail (test_recorder.RecorderTest.test_run_command_propagates_failure_and_records_fail) ... ok
+test_secret_redaction_and_no_environment_dump (test_recorder.RecorderTest.test_secret_redaction_and_no_environment_dump) ... ok
+test_start_run_unique_and_schema (test_recorder.RecorderTest.test_start_run_unique_and_schema) ... ok
+
+======================================================================
+FAIL: test_prompt_hash_link_and_system_prompt_unavailable (test_recorder.RecorderTest.test_prompt_hash_link_and_system_prompt_unavailable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "H:\.codex\worktrees\research-recorder\IM-platform\tests\research\test_recorder.py", line 95, in test_prompt_hash_link_and_system_prompt_unavailable
+    self.assertEqual(recorder.sha256_bytes(b"stable prompt\n"), meta["prompt_sha256"])
+AssertionError: '62fe4142101948638d16623134cb7efbe04c90dbd550eaf6a8f25bf18505ac94' != '8b7b019fbca42da85e5be29e2f9aa50edd5450b514910437bb77b2569e15362f'
+- 62fe4142101948638d16623134cb7efbe04c90dbd550eaf6a8f25bf18505ac94
++ 8b7b019fbca42da85e5be29e2f9aa50edd5450b514910437bb77b2569e15362f
+
+
+----------------------------------------------------------------------
+Ran 16 tests in 12.503s
+
+FAILED (failures=1)

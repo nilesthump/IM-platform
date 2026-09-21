@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:im-platform:research-recorder:ci-ingestion:1.0.0",
+  "type": "object",
+  "required": ["provider", "ci_run_id", "commit_sha", "job_name", "result", "failed_checks", "duration_ms", "evidence_reference"],
+  "properties": {
+    "provider": {"type": "string"},
+    "ci_run_id": {"type": "string"},
+    "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "job_name": {"type": "string"},
+    "result": {"enum": ["PASS", "FAIL"]},
+    "failed_checks": {"type": "array", "items": {"type": "string"}},
+    "duration_ms": {"type": "number", "minimum": 0},
+    "evidence_reference": {"type": "string"}
+  }
+}

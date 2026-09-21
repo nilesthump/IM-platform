@@ -10,12 +10,13 @@ Gate Status: NOT YET PASSED
 
 Current Batch: LOOP1-S0
 
-Current Task: LOOP1-CONTRACT-001
+Current Task: LOOP1-RESEARCH-001
 
 Current Task State: review
 
 ## Immediately Relevant Completed Work
 
+- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
 - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
 - The independent review passed the 9-file/84-rule materialization verifier, CTRL-002 Acceptance mode, and baseline diff check; all eight disposable negative controls were rejected.
@@ -27,11 +28,17 @@ Current Task State: review
 
 ## Current Blockers
 
-- None. The next action after the metadata handoff commit is a fresh independent review; the Fix Agent cannot accept its own work.
+- None for Recorder implementation. Instrumentation Epoch creation remains prohibited until a fresh independent reviewer accepts the committed Recorder candidate.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
+- Command: `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- <python3> -m unittest discover -s tests/research -v`
+  - Result: Development PASS, exit `0`; 17 tests. An earlier FAIL and subsequent repair remain preserved in the append-only bootstrap stream. This is not acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`
+- Command: `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: Development PASS, exit `0`; recovery resolved `LOOP1-RESEARCH-001` and checked all queues. This is not acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`
 - Command: `& .\contracts\http\verify-auth-user-friend.ps1`
   - Result: Fix Agent development PASS on clean committed candidate `12c566f71da9b038764ecb7a5303b116e77ca32f`, exit `0`, elapsed `5280.2464 ms`; 9 paths, 9 operations, 15 error codes, 6 positive and 21 negative scenarios, both profiles, and 6 mutation regressions.
 - Command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
@@ -44,6 +51,7 @@ Current Task State: review
 
 ## Changed Files or Migrations
 
+- Added only the Research Recorder control plane under `research/**`, `tools/research/**`, `tests/research/**`, the Research Task/evidence, and minimum `AGENTS.md`, handoff, and current-state governance text.
 - `contracts/http/auth-user-friend.openapi.json` is the canonical OpenAPI 3.1 Auth/User/Friend contract with separate credential-bound WEB/native refresh operations and operation/status-specific error codes; `contracts/http/verify-auth-user-friend.ps1` cross-validates it with fixtures and runs mutation regressions.
 - `contracts/errors/http-errors.schema.json` defines the shared HTTP error envelope and stable codes.
 - `contracts/fixtures/auth-user-friend/` defines constrained fixture schema `1.1` plus exact canonical/Go/Java positive and negative golden scenarios.
@@ -66,7 +74,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Commit this repair handoff metadata, then delegate `LOOP1-CONTRACT-001` to a fresh independent Review Agent. It must review the repaired candidate and handoff commit from a clean detached isolated checkout, run the task verifier, CTRL-002 default Acceptance mode, and the baseline diff check from `e5482b135a2ab7451c24c29c7517e1a8f19ce420`, then record durable PASS/FAIL evidence. Do not accept from the Fix Agent context, and do not claim S0 Gate PASS.
+Commit the Recorder review handoff, then delegate `LOOP1-RESEARCH-001` to a fresh independent Review Agent in a clean detached isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance. After independent PASS, establish the Epoch at the accepted commit and restore `LOOP1-CONTRACT-001` as Current Task, preserving its state and ownership.
 
 ## Last Known Good Commit
 
@@ -78,9 +86,10 @@ Commit this repair handoff metadata, then delegate `LOOP1-CONTRACT-001` to a fre
 
 ## Uncommitted Changes / Ownership
 
-- Until the review-handoff commit, only `/root/contract001_fix` owns the Task Spec, current-state, and Fix-Agent evidence changes. No contract changes remain uncommitted.
-- No unexplained user or other-Agent changes are known.
+- `/root/recorder_impl` owns only Recorder control-plane changes in the isolated research worktree on `task/LOOP1-RESEARCH-001`.
+- The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
+- Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
 
 ## Architecture Conflicts / ACP / ADR
 
-- None. ADR-0001 remains the approved temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.
+- None. Recorder is a non-product research/governance control plane and does not alter Frozen Product Architecture. ADR-0001 remains the approved temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.

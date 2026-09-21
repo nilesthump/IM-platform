@@ -1,0 +1,1188 @@
+你现在进入仓库 `IM-platform`。
+
+这是 Human Architect 明确授权的一次“Research Instrumentation / Recorder Control-Plane Insertion”。
+
+你的唯一目标：
+
+为后续 AI Agent 自动开发过程建立一个自动、结构化、可审计、可用于学术研究的数据记录层（Research Recorder）。
+
+你不得继续当前暂停中的产品/Spec/Contract 实现任务。
+你不得实现任何 IM 产品功能。
+你不得替当前暂停 Agent 完成工作。
+你不得修改 Frozen Product Architecture、公共协议、ACK 语义、数据库业务不变量或插件安全边界。
+
+\============================================================
+0\. 当前特殊状态
+==========
+
+当前已经存在另一个 Agent。
+
+它因为额度限制暂时暂停。
+
+注意：
+
+- 它没有完成任务；
+- 它没有放弃任务；
+- 它仍然拥有自己已经产生的工作；
+- 不得因为它暂停，就把它的 Current Task 当成无人拥有；
+- 不得接管其实现；
+- 不得修改、格式化、stash、reset、clean、移动、覆盖它的未提交内容；
+- 不得把它的 Task 标记为 done；
+- 不得制造“它已经被新 Agent 替代”的假象。
+
+Human 现在只是暂时冻结它的执行，让你插入 Recorder 控制层。
+
+Recorder 完成并独立验收后，原 Agent 将恢复原任务。
+
+\============================================================
+
+1. 开始前必须恢复真实仓库状态
+   \============================================================
+
+在做任何修改之前，严格执行仓库现有治理规则。
+
+至少：
+
+1. 阅读 `AGENTS.md`
+2. 阅读 `spec/handoff/agent-context.md`
+3. 阅读 `spec/progress/current.md`
+4. 精确定位 Current Task
+5. 检查它所在 queue / status / owner
+6. 阅读 Current Task 的 inputs、allowed\_paths、acceptance、forbidden
+7. 阅读其引用的 Frozen Architecture / ADR / invariant / acceptance
+8. `git status`
+9. 当前 diff
+10. recent commits
+11. Last Known Good Commit
+12. Latest Checkpoint
+13. 判断暂停 Agent 是否存在：
+
+- 未提交修改
+- 独立 branch
+- worktree
+- ownership 标记
+- evidence
+- checkpoint
+
+真实仓库状态优先于本 Prompt 中的假设。
+
+如果发现来源不明或属于暂停 Agent 的修改：
+
+DO NOT TOUCH.
+
+如果需要实际写入 Recorder：
+
+优先使用独立 branch / isolated worktree，
+从一个可信、clean、committed 的状态开始。
+
+不得为了方便 Recorder 而破坏暂停 Agent 的现场。
+
+\============================================================
+2\. 治理要求
+========
+
+本工作是 Human 明确授权的控制面插入任务。
+
+但是仍然必须服从现有 repository governance。
+
+如果现有 Task State Machine 不允许在保留原 paused task 的情况下插入控制面任务：
+
+不要静默绕过。
+
+应：
+
+1. 明确报告冲突；
+
+2. 选择最小治理修改；
+
+3. 必要时创建一个独立 Control/Research Task，例如：
+
+   LOOP1-RESEARCH-001
+
+   或符合当前命名规范的等价 ID；
+
+4. 明确记录：
+
+   - 原 paused task 未完成；
+   - ownership 未转移；
+   - 本任务只是 temporary control-plane insertion；
+   - Recorder 完成后恢复原 task。
+
+如需要 Task Spec，其 allowed\_paths 应尽量限定为：
+
+- `research/**`
+- `tools/research/**`
+- 与 Recorder 直接相关的测试
+- 本 Research Task Spec
+- 必需的 `spec/progress/**`
+- 必需的 repository Agent instruction / handoff 文档
+
+不得借此扩大到产品代码。
+
+如果 `.github/workflows/**` 根据当前 S0 治理仍禁止修改：
+
+不要提前创建 GitHub Actions。
+
+只设计 CI ingestion schema / adapter interface，
+等待正式 CI Task 激活后再接入。
+
+\============================================================
+3\. Research Recorder 的基本原则
+===========================
+
+Recorder 的核心必须是：
+
+脚本 / runner / wrapper / hook。
+
+不是：
+
+让被观察 Agent 在任务结束以后自己回忆并写“我刚才做了什么”。
+
+原则：
+
+Agent 是被观察对象。
+Recorder 是观察仪器。
+
+目标比例：
+
+约 80%～90% 事实应由脚本自动获得，例如：
+
+- timestamps
+- Git SHA
+- branch
+- dirty/clean
+- diff
+- changed paths
+- command
+- exit code
+- duration
+- verifier result
+- test result
+- Review verdict
+- CI result
+- file hash
+
+只有脚本无法理解的语义事件才允许 Agent 显式报告，例如：
+
+- architecture\_conflict
+- external\_blocker
+- 简短 decision rationale
+
+不得依赖 Agent 自述来判断：
+
+PASS / FAIL / CI success / test success。
+
+\============================================================
+4\. 禁止记录隐藏推理
+============
+
+禁止：
+
+- hidden chain-of-thought
+- private reasoning trace
+- 猜测模型内部推理
+- 要求 Agent 暴露内部 CoT
+
+允许：
+
+结构化、简短、公开的 decision summary，例如：
+
+{
+"decision": "use existing contract fixture",
+"reason": "changing the public contract is outside task scope"
+}
+
+这只是公开理由摘要，不是模型隐藏思维链。
+
+\============================================================
+5\. Instrumentation Epoch
+=========================
+
+Recorder 正式通过独立验收后，必须建立一个明确的：
+
+INSTRUMENTATION\_EPOCH
+
+至少记录：
+
+- timestamp
+- recorder schema version
+- accepted recorder commit SHA
+- recorder task ID
+- acceptance evidence
+- exact point from which prospective traces are considered complete
+
+定义：
+
+Instrumentation Epoch 之前：
+retrospective / pilot / backfill evidence
+
+Instrumentation Epoch 之后：
+prospective instrumented data
+
+未来论文中的主要定量结果应优先使用 Epoch 之后的数据。
+
+不得把 Epoch 之前的数据伪装成完整 prospective trace。
+
+\============================================================
+6\. 已经完成的历史 Agent
+=================
+
+对于已经完成的 Agent / Task，例如 CTRL-001、CTRL-002：
+
+不得伪造：
+
+- model calls
+- token usage
+- tool calls
+- exact prompt
+- exact timing
+- reasoning
+- context size
+- cost
+
+除非当时已有真实 durable evidence。
+
+允许从以下来源 backfill：
+
+- Git commits
+- Git diff
+- Task Spec
+- checkpoint
+- durable review evidence
+- verifier output
+- CI evidence（若当时存在）
+- progress/current
+- repository logs
+
+所有 retrospective 数据必须明确：
+
+{
+"collection\_mode": "retrospective\_backfill",
+"backfilled": true
+}
+
+无法证明的字段：
+
+"unavailable"
+
+禁止猜测。
+
+建议为已有完成任务生成 backfill metadata，
+至少覆盖当前已有重要 bootstrap/control-plane tasks。
+
+这些历史数据主要用于：
+
+- pilot study
+- workflow evolution
+- early failure modes
+- mutation benchmark design
+
+不要和未来 prospective dataset 无标记混合统计。
+
+\============================================================
+7\. 当前暂停中的 Agent
+================
+
+当前 paused Agent 是特殊情况。
+
+它的任务可能已经进行了一部分，
+但这一部分没有 Recorder。
+
+恢复后必须建立新的 Run：
+
+capture\_mode = "prospective\_resume"
+
+必须标记：
+
+{
+"pre\_recorder\_work": true,
+"pre\_recorder\_trace\_complete": false
+}
+
+Recorder 激活时应捕获：
+
+- 当前 commit
+- 当前 branch
+- 当前 dirty state
+- 当前 diff
+- current task
+- task state
+- task ownership
+- relevant hashes
+- checkpoint
+
+暂停前能够从 durable evidence 恢复的内容只能：
+
+backfill = true
+
+暂停前无法观测的信息：
+
+unavailable
+
+从 Recorder 激活以后，
+才开始记录真实 prospective trace。
+
+不得假装这个 Task 从第一秒开始都有完整 Recorder。
+
+\============================================================
+8\. Recorder 构建 Agent 自身
+========================
+
+你现在正在构建 Recorder。
+
+因此 Recorder 不可能完整记录你自己的整个执行过程。
+
+你自己的 Run 必须标记为：
+
+capture\_mode = "bootstrap\_partial"
+
+不得进入未来主要 quantitative experimental dataset。
+
+但是请尽可能保留：
+
+- 本 Human Prompt 的准确文本
+- Prompt hash
+- 起始 commit
+- 最终 commit
+- diff
+- verifier/test evidence
+- review result
+- timestamps（从可以可靠捕获的时点开始）
+
+这属于 Recorder bootstrap evidence，
+不是正式 prospective run。
+
+\============================================================
+9\. Prompt 必须纳入记录
+=================
+
+未来每个 Agent Run 应尽可能记录 Human 提交给 Agent 的实际 task prompt。
+
+设计一个 Prompt Registry。
+
+例如：
+
+research/
+prompts/
+...
+
+或者 content-addressed equivalent。
+
+每个 prompt 至少产生：
+
+- prompt\_id
+- prompt\_sha256
+- capture mode
+- source
+- template version（若有）
+- task\_id
+- associated run\_id
+
+对于普通、非敏感 Human Prompt：
+
+优先保存完整内容。
+
+例如：
+
+{
+"prompt\_id": "P-...",
+"prompt\_sha256": "...",
+"prompt\_capture": "full",
+"prompt\_source": "human"
+}
+
+如果 Agent UI / harness 无法被 Runner 直接启动：
+
+提供一个：
+
+register-prompt
+
+入口。
+
+使用流程：
+
+1. Human / Coordinator 先注册 prompt；
+2. Recorder 固定内容与 SHA-256；
+3. 再把同一 prompt 发送给 Agent；
+4. Run 关联 prompt\_id。
+
+不得声称能记录平台内部不可见的 system prompt。
+
+对于 harness-controlled / platform internal prompt：
+
+如果不可观察：
+
+{
+"system\_prompt\_capture": "unavailable"
+}
+
+可以记录可见的 repository instructions，例如：
+
+- AGENTS.md hash
+- Task Spec hash
+- handoff hash
+- relevant contract hash
+
+禁止猜测 OpenAI / Codex / Claude 等平台内部隐藏 Prompt。
+
+\============================================================
+10\. Secret Handling
+====================
+
+绝对禁止记录：
+
+- API key
+- password
+- token
+- `.env`
+- credentials
+- private signing data
+- raw auth headers
+
+Recorder 不得 dump 整个 environment。
+
+Prompt / command / stdout / stderr 记录必须考虑 secret redaction。
+
+如果发现疑似 secret：
+
+- 拒绝直接持久化敏感值；
+- 记录 redaction / instrumentation warning；
+- 不把 secret 写进研究 artifact。
+
+不得为了“实验完整性”降低安全要求。
+
+\============================================================
+11\. Run 数据模型
+=============
+
+每一次执行必须拥有唯一：
+
+run\_id
+
+至少记录：
+
+- recorder\_schema\_version
+- run\_id
+- task\_id
+- role
+- parent\_run\_id / related\_run\_id
+- experiment\_group
+- capture\_mode
+
+role 至少支持：
+
+- implementation
+- review
+- fix
+- coordinator
+- human
+- ci
+- bootstrap
+
+建议结构：
+
+research/
+README.md
+protocol/
+schema/
+prompts/
+runs/
+backfill/
+blobs/
+
+每一个 prospective run 建议：
+
+research/runs/\<run\_id>/
+metadata.json
+events.jsonl
+initial\_state.json
+final\_state.json
+diff.patch
+summary.json
+
+没有真实数据时：
+
+不要生成虚假内容来凑齐文件。
+
+\============================================================
+12\. Event Stream
+=================
+
+`events.jsonl` 应设计为 append-only event stream。
+
+每条至少：
+
+{
+"schema\_version": "...",
+"seq": 1,
+"timestamp": "...",
+"run\_id": "...",
+"task\_id": "...",
+"role": "...",
+"event\_type": "...",
+"data": {}
+}
+
+至少允许这些事件：
+
+- run\_started
+- run\_finished
+- prompt\_registered
+- task\_state\_observed
+- git\_state\_observed
+- command\_started
+- command\_finished
+- verification\_result
+- test\_result
+- review\_started
+- review\_finished
+- finding\_created
+- repair\_started
+- repair\_finished
+- ci\_started
+- ci\_finished
+- architecture\_conflict
+- human\_decision
+- external\_blocker
+- model\_metadata
+- instrumentation\_warning
+
+注意：
+
+“支持某个 event type”
+不等于
+“必须制造一个对应事件”。
+
+只记录真实发生的事件。
+
+\============================================================
+13\. 数据完整性
+==========
+
+Recorder 应提供基本完整性保护。
+
+至少：
+
+- seq 单调递增；
+- run\_id 一致；
+- schema validation；
+- finished run 默认不得通过普通命令修改历史 raw events；
+- 对 malformed JSON / partial write / interrupted run 有检测；
+- 能检测 duplicate sequence。
+
+如实现成本合理，可加入：
+
+- event hash
+- previous event hash
+- final manifest hash
+
+形成简单 hash chain。
+
+不要为了 cryptographic sophistication 过度设计。
+
+Git 历史 + deterministic validation + hashes 已经是主要证据。
+
+\============================================================
+14\. Initial State
+==================
+
+Run 开始时自动捕获：
+
+Repository：
+
+- repo identifier
+- branch
+- HEAD SHA
+- clean/dirty
+- changed paths
+- current Task
+- task queue
+- task status
+- task owner
+- Last Known Good Commit
+- Latest Checkpoint
+
+Authority snapshot：
+
+优先保存 hash，而不是复制大量文本：
+
+- AGENTS.md hash
+- Task Spec hash
+- Frozen Architecture artifact hash
+- applicable ADR hashes
+- applicable domain/invariant/acceptance hashes
+- relevant contract manifest/hash
+
+如果某项当时不存在：
+
+明确记录 absent，
+不要制造 placeholder authority。
+
+\============================================================
+15\. Agent / Model Metadata
+===========================
+
+只记录真正能观察到的数据。
+
+例如：
+
+- agent harness
+- model name
+- model version
+- public reasoning mode / config（如果可见）
+- fresh context yes/no（如果可靠可知）
+- explicit token budget
+- context mode
+
+Token usage：
+
+只有 API / harness 真实提供时才记录。
+
+Cost：
+
+只有有可靠 token / pricing basis 时才计算。
+
+否则：
+
+unavailable
+
+不得让 Agent 自己估算 token usage 充当事实。
+
+\============================================================
+16\. Command Recorder
+=====================
+
+实现最小命令 wrapper。
+
+例如：
+
+tools/research/run-command
+
+或平台适合的等价入口。
+
+它必须：
+
+1. 接收真实 command；
+2. 写 command\_started；
+3. 记录 start timestamp；
+4. 真正执行命令；
+5. 获取真实 exit code；
+6. 获取 duration；
+7. 必要时安全保存 stdout/stderr 或其 hash；
+8. 写 command\_finished；
+9. 原样传播 command exit code。
+
+关键原则：
+
+如果真实 command exit 1：
+
+Recorder 不得把它变成 PASS。
+
+例如未来：
+
+research-run-command pytest ...
+
+必须由脚本真正执行 pytest。
+
+禁止：
+
+Agent 说“pytest 通过”
+→ Recorder 就写 PASS。
+
+\============================================================
+17\. Git 自动捕获
+=============
+
+Git facts 应由 Recorder 自己采集。
+
+不要让 Agent填写。
+
+至少：
+
+- git rev-parse HEAD
+- branch
+- git status --porcelain
+- diff stat
+- changed files
+- final HEAD
+
+完成时生成：
+
+- final\_state
+- diff.patch（适用时）
+
+不得篡改暂停 Agent worktree 来获得干净状态。
+
+\============================================================
+18\. Human Decision Recorder
+============================
+
+提供一个简单入口，例如：
+
+tools/research/record-human-decision
+
+Human 不需要手改 JSON。
+
+至少支持：
+
+- decision\_id
+- timestamp
+- task\_id
+- run\_id
+- question
+- alternatives
+- selected
+- reason
+- affected\_authority
+- human\_actor = true
+
+例如：
+
+{
+"decision\_id": "HD-...",
+"question": "...",
+"alternatives": ["A", "B"],
+"selected": "B",
+"reason": "...",
+"human\_actor": true
+}
+
+测试时可以使用 fixture：
+
+fixture = true
+
+不得把测试 decision 冒充真实 Human Decision。
+
+\============================================================
+19\. Review / Fix Run Graph
+===========================
+
+Recorder 必须能表示：
+
+Implementation Run
+↓
+Independent Review Run
+↓ FAIL
+Fix Run
+↓
+New Independent Review Run
+↓ PASS
+
+通过：
+
+parent\_run\_id
+related\_run\_id
+task\_id
+role
+
+等方式建立关系。
+
+未来必须能机器统计：
+
+- first-pass acceptance rate
+- finding count
+- repair iteration count
+- time to acceptance
+- human intervention count
+- architecture conflict count
+
+Implementer self-review：
+
+不得标记为 independent review。
+
+Recorder 只记录事实，
+不得自行把 self-review 升级成 independent acceptance。
+
+\============================================================
+20\. CI Recorder
+================
+
+CI 是独立事实裁判。
+
+Recorder 只是记录 CI。
+
+Recorder 不是 CI。
+
+未来 schema 至少支持：
+
+- provider
+- CI run id
+- commit SHA
+- job name
+- PASS / FAIL
+- failed checks
+- duration
+- artifact/evidence reference
+
+如果当前真实 CI 尚未 operational：
+
+只实现 schema / ingestion interface / fixture tests。
+
+不要伪造：
+
+CI PASS。
+
+不要为了 Recorder 提前违反 LOOP1-CI-001 的治理边界。
+
+\============================================================
+21\. Future Research / Ablation Fields
+======================================
+
+现在不要运行论文 ablation。
+
+但 schema 为未来预留：
+
+experiment\_group:
+
+- vanilla
+- spec\_only
+- full\_governance
+
+以及：
+
+- baseline\_id
+- replicate\_id
+- mutation\_id
+- model\_condition
+- budget\_condition
+
+未来目标指标包括：
+
+- contract violation rate
+- architecture violation rate
+- mutation detection rate
+- first-pass acceptance
+- repair iterations
+- human intervention count
+- wall-clock time
+- token usage
+- monetary cost
+- cross-backend semantic divergence
+- regression rate
+
+本次任务只做 instrumentation。
+
+不制造实验结果。
+
+\============================================================
+22\. Workflow Integration
+=========================
+
+Recorder 完成后，未来 Agent 推荐流程应成为：
+
+register prompt
+↓
+start run
+↓
+capture initial state
+↓
+Agent executes normal task
+↓
+commands/tests/verifiers go through recorder where possible
+↓
+semantic events only when necessary
+↓
+capture final state
+↓
+finish run
+↓
+independent review / CI linked as separate runs
+
+优先提供简单入口，例如：
+
+start-run
+register-prompt
+run-command
+record-event
+record-human-decision
+finish-run
+validate-run
+
+具体 CLI 名字由你根据仓库环境决定。
+
+优先：
+
+- Python standard library
+- deterministic behavior
+- cross-platform
+- 少依赖
+
+必要时可提供 PowerShell wrapper，
+但不要无必要引入大型基础设施。
+
+不要引入：
+
+- database server
+- Kafka
+- Redis
+- dashboard
+- web UI
+- message queue
+
+Recorder v1 使用文件即可。
+
+\============================================================
+23\. Repository Instructions
+============================
+
+在不改变 Frozen Product Architecture 的情况下，
+更新最少量 repository-level Agent instructions，
+让未来 Agent 明确知道：
+
+1. Research Recorder 是 mandatory instrumentation；
+2. Recorder 不属于 product architecture authority；
+3. Recorder 不能修改 contract semantics；
+4. Recorder failure 必须显式暴露；
+5. 不得静默跳过 Recorder；
+6. research evidence 与 product acceptance evidence 必须区分；
+7. Recorder PASS ≠ Task PASS；
+8. Task PASS ≠ Stage Gate PASS；
+9. Agent 不得修改 recorder evidence 来让自己通过；
+10. paused/pre-recorder historical activity只能 backfill。
+
+如果这需要修改 Frozen Architecture：
+
+不要自行修改。
+
+优先作为 non-product governance / research instrumentation 处理。
+
+如果确实冲突：
+
+BLOCKED\_BY\_ARCHITECTURE
+
+并提出最小决策问题。
+
+\============================================================
+24\. 已暂停 Agent 的恢复协议
+====================
+
+Recorder 完成后，需要为原 paused Agent 留下一段明确 resume instruction。
+
+恢复时它必须：
+
+1. 继续原来的 Task，而不是重新选 Task；
+2. 保留之前 ownership；
+3. 不重写暂停前历史；
+4. 初始化一个新的 research run；
+5. capture\_mode = prospective\_resume；
+6. 标记 pre\_recorder\_work = true；
+7. 捕获恢复时 Git / Task / diff 状态；
+8. 从恢复后的第一条可观察操作开始记录；
+9. 暂停前的信息仅能 backfill；
+10. 不得伪造之前 token / model call / tool trace。
+
+最终 Handoff 必须告诉 Human：
+
+原 Agent 是否可以安全恢复；
+从哪个 commit/worktree/task 继续；
+Recorder 从哪个时间点开始有真实 trace。
+
+\============================================================
+25\. 最低测试要求
+===========
+
+Recorder 至少必须有自动测试证明：
+
+A.
+start-run：
+
+- 生成唯一 run\_id
+- metadata/schema 正确
+
+B.
+Prompt Registry：
+
+- 完整 prompt 能稳定计算 SHA-256
+- run 能关联 prompt\_id
+- unavailable system prompt 不被猜测
+
+C.
+Git capture：
+
+- 正确捕获 HEAD
+- 正确捕获 dirty state
+- 不修改被观察 worktree
+
+D.
+events.jsonl：
+
+- append 正常
+- seq 正常
+- duplicate seq 被拒绝
+- malformed event 被拒绝
+
+E.
+run-command：
+
+- command 被真正执行
+- exit 0 正确记录
+- exit non-zero 正确记录
+- 原 exit code 被传播
+- 不把失败写成 PASS
+
+F.
+finish-run：
+
+- final state 捕获
+- duration 可得
+- diff 可得
+- finished run 状态正确
+
+G.
+interrupted/partial run：
+
+- 可检测
+- 不把 partial run 当 complete
+
+H.
+Human Decision：
+
+- synthetic fixture 可记录
+- fixture 明确标记
+- 不冒充真实 Human Decision
+
+I.
+Backfill：
+
+- backfilled=true
+- unavailable 字段不会被猜测
+
+J.
+Prospective Resume：
+
+- pre\_recorder\_work=true
+- trace completeness 正确标记
+
+K.
+Secret safety：
+
+- 不 dump environment
+- secret-like input 不应明文进入 durable research log
+
+L.
+Repository safety：
+
+- existing governance verifier 仍然通过
+- 不存在任何 IM 产品实现变更
+- 原 paused Task 没有被标记完成
+- 原 ownership 未被错误转移
+
+\============================================================
+26\. 本次严格禁止
+===========
+
+禁止：
+
+- Auth 实现
+- User 实现
+- Friend 实现
+- Messaging 实现
+- Sync 实现
+- Plugin 实现
+- Go backend 实现
+- Java backend 实现
+- Client 产品实现
+- 数据库业务 schema 设计
+- 新业务 contract
+- 修改 ACK semantics
+- 修改 public protocol
+- 修改业务 invariant
+- 修改 Plugin security boundary
+- 为了 Recorder 重构产品代码
+- 接管 paused Agent
+- 重跑历史然后冒充原始 trace
+- 伪造历史 prompt
+- 伪造 token
+- 伪造 CI
+- 伪造 Reviewer independence
+- 伪造 Human Decision
+- 记录 hidden chain-of-thought
+
+\============================================================
+27\. Documentation
+==================
+
+增加简洁、机器友好的 Recorder 文档。
+
+至少说明：
+
+- schema version
+- Instrumentation Epoch
+- start-run
+- prompt registration
+- command recording
+- semantic event
+- human decision
+- finish-run
+- review/fix relationship
+- CI ingestion
+- retrospective backfill
+- prospective resume
+- bootstrap\_partial
+- unavailable metadata
+- secret handling
+- export / analysis format
+
+不要写论文。
+
+不要做营销文档。
+
+不要做 dashboard。
+
+\============================================================
+28\. Acceptance / Review
+========================
+
+实现完成后：
+
+先运行本 Task 所需本地 verification。
+
+但：
+
+Local PASS ≠ accepted.
+
+必须遵循仓库现有 independent review 规则。
+
+如果可以真实委派 fresh independent Review Agent：
+
+执行独立 review。
+
+如果 reviewer FAIL：
+
+进入正常 fix → fresh review 循环。
+
+如果当前环境无法提供真正独立 reviewer：
+
+停在 review / handoff。
+
+不得伪造 PASS。
+
+不得让本 Recorder Implementation Agent 自己接受自己的工作。
+
+\============================================================
+29\. 最终 Handoff 给 Human
+=======================
+
+最终只需要给 Human 一个清晰摘要：
+
+1. Recorder 是否完成；
+2. Instrumentation Epoch 是否已经建立；
+3. accepted commit SHA；
+4. Recorder schema version；
+5. 新增/修改了哪些控制面文件；
+6. 未来如何：
+   - register prompt
+   - start run
+   - run command
+   - record human decision
+   - finish run
+7. 历史 completed tasks 如何 backfill；
+8. 当前 paused Agent 如何 resume；
+9. 哪些字段当前 harness 无法观察；
+10. test / review / acceptance 结果；
+11. 是否存在 architecture/governance blocker；
+12. Human 是否还需要做任何决策。
+
+然后停止。
+
+DO NOT CONTINUE PRODUCT IMPLEMENTATION.

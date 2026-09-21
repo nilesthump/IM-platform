@@ -18,6 +18,8 @@ This repository implements **Scalable Distributed Instant Messaging Platform for
 
 Before yielding, update the current Task Spec and `spec/progress/current.md`. Record current task/stage/gate, completed work, changed files or migrations, exact verification command and result, durable evidence location, known failures/risks/assumptions, next exact action, last known good commit, uncommitted-change ownership, and any architecture conflict requiring ACP/ADR. Keep run history in `spec/progress/evidence/`, not in `current.md`.
 
+After the independently accepted Research Recorder Instrumentation Epoch, register the visible prompt and create a Recorder run before prospective work. Use `prospective_resume` plus incomplete pre-Recorder-trace markers when resuming older work. Recorder artifacts are research evidence only; they neither replace acceptance evidence nor authorize changes to product authority.
+
 ## Checkpoints
 
 Create a checkpoint for a stable Gate, important vertical slice, contract/schema version transition, release recovery point, or other important stable recovery state. A checkpoint records the commit (or `none` before the first commit), contract and migration versions when applicable, fixture/artifact versions when applicable, verified Gate state, and known limitations. `spec/progress/current.md` points to the latest checkpoint.

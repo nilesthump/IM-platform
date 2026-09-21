@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:im-platform:research-recorder:event:1.0.0",
+  "additionalProperties": false,
+  "required": ["schema_version", "seq", "timestamp", "run_id", "task_id", "role", "event_type", "data", "previous_event_hash", "event_hash"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "seq": {"type": "integer", "minimum": 1},
+    "timestamp": {"type": "string"},
+    "run_id": {"type": "string", "pattern": "^R-"},
+    "task_id": {"type": "string"},
+    "role": {"enum": ["implementation", "review", "fix", "coordinator", "human", "ci", "bootstrap"]},
+    "event_type": {"type": "string"},
+    "data": {"type": "object"},
+    "previous_event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

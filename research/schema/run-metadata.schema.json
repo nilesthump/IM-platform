@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:im-platform:research-recorder:run-metadata:1.0.0",
+  "type": "object",
+  "required": ["recorder_schema_version", "run_id", "task_id", "role", "parent_run_id", "related_run_id", "experiment_group", "capture_mode", "status", "pre_recorder_work", "pre_recorder_trace_complete"],
+  "properties": {
+    "recorder_schema_version": {"const": "1.0.0"},
+    "capture_mode": {"enum": ["prospective", "prospective_resume", "retrospective_backfill", "bootstrap_partial"]},
+    "experiment_group": {"enum": ["vanilla", "spec_only", "full_governance", "unassigned"]},
+    "status": {"enum": ["running", "finished"]}
+  }
+}

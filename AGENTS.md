@@ -50,6 +50,12 @@ Before ending work, update both the current Task Spec and `spec/progress/current
 
 Create a checkpoint in `spec/progress/checkpoints/` at a Gate, a stable vertical slice, a contract or schema transition, a release recovery point, or another important stable recovery point. `current.md` points to the latest checkpoint rather than duplicating it.
 
+## Research Recorder instrumentation
+
+After `LOOP1-RESEARCH-001` is independently accepted and its Instrumentation Epoch exists, prospective Agent work MUST use the file-based Research Recorder described in `research/README.md`: register the visible task prompt, start a run, route commands/tests/verifiers through the command recorder where possible, record only necessary public semantic events, and finish and validate the run. Recorder failure MUST be exposed and MUST NOT be silently skipped.
+
+The Recorder is research instrumentation, not product architecture authority. It MUST NOT change contracts, ACK semantics, security boundaries, compatibility rules, or business invariants. Research evidence and product acceptance evidence are distinct: Recorder PASS is not Task PASS, and Task PASS is not Stage Gate PASS. An Agent MUST NOT edit Recorder evidence to make its own work pass. Paused or pre-Recorder activity may only be represented as explicitly marked backfill with unavailable facts left unavailable; it must never be presented as a complete prospective trace.
+
 ## Batch Orchestration Protocol
 
 - A Coordinator may execute a named batch or current Stage. It recovers repository state, resolves dependencies, delegates fresh task contexts, waits for results, progresses task queues, updates progress/evidence/checkpoints, and evaluates the Stage Gate.
