@@ -2,7 +2,7 @@
 task_id: LOOP1-RESEARCH-001
 title: Insert Research Recorder control plane
 status: review
-owner: unassigned-fix-agent
+owner: unassigned-independent-review-agent
 stage: S0
 gate: S0
 ---
@@ -55,7 +55,7 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 # Verification
 
 - `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- python3 -m unittest discover -s tests/research -v` (or the resolved Python 3 executable as the recorded command)
-- `& .\tools\research\recorder.ps1 validate-repository --allow-partial`
+- `& .\tools\research\recorder.ps1 validate-repository`
 - `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
 - `git diff --check 1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc..HEAD -- . ':(exclude)research/runs/**/diff.patch'` (archived patches preserve observed whitespace as evidence)
 - Independent acceptance from a clean committed checkout repeats the tests and repository verifier under ADR-0001.
@@ -72,14 +72,16 @@ Add a file-based, auditable Research Recorder control plane for future Agent run
 - The archived `diff.patch` intentionally preserves observed patch whitespace and is excluded from repository whitespace lint; the artifact remains hash-protected and unmodified after finish.
 - Fresh independent Review Agent `/root/recorder_review` reviewed commit `96fc13d5e953a8a926a9295dd82847789ed222fc` from a clean detached isolated checkout and returned FAIL. Durable evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`.
 - Blocking findings: the committed bootstrap run fails default repository validation with a manifest hash mismatch; structured secret keys and quoted JSON prompt values are persisted without redaction; CI ingestion accepts and persists secret-bearing extra fields; and the committed bootstrap prompt bytes do not match their recorded SHA-256.
+- Fresh Fix Agent `/root/recorder_fix1` repaired all four findings at content commit `1d850cf8cbe6c9aeec94e43f7395b8901bcb5f78`; 22 tests, default repository validation, CTRL-002 Development mode, prompt blob/hash comparison, diff/scope and generated-file checks pass. This is development evidence, not acceptance.
+- Fix evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-fix-1d850cf-development.md`.
 
 # Handoff
 
 - Original paused task: `LOOP1-CONTRACT-001`, state `review`, owner `unassigned-independent-review-agent`, original worktree `H:\IM-platform`, branch `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc` at insertion observation. Its untracked `contracts/http/schema-lint/` is unknown/paused-Agent-owned and must not be touched.
-- Recorder work is isolated at `H:\.codex\worktrees\research-recorder\IM-platform` on `task/LOOP1-RESEARCH-001`.
+- Recorder repair is isolated at `H:\.codex\worktrees\research-recorder-fix\IM-platform` on `fix/LOOP1-RESEARCH-001-1`.
 - No Instrumentation Epoch exists until fresh independent review accepts a committed candidate.
-- Implementation is complete but unaccepted. The Implementation Agent has not declared PASS or created an Epoch.
+- Repair is complete but unaccepted. The Fix Agent has not declared acceptance or created an Epoch.
 
 # Next Action
 
-- Delegate a fresh Fix Agent for the four findings in `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`. Add regressions for exact committed-artifact validation and structured/quoted/CI secret inputs, commit a new candidate, then delegate a new fresh independent Review Agent. Do not establish an Instrumentation Epoch or resume product work before PASS.
+- Delegate a new fresh independent Review Agent to review the committed repair candidate from a clean isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before independent PASS.

@@ -28,12 +28,19 @@ Current Task State: review
 
 ## Current Blockers
 
-- `LOOP1-RESEARCH-001` candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` failed fresh independent review. The committed bootstrap run fails default repository validation; structured secret keys and quoted JSON prompts bypass redaction; CI ingestion accepts secret-bearing extra fields; and the committed prompt content hash does not match metadata.
-- Instrumentation Epoch creation and paused-product-task resume remain prohibited until a fresh Fix Agent repairs these findings and a new fresh independent reviewer accepts the replacement candidate.
+- `LOOP1-RESEARCH-001` candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` permanently failed fresh independent review. Fresh Fix Agent `/root/recorder_fix1` repaired all four findings at content commit `1d850cf8cbe6c9aeec94e43f7395b8901bcb5f78`; development verification passes, but a new fresh independent review is still required.
+- Instrumentation Epoch creation and paused-product-task resume remain prohibited until a new fresh independent reviewer accepts the replacement candidate.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
+- Fresh Fix Agent command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
+  - Result: Development PASS, exit `0`; 22 tests in `15.305s`, including exact committed-artifact, CRLF manifest portability, prompt hash/cross-link, structured/quoted secret, and CI extra-secret negative regressions.
+- Fresh Fix Agent command: `& .\tools\research\recorder.ps1 validate-repository`
+  - Result: Development PASS, exit `0`; the committed bootstrap run and Prompt Registry validate without exemption.
+- Fresh Fix Agent commands: prompt Git-blob/metadata SHA comparison, CTRL-002 Development mode, diff/scope and `*.pyc` checks.
+  - Result: Development PASS; prompt SHA values both `a7c3cb691d25fb8fd456c4f544653fc48e881c271ee3e32486f369a9cd08da8f`, governance recovery passes, no product-scope or generated Python artifacts exist.
+  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-fix-1d850cf-development.md`.
 - Independent command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
   - Result: PASS, exit `0`; 17 tests in `12.078s`, but the suite did not detect the committed-artifact and structured-secret failures below.
 - Independent command: `& .\tools\research\recorder.ps1 validate-repository`
@@ -72,12 +79,12 @@ Current Task State: review
 - The earlier `LOOP1-SPEC-001` closure introduced no database migrations, machine-verifiable public contract files, product implementation, container images, or fixture versions.
 - `.github/workflows/` remains absent. Frozen Architecture PDF bytes remain unchanged.
 - The repair adds durable independent-FAIL and Fix-Agent development evidence. No checkpoint is created because the repaired candidate has not yet passed independent review.
+- Recorder repair adds LF-canonical manifest/prompt handling, key-aware recursive redaction, strict CI evidence allowlisting, prompt registry validation, and focused regressions only; it changes no product or contract path.
 
 ## Known Failures, Risks, and Assumptions
 
 - Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` is rejected and must not be used to establish the Instrumentation Epoch. Its independent FAIL evidence is permanent.
-- Existing positive tests are insufficient for Secret Handling because they do not cover sensitive JSON/dictionary keys or CI evidence with additional secret-bearing fields.
-- Repository validation currently does not validate the Prompt Registry content hash/cross-link and rejects the one committed finished run for a manifest mismatch.
+- The previous 17-test suite missed structured secrets and committed-artifact portability; the repaired 22-test suite now covers those regressions. Independent confirmation remains pending.
 - `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
 - `12c566f71da9b038764ecb7a5303b116e77ca32f` has only Fix-Agent development verification and is not accepted until a fresh independent reviewer passes it under ADR-0001; the task remains `review` and S0 remains NOT YET PASSED.
 - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
@@ -89,7 +96,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate `LOOP1-RESEARCH-001` to a fresh Fix Agent to repair the four findings in `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`, then submit a new committed candidate to a new fresh independent Review Agent under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance.
+Delegate `LOOP1-RESEARCH-001` to a new fresh independent Review Agent to review the final committed repair candidate from a clean isolated checkout under ADR-0001. Do not establish an Instrumentation Epoch or resume product work before acceptance.
 
 ## Last Known Good Commit
 
@@ -101,7 +108,7 @@ Delegate `LOOP1-RESEARCH-001` to a fresh Fix Agent to repair the four findings i
 
 ## Uncommitted Changes / Ownership
 
-- `/root/recorder_review` owns only the independent FAIL closure changes until their commit. After that closure commit, no uncommitted review changes should remain; implementation ownership is not assumed by the reviewer.
+- The Fix Agent will hand off a clean committed candidate; task ownership is `unassigned-independent-review-agent`.
 - The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
 
