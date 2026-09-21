@@ -16,7 +16,7 @@ Current Task State: review
 
 ## Immediately Relevant Completed Work
 
-- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.
+- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` resumed under Recorder, remains unfinished in `review`, and is now awaiting a fresh Fix Agent after independent FAIL.
 - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
 - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
@@ -25,11 +25,13 @@ Current Task State: review
 - Accepted checkpoint: `spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md`.
 - Fresh independent Review Agent `/root/contract001_review` reviewed `LOOP1-CONTRACT-001` commit `1c2637cb253dc6eece0393c229fe77cd5934160e` from a clean detached isolated checkout and returned FAIL. Durable evidence is `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-independent-review-1c2637c-fail.md`.
 - Fix Agent `/root/contract001_fix` repaired all review findings at candidate commit `12c566f71da9b038764ecb7a5303b116e77ca32f`; development verification passed from that clean committed checkout, but this is not acceptance.
+- Fresh independent Review Agent `/root/contract001_resume_review` resumed under Recorder run `R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4` and returned FAIL on candidate `12c566f71da9b038764ecb7a5303b116e77ca32f`. A disposable negative control removed OpenAPI 3.1-required `info.title`, but the committed verifier still returned PASS.
+- Durable FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`.
 - The repaired candidate defines 9 canonical Auth/User/Friend HTTP operations, 15 shared error codes with operation/status bindings and complete negative coverage, fixture version `1.1`, 6 positive and 21 negative dual-profile scenarios, and a deterministic verifier with six mutation regressions.
 
 ## Current Blockers
 
-- `LOOP1-CONTRACT-001` remains unfinished in `review`. Its repaired candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` has development verification only and still requires a fresh independent review under ADR-0001.
+- `LOOP1-CONTRACT-001` remains unfinished in `review`. The resumed independent review found that candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` accepts an OpenAPI document missing required `info.title`; a fresh Fix Agent and then a new fresh independent Review Agent are required.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
@@ -71,6 +73,13 @@ Current Task State: review
   - Result: Fix Agent development PASS, exit `0`, elapsed `40.6779 ms`.
   - Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-fix-12c566f-pass.md`
 - Independent FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-independent-review-1c2637c-fail.md`.
+- Resumed independent command: `& .\contracts\http\verify-auth-user-friend.ps1`
+  - Result: PASS on the unmodified candidate, exit `0`, elapsed `6918.3063 ms`.
+- Resumed independent command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+  - Result: PASS, exit `0`, elapsed `959.8942 ms`.
+- Resumed independent negative control: remove OpenAPI 3.1-required `info.title` in a disposable detached candidate checkout, then run `& .\contracts\http\verify-auth-user-friend.ps1`.
+  - Result: unexpected PASS, exit `0`, elapsed `5981.2862 ms`; schema-lint acceptance FAIL.
+  - Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`.
 - Accepted `LOOP1-SPEC-001` verification history remains in `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
 
 ## Changed Files or Migrations
@@ -92,7 +101,7 @@ Current Task State: review
 - Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
 - All activity before the Instrumentation Epoch is bootstrap, retrospective backfill, or pilot evidence and must not be represented as complete prospective trace data.
 - `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
-- `12c566f71da9b038764ecb7a5303b116e77ca32f` has only Fix-Agent development verification and is not accepted until a fresh independent reviewer passes it under ADR-0001; the task remains `review` and S0 remains NOT YET PASSED.
+- Candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is independently rejected because its verifier does not enforce OpenAPI 3.1 structural schema validity. Semantic verification PASS does not override the explicit schema-lint acceptance failure; the task remains `review` and S0 remains NOT YET PASSED.
 - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
 - The Coordinator prospectively authorized the exact durable-evidence path for this repair cycle; that authorization does not retroactively excuse the prior hard violation.
 - The independent reviews of `74134bd306cbf0a1546f500bc46c45a1217b2d58` and `85069032c137cce6e526e0e329b6e93178515274` remain permanent FAIL records; accepted commit `aef6497d6216d9a8251250d157935e7af418d86b` supersedes them for task acceptance.
@@ -102,11 +111,11 @@ Current Task State: review
 
 ## Next Exact Action
 
-Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Recorder acceptance closure without overwriting its Agent-owned untracked `contracts/http/schema-lint/`. Then restore the same task and ownership, register the actual resume prompt, start a `prospective_resume` Recorder run with `pre_recorder_work=true` and incomplete prior trace, and continue its fresh independent review. Do not select another product task.
+Delegate `LOOP1-CONTRACT-001` to a fresh Fix Agent. The agent must add deterministic repository-contained OpenAPI 3.1 structural schema lint and a regression rejecting missing required `info.title`, without reading, copying, modifying, claiming, or depending on the paused Agent-owned untracked `contracts/http/schema-lint/` tree. Then delegate the committed repair to a new fresh independent Review Agent. Do not select another product task.
 
 ## Last Known Good Commit
 
-`ab3b507241cf51822af79cbcb63dfdf40e273359` (independently accepted Recorder content); `LOOP1-CONTRACT-001` candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` remains development-verified only.
+`1c274bcbf92ebcc05c1bc208386c5976437d8221` (Recorder acceptance closure); `LOOP1-CONTRACT-001` candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is independently rejected and is not a task acceptance point.
 
 ## Latest Checkpoint
 
@@ -115,8 +124,9 @@ Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Rec
 ## Uncommitted Changes / Ownership
 
 - Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
-- The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
+- The original paused Agent retains sole ownership of the untracked `contracts/http/schema-lint/` tree in `H:\IM-platform`; resumed review work did not read, modify, copy, stash, clean, claim, or depend on it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
+- Recorder prompt/run artifacts for resumed review are owned by `/root/contract001_resume_review`.
 
 ## Architecture Conflicts / ACP / ADR
 

@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-001
 title: Freeze HTTP Auth, User, and Friend contracts
 status: review
-owner: unassigned-independent-review-agent
+owner: unassigned-fresh-fix-agent
 stage: S0
 gate: S0
 ---
@@ -73,18 +73,22 @@ The Coordinator explicitly authorized the exact evidence path above on 2026-09-2
 - The repair defines 9 Auth/User/Friend paths and operations, retains all 15 stable shared errors, upgrades fixtures to version `1.1` with 6 positive and 21 negative scenarios, and covers every shared error code.
 - The repaired verifier passed from the clean committed fix with exit `0` in `5280.2464 ms`; it validates fixture request/response bodies and statuses against OpenAPI, enforces operation/status error-code bindings, proves Go/Java normalized parity, and runs six mutation regressions.
 - CTRL-002 Development mode passed from the clean committed fix with exit `0` in `402.055 ms`; baseline diff check from `e5482b135a2ab7451c24c29c7517e1a8f19ce420` passed with exit `0` in `40.6779 ms`. These are development evidence only at `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-fix-12c566f-pass.md`.
+- Fresh independent Review Agent `/root/contract001_resume_review` reviewed candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` from clean detached checkout `H:\.codex\worktrees\contract001-independent-review-resume-b5e568c3\IM-platform` under ADR-0001 and returned FAIL.
+- The contract verifier passed on the unmodified candidate, but a disposable negative control removed OpenAPI 3.1-required `info.title` and the verifier still returned PASS, exit `0`, in `5981.2862 ms`. The required schema-lint acceptance is therefore not independently established.
+- Permanent evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`. Recorder run: `R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4`.
 
 # Handoff
 
-- The original implementation at `acfe36c2040e749ee508485ee8b577dc76604961` failed independent review. The repaired candidate is committed at `12c566f71da9b038764ecb7a5303b116e77ca32f`; it still requires a fresh independent review and applicable bootstrap acceptance.
+- The original implementation at `acfe36c2040e749ee508485ee8b577dc76604961` and repaired candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` both failed independent review; the latter now requires a fresh Fix Agent before another independent review.
 - Canonical deliverables are `contracts/http/auth-user-friend.openapi.json`, `contracts/errors/http-errors.schema.json`, dual-profile golden fixtures under `contracts/fixtures/auth-user-friend/`, and deterministic verifier `contracts/http/verify-auth-user-friend.ps1`.
 - The contract fixes wire-level endpoint and schema choices while preserving the frozen session slot/epoch, refresh-token hashing and revocation, token transport, normalized friendship, unique DIRECT conversation, two-member atomic transaction, immediate friendship, authorization, and error semantics. WEB cookie refresh and native body refresh are separate operations so a credentialless refresh is not representable.
 - Fixture bodies now use exact nested `session`/`tokens`, `normalizedPair`, and `memberUserIds` structures. Every expected result contains canonical, Go-normalized, and Java-normalized observables that the verifier compares semantically.
 - Each declared error response carries an enforced operation/status-specific `x-error-codes` set; negative fixtures exercise all 15 shared codes.
 - No backend, WSS envelope/message schema, Sync, Plugin API, database schema, or frozen architecture was changed.
 - The independent FAIL and the original hard process violation remain permanent evidence even though the Coordinator prospectively authorized this task's exact durable-evidence path for the repair cycle.
-- Development verification is not acceptance evidence. A fresh independent Review Agent must review the committed diff from a clean isolated checkout under ADR-0001.
+- The resumed independent review failed because the committed verifier is not an OpenAPI 3.1 structural schema lint: it accepted a document missing required `info.title`. The semantic contract checks otherwise passed, but that does not satisfy the explicit schema-lint acceptance item.
+- A fresh Fix Agent must add a deterministic, repository-contained OpenAPI 3.1 schema lint (without relying on the paused Agent-owned untracked `contracts/http/schema-lint/` tree), preserve all existing semantics and fixtures, and commit the repair before a new fresh independent review.
 
 # Next Action
 
-- After the review-handoff metadata commit, delegate the entire repaired candidate to a fresh independent Review Agent. Review from a clean detached isolated checkout, run `& .\contracts\http\verify-auth-user-friend.ps1`, default Acceptance mode of `& .\tools\verify-loop1-ctrl-002.ps1`, and `git diff --check e5482b135a2ab7451c24c29c7517e1a8f19ce420..HEAD`; record PASS/FAIL under this task's evidence directory. The Fix Agent must not accept its own work.
+- Delegate to a fresh Fix Agent. It must implement deterministic OpenAPI 3.1 structural schema lint and a regression proving a missing required `info.title` is rejected, without reading, copying, modifying, claiming, or depending on the paused Agent-owned untracked `contracts/http/schema-lint/` tree. Then delegate the committed repair to a new fresh independent Review Agent; no fixer may accept its own work.
