@@ -1,0 +1,26 @@
+413-    sys.stdout.write(stdout_text)
+414-    sys.stderr.write(stderr_text)
+415-    safe_out, out_redacted = redact(stdout_text)
+416-    safe_err, err_redacted = redact(stderr_text)
+417:    blob_dir = run_dir(root, args.run_id) / "blobs"
+418:    blob_dir.mkdir(exist_ok=True)
+419:    (blob_dir / f"{command_id}.stdout.txt").write_text(safe_out, encoding="utf-8", newline="\n")
+420:    (blob_dir / f"{command_id}.stderr.txt").write_text(safe_err, encoding="utf-8", newline="\n")
+421-    append_event(root, args.run_id, "command_finished", {"command_id": command_id, "exit_code": result.returncode,
+422-                 "duration_ms": duration_ms, "result": "PASS" if result.returncode == 0 else "FAIL",
+423-                 "stdout_sha256": sha256_bytes(result.stdout), "stderr_sha256": sha256_bytes(result.stderr),
+424:                 "stdout_blob": f"blobs/{command_id}.stdout.txt", "stderr_blob": f"blobs/{command_id}.stderr.txt",
+425-                 "secret_redaction_applied": command_redacted or out_redacted or err_redacted})
+426-    return result.returncode
+427-
+428-
+--
+523-    print(json.dumps(summary, sort_keys=True))
+524-    return 0
+525-
+526-
+527:def validate_run(root: Path, run_id: str, require_finished: bool = True) -> dict:
+528-    directory = run_dir(root, validated_run_id(run_id))
+529-    metadata = read_json(directory / "metadata.json")
+530-    required_meta = {"recorder_schema_version", "run_id", "task_id", "role", "experiment_group", "capture_mode", "status"}
+531-    if missing := required_meta - set(metadata):

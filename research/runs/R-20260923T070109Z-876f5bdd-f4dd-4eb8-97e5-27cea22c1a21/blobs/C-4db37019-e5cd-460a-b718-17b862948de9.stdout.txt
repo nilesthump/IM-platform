@@ -1,0 +1,237 @@
+ .../auth-user-friend.openapi.structure.schema.json |  167 --
+ .../http/auth-user-friend.openapi.validator.js     |    4 +
+ contracts/http/build-openapi-3.1-validator.js      |   49 +
+ contracts/http/check-openapi-3.1.js                |   19 +
+ contracts/http/openapi-3.1-2026-08-03.schema.json  | 1412 +++++++++++
+ contracts/http/openapi-3.1-lint.md                 |    9 +
+ contracts/http/verify-auth-user-friend.ps1         |   63 +-
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |  273 +++
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    0
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ ...0220ccaa-7446-4b40-a469-4cfc227761c7.stderr.txt |    2 +
+ ...0220ccaa-7446-4b40-a469-4cfc227761c7.stdout.txt |    0
+ ...0467550c-6cd5-4136-ab07-a68b88b3c668.stderr.txt |    0
+ ...0467550c-6cd5-4136-ab07-a68b88b3c668.stdout.txt |   32 +
+ ...08b060d8-58c7-4712-abd1-1e9500c8df40.stderr.txt |    0
+ ...08b060d8-58c7-4712-abd1-1e9500c8df40.stdout.txt |    1 +
+ ...09d278a0-729b-4548-85fc-f3be14f58cfb.stderr.txt |    0
+ ...09d278a0-729b-4548-85fc-f3be14f58cfb.stdout.txt |   10 +
+ ...0a06990f-cc92-4a20-8aca-f42b48bc4462.stderr.txt |    2 +
+ ...0a06990f-cc92-4a20-8aca-f42b48bc4462.stdout.txt |   97 +
+ ...184edb85-e6cd-418c-87b6-f5ea9de61a86.stderr.txt |    0
+ ...184edb85-e6cd-418c-87b6-f5ea9de61a86.stdout.txt |  260 ++
+ ...1a78fdab-e4da-4d9a-bba4-5b7a9fd06693.stderr.txt |    0
+ ...1a78fdab-e4da-4d9a-bba4-5b7a9fd06693.stdout.txt |    0
+ ...1c170261-c0c8-4e34-9c59-30f35ad95474.stderr.txt |    0
+ ...1c170261-c0c8-4e34-9c59-30f35ad95474.stdout.txt |    3 +
+ ...1dab413e-871a-47dd-b180-c0c109bedeb6.stderr.txt |    0
+ ...1dab413e-871a-47dd-b180-c0c109bedeb6.stdout.txt |  206 ++
+ ...229628b3-2687-4895-84d6-89567c8cf467.stderr.txt |    0
+ ...229628b3-2687-4895-84d6-89567c8cf467.stdout.txt |   50 +
+ ...2599068b-d1e2-419b-adb6-b3265248ebaf.stderr.txt |    0
+ ...2599068b-d1e2-419b-adb6-b3265248ebaf.stdout.txt |    4 +
+ ...288bd21d-83b3-4fed-9534-8c2e3298bc80.stderr.txt |    0
+ ...288bd21d-83b3-4fed-9534-8c2e3298bc80.stdout.txt |  163 ++
+ ...34f0273f-a2c7-432f-bf85-594a6927ae44.stderr.txt |   66 +
+ ...34f0273f-a2c7-432f-bf85-594a6927ae44.stdout.txt |   28 +
+ ...451baf7a-7b8b-4d7d-98a3-80e98976084f.stderr.txt |    0
+ ...451baf7a-7b8b-4d7d-98a3-80e98976084f.stdout.txt |    1 +
+ ...48cd03c5-cd64-4162-b543-4fad642a6fc2.stderr.txt |    0
+ ...48cd03c5-cd64-4162-b543-4fad642a6fc2.stdout.txt |    2 +
+ ...502d3920-a9d6-4f11-b413-a743522736fa.stderr.txt |    0
+ ...502d3920-a9d6-4f11-b413-a743522736fa.stdout.txt |  283 +++
+ ...5782cea8-a7ac-4940-a7ff-dd17248dd044.stderr.txt |    0
+ ...5782cea8-a7ac-4940-a7ff-dd17248dd044.stdout.txt |    2 +
+ ...5aec3364-411a-4fd2-802a-c8895a513c07.stderr.txt |    0
+ ...5aec3364-411a-4fd2-802a-c8895a513c07.stdout.txt |    2 +
+ ...5b7cdde7-ffb6-4932-a66d-2dfb323dbec9.stderr.txt |    0
+ ...5b7cdde7-ffb6-4932-a66d-2dfb323dbec9.stdout.txt |    6 +
+ ...5f65bc89-f35c-4898-9564-bbe52bbf0729.stderr.txt |    0
+ ...5f65bc89-f35c-4898-9564-bbe52bbf0729.stdout.txt |    0
+ ...683c8ac8-f04a-4632-8278-f7c8335a8bb3.stderr.txt |    1 +
+ ...683c8ac8-f04a-4632-8278-f7c8335a8bb3.stdout.txt |    1 +
+ ...69e54237-2c83-4fb8-97ea-845b9f7ef26e.stderr.txt |    0
+ ...69e54237-2c83-4fb8-97ea-845b9f7ef26e.stdout.txt |   45 +
+ ...6b291137-13db-44b7-95ea-2838b15933c5.stderr.txt |    0
+ ...6b291137-13db-44b7-95ea-2838b15933c5.stdout.txt |   15 +
+ ...6c8e78c7-25ee-4b49-9e9d-f005763ac832.stderr.txt |    0
+ ...6c8e78c7-25ee-4b49-9e9d-f005763ac832.stdout.txt |    7 +
+ ...76229856-c57a-46b8-9b5f-0d773e26a29a.stderr.txt |    0
+ ...76229856-c57a-46b8-9b5f-0d773e26a29a.stdout.txt |    0
+ ...8ab5a557-ecb3-49ff-a7ee-52eacfe6e7c3.stderr.txt |    1 +
+ ...8ab5a557-ecb3-49ff-a7ee-52eacfe6e7c3.stdout.txt |    1 +
+ ...8e29f0eb-e31a-481a-9cbc-aea3c091e4bb.stderr.txt |    0
+ ...8e29f0eb-e31a-481a-9cbc-aea3c091e4bb.stdout.txt |  267 +++
+ ...93df1501-99b1-4724-b298-d04bd3f20153.stderr.txt |    0
+ ...93df1501-99b1-4724-b298-d04bd3f20153.stdout.txt |    1 +
+ ...94232108-c0e9-4453-8697-fc6847f6ec7f.stderr.txt |    0
+ ...94232108-c0e9-4453-8697-fc6847f6ec7f.stdout.txt |    3 +
+ ...9a72faff-2444-4134-8513-e37fb548aa42.stderr.txt |    0
+ ...9a72faff-2444-4134-8513-e37fb548aa42.stdout.txt |    0
+ ...a4fbb08e-dffd-4e1a-a69c-4ac17e933c02.stderr.txt |    0
+ ...a4fbb08e-dffd-4e1a-a69c-4ac17e933c02.stdout.txt |    3 +
+ ...a7185ed4-8dc2-42f6-8bfc-99577cb313a5.stderr.txt |    0
+ ...a7185ed4-8dc2-42f6-8bfc-99577cb313a5.stdout.txt |  264 +++
+ ...a9a93e81-f8d1-4095-852f-dbc83e37a50b.stderr.txt |    3 +
+ ...a9a93e81-f8d1-4095-852f-dbc83e37a50b.stdout.txt |    0
+ ...b45ddaee-3b6e-4138-9310-bac092ccfc27.stderr.txt |    0
+ ...b45ddaee-3b6e-4138-9310-bac092ccfc27.stdout.txt |    0
+ ...c613c8b9-7a47-4194-a8f2-503e146f21b0.stderr.txt |    0
+ ...c613c8b9-7a47-4194-a8f2-503e146f21b0.stdout.txt |  619 +++++
+ ...c701fdf2-751e-43d7-a1a2-f9bdbb81916f.stderr.txt |    0
+ ...c701fdf2-751e-43d7-a1a2-f9bdbb81916f.stdout.txt |    0
+ ...c710922f-4e57-45cb-b4e4-0b8a39670412.stderr.txt |    0
+ ...c710922f-4e57-45cb-b4e4-0b8a39670412.stdout.txt |  735 ++++++
+ ...d4acd01b-0c79-4173-b3c9-518e7116e901.stderr.txt |    0
+ ...d4acd01b-0c79-4173-b3c9-518e7116e901.stdout.txt |    1 +
+ ...d96a89f0-a34a-4dcf-9d5d-022fcde28532.stderr.txt |    0
+ ...d96a89f0-a34a-4dcf-9d5d-022fcde28532.stdout.txt |   14 +
+ ...dbda4b3e-395c-4d04-a2d5-4b20cc0daf8e.stderr.txt |    0
+ ...dbda4b3e-395c-4d04-a2d5-4b20cc0daf8e.stdout.txt |    1 +
+ ...dc4f267e-86ac-4915-b27d-d513903a5df0.stderr.txt |    0
+ ...dc4f267e-86ac-4915-b27d-d513903a5df0.stdout.txt |   29 +
+ ...e9a21c57-93f3-4533-897f-4de292d60768.stderr.txt |    0
+ ...e9a21c57-93f3-4533-897f-4de292d60768.stdout.txt |    3 +
+ ...ebf5bed3-b7ba-4a68-a447-1946532afe2c.stderr.txt |    0
+ ...ebf5bed3-b7ba-4a68-a447-1946532afe2c.stdout.txt |   10 +
+ ...ef9da389-a19e-4665-b839-25b80ff22f27.stderr.txt |    5 +
+ ...ef9da389-a19e-4665-b839-25b80ff22f27.stdout.txt |    0
+ ...f089c944-857c-4ea4-8280-1b3f69791582.stderr.txt |    0
+ ...f089c944-857c-4ea4-8280-1b3f69791582.stdout.txt |  246 ++
+ ...f1cebb03-518f-43d8-bbd9-4bba1965a7c1.stderr.txt |    0
+ ...f1cebb03-518f-43d8-bbd9-4bba1965a7c1.stdout.txt |   16 +
+ ...f98e94c0-9724-4d4c-bebc-a6cf633a42df.stderr.txt |    0
+ ...f98e94c0-9724-4d4c-bebc-a6cf633a42df.stdout.txt |  351 +++
+ ...ff62960f-ace6-491d-aaf6-e90840ec21b1.stderr.txt |    0
+ ...ff62960f-ace6-491d-aaf6-e90840ec21b1.stdout.txt |    1 +
+ .../diff.patch                                     |  841 +++++++
+ .../events.jsonl                                   |  103 +
+ .../final_state.json                               | 1464 ++++++++++++
+ .../initial_state.json                             | 1266 ++++++++++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ ...01d5d169-3cbd-4885-b9aa-c760feb8ab81.stderr.txt |    0
+ ...01d5d169-3cbd-4885-b9aa-c760feb8ab81.stdout.txt |    0
+ ...095edb19-bcc3-45c1-aac4-222938e42d1a.stderr.txt |    0
+ ...095edb19-bcc3-45c1-aac4-222938e42d1a.stdout.txt |   46 +
+ ...09c4e294-0adc-4982-abd4-751ccffda242.stderr.txt |    0
+ ...09c4e294-0adc-4982-abd4-751ccffda242.stdout.txt |    0
+ ...1d94d82b-24fe-4bbb-aaef-95932d194ba3.stderr.txt |    0
+ ...1d94d82b-24fe-4bbb-aaef-95932d194ba3.stdout.txt |   79 +
+ ...230376e1-e28e-4e04-a65f-a2e78917a914.stderr.txt |    0
+ ...230376e1-e28e-4e04-a65f-a2e78917a914.stdout.txt |    2 +
+ ...2375d3d0-c128-45f8-b7db-f2a6a6b14ead.stderr.txt |    0
+ ...2375d3d0-c128-45f8-b7db-f2a6a6b14ead.stdout.txt |   22 +
+ ...3c804c60-952a-42dc-b4ec-1124aa0496dc.stderr.txt |    0
+ ...3c804c60-952a-42dc-b4ec-1124aa0496dc.stdout.txt |  103 +
+ ...47a67ff2-4bac-466d-932a-ba1e80914c41.stderr.txt |    0
+ ...47a67ff2-4bac-466d-932a-ba1e80914c41.stdout.txt |    1 +
+ ...4ca003ca-3d5c-4340-9a18-0c63b9fe4ae2.stderr.txt |    0
+ ...4ca003ca-3d5c-4340-9a18-0c63b9fe4ae2.stdout.txt |    2 +
+ ...4f98bf9e-a292-48a3-9db9-5785867e0dba.stderr.txt |    0
+ ...4f98bf9e-a292-48a3-9db9-5785867e0dba.stdout.txt |    1 +
+ ...6ceb45cc-e692-4867-9b28-a90e49899384.stderr.txt |    0
+ ...6ceb45cc-e692-4867-9b28-a90e49899384.stdout.txt |    1 +
+ ...6e65da2f-92a3-4ee9-a485-845a983b5117.stderr.txt |    0
+ ...6e65da2f-92a3-4ee9-a485-845a983b5117.stdout.txt |    1 +
+ ...79df8fcd-e619-45bb-93ce-04bb0377054a.stderr.txt |    0
+ ...79df8fcd-e619-45bb-93ce-04bb0377054a.stdout.txt |   44 +
+ ...84c1230d-67fc-4f8b-9a96-cdb801496fb6.stderr.txt |    0
+ ...84c1230d-67fc-4f8b-9a96-cdb801496fb6.stdout.txt |    1 +
+ ...85c3cc09-fda6-4dbf-bf1b-6c9cdc449d57.stderr.txt |    0
+ ...85c3cc09-fda6-4dbf-bf1b-6c9cdc449d57.stdout.txt |   65 +
+ ...87b9ea39-d8df-481c-99ae-6469b3e0a34c.stderr.txt |    0
+ ...87b9ea39-d8df-481c-99ae-6469b3e0a34c.stdout.txt |  102 +
+ ...8a477bbc-fe2d-41e5-b031-dae3cbb5b8d1.stderr.txt |    0
+ ...8a477bbc-fe2d-41e5-b031-dae3cbb5b8d1.stdout.txt |   15 +
+ ...a05dc1c2-ad2d-4ca8-97b5-cfa6ecb50f3a.stderr.txt |    0
+ ...a05dc1c2-ad2d-4ca8-97b5-cfa6ecb50f3a.stdout.txt |    1 +
+ ...a7c3b694-b696-4c3a-9761-9f32558c4329.stderr.txt |    0
+ ...a7c3b694-b696-4c3a-9761-9f32558c4329.stdout.txt |    2 +
+ ...a9f1b4af-4698-4fb1-91e3-0032a4976d74.stderr.txt |    0
+ ...a9f1b4af-4698-4fb1-91e3-0032a4976d74.stdout.txt |    3 +
+ ...c16ed704-6ab3-4884-8e70-7eef9c5c11ef.stderr.txt |    0
+ ...c16ed704-6ab3-4884-8e70-7eef9c5c11ef.stdout.txt |    0
+ ...c27941bc-c1de-455b-a824-43d16786fb5c.stderr.txt |    0
+ ...c27941bc-c1de-455b-a824-43d16786fb5c.stdout.txt |   50 +
+ ...c2f27306-0d61-4763-8375-c48060d37eef.stderr.txt |    0
+ ...c2f27306-0d61-4763-8375-c48060d37eef.stdout.txt |   39 +
+ ...c7bfe325-23ee-4c64-a566-ca00eab14e27.stderr.txt |    0
+ ...c7bfe325-23ee-4c64-a566-ca00eab14e27.stdout.txt | 1553 ++++++++++++
+ ...cb107348-3360-455d-a309-cbb2e9ccff57.stderr.txt |    0
+ ...cb107348-3360-455d-a309-cbb2e9ccff57.stdout.txt |   50 +
+ ...d5ce2f9b-02af-40ec-b20e-67ffb85c4e58.stderr.txt |    0
+ ...d5ce2f9b-02af-40ec-b20e-67ffb85c4e58.stdout.txt |    1 +
+ ...d76dbc89-fb7c-40fb-9d76-f9641a124149.stderr.txt |    1 +
+ ...d76dbc89-fb7c-40fb-9d76-f9641a124149.stdout.txt |    1 +
+ ...db66b356-ae64-4eef-9da6-384ef1c04c03.stderr.txt |    0
+ ...db66b356-ae64-4eef-9da6-384ef1c04c03.stdout.txt |    0
+ ...f3ee93ca-1eeb-41ac-9426-d4dda934d511.stderr.txt |    1 +
+ ...f3ee93ca-1eeb-41ac-9426-d4dda934d511.stdout.txt |    1 +
+ ...f6275cf4-612e-44b6-b5df-225ef73b319c.stderr.txt |    0
+ ...f6275cf4-612e-44b6-b5df-225ef73b319c.stdout.txt |  615 +++++
+ ...f92c0935-4a8e-4c69-b911-0b4a05bc8b0a.stderr.txt |    0
+ ...f92c0935-4a8e-4c69-b911-0b4a05bc8b0a.stdout.txt |   50 +
+ .../diff.patch                                     |  843 +++++++
+ .../events.jsonl                                   |   71 +
+ .../final_state.json                               | 1622 +++++++++++++
+ .../initial_state.json                             | 1482 ++++++++++++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ ...0ff7006f-d190-4e16-a0eb-738310be399b.stderr.txt |    0
+ ...0ff7006f-d190-4e16-a0eb-738310be399b.stdout.txt |    1 +
+ ...82177a09-b1ae-454c-b649-afd00dc3fb88.stderr.txt |    2 +
+ ...82177a09-b1ae-454c-b649-afd00dc3fb88.stdout.txt |    0
+ ...dd960e1e-f748-441b-949d-fdacaf6125f1.stderr.txt |    0
+ ...dd960e1e-f748-441b-949d-fdacaf6125f1.stdout.txt |    3 +
+ ...eacbe923-0e39-485e-9d3b-be2c37dbbd3d.stderr.txt |    0
+ ...eacbe923-0e39-485e-9d3b-be2c37dbbd3d.stdout.txt |    1 +
+ .../diff.patch                                     |  826 +++++++
+ .../events.jsonl                                   |   12 +
+ .../final_state.json                               | 1654 +++++++++++++
+ .../initial_state.json                             | 1622 +++++++++++++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ .../blobs/.gitattributes                           |    1 +
+ ...0f5acac4-f5c5-44b2-971f-8f2aba15fa6e.stderr.txt |    0
+ ...0f5acac4-f5c5-44b2-971f-8f2aba15fa6e.stdout.txt |    0
+ ...2b39b9f2-1936-4163-84ca-3f71cc510eb3.stderr.txt |    0
+ ...2b39b9f2-1936-4163-84ca-3f71cc510eb3.stdout.txt |    1 +
+ ...312d86cc-de8a-4755-930f-9b1090a839a8.stderr.txt |    0
+ ...312d86cc-de8a-4755-930f-9b1090a839a8.stdout.txt |    3 +
+ ...33d750c3-3ecd-4be3-9b87-24ac5e8e91d2.stderr.txt |   73 +
+ ...33d750c3-3ecd-4be3-9b87-24ac5e8e91d2.stdout.txt |    1 +
+ ...4099ecc0-663f-49f5-aa18-943afb17f40f.stderr.txt |    0
+ ...4099ecc0-663f-49f5-aa18-943afb17f40f.stdout.txt |    1 +
+ ...436cdff2-658f-460c-b81d-15369105bc71.stderr.txt |    2 +
+ ...436cdff2-658f-460c-b81d-15369105bc71.stdout.txt |    0
+ ...55948a6b-2fb6-4f01-bbee-07a794f3ae53.stderr.txt |    0
+ ...55948a6b-2fb6-4f01-bbee-07a794f3ae53.stdout.txt |    0
+ ...9a72acaa-2fe8-4ed8-815e-c21bd2f04c05.stderr.txt |    0
+ ...9a72acaa-2fe8-4ed8-815e-c21bd2f04c05.stdout.txt |    1 +
+ ...accefa61-3192-4aa0-aefc-d84fe1db697b.stderr.txt |    1 +
+ ...accefa61-3192-4aa0-aefc-d84fe1db697b.stdout.txt |    0
+ ...df1c7a07-08f1-4952-9f91-6eda9fd11121.stderr.txt |    0
+ ...df1c7a07-08f1-4952-9f91-6eda9fd11121.stdout.txt |    1 +
+ .../diff.patch                                     | 2504 ++++++++++++++++++++
+ .../events.jsonl                                   |   25 +
+ .../final_state.json                               | 1348 +++++++++++
+ .../initial_state.json                             | 1276 ++++++++++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ spec/progress/current.md                           |   42 +-
+ .../2026-09-23-fix-272bb28-development.md          |   47 +
+ .../2026-09-23-fix-delegation-prompt.txt           |    1 +
+ .../2026-09-23-independent-review-5d1d165-fail.md  |   80 +
+ .../2026-09-23-recorder-path-authorization.md      |   26 +
+ spec/tasks/review/LOOP1-CONTRACT-001.md            |   20 +-
+ 236 files changed, 26041 insertions(+), 188 deletions(-)

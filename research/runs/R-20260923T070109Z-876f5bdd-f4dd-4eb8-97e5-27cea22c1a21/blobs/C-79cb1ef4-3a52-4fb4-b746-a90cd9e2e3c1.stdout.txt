@@ -1,0 +1,16 @@
+420-    (blob_dir / f"{command_id}.stderr.txt").write_text(safe_err, encoding="utf-8", newline="\n")
+421-    append_event(root, args.run_id, "command_finished", {"command_id": command_id, "exit_code": result.returncode,
+422-                 "duration_ms": duration_ms, "result": "PASS" if result.returncode == 0 else "FAIL",
+423:                 "stdout_sha256": sha256_bytes(result.stdout), "stderr_sha256": sha256_bytes(result.stderr),
+424:                 "stdout_blob": f"blobs/{command_id}.stdout.txt", "stderr_blob": f"blobs/{command_id}.stderr.txt",
+425-                 "secret_redaction_applied": command_redacted or out_redacted or err_redacted})
+426-    return result.returncode
+427-
+--
+556-    return {"run_id": run_id, "status": metadata["status"], "event_count": len(records)}
+557-
+558-
+559:def cmd_validate_run(args: argparse.Namespace, repo: Path, root: Path) -> int:
+560-    print(json.dumps(validate_run(root, args.run_id, not args.allow_partial), sort_keys=True))
+561-    return 0
+562-

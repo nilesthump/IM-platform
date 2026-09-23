@@ -1,0 +1,190 @@
+                } elseif ($hasRequestBody) {
+                    $issues += "$($scenario.id) supplies a body to an operation without requestBody"
+                }
+
+                $hasExpectedBody = Test-HasProperty $step.expected 'body'
+                $responseSchema = $null
+                if ($null -ne $response -and $null -ne $response.content -and $null -ne $response.content.'application/json') {
+                    $responseSchema = $response.content.'application/json'.schema
+                }
+                if ($null -ne $responseSchema -and -not $hasExpectedBody) { $issues += "$($scenario.id) omits the declared response body for status $statusName" }
+                if ($null -eq $responseSchema -and $hasExpectedBody) { $issues += "$($scenario.id) supplies a body for bodyless status $statusName" }
+                if ($hasExpectedBody -and $null -ne $responseSchema) {
+                    $issues += @(Get-SchemaErrors $step.expected.body $responseSchema $OpenApi $Errors "$($scenario.id).expected.body")
+                }
+
+                if (Test-HasProperty $step.expected 'headers') {
+                    foreach ($headerName in @($step.expected.headers.PSObject.Properties.Name)) {
+                        if ($headerName -notin @($response.headers.PSObject.Properties.Name)) { $issues += "$($scenario.id) expects undeclared response header $headerName" }
+                        if ($headerName -ceq 'Set-Cookie') {
+                            $headerValue = [string](Get-PropertyValue $step.expected.headers $headerName)
+                            foreach ($term in @('Secure','HttpOnly','SameSite')) {
+                                if ($headerValue -notmatch $term) { $issues += "$($scenario.id) Set-Cookie expectation missing $term" }
+                            }
+                        }
+                    }
+                }
+
+                if (Test-HasProperty $step.expected 'errorCode') {
+                    $code = [string]$step.expected.errorCode
+                    $coveredCodes += $code
+                    if ($code -notin $globalCodes) { $issues += "$($scenario.id) uses unknown error code $code" }
+                    $permitted = @((Get-PropertyValue $responseWrapper 'x-error-codes'))
+                    if ($code -notin $permitted) { $issues += "$($scenario.id) uses $code, not permitted for $($operation.operationId) status $statusName" }
+                    if (-not $hasExpectedBody -or $step.expected.body.error.code -cne $code) { $issues += "$($scenario.id) errorCode must equal response body error.code" }
+                } elseif ([int]$step.expected.status -ge 400) {
+                    $issues += "$($scenario.id) error response lacks errorCode"
+                }
+
+                $canonical = $step.expected | Select-Object -Property * -ExcludeProperty normalizedOutputs
+                $canonicalJson = ConvertTo-CanonicalJson $canonical
+                foreach ($profile in @('go','java')) {
+                    $profileOutput = Get-PropertyValue $step.expected.normalizedOutputs $profile
+                    if ((ConvertTo-CanonicalJson $profileOutput) -cne $canonicalJson) {
+                        $issues += "$($scenario.id) $profile normalized output differs from canonical expected"
+                    }
+                }
+            }
+        }
+    }
+    foreach ($code in $expectedCodes) {
+        if ($code -notin $coveredCodes) { $issues += "negative fixture coverage missing shared error code $code" }
+    }
+
+    $allRefs = [regex]::Matches(($OpenApi | ConvertTo-Json -Depth 100), '"\$ref"\s*:\s*"([^"]+)"')
+    foreach ($refMatch in $allRefs) {
+        $ref = $refMatch.Groups[1].Value
+        if ($ref.StartsWith('#/')) {
+            if ($null -eq (Resolve-Pointer $OpenApi $ref)) { $issues += "unresolved internal reference: $ref" }
+        } elseif ($ref -ne '../errors/http-errors.schema.json#/$defs/ErrorResponse') {
+            $issues += "unexpected external reference: $ref"
+        }
+    }
+
+    return $issues
+}
+
+foreach ($path in @($openApiPath,$openApiSchemaPath,$openApiValidatorPath,$openApiLintPath,$errorPath,$fixtureSchemaPath,$positivePath,$negativePath)) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { $failures += "missing required contract file: $path" }
+}
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) { $failures += 'Node.js is required for offline OpenAPI 3.1 structural lint' }
+if ($failures.Count -eq 0) {
+    try { $openApi = Get-Content -LiteralPath $openApiPath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "OpenAPI JSON parse failed: $($_.Exception.Message)" }
+    try { $errors = Get-Content -LiteralPath $errorPath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "error schema JSON parse failed: $($_.Exception.Message)" }
+    try { $positive = Get-Content -LiteralPath $positivePath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "positive fixtures JSON parse failed: $($_.Exception.Message)" }
+    try { $negative = Get-Content -LiteralPath $negativePath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "negative fixtures JSON parse failed: $($_.Exception.Message)" }
+}
+if ($failures.Count -eq 0) {
+    $failures += @(Get-OpenApiStructureErrors $openApi $openApiLintPath 'OpenAPI document')
+}
+if ($failures.Count -eq 0) {
+    foreach ($fixturePath in @($positivePath,$negativePath)) {
+        try {
+            if (-not (Get-Content -LiteralPath $fixturePath -Raw | Test-Json -SchemaFile $fixtureSchemaPath -ErrorAction Stop)) { $failures += "fixture schema validation returned false: $fixturePath" }
+        } catch { $failures += "fixture schema validation failed: $fixturePath $($_.Exception.Message)" }
+    }
+}
+if ($failures.Count -eq 0) {
+    $failures += @(Get-ModelFailures $openApi $errors $positive $negative)
+}
+
+if ($failures.Count -eq 0) {
+    function Copy-JsonModel {
+        param($Value)
+        return ($Value | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100)
+    }
+    $mutations = @()
+
+    $mutatedPositive = Copy-JsonModel $positive
+    $mutatedPositive.scenarios[0].steps[0].expected.body = [pscustomobject]@{ arbitrary = 'not-a-contract-body' }
+    $mutations += [pscustomobject]@{ Name='body-mismatch'; OpenApi=$openApi; Positive=$mutatedPositive; Negative=$negative }
+
+    $mutatedNegative = Copy-JsonModel $negative
+    $target = @($mutatedNegative.scenarios | Where-Object id -eq 'invalid-credentials')[0].steps[0].expected
+    $target.status = 418; $target.normalizedOutputs.go.status = 418; $target.normalizedOutputs.java.status = 418
+    $mutations += [pscustomobject]@{ Name='undeclared-status'; OpenApi=$openApi; Positive=$positive; Negative=$mutatedNegative }
+
+    $mutatedNegative = Copy-JsonModel $negative
+    $target = @($mutatedNegative.scenarios | Where-Object id -eq 'invalid-credentials')[0].steps[0].expected
+    $target.errorCode = 'AUTHORIZATION_DENIED'; $target.body.error.code = 'AUTHORIZATION_DENIED'
+    $target.normalizedOutputs.go.errorCode = 'AUTHORIZATION_DENIED'; $target.normalizedOutputs.go.body.error.code = 'AUTHORIZATION_DENIED'
+    $target.normalizedOutputs.java.errorCode = 'AUTHORIZATION_DENIED'; $target.normalizedOutputs.java.body.error.code = 'AUTHORIZATION_DENIED'
+    $mutations += [pscustomobject]@{ Name='undeclared-error-code'; OpenApi=$openApi; Positive=$positive; Negative=$mutatedNegative }
+
+    $mutatedPositive = Copy-JsonModel $positive
+    $mutatedPositive.scenarios[0].steps[0].expected.normalizedOutputs.java.status = 202
+    $mutations += [pscustomobject]@{ Name='missing-profile-parity'; OpenApi=$openApi; Positive=$mutatedPositive; Negative=$negative }
+
+    $mutatedNegative = Copy-JsonModel $negative
+    $mutatedNegative.scenarios = @($mutatedNegative.scenarios | Where-Object id -ne 'expired-access-token')
+    $mutations += [pscustomobject]@{ Name='missing-error-coverage'; OpenApi=$openApi; Positive=$positive; Negative=$mutatedNegative }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.paths.'/v1/auth/refresh/web'.post.security = @([pscustomobject]@{})
+    $mutatedOpenApi.paths.'/v1/auth/refresh/web'.post.requestBody.required = $false
+    $mutations += [pscustomobject]@{ Name='credentialless-refresh'; OpenApi=$mutatedOpenApi; Positive=$positive; Negative=$negative }
+
+    $structuralMutations = @()
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.info.PSObject.Properties.Remove('title')
+    $structuralMutations += [pscustomobject]@{ Name='missing-info-title'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi | Add-Member -NotePropertyName unknownRoot -NotePropertyValue 1
+    $structuralMutations += [pscustomobject]@{ Name='unknown-root-member'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.info | Add-Member -NotePropertyName unknownInfo -NotePropertyValue 1
+    $structuralMutations += [pscustomobject]@{ Name='unknown-info-member'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.paths.'/v1/auth/login'.post.responses.'200' = 42
+    $structuralMutations += [pscustomobject]@{ Name='scalar-response'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.paths.'/v1/auth/login'.post.responses | Add-Member -NotePropertyName '2XXx' -NotePropertyValue ([pscustomobject]@{ description='invalid status key' })
+    $structuralMutations += [pscustomobject]@{ Name='invalid-response-key'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.paths.'/v1/auth/login'.post | Add-Member -NotePropertyName unknownOperation -NotePropertyValue 1
+    $structuralMutations += [pscustomobject]@{ Name='unknown-operation-member'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.components.securitySchemes.bearerAuth.type = 'imaginary'
+    $structuralMutations += [pscustomobject]@{ Name='invalid-security-scheme-type'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.paths.'/v1/users/search'.get.parameters[0].in = 'imaginary'
+    $structuralMutations += [pscustomobject]@{ Name='invalid-parameter-location'; OpenApi=$mutatedOpenApi }
+
+    $mutatedOpenApi = Copy-JsonModel $openApi
+    $mutatedOpenApi.paths.'/v1/auth/login'.post.requestBody.content.'application/json' = 42
+    $structuralMutations += [pscustomobject]@{ Name='scalar-media-type'; OpenApi=$mutatedOpenApi }
+
+    foreach ($mutation in $structuralMutations) {
+        if (@(Get-OpenApiStructureErrors $mutation.OpenApi $openApiLintPath "$($mutation.Name) mutation").Count -eq 0) {
+            $failures += "OpenAPI schema-lint regression was not rejected: $($mutation.Name)"
+        }
+    }
+
+    foreach ($mutation in $mutations) {
+        $mutationFailures = @(Get-ModelFailures $mutation.OpenApi $errors $mutation.Positive $mutation.Negative)
+        if ($mutationFailures.Count -eq 0) { $failures += "mutation regression was not rejected: $($mutation.Name)" }
+    }
+}
+
+if ($failures.Count -gt 0) {
+    $failures | Sort-Object -Unique | ForEach-Object { Write-Host "ERROR: $_" }
+    exit 1
+}
+
+$pathCount = @($openApi.paths.PSObject.Properties).Count
+$operationCount = 0
+foreach ($path in @($openApi.paths.PSObject.Properties)) {
+    $operationCount += @($path.Value.PSObject.Properties | Where-Object Name -in @('get','post','put','delete','patch')).Count
+}
+$positiveCount = @($positive.scenarios).Count
+$negativeCount = @($negative.scenarios).Count
+$errorCount = @($errors.'$defs'.ErrorCode.enum).Count
+Write-Host "PASS: Auth/User/Friend contracts verified paths=$pathCount operations=$operationCount error_codes=$errorCount positive=$positiveCount negative=$negativeCount profiles=go,java schema_lint=OAI-OpenAPI-3.1-2026-08-03 mutation_regressions=15."
+exit 0

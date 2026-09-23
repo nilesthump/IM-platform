@@ -1,0 +1,40 @@
+contracts/http/verify-auth-user-friend.ps1:266:                if ($parameter.in -eq 'query' -and $parameter.name -match '(?i)(token|password|secret|credential)') { $issues += "authentication material declared in query: $($pathProperty.Name) $($parameter.name)" }
+contracts/http/verify-auth-user-friend.ps1:297:    if ($OpenApi.components.schemas.FriendshipResult.properties.memberUserIds.minItems -ne 2 -or $OpenApi.components.schemas.FriendshipResult.properties.memberUserIds.maxItems -ne 2) { $issues += 'FriendshipResult must require exactly two members' }
+contracts/http/verify-auth-user-friend.ps1:336:    $requiredNegative = @('invalid-credentials','token-in-query-rejected','invalid-client-type','refresh-client-type-mismatch','unsupported-protocol-version','missing-authentication','authorization-binding-mismatch','invalid-access-token','expired-access-token','revoked-session-token','username-already-exists','friend-target-not-found','friendship-state-conflict','friend-add-authorization-denied','web-refresh-missing-cookie','native-refresh-missing-token','friend-self-rejected','duplicate-friendship-divergence-rejected','non-normalized-pair-divergence-rejected','stale-session-epoch-rejected','revoked-refresh-token-rejected')
+contracts/fixtures/auth-user-friend\positive.json:71:            "query": {
+contracts/fixtures/auth-user-friend\positive.json:119:        "password or token appears in structured logs"
+contracts/fixtures/auth-user-friend\positive.json:130:        "AUF-A-001",
+contracts/fixtures/auth-user-friend\positive.json:131:        "AUF-A-003"
+contracts/fixtures/auth-user-friend\positive.json:459:        "the old WEB connection observes session.revoked before close"
+contracts/fixtures/auth-user-friend\positive.json:669:        "AUF-A-006"
+contracts/fixtures/auth-user-friend\positive.json:672:        "alice has an ACTIVE DESKTOP session with refresh token and WSS connection"
+contracts/fixtures/auth-user-friend\positive.json:699:        "the WSS connection receives the revocation effect then closes"
+contracts/fixtures/auth-user-friend\positive.json:713:        "AUF-A-004",
+contracts/fixtures/auth-user-friend\positive.json:714:        "AUF-A-005"
+contracts/fixtures/auth-user-friend\positive.json:738:              "memberUserIds": [
+contracts/fixtures/auth-user-friend\positive.json:754:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\positive.json:770:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\positive.json:797:              "memberUserIds": [
+contracts/fixtures/auth-user-friend\positive.json:813:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\positive.json:829:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\positive.json:844:        "friendship conversation memberships sync events and outbox effects share one commit outcome"
+contracts/fixtures/auth-user-friend\negative.json:79:      "id": "token-in-query-rejected",
+contracts/fixtures/auth-user-friend\negative.json:83:        "AUF-A-007"
+contracts/fixtures/auth-user-friend\negative.json:98:                "message": "Authentication material is forbidden in query parameters."
+contracts/fixtures/auth-user-friend\negative.json:109:                    "message": "Authentication material is forbidden in query parameters."
+contracts/fixtures/auth-user-friend\negative.json:120:                    "message": "Authentication material is forbidden in query parameters."
+contracts/fixtures/auth-user-friend\negative.json:133:        "query credential is logged or traced"
+contracts/fixtures/auth-user-friend\negative.json:272:        "AUF-A-008"
+contracts/fixtures/auth-user-friend\negative.json:1076:        "no friendship conversation membership sync event or outbox effect is written"
+contracts/fixtures/auth-user-friend\negative.json:1088:        "AUF-A-004"
+contracts/fixtures/auth-user-friend\negative.json:1111:              "memberUserIds": [
+contracts/fixtures/auth-user-friend\negative.json:1127:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\negative.json:1143:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\negative.json:1166:        "AUF-A-004"
+contracts/fixtures/auth-user-friend\negative.json:1190:              "memberUserIds": [
+contracts/fixtures/auth-user-friend\negative.json:1206:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\negative.json:1222:                  "memberUserIds": [
+contracts/fixtures/auth-user-friend\negative.json:1245:        "AUF-A-001"
+contracts/fixtures/auth-user-friend\fixture.schema.json:118:                    "query": {
+contracts/fixtures/auth-user-friend\fixture.schema.json:336:        "memberUserIds",
+contracts/fixtures/auth-user-friend\fixture.schema.json:366:        "memberUserIds": {

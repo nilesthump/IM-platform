@@ -1,0 +1,111 @@
+diff --git a/contracts/http/verify-auth-user-friend.ps1 b/contracts/http/verify-auth-user-friend.ps1
+index ee44df9..f349a70 100644
+--- a/contracts/http/verify-auth-user-friend.ps1
++++ b/contracts/http/verify-auth-user-friend.ps1
+@@ -11,7 +11,9 @@ if (-not $RepoRoot) {
+ }
+ 
+ $openApiPath = Join-Path $RepoRoot 'contracts/http/auth-user-friend.openapi.json'
+-$openApiSchemaPath = Join-Path $RepoRoot 'contracts/http/auth-user-friend.openapi.structure.schema.json'
++$openApiSchemaPath = Join-Path $RepoRoot 'contracts/http/openapi-3.1-2026-08-03.schema.json'
++$openApiValidatorPath = Join-Path $RepoRoot 'contracts/http/auth-user-friend.openapi.validator.js'
++$openApiLintPath = Join-Path $RepoRoot 'contracts/http/check-openapi-3.1.js'
+ $errorPath = Join-Path $RepoRoot 'contracts/errors/http-errors.schema.json'
+ $fixtureRoot = Join-Path $RepoRoot 'contracts/fixtures/auth-user-friend'
+ $fixtureSchemaPath = Join-Path $fixtureRoot 'fixture.schema.json'
+@@ -222,11 +224,12 @@ function Get-OperationMatch {
+ }
+ 
+ function Get-OpenApiStructureErrors {
+-    param($Value, [string]$SchemaPath, [string]$Location)
++    param($Value, [string]$ValidatorPath, [string]$Location)
+     try {
+         $json = $Value | ConvertTo-Json -Depth 100
+-        if (-not ($json | Test-Json -SchemaFile $SchemaPath -ErrorAction Stop)) {
+-            return @("$Location does not conform to the repository OpenAPI 3.1 structural schema")
++        $diagnostics = @($json | & node $ValidatorPath 2>&1)
++        if ($LASTEXITCODE -ne 0) {
++            return @("$Location does not conform to the pinned OAI OpenAPI 3.1 structural schema: $($diagnostics -join '; ')")
+         }
+     } catch {
+         return @("$Location OpenAPI 3.1 structural schema validation failed: $($_.Exception.Message)")
+@@ -441,9 +444,10 @@ function Get-ModelFailures {
+     return $issues
+ }
+ 
+-foreach ($path in @($openApiPath,$openApiSchemaPath,$errorPath,$fixtureSchemaPath,$positivePath,$negativePath)) {
++foreach ($path in @($openApiPath,$openApiSchemaPath,$openApiValidatorPath,$openApiLintPath,$errorPath,$fixtureSchemaPath,$positivePath,$negativePath)) {
+     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { $failures += "missing required contract file: $path" }
+ }
++if (-not (Get-Command node -ErrorAction SilentlyContinue)) { $failures += 'Node.js is required for offline OpenAPI 3.1 structural lint' }
+ if ($failures.Count -eq 0) {
+     try { $openApi = Get-Content -LiteralPath $openApiPath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "OpenAPI JSON parse failed: $($_.Exception.Message)" }
+     try { $errors = Get-Content -LiteralPath $errorPath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "error schema JSON parse failed: $($_.Exception.Message)" }
+@@ -451,7 +455,7 @@ if ($failures.Count -eq 0) {
+     try { $negative = Get-Content -LiteralPath $negativePath -Raw | ConvertFrom-Json -Depth 100 } catch { $failures += "negative fixtures JSON parse failed: $($_.Exception.Message)" }
+ }
+ if ($failures.Count -eq 0) {
+-    $failures += @(Get-OpenApiStructureErrors $openApi $openApiSchemaPath 'OpenAPI document')
++    $failures += @(Get-OpenApiStructureErrors $openApi $openApiLintPath 'OpenAPI document')
+ }
+ if ($failures.Count -eq 0) {
+     foreach ($fixturePath in @($positivePath,$negativePath)) {
+@@ -500,10 +504,47 @@ if ($failures.Count -eq 0) {
+     $mutatedOpenApi.paths.'/v1/auth/refresh/web'.post.requestBody.required = $false
+     $mutations += [pscustomobject]@{ Name='credentialless-refresh'; OpenApi=$mutatedOpenApi; Positive=$positive; Negative=$negative }
+ 
+-    $missingInfoTitle = Copy-JsonModel $openApi
+-    $missingInfoTitle.info.PSObject.Properties.Remove('title')
+-    if (@(Get-OpenApiStructureErrors $missingInfoTitle $openApiSchemaPath 'missing-info-title mutation').Count -eq 0) {
+-        $failures += 'OpenAPI schema-lint regression was not rejected: missing-info-title'
++    $structuralMutations = @()
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.info.PSObject.Properties.Remove('title')
++    $structuralMutations += [pscustomobject]@{ Name='missing-info-title'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi | Add-Member -NotePropertyName unknownRoot -NotePropertyValue 1
++    $structuralMutations += [pscustomobject]@{ Name='unknown-root-member'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.info | Add-Member -NotePropertyName unknownInfo -NotePropertyValue 1
++    $structuralMutations += [pscustomobject]@{ Name='unknown-info-member'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.paths.'/v1/auth/login'.post.responses.'200' = 42
++    $structuralMutations += [pscustomobject]@{ Name='scalar-response'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.paths.'/v1/auth/login'.post.responses | Add-Member -NotePropertyName '2XXx' -NotePropertyValue ([pscustomobject]@{ description='invalid status key' })
++    $structuralMutations += [pscustomobject]@{ Name='invalid-response-key'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.paths.'/v1/auth/login'.post | Add-Member -NotePropertyName unknownOperation -NotePropertyValue 1
++    $structuralMutations += [pscustomobject]@{ Name='unknown-operation-member'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.components.securitySchemes.bearerAuth.type = 'imaginary'
++    $structuralMutations += [pscustomobject]@{ Name='invalid-security-scheme-type'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.paths.'/v1/users/search'.get.parameters[0].in = 'imaginary'
++    $structuralMutations += [pscustomobject]@{ Name='invalid-parameter-location'; OpenApi=$mutatedOpenApi }
++
++    $mutatedOpenApi = Copy-JsonModel $openApi
++    $mutatedOpenApi.paths.'/v1/auth/login'.post.requestBody.content.'application/json' = 42
++    $structuralMutations += [pscustomobject]@{ Name='scalar-media-type'; OpenApi=$mutatedOpenApi }
++
++    foreach ($mutation in $structuralMutations) {
++        if (@(Get-OpenApiStructureErrors $mutation.OpenApi $openApiLintPath "$($mutation.Name) mutation").Count -eq 0) {
++            $failures += "OpenAPI schema-lint regression was not rejected: $($mutation.Name)"
++        }
+     }
+ 
+     foreach ($mutation in $mutations) {
+@@ -525,5 +566,5 @@ foreach ($path in @($openApi.paths.PSObject.Properties)) {
+ $positiveCount = @($positive.scenarios).Count
+ $negativeCount = @($negative.scenarios).Count
+ $errorCount = @($errors.'$defs'.ErrorCode.enum).Count
+-Write-Host "PASS: Auth/User/Friend contracts verified paths=$pathCount operations=$operationCount error_codes=$errorCount positive=$positiveCount negative=$negativeCount profiles=go,java schema_lint=OpenAPI-3.1 mutation_regressions=7."
++Write-Host "PASS: Auth/User/Friend contracts verified paths=$pathCount operations=$operationCount error_codes=$errorCount positive=$positiveCount negative=$negativeCount profiles=go,java schema_lint=OAI-OpenAPI-3.1-2026-08-03 mutation_regressions=15."
+ exit 0

@@ -1,0 +1,75 @@
+      "forbiddenObservations": [
+        "non-normalized or ordered duplicate pair commits"
+      ]
+    },
+    {
+      "id": "stale-session-epoch-rejected",
+      "rules": [
+        "AUF-D-003",
+        "AUF-I-002",
+        "AUF-A-001"
+      ],
+      "preconditions": [
+        "WEB slot current epoch is 8",
+        "token carries epoch 7"
+      ],
+      "steps": [
+        {
+          "request": {
+            "method": "GET",
+            "path": "/v1/users/me",
+            "headers": {
+              "Authorization": "Bearer <stale-web-token-epoch-7>"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "errorCode": "AUTH_SESSION_EPOCH_STALE",
+            "body": {
+              "error": {
+                "code": "AUTH_SESSION_EPOCH_STALE",
+                "message": "Access token carries a stale session epoch."
+              },
+              "requestId": "negative-18"
+            },
+            "normalizedOutputs": {
+              "go": {
+                "status": 401,
+                "errorCode": "AUTH_SESSION_EPOCH_STALE",
+                "body": {
+                  "error": {
+                    "code": "AUTH_SESSION_EPOCH_STALE",
+                    "message": "Access token carries a stale session epoch."
+                  },
+                  "requestId": "negative-18"
+                }
+              },
+              "java": {
+                "status": 401,
+                "errorCode": "AUTH_SESSION_EPOCH_STALE",
+                "body": {
+                  "error": {
+                    "code": "AUTH_SESSION_EPOCH_STALE",
+                    "message": "Access token carries a stale session epoch."
+                  },
+                  "requestId": "negative-18"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateAssertions": [
+        "no authenticated request context is created"
+      ],
+      "forbiddenObservations": [
+        "old token reconnects or reads data"
+      ]
+    },
+    {
+      "id": "revoked-refresh-token-rejected",
+      "rules": [
+        "AUF-D-008",
+        "AUF-I-002"
+      ],
+      "preconditions": [
