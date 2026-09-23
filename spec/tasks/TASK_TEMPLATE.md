@@ -31,6 +31,13 @@ State one bounded outcome.
 
 - State changes that are out of scope or require architecture approval.
 
+# Minimality
+
+- What is the smallest implementation satisfying this task?
+- Which new abstractions, dependencies, or infrastructure have a current justification?
+- Which future work stays outside this task?
+- For non-obvious complexity, cite the current requirement or evidence.
+
 # Verification
 
 - Record exact commands, expected results, and the minimum baseline verification.

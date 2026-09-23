@@ -14,6 +14,12 @@ Current Task: LOOP1-CONTRACT-001
 
 Current Task State: review
 
+## Authorized Control-Plane Insertion
+
+- `LOOP1-MIN-001` is being implemented in an isolated branch from accepted Recorder control-plane commit `1c274bcbf92ebcc05c1bc208386c5976437d8221`. Its governance rule is not effective until independent acceptance, merge to local `main`, and successful post-merge verification.
+- `LOOP1-CONTRACT-001` remains the unfinished product task in `review` with its original ownership, worktree, and uncommitted files preserved. This insertion does not accept or resume it.
+- Minimality implementation Recorder prompt `P-d7268d90-c7bb-4440-9406-7a27b633f0bb`, run `R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b`; independent review and acceptance evidence pending.
+
 ## Immediately Relevant Completed Work
 
 - Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.

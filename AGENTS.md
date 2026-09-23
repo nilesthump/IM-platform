@@ -17,6 +17,8 @@ Before doing any work, every agent MUST read and inspect, in this order:
 
 Do not implement until the current Task Spec's goal, dependencies, `allowed_paths`, acceptance criteria, forbidden work, and verification are understood.
 
+Before implementation or review, read [the Minimality Contract](spec/governance/minimality.md). Agents MUST choose the simplest implementation that satisfies current approved requirements and acceptance; MUST NOT implement future-stage mechanisms on speculation; and MUST cite present justification for significant added complexity. Review Agents MUST check unnecessary complexity against current requirements and evidence. If the only path requires expanding Frozen Architecture, stop under the architecture process rather than expanding it.
+
 ## Authority and architecture protection
 
 The authority order is:
