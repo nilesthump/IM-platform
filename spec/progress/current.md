@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Authorized Control-Plane Insertion
 
+- Fresh independent review of Minimality candidate `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the verifier rejects this review's authorized new Recorder artifacts as out of scope. Durable evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`. Next control-plane action: fresh Fix Agent, then fresh independent Review Agent; no merge. `LOOP1-CONTRACT-001` remains unchanged in `review`.
 - `LOOP1-MIN-001` is being implemented in an isolated branch from accepted Recorder control-plane commit `1c274bcbf92ebcc05c1bc208386c5976437d8221`. Its governance rule is not effective until independent acceptance, merge to local `main`, and successful post-merge verification.
 - `LOOP1-CONTRACT-001` remains the unfinished product task in `review` with its original ownership, worktree, and uncommitted files preserved. This insertion does not accept or resume it.
 - Minimality implementation Recorder prompt `P-d7268d90-c7bb-4440-9406-7a27b633f0bb`, run `R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b`; independent review and acceptance evidence pending.
