@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-001
 title: Freeze HTTP Auth, User, and Friend contracts
 status: review
-owner: unassigned-fresh-fix-agent
+owner: unassigned-fresh-independent-review-agent
 stage: S0
 gate: S0
 ---
@@ -90,6 +90,10 @@ On 2026-09-23, the Human answered `ok` to the Coordinator's explicit request to 
 - Canonical OpenAPI, shared errors, and fixtures are unchanged between `12c566f71da9b038764ecb7a5303b116e77ca32f` and `5d1d16561d7671ce54d6456741a51c21f5d3dadc`; no additional contract-semantic defect was found.
 - Permanent FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-5d1d165-fail.md`.
 - Human authorization for Task-linked Recorder prompt/run paths and validation of the preserved Review artifacts: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-recorder-path-authorization.md`. This does not change either independent FAIL outcome.
+- Fresh Fix Agent `/root/contract001_complete_oas_lint_fix` committed the OAI OpenAPI 3.1 structural lint repair at candidate `272bb28` under prospective Recorder run `R-20260923T034702Z-a877284a-a16d-4848-9d8f-164c2833b74a`, linked to the preceding failed Review run.
+- The Fix replaced the narrow bespoke schema with the pinned OAI 2026-08-03 structural schema and a repository-contained standalone validator. It added nine structural negative regressions, including all three shapes from the latest independent FAIL. The canonical OpenAPI, shared errors, and fixtures remain byte-identical.
+- Development verification passed: full task verifier exit `0` with 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, and 15 total mutations; CTRL-002 Development exit `0`; committed repair diff check exit `0`; deterministic validator regeneration produced the same SHA-256. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-fix-272bb28-development.md`. This is not independent acceptance.
+- The prospective Fix Recorder run finished as development `PASS` with 25 events and passed `validate-run`. One unused prompt artifact with incorrect default source and a quota-blocked command attempt are disclosed in the evidence; the correct prompt and resumed command are captured in the valid run.
 
 # Handoff
 
@@ -105,7 +109,8 @@ On 2026-09-23, the Human answered `ok` to the Coordinator's explicit request to 
 - The fresh independent re-review confirmed that the missing-`info.title` case is rejected but found the bespoke schema remains too narrow to establish OpenAPI 3.1 structural validity. It accepts multiple invalid structures, so the Task remains in `review` and requires another fresh Fix Agent.
 - The re-review also recorded a governance inconsistency: Task-linked Recorder artifacts are required by repository policy but `research/**` is absent from this Task's hard `allowed_paths`. Resolve that boundary explicitly before committing the next cycle's Recorder artifacts.
 - The Human authorized the exact Task-linked Recorder prompt/run paths on 2026-09-23. The prior boundary finding remains in the independent FAIL record; subsequent cycles may use these paths only for this Task.
+- Fresh Fix candidate `272bb28` addresses the three independently observed structural escapes using the official OAI structural schema and broader mutation regressions. The OAI source intentionally omits full Schema Object validation, so the semantic contract verifier remains necessary. The Fix Agent has not accepted this candidate; a fresh independent Review Agent must verify it from a clean committed checkout. The original paused-Agent-owned untracked `contracts/http/schema-lint/` tree remains outside this Fix's ownership and was not read or changed.
 
 # Next Action
 
-- Delegate to a fresh Fix Agent to replace or materially complete the OpenAPI 3.1 structural schema and add broader invalid-structure regressions. After the Fix handoff, delegate a new fresh independent Review Agent; no fixer may accept its own work.
+- Delegate a new fresh independent Review Agent for Fix candidate `272bb28` and this committed handoff closure. The reviewer must independently check OAI-schema provenance, offline validator behavior, broad invalid-structure controls, canonical immutability, complete task verification, and clean-checkout acceptance under ADR-0001. On FAIL, retain `review` and delegate a fresh Fix Agent; no fixer may accept its own work.

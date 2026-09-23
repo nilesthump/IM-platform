@@ -16,7 +16,7 @@ Current Task State: review
 
 ## Immediately Relevant Completed Work
 
-- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. `LOOP1-CONTRACT-001` remains unfinished in `review`; fresh independent re-review rejected Fix candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` because the bespoke structural schema still accepts invalid OpenAPI 3.1 shapes.
+- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. `LOOP1-CONTRACT-001` remains unfinished in `review`; fresh independent re-review rejected Fix candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc`, and a new Fix candidate `272bb28` now awaits independent review.
 - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
 - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
@@ -30,16 +30,22 @@ Current Task State: review
 - Fresh Fix Agent `/root/contract001_schema_fix` added deterministic repository-contained OpenAPI 3.1 structural schema lint and a missing-`info.title` regression at candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc`. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-fix-5d1d165-development.md`; Recorder run `R-20260921T083334Z-f24d9caf-e49d-4678-a2d8-f05c6481190b`.
 - Fresh independent Review Agent `/root/contract001_schema_rereview` reviewed closure `9290139b918e76a0f0310b646ec7a9c6433c91a1` under Recorder run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905` and returned FAIL. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-5d1d165-fail.md`.
 - The Human authorized Task-linked Recorder prompt/run paths on 2026-09-23. The Coordinator validated both preserved Review runs and recorded the exact authorization at `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-recorder-path-authorization.md`.
-- The repaired candidate defines 9 canonical Auth/User/Friend HTTP operations, 15 shared error codes with operation/status bindings and complete negative coverage, fixture version `1.1`, 6 positive and 21 negative dual-profile scenarios, and a deterministic verifier with seven committed mutation regressions.
+- Fresh Fix Agent `/root/contract001_complete_oas_lint_fix` committed candidate `272bb28`, replacing the narrow bespoke schema with an offline validator generated from the pinned official OAI OpenAPI 3.1 structural schema and adding nine structural negative regressions. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-fix-272bb28-development.md`; Recorder run `R-20260923T034702Z-a877284a-a16d-4848-9d8f-164c2833b74a`.
+- The current Fix candidate defines 9 canonical Auth/User/Friend HTTP operations, 15 shared error codes with operation/status bindings and complete negative coverage, fixture version `1.1`, 6 positive and 21 negative dual-profile scenarios, and a deterministic verifier with 15 committed mutation regressions.
 
 ## Current Blockers
 
-- `LOOP1-CONTRACT-001` remains unfinished in `review`. Candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` rejects missing `info.title` but still accepts other invalid OpenAPI 3.1 structures; it requires a fresh Fix Agent and then a new independent review.
+- `LOOP1-CONTRACT-001` remains unfinished in `review`. The independently rejected candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` is superseded by Fix candidate `272bb28`, which requires a fresh independent review and clean-checkout acceptance before the task can enter `done`.
 - The Human authorized `research/prompts/**` and `research/runs/**` only for `LOOP1-CONTRACT-001` Recorder artifacts on 2026-09-23. The prior write-boundary finding remains permanent evidence; no governance decision remains pending for the next Fix run.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
+- Fresh Fix Agent Recorder-wrapped command: `pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`.
+  - Result: Development PASS, exit `0`, elapsed `6174.1193 ms`; 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, OAI OpenAPI 3.1 structural lint, and 15 total mutation regressions including nine structural negatives.
+- Fresh Fix Agent Recorder-wrapped command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`.
+  - Result: Development PASS, exit `0`, elapsed `995.6156 ms`; explicitly non-acceptance evidence. Rebuilding the offline validator with pinned Ajv produced the identical SHA-256; canonical OpenAPI/errors/fixtures diff and committed repair diff checks passed.
+- Fresh Fix Recorder run `R-20260923T034702Z-a877284a-a16d-4848-9d8f-164c2833b74a` finished as development `PASS`; `validate-run` PASS, 25 events. This is Recorder integrity, not Contract acceptance.
 - Recorder-wrapped Coordinator verification: CTRL-002 Development PASS; preserved Review runs validate with 103 and 71 events; `git diff --check` PASS. These verify only the governance handoff and Recorder integrity, not Contract acceptance.
 - Fresh independent Review Agent command through Recorder: `pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`
   - Result: PASS on clean detached closure `9290139b918e76a0f0310b646ec7a9c6433c91a1`, exit `0`, elapsed `5915.9704 ms`; 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, schema lint, and 7 committed regressions.
@@ -113,7 +119,7 @@ Current Task State: review
 
 - Added only the Research Recorder control plane under `research/**`, `tools/research/**`, `tests/research/**`, the Research Task/evidence, and minimum `AGENTS.md`, handoff, and current-state governance text.
 - `contracts/http/auth-user-friend.openapi.json` is the canonical OpenAPI 3.1 Auth/User/Friend contract with separate credential-bound WEB/native refresh operations and operation/status-specific error codes; `contracts/http/verify-auth-user-friend.ps1` cross-validates it with fixtures and runs mutation regressions.
-- `contracts/http/auth-user-friend.openapi.structure.schema.json` is the repository-contained OpenAPI 3.1 structural lint used by the task verifier; the verifier now proves a document missing required `info.title` is rejected.
+- The obsolete `contracts/http/auth-user-friend.openapi.structure.schema.json` was removed. The task verifier now uses `contracts/http/openapi-3.1-2026-08-03.schema.json`, an offline standalone validator, and nine structural negative regressions. OAI's structural schema does not validate all embedded Schema Object content or every prose rule.
 - `contracts/errors/http-errors.schema.json` defines the shared HTTP error envelope and stable codes.
 - `contracts/fixtures/auth-user-friend/` defines constrained fixture schema `1.1` plus exact canonical/Go/Java positive and negative golden scenarios.
 - No database migrations, product implementation, WSS/Sync/Plugin contract, or frozen architecture changes were introduced by `LOOP1-CONTRACT-001`.
@@ -132,6 +138,7 @@ Current Task State: review
 - Candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is independently rejected because its verifier does not enforce OpenAPI 3.1 structural schema validity. Semantic verification PASS does not override the explicit schema-lint acceptance failure; the task remains `review` and S0 remains NOT YET PASSED.
 - Fix-Agent development evidence for candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` claimed the missing-`info.title` finding was repaired; the later independent result below supersedes that development conclusion for acceptance.
 - Candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` is independently rejected: its narrow bespoke schema catches missing `info.title` but accepts unknown top-level/`Info` members and a scalar Response Object, so the schema-lint acceptance remains incomplete.
+- Candidate `272bb28` passes Fix-Agent development verification but has no independent review result. The OAI schema intentionally leaves Schema Object contents and some prose requirements outside structural lint; the existing task-specific semantic verifier remains in force.
 - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
 - The Coordinator prospectively authorized the exact durable-evidence path for this repair cycle; that authorization does not retroactively excuse the prior hard violation.
 - The independent reviews of `74134bd306cbf0a1546f500bc46c45a1217b2d58` and `85069032c137cce6e526e0e329b6e93178515274` remain permanent FAIL records; accepted commit `aef6497d6216d9a8251250d157935e7af418d86b` supersedes them for task acceptance.
@@ -141,11 +148,11 @@ Current Task State: review
 
 ## Next Exact Action
 
-Commit the exact Human-authorized Recorder path amendment and preserved Review artifacts, then delegate `LOOP1-CONTRACT-001` to a fresh Fix Agent to replace or materially complete the OpenAPI 3.1 structural lint and add broader invalid-structure regressions. After Fix handoff, use a new fresh independent Review Agent. Do not select another product task.
+After the Fix handoff closure is committed, delegate `LOOP1-CONTRACT-001` candidate `272bb28` to a new fresh independent Review Agent in a clean committed checkout. The reviewer must independently exercise structural negative controls and the full task verifier; on PASS, apply ADR-0001 acceptance and the task transition. Do not select another product task while this task is unfinished.
 
 ## Last Known Good Commit
 
-`1c274bcbf92ebcc05c1bc208386c5976437d8221` (Recorder acceptance closure); `LOOP1-CONTRACT-001` fix candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` is independently rejected and is not a task acceptance point.
+`1c274bcbf92ebcc05c1bc208386c5976437d8221` (Recorder acceptance closure); `LOOP1-CONTRACT-001` Fix candidate `272bb28` is a committed development candidate, not a task acceptance point.
 
 ## Latest Checkpoint
 
@@ -156,8 +163,7 @@ Commit the exact Human-authorized Recorder path amendment and preserved Review a
 - Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
 - The original paused Agent retains sole ownership of the untracked `contracts/http/schema-lint/` tree in `H:\IM-platform`; resumed review work did not read, modify, copy, stash, clean, claim, or depend on it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
-- Recorder prompt/run artifacts for resumed review and fresh re-review remain untracked until the Coordinator commits them under the Human's exact 2026-09-23 path authorization. The empty-prompt registration limitation artifact remains preserved and explicitly excluded from the valid Review Run.
-- The current Coordinator Recorder prompt/run artifacts are owned by `/root` until this authorization handoff is committed.
+- Recorder prompt/run artifacts for the current Fix are owned by `/root/contract001_complete_oas_lint_fix` until the Fix handoff closure commits them. The unused wrong-source prompt registration is preserved and excluded from the active Fix run; the active run links the accurate `source=agent` prompt.
 
 ## Architecture Conflicts / ACP / ADR
 
