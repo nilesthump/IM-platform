@@ -29,13 +29,24 @@ if (Test-Path $contractPath) {
         'Reviewers cannot change product requirements, public contracts, or Frozen Architecture',
         'subordinate to Frozen Architecture'
     )
-    function Test-Clauses([string]$text) {
+    function Test-Policy([string]$text) {
         foreach ($clause in $clauses) {
             if (-not $text.Contains($clause)) { return $false }
         }
+        # These narrow checks reject explicit permissions that negate the guard.
+        # They are representative policy controls, not a style or complexity score.
+        $contradictions = @(
+            'future.stage infrastructure[^.\r\n]{0,160}\b(may|can|allowed|permitted)\b[^.\r\n]{0,160}\b(solely|only)\b[^.\r\n]{0,160}\b(future|might|possible)\b',
+            'abstractions?[^.\r\n]{0,160}\bwithout current (requirements?|justification)\b[^.\r\n]{0,160}\b(may|can|allowed|permitted)\b',
+            'minimality[^.\r\n]{0,160}\b(overrides?|supersedes?)\b[^.\r\n]{0,160}\bFrozen Architecture\b',
+            'reviewers?[^.\r\n]{0,160}\b(may|can|allowed|permitted)\b[^.\r\n]{0,160}\b(rewrite|change|modify)\b[^.\r\n]{0,160}\b(public contracts?|contracts?)\b'
+        )
+        foreach ($pattern in $contradictions) {
+            if ([regex]::IsMatch($text, $pattern, [Text.RegularExpressions.RegexOptions]::IgnoreCase)) { return $false }
+        }
         return $true
     }
-    Require (Test-Clauses $contract) 'canonical contract lacks a required governance clause'
+    Require (Test-Policy $contract) 'canonical contract lacks a required clause or contains contradictory permission'
 }
 $agents = Get-Content -Raw -LiteralPath $agentsPath
 $template = Get-Content -Raw -LiteralPath $templatePath
@@ -44,20 +55,21 @@ Require ($agents.Contains('MUST choose the simplest implementation') -and $agent
 Require ($agents.Contains('Review Agents MUST check unnecessary complexity')) 'review instruction missing'
 Require ($template.Contains('# Minimality') -and $template.Contains('current justification')) 'Task Template minimality prompt missing'
 
-# Disposable negative controls verify that the guard fails when its essential
-# clauses are removed. They do not alter repository artifacts or score code.
+# Exercise the same policy check against disposable contradictory clauses.
+# Necessary, currently justified complexity must still be accepted.
 if (Test-Path $contractPath) {
     $controls = @(
-        @{ Name = 'future-only rationale'; Needle = 'insufficient on their own' },
-        @{ Name = 'unjustified abstraction'; Needle = 'current approved requirements' },
-        @{ Name = 'necessary complexity'; Needle = 'Necessary boundaries and abstractions remain valid' },
-        @{ Name = 'architecture precedence'; Needle = 'subordinate to Frozen Architecture' },
-        @{ Name = 'contract rewrite'; Needle = 'Reviewers cannot change product requirements, public contracts, or Frozen Architecture' }
+        @{ Name = 'future-only rationale'; Clause = 'Future-stage infrastructure may be added solely because a future stage might need it.' },
+        @{ Name = 'unjustified abstraction'; Clause = 'Abstractions without current requirements may be added for future reuse.' },
+        @{ Name = 'architecture precedence'; Clause = 'Minimality overrides Frozen Architecture when simpler.' },
+        @{ Name = 'contract rewrite'; Clause = 'Reviewers may rewrite public contracts to simplify them.' }
     )
     foreach ($control in $controls) {
-        $mutant = $contract.Replace($control.Needle, '')
-        Require (-not (Test-Clauses $mutant)) "negative control failed: $($control.Name)"
+        $mutant = "$contract`n$($control.Clause)"
+        Require (-not (Test-Policy $mutant)) "negative control failed: $($control.Name)"
     }
+    $necessary = "$contract`nA repository abstraction is required by the current atomic transaction boundary."
+    Require (Test-Policy $necessary) 'necessary current complexity was mechanically rejected'
 }
 
 if (-not $SkipScope) {
@@ -72,7 +84,7 @@ if (-not $SkipScope) {
             $name -eq 'tools/verify-loop1-min-001.ps1' -or
             $name -eq 'spec/progress/current.md' -or
             $name -match '^spec/progress/(evidence/LOOP1-MIN-001/|checkpoints/.*loop1-min-001)' -or
-            $name -match '^research/(prompts/P-d7268d90-c7bb-4440-9406-7a27b633f0bb/|runs/R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b/)'
+            $name -match '^research/(prompts/P-(d7268d90-c7bb-4440-9406-7a27b633f0bb|4784081a-43aa-4beb-b8d5-c2be9fa5c62f|41263ca4-df41-4cc7-8089-58611e95c6ff|abd528ee-c978-4af7-8020-03fcd4b45222)/|runs/R-(20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b|20260923T014200Z-16aca9f1-8664-48d6-9af6-40e3a7bca7b4|20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e)/)'
         Require $allowed "out-of-scope path: $name"
     }
 }

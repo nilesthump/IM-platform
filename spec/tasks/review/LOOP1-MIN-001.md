@@ -36,6 +36,11 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
 - `research/prompts/P-d7268d90-c7bb-4440-9406-7a27b633f0bb/**`
 - `research/runs/R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b/**`
 - Additional fresh independent review Recorder prompt/run paths created by the reviewer for this task only.
+- `research/prompts/P-41263ca4-df41-4cc7-8089-58611e95c6ff/**`
+- `research/prompts/P-abd528ee-c978-4af7-8020-03fcd4b45222/**`
+- `research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/**`
+
+The Coordinator prospectively authorized the three exact Fix-cycle Recorder paths above on 2026-09-23. The first prompt is an empty registration attempt caused by an incorrect PowerShell pipeline; it remains as factual Recorder evidence. The second prompt contains the exact Fix delegation and is associated with the Fix run.
 
 # Acceptance
 
@@ -62,13 +67,15 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
 - Implementation Recorder: `R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b`.
 - Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-development.md`. Minimality verifier, CTRL-002 Development, and diff check passed locally; none is acceptance.
 - Acceptance evidence pending independent review.
+- Independent review of `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` returned FAIL because appended contradictory governance clauses were accepted by the verifier. Permanent evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-4f954ea-fail.md`; FAIL closure: `ca803b789b167f6e511a5229224250ee53ea937e`.
+- Fresh Fix Agent `/root/min001_fix` repaired the verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; prospective Recorder run `R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e`. The task verifier and CTRL-002 Development mode passed. In a disposable checkout, the independent review's exact contradictory clause was rejected (exit `1`), while a justified current transaction-boundary abstraction passed (exit `0`). A PowerShell-quoted diff check passed. Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Independent acceptance remains pending.
 
 # Handoff
 
-- Implementation complete in isolated worktree `H:\.codex\worktrees\loop1-min-001\IM-platform` from accepted control-plane commit `1c274bcbf92ebcc05c1bc208386c5976437d8221`; independent review pending.
+- Original implementation in isolated worktree `H:\.codex\worktrees\loop1-min-001\IM-platform` was rejected by independent review. The Fix Agent owns only the new isolated Fix worktree; no product or Contract task path is modified.
 - `LOOP1-CONTRACT-001` remains the separate unfinished current product task.
 - A direct fast-forward to `main` would import unaccepted `LOOP1-CONTRACT-001` ancestors. Preserve this as a merge blocker until a safe, independently accepted reconciliation exists.
 
 # Next Action
 
-- Request a fresh independent review of the clean committed candidate, then resolve the main ancestry blocker without importing unfinished Contract content.
+- Complete the focused Fix cycle, then request a new fresh independent review of its clean committed candidate. Resolve the main ancestry blocker without importing unfinished Contract content.

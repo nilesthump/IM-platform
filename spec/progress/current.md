@@ -22,6 +22,7 @@ Current Task State: review
 
 ## Immediately Relevant Completed Work
 
+- Concurrent Human-authorized control-plane insertion `LOOP1-MIN-001` remains in `review`, separate from current product task `LOOP1-CONTRACT-001`. The first Minimality candidate `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` failed independent review because its verifier accepted contradictory policy text; FAIL closure is `ca803b789b167f6e511a5229224250ee53ea937e`. Fresh Fix Agent `/root/min001_fix` repaired only that verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; development checks and disposable contradictory/necessary-complexity controls passed. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Next control-plane action: finish Recorder, commit the candidate, and obtain a new fresh independent review. This is not acceptance or an effective repository-level guard.
 - Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.
 - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
