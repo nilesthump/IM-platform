@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""File-based Research Recorder v1. Records observable facts, never hidden reasoning."""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import datetime as dt
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+import uuid
+
+SCHEMA_VERSION = "1.0.0"
+EVENT_TYPES = {
+    "run_started", "run_finished", "prompt_registered", "task_state_observed",
+    "git_state_observed", "command_started", "command_finished",
+    "verification_result", "test_result", "review_started", "review_finished",
+    "finding_created", "repair_started", "repair_finished", "ci_started",
+    "ci_finished", "architecture_conflict", "human_decision", "external_blocker",
+    "model_metadata", "instrumentation_warning",
+}
+ROLES = {"implementation", "review", "fix", "coordinator", "human", "ci", "bootstrap"}
+CAPTURE_MODES = {"prospective", "prospective_resume", "retrospective_backfill", "bootstrap_partial"}
+EXPERIMENT_GROUPS = {"vanilla", "spec_only", "full_governance", "unassigned"}
+SECRET_PATTERNS = [
+    re.compile(r"(?i)(authorization\s*:\s*(?:bearer\s+)?)[^\s]+"),
+    re.compile(r"(?i)\b(api[_-]?key|password|passwd|secret|access[_-]?token|refresh[_-]?token)\b\s*[:=]\s*[^\s,;]+"),
+    re.compile(r"\b(?:ghp|github_pat|sk)-[A-Za-z0-9_-]{12,}\b"),
+    re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
+]
+SENSITIVE_KEY_NAMES = {
+    "password", "passwd", "pwd", "secret", "apikey", "token", "accesstoken",
+    "refreshtoken", "authorization", "rawauthheaders", "authheader", "authheaders",
+    "credential", "credentials", "clientsecret", "privatekey", "signingkey",
+}
+CI_EVIDENCE_FIELDS = {
+    "provider", "ci_run_id", "commit_sha", "job_name", "result", "failed_checks",
+    "duration_ms", "evidence_reference",
+}

@@ -1,0 +1,735 @@
+===== same-slot-login-replaces-only-that-slot =====
+{
+  "id": "same-slot-login-replaces-only-that-slot",
+  "rules": [
+    "AUF-D-001",
+    "AUF-D-002",
+    "AUF-D-003",
+    "AUF-I-001",
+    "AUF-I-002",
+    "AUF-A-001",
+    "AUF-A-003"
+  ],
+  "preconditions": [
+    "alice exists",
+    "no active sessions"
+  ],
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "body": {
+          "username": "alice",
+          "password": "fixture-password-not-a-real-secret",
+          "clientType": "WEB",
+          "deviceId": "browser-1",
+          "clientVersion": "1.0.0",
+          "protocolVersion": "1"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "headers": {
+          "Set-Cookie": "__Host-im_refresh=<web-refresh-1>; Secure; HttpOnly; Path=/; SameSite=Strict"
+        },
+        "body": {
+          "session": {
+            "sessionId": "50000000-0000-4000-8000-000000000001",
+            "userId": "10000000-0000-4000-8000-000000000001",
+            "clientType": "WEB",
+            "sessionEpoch": 1,
+            "status": "ACTIVE"
+          },
+          "tokens": {
+            "accessToken": "<web-access-epoch-1>",
+            "accessTokenExpiresInSeconds": 900,
+            "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+          },
+          "replacedExistingSession": false
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "headers": {
+              "Set-Cookie": "__Host-im_refresh=<web-refresh-1>; Secure; HttpOnly; Path=/; SameSite=Strict"
+            },
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000001",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "WEB",
+                "sessionEpoch": 1,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<web-access-epoch-1>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+              },
+              "replacedExistingSession": false
+            }
+          },
+          "java": {
+            "status": 200,
+            "headers": {
+              "Set-Cookie": "__Host-im_refresh=<web-refresh-1>; Secure; HttpOnly; Path=/; SameSite=Strict"
+            },
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000001",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "WEB",
+                "sessionEpoch": 1,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<web-access-epoch-1>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+              },
+              "replacedExistingSession": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "body": {
+          "username": "alice",
+          "password": "fixture-password-not-a-real-secret",
+          "clientType": "DESKTOP",
+          "deviceId": "desktop-1",
+          "clientVersion": "1.0.0",
+          "protocolVersion": "1"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "session": {
+            "sessionId": "50000000-0000-4000-8000-000000000002",
+            "userId": "10000000-0000-4000-8000-000000000001",
+            "clientType": "DESKTOP",
+            "sessionEpoch": 1,
+            "status": "ACTIVE"
+          },
+          "tokens": {
+            "accessToken": "<desktop-access-epoch-1>",
+            "accessTokenExpiresInSeconds": 900,
+            "refreshToken": "<desktop-refresh-1>",
+            "refreshTokenExpiresInSeconds": 2592000,
+            "refreshTokenDelivery": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+          },
+          "replacedExistingSession": false
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000002",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "DESKTOP",
+                "sessionEpoch": 1,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<desktop-access-epoch-1>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshToken": "<desktop-refresh-1>",
+                "refreshTokenExpiresInSeconds": 2592000,
+                "refreshTokenDelivery": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+              },
+              "replacedExistingSession": false
+            }
+          },
+          "java": {
+            "status": 200,
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000002",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "DESKTOP",
+                "sessionEpoch": 1,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<desktop-access-epoch-1>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshToken": "<desktop-refresh-1>",
+                "refreshTokenExpiresInSeconds": 2592000,
+                "refreshTokenDelivery": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+              },
+              "replacedExistingSession": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "body": {
+          "username": "alice",
+          "password": "fixture-password-not-a-real-secret",
+          "clientType": "WEB",
+          "deviceId": "browser-2",
+          "clientVersion": "1.0.1",
+          "protocolVersion": "1"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "headers": {
+          "Set-Cookie": "__Host-im_refresh=<web-refresh-2>; Secure; HttpOnly; Path=/; SameSite=Strict"
+        },
+        "body": {
+          "session": {
+            "sessionId": "50000000-0000-4000-8000-000000000003",
+            "userId": "10000000-0000-4000-8000-000000000001",
+            "clientType": "WEB",
+            "sessionEpoch": 2,
+            "status": "ACTIVE"
+          },
+          "tokens": {
+            "accessToken": "<web-access-epoch-2>",
+            "accessTokenExpiresInSeconds": 900,
+            "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+          },
+          "replacedExistingSession": true
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "headers": {
+              "Set-Cookie": "__Host-im_refresh=<web-refresh-2>; Secure; HttpOnly; Path=/; SameSite=Strict"
+            },
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000003",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "WEB",
+                "sessionEpoch": 2,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<web-access-epoch-2>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+              },
+              "replacedExistingSession": true
+            }
+          },
+          "java": {
+            "status": 200,
+            "headers": {
+              "Set-Cookie": "__Host-im_refresh=<web-refresh-2>; Secure; HttpOnly; Path=/; SameSite=Strict"
+            },
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000003",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "WEB",
+                "sessionEpoch": 2,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<web-access-epoch-2>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+              },
+              "replacedExistingSession": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/users/me",
+        "headers": {
+          "Authorization": "Bearer <new-web-token-epoch-2>"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "user": {
+            "userId": "10000000-0000-4000-8000-000000000001",
+            "username": "alice",
+            "displayName": "Alice"
+          }
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "body": {
+              "user": {
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "username": "alice",
+                "displayName": "Alice"
+              }
+            }
+          },
+          "java": {
+            "status": 200,
+            "body": {
+              "user": {
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "username": "alice",
+                "displayName": "Alice"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/v1/users/me",
+        "headers": {
+          "Authorization": "Bearer <desktop-token-epoch-1>"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "user": {
+            "userId": "10000000-0000-4000-8000-000000000001",
+            "username": "alice",
+            "displayName": "Alice"
+          }
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "body": {
+              "user": {
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "username": "alice",
+                "displayName": "Alice"
+              }
+            }
+          },
+          "java": {
+            "status": 200,
+            "body": {
+              "user": {
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "username": "alice",
+                "displayName": "Alice"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "stateAssertions": [
+    "exactly one WEB session is ACTIVE",
+    "the former WEB session is REVOKED before epoch 2 is returned",
+    "the DESKTOP session remains ACTIVE",
+    "the old WEB connection observes session.revoked before close"
+  ],
+  "forbiddenObservations": [
+    "two ACTIVE sessions for alice and WEB",
+    "revocation of the DESKTOP slot"
+  ]
+}
+===== native-refresh-rotates-current-session-credential =====
+{
+  "id": "native-refresh-rotates-current-session-credential",
+  "rules": [
+    "AUF-D-001",
+    "AUF-D-009",
+    "AUF-I-002",
+    "AUF-I-007"
+  ],
+  "preconditions": [
+    "alice has an ACTIVE MOBILE session at epoch 4 with refresh token R1"
+  ],
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/refresh/native",
+        "body": {
+          "refreshToken": "<refresh-R1>",
+          "clientType": "MOBILE",
+          "deviceId": "mobile-1",
+          "clientVersion": "1.0.0",
+          "protocolVersion": "1"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "session": {
+            "sessionId": "50000000-0000-4000-8000-000000000004",
+            "userId": "10000000-0000-4000-8000-000000000001",
+            "clientType": "MOBILE",
+            "sessionEpoch": 4,
+            "status": "ACTIVE"
+          },
+          "tokens": {
+            "accessToken": "<mobile-access-epoch-4>",
+            "accessTokenExpiresInSeconds": 900,
+            "refreshToken": "<refresh-R2>",
+            "refreshTokenExpiresInSeconds": 2592000,
+            "refreshTokenDelivery": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+          },
+          "replacedExistingSession": false
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000004",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "MOBILE",
+                "sessionEpoch": 4,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<mobile-access-epoch-4>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshToken": "<refresh-R2>",
+                "refreshTokenExpiresInSeconds": 2592000,
+                "refreshTokenDelivery": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+              },
+              "replacedExistingSession": false
+            }
+          },
+          "java": {
+            "status": 200,
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000004",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "MOBILE",
+                "sessionEpoch": 4,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<mobile-access-epoch-4>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshToken": "<refresh-R2>",
+                "refreshTokenExpiresInSeconds": 2592000,
+                "refreshTokenDelivery": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+              },
+              "replacedExistingSession": false
+            }
+          }
+        }
+      }
+    }
+  ],
+  "stateAssertions": [
+    "R1 is revoked atomically when R2 is issued",
+    "the session remains MOBILE epoch 4"
+  ],
+  "forbiddenObservations": [
+    "R1 appears in logs or traces",
+    "token lifetime is fixed by the contract"
+  ]
+}
+===== web-refresh-rotates-secure-cookie =====
+{
+  "id": "web-refresh-rotates-secure-cookie",
+  "rules": [
+    "AUF-D-001",
+    "AUF-D-009",
+    "AUF-I-002",
+    "AUF-I-007"
+  ],
+  "preconditions": [
+    "alice has an ACTIVE WEB session at epoch 5 and the browser holds refresh cookie R5"
+  ],
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/refresh/web",
+        "headers": {
+          "Cookie": "__Host-im_refresh=<web-refresh-5>"
+        },
+        "body": {
+          "clientType": "WEB",
+          "deviceId": "browser-5",
+          "clientVersion": "1.0.0",
+          "protocolVersion": "1"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "headers": {
+          "Set-Cookie": "__Host-im_refresh=<web-refresh-6>; Secure; HttpOnly; Path=/; SameSite=Strict"
+        },
+        "body": {
+          "session": {
+            "sessionId": "50000000-0000-4000-8000-000000000005",
+            "userId": "10000000-0000-4000-8000-000000000001",
+            "clientType": "WEB",
+            "sessionEpoch": 5,
+            "status": "ACTIVE"
+          },
+          "tokens": {
+            "accessToken": "<web-access-epoch-5>",
+            "accessTokenExpiresInSeconds": 900,
+            "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+          },
+          "replacedExistingSession": false
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "headers": {
+              "Set-Cookie": "__Host-im_refresh=<web-refresh-6>; Secure; HttpOnly; Path=/; SameSite=Strict"
+            },
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000005",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "WEB",
+                "sessionEpoch": 5,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<web-access-epoch-5>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+              },
+              "replacedExistingSession": false
+            }
+          },
+          "java": {
+            "status": 200,
+            "headers": {
+              "Set-Cookie": "__Host-im_refresh=<web-refresh-6>; Secure; HttpOnly; Path=/; SameSite=Strict"
+            },
+            "body": {
+              "session": {
+                "sessionId": "50000000-0000-4000-8000-000000000005",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "clientType": "WEB",
+                "sessionEpoch": 5,
+                "status": "ACTIVE"
+              },
+              "tokens": {
+                "accessToken": "<web-access-epoch-5>",
+                "accessTokenExpiresInSeconds": 900,
+                "refreshTokenDelivery": "HTTP_ONLY_SECURE_COOKIE"
+              },
+              "replacedExistingSession": false
+            }
+          }
+        }
+      }
+    }
+  ],
+  "stateAssertions": [
+    "the presented cookie credential is revoked atomically when the rotated cookie is issued",
+    "the session remains WEB epoch 5"
+  ],
+  "forbiddenObservations": [
+    "refresh token appears in response body logs or traces",
+    "cookie lacks Secure or HttpOnly"
+  ]
+}
+===== logout-revokes-session-refresh-and-connection =====
+{
+  "id": "logout-revokes-session-refresh-and-connection",
+  "rules": [
+    "AUF-D-008",
+    "AUF-A-006"
+  ],
+  "preconditions": [
+    "alice has an ACTIVE DESKTOP session with refresh token and WSS connection"
+  ],
+  "steps": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/logout",
+        "headers": {
+          "Authorization": "Bearer <desktop-access-token>"
+        }
+      },
+      "expected": {
+        "status": 204,
+        "normalizedOutputs": {
+          "go": {
+            "status": 204
+          },
+          "java": {
+            "status": 204
+          }
+        }
+      }
+    }
+  ],
+  "stateAssertions": [
+    "session is REVOKED",
+    "all refresh tokens for the session are revoked",
+    "the WSS connection receives the revocation effect then closes"
+  ],
+  "forbiddenObservations": [
+    "local SQLite or client history is deleted"
+  ]
+}
+===== friend-add-normalizes-and-reuses-direct =====
+{
+  "id": "friend-add-normalizes-and-reuses-direct",
+  "rules": [
+    "AUF-D-005",
+    "AUF-D-006",
+    "AUF-D-007",
+    "AUF-I-005",
+    "AUF-I-006",
+    "AUF-A-004",
+    "AUF-A-005"
+  ],
+  "preconditions": [
+    "users A and B exist and are distinct",
+    "no A/B friendship exists"
+  ],
+  "steps": [
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/friends/20000000-0000-4000-8000-000000000002",
+        "headers": {
+          "Authorization": "Bearer <user-A-access-token>"
+        }
+      },
+      "expected": {
+        "status": 201,
+        "body": {
+          "friendshipId": "30000000-0000-4000-8000-000000000003",
+          "normalizedPair": {
+            "lowUserId": "10000000-0000-4000-8000-000000000001",
+            "highUserId": "20000000-0000-4000-8000-000000000002"
+          },
+          "directConversationId": "40000000-0000-4000-8000-000000000004",
+          "memberUserIds": [
+            "10000000-0000-4000-8000-000000000001",
+            "20000000-0000-4000-8000-000000000002"
+          ],
+          "created": true
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 201,
+            "body": {
+              "friendshipId": "30000000-0000-4000-8000-000000000003",
+              "normalizedPair": {
+                "lowUserId": "10000000-0000-4000-8000-000000000001",
+                "highUserId": "20000000-0000-4000-8000-000000000002"
+              },
+              "directConversationId": "40000000-0000-4000-8000-000000000004",
+              "memberUserIds": [
+                "10000000-0000-4000-8000-000000000001",
+                "20000000-0000-4000-8000-000000000002"
+              ],
+              "created": true
+            }
+          },
+          "java": {
+            "status": 201,
+            "body": {
+              "friendshipId": "30000000-0000-4000-8000-000000000003",
+              "normalizedPair": {
+                "lowUserId": "10000000-0000-4000-8000-000000000001",
+                "highUserId": "20000000-0000-4000-8000-000000000002"
+              },
+              "directConversationId": "40000000-0000-4000-8000-000000000004",
+              "memberUserIds": [
+                "10000000-0000-4000-8000-000000000001",
+                "20000000-0000-4000-8000-000000000002"
+              ],
+              "created": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/v1/friends/10000000-0000-4000-8000-000000000001",
+        "headers": {
+          "Authorization": "Bearer <user-B-access-token>"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "friendshipId": "30000000-0000-4000-8000-000000000003",
+          "normalizedPair": {
+            "lowUserId": "10000000-0000-4000-8000-000000000001",
+            "highUserId": "20000000-0000-4000-8000-000000000002"
+          },
+          "directConversationId": "40000000-0000-4000-8000-000000000004",
+          "memberUserIds": [
+            "10000000-0000-4000-8000-000000000001",
+            "20000000-0000-4000-8000-000000000002"
+          ],
+          "created": false
+        },
+        "normalizedOutputs": {
+          "go": {
+            "status": 200,
+            "body": {
+              "friendshipId": "30000000-0000-4000-8000-000000000003",
+              "normalizedPair": {
+                "lowUserId": "10000000-0000-4000-8000-000000000001",
+                "highUserId": "20000000-0000-4000-8000-000000000002"
+              },
+              "directConversationId": "40000000-0000-4000-8000-000000000004",
+              "memberUserIds": [
+                "10000000-0000-4000-8000-000000000001",
+                "20000000-0000-4000-8000-000000000002"
+              ],
+              "created": false
+            }
+          },
+          "java": {
+            "status": 200,
+            "body": {
+              "friendshipId": "30000000-0000-4000-8000-000000000003",
+              "normalizedPair": {
+                "lowUserId": "10000000-0000-4000-8000-000000000001",
+                "highUserId": "20000000-0000-4000-8000-000000000002"
+              },
+              "directConversationId": "40000000-0000-4000-8000-000000000004",
+              "memberUserIds": [
+                "10000000-0000-4000-8000-000000000001",
+                "20000000-0000-4000-8000-000000000002"
+              ],
+              "created": false
+            }
+          }
+        }
+      }
+    }
+  ],
+  "stateAssertions": [
+    "one normalized friendship exists",
+    "one DIRECT conversation exists",
+    "exactly two distinct memberships exist",
+    "friendship conversation memberships sync events and outbox effects share one commit outcome"
+  ],
+  "forbiddenObservations": [
+    "PENDING friendship state",
+    "a second friendship",
+    "a second DIRECT conversation"
+  ]
+}

@@ -1,0 +1,283 @@
+SCHEMA WebTokens
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "accessToken",
+    "accessTokenExpiresInSeconds",
+    "refreshTokenDelivery"
+  ],
+  "properties": {
+    "accessToken": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accessTokenExpiresInSeconds": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "refreshTokenDelivery": {
+      "const": "HTTP_ONLY_SECURE_COOKIE"
+    }
+  }
+}
+SCHEMA NativeTokens
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "accessToken",
+    "accessTokenExpiresInSeconds",
+    "refreshToken",
+    "refreshTokenExpiresInSeconds",
+    "refreshTokenDelivery"
+  ],
+  "properties": {
+    "accessToken": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accessTokenExpiresInSeconds": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "refreshToken": {
+      "type": "string",
+      "minLength": 1
+    },
+    "refreshTokenExpiresInSeconds": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "refreshTokenDelivery": {
+      "const": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+    }
+  }
+}
+SCHEMA RegisterRequest
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "username",
+    "password",
+    "displayName"
+  ],
+  "properties": {
+    "username": {
+      "$ref": "#/components/schemas/Username"
+    },
+    "password": {
+      "$ref": "#/components/schemas/Password"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    }
+  }
+}
+SCHEMA User
+null
+SCHEMA ErrorResponse
+null
+OP login
+DESC A successful login atomically revokes any active session in the same user/clientType slot, increments that slot's sessionEpoch, creates the replacement session, and only then returns it. Other clientType slots remain valid.
+{
+  "200": {
+    "description": "Login committed",
+    "headers": {
+      "Set-Cookie": {
+        "description": "For WEB only, __Host-im_refresh is emitted with Secure, HttpOnly, Path=/, and SameSite=Strict attributes; native clients never receive this cookie.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/AuthResult"
+        }
+      }
+    }
+  },
+  "400": {
+    "$ref": "#/components/responses/BadRequest",
+    "x-error-codes": [
+      "VALIDATION_FAILED"
+    ]
+  },
+  "401": {
+    "$ref": "#/components/responses/Unauthorized",
+    "x-error-codes": [
+      "AUTH_INVALID_CREDENTIALS"
+    ]
+  },
+  "426": {
+    "$ref": "#/components/responses/UnsupportedProtocol",
+    "x-error-codes": [
+      "PROTOCOL_VERSION_UNSUPPORTED"
+    ]
+  }
+}
+OP refreshWebSession
+DESC WEB must present the refresh credential only in the __Host-im_refresh Secure HttpOnly cookie. The required body supplies client metadata but cannot carry a refresh token. A successful refresh rotates and independently revokes the presented refresh token.
+{
+  "200": {
+    "description": "WEB refresh committed",
+    "headers": {
+      "Set-Cookie": {
+        "description": "The rotated __Host-im_refresh cookie is emitted with Secure, HttpOnly, Path=/, and SameSite=Strict attributes.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/AuthResult"
+        }
+      }
+    }
+  },
+  "400": {
+    "$ref": "#/components/responses/BadRequest",
+    "x-error-codes": [
+      "VALIDATION_FAILED"
+    ]
+  },
+  "401": {
+    "$ref": "#/components/responses/Unauthorized",
+    "x-error-codes": [
+      "AUTH_REQUIRED",
+      "AUTH_TOKEN_INVALID",
+      "AUTH_TOKEN_EXPIRED",
+      "AUTH_SESSION_REVOKED",
+      "AUTH_SESSION_EPOCH_STALE",
+      "AUTH_CLIENT_TYPE_MISMATCH",
+      "AUTH_REFRESH_REVOKED"
+    ]
+  },
+  "426": {
+    "$ref": "#/components/responses/UnsupportedProtocol",
+    "x-error-codes": [
+      "PROTOCOL_VERSION_UNSUPPORTED"
+    ]
+  }
+}
+OP refreshNativeSession
+DESC DESKTOP and MOBILE must present a nonempty refresh token together with clientType, deviceId, clientVersion, and protocolVersion in the required JSON body. WEB is not representable on this operation. A successful refresh rotates and independently revokes the presented refresh token.
+{
+  "200": {
+    "description": "Native refresh committed",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/AuthResult"
+        }
+      }
+    }
+  },
+  "400": {
+    "$ref": "#/components/responses/BadRequest",
+    "x-error-codes": [
+      "VALIDATION_FAILED"
+    ]
+  },
+  "401": {
+    "$ref": "#/components/responses/Unauthorized",
+    "x-error-codes": [
+      "AUTH_TOKEN_INVALID",
+      "AUTH_TOKEN_EXPIRED",
+      "AUTH_SESSION_REVOKED",
+      "AUTH_SESSION_EPOCH_STALE",
+      "AUTH_CLIENT_TYPE_MISMATCH",
+      "AUTH_REFRESH_REVOKED"
+    ]
+  },
+  "426": {
+    "$ref": "#/components/responses/UnsupportedProtocol",
+    "x-error-codes": [
+      "PROTOCOL_VERSION_UNSUPPORTED"
+    ]
+  }
+}
+OP logout
+DESC Atomically revokes the bound session and every refresh token issued for it. The service then emits the session revocation effect and closes its WSS connection. Local client history is not deleted.
+{
+  "204": {
+    "description": "Session and refresh credentials revoked; no response body"
+  },
+  "401": {
+    "$ref": "#/components/responses/Unauthorized",
+    "x-error-codes": [
+      "AUTH_REQUIRED",
+      "AUTH_TOKEN_INVALID",
+      "AUTH_TOKEN_EXPIRED",
+      "AUTH_SESSION_REVOKED",
+      "AUTH_SESSION_EPOCH_STALE",
+      "AUTH_CLIENT_TYPE_MISMATCH"
+    ]
+  }
+}
+OP addFriend
+DESC Idempotently establishes an immediate bidirectional friendship. The normalized friendship, the pair's single DIRECT conversation, exactly two memberships, user sync events, and outbox effects commit atomically. There is no pending or approval state. Reversing caller and target returns the same friendshipId and directConversationId.
+{
+  "200": {
+    "description": "Existing normalized friendship returned",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/FriendshipResult"
+        }
+      }
+    }
+  },
+  "201": {
+    "description": "Friendship and DIRECT conversation atomically created",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/FriendshipResult"
+        }
+      }
+    }
+  },
+  "401": {
+    "$ref": "#/components/responses/Unauthorized",
+    "x-error-codes": [
+      "AUTH_REQUIRED",
+      "AUTH_TOKEN_INVALID",
+      "AUTH_TOKEN_EXPIRED",
+      "AUTH_SESSION_REVOKED",
+      "AUTH_SESSION_EPOCH_STALE",
+      "AUTH_CLIENT_TYPE_MISMATCH"
+    ]
+  },
+  "403": {
+    "$ref": "#/components/responses/Forbidden",
+    "x-error-codes": [
+      "AUTHORIZATION_DENIED"
+    ]
+  },
+  "404": {
+    "$ref": "#/components/responses/NotFound",
+    "x-error-codes": [
+      "USER_NOT_FOUND"
+    ]
+  },
+  "409": {
+    "$ref": "#/components/responses/Conflict",
+    "x-error-codes": [
+      "FRIENDSHIP_STATE_CONFLICT"
+    ]
+  },
+  "422": {
+    "$ref": "#/components/responses/Unprocessable",
+    "x-error-codes": [
+      "FRIEND_SELF_NOT_ALLOWED"
+    ]
+  }
+}

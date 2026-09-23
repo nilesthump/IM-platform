@@ -35,8 +35,12 @@ Define the canonical HTTP Auth/User/Friend OpenAPI contract, shared errors, and 
 - `spec/tasks/**/LOOP1-CONTRACT-001.md`
 - `spec/progress/current.md`
 - `spec/progress/evidence/LOOP1-CONTRACT-001/**`
+- `research/prompts/**` (only Recorder prompts linked to `LOOP1-CONTRACT-001`)
+- `research/runs/**` (only Recorder runs linked to `LOOP1-CONTRACT-001`)
 
 The Coordinator explicitly authorized the exact evidence path above on 2026-09-20 to satisfy repository-level durable-evidence governance. This prospective authorization does not erase the independent review's permanent finding that implementation commit `acfe36c2040e749ee508485ee8b577dc76604961` had previously self-expanded the write boundary.
+
+On 2026-09-23, the Human answered `ok` to the Coordinator's explicit request to add the two Task-linked Recorder paths above and commit the preserved Review artifacts. This authorization is limited to `LOOP1-CONTRACT-001` prompts and runs; it does not erase the prior independent finding that Fix-run Recorder artifacts were committed before those paths were listed here. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-recorder-path-authorization.md`.
 
 # Acceptance
 
@@ -85,6 +89,7 @@ The Coordinator explicitly authorized the exact evidence path above on 2026-09-2
 - The independent missing-`info.title` disposable control was correctly rejected. However, broader in-memory controls proved that the bespoke structural schema accepts an unknown top-level member, an unknown `Info` member, and a scalar Response Object. The explicit schema-lint acceptance is therefore still incomplete.
 - Canonical OpenAPI, shared errors, and fixtures are unchanged between `12c566f71da9b038764ecb7a5303b116e77ca32f` and `5d1d16561d7671ce54d6456741a51c21f5d3dadc`; no additional contract-semantic defect was found.
 - Permanent FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-5d1d165-fail.md`.
+- Human authorization for Task-linked Recorder prompt/run paths and validation of the preserved Review artifacts: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-recorder-path-authorization.md`. This does not change either independent FAIL outcome.
 
 # Handoff
 
@@ -99,7 +104,8 @@ The Coordinator explicitly authorized the exact evidence path above on 2026-09-2
 - The Fix Agent added deterministic repository-contained OpenAPI 3.1 structural schema lint and a regression proving a missing required `info.title` is rejected without reading, copying, modifying, claiming, or depending on the paused Agent-owned untracked `contracts/http/schema-lint/` tree. No contract semantics or fixtures changed.
 - The fresh independent re-review confirmed that the missing-`info.title` case is rejected but found the bespoke schema remains too narrow to establish OpenAPI 3.1 structural validity. It accepts multiple invalid structures, so the Task remains in `review` and requires another fresh Fix Agent.
 - The re-review also recorded a governance inconsistency: Task-linked Recorder artifacts are required by repository policy but `research/**` is absent from this Task's hard `allowed_paths`. Resolve that boundary explicitly before committing the next cycle's Recorder artifacts.
+- The Human authorized the exact Task-linked Recorder prompt/run paths on 2026-09-23. The prior boundary finding remains in the independent FAIL record; subsequent cycles may use these paths only for this Task.
 
 # Next Action
 
-- First resolve the Task-linked `research/**` Recorder write-boundary inconsistency through explicit Human authorization or a properly authorized Task boundary update. Then delegate to a fresh Fix Agent to replace or materially complete the OpenAPI 3.1 structural schema and add broader invalid-structure regressions. After the Fix handoff, delegate a new fresh independent Review Agent; no fixer may accept its own work.
+- Delegate to a fresh Fix Agent to replace or materially complete the OpenAPI 3.1 structural schema and add broader invalid-structure regressions. After the Fix handoff, delegate a new fresh independent Review Agent; no fixer may accept its own work.

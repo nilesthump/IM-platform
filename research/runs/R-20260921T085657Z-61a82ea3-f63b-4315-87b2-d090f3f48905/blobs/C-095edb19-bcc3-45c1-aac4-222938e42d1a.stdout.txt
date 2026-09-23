@@ -1,0 +1,46 @@
+架构基线 v1.0 | Frozen Architecture                                                                  Loop 1 执行版
+
+
+
+
+7. HTTPS/WSS/TLS 与认证协议
+7.1 登录与 Token
+● POST /auth/login 包含 username/password、client_type、device_id、client_version、protocol_version。
+
+● Access Token 短期、Refresh Token 长期；具体时长是配置，不写死进协议。
+
+● Web 优先使用 HttpOnly Secure Cookie 持有 Refresh Token；原生端使用 OS secure storage。
+
+● 显式 logout 撤销 Session、Refresh Token 与 WSS；退出登录不等于立即删除本地 SQLite。
+
+7.2 WSS 状态机
+TCP/TLS -> WebSocket Upgrade -> UNAUTHENTICATED
+UNAUTHENTICATED 只允许 auth.bind 与 ping/pong
+auth.bind 校验签名、exp、session_id、client_type、session_epoch
+成功 -> AUTHENTICATED，socket 永久绑定 user/session/client_type
+同端新登录 -> session.revoked -> 推送旧连接 -> close
+
+
+7.3 Session 缓存一致性
+Core 在 Session 创建/撤销事务中写 outbox；Gateway 经 NATS 更新内存映射 (user_id, client_type) ->
+session_id/epoch/connection_id。每条消息不查询 PostgreSQL。实时撤销事件是体验优化；数据库权威状态和 epoch 确
+保旧 token 最终无法重连。
+
+7.4 传输与日志安全
+ 规则                       要求
+
+ 传输                       生产入口仅 HTTPS/WSS/TLS；禁用明文回退
+
+ Token                    禁止放 URL query；禁止写应用日志/trace；错误响应不得回显
+
+ 密码                       只存强哈希；凭证与普通用户资料分离
+
+ 插件                       永不向 Custom Renderer 暴露认证 token 或 SQLite 直连
+
+ 日志                       request_id/message_id 可观测；消息正文默认不进入结构化日志
+
+
+
+
+面向十万级在线连接的可扩展分布式即时通信平台                                                                                   12
+

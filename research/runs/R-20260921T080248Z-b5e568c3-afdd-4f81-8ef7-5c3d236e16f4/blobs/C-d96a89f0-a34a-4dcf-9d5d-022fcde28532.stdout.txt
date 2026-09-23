@@ -1,0 +1,14 @@
+tools/research\recorder.py:25:    "ci_finished", "architecture_conflict", "human_decision", "external_blocker",
+tools/research\recorder.py:261:        required = {"schema_version", "seq", "timestamp", "run_id", "task_id", "role", "event_type", "data", "previous_event_hash", "event_hash"}
+tools/research\recorder.py:268:        if item["schema_version"] != SCHEMA_VERSION or item["event_type"] not in EVENT_TYPES or item["role"] not in ROLES or not isinstance(item["data"], dict):
+tools/research\recorder.py:281:def append_event(root: Path, run_id: str, event_type: str, data: dict, *, allow_finished: bool = False) -> dict:
+tools/research\recorder.py:282:    if event_type not in EVENT_TYPES:
+tools/research\recorder.py:283:        raise RecorderError(f"unsupported event_type: {event_type}")
+tools/research\recorder.py:300:                 "task_id": metadata["task_id"], "role": metadata["role"], "event_type": event_type,
+tools/research\recorder.py:434:    if args.event_type in {"verification_result", "test_result", "review_finished", "ci_finished"} and "result" not in safe_data:
+tools/research\recorder.py:435:        raise RecorderError(f"{args.event_type} requires an observed result")
+tools/research\recorder.py:438:    event = append_event(root, args.run_id, args.event_type, safe_data)
+tools/research\recorder.py:536:    if not records or records[0]["event_type"] != "run_started":
+tools/research\recorder.py:542:        if records[-1]["event_type"] != "run_finished":
+research/schema\event.schema.json:5:  "required": ["schema_version", "seq", "timestamp", "run_id", "task_id", "role", "event_type", "data", "previous_event_hash", "event_hash"],
+research/schema\event.schema.json:13:    "event_type": {"type": "string"},

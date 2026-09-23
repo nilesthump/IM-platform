@@ -1,0 +1,103 @@
+ AGENTS.md                                          |    6 +
+ contracts/errors/.gitkeep                          |    1 -
+ contracts/errors/http-errors.schema.json           |   59 +
+ contracts/fixtures/.gitkeep                        |    1 -
+ .../fixtures/auth-user-friend/fixture.schema.json  |  558 ++++
+ contracts/fixtures/auth-user-friend/negative.json  | 1371 +++++++++
+ contracts/fixtures/auth-user-friend/positive.json  |  853 ++++++
+ contracts/http/.gitkeep                            |    1 -
+ contracts/http/auth-user-friend.openapi.json       | 1027 +++++++
+ .../auth-user-friend.openapi.structure.schema.json |  167 ++
+ contracts/http/verify-auth-user-friend.ps1         |  529 ++++
+ research/.gitattributes                            |    2 +
+ research/INSTRUMENTATION_EPOCH.json                |    9 +
+ research/README.md                                 |   48 +
+ research/backfill/LOOP1-CONTRACT-001.json          |   33 +
+ research/backfill/LOOP1-CTRL-001.json              |   22 +
+ research/backfill/LOOP1-CTRL-002.json              |   31 +
+ research/backfill/LOOP1-SPEC-001.json              |   36 +
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ .../metadata.json                                  |   13 +
+ .../P-LOOP1-RESEARCH-001-HUMAN-AUTH-V1/prompt.txt  | 1188 ++++++++
+ research/protocol/paused-agent-resume.md           |    7 +
+ research/resume/LOOP1-CONTRACT-001-activation.json |   27 +
+ .../LOOP1-CONTRACT-001-start-run.example.json      |   13 +
+ ...0918ab2e-fe0a-41ad-bfad-0b6e38024603.stderr.txt |    0
+ ...0918ab2e-fe0a-41ad-bfad-0b6e38024603.stdout.txt |    3 +
+ ...0cc9df18-3bc7-4110-a076-bb81c4c46ad6.stderr.txt |    0
+ ...0cc9df18-3bc7-4110-a076-bb81c4c46ad6.stdout.txt |   17 +
+ ...189755ce-7661-4b8b-a4db-97dc579254cc.stderr.txt |    0
+ ...189755ce-7661-4b8b-a4db-97dc579254cc.stdout.txt |    1 +
+ ...2eaf7398-5c8d-4870-be64-b4fa6fddb829.stderr.txt |    0
+ ...2eaf7398-5c8d-4870-be64-b4fa6fddb829.stdout.txt |    1 +
+ ...2fddb7a4-3984-4e8b-8f89-9187cfb36ba9.stderr.txt |    0
+ ...2fddb7a4-3984-4e8b-8f89-9187cfb36ba9.stdout.txt |   19 +
+ ...310b2f12-a942-4998-898b-64b6a2c488bb.stderr.txt |    4 +
+ ...310b2f12-a942-4998-898b-64b6a2c488bb.stdout.txt |   14 +
+ ...447d4671-6fa2-47b1-8207-a24fbe075a7d.stderr.txt |    0
+ ...447d4671-6fa2-47b1-8207-a24fbe075a7d.stdout.txt |    3 +
+ ...4ff5f60b-807d-4217-bb2a-e8e463a6fdce.stderr.txt |    0
+ ...4ff5f60b-807d-4217-bb2a-e8e463a6fdce.stdout.txt |    1 +
+ ...6637b1eb-5e49-4e6e-8aa7-7cf7fe0a47aa.stderr.txt |    0
+ ...6637b1eb-5e49-4e6e-8aa7-7cf7fe0a47aa.stdout.txt |    1 +
+ ...c0463362-e1f7-42a1-a89c-7ed23fc8280e.stderr.txt |    0
+ ...c0463362-e1f7-42a1-a89c-7ed23fc8280e.stdout.txt |  506 ++++
+ ...c065f94b-02cd-4a3f-b717-96da0f55f269.stderr.txt |    0
+ ...c065f94b-02cd-4a3f-b717-96da0f55f269.stdout.txt |    1 +
+ ...d0f05291-3e4f-4ba1-a091-b3fa2ebe340b.stderr.txt |    0
+ ...d0f05291-3e4f-4ba1-a091-b3fa2ebe340b.stdout.txt |    3 +
+ ...f850baae-a1bf-4b29-9d16-b3f6c532ead0.stderr.txt |    2 +
+ ...f850baae-a1bf-4b29-9d16-b3f6c532ead0.stdout.txt |   11 +
+ ...faf3d82c-bfeb-43a2-9915-53e69f6374ae.stderr.txt |    0
+ ...faf3d82c-bfeb-43a2-9915-53e69f6374ae.stdout.txt |    3 +
+ ...fc216b6a-88a7-48ae-99fa-16e0af72422f.stderr.txt |    0
+ ...fc216b6a-88a7-48ae-99fa-16e0af72422f.stdout.txt |   51 +
+ .../diff.patch                                     | 1059 +++++++
+ .../events.jsonl                                   |   34 +
+ .../final_state.json                               | 1556 ++++++++++
+ .../initial_state.json                             | 1476 +++++++++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ ...46e0f98c-32db-4629-b9f4-4fec40e23e7f.stderr.txt |    0
+ ...46e0f98c-32db-4629-b9f4-4fec40e23e7f.stdout.txt |    3 +
+ ...4965d0d3-7577-48c0-a7a1-d143b6f129a6.stderr.txt |    0
+ ...4965d0d3-7577-48c0-a7a1-d143b6f129a6.stdout.txt |    3 +
+ ...49c9f1a5-d758-42eb-b761-e071baca4b1d.stderr.txt |   22 +
+ ...49c9f1a5-d758-42eb-b761-e071baca4b1d.stdout.txt |   21 +
+ ...81e58c81-8d78-4d72-bfcc-de77d3174daf.stderr.txt |   32 +
+ ...81e58c81-8d78-4d72-bfcc-de77d3174daf.stdout.txt |   19 +
+ ...bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stderr.txt |   21 +
+ ...bab9c64c-8a4f-428a-b936-5b4f7e8bc2da.stdout.txt |   20 +
+ ...c16547a6-ec41-40c1-9e4d-c4035228f410.stderr.txt |    3 +
+ ...c16547a6-ec41-40c1-9e4d-c4035228f410.stdout.txt |    0
+ .../diff.patch                                     | 3125 ++++++++++++++++++++
+ .../events.jsonl                                   |   17 +
+ .../final_state.json                               |  152 +
+ .../initial_state.json                             |  201 ++
+ .../metadata.json                                  |   23 +
+ .../summary.json                                   |   10 +
+ research/schema/ci-ingestion.schema.json           |   17 +
+ research/schema/event.schema.json                  |   18 +
+ research/schema/run-metadata.schema.json           |   12 +
+ spec/handoff/agent-context.md                      |    2 +
+ .../2026-09-21-loop1-research-001-accepted.md      |   13 +
+ spec/progress/current.md                           |  110 +-
+ .../2026-09-20-development-acfe36c-pass.md         |   35 +
+ .../2026-09-20-fix-12c566f-pass.md                 |   47 +
+ .../2026-09-20-independent-review-1c2637c-fail.md  |   37 +
+ .../2026-09-20-metadata-sha-correction.md          |   37 +
+ .../2026-09-21-fix-5d1d165-development.md          |   48 +
+ .../2026-09-21-fix-delegation-prompt.txt           |    1 +
+ .../2026-09-21-independent-review-12c566f-fail.md  |   63 +
+ .../LOOP1-RESEARCH-001/2026-09-21-development.md   |   45 +
+ .../2026-09-21-fix-1d850cf-development.md          |   47 +
+ .../2026-09-21-independent-review-96fc13d-fail.md  |   84 +
+ .../2026-09-21-independent-review-ab3b507-pass.md  |   68 +
+ spec/tasks/done/LOOP1-RESEARCH-001.md              |   90 +
+ spec/tasks/ready/LOOP1-CONTRACT-001.md             |   66 -
+ spec/tasks/review/LOOP1-CONTRACT-001.md            |   98 +
+ tests/research/test_recorder.py                    |  315 ++
+ tools/research/recorder.ps1                        |   46 +
+ tools/research/recorder.py                         |  664 +++++
+ 102 files changed, 16369 insertions(+), 90 deletions(-)

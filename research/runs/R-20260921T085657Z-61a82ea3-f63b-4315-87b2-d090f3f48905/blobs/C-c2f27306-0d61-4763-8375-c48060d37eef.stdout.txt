@@ -1,0 +1,39 @@
+架构基线 v1.0 | Frozen Architecture                                                                                Loop 1 执行版
+
+
+
+
+11. 公共契约与双后端实现
+11.1 唯一权威
+Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户端 SDK。契约包含 OpenAPI/HTTP、WSS
+envelope 与消息类型、错误码、协议版本与 capabilities、数据库 schema/migrations、Plugin API、Golden Test Vectors。
+实现代码不得成为反向权威。
+
+11.2 等价而非同构
+ 必须相同                                                   允许不同
+
+ HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、                    框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部
+ 插件权限、数据库结果                                             接口
+
+ Release Manifest、健康检查、metrics 标签、日志关联字段                内部模块名称与代码风格
+
+
+11.3 Golden Contract Tests
+同一 fixture 输入 -> Go profile -> 规范化结果 A
+同一 fixture 输入 -> Java profile -> 规范化结果 B
+断言 A == Canonical Expected && B == Canonical Expected
+
+必须覆盖：auth/session、friend/direct uniqueness、group idempotency、message ACK/outbox、retry、sync gap、plugin permissions、
+errors/version negotiation
+
+
+11.4 数据库迁移
+两套后端共享数据库语义，但单次部署只运行一个 profile。migration 由独立迁移组件执行，不允许应用实例竞争执行。
+所有兼容窗口内的服务与客户端 fixture 必须通过 migration 测试。破坏性 schema 变更采用 expand -> migrate/backfill
+-> switch -> contract，多版本共存期间禁止先删旧字段。
+
+
+
+
+面向十万级在线连接的可扩展分布式即时通信平台                                                                                                 16
+

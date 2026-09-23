@@ -29,16 +29,18 @@ Current Task State: review
 - Durable FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`.
 - Fresh Fix Agent `/root/contract001_schema_fix` added deterministic repository-contained OpenAPI 3.1 structural schema lint and a missing-`info.title` regression at candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc`. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-fix-5d1d165-development.md`; Recorder run `R-20260921T083334Z-f24d9caf-e49d-4678-a2d8-f05c6481190b`.
 - Fresh independent Review Agent `/root/contract001_schema_rereview` reviewed closure `9290139b918e76a0f0310b646ec7a9c6433c91a1` under Recorder run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905` and returned FAIL. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-5d1d165-fail.md`.
+- The Human authorized Task-linked Recorder prompt/run paths on 2026-09-23. The Coordinator validated both preserved Review runs and recorded the exact authorization at `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-recorder-path-authorization.md`.
 - The repaired candidate defines 9 canonical Auth/User/Friend HTTP operations, 15 shared error codes with operation/status bindings and complete negative coverage, fixture version `1.1`, 6 positive and 21 negative dual-profile scenarios, and a deterministic verifier with seven committed mutation regressions.
 
 ## Current Blockers
 
 - `LOOP1-CONTRACT-001` remains unfinished in `review`. Candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` rejects missing `info.title` but still accepts other invalid OpenAPI 3.1 structures; it requires a fresh Fix Agent and then a new independent review.
-- Governance ambiguity: repository policy requires Task-linked Recorder artifacts under `research/**`, while this Task's hard `allowed_paths` omits `research/**`. Resolve that boundary explicitly before the next Fix run commits Recorder artifacts.
+- The Human authorized `research/prompts/**` and `research/runs/**` only for `LOOP1-CONTRACT-001` Recorder artifacts on 2026-09-23. The prior write-boundary finding remains permanent evidence; no governance decision remains pending for the next Fix run.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
+- Recorder-wrapped Coordinator verification: CTRL-002 Development PASS; preserved Review runs validate with 103 and 71 events; `git diff --check` PASS. These verify only the governance handoff and Recorder integrity, not Contract acceptance.
 - Fresh independent Review Agent command through Recorder: `pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`
   - Result: PASS on clean detached closure `9290139b918e76a0f0310b646ec7a9c6433c91a1`, exit `0`, elapsed `5915.9704 ms`; 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, schema lint, and 7 committed regressions.
 - Fresh independent command through Recorder: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
@@ -139,7 +141,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Resolve the Task-linked `research/**` Recorder write-boundary inconsistency explicitly, then delegate `LOOP1-CONTRACT-001` to a fresh Fix Agent to replace or materially complete the OpenAPI 3.1 structural lint and add broader invalid-structure regressions. After Fix handoff, use a new fresh independent Review Agent. Do not select another product task.
+Commit the exact Human-authorized Recorder path amendment and preserved Review artifacts, then delegate `LOOP1-CONTRACT-001` to a fresh Fix Agent to replace or materially complete the OpenAPI 3.1 structural lint and add broader invalid-structure regressions. After Fix handoff, use a new fresh independent Review Agent. Do not select another product task.
 
 ## Last Known Good Commit
 
@@ -154,8 +156,8 @@ Resolve the Task-linked `research/**` Recorder write-boundary inconsistency expl
 - Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
 - The original paused Agent retains sole ownership of the untracked `contracts/http/schema-lint/` tree in `H:\IM-platform`; resumed review work did not read, modify, copy, stash, clean, claim, or depend on it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
-- Recorder prompt/run artifacts for resumed review are owned by `/root/contract001_resume_review`.
-- Recorder prompt/run artifacts for fresh re-review run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905`, including the preserved empty-prompt registration limitation artifact, remain untracked and owned by `/root/contract001_schema_rereview` pending explicit `research/**` path authorization; they were not included in the Task-allowed review closure commit.
+- Recorder prompt/run artifacts for resumed review and fresh re-review remain untracked until the Coordinator commits them under the Human's exact 2026-09-23 path authorization. The empty-prompt registration limitation artifact remains preserved and explicitly excluded from the valid Review Run.
+- The current Coordinator Recorder prompt/run artifacts are owned by `/root` until this authorization handoff is committed.
 
 ## Architecture Conflicts / ACP / ADR
 

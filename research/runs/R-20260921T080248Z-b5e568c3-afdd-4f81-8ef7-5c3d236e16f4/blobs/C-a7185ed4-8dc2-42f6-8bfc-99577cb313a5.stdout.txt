@@ -1,0 +1,264 @@
+servers=https://api.example.invalid
+POST /v1/auth/register id=registerUser security= statuses=201,400,409
+POST /v1/auth/login id=login security= statuses=200,400,401,426
+POST /v1/auth/logout id=logout security={"bearerAuth":[]} statuses=204,401
+GET /v1/users/me id=getCurrentUser security={"bearerAuth":[]} statuses=200,400,401
+GET /v1/users/search id=searchUsers security={"bearerAuth":[]} statuses=200,400,401
+GET /v1/friends id=listFriends security={"bearerAuth":[]} statuses=200,401
+PUT /v1/friends/{friendUserId} id=addFriend security={"bearerAuth":[]} statuses=200,201,401,403,404,409,422
+POST /v1/auth/refresh/web id=refreshWebSession security={"refreshCookie":[]} statuses=200,400,401,426
+POST /v1/auth/refresh/native id=refreshNativeSession security= statuses=200,400,401,426
+schemes={"bearerAuth":{"type":"http","scheme":"bearer","bearerFormat":"JWT","description":"Short-lived access token carrying user_id, session_id, client_type, session_epoch, iat, and exp claims. It is accepted only from the Authorization header."},"refreshCookie":{"type":"apiKey","in":"cookie","name":"__Host-im_refresh","description":"Long-lived WEB refresh token received only as a Secure HttpOnly SameSite cookie. The server persists only its hash and can revoke it independently."}}
+SCHEMA LoginRequest
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "username",
+    "password",
+    "clientType",
+    "deviceId",
+    "clientVersion",
+    "protocolVersion"
+  ],
+  "properties": {
+    "username": {
+      "$ref": "#/components/schemas/Username"
+    },
+    "password": {
+      "$ref": "#/components/schemas/Password"
+    },
+    "clientType": {
+      "$ref": "#/components/schemas/ClientType"
+    },
+    "deviceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "clientVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "protocolVersion": {
+      "type": "string",
+      "const": "1"
+    }
+  }
+}
+SCHEMA WebRefreshRequest
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "clientType",
+    "deviceId",
+    "clientVersion",
+    "protocolVersion"
+  ],
+  "properties": {
+    "clientType": {
+      "const": "WEB"
+    },
+    "deviceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "clientVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "protocolVersion": {
+      "type": "string",
+      "const": "1"
+    }
+  }
+}
+SCHEMA NativeRefreshRequest
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "refreshToken",
+    "clientType",
+    "deviceId",
+    "clientVersion",
+    "protocolVersion"
+  ],
+  "properties": {
+    "refreshToken": {
+      "type": "string",
+      "minLength": 1,
+      "writeOnly": true
+    },
+    "clientType": {
+      "$ref": "#/components/schemas/NativeClientType"
+    },
+    "deviceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "clientVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "protocolVersion": {
+      "type": "string",
+      "const": "1"
+    }
+  }
+}
+SCHEMA AuthResult
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session",
+    "tokens",
+    "replacedExistingSession"
+  ],
+  "properties": {
+    "session": {
+      "$ref": "#/components/schemas/Session"
+    },
+    "tokens": {},
+    "replacedExistingSession": {
+      "type": "boolean"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "session": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Session"
+            },
+            {
+              "properties": {
+                "clientType": {
+                  "const": "WEB"
+                }
+              }
+            }
+          ]
+        },
+        "tokens": {
+          "$ref": "#/components/schemas/WebTokens"
+        }
+      }
+    },
+    {
+      "properties": {
+        "session": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Session"
+            },
+            {
+              "properties": {
+                "clientType": {
+                  "enum": [
+                    "DESKTOP",
+                    "MOBILE"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "tokens": {
+          "$ref": "#/components/schemas/NativeTokens"
+        }
+      }
+    }
+  ]
+}
+SCHEMA Session
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sessionId",
+    "userId",
+    "clientType",
+    "sessionEpoch",
+    "status"
+  ],
+  "properties": {
+    "sessionId": {
+      "$ref": "#/components/schemas/Id"
+    },
+    "userId": {
+      "$ref": "#/components/schemas/Id"
+    },
+    "clientType": {
+      "$ref": "#/components/schemas/ClientType"
+    },
+    "sessionEpoch": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "$ref": "#/components/schemas/SessionStatus"
+    }
+  }
+}
+SCHEMA FriendshipResult
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "friendshipId",
+    "normalizedPair",
+    "directConversationId",
+    "memberUserIds",
+    "created"
+  ],
+  "properties": {
+    "friendshipId": {
+      "$ref": "#/components/schemas/Id"
+    },
+    "normalizedPair": {
+      "$ref": "#/components/schemas/NormalizedUserPair"
+    },
+    "directConversationId": {
+      "$ref": "#/components/schemas/Id"
+    },
+    "memberUserIds": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/components/schemas/Id"
+      }
+    },
+    "created": {
+      "type": "boolean"
+    }
+  }
+}
+SCHEMA NormalizedUserPair
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lowUserId",
+    "highUserId"
+  ],
+  "properties": {
+    "lowUserId": {
+      "$ref": "#/components/schemas/Id"
+    },
+    "highUserId": {
+      "$ref": "#/components/schemas/Id"
+    }
+  },
+  "description": "lowUserId and highUserId are the deterministic ascending ordering of the two distinct user IDs."
+}

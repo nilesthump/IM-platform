@@ -1,0 +1,44 @@
+架构基线 v1.0 | Frozen Architecture                                                                             Loop 1 执行版
+
+
+
+
+附录 B. 冻结不变量速查
+ 域                       不变量
+
+ Session                 同 user/client_type 最多一个有效 Session；不同 client_type 可同时登录；epoch 使旧端失效
+
+ Friend                  规范化 pair 唯一；好友与唯一 DIRECT Conversation 同事务
+
+ Group                   成员只能来自发起者好友列表；create request 幂等
+
+ Message                 ACK=durable commit；conversation 内 seq 单调；服务端幂等 key 含 sender/conversation/request
+
+ Outbox                  与业务数据同事务；NATS 可重复/短暂遗漏；Sync 保证最终完整
+
+ SQLite                  UNIQUE(conversation_id, request_id)；所有入口事务 UPSERT；SENT 不回退
+
+ Sync                    user cursor 只管低频状态；消息按 conversation seq；contiguous_seq 不跨 gap
+
+ Web                     无聊天 DB、无离线历史；页面生命周期之外不保证消息状态
+
+ Plugin                  版本制品不可变；权限最小化；WASM/renderer sandbox；后端与 renderer 同版本原子绑定
+
+ Architecture            公共契约唯一权威；Agent 不得越权修改 frozen decisions
+
+ CI                      只测被修改后端；shared contract/schema/SDK 变更触发全平台兼容测试
+
+ Release                 不可变制品 + manifest；expand/migrate/switch/contract；发布前验证回滚
+
+
+
+
+文档结束
+本方案是 Loop 1 的正式执行基线。任何新增目标必须先进入 backlog；任何架构变更必须走 ACP/ADR；任何阶段前进必须
+以 Gate 证据为准。
+
+
+
+
+面向十万级在线连接的可扩展分布式即时通信平台                                                                                              28
+

@@ -1,0 +1,260 @@
+[CmdletBinding()]
+param(
+    [string]$RepoRoot
+)
+
+$ErrorActionPreference = 'Stop'
+if (-not $RepoRoot) {
+    $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+} else {
+    $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+
+$openApiPath = Join-Path $RepoRoot 'contracts/http/auth-user-friend.openapi.json'
+$errorPath = Join-Path $RepoRoot 'contracts/errors/http-errors.schema.json'
+$fixtureRoot = Join-Path $RepoRoot 'contracts/fixtures/auth-user-friend'
+$fixtureSchemaPath = Join-Path $fixtureRoot 'fixture.schema.json'
+$positivePath = Join-Path $fixtureRoot 'positive.json'
+$negativePath = Join-Path $fixtureRoot 'negative.json'
+$failures = @()
+
+function Test-HasProperty {
+    param($Value, [string]$Name)
+    return @($Value.PSObject.Properties | Where-Object { $_.Name -ceq $Name }).Count -eq 1
+}
+
+function Get-PropertyValue {
+    param($Value, [string]$Name)
+    $property = @($Value.PSObject.Properties | Where-Object { $_.Name -ceq $Name })
+    if ($property.Count -eq 1) {
+        if ($property[0].Value -is [array]) { Write-Output -NoEnumerate $property[0].Value; return }
+        return $property[0].Value
+    }
+    return $null
+}
+
+function Resolve-Pointer {
+    param($Root, [string]$Pointer)
+    if (-not $Pointer.StartsWith('#/')) { return $null }
+    $node = $Root
+    foreach ($segment in @($Pointer.Substring(2) -split '/')) {
+        $decoded = $segment.Replace('~1','/').Replace('~0','~')
+        $property = @($node.PSObject.Properties | Where-Object { $_.Name -ceq $decoded })
+        if ($property.Count -ne 1) { return $null }
+        $node = $property[0].Value
+    }
+    return $node
+}
+
+function Resolve-Schema {
+    param($Schema, $OpenApi, $Errors)
+    if ($null -eq $Schema -or -not (Test-HasProperty $Schema '$ref')) { return $Schema }
+    $ref = [string](Get-PropertyValue $Schema '$ref')
+    if ($ref.StartsWith('#/')) {
+        $resolved = Resolve-Pointer $OpenApi $ref
+        if ($null -eq $resolved) { $resolved = Resolve-Pointer $Errors $ref }
+        return $resolved
+    }
+    if ($ref -eq '../errors/http-errors.schema.json#/$defs/ErrorResponse') {
+        return Resolve-Pointer $Errors '#/$defs/ErrorResponse'
+    }
+    return $null
+}
+
+function ConvertTo-CanonicalJson {
+    param($Value)
+    if ($null -eq $Value) { return 'null' }
+    if ($Value -is [string]) { return ($Value | ConvertTo-Json -Compress) }
+    if ($Value -is [bool]) { if ($Value) { return 'true' }; return 'false' }
+    if ($Value -is [array]) {
+        $items = @($Value | ForEach-Object { ConvertTo-CanonicalJson $_ })
+        return '[' + ($items -join ',') + ']'
+    }
+    if ($Value -is [System.Collections.IDictionary]) {
+        $pairs = @()
+        foreach ($key in @($Value.Keys | Sort-Object)) {
+            $pairs += (($key | ConvertTo-Json -Compress) + ':' + (ConvertTo-CanonicalJson $Value[$key]))
+        }
+        return '{' + ($pairs -join ',') + '}'
+    }
+    if (@($Value.PSObject.Properties).Count -gt 0 -and -not ($Value -is [System.ValueType])) {
+        $pairs = @()
+        foreach ($property in @($Value.PSObject.Properties | Sort-Object Name)) {
+            $pairs += (($property.Name | ConvertTo-Json -Compress) + ':' + (ConvertTo-CanonicalJson $property.Value))
+        }
+        return '{' + ($pairs -join ',') + '}'
+    }
+    return ($Value | ConvertTo-Json -Compress)
+}
+
+function Get-SchemaErrors {
+    param($Value, $Schema, $OpenApi, $Errors, [string]$Location)
+    $result = @()
+    $resolved = Resolve-Schema $Schema $OpenApi $Errors
+    if ($null -eq $resolved) {
+        $result += "$Location has an unresolved schema reference"
+        return $result
+    }
+    $Schema = $resolved
+
+    if (Test-HasProperty $Schema 'allOf') {
+        foreach ($part in @($Schema.allOf)) {
+            $result += @(Get-SchemaErrors $Value $part $OpenApi $Errors $Location)
+        }
+    }
+    if (Test-HasProperty $Schema 'oneOf') {
+        $matchCount = 0
+        $branchIndex = 0
+        $branchDiagnostics = @()
+        foreach ($part in @($Schema.oneOf)) {
+            $branchErrors = @(Get-SchemaErrors $Value $part $OpenApi $Errors $Location)
+            if ($branchErrors.Count -eq 0) { $matchCount++ }
+            else { $branchDiagnostics += "branch ${branchIndex}: $($branchErrors -join '; ')" }
+            $branchIndex++
+        }
+        if ($matchCount -ne 1) { $result += "$Location must match exactly one oneOf branch; matches=$matchCount ($($branchDiagnostics -join ' | '))" }
+    }
+    if (Test-HasProperty $Schema 'not') {
+        if (@(Get-SchemaErrors $Value $Schema.not $OpenApi $Errors $Location).Count -eq 0) {
+            $result += "$Location matches a forbidden schema"
+        }
+    }
+
+    if (Test-HasProperty $Schema 'const') {
+        if ((ConvertTo-CanonicalJson $Value) -cne (ConvertTo-CanonicalJson $Schema.const)) {
+            $result += "$Location differs from const"
+        }
+    }
+    if (Test-HasProperty $Schema 'enum') {
+        $actual = ConvertTo-CanonicalJson $Value
+        $matches = @($Schema.enum | Where-Object { (ConvertTo-CanonicalJson $_) -ceq $actual })
+        if ($matches.Count -eq 0) { $result += "$Location is outside enum" }
+    }
+
+    $type = if (Test-HasProperty $Schema 'type') { [string]$Schema.type } else { '' }
+    if ($type -eq 'object' -and $null -ne $Value -and ($Value -is [array] -or $Value -is [string] -or $Value -is [System.ValueType])) {
+        $result += "$Location must be an object"
+        return $result
+    }
+    if ($type -eq 'array' -and -not ($Value -is [array])) {
+        $result += "$Location must be an array"
+        return $result
+    }
+    if ($type -eq 'string' -and -not ($Value -is [string])) {
+        $result += "$Location must be a string"
+        return $result
+    }
+    if ($type -eq 'integer' -and -not (($Value -is [int]) -or ($Value -is [long]))) {
+        $result += "$Location must be an integer"
+        return $result
+    }
+    if ($type -eq 'boolean' -and -not ($Value -is [bool])) {
+        $result += "$Location must be a boolean"
+        return $result
+    }
+
+    if ($Value -is [string]) {
+        if ((Test-HasProperty $Schema 'minLength') -and $Value.Length -lt [int]$Schema.minLength) { $result += "$Location is shorter than minLength" }
+        if ((Test-HasProperty $Schema 'maxLength') -and $Value.Length -gt [int]$Schema.maxLength) { $result += "$Location is longer than maxLength" }
+        if ((Test-HasProperty $Schema 'pattern') -and $Value -notmatch [string]$Schema.pattern) { $result += "$Location does not match pattern" }
+        if ((Test-HasProperty $Schema 'format') -and $Schema.format -eq 'uuid' -and $Value -notmatch '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$') {
+            $result += "$Location is not a UUID"
+        }
+    }
+    if ((($Value -is [int]) -or ($Value -is [long])) -and (Test-HasProperty $Schema 'minimum') -and $Value -lt [long]$Schema.minimum) {
+        $result += "$Location is below minimum"
+    }
+    if ($Value -is [array]) {
+        if ((Test-HasProperty $Schema 'minItems') -and $Value.Count -lt [int]$Schema.minItems) { $result += "$Location has too few items" }
+        if ((Test-HasProperty $Schema 'maxItems') -and $Value.Count -gt [int]$Schema.maxItems) { $result += "$Location has too many items" }
+        if ((Test-HasProperty $Schema 'uniqueItems') -and $Schema.uniqueItems) {
+            $canonicalItems = @($Value | ForEach-Object { ConvertTo-CanonicalJson $_ })
+            if (@($canonicalItems | Group-Object | Where-Object Count -gt 1).Count -gt 0) { $result += "$Location has duplicate items" }
+        }
+        if (Test-HasProperty $Schema 'items') {
+            for ($index = 0; $index -lt $Value.Count; $index++) {
+                $result += @(Get-SchemaErrors $Value[$index] $Schema.items $OpenApi $Errors "$Location[$index]")
+            }
+        }
+    }
+
+    $hasObjectRules = (Test-HasProperty $Schema 'properties') -or (Test-HasProperty $Schema 'required') -or (Test-HasProperty $Schema 'additionalProperties')
+    if ($hasObjectRules -and $null -ne $Value -and -not ($Value -is [array]) -and -not ($Value -is [string]) -and -not ($Value -is [System.ValueType])) {
+        $actualNames = @($Value.PSObject.Properties.Name)
+        if (Test-HasProperty $Schema 'required') {
+            foreach ($requiredName in @($Schema.required)) {
+                if ($requiredName -notin $actualNames) { $result += "$Location missing required property $requiredName" }
+            }
+        }
+        if ((Test-HasProperty $Schema 'additionalProperties') -and $Schema.additionalProperties -eq $false) {
+            $allowedNames = @($Schema.properties.PSObject.Properties.Name)
+            foreach ($actualName in $actualNames) {
+                if ($actualName -notin $allowedNames) { $result += "$Location has undeclared property $actualName" }
+            }
+        }
+        if (Test-HasProperty $Schema 'properties') {
+            foreach ($property in @($Schema.properties.PSObject.Properties)) {
+                if ($property.Name -in $actualNames) {
+                    $result += @(Get-SchemaErrors (Get-PropertyValue $Value $property.Name) $property.Value $OpenApi $Errors "$Location.$($property.Name)")
+                }
+            }
+        }
+    }
+    return $result
+}
+
+function Get-OperationMatch {
+    param($OpenApi, [string]$Method, [string]$RequestPath)
+    $pathOnly = @($RequestPath -split '\?')[0]
+    foreach ($pathProperty in @($OpenApi.paths.PSObject.Properties)) {
+        $isMatch = $pathOnly -ceq $pathProperty.Name
+        if (-not $isMatch -and $pathProperty.Name -eq '/v1/friends/{friendUserId}') {
+            $isMatch = $pathOnly -match '^/v1/friends/[^/]+$'
+        }
+        if (-not $isMatch) { continue }
+        $methodProperty = @($pathProperty.Value.PSObject.Properties | Where-Object { $_.Name -ceq $Method.ToLowerInvariant() })
+        if ($methodProperty.Count -eq 1) {
+            return [pscustomobject]@{ Template = $pathProperty.Name; Operation = $methodProperty[0].Value }
+        }
+    }
+    return $null
+}
+
+function Resolve-ResponseObject {
+    param($Response, $OpenApi)
+    if (-not (Test-HasProperty $Response '$ref')) { return $Response }
+    return Resolve-Pointer $OpenApi ([string](Get-PropertyValue $Response '$ref'))
+}
+
+function Get-ModelFailures {
+    param($OpenApi, $Errors, $Positive, $Negative)
+    $issues = @()
+    $expectedPaths = @('/v1/auth/register','/v1/auth/login','/v1/auth/refresh/web','/v1/auth/refresh/native','/v1/auth/logout','/v1/users/me','/v1/users/search','/v1/friends','/v1/friends/{friendUserId}')
+    $actualPaths = @($OpenApi.paths.PSObject.Properties.Name)
+    if ($OpenApi.openapi -ne '3.1.0') { $issues += 'OpenAPI version must be 3.1.0' }
+    if ($OpenApi.info.version -ne '1.0.0') { $issues += 'contract version must be 1.0.0' }
+    if ((($actualPaths | Sort-Object) -join ',') -cne (($expectedPaths | Sort-Object) -join ',')) { $issues += 'canonical HTTP path set differs from the expected Auth/User/Friend scope' }
+    foreach ($path in $actualPaths) {
+        if ($path -match '(?i)(websocket|wss|sync|plugin|message|group|database)') { $issues += "forbidden out-of-scope path: $path" }
+    }
+
+    $operationIds = @()
+    $globalCodes = @($Errors.'$defs'.ErrorCode.enum)
+    foreach ($pathProperty in @($OpenApi.paths.PSObject.Properties)) {
+        foreach ($methodProperty in @($pathProperty.Value.PSObject.Properties)) {
+            if ($methodProperty.Name -notin @('get','post','put','delete','patch')) { continue }
+            $operation = $methodProperty.Value
+            if (-not $operation.operationId) { $issues += "missing operationId: $($methodProperty.Name.ToUpper()) $($pathProperty.Name)" } else { $operationIds += $operation.operationId }
+            foreach ($parameter in @($operation.parameters)) {
+                if ($parameter.in -eq 'query' -and $parameter.name -match '(?i)(token|password|secret|credential)') { $issues += "authentication material declared in query: $($pathProperty.Name) $($parameter.name)" }
+            }
+            foreach ($responseProperty in @($operation.responses.PSObject.Properties)) {
+                if ($responseProperty.Name -notmatch '^[45][0-9][0-9]$') { continue }
+                $codes = @((Get-PropertyValue $responseProperty.Value 'x-error-codes'))
+                if ($codes.Count -eq 0) { $issues += "$($operation.operationId) status $($responseProperty.Name) lacks x-error-codes" }
+                foreach ($code in $codes) {
+                    if ($code -notin $globalCodes) { $issues += "$($operation.operationId) status $($responseProperty.Name) permits unknown error code $code" }
+                }
+                $resolvedResponse = Resolve-ResponseObject $responseProperty.Value $OpenApi
+                $schema = $resolvedResponse.content.'application/json'.schema
+                if ([string](Get-PropertyValue $schema '$ref') -ne '../errors/http-errors.schema.json#/$defs/ErrorResponse') {

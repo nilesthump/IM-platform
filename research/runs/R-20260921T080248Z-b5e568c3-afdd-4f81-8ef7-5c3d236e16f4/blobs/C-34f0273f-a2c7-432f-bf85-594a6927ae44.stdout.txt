@@ -1,0 +1,28 @@
+FIXTURE positive version=1.1 profiles=go,java
+registration-and-authorized-user-search: 
+same-slot-login-replaces-only-that-slot: 
+native-refresh-rotates-current-session-credential: 
+web-refresh-rotates-secure-cookie: 
+logout-revokes-session-refresh-and-connection: 
+friend-add-normalizes-and-reuses-direct: 
+FIXTURE negative version=1.1 profiles=go,java
+invalid-credentials: 
+token-in-query-rejected: 
+invalid-client-type: 
+refresh-client-type-mismatch: 
+unsupported-protocol-version: 
+missing-authentication: 
+authorization-binding-mismatch: 
+invalid-access-token[REDACTED] 
+revoked-session-token: 
+username-already-exists: 
+friend-target-not-found: 
+friendship-state-conflict: 
+friend-add-authorization-denied: 
+web-refresh-missing-cookie: 
+native-refresh-missing-token: 
+friend-self-rejected: 
+duplicate-friendship-divergence-rejected: 
+non-normalized-pair-divergence-rejected: 
+stale-session-epoch-rejected: 
+revoked-refresh-token-rejected: 

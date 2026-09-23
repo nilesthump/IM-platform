@@ -1,0 +1,841 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index fd9569d..f6736dc 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,7 +16,7 @@ Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
+-- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.
++- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` resumed under Recorder, remains unfinished in `review`, and is now awaiting a fresh Fix Agent after independent FAIL.
+ - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
+ - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
+ - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
+@@ -25,11 +25,13 @@ Current Task State: review
+ - Accepted checkpoint: `spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md`.
+ - Fresh independent Review Agent `/root/contract001_review` reviewed `LOOP1-CONTRACT-001` commit `1c2637cb253dc6eece0393c229fe77cd5934160e` from a clean detached isolated checkout and returned FAIL. Durable evidence is `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-independent-review-1c2637c-fail.md`.
+ - Fix Agent `/root/contract001_fix` repaired all review findings at candidate commit `12c566f71da9b038764ecb7a5303b116e77ca32f`; development verification passed from that clean committed checkout, but this is not acceptance.
++- Fresh independent Review Agent `/root/contract001_resume_review` resumed under Recorder run `R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4` and returned FAIL on candidate `12c566f71da9b038764ecb7a5303b116e77ca32f`. A disposable negative control removed OpenAPI 3.1-required `info.title`, but the committed verifier still returned PASS.
++- Durable FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`.
+ - The repaired candidate defines 9 canonical Auth/User/Friend HTTP operations, 15 shared error codes with operation/status bindings and complete negative coverage, fixture version `1.1`, 6 positive and 21 negative dual-profile scenarios, and a deterministic verifier with six mutation regressions.
+ 
+ ## Current Blockers
+ 
+-- `LOOP1-CONTRACT-001` remains unfinished in `review`. Its repaired candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` has development verification only and still requires a fresh independent review under ADR-0001.
++- `LOOP1-CONTRACT-001` remains unfinished in `review`. The resumed independent review found that candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` accepts an OpenAPI document missing required `info.title`; a fresh Fix Agent and then a new fresh independent Review Agent are required.
+ - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
+ 
+ ## Verification
+@@ -71,6 +73,13 @@ Current Task State: review
+   - Result: Fix Agent development PASS, exit `0`, elapsed `40.6779 ms`.
+   - Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-fix-12c566f-pass.md`
+ - Independent FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-independent-review-1c2637c-fail.md`.
++- Resumed independent command: `& .\contracts\http\verify-auth-user-friend.ps1`
++  - Result: PASS on the unmodified candidate, exit `0`, elapsed `6918.3063 ms`.
++- Resumed independent command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Acceptance`
++  - Result: PASS, exit `0`, elapsed `959.8942 ms`.
++- Resumed independent negative control: remove OpenAPI 3.1-required `info.title` in a disposable detached candidate checkout, then run `& .\contracts\http\verify-auth-user-friend.ps1`.
++  - Result: unexpected PASS, exit `0`, elapsed `5981.2862 ms`; schema-lint acceptance FAIL.
++  - Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`.
+ - Accepted `LOOP1-SPEC-001` verification history remains in `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
+ 
+ ## Changed Files or Migrations
+@@ -92,7 +101,7 @@ Current Task State: review
+ - Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
+ - All activity before the Instrumentation Epoch is bootstrap, retrospective backfill, or pilot evidence and must not be represented as complete prospective trace data.
+ - `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
+-- `12c566f71da9b038764ecb7a5303b116e77ca32f` has only Fix-Agent development verification and is not accepted until a fresh independent reviewer passes it under ADR-0001; the task remains `review` and S0 remains NOT YET PASSED.
++- Candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is independently rejected because its verifier does not enforce OpenAPI 3.1 structural schema validity. Semantic verification PASS does not override the explicit schema-lint acceptance failure; the task remains `review` and S0 remains NOT YET PASSED.
+ - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
+ - The Coordinator prospectively authorized the exact durable-evidence path for this repair cycle; that authorization does not retroactively excuse the prior hard violation.
+ - The independent reviews of `74134bd306cbf0a1546f500bc46c45a1217b2d58` and `85069032c137cce6e526e0e329b6e93178515274` remain permanent FAIL records; accepted commit `aef6497d6216d9a8251250d157935e7af418d86b` supersedes them for task acceptance.
+@@ -102,11 +111,11 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Recorder acceptance closure without overwriting its Agent-owned untracked `contracts/http/schema-lint/`. Then restore the same task and ownership, register the actual resume prompt, start a `prospective_resume` Recorder run with `pre_recorder_work=true` and incomplete prior trace, and continue its fresh independent review. Do not select another product task.
++Delegate `LOOP1-CONTRACT-001` to a fresh Fix Agent. The agent must add deterministic repository-contained OpenAPI 3.1 structural schema lint and a regression rejecting missing required `info.title`, without reading, copying, modifying, claiming, or depending on the paused Agent-owned untracked `contracts/http/schema-lint/` tree. Then delegate the committed repair to a new fresh independent Review Agent. Do not select another product task.
+ 
+ ## Last Known Good Commit
+ 
+-`ab3b507241cf51822af79cbcb63dfdf40e273359` (independently accepted Recorder content); `LOOP1-CONTRACT-001` candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` remains development-verified only.
++`1c274bcbf92ebcc05c1bc208386c5976437d8221` (Recorder acceptance closure); `LOOP1-CONTRACT-001` candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is independently rejected and is not a task acceptance point.
+ 
+ ## Latest Checkpoint
+ 
+@@ -115,8 +124,9 @@ Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Rec
+ ## Uncommitted Changes / Ownership
+ 
+ - Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
+-- The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
++- The original paused Agent retains sole ownership of the untracked `contracts/http/schema-lint/` tree in `H:\IM-platform`; resumed review work did not read, modify, copy, stash, clean, claim, or depend on it.
+ - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
++- Recorder prompt/run artifacts for resumed review are owned by `/root/contract001_resume_review`.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md b/spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md
+new file mode 100644
+index 0000000..d954976
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md
+@@ -0,0 +1,63 @@
++# LOOP1-CONTRACT-001 Independent Acceptance Review - FAIL
++
++## Review identity and scope
++
++- Task: `LOOP1-CONTRACT-001`
++- Task state: `review`
++- Overall result: **FAIL**
++- Candidate commit: `12c566f71da9b038764ecb7a5303b116e77ca32f`
++- Review closure HEAD: `1c274bcbf92ebcc05c1bc208386c5976437d8221`
++- Baseline commit: `e5482b135a2ab7451c24c29c7517e1a8f19ce420`
++- Source branch: `task/LOOP1-CONTRACT-001`
++- Reviewer: fresh independent Review Agent `/root/contract001_resume_review`; not an implementer or Fix Agent.
++- Recorder prompt: `P-5c367892-2b36-4268-9f32-5f29ba567263`
++- Recorder run: `R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4`
++- Prospective trace start: `2026-09-21T08:02:48.076916Z`; `capture_mode=prospective_resume`, `pre_recorder_work=true`, `pre_recorder_trace_complete=false`, `experiment_group=full_governance`.
++- Acceptance mechanism: ADR-0001 temporary S0 bootstrap review. A FAIL does not accept the task or establish S0 Gate PASS.
++
++## Clean isolated review state
++
++- Primary review checkout: detached clean worktree `H:\.codex\worktrees\contract001-independent-review-resume-b5e568c3\IM-platform` at `1c274bcbf92ebcc05c1bc208386c5976437d8221`.
++- Candidate negative-control checkout: detached disposable worktree `H:\.codex\worktrees\contract001-review-negative-b5e568c3\IM-platform` at `12c566f71da9b038764ecb7a5303b116e77ca32f` before mutation.
++- The reviewer did not read, copy, modify, claim, or depend on the paused Agent-owned untracked `H:\IM-platform\contracts\http\schema-lint\` tree.
++- Frozen Architecture PDF SHA-256 matched `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
++
++## Verification results
++
++1. `& .\contracts\http\verify-auth-user-friend.ps1`
++   - Executed in the clean detached primary review checkout through Recorder.
++   - Exit code `0`; elapsed `6918.3063 ms`.
++   - PASS: 9 paths, 9 operations, 15 error codes, 6 positive and 21 negative scenarios, Go/Java parity, and 6 built-in mutation regressions.
++2. `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Acceptance`
++   - Executed in the clean detached primary review checkout through Recorder.
++   - Exit code `0`; elapsed `959.8942 ms`.
++   - PASS: recovered `LOOP1-CONTRACT-001` in `review` from a clean checkout.
++3. `git diff --check e5482b135a2ab7451c24c29c7517e1a8f19ce420..HEAD`
++   - Exit code `2`; elapsed `51.3008 ms`.
++   - The only reports were trailing spaces embedded in the already accepted Recorder raw artifact `research/runs/R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL/diff.patch`, outside CONTRACT-001 candidate content.
++4. `git diff --check e5482b135a2ab7451c24c29c7517e1a8f19ce420..12c566f71da9b038764ecb7a5303b116e77ca32f`
++   - Exit code `0`; elapsed `35.5253 ms`; candidate diff PASS.
++5. `git diff --check e5482b135a2ab7451c24c29c7517e1a8f19ce420..HEAD -- . ':(exclude)research/runs/**/diff.patch'`
++   - Exit code `0`; elapsed `46.3405 ms`; current closure excluding immutable Recorder raw patch payloads PASS.
++
++## Blocking finding
++
++### CONTRACT001-OAS-SCHEMA-LINT - committed verifier is not an OpenAPI 3.1 schema lint
++
++- Severity: high; acceptance-blocking.
++- The Task explicitly requires schema lint to pass, and the canonical file declares OpenAPI `3.1.0`.
++- OpenAPI Specification 3.1.0 requires `info.title` in every Info Object: `https://spec.openapis.org/oas/v3.1.0#info-object`.
++- In the disposable detached candidate checkout, the reviewer removed only `info.title` from `contracts/http/auth-user-friend.openapi.json` and reran the committed verifier.
++- Exact verifier command: `& .\contracts\http\verify-auth-user-friend.ps1`.
++- Observed result: unexpected PASS, exit code `0`, elapsed `5981.2862 ms`, with the same success summary as the valid document.
++- Therefore the committed verifier checks selected project semantics but does not establish OpenAPI 3.1 structural validity. The explicit schema-lint acceptance item remains unmet even though all semantic checks passed.
++
++## Semantic and boundary review
++
++- The unmodified candidate preserves the frozen Session slot/epoch, WEB cookie versus native secure-storage refresh transport, logout revocation, normalized friendship and single DIRECT conversation, atomic friend effects, error-code bindings, and dual-profile parity semantics.
++- No architecture conflict, product implementation, ACK change, WSS/Sync/Plugin contract change, database migration, or golden-fixture weakening was found.
++- No Human Decision is required. This is a repairable verifier/acceptance gap.
++
++## Conclusion and next action
++
++`LOOP1-CONTRACT-001` remains unfinished in `review` and must not move to `done`. Delegate to a fresh Fix Agent to add deterministic repository-contained OpenAPI 3.1 structural schema lint plus a regression rejecting a document without required `info.title`. The Fix Agent must not read or adopt the paused Agent-owned untracked schema-lint tree, and a new fresh independent Review Agent must review the committed repair.
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-001.md b/spec/tasks/review/LOOP1-CONTRACT-001.md
+index 7da57ae..f434a23 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-001.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-001.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-CONTRACT-001
+ title: Freeze HTTP Auth, User, and Friend contracts
+ status: review
+-owner: unassigned-independent-review-agent
++owner: unassigned-fresh-fix-agent
+ stage: S0
+ gate: S0
+ ---
+@@ -73,18 +73,22 @@ The Coordinator explicitly authorized the exact evidence path above on 2026-09-2
+ - The repair defines 9 Auth/User/Friend paths and operations, retains all 15 stable shared errors, upgrades fixtures to version `1.1` with 6 positive and 21 negative scenarios, and covers every shared error code.
+ - The repaired verifier passed from the clean committed fix with exit `0` in `5280.2464 ms`; it validates fixture request/response bodies and statuses against OpenAPI, enforces operation/status error-code bindings, proves Go/Java normalized parity, and runs six mutation regressions.
+ - CTRL-002 Development mode passed from the clean committed fix with exit `0` in `402.055 ms`; baseline diff check from `e5482b135a2ab7451c24c29c7517e1a8f19ce420` passed with exit `0` in `40.6779 ms`. These are development evidence only at `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-fix-12c566f-pass.md`.
++- Fresh independent Review Agent `/root/contract001_resume_review` reviewed candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` from clean detached checkout `H:\.codex\worktrees\contract001-independent-review-resume-b5e568c3\IM-platform` under ADR-0001 and returned FAIL.
++- The contract verifier passed on the unmodified candidate, but a disposable negative control removed OpenAPI 3.1-required `info.title` and the verifier still returned PASS, exit `0`, in `5981.2862 ms`. The required schema-lint acceptance is therefore not independently established.
++- Permanent evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`. Recorder run: `R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4`.
+ 
+ # Handoff
+ 
+-- The original implementation at `acfe36c2040e749ee508485ee8b577dc76604961` failed independent review. The repaired candidate is committed at `12c566f71da9b038764ecb7a5303b116e77ca32f`; it still requires a fresh independent review and applicable bootstrap acceptance.
++- The original implementation at `acfe36c2040e749ee508485ee8b577dc76604961` and repaired candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` both failed independent review; the latter now requires a fresh Fix Agent before another independent review.
+ - Canonical deliverables are `contracts/http/auth-user-friend.openapi.json`, `contracts/errors/http-errors.schema.json`, dual-profile golden fixtures under `contracts/fixtures/auth-user-friend/`, and deterministic verifier `contracts/http/verify-auth-user-friend.ps1`.
+ - The contract fixes wire-level endpoint and schema choices while preserving the frozen session slot/epoch, refresh-token hashing and revocation, token transport, normalized friendship, unique DIRECT conversation, two-member atomic transaction, immediate friendship, authorization, and error semantics. WEB cookie refresh and native body refresh are separate operations so a credentialless refresh is not representable.
+ - Fixture bodies now use exact nested `session`/`tokens`, `normalizedPair`, and `memberUserIds` structures. Every expected result contains canonical, Go-normalized, and Java-normalized observables that the verifier compares semantically.
+ - Each declared error response carries an enforced operation/status-specific `x-error-codes` set; negative fixtures exercise all 15 shared codes.
+ - No backend, WSS envelope/message schema, Sync, Plugin API, database schema, or frozen architecture was changed.
+ - The independent FAIL and the original hard process violation remain permanent evidence even though the Coordinator prospectively authorized this task's exact durable-evidence path for the repair cycle.
+-- Development verification is not acceptance evidence. A fresh independent Review Agent must review the committed diff from a clean isolated checkout under ADR-0001.
++- The resumed independent review failed because the committed verifier is not an OpenAPI 3.1 structural schema lint: it accepted a document missing required `info.title`. The semantic contract checks otherwise passed, but that does not satisfy the explicit schema-lint acceptance item.
++- A fresh Fix Agent must add a deterministic, repository-contained OpenAPI 3.1 schema lint (without relying on the paused Agent-owned untracked `contracts/http/schema-lint/` tree), preserve all existing semantics and fixtures, and commit the repair before a new fresh independent review.
+ 
+ # Next Action
+ 
+-- After the review-handoff metadata commit, delegate the entire repaired candidate to a fresh independent Review Agent. Review from a clean detached isolated checkout, run `& .\contracts\http\verify-auth-user-friend.ps1`, default Acceptance mode of `& .\tools\verify-loop1-ctrl-002.ps1`, and `git diff --check e5482b135a2ab7451c24c29c7517e1a8f19ce420..HEAD`; record PASS/FAIL under this task's evidence directory. The Fix Agent must not accept its own work.
++- Delegate to a fresh Fix Agent. It must implement deterministic OpenAPI 3.1 structural schema lint and a regression proving a missing required `info.title` is rejected, without reading, copying, modifying, claiming, or depending on the paused Agent-owned untracked `contracts/http/schema-lint/` tree. Then delegate the committed repair to a new fresh independent Review Agent; no fixer may accept its own work.
+
+# Untracked paths observed; content intentionally not captured
+# ?? contracts/http/schema-lint/README.md
+# ?? contracts/http/schema-lint/resources/json-meta-applicator.json
+# ?? contracts/http/schema-lint/resources/json-meta-content.json
+# ?? contracts/http/schema-lint/resources/json-meta-core.json
+# ?? contracts/http/schema-lint/resources/json-meta-format-annotation.json
+# ?? contracts/http/schema-lint/resources/json-meta-meta-data.json
+# ?? contracts/http/schema-lint/resources/json-meta-unevaluated.json
+# ?? contracts/http/schema-lint/resources/json-meta-validation.json
+# ?? contracts/http/schema-lint/resources/json-schema-2020-12.json
+# ?? contracts/http/schema-lint/resources/oas-dialect-base.json
+# ?? contracts/http/schema-lint/resources/oas-meta-base.json
+# ?? contracts/http/schema-lint/resources/oas-schema-base.json
+# ?? contracts/http/schema-lint/resources/oas-schema.json
+# ?? contracts/http/schema-lint/validate-contracts.js
+# ?? contracts/http/schema-lint/vendor/node_modules/.package-lock.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/.runkit_example.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/LICENSE
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/README.md
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/2019.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/2019.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/2019.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/2020.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/2020.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/2020.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/ajv.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/ajv.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/ajv.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/code.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/code.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/code.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/scope.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/scope.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/codegen/scope.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/errors.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/errors.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/errors.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/parse.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/parse.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/parse.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/serialize.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/serialize.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/serialize.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/types.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/types.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/jtd/types.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/names.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/names.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/names.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/ref_error.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/ref_error.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/ref_error.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/resolve.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/resolve.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/resolve.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/rules.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/rules.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/rules.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/util.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/util.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/util.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/applicability.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/applicability.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/applicability.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/boolSchema.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/boolSchema.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/boolSchema.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/dataType.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/dataType.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/dataType.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/defaults.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/defaults.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/defaults.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/keyword.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/keyword.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/keyword.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/subschema.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/subschema.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/compile/validate/subschema.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/core.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/core.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/core.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/jtd.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/jtd.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/jtd.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/data.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/meta/applicator.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/meta/content.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/meta/core.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/meta/format.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/meta/meta-data.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/meta/validation.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2019-09/schema.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/meta/applicator.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/meta/content.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/meta/core.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/meta/format-annotation.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/meta/meta-data.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/meta/unevaluated.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/meta/validation.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-2020-12/schema.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-draft-06.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-draft-07.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/json-schema-secure.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/jtd-schema.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/jtd-schema.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/refs/jtd-schema.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/equal.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/equal.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/equal.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/parseJson.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/parseJson.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/parseJson.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/quote.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/quote.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/quote.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/re2.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/re2.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/re2.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/timestamp.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/timestamp.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/timestamp.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/ucs2length.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/ucs2length.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/ucs2length.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/uri.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/uri.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/uri.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/validation_error.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/validation_error.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/runtime/validation_error.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/standalone/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/standalone/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/standalone/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/standalone/instance.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/standalone/instance.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/standalone/instance.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/json-schema.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/json-schema.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/json-schema.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/jtd-schema.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/jtd-schema.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/types/jtd-schema.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/additionalItems.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/additionalItems.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/additionalItems.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/additionalProperties.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/allOf.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/allOf.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/allOf.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/anyOf.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/anyOf.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/anyOf.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/contains.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/contains.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/contains.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/dependencies.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/dependencies.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/dependencies.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/dependentSchemas.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/dependentSchemas.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/dependentSchemas.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/if.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/if.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/if.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/items.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/items.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/items.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/items2020.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/items2020.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/items2020.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/not.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/not.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/not.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/oneOf.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/oneOf.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/oneOf.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/patternProperties.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/patternProperties.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/patternProperties.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/prefixItems.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/prefixItems.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/prefixItems.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/properties.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/properties.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/properties.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/propertyNames.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/propertyNames.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/propertyNames.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/thenElse.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/thenElse.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/applicator/thenElse.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/code.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/code.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/code.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/id.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/id.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/id.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/ref.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/ref.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/core/ref.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/discriminator/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/discriminator/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/discriminator/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/discriminator/types.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/discriminator/types.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/discriminator/types.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/draft2020.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/draft2020.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/draft2020.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/draft7.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/draft7.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/draft7.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/dynamicAnchor.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/dynamicAnchor.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/dynamicAnchor.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/dynamicRef.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/dynamicRef.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/dynamicRef.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/recursiveAnchor.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/recursiveAnchor.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/recursiveAnchor.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/recursiveRef.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/recursiveRef.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/dynamic/recursiveRef.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/errors.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/errors.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/errors.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/format/format.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/format/format.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/format/format.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/format/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/format/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/format/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/discriminator.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/discriminator.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/discriminator.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/elements.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/elements.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/elements.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/enum.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/enum.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/enum.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/error.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/error.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/error.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/metadata.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/metadata.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/metadata.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/nullable.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/nullable.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/nullable.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/optionalProperties.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/optionalProperties.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/optionalProperties.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/properties.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/properties.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/properties.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/ref.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/ref.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/ref.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/type.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/type.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/type.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/union.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/union.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/union.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/values.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/values.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/jtd/values.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/metadata.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/metadata.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/metadata.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/next.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/next.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/next.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedItems.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedItems.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedItems.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedProperties.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedProperties.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedProperties.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/const.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/const.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/const.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/dependentRequired.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/dependentRequired.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/dependentRequired.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/enum.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/enum.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/enum.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/index.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitContains.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitContains.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitContains.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitItems.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitItems.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitItems.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitLength.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitLength.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitLength.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitNumber.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitNumber.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitNumber.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitProperties.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitProperties.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/limitProperties.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/multipleOf.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/multipleOf.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/multipleOf.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/pattern.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/pattern.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/pattern.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/required.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/required.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/required.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/uniqueItems.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/uniqueItems.js
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/dist/vocabularies/validation/uniqueItems.js.map
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/2019.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/2020.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/ajv.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/codegen/code.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/codegen/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/codegen/scope.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/errors.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/jtd/parse.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/jtd/serialize.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/jtd/types.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/names.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/ref_error.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/resolve.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/rules.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/util.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/validate/applicability.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/validate/boolSchema.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/validate/dataType.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/validate/defaults.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/validate/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/validate/keyword.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/compile/validate/subschema.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/core.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/jtd.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/data.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/meta/applicator.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/meta/content.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/meta/core.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/meta/format.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/meta/meta-data.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/meta/validation.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2019-09/schema.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/meta/applicator.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/meta/content.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/meta/core.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/meta/format-annotation.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/meta/meta-data.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/meta/unevaluated.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/meta/validation.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-2020-12/schema.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-draft-06.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-draft-07.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/json-schema-secure.json
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/refs/jtd-schema.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/equal.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/parseJson.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/quote.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/re2.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/timestamp.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/ucs2length.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/uri.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/runtime/validation_error.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/standalone/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/standalone/instance.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/types/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/types/json-schema.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/types/jtd-schema.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/additionalItems.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/additionalProperties.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/allOf.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/anyOf.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/contains.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/dependencies.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/dependentSchemas.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/if.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/items.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/items2020.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/not.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/oneOf.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/patternProperties.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/prefixItems.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/properties.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/propertyNames.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/applicator/thenElse.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/code.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/core/id.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/core/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/core/ref.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/discriminator/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/discriminator/types.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/draft2020.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/draft7.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/dynamic/dynamicAnchor.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/dynamic/dynamicRef.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/dynamic/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/dynamic/recursiveAnchor.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/dynamic/recursiveRef.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/errors.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/format/format.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/format/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/discriminator.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/elements.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/enum.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/error.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/metadata.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/nullable.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/optionalProperties.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/properties.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/ref.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/type.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/union.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/jtd/values.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/metadata.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/next.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/unevaluated/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/unevaluated/unevaluatedItems.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/unevaluated/unevaluatedProperties.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/const.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/dependentRequired.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/enum.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/index.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/limitContains.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/limitItems.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/limitLength.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/limitNumber.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/limitProperties.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/multipleOf.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/pattern.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/required.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/lib/vocabularies/validation/uniqueItems.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/ajv/package.json
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/LICENSE
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/README.md
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/es6/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/es6/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/es6/react.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/es6/react.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/package.json
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/react.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-deep-equal/react.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/.gitattributes
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/.github/dependabot.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/.github/workflows/ci.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/.github/workflows/lock-threads.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/.github/workflows/package-manager-ci.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/LICENSE
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/README.md
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/benchmark/benchmark.mjs
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/benchmark/equal.mjs
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/benchmark/non-simple-domain.mjs
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/benchmark/package.json
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/benchmark/string-array-to-hex-stripped.mjs
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/benchmark/ws-is-secure.mjs
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/eslint.config.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/lib/schemes.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/lib/utils.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/package.json
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/ajv.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/component-safe-serialization.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/equal.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/fixtures/uri-js-parse.json
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/fixtures/uri-js-serialize.json
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/ipv6-canonical.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/ipv6-validation.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/malformed-percent.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/malformed-urn.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/parse.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/query-fragment-normalization.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/reserved-path-normalization.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/resolve.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/rfc-3986.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/scheme-validation.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/security-normalization.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/security.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/serialize.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/uri-js-compatibility.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/uri-js.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/urn-full-input.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/util.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/test/websocket-query-preservation.test.js
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/tsconfig.json
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/types/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/fast-uri/types/index.test-d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/.eslintrc.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/.github/FUNDING.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/.github/workflows/build.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/.github/workflows/publish.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/LICENSE
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/README.md
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/index.d.ts
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/package.json
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/spec/.eslintrc.yml
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/spec/fixtures/schema.js
+# ?? contracts/http/schema-lint/vendor/node_modules/json-schema-traverse/spec/index.spec.js
+# ?? contracts/http/schema-lint/vendor/node_modules/require-from-string/index.js
+# ?? contracts/http/schema-lint/vendor/node_modules/require-from-string/license
+# ?? contracts/http/schema-lint/vendor/node_modules/require-from-string/package.json
+# ?? contracts/http/schema-lint/vendor/node_modules/require-from-string/readme.md
+# ?? contracts/http/schema-lint/vendor/package-lock.json
+# ?? contracts/http/schema-lint/vendor/package.json
+# ?? research/prompts/P-5c367892-2b36-4268-9f32-5f29ba567263/metadata.json
+# ?? research/prompts/P-5c367892-2b36-4268-9f32-5f29ba567263/prompt.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-0220ccaa-7446-4b40-a469-4cfc227761c7.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-0220ccaa-7446-4b40-a469-4cfc227761c7.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-0467550c-6cd5-4136-ab07-a68b88b3c668.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-0467550c-6cd5-4136-ab07-a68b88b3c668.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-08b060d8-58c7-4712-abd1-1e9500c8df40.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-08b060d8-58c7-4712-abd1-1e9500c8df40.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-09d278a0-729b-4548-85fc-f3be14f58cfb.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-09d278a0-729b-4548-85fc-f3be14f58cfb.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-0a06990f-cc92-4a20-8aca-f42b48bc4462.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-0a06990f-cc92-4a20-8aca-f42b48bc4462.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-184edb85-e6cd-418c-87b6-f5ea9de61a86.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-184edb85-e6cd-418c-87b6-f5ea9de61a86.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-1a78fdab-e4da-4d9a-bba4-5b7a9fd06693.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-1a78fdab-e4da-4d9a-bba4-5b7a9fd06693.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-1c170261-c0c8-4e34-9c59-30f35ad95474.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-1c170261-c0c8-4e34-9c59-30f35ad95474.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-1dab413e-871a-47dd-b180-c0c109bedeb6.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-1dab413e-871a-47dd-b180-c0c109bedeb6.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-229628b3-2687-4895-84d6-89567c8cf467.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-229628b3-2687-4895-84d6-89567c8cf467.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-2599068b-d1e2-419b-adb6-b3265248ebaf.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-2599068b-d1e2-419b-adb6-b3265248ebaf.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-288bd21d-83b3-4fed-9534-8c2e3298bc80.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-288bd21d-83b3-4fed-9534-8c2e3298bc80.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-34f0273f-a2c7-432f-bf85-594a6927ae44.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-34f0273f-a2c7-432f-bf85-594a6927ae44.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-451baf7a-7b8b-4d7d-98a3-80e98976084f.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-451baf7a-7b8b-4d7d-98a3-80e98976084f.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-48cd03c5-cd64-4162-b543-4fad642a6fc2.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-48cd03c5-cd64-4162-b543-4fad642a6fc2.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-502d3920-a9d6-4f11-b413-a743522736fa.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-502d3920-a9d6-4f11-b413-a743522736fa.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5782cea8-a7ac-4940-a7ff-dd17248dd044.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5782cea8-a7ac-4940-a7ff-dd17248dd044.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5aec3364-411a-4fd2-802a-c8895a513c07.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5aec3364-411a-4fd2-802a-c8895a513c07.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5b7cdde7-ffb6-4932-a66d-2dfb323dbec9.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5b7cdde7-ffb6-4932-a66d-2dfb323dbec9.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5f65bc89-f35c-4898-9564-bbe52bbf0729.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-5f65bc89-f35c-4898-9564-bbe52bbf0729.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-683c8ac8-f04a-4632-8278-f7c8335a8bb3.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-683c8ac8-f04a-4632-8278-f7c8335a8bb3.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-69e54237-2c83-4fb8-97ea-845b9f7ef26e.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-69e54237-2c83-4fb8-97ea-845b9f7ef26e.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-6b291137-13db-44b7-95ea-2838b15933c5.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-6b291137-13db-44b7-95ea-2838b15933c5.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-6c8e78c7-25ee-4b49-9e9d-f005763ac832.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-6c8e78c7-25ee-4b49-9e9d-f005763ac832.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-76229856-c57a-46b8-9b5f-0d773e26a29a.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-76229856-c57a-46b8-9b5f-0d773e26a29a.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-8ab5a557-ecb3-49ff-a7ee-52eacfe6e7c3.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-8ab5a557-ecb3-49ff-a7ee-52eacfe6e7c3.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-8e29f0eb-e31a-481a-9cbc-aea3c091e4bb.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-8e29f0eb-e31a-481a-9cbc-aea3c091e4bb.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-93df1501-99b1-4724-b298-d04bd3f20153.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-93df1501-99b1-4724-b298-d04bd3f20153.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-94232108-c0e9-4453-8697-fc6847f6ec7f.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-94232108-c0e9-4453-8697-fc6847f6ec7f.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-9a72faff-2444-4134-8513-e37fb548aa42.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-9a72faff-2444-4134-8513-e37fb548aa42.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-a4fbb08e-dffd-4e1a-a69c-4ac17e933c02.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-a4fbb08e-dffd-4e1a-a69c-4ac17e933c02.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-a7185ed4-8dc2-42f6-8bfc-99577cb313a5.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-a7185ed4-8dc2-42f6-8bfc-99577cb313a5.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-a9a93e81-f8d1-4095-852f-dbc83e37a50b.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-a9a93e81-f8d1-4095-852f-dbc83e37a50b.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-b45ddaee-3b6e-4138-9310-bac092ccfc27.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-b45ddaee-3b6e-4138-9310-bac092ccfc27.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-c613c8b9-7a47-4194-a8f2-503e146f21b0.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-c613c8b9-7a47-4194-a8f2-503e146f21b0.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-c701fdf2-751e-43d7-a1a2-f9bdbb81916f.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-c701fdf2-751e-43d7-a1a2-f9bdbb81916f.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-c710922f-4e57-45cb-b4e4-0b8a39670412.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-c710922f-4e57-45cb-b4e4-0b8a39670412.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-d4acd01b-0c79-4173-b3c9-518e7116e901.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-d4acd01b-0c79-4173-b3c9-518e7116e901.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-d96a89f0-a34a-4dcf-9d5d-022fcde28532.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-d96a89f0-a34a-4dcf-9d5d-022fcde28532.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-dbda4b3e-395c-4d04-a2d5-4b20cc0daf8e.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-dbda4b3e-395c-4d04-a2d5-4b20cc0daf8e.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-dc4f267e-86ac-4915-b27d-d513903a5df0.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-dc4f267e-86ac-4915-b27d-d513903a5df0.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-e9a21c57-93f3-4533-897f-4de292d60768.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-e9a21c57-93f3-4533-897f-4de292d60768.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-ebf5bed3-b7ba-4a68-a447-1946532afe2c.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-ebf5bed3-b7ba-4a68-a447-1946532afe2c.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-ef9da389-a19e-4665-b839-25b80ff22f27.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-ef9da389-a19e-4665-b839-25b80ff22f27.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-f089c944-857c-4ea4-8280-1b3f69791582.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-f089c944-857c-4ea4-8280-1b3f69791582.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-f1cebb03-518f-43d8-bbd9-4bba1965a7c1.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-f1cebb03-518f-43d8-bbd9-4bba1965a7c1.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-f98e94c0-9724-4d4c-bebc-a6cf633a42df.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-f98e94c0-9724-4d4c-bebc-a6cf633a42df.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-ff62960f-ace6-491d-aaf6-e90840ec21b1.stderr.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/blobs/C-ff62960f-ace6-491d-aaf6-e90840ec21b1.stdout.txt
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/events.jsonl
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/initial_state.json
+# ?? research/runs/R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4/metadata.json

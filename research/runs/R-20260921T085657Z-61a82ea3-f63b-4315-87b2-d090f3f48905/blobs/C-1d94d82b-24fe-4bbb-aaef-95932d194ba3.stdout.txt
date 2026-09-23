@@ -1,0 +1,79 @@
+架构基线 v1.0 | Frozen Architecture                                                                                                Loop 1 执行版
+
+
+
+
+4. 领域模型与业务不变量
+
+                 User                                   Session                      Friendship                           Conversation
+                                    1 : 0..3                                                            pair -> direct
+               user_id                                    M : N/ epoch
+                                                  client_type                    low_user / high_user                    DIRECT / GROUP
+        username / display_name                   ACTIVE / REVOKED                  UNIQUE pair                            seq allocator
+
+
+
+               member
+                                                                                        N:1
+
+
+
+
+                                                      Message                      PluginInstance                         PluginArtifact
+         ConversationMember          1:N                                                                    N:1
+                                                   request_id / seq                active / desired                      version / hashes
+            role / joined_at
+                                                    TEXT / PLUGIN                       status                              immutable
+
+
+                                                          1 : 1+                         1:N
+
+
+
+
+                                                    OutboxEvent                       PluginKV
+                                                 aggregate / payload               schema_version
+                                                    published_at                 conversation scope
+
+
+
+                        图 4-1 UML 领域关系概览。字段仅显示关键不变量；完整 schema 由 contracts/database 管理。
+
+4.1 账号与 Session
+每个用户拥有 WEB、DESKTOP、MOBILE 三个登录槽位。每种 client_type 同时最多一个有效 Session，但三种端可同时
+登录。同端新登录必须在事务中撤销旧 Session 并递增 session_epoch。PostgreSQL 是登录状态权威；Gateway 内存是在
+线连接与路由缓存。
+UNIQUE(user_id, client_type)
+Access Token: user_id, session_id, client_type, session_epoch, iat, exp
+Refresh Token: 只存 hash，可独立撤销
+WSS: 先建立 TLS/WebSocket，再发送 auth.bind；禁止 token 放 URL query
+
+
+4.2 好友与唯一私聊
+Loop 1 不做好友申请审批。添加好友表示即时建立双向关系，并在同一事务中创建或取得唯一 DIRECT Conversation。
+好友关系使用规范化无向 pair：low=min(A,B)、high=max(A,B)。
+friendships: UNIQUE(user_low_id, user_high_id)
+DIRECT conversation: UNIQUE(direct_user_low_id, direct_user_high_id)
+事务: friendship + direct conversation + two members + sync events + outbox -> COMMIT
+
+
+4.3 群聊最小实现
+发起者只能从自己的好友列表选择成员。创建请求必须带 request_id 以避免网络重试重复建群。事务写入 GROUP
+Conversation、成员、用户状态同步事件与 outbox。Loop 1 不含邀请链接、二维码、陌生人拉群、复杂管理员审批。
+
+4.4 消息身份与序号
+ 身份                        约束                                               用途
+
+ 客户端逻辑身份                   UNIQUE(conversation_id, request_id)              SQLite 本地发送、ACK、重试、Sync 收敛
+
+ 服务端幂等身份                   UNIQUE(sender_id, conversation_id, request_id)   跨重试/节点避免重复逻辑消息
+
+ 服务端正式身份                   UNIQUE(server_message_id)                        全局记录身份
+
+ 顺序                        UNIQUE(conversation_id, seq)                     会话内单调递增、缺口检测与历史分页
+
+
+
+
+面向十万级在线连接的可扩展分布式即时通信平台                                                                                                                      9
+

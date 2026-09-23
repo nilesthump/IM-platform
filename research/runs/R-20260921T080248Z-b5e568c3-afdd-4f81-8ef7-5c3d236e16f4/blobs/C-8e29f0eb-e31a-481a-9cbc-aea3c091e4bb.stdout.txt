@@ -1,0 +1,267 @@
+pages 28
+PAGE 2
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+目录
+目录 2
+0. 执行摘要 5
+1. 项目目标、成功定义与边界 6
+1.1 目标 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+1.2 Loop 1 成功定义 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+1.3 非目标与延后项 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+2. 冻结架构原则与变更治理 7
+2.1 Frozen Architecture 变更协议 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+2.2 权威顺序 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+3. 系统总体架构与部署单元 8
+3.1 三个物理部署单元 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.2 运行 profile . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+3.3 Loop 1 单机部署 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+4. 领域模型与业务不变量 9
+4.1 账号与 Session . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+4.2 好友与唯一私聊 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+4.3 群聊最小实现 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+4.4 消息身份与序号 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+5. 消息写入、Outbo
+PAGE 3
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+8.3 WASM 后端 Sandbox . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+9. 插件版本、热插拔与回滚 14
+9.1 安装 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+9.2 升级与双版本共存 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+9.3 Disable / Uninstall / Purge . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+9.4 官方兼容 fixtures . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+10. Monorepo 与规范控制面 15
+10.1 spec/ 各目录的职责 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+11. 公共契约与双后端实现 16
+11.1 唯一权威 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+11.2 等价而非同构 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+11.3 Golden Contract Tests . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+11.4 数据库迁移 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+12. AI Development Loop 17
+12.1 Task Spec 模板 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+12.2 状态队列 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+12.3 
+PAGE 4
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+17.5 发布失败判定 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+18. 可观测性、安全与运维基线 23
+18.1 关联标识 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+18.2 健康与就绪 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+18.3 安全清单 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+18.4 告警优先级 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+19. 第一批 Agent 可执行任务 24
+20. 后续任务队列与依赖 25
+20.1 依赖纪律 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+21. Agent 首日执行清单 26
+21.1 第 0-2 小时 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+21.2 第一个实现回合 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+21.3 Agent 的停止条件 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+附录 A. Gate Checklist 27
+通用 Gate 条件 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27
+附录 B. 冻结不变量速查 28
+面向十万级在线连接的可扩展分布式即时通信平台 4
+PAGE 7
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+2. 冻结架构原则与变更治理
+ID 冻结决策 强制约束
+F-01 公共契约唯一权威 HTTPS、WSS、错误码、领域语义、Sync、Plugin API 先定义，两个后端不得各自发明
+F-02 双后端独立实现 100% Go profile 或 100% Java/Spring profile；Loop 1 不混跑
+F-03 PostgreSQL 是事实来源 消息、会话、Session、插件状态持久化；NATS 丢事件不能造成永久数据缺失
+F-04 Transactional Outbox message 与 outbox 同一事务；ACK 表示 durable commit
+F-05 Gateway 轻业务 接入、鉴权绑定、连接注册、限流、协议路由、local fan-out；业务规则在 Core
+F-06 双层同步游标 用户低频状态用 user_sync_cursor；消息用 conversation seq + contiguous_seq
+F-07 客户端差异 Web memory only；Desktop/Mobile SQLite materialized view
+F-08 插件最小权限 所有能力经 capability/permission；Render Bundle 审查 + sandbox；不可直接触达宿主敏感资源
+F-09 门禁驱动 Gate PASS 立即前进；Gate FAIL 必须留在阶段修复
+F-10 CI 独立裁判 Agent 的自检不是验收；合并与发布只依据独立流水线证据
+2.1 Frozen Architecture 变更协议
+禁止：直接修改 frozen spec / contracts / DB invariants / plugin security boundary
+允许：创建 Architecture Change Proposal (ACP) 或 ADR 草案
+流程：提出动机 -> 影响分析 -> 兼容/迁移/回滚方案 -> 架构负责人批准 -> 更新契约 -> 全平台兼容 CI -> 实施
+Agent 遇到与 frozen architecture 冲突的任务时必须停止该冲突部分，在任务记录中标记 BLOCKED_BY_ARCHITECTURE
+，并提出最小决策问题。不得用“实现方便”作为静默改变协议、唯一约束、ACK 语义或安全边界的理由。
+2.2 权威顺序
+1. spec/architecture/decisions/ (已批准 ADR / frozen decision)
+2. contracts/ (机器可验证的公共契约)
+3. spec/domain/ + spec/invariants/
+4. spec/acceptance/ (Gate 与验收证据)
+5. spec/tasks/ (任务局部范围)
+6. implementation (不得反向定义契约)
+面向十万级在线连接的可扩展分布式即时通信平台 7
+PAGE 9
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+4. 领域模型与业务不变量
+User Session Friendship Conversation
+1 : 0..3 pair -> direct
+user_id client_tyMp :e N / epoch low_user / high_user DIRECT / GROUP
+username / display_name ACTIVE / REVOKED UNIQUE pair seq allocator
+member
+N : 1
+Message PluginInstance PluginArtifact
+ConversationMember 1 : N N : 1
+request_id / seq active / desired version / hashes
+role / joined_at
+TEXT / PLUGIN status immutable
+1 : 1+ 1 : N
+OutboxEvent PluginKV
+aggregate / payload schema_version
+published_at conversation scope
+图 4-1 UML 领域关系概览。字段仅显示关键不变量；完整 schema 由 contracts/database 管理。
+4.1 账号与 Session
+每个用户拥有 WEB、DESKTOP、MOBILE 三个登录槽位。每种 client_type 同时最多一个有效 Session，但三种端可同时
+登录。同端新登录必须在事务中撤销旧 Session 并递增 session_epoch。PostgreSQL 是登录状态权威；Gateway 内存是在
+线连接与路由缓存。
+UNIQUE(user_id, client_type)
+Access Token: user_id, session_id, client_type, session_epoch, iat, exp
+Refresh Token: 只存 hash，可独立撤销
+WSS: 先建立 TLS/WebSocket，再发送 auth.bind；禁止 token 放 URL query
+4.2 好友与唯一私聊
+Loop 1 不做好友申请审批。添加好友表示即时建立双向关系，并在同一事务中创建或取得唯一 DIRECT Conversation。
+好友关系使用规范化无向 pair：low=min(A,B)、high=max(A,B)。
+friendships: UNIQUE(user_low_id, user_high_id)
+DIRECT conversation: UNIQUE(direct_user_low_id, direct_user_high_id)
+事务: friendship + direct conversation + two members + sync events + outbox -> COMMIT
+4.3 群聊最小实现
+发起者只能从自己的好友列表选择成员。创建请求必须带 request_id 以避免网络重试重复建群。事务写入 GROUP
+Conversation、成员、用户状态同步事件与 outbox。Loop 1 不含邀请链接、二维码、陌生人拉群、复杂管理员审批。
+4.4 消息身份与序号
+身份 约束 用途
+客户端逻辑身份 UNIQUE(conversation_id, request_id) SQLite 本地发送、ACK、重试、Sync 收敛
+服务端幂等身份 UNIQUE(sender_id, conversation_id, request_id) 跨重试/节点避免重复逻辑消息
+服务端正式身份 UNIQUE(server_message_id) 全局记录身份
+顺序 UNIQUE(conversation_id, seq) 会话内单调递增、缺口检测与历史分页
+面向十万级在线连接的可扩展分布式即时通信平台 9
+PAGE 12
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+7. HTTPS/WSS/TLS 与认证协议
+7.1 登录与 Token
+● POST /auth/login 包含 username/password、client_type、device_id、client_version、protocol_version。
+● Access Token 短期、Refresh Token 长期；具体时长是配置，不写死进协议。
+● Web 优先使用 HttpOnly Secure Cookie 持有 Refresh Token；原生端使用 OS secure storage。
+● 显式 logout 撤销 Session、Refresh Token 与 WSS；退出登录不等于立即删除本地 SQLite。
+7.2 WSS 状态机
+TCP/TLS -> WebSocket Upgrade -> UNAUTHENTICATED
+UNAUTHENTICATED 只允许 auth.bind 与 ping/pong
+auth.bind 校验签名、exp、session_id、client_type、session_epoch
+成功 -> AUTHENTICATED，socket 永久绑定 user/session/client_type
+同端新登录 -> session.revoked -> 推送旧连接 -> close
+7.3 Session 缓存一致性
+Core 在 Session 创建/撤销事务中写 outbox；Gateway 经 NATS 更新内存映射 (user_id, client_type) ->
+session_id/epoch/connection_id。每条消息不查询 PostgreSQL。实时撤销事件是体验优化；数据库权威状态和 epoch 确
+保旧 token 最终无法重连。
+7.4 传输与日志安全
+规则 要求
+传输 生产入口仅 HTTPS/WSS/TLS；禁用明文回退
+Token 禁止放 URL query；禁止写应用日志/trace；错误响应不得回显
+密码 只存强哈希；凭证与普通用户资料分离
+插件 永不向 Custom Renderer 暴露认证 token 或 SQLite 直连
+日志 request_id/message_id 可观测；消息正文默认不进入结构化日志
+面向十万级在线连接的可扩展分布式即时通信平台 12
+PAGE 16
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+11. 公共契约与双后端实现
+11.1 唯一权威
+Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户端 SDK。契约包含 OpenAPI/HTTP、WSS
+envelope 与消息类型、错误码、协议版本与 capabilities、数据库 schema/migrations、Plugin API、Golden Test Vectors。
+实现代码不得成为反向权威。
+11.2 等价而非同构
+必须相同 允许不同
+HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、 框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部
+插件权限、数据库结果 接口
+Release Manifest、健康检查、metrics 标签、日志关联字段 内部模块名称与代码风格
+11.3 Golden Contract Tests
+同一 fixture 输入 -> Go profile -> 规范化结果 A
+同一 fixture 输入 -> Java profile -> 规范化结果 B
+断言 A == Canonical Expected && B == Canonical Expected
+必须覆盖：auth/session、friend/direct uniqueness、group idempotency、message ACK/outbox、retry、sync gap、plugin permissions、
+errors/version negotiation
+11.4 数据库迁移
+两套后端共享数据库语义，但单次部署只运行一个 profile。migration 由独立迁移组件执行，不允许应用实例竞争执行。
+所有兼容窗口内的服务与客户端 fixture 必须通过 migration 测试。破坏性 schema 变更采用 expand -> migrate/backfill
+-> switch -> contract，多版本共存期间禁止先删旧字段。
+面向十万级在线连接的可扩展分布式即时通信平台 16
+PAGE 19
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+14. CI/CD 独立校验架构
+Diff 分类 backend/go/** backend/java/** contracts/** / DB
+Go CI Java CI 全平台兼容矩阵
+unit + integration unit + integration Go + Java + clients
+contract contract plugin + migration
+可重复制品 Release Gate
+Staging Smoke
+镜像 / 客户端 manifest + rollback
+Agent 负责提出变更；CI 独立验证事实。Agent 无权自行宣布 Gate 通过。
+图 14-1 Path-aware CI DAG。公共契约变更是唯一需要无条件放大全平台验证的路径。
+14.1 路径感知规则
+变更路径 必跑作业
+backend/go/** Go lint/unit/integration/contract；不默认跑 Java
+backend/java/** Java lint/unit/integration/contract；不默认跑 Go
+clients/web/** Web unit/build/protocol/plugin UI tests
+clients/desktop/** 或 clients/mobile/** 对应客户端 + SQLite migration + protocol tests
+contracts/**、数据库迁移、shared Go + Java + Web + Desktop + Mobile + old client fixtures + plugin fixtures + migration compatibility
+protocol/plugin SDK
+deploy/**、ci/** compose/manifest/security/smoke/rollback validation
+14.2 流水线层次
+static/lint -> unit -> contract -> integration -> compatibility -> build
+-> immutable artifacts -> SBOM/signature -> staging deploy -> smoke/E2E
+-> release gate -> canary/controlled rollout -> observe -> complete or rollback
+14.3 兼容矩阵
+最低矩阵包含 Client Protocol v1、v2、HEAD；Go/Java profile；Echo/Poll 插件 fixture；SQLite old schema fixtures。服务
+端只维护一个当前实现版本与有限兼容窗口。latest/recommended/min_supported 必须在 Release Manifest 中显式声明
+，客户端版本号与 protocol_version 不绑定。
+14.4 CI 与 Agent 的信任边界
+Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从干净 checkout 重建后判定。任何需要跳过测试、重
+录 golden fixture、降低阈值或更改验收项的动作都视为架构/验收变更，必须单独审批。
+面向十万级在线连接的可扩展分布式即时通信平台 19
+PAGE 22
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+17. Release、迁移与回滚规则
+17.1 Release Manifest
+release_id / git_commit / build_time
+backend_profile: go | java
+container_digests / client_artifact_hashes
+contract_version / protocol_versions / plugin_api_version
+db_migration_level / sqlite_schema_versions
+min_supported_client / recommended_client
+feature_flags / rollout plan / rollback target
+verification evidence links
+17.2 发布规则
+● 制品不可变：同一版本号不得覆盖镜像、客户端包或插件包。
+● 从同一已验证 commit 构建一次，按环境提升制品；禁止生产环境重新构建。
+● 先 migration compatibility，再服务端，再客户端；支持窗口内旧客户端必须继续工作。
+● staging smoke/E2E、兼容矩阵、security、rollback rehearsal 未通过不得发布。
+● Go 与 Java profile 的发布相互独立，但都声明同一 contract version。
+17.3 数据库迁移
+阶段 允许动作 禁止动作
+Expand 新增 nullable/有默认值字段、新表、新索引（评估锁） 删除/重命名旧字段
+Migrate 可重入 backfill、双写/双读兼容、验证计数与约束 一次性不可恢复数据改写
+Switch 服务开始使用新结构，旧结构仍保留一个兼容窗口 混合版本尚在运行时 contract
+Contract 证据证明无旧版本依赖后删除旧结构 无备份/无回滚点直接清理
+17.4 回滚
+应用回滚必须指向 manifest 中已验证的前一不可变制品。数据库若已进入不可逆阶段，不得盲目回滚二进制；应优先
+forward-fix 或使用预先验证的 down migration。插件升级依靠 previous_version + plugin_kv 快照回滚。客户端 SQLite
+migration 必须保留升级 fixture，无法安全 down-migrate 时采用向前修复。
+17.5 发布失败判定
+出现认证失败率异常、ACK/投递错误、Outbox lag 持续增长、schema 兼容失败、插件 sandbox 越权、资源无界增长或
+正确性红线任一非零时，立即停止 rollout，并按 manifest 执行回滚/forward-fix。事故后生成 checkpoint 与 ADR/修复任
+务。
+面向十万级在线连接的可扩展分布式即时通信平台 22
+PAGE 28
+架构基线 v1.0 | Frozen Architecture Loop 1 执行版
+附录 B. 冻结不变量速查
+域 不变量
+Session 同 user/client_type 最多一个有效 Session；不同 client_type 可同时登录；epoch 使旧端失效
+Friend 规范化 pair 唯一；好友与唯一 DIRECT Conversation 同事务
+Group 成员只能来自发起者好友列表；create request 幂等
+Message ACK=durable commit；conversation 内 seq 单调；服务端幂等 key 含 sender/conversation/request
+Outbox 与业务数据同事务；NATS 可重复/短暂遗漏；Sync 保证最终完整
+SQLite UNIQUE(conversation_id, request_id)；所有入口事务 UPSERT；SENT 不回退
+Sync user cursor 只管低频状态；消息按 conversation seq；contiguous_seq 不跨 gap
+Web 无聊天 DB、无离线历史；页面生命周期之外不保证消息状态
+Plugin 版本制品不可变；权限最小化；WASM/renderer sandbox；后端与 renderer 同版本原子绑定
+Architecture 公共契约唯一权威；Agent 不得越权修改 frozen decisions
+CI 只测被修改后端；shared contract/schema/SDK 变更触发全平台兼容测试
+Release 不可变制品 + manifest；expand/migrate/switch/contract；发布前验证回滚
+文档结束
+本方案是 Loop 1 的正式执行基线。任何新增目标必须先进入 backlog；任何架构变更必须走 ACP/ADR；任何阶段前进必须
+以 Gate 证据为准。
+面向十万级在线连接的可扩展分布式即时通信平台 28

@@ -1,0 +1,50 @@
+架构基线 v1.0 | Frozen Architecture                                                                              Loop 1 执行版
+
+
+
+
+2. 冻结架构原则与变更治理
+ ID         冻结决策                            强制约束
+
+ F-01       公共契约唯一权威                        HTTPS、WSS、错误码、领域语义、Sync、Plugin API 先定义，两个后端不得各自发明
+
+ F-02       双后端独立实现                         100% Go profile 或 100% Java/Spring profile；Loop 1 不混跑
+
+ F-03       PostgreSQL 是事实来源                消息、会话、Session、插件状态持久化；NATS 丢事件不能造成永久数据缺失
+
+ F-04       Transactional Outbox            message 与 outbox 同一事务；ACK 表示 durable commit
+
+ F-05       Gateway 轻业务                     接入、鉴权绑定、连接注册、限流、协议路由、local fan-out；业务规则在 Core
+
+ F-06       双层同步游标                          用户低频状态用 user_sync_cursor；消息用 conversation seq + contiguous_seq
+
+ F-07       客户端差异                           Web memory only；Desktop/Mobile SQLite materialized view
+
+ F-08       插件最小权限                          所有能力经 capability/permission；Render Bundle 审查 + sandbox；不可直接触达宿主敏感资源
+
+ F-09       门禁驱动                            Gate PASS 立即前进；Gate FAIL 必须留在阶段修复
+
+ F-10       CI 独立裁判                         Agent 的自检不是验收；合并与发布只依据独立流水线证据
+
+
+2.1 Frozen Architecture 变更协议
+禁止：直接修改 frozen spec / contracts / DB invariants / plugin security boundary
+允许：创建 Architecture Change Proposal (ACP) 或 ADR 草案
+流程：提出动机 -> 影响分析 -> 兼容/迁移/回滚方案 -> 架构负责人批准 -> 更新契约 -> 全平台兼容 CI -> 实施
+
+Agent 遇到与 frozen architecture 冲突的任务时必须停止该冲突部分，在任务记录中标记 BLOCKED_BY_ARCHITECTURE
+，并提出最小决策问题。不得用“实现方便”作为静默改变协议、唯一约束、ACK 语义或安全边界的理由。
+
+2.2 权威顺序
+1. spec/architecture/decisions/ (已批准 ADR / frozen decision)
+2. contracts/ (机器可验证的公共契约)
+3. spec/domain/ + spec/invariants/
+4. spec/acceptance/ (Gate 与验收证据)
+5. spec/tasks/ (任务局部范围)
+6. implementation (不得反向定义契约)
+
+
+
+
+面向十万级在线连接的可扩展分布式即时通信平台                                                                                                7
+

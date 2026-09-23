@@ -1,0 +1,65 @@
+架构基线 v1.0 | Frozen Architecture                                                                                           Loop 1 执行版
+
+
+
+
+19. 第一批 Agent 可执行任务
+任务必须逐个进入 ready。S0 Gate 未通过前，S1 任务不得 active；依此类推。下面清单按依赖顺序排列，不授权并行修
+改同一契约。
+
+ Task ID                目标                        阶段   交付物                                     验收
+
+ LOOP1-CTRL-001         建立 Monorepo 与规范目          S0   repo skeleton; spec/ contracts/         目录 lint PASS；无重复权威
+                        录                              tasks/ progress/；README 仅指向权            文档
+                                                       威入口
+
+ LOOP1-CTRL-002         编写 agent-context/curren   S0   handoff、progress、task schema            新 Agent dry-run 能按顺序
+                        t/task 模板                                                              恢复
+
+ LOOP1-CONTRACT-0       冻结 HTTP Auth/User/Frien   S0   OpenAPI + errors + golden fixtures      schema lint；正/负例齐全
+ 01                     d 契约
+
+ LOOP1-CONTRACT-0       冻结 WSS Envelope/Auth/     S0   auth.bind/ack、message.send/ack/cr       contract generator/tests
+ 02                     Message 契约                     eated、session.revoked                   PASS
+
+ LOOP1-CONTRACT-0       冻结 Sync 与 Plugin API v1   S0   user cursor、conversation seq、           fixtures 覆盖重复/乱序/权限
+ 03                                                    Events/Queries/Actions/UI Host          拒绝
+
+ LOOP1-DB-001           建立 canonical schema 与     S0   users/sessions/friendships/conversati   唯一约束与迁移测试 PASS
+                        migration runner               ons/members/messages/outbox/plu
+                                                       gins
+
+ LOOP1-INFRA-001        Compose + PostgreSQL +    S0   go/java profile skeleton、真实 TLS         clean checkout 一键启动 +
+                        NATS + TLS Proxy               入口                                      smoke
+
+ LOOP1-CI-001           Path-aware CI skeleton    S0   diff classifier、Go/Java/client/shared   路径矩阵单元测试 PASS
+                                                       jobs
+
+ LOOP1-GO-AUTH-00       Go Auth/Session 纵切        S1   login/refresh/logout、slot、epoch、        同端替换旧 Session；多端
+ 1                                                     auth.bind                               并存
+
+ LOOP1-GO-SOCIAL-0      Go 搜索/好友/唯一私聊事            S1   normalized pair、direct uniqueness、      并发互加最终 1 friendship
+ 01                     务                              sync/outbox                             + 1 direct
+
+ LOOP1-GO-MSG-001       Go 文本消息 + seq +           S1   durable ACK、idempotency、                ACK 丢失重试不重复；接收
+                        outbox                         dispatcher、NATS                         端实时收到
+
+ LOOP1-E2E-001          首条纵向 E2E                  S1   A 登录搜索添加 B 并发送 hello                    从 TLS 入口运行；证据归档
+
+ LOOP1-CLIENT-SQLIT     SQLite schema 与           S2   UNIQUE(conversation_id, request_id)、 四条入口均幂等收敛
+ E-001                  repository                     UPSERT、migration fixture
+
+ LOOP1-CLIENT-SEND      Optimistic send 状态机       S2   SENDING/SENT/FAILED/retry               SENT 不倒退；retry 复用
+ -001                                                                                          request_id
+
+ LOOP1-SYNC-001         双层离线同步                    S2   user cursor + per-conversation          乱序/重复/交叉实时流无
+                                                       contiguous_seq                          gap
+
+ LOOP1-WEB-001          Web 临时客户端                 S2   登录/好友/会话/实时文本 memory                    刷新不保留历史；当前状态
+                                                       only                                    可重新获取
+
+
+
+
+面向十万级在线连接的可扩展分布式即时通信平台                                                                                                            24
+
