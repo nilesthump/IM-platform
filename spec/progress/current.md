@@ -155,7 +155,7 @@ Resolve the Task-linked `research/**` Recorder write-boundary inconsistency expl
 - The original paused Agent retains sole ownership of the untracked `contracts/http/schema-lint/` tree in `H:\IM-platform`; resumed review work did not read, modify, copy, stash, clean, claim, or depend on it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
 - Recorder prompt/run artifacts for resumed review are owned by `/root/contract001_resume_review`.
-- Recorder prompt/run artifacts for fresh re-review run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905`, including the preserved empty-prompt registration limitation artifact, are owned by `/root/contract001_schema_rereview` until the review closure commit.
+- Recorder prompt/run artifacts for fresh re-review run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905`, including the preserved empty-prompt registration limitation artifact, remain untracked and owned by `/root/contract001_schema_rereview` pending explicit `research/**` path authorization; they were not included in the Task-allowed review closure commit.
 
 ## Architecture Conflicts / ACP / ADR
 
