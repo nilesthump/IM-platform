@@ -12,11 +12,11 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CONTRACT-001
 
-Current Task State: review
+Current Task State: done
 
 ## Immediately Relevant Completed Work
 
-- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. `LOOP1-CONTRACT-001` remains in `review`: fresh independent content review found no blocking Contract defect in candidate `272bb28`, but its prospective Review Recorder run cannot be committed with intact raw-output hashes under current Git text normalization. This is an instrumentation closure blocker, not Task acceptance.
+- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. `LOOP1-CONTRACT-001` is now `done` under ADR-0001: independent content review passed candidate `d46ce5a`, and later Human-authorized run-local Git transport preserved all Recorder output hashes in a clean committed checkout. S0 Gate remains NOT YET PASSED.
 - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
 - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
@@ -32,17 +32,18 @@ Current Task State: review
 - The Human authorized Task-linked Recorder prompt/run paths on 2026-09-23. The Coordinator validated both preserved Review runs and recorded the exact authorization at `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-recorder-path-authorization.md`.
 - Fresh Fix Agent `/root/contract001_complete_oas_lint_fix` committed candidate `272bb28`, replacing the narrow bespoke schema with an offline validator generated from the pinned official OAI OpenAPI 3.1 structural schema and adding nine structural negative regressions. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-fix-272bb28-development.md`; Recorder run `R-20260923T034702Z-a877284a-a16d-4848-9d8f-164c2833b74a`.
 - Fresh independent Review Agent `/root/contract001_official_oas_review` completed substantive Review PASS at clean detached closure `d46ce5a9e6ee7a7a080e0a574189b090135abdb5`, but acceptance closure was stopped when staging revealed 35 of 142 unredacted Recorder output blobs changed SHA-256 under Git normalization. The automatic approval reviewer rejected a post-validation attribute change and prohibited an alternate bypass. Provisional evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-d46ce5a-pass.md`. The finished Review run and prompt remain uncommitted and unchanged.
+- The Human later explicitly approved the exact run-local transport attribute. Its preserved Recorder package was committed at `4b4cb4a15f17025cb92531d24e39f84816d973fa`. Clean committed detached validation returned PASS for both Review and linked closure runs (149 and 12 events), with 142/142 and 6/6 output blobs matching SHA-256. Independent acceptance evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-acceptance-closure.md`. Accepted checkpoint: `spec/progress/checkpoints/2026-09-23-loop1-contract-001-accepted.md`.
 - The current Fix candidate defines 9 canonical Auth/User/Friend HTTP operations, 15 shared error codes with operation/status bindings and complete negative coverage, fixture version `1.1`, 6 positive and 21 negative dual-profile scenarios, and a deterministic verifier with 15 committed mutation regressions.
 
 ## Current Blockers
 
-- `LOOP1-CONTRACT-001` remains unfinished in `review`. Candidate `272bb28` passed substantive independent checks, but Recorder Git transport produced 35 raw-output hash mismatches in the staged Review run. The blocked post-validation attribute change must not be bypassed; a compliant control-plane resolution and fresh acceptance closure are needed before `done`.
+- No current `LOOP1-CONTRACT-001` blocker. The prior Recorder Git-transport rejection and subsequent explicit Human authorization remain documented; the accepted closure preserves original run event/output bytes.
 - The Human authorized `research/prompts/**` and `research/runs/**` only for `LOOP1-CONTRACT-001` Recorder artifacts on 2026-09-23. The prior write-boundary finding remains permanent evidence; no governance decision remains pending for the next Fix run.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
-- Fresh independent content review on clean detached `d46ce5a`: contract verifier exit `0` in `6710.3654 ms`; CTRL-002 default Acceptance exit `0` in `953.4633 ms`; fifteen in-memory structural negatives rejected; official OAI source and LF regenerated validator hashes matched; 20 committed Fix-run output blobs matched. Review Recorder run finished `PASS` and local `validate-run` passed with 149 events. Staged transport audit then found 35/142 raw-output blob SHA-256 mismatches; no accepted checkpoint or `done` transition followed. Details and exact command IDs are in provisional evidence.
+- Fresh independent content review on clean detached `d46ce5a`: contract verifier exit `0` in `6710.3654 ms`; CTRL-002 default Acceptance exit `0` in `953.4633 ms`; fifteen in-memory structural negatives rejected; official OAI source and LF regenerated validator hashes matched; 20 committed Fix-run output blobs matched. Review Recorder run finished `PASS` and validated with 149 events. After explicit Human authorization, local, staged, and clean committed output-blob SHA audits passed; both Review and closure runs validated from clean detached `4b4cb4a`. Details and exact command IDs are in durable evidence.
 - Fresh Fix Agent Recorder-wrapped command: `pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`.
   - Result: Development PASS, exit `0`, elapsed `6174.1193 ms`; 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, OAI OpenAPI 3.1 structural lint, and 15 total mutation regressions including nine structural negatives.
 - Fresh Fix Agent Recorder-wrapped command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`.
@@ -140,7 +141,7 @@ Current Task State: review
 - Candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is independently rejected because its verifier does not enforce OpenAPI 3.1 structural schema validity. Semantic verification PASS does not override the explicit schema-lint acceptance failure; the task remains `review` and S0 remains NOT YET PASSED.
 - Fix-Agent development evidence for candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` claimed the missing-`info.title` finding was repaired; the later independent result below supersedes that development conclusion for acceptance.
 - Candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` is independently rejected: its narrow bespoke schema catches missing `info.title` but accepts unknown top-level/`Info` members and a scalar Response Object, so the schema-lint acceptance remains incomplete.
-- Candidate `272bb28` passes Fix-Agent development verification but has no independent review result. The OAI schema intentionally leaves Schema Object contents and some prose requirements outside structural lint; the existing task-specific semantic verifier remains in force.
+- Candidate `272bb28` passed fresh independent review under the ADR-0001 mechanism. The OAI schema intentionally leaves Schema Object contents and some prose requirements outside structural lint; the existing task-specific semantic verifier remains in force.
 - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
 - The Coordinator prospectively authorized the exact durable-evidence path for this repair cycle; that authorization does not retroactively excuse the prior hard violation.
 - The independent reviews of `74134bd306cbf0a1546f500bc46c45a1217b2d58` and `85069032c137cce6e526e0e329b6e93178515274` remain permanent FAIL records; accepted commit `aef6497d6216d9a8251250d157935e7af418d86b` supersedes them for task acceptance.
@@ -150,15 +151,15 @@ Current Task State: review
 
 ## Next Exact Action
 
-Human/Coordinator: resolve the rejected Recorder Git-transport change through an authorized control-plane path, then arrange a fresh compliant independent acceptance closure for candidate `272bb28`. Keep `LOOP1-CONTRACT-001` in `review` and S0 Gate NOT YET PASSED; do not commit the hash-mismatching run or start another product task while this remains unfinished.
+Coordinator: inspect the accepted `LOOP1-CONTRACT-001` closure, then select the next dependency-satisfied S0 task; at final merge include additions from `task/LOOP1-MIN-001` in `main` as Human requested. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`1c274bcbf92ebcc05c1bc208386c5976437d8221` (Recorder acceptance closure); `LOOP1-CONTRACT-001` Fix candidate `272bb28` is a committed development candidate, not a task acceptance point.
+`4b4cb4a15f17025cb92531d24e39f84816d973fa` (committed Recorder transport and clean-checkout acceptance base); `LOOP1-CONTRACT-001` independent content Review candidate was `d46ce5a9e6ee7a7a080e0a574189b090135abdb5`.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-21-loop1-research-001-accepted.md`
+`spec/progress/checkpoints/2026-09-23-loop1-contract-001-accepted.md`
 
 ## Uncommitted Changes / Ownership
 
@@ -166,7 +167,7 @@ Human/Coordinator: resolve the rejected Recorder Git-transport change through an
 - The original paused Agent retains sole ownership of the untracked `contracts/http/schema-lint/` tree in `H:\IM-platform`; resumed review work did not read, modify, copy, stash, clean, claim, or depend on it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
 - Recorder prompt/run artifacts for the current Fix are owned by `/root/contract001_complete_oas_lint_fix` until the Fix handoff closure commits them. The unused wrong-source prompt registration is preserved and excluded from the active Fix run; the active run links the accurate `source=agent` prompt.
-- The new prospective independent Review prompt `P-2bac526e-8167-4763-a91c-3ed2bf3bac91` and finished run `R-20260923T070109Z-876f5bdd-f4dd-4eb8-97e5-27cea22c1a21` are uncommitted, unchanged, and owned by `/root/contract001_official_oas_review` pending an authorized transport resolution. The original paused Agent alone retains ownership of untracked `contracts/http/schema-lint/`.
+- The independent Review prompt/run and linked Human-authorized closure prompt/run were committed at `4b4cb4a`; no Recorder artifacts remain uncommitted. The original paused Agent alone retains ownership of untracked `contracts/http/schema-lint/`, which was not read, copied, modified, staged, or used by this Review.
 
 ## Architecture Conflicts / ACP / ADR
 

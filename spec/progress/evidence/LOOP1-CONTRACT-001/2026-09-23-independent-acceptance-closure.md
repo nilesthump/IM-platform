@@ -1,0 +1,26 @@
+# LOOP1-CONTRACT-001 independent acceptance closure
+
+- Date: 2026-09-23.
+- Independent reviewer: `/root/contract001_official_oas_review`; not the Implementation or Fix Agent. Standards and Spec axes both PASS with no blocking Contract finding.
+- Reviewed candidate: `d46ce5a9e6ee7a7a080e0a574189b090135abdb5`, detached clean checkout `H:\.codex\worktrees\contract001-independent-review-official-20260923\IM-platform`.
+- Review range: `e5482b135a2ab7451c24c29c7517e1a8f19ce420..d46ce5a9e6ee7a7a080e0a574189b090135abdb5`; Fix code candidate `272bb28251671f6f961e9379c7c148fdc9823154`.
+- Complete content-review commands, exits, elapsed times, clean Git status, official OAI provenance, negative controls, and scope/independence findings: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-d46ce5a-pass.md`. Contract verifier PASS exit `0` in `6710.3654 ms`; CTRL-002 default Acceptance PASS exit `0` in `953.4633 ms`; 15 structural negative controls rejected. These were run under finished Review Recorder run `R-20260923T070109Z-876f5bdd-f4dd-4eb8-97e5-27cea22c1a21` (`P-2bac526e-8167-4763-a91c-3ed2bf3bac91`), 149 events.
+- The Review was initially prevented from closing because Git normalized 35 of 142 raw output blobs on staging. The automatic approval reviewer rejected the post-validation attribute edit without explicit authorization. This rejection remains in the prior evidence; no bypass was used.
+- Later Human message, registered verbatim as `P-5d79f6c7-6a1d-4ccd-8ab3-ecd523eb23f1`, explicitly approved the Coordinator's exact run-local attribute request. The Human's additional instruction to include `task/LOOP1-MIN-001` at the final `main` merge belongs to the Coordinator, not this reviewer. The authorization and its limits are recorded at `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-review-recorder-transport-closure.md`.
+- Linked closure run `R-20260923T141457Z-f14fe85b-7ec9-4ee4-a771-c2ef3eaa3b23` began prospectively at `2026-09-23T14:14:57.579063Z`, role `review`, `capture_mode=prospective_resume`, `pre_recorder_work=true`, `pre_recorder_trace_complete=false`, `experiment_group=full_governance`; Human decision `HD-cf7e87da-6c46-43e4-99f6-f37cef9b9baf`. It finished PASS and validated with 12 events. Earlier activity was not represented as a complete prospective trace.
+- Transport commit: `4b4cb4a15f17025cb92531d24e39f84816d973fa`, branch `task/LOOP1-CONTRACT-001`. The only addition inside the finished Review run was its Human-authorized `blobs/.gitattributes` (`*.txt -text -eol`); original events, metadata, output bytes, and hashes were not edited. Local and staged audits each found 142/142 Review output blobs matching recorded SHA-256. The closure run's own transport was configured before producing output, with 6/6 staged output blobs matching.
+
+## Clean committed independent acceptance check
+
+Method: new detached worktree `H:\.codex\worktrees\contract001-transport-audit-20260923\IM-platform` at exactly `4b4cb4a15f17025cb92531d24e39f84816d973fa`; `git status --short --branch` exit `0`, `## HEAD (no branch)` with no changed or untracked paths. The paused Agent's untracked `H:\IM-platform\contracts\http\schema-lint\` was absent from this isolated checkout and was not read, copied, modified, staged, claimed, or used.
+
+| Exact command/check | Exit | Elapsed | Result |
+| --- | ---: | ---: | --- |
+| `.\tools\research\recorder.ps1 validate-run --run-id R-20260923T070109Z-876f5bdd-f4dd-4eb8-97e5-27cea22c1a21` | `0` | `2.2785351 s` | PASS; finished, 149 events. |
+| `.\tools\research\recorder.ps1 validate-run --run-id R-20260923T141457Z-f14fe85b-7ec9-4ee4-a771-c2ef3eaa3b23` | `0` | `1.9917184 s` | PASS; finished, 12 events. |
+| PowerShell: parse each run's `events.jsonl`; for every `command_finished`, use `Get-FileHash -Algorithm SHA256` on its recorded stdout/stderr blob and compare to `stdout_sha256`/`stderr_sha256` | `0` | `0.4154971 s` | Review: 71 commands, 142 blobs, 0 mismatches; closure: 3 commands, 6 blobs, 0 mismatches. |
+| `git status --short --branch` | `0` | `0.9 s` | `## HEAD (no branch)`; clean. |
+
+Result: PASS under approved ADR-0001 temporary S0 independent acceptance mechanism. The canonical HTTP Auth/User/Friend OpenAPI, shared errors, positive/negative fixtures, and schema lint meet this Task's acceptance; no product code, WSS/Sync/Plugin contract, ACK semantics, Frozen Architecture, or migration changed in the transport closure. The official OAI structural schema intentionally does not validate embedded Schema Objects by itself; the task-specific semantic/fixture verifier remains required and passed. Recorder PASS is not the reason for Task PASS; substantive independent verification plus durable clean committed evidence is. `LOOP1-CONTRACT-001` may move `review` to `done`; S0 Gate remains NOT YET PASSED.
+
+Coordinator prospectively authorized exactly `spec/progress/checkpoints/2026-09-23-loop1-contract-001-accepted.md` for this accepted contract/schema transition before it was written. The prior independent FAIL findings and the transport rejection remain permanent history. No fresh Fix Agent or Human decision is currently needed for this Task. Next: Coordinator inspect this closure and choose the next dependency-satisfied S0 task; defer all branch merges, including `task/LOOP1-MIN-001`, to the Coordinator.
