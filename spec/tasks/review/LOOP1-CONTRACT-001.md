@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-001
 title: Freeze HTTP Auth, User, and Friend contracts
 status: review
-owner: unassigned-fresh-independent-review-agent
+owner: unassigned-fresh-fix-agent
 stage: S0
 gate: S0
 ---
@@ -80,6 +80,11 @@ The Coordinator explicitly authorized the exact evidence path above on 2026-09-2
 - The repair adds repository-contained `contracts/http/auth-user-friend.openapi.structure.schema.json`, integrates it into the task verifier, and adds a missing-`info.title` mutation regression. It does not change the canonical OpenAPI document, shared errors, fixtures, or product semantics.
 - Development verification passed: task verifier exit `0` with OpenAPI 3.1 schema lint and 7 mutation regressions; focused missing-`info.title` negative control exit `0`; CTRL-002 Development mode exit `0`; repair-only and Recorder-payload-excluded diff checks exit `0`.
 - Fix development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-fix-5d1d165-development.md`. These results are not independent acceptance.
+- Fresh independent Review Agent `/root/contract001_schema_rereview` reviewed handoff closure `9290139b918e76a0f0310b646ec7a9c6433c91a1` and Fix candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` from a clean detached isolated checkout under Recorder run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905` and returned FAIL.
+- The normal task verifier passed with 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, schema lint, and 7 committed mutation regressions. CTRL-002 Acceptance mode also passed.
+- The independent missing-`info.title` disposable control was correctly rejected. However, broader in-memory controls proved that the bespoke structural schema accepts an unknown top-level member, an unknown `Info` member, and a scalar Response Object. The explicit schema-lint acceptance is therefore still incomplete.
+- Canonical OpenAPI, shared errors, and fixtures are unchanged between `12c566f71da9b038764ecb7a5303b116e77ca32f` and `5d1d16561d7671ce54d6456741a51c21f5d3dadc`; no additional contract-semantic defect was found.
+- Permanent FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-5d1d165-fail.md`.
 
 # Handoff
 
@@ -92,7 +97,9 @@ The Coordinator explicitly authorized the exact evidence path above on 2026-09-2
 - The independent FAIL and the original hard process violation remain permanent evidence even though the Coordinator prospectively authorized this task's exact durable-evidence path for the repair cycle.
 - The resumed independent review failed because the committed verifier is not an OpenAPI 3.1 structural schema lint: it accepted a document missing required `info.title`. The semantic contract checks otherwise passed, but that does not satisfy the explicit schema-lint acceptance item.
 - The Fix Agent added deterministic repository-contained OpenAPI 3.1 structural schema lint and a regression proving a missing required `info.title` is rejected without reading, copying, modifying, claiming, or depending on the paused Agent-owned untracked `contracts/http/schema-lint/` tree. No contract semantics or fixtures changed.
+- The fresh independent re-review confirmed that the missing-`info.title` case is rejected but found the bespoke schema remains too narrow to establish OpenAPI 3.1 structural validity. It accepts multiple invalid structures, so the Task remains in `review` and requires another fresh Fix Agent.
+- The re-review also recorded a governance inconsistency: Task-linked Recorder artifacts are required by repository policy but `research/**` is absent from this Task's hard `allowed_paths`. Resolve that boundary explicitly before committing the next cycle's Recorder artifacts.
 
 # Next Action
 
-- Delegate candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` to a new fresh independent Review Agent. Review from a clean isolated checkout, rerun the task verifier, CTRL-002 Acceptance mechanism, repair/baseline diff checks, and a disposable missing-`info.title` negative control. The Fix Agent must not accept its own work.
+- First resolve the Task-linked `research/**` Recorder write-boundary inconsistency through explicit Human authorization or a properly authorized Task boundary update. Then delegate to a fresh Fix Agent to replace or materially complete the OpenAPI 3.1 structural schema and add broader invalid-structure regressions. After the Fix handoff, delegate a new fresh independent Review Agent; no fixer may accept its own work.
