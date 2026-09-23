@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Authorized Control-Plane Insertion
 
+- Fresh Fix Agent `/root/min001_fix2` repaired the second independent FAIL on isolated branch `fix/LOOP1-MIN-001-recorder-scope`: the Minimality verifier now admits recognized task-owned Recorder artifacts with future IDs and rejects other-task or arbitrary research files. Prospective Fix run `R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd`; task verifier, disposable positive/negative controls, CTRL-002 Development, and diff check passed locally. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-recorder-scope-development.md`. This is not acceptance. Next: finish/validate Recorder, commit a clean Fix candidate, delegate a fresh independent Reviewer. The direct-main-merge ancestry blocker remains.
 - Fresh independent review of Minimality candidate `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the verifier rejects this review's authorized new Recorder artifacts as out of scope. Durable evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`. Next control-plane action: fresh Fix Agent, then fresh independent Review Agent; no merge. `LOOP1-CONTRACT-001` remains unchanged in `review`.
 - `LOOP1-MIN-001` is being implemented in an isolated branch from accepted Recorder control-plane commit `1c274bcbf92ebcc05c1bc208386c5976437d8221`. Its governance rule is not effective until independent acceptance, merge to local `main`, and successful post-merge verification.
 - `LOOP1-CONTRACT-001` remains the unfinished product task in `review` with its original ownership, worktree, and uncommitted files preserved. This insertion does not accept or resume it.
@@ -110,11 +111,11 @@ Current Task State: review
 
 ## Next Exact Action
 
-Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Recorder acceptance closure without overwriting its Agent-owned untracked `contracts/http/schema-lint/`. Then restore the same task and ownership, register the actual resume prompt, start a `prospective_resume` Recorder run with `pre_recorder_work=true` and incomplete prior trace, and continue its fresh independent review. Do not select another product task.
+Finish and validate the `LOOP1-MIN-001` Fix Recorder run, commit the isolated Fix candidate, and delegate a fresh independent Review Agent. Preserve paused `LOOP1-CONTRACT-001`; do not merge the Minimality branch to main before acceptance or import unfinished Contract ancestors.
 
 ## Last Known Good Commit
 
-`ab3b507241cf51822af79cbcb63dfdf40e273359` (independently accepted Recorder content); `LOOP1-CONTRACT-001` candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` remains development-verified only.
+`1c274bcbf92ebcc05c1bc208386c5976437d8221` (Recorder acceptance closure); `LOOP1-MIN-001` remains development-verified only after two independent FAIL reviews.
 
 ## Latest Checkpoint
 
@@ -122,6 +123,7 @@ Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Rec
 
 ## Uncommitted Changes / Ownership
 
+- Fresh Fix Agent `/root/min001_fix2` owns only the isolated `H:\.codex\worktrees\loop1-min-001-fix2\IM-platform` verifier, task/progress/evidence edits, and its authorized Recorder prompt/run until handoff commit. Disposable synthetic tests remain only in its separate throwaway checkout.
 - Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
 - The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.

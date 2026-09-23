@@ -1,0 +1,125 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 750c151..9f5ed8b 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: review
+ 
+ ## Authorized Control-Plane Insertion
+ 
++- Fresh Fix Agent `/root/min001_fix2` repaired the second independent FAIL on isolated branch `fix/LOOP1-MIN-001-recorder-scope`: the Minimality verifier now admits recognized task-owned Recorder artifacts with future IDs and rejects other-task or arbitrary research files. Prospective Fix run `R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd`; task verifier, disposable positive/negative controls, CTRL-002 Development, and diff check passed locally. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-recorder-scope-development.md`. This is not acceptance. Next: finish/validate Recorder, commit a clean Fix candidate, delegate a fresh independent Reviewer. The direct-main-merge ancestry blocker remains.
+ - Fresh independent review of Minimality candidate `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the verifier rejects this review's authorized new Recorder artifacts as out of scope. Durable evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`. Next control-plane action: fresh Fix Agent, then fresh independent Review Agent; no merge. `LOOP1-CONTRACT-001` remains unchanged in `review`.
+ - `LOOP1-MIN-001` is being implemented in an isolated branch from accepted Recorder control-plane commit `1c274bcbf92ebcc05c1bc208386c5976437d8221`. Its governance rule is not effective until independent acceptance, merge to local `main`, and successful post-merge verification.
+ - `LOOP1-CONTRACT-001` remains the unfinished product task in `review` with its original ownership, worktree, and uncommitted files preserved. This insertion does not accept or resume it.
+@@ -110,11 +111,11 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Recorder acceptance closure without overwriting its Agent-owned untracked `contracts/http/schema-lint/`. Then restore the same task and ownership, register the actual resume prompt, start a `prospective_resume` Recorder run with `pre_recorder_work=true` and incomplete prior trace, and continue its fresh independent review. Do not select another product task.
++Finish and validate the `LOOP1-MIN-001` Fix Recorder run, commit the isolated Fix candidate, and delegate a fresh independent Review Agent. Preserve paused `LOOP1-CONTRACT-001`; do not merge the Minimality branch to main before acceptance or import unfinished Contract ancestors.
+ 
+ ## Last Known Good Commit
+ 
+-`ab3b507241cf51822af79cbcb63dfdf40e273359` (independently accepted Recorder content); `LOOP1-CONTRACT-001` candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` remains development-verified only.
++`1c274bcbf92ebcc05c1bc208386c5976437d8221` (Recorder acceptance closure); `LOOP1-MIN-001` remains development-verified only after two independent FAIL reviews.
+ 
+ ## Latest Checkpoint
+ 
+@@ -122,6 +123,7 @@ Safely fast-forward the paused `task/LOOP1-CONTRACT-001` line to include the Rec
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/min001_fix2` owns only the isolated `H:\.codex\worktrees\loop1-min-001-fix2\IM-platform` verifier, task/progress/evidence edits, and its authorized Recorder prompt/run until handoff commit. Disposable synthetic tests remain only in its separate throwaway checkout.
+ - Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
+ - The original paused Agent retains ownership of `LOOP1-CONTRACT-001` and the original worktree `H:\IM-platform`. At insertion observation it was on `task/LOOP1-CONTRACT-001`, HEAD `1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc`, with unknown/paused-Agent-owned untracked `contracts/http/schema-lint/`; Recorder work must not read, modify, copy, stash, clean, or claim it.
+ - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.
+diff --git a/spec/tasks/review/LOOP1-MIN-001.md b/spec/tasks/review/LOOP1-MIN-001.md
+index 4b2822f..c6f0fef 100644
+--- a/spec/tasks/review/LOOP1-MIN-001.md
++++ b/spec/tasks/review/LOOP1-MIN-001.md
+@@ -39,8 +39,12 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
+ - `research/prompts/P-41263ca4-df41-4cc7-8089-58611e95c6ff/**`
+ - `research/prompts/P-abd528ee-c978-4af7-8020-03fcd4b45222/**`
+ - `research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/**`
++- `research/prompts/P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812/**`
++- `research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/**`
+ 
+-The Coordinator prospectively authorized the three exact Fix-cycle Recorder paths above on 2026-09-23. The first prompt is an empty registration attempt caused by an incorrect PowerShell pipeline; it remains as factual Recorder evidence. The second prompt contains the exact Fix delegation and is associated with the Fix run.
++The Coordinator prospectively authorized the three earlier Fix-cycle Recorder paths on 2026-09-23. The first prompt is an empty registration attempt caused by an incorrect PowerShell pipeline; it remains as factual Recorder evidence. The second prompt contains the exact earlier Fix delegation and is associated with that Fix run.
++
++The Coordinator prospectively authorized the two exact fresh Fix-cycle Recorder paths immediately above on 2026-09-23 before their creation. This authorization covers one prompt and one run for `LOOP1-MIN-001` only; it does not authorize arbitrary research paths or other tasks' artifacts.
+ 
+ # Acceptance
+ 
+@@ -69,6 +73,7 @@ The Coordinator prospectively authorized the three exact Fix-cycle Recorder path
+ - Acceptance evidence pending a new independent review. Fresh independent review of `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the fixed Recorder-ID scope allowlist rejects the task-authorized new review prompt/run artifacts required for closure. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`; review run `R-20260923T020500Z-b75d8ea3-9d8a-42bd-828e-351f355fd3a3` validated.
+ - Independent review of `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` returned FAIL because appended contradictory governance clauses were accepted by the verifier. Permanent evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-4f954ea-fail.md`; FAIL closure: `ca803b789b167f6e511a5229224250ee53ea937e`.
+ - Fresh Fix Agent `/root/min001_fix` repaired the verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; prospective Recorder run `R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e`. The task verifier and CTRL-002 Development mode passed. In a disposable checkout, the independent review's exact contradictory clause was rejected (exit `1`), while a justified current transaction-boundary abstraction passed (exit `0`). A PowerShell-quoted diff check passed. Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Independent acceptance remains pending.
++- Fresh Fix Agent `/root/min001_fix2` repairs the fixed-ID Recorder scope failure in isolated branch `fix/LOOP1-MIN-001-recorder-scope`; prospective Recorder prompt `P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812`, run `R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd`. The verifier now checks the Recorder artifact form and its metadata task/ID instead of maintaining an ID allowlist. A disposable checkout accepted the new review artifacts and rejected other-task artifacts, arbitrary research files, and extra files inside a valid task prompt. Development evidence is recorded separately; this remains unaccepted until fresh independent review.
+ 
+ # Handoff
+ 
+@@ -78,4 +83,4 @@ The Coordinator prospectively authorized the three exact Fix-cycle Recorder path
+ 
+ # Next Action
+ 
+-- Delegate a fresh Fix Agent to repair Recorder scope classification for authorized review artifacts, then a fresh independent Review Agent. Resolve the main ancestry blocker without importing unfinished Contract content.
++- Finish and validate the prospective Fix run, commit the repaired candidate and development evidence, then delegate a fresh independent Review Agent. Resolve the main ancestry blocker without importing unfinished Contract content.
+diff --git a/tools/verify-loop1-min-001.ps1 b/tools/verify-loop1-min-001.ps1
+index c15a8d0..7fdbf19 100644
+--- a/tools/verify-loop1-min-001.ps1
++++ b/tools/verify-loop1-min-001.ps1
+@@ -76,6 +76,19 @@ if (-not $SkipScope) {
+     $base = '1c274bcbf92ebcc05c1bc208386c5976437d8221'
+     $names = @(& git -C $root diff --name-only $base --)
+     $names += @(& git -C $root ls-files --others --exclude-standard)
++    function Test-TaskRecorderPath([string]$name) {
++        if ($name -notmatch '^research/(prompts/(P-[0-9a-f-]{36})/(metadata\.json|prompt\.txt)|runs/(R-[0-9]{8}T[0-9]{6}Z-[0-9a-f-]{36})/(metadata\.json|initial_state\.json|events\.jsonl|final_state\.json|summary\.json|diff\.patch|blobs/C-[0-9a-f-]{36}\.(stdout|stderr)\.txt))$') {
++            return $false
++        }
++        $kind = if ($Matches[2]) { 'prompts' } else { 'runs' }
++        $id = if ($kind -eq 'prompts') { $Matches[2] } else { $Matches[4] }
++        $metadataPath = Join-Path $root "research/$kind/$id/metadata.json"
++        if (-not (Test-Path -LiteralPath $metadataPath)) { return $false }
++        try { $metadata = Get-Content -Raw -LiteralPath $metadataPath | ConvertFrom-Json }
++        catch { return $false }
++        return $metadata.task_id -eq 'LOOP1-MIN-001' -and
++            $(if ($kind -eq 'prompts') { $metadata.prompt_id -eq $id } else { $metadata.run_id -eq $id })
++    }
+     foreach ($name in ($names | Sort-Object -Unique)) {
+         $allowed = $name -eq 'AGENTS.md' -or
+             $name -eq 'spec/governance/minimality.md' -or
+@@ -84,7 +97,7 @@ if (-not $SkipScope) {
+             $name -eq 'tools/verify-loop1-min-001.ps1' -or
+             $name -eq 'spec/progress/current.md' -or
+             $name -match '^spec/progress/(evidence/LOOP1-MIN-001/|checkpoints/.*loop1-min-001)' -or
+-            $name -match '^research/(prompts/P-(d7268d90-c7bb-4440-9406-7a27b633f0bb|4784081a-43aa-4beb-b8d5-c2be9fa5c62f|41263ca4-df41-4cc7-8089-58611e95c6ff|abd528ee-c978-4af7-8020-03fcd4b45222)/|runs/R-(20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b|20260923T014200Z-16aca9f1-8664-48d6-9af6-40e3a7bca7b4|20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e)/)'
++            (Test-TaskRecorderPath $name)
+         Require $allowed "out-of-scope path: $name"
+     }
+ }
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812/metadata.json
+# ?? research/prompts/P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812/prompt.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-66eab5ec-1267-4bcc-942a-92b8db0bf534.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-66eab5ec-1267-4bcc-942a-92b8db0bf534.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-6f3b46cf-5afe-4937-ba7f-e89d3422e76a.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-6f3b46cf-5afe-4937-ba7f-e89d3422e76a.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-7a9732d6-d721-42e9-b0b9-3cef3bf8f8cc.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-7a9732d6-d721-42e9-b0b9-3cef3bf8f8cc.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-9c042f31-9816-492d-908b-ebd84c52295c.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-9c042f31-9816-492d-908b-ebd84c52295c.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-aca385aa-3dd6-4575-b204-c42a11874107.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-aca385aa-3dd6-4575-b204-c42a11874107.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-cfc362a4-ddf5-4292-bfdb-471686b9466b.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-cfc362a4-ddf5-4292-bfdb-471686b9466b.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-d4b0f8d5-8b0b-4bfc-bf3d-8a5310abcff7.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-d4b0f8d5-8b0b-4bfc-bf3d-8a5310abcff7.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-e4469c3f-0c52-4c36-89b2-0f4323153bad.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-e4469c3f-0c52-4c36-89b2-0f4323153bad.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-ff09cb64-aa3c-4293-815b-8ef8eb74b3a2.stderr.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/blobs/C-ff09cb64-aa3c-4293-815b-8ef8eb74b3a2.stdout.txt
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/events.jsonl
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/initial_state.json
+# ?? research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/metadata.json
+# ?? spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-recorder-scope-development.md

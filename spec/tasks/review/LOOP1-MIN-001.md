@@ -39,8 +39,12 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
 - `research/prompts/P-41263ca4-df41-4cc7-8089-58611e95c6ff/**`
 - `research/prompts/P-abd528ee-c978-4af7-8020-03fcd4b45222/**`
 - `research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/**`
+- `research/prompts/P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812/**`
+- `research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/**`
 
-The Coordinator prospectively authorized the three exact Fix-cycle Recorder paths above on 2026-09-23. The first prompt is an empty registration attempt caused by an incorrect PowerShell pipeline; it remains as factual Recorder evidence. The second prompt contains the exact Fix delegation and is associated with the Fix run.
+The Coordinator prospectively authorized the three earlier Fix-cycle Recorder paths on 2026-09-23. The first prompt is an empty registration attempt caused by an incorrect PowerShell pipeline; it remains as factual Recorder evidence. The second prompt contains the exact earlier Fix delegation and is associated with that Fix run.
+
+The Coordinator prospectively authorized the two exact fresh Fix-cycle Recorder paths immediately above on 2026-09-23 before their creation. This authorization covers one prompt and one run for `LOOP1-MIN-001` only; it does not authorize arbitrary research paths or other tasks' artifacts.
 
 # Acceptance
 
@@ -69,6 +73,7 @@ The Coordinator prospectively authorized the three exact Fix-cycle Recorder path
 - Acceptance evidence pending a new independent review. Fresh independent review of `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the fixed Recorder-ID scope allowlist rejects the task-authorized new review prompt/run artifacts required for closure. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`; review run `R-20260923T020500Z-b75d8ea3-9d8a-42bd-828e-351f355fd3a3` validated.
 - Independent review of `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` returned FAIL because appended contradictory governance clauses were accepted by the verifier. Permanent evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-4f954ea-fail.md`; FAIL closure: `ca803b789b167f6e511a5229224250ee53ea937e`.
 - Fresh Fix Agent `/root/min001_fix` repaired the verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; prospective Recorder run `R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e`. The task verifier and CTRL-002 Development mode passed. In a disposable checkout, the independent review's exact contradictory clause was rejected (exit `1`), while a justified current transaction-boundary abstraction passed (exit `0`). A PowerShell-quoted diff check passed. Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Independent acceptance remains pending.
+- Fresh Fix Agent `/root/min001_fix2` repairs the fixed-ID Recorder scope failure in isolated branch `fix/LOOP1-MIN-001-recorder-scope`; prospective Recorder prompt `P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812`, run `R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd`. The verifier now checks the Recorder artifact form and its metadata task/ID instead of maintaining an ID allowlist. A disposable checkout accepted the new review artifacts and rejected other-task artifacts, arbitrary research files, and extra files inside a valid task prompt. Development evidence is recorded separately; this remains unaccepted until fresh independent review.
 
 # Handoff
 
@@ -78,4 +83,4 @@ The Coordinator prospectively authorized the three exact Fix-cycle Recorder path
 
 # Next Action
 
-- Delegate a fresh Fix Agent to repair Recorder scope classification for authorized review artifacts, then a fresh independent Review Agent. Resolve the main ancestry blocker without importing unfinished Contract content.
+- Finish and validate the prospective Fix run, commit the repaired candidate and development evidence, then delegate a fresh independent Review Agent. Resolve the main ancestry blocker without importing unfinished Contract content.

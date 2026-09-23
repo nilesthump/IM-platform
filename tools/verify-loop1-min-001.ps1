@@ -76,6 +76,19 @@ if (-not $SkipScope) {
     $base = '1c274bcbf92ebcc05c1bc208386c5976437d8221'
     $names = @(& git -C $root diff --name-only $base --)
     $names += @(& git -C $root ls-files --others --exclude-standard)
+    function Test-TaskRecorderPath([string]$name) {
+        if ($name -notmatch '^research/(prompts/(P-[0-9a-f-]{36})/(metadata\.json|prompt\.txt)|runs/(R-[0-9]{8}T[0-9]{6}Z-[0-9a-f-]{36})/(metadata\.json|initial_state\.json|events\.jsonl|final_state\.json|summary\.json|diff\.patch|blobs/C-[0-9a-f-]{36}\.(stdout|stderr)\.txt))$') {
+            return $false
+        }
+        $kind = if ($Matches[2]) { 'prompts' } else { 'runs' }
+        $id = if ($kind -eq 'prompts') { $Matches[2] } else { $Matches[4] }
+        $metadataPath = Join-Path $root "research/$kind/$id/metadata.json"
+        if (-not (Test-Path -LiteralPath $metadataPath)) { return $false }
+        try { $metadata = Get-Content -Raw -LiteralPath $metadataPath | ConvertFrom-Json }
+        catch { return $false }
+        return $metadata.task_id -eq 'LOOP1-MIN-001' -and
+            $(if ($kind -eq 'prompts') { $metadata.prompt_id -eq $id } else { $metadata.run_id -eq $id })
+    }
     foreach ($name in ($names | Sort-Object -Unique)) {
         $allowed = $name -eq 'AGENTS.md' -or
             $name -eq 'spec/governance/minimality.md' -or
@@ -84,7 +97,7 @@ if (-not $SkipScope) {
             $name -eq 'tools/verify-loop1-min-001.ps1' -or
             $name -eq 'spec/progress/current.md' -or
             $name -match '^spec/progress/(evidence/LOOP1-MIN-001/|checkpoints/.*loop1-min-001)' -or
-            $name -match '^research/(prompts/P-(d7268d90-c7bb-4440-9406-7a27b633f0bb|4784081a-43aa-4beb-b8d5-c2be9fa5c62f|41263ca4-df41-4cc7-8089-58611e95c6ff|abd528ee-c978-4af7-8020-03fcd4b45222)/|runs/R-(20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b|20260923T014200Z-16aca9f1-8664-48d6-9af6-40e3a7bca7b4|20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e)/)'
+            (Test-TaskRecorderPath $name)
         Require $allowed "out-of-scope path: $name"
     }
 }
