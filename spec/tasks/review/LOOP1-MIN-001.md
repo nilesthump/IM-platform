@@ -9,7 +9,7 @@ gate: S0
 
 # Goal
 
-Establish a small, evidence-driven minimality rule for implementation and independent review without changing product authority or the unfinished `LOOP1-CONTRACT-001` task.
+Establish a small, evidence-driven minimality rule for implementation and independent review without changing product authority or `LOOP1-CONTRACT-001` work or ownership. That separate Contract task is now independently accepted and `done`.
 
 # Inputs
 
@@ -21,7 +21,7 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
 # Dependencies
 
 - `LOOP1-RESEARCH-001` independently accepted; Recorder Instrumentation Epoch established.
-- `LOOP1-CONTRACT-001` remains in review under its original ownership and is not a dependency for this control task.
+- `LOOP1-CONTRACT-001` was not a dependency for this control task. It is now independently accepted and `done` at `2a3812e0b4a23157ecd6fe341f0011ca96390229`; its accepted closure is the integration base.
 
 # Allowed Paths
 
@@ -43,12 +43,16 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
 - `research/runs/R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd/**`
 - `research/prompts/P-b064b456-d3d4-4b8e-8cee-ff007cacf3fc/**`
 - `research/runs/R-20260924T012720Z-19b85628-de32-47a3-b539-96e1027ff19b/**`
+- `research/prompts/P-9a16f48f-e439-4bbd-91d8-093a30397aac/**`
+- `research/runs/R-20260924T015550Z-a800f61f-4e6a-4d26-9eb0-1802f7594bb2/**`
 
 The Coordinator prospectively authorized the three earlier Fix-cycle Recorder paths on 2026-09-23. The first prompt is an empty registration attempt caused by an incorrect PowerShell pipeline; it remains as factual Recorder evidence. The second prompt contains the exact earlier Fix delegation and is associated with that Fix run.
 
 The Coordinator prospectively authorized the two exact fresh Fix-cycle Recorder paths immediately above on 2026-09-23 before their creation. This authorization covers one prompt and one run for `LOOP1-MIN-001` only; it does not authorize arbitrary research paths or other tasks' artifacts.
 
-The Human's final-merge instruction authorizes the exact Coordinator prompt and prospective-resume Run paths above for this task's local-main integration. The run-local `blobs/.gitattributes` preserves Recorder output bytes across Git checkout and is valid only with exact content `* -text`; this does not authorize other research files. The integration verifier scopes the Minimality delta against accepted Contract closure `2a3812e0b4a23157ecd6fe341f0011ca96390229` rather than the shared Recorder base, so accepted Contract files are not misclassified as Minimality changes. These integration adjustments require fresh independent review.
+The Human's earlier final-merge instruction requested inclusion of Minimality changes; it did not itself authorize Coordinator Recorder paths. After the independent integration FAIL, the Human answered `ok` to a separate explicit authorization question covering the exact Coordinator prompt and prospective-resume Run paths above, including that run's `blobs/.gitattributes`. This authorization is recorded in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-recorder-path-authorization.md`. The Coordinator prospectively delegated one task-owned Fix prompt/run pair (the exact new IDs listed above) and a future independent reviewer task-owned prompt/run for this repair cycle. The Human did not specify those later-generated IDs. No arbitrary research paths or other tasks' artifacts are authorized.
+
+The Coordinator run's committed `blobs/.gitattributes` has canonical content `* -text` to preserve Recorder output bytes across Git checkout; the verifier accepts that value after trimming surrounding whitespace and does not enforce byte-exact spelling. The integration verifier scopes the Minimality delta against accepted Contract closure `2a3812e0b4a23157ecd6fe341f0011ca96390229` rather than the shared Recorder base, so accepted Contract files are not misclassified as Minimality changes. These integration adjustments require fresh independent review.
 
 # Acceptance
 
@@ -74,19 +78,21 @@ The Human's final-merge instruction authorizes the exact Coordinator prompt and 
 
 - Implementation Recorder: `R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b`.
 - Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-development.md`. Minimality verifier, CTRL-002 Development, and diff check passed locally; none is acceptance.
-- Acceptance evidence pending a new independent review. Fresh independent review of `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the fixed Recorder-ID scope allowlist rejects the task-authorized new review prompt/run artifacts required for closure. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`; review run `R-20260923T020500Z-b75d8ea3-9d8a-42bd-828e-351f355fd3a3` validated.
+- Integration acceptance remains pending a new independent review. An earlier fresh independent review of `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the fixed Recorder-ID scope allowlist rejected task-authorized new review prompt/run artifacts required for closure. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`; review run `R-20260923T020500Z-b75d8ea3-9d8a-42bd-828e-351f355fd3a3` validated.
 - Independent review of `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` returned FAIL because appended contradictory governance clauses were accepted by the verifier. Permanent evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-4f954ea-fail.md`; FAIL closure: `ca803b789b167f6e511a5229224250ee53ea937e`.
 - Fresh independent review of candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7` returned PASS in a clean committed checkout, including the task verifier, CTRL-002 Acceptance, Recorder validation, and disposable negative controls. Durable evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-c18ec53-pass.md`; Review run `R-20260923T023219Z-0bbe8cd8-6ae7-4aae-a0f5-f6c1c717423e`. This is content acceptance, not local-main post-merge acceptance.
 - Fresh independent integration review of committed merge `b1a6e13dd044a80e42055c5e02278785df9c0a13` returned FAIL. The clean candidate passed the Minimality verifier, CTRL-002 Acceptance, and integrated Recorder validation, but Coordinator Recorder write-path authority is not established by the visible Human merge instruction and committed Task/progress recovery facts are stale. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-b1a6e13-fail.md`; Review run `R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e`.
+- Following that FAIL, the Human explicitly authorized the existing Coordinator Recorder paths and a fresh Fix/Review cycle as documented in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-recorder-path-authorization.md`. Fresh Fix prompt `P-9a16f48f-e439-4bbd-91d8-093a30397aac` and prospective run `R-20260924T015550Z-a800f61f-4e6a-4d26-9eb0-1802f7594bb2` document this repair. Development results remain separate from acceptance.
+- This factual Fix passed Recorder-wrapped Minimality verifier, CTRL-002 Development mode, accepted Contract verifier, and tracked-source `git diff --check`; exact command IDs, exit codes, and durations are in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-integration-fix-development.md`. The prospective Fix run finished `PASS` with 18 events and passed `validate-run` and repository validation after finish. These are development and instrumentation checks, not independent acceptance.
 - Fresh Fix Agent `/root/min001_fix` repaired the verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; prospective Recorder run `R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e`. The task verifier and CTRL-002 Development mode passed. In a disposable checkout, the independent review's exact contradictory clause was rejected (exit `1`), while a justified current transaction-boundary abstraction passed (exit `0`). A PowerShell-quoted diff check passed. Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Independent acceptance remains pending.
-- Fresh Fix Agent `/root/min001_fix2` repairs the fixed-ID Recorder scope failure in isolated branch `fix/LOOP1-MIN-001-recorder-scope`; prospective Recorder prompt `P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812`, run `R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd`. The verifier now checks the Recorder artifact form and its metadata task/ID instead of maintaining an ID allowlist. A disposable checkout accepted the new review artifacts and rejected other-task artifacts, arbitrary research files, and extra files inside a valid task prompt. Development evidence is recorded separately; this remains unaccepted until fresh independent review.
+- Fresh Fix Agent `/root/min001_fix2` repaired the fixed-ID Recorder scope failure in isolated branch `fix/LOOP1-MIN-001-recorder-scope`; prospective Recorder prompt `P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812`, run `R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd`. The verifier now checks the Recorder artifact form and its metadata task/ID instead of maintaining an ID allowlist. A disposable checkout accepted the new review artifacts and rejected other-task artifacts, arbitrary research files, and extra files inside a valid task prompt. This Fix cycle was later superseded by the accepted Minimality content review.
 
 # Handoff
 
 - Original implementation and Fix cycles remain documented in their isolated worktrees and durable evidence. Fresh independent Review PASS applies to the corrected candidate, not to the later integration-specific verifier adjustment.
 - `LOOP1-CONTRACT-001` is independently accepted and `done` at closure `2a3812e0b4a23157ecd6fe341f0011ca96390229`; the prior ancestry blocker is resolved. Its original untracked work remains owned by the original Agent.
-- Coordinator is integrating both accepted lineages in isolated branch `integration/loop1-contract-min-20260923`. The integration-specific verifier and recovery-state changes require fresh independent review before local `main` advances.
+- The committed integration merge `b1a6e13` is independently rejected and local `main` remains unchanged. This fresh Fix is based on the preserved FAIL closure `1c8694c`; its factual governance repair requires a new independent integration review before local `main` advances.
 
 # Next Action
 
-- Resolve the Recorder-path authorization question with the Human, assign a fresh Fix Agent to correct factual Task/progress recovery state and any authorized scope adjustment, then obtain a new independent integration review before local `main` advances. Do not mark this task done or S0 passed.
+- Have a fresh independent Review Agent assess the committed Fix candidate from a clean checkout, including the Human authorization record, Task/progress accuracy, verifier, Recorder integrity, and preserved historical FAIL evidence. Do not advance local `main`, mark this task done, or pass S0 before acceptance.
