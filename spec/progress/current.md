@@ -175,7 +175,7 @@ Current Task State: done
 ## Uncommitted Changes / Ownership
 
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
-- Coordinator owns only the final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts in the isolated integration worktree until the closure commit. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
+- Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
 
 ## Architecture Conflicts / ACP / ADR
