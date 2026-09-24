@@ -12,19 +12,19 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-MIN-001
 
-Current Task State: review
+Current Task State: done
 
 ## Authorized Control-Plane Insertion
 
-- `LOOP1-MIN-001` has independent Review PASS for committed candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7`, recorded in `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-c18ec53-pass.md`. It remains in `review` until safe merge to local `main` and post-merge verification.
-- Independent integration review of committed `b1a6e13dd044a80e42055c5e02278785df9c0a13` returned FAIL: the earlier Human merge instruction did not establish Coordinator Recorder-path authorization, and candidate Task/progress recovery facts were stale. Durable findings remain unchanged in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-b1a6e13-fail.md`. After that review, the Human explicitly approved those exact existing Recorder paths and a fresh Fix/Review cycle; scope and provenance are recorded in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-recorder-path-authorization.md`. This Fix repairs factual governance records only; it is not independent acceptance.
+- `LOOP1-MIN-001` is independently accepted and `done`: content Review PASS at `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7`, corrected integration Review PASS at clean candidate `fa0099cf2b6cc887d02328b6d433eb4f66147320`, and local-main post-merge verifiers PASS. The accepted integration Review closure is `09cac596ca527fa80b187c63e5beb8308e946762`; durable evidence is under `spec/progress/evidence/LOOP1-MIN-001/` and the stable checkpoint below.
+- Earlier integration candidate `b1a6e13dd044a80e42055c5e02278785df9c0a13` remains independently rejected with permanent findings. The Human later approved the exact Coordinator Recorder paths, then a fresh Fix and a different fresh independent Reviewer closed those findings; this did not retroactively change the FAIL result.
 - `LOOP1-CONTRACT-001` is independently accepted and in `done` at closure `2a3812e0b4a23157ecd6fe341f0011ca96390229`. Its original worktree and untracked `contracts/http/schema-lint/` remain under their original ownership, untouched by this integration.
-- The Human requested that the final local `main` merge include additions from `task/LOOP1-MIN-001`. Committed integration merge `b1a6e13` combines its independently accepted descendant `review/LOOP1-MIN-001-pass-3` and the accepted Contract closure, but remains rejected pending a new independent review of the factual repair. The merge is committed and was locally verified on a clean checkout; local `main` has not advanced.
+- The Human requested that final local `main` include additions from `task/LOOP1-MIN-001`. Local `main` safely fast-forwarded from `e5482b135a2ab7451c24c29c7517e1a8f19ce420` to independent PASS closure `09cac596ca527fa80b187c63e5beb8308e946762`, containing both the MIN lineage and accepted Contract closure; clean post-merge verification passed. No remote push occurred.
 
 ## Immediately Relevant Completed Work
 
 - Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. `LOOP1-CONTRACT-001` is now `done` under ADR-0001: independent content review passed candidate `d46ce5a`, and later Human-authorized run-local Git transport preserved all Recorder output hashes in a clean committed checkout. S0 Gate remains NOT YET PASSED.
-- The Minimality candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7` passed fresh independent review after two documented FAIL/Fix cycles. This is content acceptance, not yet post-merge acceptance; `LOOP1-MIN-001` remains in `review`.
+- The Minimality candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7` passed fresh independent content review after two documented FAIL/Fix cycles; later integration PASS and clean local-main post-merge checks completed the separate merge acceptance requirement.
 - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
 - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
@@ -45,13 +45,15 @@ Current Task State: review
 
 ## Current Blockers
 
-- `LOOP1-MIN-001` cannot enter `done` or advance local `main` until a fresh independent reviewer accepts the corrected integration candidate and the required post-merge verification passes. The prior integration FAIL remains permanent evidence; the later Human authorization does not retroactively turn that review into PASS.
+- No current `LOOP1-MIN-001` blocker. The prior integration FAIL remains permanent evidence; the later Human authorization did not retroactively turn that review into PASS.
 - No current `LOOP1-CONTRACT-001` blocker. Its prior Recorder Git-transport rejection and subsequent explicit Human authorization remain documented; the accepted closure preserves original run event/output bytes.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
 
-- Current MIN integration factual Fix: Recorder-wrapped Minimality verifier PASS (exit `0`, 907.53 ms after final edits); CTRL-002 Development PASS (exit `0`, 991.7274 ms); accepted Contract verifier PASS (exit `0`, 6108.3547 ms); tracked-source `git diff --check` PASS (exit `0`, 34.69 ms). Run `R-20260924T015550Z-a800f61f-4e6a-4d26-9eb0-1802f7594bb2` finished `PASS` with 18 events and passed `validate-run` and repository validation after finish. Exact command IDs and stdout/stderr hashes are in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-integration-fix-development.md` and the immutable run. All are development/instrumentation checks; fresh independent integration acceptance remains required.
+- Fresh independent integration Review PASS on clean detached `fa0099c` under ADR-0001: Minimality exit `0` in `881.321 ms`, CTRL-002 Acceptance exit `0` in `969.1123 ms`, Contract exit `0` in `6156.5435 ms`, task-owned Recorder validation and protected-path checks PASS. Review Run `R-20260924T021010Z-23d39be1-65fb-4e9c-9851-084b7972aa29` finished PASS with 26 events and passed committed validation; evidence `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-fa0099c-pass.md`.
+- Clean local-main post-merge checks after fast-forward to `09cac596`: Minimality exit `0` in `861.5677 ms`; CTRL-002 Acceptance exit `0` in `916.7036 ms`; Contract exit `0` in `6102.8251 ms`; Recorder repository validation exit `0` in `665.4624 ms`; Contract/MIN ancestry checks exit `0`. Coordinator Run `R-20260924T063710Z-8018f93d-e54c-4772-a738-1027e0c783ac` finished PASS and validated with 27 events, with pre-Run limitations explicitly marked. Exact command IDs and evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-post-main-merge.md`.
+- Earlier MIN integration factual Fix: Recorder-wrapped Minimality verifier PASS (exit `0`, 907.53 ms after final edits); CTRL-002 Development PASS (exit `0`, 991.7274 ms); accepted Contract verifier PASS (exit `0`, 6108.3547 ms); tracked-source `git diff --check` PASS (exit `0`, 34.69 ms). Run `R-20260924T015550Z-a800f61f-4e6a-4d26-9eb0-1802f7594bb2` finished `PASS` with 18 events and passed `validate-run` and repository validation after finish. Exact command IDs and stdout/stderr hashes are in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-integration-fix-development.md` and the immutable run. These development/instrumentation checks were later superseded for acceptance by the fresh independent PASS above.
 - Fresh independent content review on clean detached `d46ce5a`: contract verifier exit `0` in `6710.3654 ms`; CTRL-002 default Acceptance exit `0` in `953.4633 ms`; fifteen in-memory structural negatives rejected; official OAI source and LF regenerated validator hashes matched; 20 committed Fix-run output blobs matched. Review Recorder run finished `PASS` and validated with 149 events. After explicit Human authorization, local, staged, and clean committed output-blob SHA audits passed; both Review and closure runs validated from clean detached `4b4cb4a`. Details and exact command IDs are in durable evidence.
 - Fresh Fix Agent Recorder-wrapped command: `pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`.
   - Result: Development PASS, exit `0`, elapsed `6174.1193 ms`; 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, OAI OpenAPI 3.1 structural lint, and 15 total mutation regressions including nine structural negatives.
@@ -160,21 +162,21 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator: obtain a new independent integration review of this committed Fix candidate from a clean checkout, including the explicit Human authorization record and corrected recovery state. On PASS, follow the MIN Task's local-main merge and post-merge verification requirements. Until then, do not fast-forward local `main`, start another product task, mark MIN `done`, or mark S0 passed.
+`LOOP1-MIN-001` is accepted and merged locally. In a new authorized task context, select the next dependency-satisfied S0 task; do not start new product work as part of this merge closure. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`2a3812e0b4a23157ecd6fe341f0011ca96390229` (accepted Contract closure); `010710dfc02642385c78dba69e04639b19d09771` (Minimality content review branch with independent PASS evidence). Their integration merge `b1a6e13dd044a80e42055c5e02278785df9c0a13` is committed but independently rejected; this factual Fix is only a candidate until fresh review.
+`09cac596ca527fa80b187c63e5beb8308e946762` (clean local-main independent integration PASS closure); it contains accepted Contract closure `2a3812e0b4a23157ecd6fe341f0011ca96390229` and requested Minimality task lineage.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-23-loop1-contract-001-accepted.md`
+`spec/progress/checkpoints/2026-09-24-loop1-min-001-main-accepted.md`
 
 ## Uncommitted Changes / Ownership
 
-- Fresh Fix Agent `/root/min001_integration_fix` owns only its isolated `H:\.codex\worktrees\loop1-min-integration-fix-20260924\IM-platform` factual Task/progress/evidence repair and task-owned Recorder prompt/run. At handoff, the Fix candidate is committed with no remaining uncommitted files in that worktree. No historical Reviewer evidence or product/Contract file was rewritten.
-- Local `main` and the Coordinator's integration worktree remain under Coordinator ownership; this Fix does not merge or alter them.
-- The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this Fix does not read, modify, copy, stage, or depend on it.
+- Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
+- Coordinator owns only the final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts in the isolated integration worktree until the closure commit. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
+- The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
 
 ## Architecture Conflicts / ACP / ADR
 
