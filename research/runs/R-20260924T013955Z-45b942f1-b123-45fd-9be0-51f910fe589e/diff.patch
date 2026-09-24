@@ -1,0 +1,73 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index ea153a7..bd8d728 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -17,6 +17,7 @@ Current Task State: review
+ ## Authorized Control-Plane Insertion
+ 
+ - `LOOP1-MIN-001` has independent Review PASS for committed candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7`, recorded in `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-c18ec53-pass.md`. It remains in `review` until safe merge to local `main` and post-merge verification.
++- Independent integration review of committed `b1a6e13dd044a80e42055c5e02278785df9c0a13` returned FAIL: Recorder-path authorization is not established by the visible Human merge instruction, and candidate Task/progress recovery facts are stale. Durable findings: `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-b1a6e13-fail.md`. Local `main` remains unchanged; this reviewer has not fixed or accepted the candidate.
+ - `LOOP1-CONTRACT-001` is independently accepted and in `done` at closure `2a3812e0b4a23157ecd6fe341f0011ca96390229`. Its original worktree and untracked `contracts/http/schema-lint/` remain under their original ownership, untouched by this integration.
+ - The Human requested that the final local `main` merge include additions from `task/LOOP1-MIN-001`. This isolated integration branch contains its independently accepted descendant `review/LOOP1-MIN-001-pass-3` and the accepted Contract closure. Local `main` has not yet advanced.
+ 
+@@ -158,11 +159,11 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Coordinator: complete isolated integration of the independently accepted Contract and Minimality lineages, verify the committed integration state, safely fast-forward local `main`, then perform post-merge verification and independent Minimality closure. Do not start the next product task. S0 Gate remains NOT YET PASSED.
++Coordinator: resolve the Recorder-path authorization question with the Human, delegate a fresh Fix Agent for factual Task/progress correction and any authorized scope adjustment, then delegate a new independent integration review. Do not fast-forward local `main`, start the next product task, or mark S0 passed.
+ 
+ ## Last Known Good Commit
+ 
+-`2a3812e0b4a23157ecd6fe341f0011ca96390229` (accepted Contract closure); `010710dfc02642385c78dba69e04639b19d09771` (Minimality review branch with independent PASS evidence). Their integration merge is not yet committed or verified.
++`2a3812e0b4a23157ecd6fe341f0011ca96390229` (accepted Contract closure); `010710dfc02642385c78dba69e04639b19d09771` (Minimality content review branch with independent PASS evidence). Their integration merge `b1a6e13dd044a80e42055c5e02278785df9c0a13` is committed but independently rejected pending governance resolution and correction.
+ 
+ ## Latest Checkpoint
+ 
+diff --git a/spec/tasks/review/LOOP1-MIN-001.md b/spec/tasks/review/LOOP1-MIN-001.md
+index 7042f9f..941c9ea 100644
+--- a/spec/tasks/review/LOOP1-MIN-001.md
++++ b/spec/tasks/review/LOOP1-MIN-001.md
+@@ -77,6 +77,7 @@ The Human's final-merge instruction authorizes the exact Coordinator prompt and
+ - Acceptance evidence pending a new independent review. Fresh independent review of `03c32867205e098c84f0f289711ea1767913de68` returned FAIL: the fixed Recorder-ID scope allowlist rejects the task-authorized new review prompt/run artifacts required for closure. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-03c3286-fail.md`; review run `R-20260923T020500Z-b75d8ea3-9d8a-42bd-828e-351f355fd3a3` validated.
+ - Independent review of `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` returned FAIL because appended contradictory governance clauses were accepted by the verifier. Permanent evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-4f954ea-fail.md`; FAIL closure: `ca803b789b167f6e511a5229224250ee53ea937e`.
+ - Fresh independent review of candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7` returned PASS in a clean committed checkout, including the task verifier, CTRL-002 Acceptance, Recorder validation, and disposable negative controls. Durable evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-c18ec53-pass.md`; Review run `R-20260923T023219Z-0bbe8cd8-6ae7-4aae-a0f5-f6c1c717423e`. This is content acceptance, not local-main post-merge acceptance.
++- Fresh independent integration review of committed merge `b1a6e13dd044a80e42055c5e02278785df9c0a13` returned FAIL. The clean candidate passed the Minimality verifier, CTRL-002 Acceptance, and integrated Recorder validation, but Coordinator Recorder write-path authority is not established by the visible Human merge instruction and committed Task/progress recovery facts are stale. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-b1a6e13-fail.md`; Review run `R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e`.
+ - Fresh Fix Agent `/root/min001_fix` repaired the verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; prospective Recorder run `R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e`. The task verifier and CTRL-002 Development mode passed. In a disposable checkout, the independent review's exact contradictory clause was rejected (exit `1`), while a justified current transaction-boundary abstraction passed (exit `0`). A PowerShell-quoted diff check passed. Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Independent acceptance remains pending.
+ - Fresh Fix Agent `/root/min001_fix2` repairs the fixed-ID Recorder scope failure in isolated branch `fix/LOOP1-MIN-001-recorder-scope`; prospective Recorder prompt `P-3938e88c-ea8d-4dfa-94f4-edd7c4b17812`, run `R-20260923T021826Z-679d5d5a-4016-4481-bf0f-6ea135fa78bd`. The verifier now checks the Recorder artifact form and its metadata task/ID instead of maintaining an ID allowlist. A disposable checkout accepted the new review artifacts and rejected other-task artifacts, arbitrary research files, and extra files inside a valid task prompt. Development evidence is recorded separately; this remains unaccepted until fresh independent review.
+ 
+@@ -88,4 +89,4 @@ The Human's final-merge instruction authorizes the exact Coordinator prompt and
+ 
+ # Next Action
+ 
+-- Commit and verify the isolated integration candidate, obtain a fresh independent review of its integration-specific changes, then safely fast-forward local `main`, perform post-merge verification, and close this task only if all acceptance conditions pass.
++- Resolve the Recorder-path authorization question with the Human, assign a fresh Fix Agent to correct factual Task/progress recovery state and any authorized scope adjustment, then obtain a new independent integration review before local `main` advances. Do not mark this task done or S0 passed.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-05174db0-5fcd-46a3-8a48-ae3aaf660cc0/metadata.json
+# ?? research/prompts/P-05174db0-5fcd-46a3-8a48-ae3aaf660cc0/prompt.txt
+# ?? research/prompts/P-c8fa3892-37c8-4c7b-a086-9a63e66869e3/metadata.json
+# ?? research/prompts/P-c8fa3892-37c8-4c7b-a086-9a63e66869e3/prompt.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/.gitattributes
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-166cffa3-a131-4bce-990d-4c815506e821.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-166cffa3-a131-4bce-990d-4c815506e821.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-2da249e5-05fb-4773-a658-497c93571c58.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-2da249e5-05fb-4773-a658-497c93571c58.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-3e139472-708c-49c6-ba10-f9faf9ccc73c.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-3e139472-708c-49c6-ba10-f9faf9ccc73c.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-42c116cf-4b7d-4ba8-a81e-5fd973e0e58e.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-42c116cf-4b7d-4ba8-a81e-5fd973e0e58e.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-4c7c85c6-9105-4f17-8d70-eea321f731c2.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-4c7c85c6-9105-4f17-8d70-eea321f731c2.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-7f80e623-7f32-4ccc-943c-896362a8f34b.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-7f80e623-7f32-4ccc-943c-896362a8f34b.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-ab4f0030-af42-4086-9960-f4dc310df3b4.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-ab4f0030-af42-4086-9960-f4dc310df3b4.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-b874ff48-4b06-43c8-a99a-0c65e87e000c.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-b874ff48-4b06-43c8-a99a-0c65e87e000c.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-f1e28dd5-7454-4df5-992a-527d209c8e46.stderr.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/blobs/C-f1e28dd5-7454-4df5-992a-527d209c8e46.stdout.txt
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/events.jsonl
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/initial_state.json
+# ?? research/runs/R-20260924T013955Z-45b942f1-b123-45fd-9be0-51f910fe589e/metadata.json
+# ?? spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-b1a6e13-fail.md

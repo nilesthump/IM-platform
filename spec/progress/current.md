@@ -17,6 +17,7 @@ Current Task State: review
 ## Authorized Control-Plane Insertion
 
 - `LOOP1-MIN-001` has independent Review PASS for committed candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7`, recorded in `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-c18ec53-pass.md`. It remains in `review` until safe merge to local `main` and post-merge verification.
+- Independent integration review of committed `b1a6e13dd044a80e42055c5e02278785df9c0a13` returned FAIL: Recorder-path authorization is not established by the visible Human merge instruction, and candidate Task/progress recovery facts are stale. Durable findings: `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-b1a6e13-fail.md`. Local `main` remains unchanged; this reviewer has not fixed or accepted the candidate.
 - `LOOP1-CONTRACT-001` is independently accepted and in `done` at closure `2a3812e0b4a23157ecd6fe341f0011ca96390229`. Its original worktree and untracked `contracts/http/schema-lint/` remain under their original ownership, untouched by this integration.
 - The Human requested that the final local `main` merge include additions from `task/LOOP1-MIN-001`. This isolated integration branch contains its independently accepted descendant `review/LOOP1-MIN-001-pass-3` and the accepted Contract closure. Local `main` has not yet advanced.
 
@@ -158,11 +159,11 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator: complete isolated integration of the independently accepted Contract and Minimality lineages, verify the committed integration state, safely fast-forward local `main`, then perform post-merge verification and independent Minimality closure. Do not start the next product task. S0 Gate remains NOT YET PASSED.
+Coordinator: resolve the Recorder-path authorization question with the Human, delegate a fresh Fix Agent for factual Task/progress correction and any authorized scope adjustment, then delegate a new independent integration review. Do not fast-forward local `main`, start the next product task, or mark S0 passed.
 
 ## Last Known Good Commit
 
-`2a3812e0b4a23157ecd6fe341f0011ca96390229` (accepted Contract closure); `010710dfc02642385c78dba69e04639b19d09771` (Minimality review branch with independent PASS evidence). Their integration merge is not yet committed or verified.
+`2a3812e0b4a23157ecd6fe341f0011ca96390229` (accepted Contract closure); `010710dfc02642385c78dba69e04639b19d09771` (Minimality content review branch with independent PASS evidence). Their integration merge `b1a6e13dd044a80e42055c5e02278785df9c0a13` is committed but independently rejected pending governance resolution and correction.
 
 ## Latest Checkpoint
 
