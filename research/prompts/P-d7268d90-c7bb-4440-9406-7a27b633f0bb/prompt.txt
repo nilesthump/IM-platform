@@ -1,0 +1,1280 @@
+你现在进入 `IM-platform` 仓库。
+
+这是 Human Architect 明确授权的一次控制面插入任务：
+
+建立并独立验收一个 “Minimality / Anti-Overengineering Guard”，
+用于约束后续 Coding Agent、Fix Agent 和 Review Agent：
+
+在满足当前 Frozen Architecture、Contracts、Invariants 和 Acceptance 的前提下，
+必须优先采用最简单、最小、最直接的实现，
+禁止为尚不存在的未来需求提前制造抽象、基础设施和扩展层。
+
+\============================================================
+0\. 当前特殊状态
+==========
+
+当前 `LOOP1-CONTRACT-001` 仍未完成。
+
+另一个 Agent 仍拥有该任务及其已有工作。
+
+本任务绝对不得：
+
+- 接管 LOOP1-CONTRACT-001；
+- 完成 LOOP1-CONTRACT-001；
+- 修改其 Contract 内容；
+- 修改其 golden fixtures；
+- 修改它拥有的未提交工作；
+- 重构它正在修改的文件；
+- 改变其 task state / ownership；
+- 以“最小化”为理由删除其工作；
+- 与原 Agent 同时进行 write-capable 操作。
+
+Writer concurrency 仍然必须为 1。
+
+如果当前 CONTRACT-001 Agent 仍在实际写仓库，
+立即停止并报告：
+
+`BLOCKED_BY_ACTIVE_WRITER`
+
+只有在确认原 Agent 已暂停、当前没有其他 write-capable Agent 修改仓库后，
+才能开始本控制面任务。
+
+\============================================================
+
+1. Recorder 必须从第一步启用
+   \============================================================
+
+Research Recorder 已经建立并经过独立验收。
+
+本任务属于 Instrumentation Epoch 之后的 prospective run。
+
+在进行任何可写修改前：
+
+1. 阅读当前 Recorder 文档；
+2. 将 Human 当前这条 Prompt 原文注册到 Prompt Registry；
+3. 启动本任务 research run；
+4. role 使用适合当前 Recorder schema 的 control/governance implementation 角色；
+   如果 schema 没有专门 governance role，则使用 `implementation`，
+   不得自行扩 schema 仅为了角色命名；
+5. experiment\_group = `full_governance`；
+6. 后续 verifier/test/脚本命令尽可能通过 Recorder command wrapper 执行。
+
+不得伪造 token、cost、tool calls 或不可观察信息。
+
+\============================================================
+2\. 必须先恢复仓库真实状态
+===============
+
+严格按照 `AGENTS.md` 的强制顺序恢复：
+
+1. `spec/handoff/agent-context.md`
+2. `spec/progress/current.md`
+3. 精确解析 Current Task
+4. 检查所有 task queues
+5. 阅读相关 Frozen Architecture / ADR
+6. `git status`
+7. staged / unstaged diff
+8. untracked files
+9. recent commits
+10. 最小 baseline verification
+11. Recorder 当前状态
+
+特别确认：
+
+- LOOP1-CONTRACT-001 当前真实 queue / status / owner；
+- 是否存在属于该 Agent 的未提交修改；
+- 是否存在独立 worktree；
+- 当前 main / control-plane accepted commit；
+- 是否可以建立独立 worktree/branch 完成本任务。
+
+不得：
+
+- reset
+- clean
+- stash 他人工作
+- rebase 他人分支
+- force checkout
+- 覆盖其他 Agent worktree
+
+优先：
+
+从最新已接受、clean、committed 的控制面基线创建独立 worktree/branch。
+
+\============================================================
+3\. 本任务的性质
+==========
+
+这是：
+
+Control Plane / Governance
+
+不是：
+
+Product Architecture
+Product Feature
+Contract Design
+Implementation Refactor
+
+目标是：
+
+把已有架构中的“证据驱动复杂化、不得扩大当前范围”的原则，
+转化为机器和 Agent 都能执行的 Minimality Contract。
+
+不得修改 Frozen Product Architecture。
+
+如果实现该治理规则必须改变 Frozen Architecture：
+
+`BLOCKED_BY_ARCHITECTURE`
+
+并向 Human 提出最小决策问题。
+
+\============================================================
+4\. 核心原则
+========
+
+建立以下仓库级原则：
+
+# Every additional abstraction must pay rent.
+
+任何新增：
+
+- abstraction
+- interface
+- service layer
+- adapter
+- factory
+- strategy
+- framework
+- dependency
+- configuration option
+- database object
+- background worker
+- infrastructure component
+- compatibility layer
+- extension point
+
+都必须能够指向至少一个：
+
+1. 当前已批准 requirement；
+2. 当前 invariant；
+3. 当前 acceptance criterion；
+4. 当前已经观测到的问题；
+5. 当前测试失败或性能/可靠性证据。
+
+“以后可能需要”
+“更 enterprise”
+“更通用”
+“更可扩展”
+“最佳实践通常这么做”
+
+不能单独作为引入复杂度的充分理由。
+
+\============================================================
+5\. Minimality Contract
+=======================
+
+建立一个清晰、简短、可复用的 Minimality Contract。
+
+建议语义如下，但应根据现有仓库组织选择最小落点：
+
+---
+
+## Minimality
+
+Implement only what is required to satisfy:
+
+- current approved architecture;
+- current machine-verifiable contracts;
+- current invariants;
+- current acceptance criteria;
+- concrete, observed implementation constraints.
+
+Prefer the smallest implementation that satisfies them.
+
+Do NOT introduce without current justification:
+
+- speculative extension points;
+- abstractions with no current consumer;
+- generic frameworks for one current use case;
+- infrastructure for future stages;
+- compatibility layers for versions that do not exist;
+- configurable strategies when only one behavior is required;
+- indirection whose only justification is possible future reuse;
+- dependencies that duplicate existing capability;
+- distributed components for hypothetical future scale;
+- premature performance optimization without measurements.
+
+When additional complexity appears necessary, record:
+
+1. the current requirement / invariant / acceptance criterion it serves;
+2. why the simpler implementation is insufficient;
+3. concrete evidence where applicable;
+4. the smallest added mechanism;
+5. removal/replacement conditions if the complexity is provisional.
+
+\============================================================
+6\. 不要把 Minimality 变成“禁止抽象”
+===========================
+
+非常重要：
+
+Minimality ≠ 少写代码。
+Minimality ≠ 禁止 interface。
+Minimality ≠ 禁止设计模式。
+Minimality ≠ 禁止模块化。
+Minimality ≠ 所有东西都写在一个文件里。
+
+正确判断是：
+
+“当前复杂度是否有实际责任？”
+
+例如：
+
+允许：
+
+- 为真实事务边界建立 repository abstraction；
+- 为 Go/Java shared observable semantics 建立 contract test；
+- 为现有 plugin permission 建立明确 capability boundary；
+- 为真实 Outbox reliability requirement 提供必要实现。
+
+不允许：
+
+- 只有一个实现却为了未来可能第二个实现建立多层 strategy/factory；
+- 当前无旧客户端却实现额外 compatibility framework；
+- 当前单机阶段为了未来 Loop 2 提前实现 distributed router；
+- 没有测量结果就实现复杂 cache / sharding；
+- 为一个 endpoint 引入通用 workflow engine；
+- 为两个 struct 建造完整 internal framework。
+
+不得把 minimality 简化成 LOC 指标。
+
+\============================================================
+7\. 与 Frozen Architecture 对齐
+============================
+
+检查并引用现有 Frozen Architecture 中已有 minimality evidence。
+
+至少应确认：
+
+- Loop 1 不得因为 Loop 2 目标扩大当前实现范围；
+- Redis/Kafka/分库分表/自动切主需要真实证据 + ADR；
+- 当前简单 sequence row 允许存在热点；
+- 只有压测证明不可接受才演进；
+- Task 不允许架构自由发挥；
+- Agent 与 Frozen Architecture 冲突时必须停止。
+
+本任务不得重新解释这些业务决策。
+
+只把它们转成开发治理规则。
+
+\============================================================
+8\. Task Spec Integration
+=========================
+
+评估 `spec/tasks/TASK_TEMPLATE.md` 是否需要加入最小化部分。
+
+优先增加一个很短的 section，例如：
+
+# Minimality
+
+- What is the smallest implementation satisfying this Task?
+- Which new abstractions/dependencies/infrastructure are actually required?
+- What future work is explicitly NOT being implemented?
+- If non-obvious complexity is added, what current evidence justifies it?
+
+不要让每个 Task 被迫写长篇作文。
+
+目标是：
+
+让 Agent 在实现前明确 complexity boundary。
+
+对于当前已经进行中的 LOOP1-CONTRACT-001：
+
+不得为了加入 Minimality section 修改其业务内容。
+
+如果 repository-level instruction 已足以约束它后续的 review/fix，
+优先不修改它。
+
+\============================================================
+9\. AGENTS.md Integration
+=========================
+
+在保持简洁的前提下，
+让 `AGENTS.md` 明确要求未来 Agent：
+
+- 在实现前读取 Minimality Contract；
+- 默认选择当前满足 acceptance 的最简单实现；
+- 不得为 future stage 提前实现；
+- 新增显著复杂度必须能指出当前 justification；
+- 如果只能通过扩大架构才能完成，必须停下而不是自行扩展。
+
+不要把完整 Minimality 文档复制进 AGENTS.md。
+
+AGENTS.md 应仅：
+
+- 建立 authority；
+- 指向 canonical minimality document；
+- 定义 MUST / MUST NOT。
+
+\============================================================
+10\. Review Agent Integration
+=============================
+
+建立 Minimality Review 维度。
+
+Review Agent 除 correctness/security/contract 外，
+必须检查：
+
+1. 是否存在无当前调用者的 abstraction？
+2. 是否存在只为未来需求准备的生产代码？
+3. 是否新增不必要 dependency？
+4. 是否将单一当前路径设计成不必要的 strategy/factory/framework？
+5. 是否实现 future stage infrastructure？
+6. 是否新增 compatibility layer，而当前没有对应 compatibility requirement？
+7. 是否存在删除后所有当前 acceptance 仍然 PASS 的非必要生产机制？
+8. 是否出现“为了优雅/企业级/未来扩展”而增加的复杂度？
+
+关键 review question：
+
+> If this code/abstraction were removed or simplified,
+> would every currently approved acceptance criterion still pass?
+
+如果答案是 YES：
+
+Reviewer 必须要求：
+
+- 删除/简化；
+
+或：
+
+- 给出当前 requirement/evidence justification。
+
+Reviewer 不能因为“个人喜欢更简单”否决正确必要的复杂度。
+
+必须基于当前 requirements / acceptance / evidence。
+
+\============================================================
+11\. Complexity Evidence
+========================
+
+可以建立轻量 complexity delta 记录，但不要过度建设。
+
+如果容易实现，可记录：
+
+- files changed
+- production LOC added/deleted
+- test LOC added/deleted
+- new dependencies
+- new public symbols/interfaces
+- new config keys
+- new DB objects
+- new services/processes
+
+这些仅是：
+
+review signals
+
+不是：
+
+automatic correctness score。
+
+禁止创建：
+
+- arbitrary architecture score；
+- “LOC 超过 N 就 FAIL”的硬规则；
+- AI complexity rating；
+- 黑箱评分系统。
+
+如任务规模与 diff 明显不匹配，
+只产生：
+
+review warning
+
+由 Reviewer 检查原因。
+
+\============================================================
+12\. 避免治理本身继续过度设计
+=================
+
+本任务本身也受 Minimality 约束。
+
+严禁为了 Anti-Overengineering 再建立一个巨大系统。
+
+不要引入：
+
+- 数据库
+- Redis
+- Kafka
+- dashboard
+- web service
+- workflow engine
+- DSL
+- distributed lock
+- ML complexity detector
+- LLM complexity classifier
+- 独立 daemon
+
+优先使用：
+
+- Markdown
+- existing Task Spec
+- existing AGENTS.md
+- existing verifier
+- existing Recorder
+- small deterministic scripts/tests
+
+如果一个简单文档 + 小 verifier 足够：
+
+不要建 framework。
+
+\============================================================
+13\. 自动验证
+=========
+
+建立最低限度的 deterministic verification。
+
+至少验证：
+
+A. Canonical Minimality Contract 存在。
+
+B. AGENTS.md 正确引用它。
+
+C. Task Template 包含最小化要求，若最终设计决定加入。
+
+D. Review guidance 包含 Minimality review。
+
+E. 不允许 minimality governance 改变 Frozen Architecture authority order。
+
+F. 不允许该治理变成 product architecture authority。
+
+G. 当前 LOOP1-CONTRACT-001 文件/ownership/state 不被本任务修改。
+
+H. 没有任何 product implementation change。
+
+I. existing repository governance verifier 继续 PASS。
+
+J. Recorder run 可成功 validate。
+
+Negative tests 至少覆盖：
+
+- Future-stage infrastructure 不能仅以“未来可能需要”为 justification；
+- 没有 current requirement 的 abstraction 必须产生 review finding/warning；
+- 合法必要复杂度不能被机械判 FAIL；
+- Minimality rule 不能覆盖 Frozen Architecture；
+- Minimality rule 不能允许 Reviewer 擅自重写 Contract。
+
+\============================================================
+14\. 不要使用硬编码“禁止清单”代替判断
+======================
+
+例如：
+
+Redis/Kafka 当前被 Frozen Architecture 限制，
+但未来如果通过真实 evidence + approved ADR，
+它们可能成为合法设计。
+
+因此 Minimality 必须表达：
+
+evidence-driven complexity
+
+而不是：
+
+永久禁止某项技术。
+
+正确模型：
+
+simple by default
+↓
+evidence of insufficiency
+↓
+smallest justified increase in complexity
+↓
+approved architecture process when needed
+
+\============================================================
+15\. 当前 CONTRACT-001 如何受到新约束
+============================
+
+本任务完成并独立验收后：
+
+当前 LOOP1-CONTRACT-001 Agent 在继续工作前必须：
+
+1. safe fast-forward / merge 已验收 Minimality Guard；
+2. 重新读取：
+   - AGENTS.md
+   - canonical Minimality Contract
+   - 当前 Task Spec；
+3. 不重做已经完成工作；
+4. 对尚未完成的实现/review/fix 应用新规则；
+5. 不为了满足新规则机械重写已有正确工作；
+6. Reviewer 只在发现实际 unnecessary complexity 时提出 finding。
+
+不要 retroactively 伪造：
+
+“此前 Agent 已经遵守 Minimality Guard”。
+
+Recorder 应明确：
+
+Minimality Guard 从 accepted instrumentation point 以后生效。
+
+\============================================================
+16\. Task / Branch
+==================
+
+根据现有治理建立最小合规 Control Task。
+
+建议 ID：
+
+LOOP1-MIN-001
+
+如果仓库已有更适合命名规范，
+可选择等价 ID。
+
+目标：
+
+Establish evidence-driven minimality guard for Agent implementation and review.
+
+allowed\_paths 必须尽可能小。
+
+不要改：
+
+- contracts/http/\*\*
+- contracts/websocket/\*\*
+- contracts/plugin-api/\*\*
+- contracts/database/\*\*
+- backend/\*\*
+- clients/\*\*
+- plugins/\*\*
+- product tests
+
+除非仅有明确独立的 governance fixture 路径被当前 Task 授权。
+
+\============================================================
+17\. Acceptance
+===============
+
+本任务完成必须证明：
+
+1. Canonical Minimality Contract 存在；
+2. 新 Agent 能发现它；
+3. Implementation Agent 被要求优先最小实现；
+4. Review Agent 被要求检查 unnecessary complexity；
+5. 复杂度增加必须有 current justification；
+6. future-stage speculation 不能作为充分理由；
+7. 必要复杂度不会因简单化规则被错误禁止；
+8. Minimality 不修改 Frozen Architecture；
+9. Minimality 不修改 public contracts；
+10. Minimality 不修改产品实现；
+11. 当前 CONTRACT-001 ownership/work/state 未被破坏；
+12. deterministic verifier/tests PASS；
+13. Recorder prospective run 完整；
+14. fresh independent Review Agent 验收。
+
+\============================================================
+18\. Independent Review
+=======================
+
+Local PASS ≠ accepted。
+
+完成后必须进入现有：
+
+implementation
+→ review
+→ fresh independent reviewer
+
+流程。
+
+Review Agent 至少检查：
+
+- 这套 Anti-Overengineering Guard 自己有没有 overengineering；
+- 是否偷偷建立第二套 architecture authority；
+- 是否会阻止合理必要实现；
+- 是否会让 Reviewer 拥有修改产品需求的权力；
+- 是否只依赖 subjective style preference；
+- 是否破坏当前任务状态；
+- 是否真正能约束 future speculative complexity。
+
+如果 FAIL：
+
+fresh Fix Agent
+→ fresh independent Review Agent
+
+不得 self-accept。
+
+\============================================================
+19\. Instrumentation Epoch / Evidence
+=====================================
+
+本任务整个执行必须通过现有 Research Recorder。
+
+最终 evidence 记录：
+
+- prompt\_id
+- run\_id
+- start/end
+- accepted commit
+- independent review result
+- verifier result
+- changed paths
+- Frozen Architecture hash unchanged
+- product contract hash unchanged where applicable
+- current CONTRACT-001 state unchanged
+- instrumentation limitations
+
+不要把本任务创建出来的测试 fixture 当真实 Human Decision。
+
+\============================================================
+
+20\. Accepted 后必须安全合入 main
+
+\============================================================
+
+
+
+本 Control Task 的最终完成条件不仅是 independent Review PASS。
+
+
+
+只有在：
+
+
+
+1\. Implementation 完成；
+
+2\. deterministic verification PASS；
+
+3\. fresh independent Review Agent PASS；
+
+4\. acceptance evidence 已持久化；
+
+5\. acceptance closure 已形成；
+
+6\. 当前候选提交处于 clean committed state；
+
+
+
+之后，才允许将本任务安全合入 \`main\`。
+
+
+
+在 independent acceptance 之前：
+
+
+
+ABSOLUTELY DO NOT MERGE TO MAIN.
+
+
+
+\------------------------------------------------------------
+
+20.1 Merge 前重新检查真实仓库状态
+
+\------------------------------------------------------------
+
+
+
+在合入 \`main\` 前必须检查：
+
+
+
+\- 当前 accepted candidate SHA；
+
+\- acceptance closure SHA；
+
+\- 当前 task branch；
+
+\- \`main\` 当前 HEAD；
+
+\- remote/main（若当前工作流使用 remote）；
+
+\- \`git status\`;
+
+\- staged / unstaged / untracked changes；
+
+\- accepted branch 与 main 的 ancestry；
+
+\- 自本任务创建后 main 是否已有其他 accepted changes；
+
+\- 是否存在其他 Agent 当前拥有 main/worktree 上的未提交修改。
+
+
+
+必须保证：
+
+
+
+\- accepted candidate 与 closure 已提交；
+
+\- review evidence 已提交；
+
+\- worktree clean；
+
+\- 不覆盖其他 Agent 工作；
+
+\- 不遗漏 Recorder evidence；
+
+\- 不把 review 前的旧 candidate 合入 main。
+
+
+
+如果 main 已发生无法安全自动处理的 divergence：
+
+
+
+STOP.
+
+
+
+不要：
+
+
+
+\- force merge
+
+\- force push
+
+\- reset main
+
+\- reset --hard
+
+\- rebase 他人已共享历史
+
+\- 丢弃其他 accepted commit
+
+\- 自动解决语义冲突
+
+
+
+报告真实 divergence，
+
+由 Human / Coordinator 决定最小 reconciliation 方法。
+
+
+
+\------------------------------------------------------------
+
+20.2 优先使用 Fast-Forward 合入
+
+\------------------------------------------------------------
+
+
+
+如果 accepted closure 是当前 main 的直接后继，
+
+优先执行安全 fast-forward：
+
+
+
+1\. 切换到拥有 clean \`main\` 的工作区；
+
+2\. 更新/确认 \`main\` 当前 HEAD；
+
+3\. 验证：
+
+
+
+&#x20;  git merge-base --is-ancestor \<MAIN\_HEAD> \<ACCEPTANCE\_CLOSURE>
+
+
+
+4\. 若成立，执行：
+
+
+
+&#x20;  git merge --ff-only \<accepted-task-branch>
+
+
+
+或等价地 fast-forward 到：
+
+
+
+&#x20;  \<ACCEPTANCE\_CLOSURE\_SHA>
+
+
+
+不得仅凭 branch name 推断目标 commit。
+
+
+
+merge 前再次确认：
+
+
+
+accepted-task-branch HEAD
+
+\==
+
+acceptance closure SHA
+
+
+
+\------------------------------------------------------------
+
+20.3 如果不能 Fast-Forward
+
+\------------------------------------------------------------
+
+
+
+如果：
+
+
+
+\- main 在本任务期间已有其他 accepted commits；
+
+\- accepted branch 与 main 已分叉；
+
+\- fast-forward 不成立；
+
+
+
+不要为了“必须 merge”而强行制造 merge commit。
+
+
+
+先停止并判断：
+
+
+
+A. 是否只是独立、无冲突的已接受控制面变化；
+
+B. 是否需要基于最新 main 重新验证；
+
+C. 是否会改变已独立 Review 的实际 diff；
+
+D. 原 acceptance evidence 是否仍然覆盖最终将进入 main 的内容。
+
+
+
+重要原则：
+
+
+
+Independent Review 接受的是一个具体 commit/diff。
+
+
+
+如果为了 merge 对 accepted candidate 做了任何内容变化，
+
+原 PASS 不自动覆盖新结果。
+
+
+
+任何产生新内容的新 candidate 必须：
+
+
+
+\- 重新运行 applicable verification；
+
+\- 重新经过 fresh independent Review；
+
+\- 形成新的 acceptance evidence；
+
+
+
+然后才能合入 main。
+
+
+
+不得出现：
+
+
+
+review A
+
+→ merge 时手工改代码
+
+→ 仍声称 A 的 PASS 有效
+
+
+
+\------------------------------------------------------------
+
+20.4 Merge 后验证 main
+
+\------------------------------------------------------------
+
+
+
+合入后必须在 \`main\` 上确认：
+
+
+
+1\. \`git status\` clean；
+
+2\. \`git rev-parse HEAD\` 等于预期 acceptance closure
+
+&#x20;  （fast-forward 情况）；
+
+3\. Minimality Guard canonical document 存在；
+
+4\. AGENTS.md 正确引用 Minimality Guard；
+
+5\. Task Template / Review guidance 与 accepted candidate 一致；
+
+6\. Frozen Architecture hash 未变化；
+
+7\. public contracts 未因本任务变化；
+
+8\. product implementation 未变化；
+
+9\. LOOP1-CONTRACT-001 的工作、ownership、queue/status 未被错误改变；
+
+10\. Recorder evidence 完整；
+
+11\. applicable repository governance verifier 在 main 上再次 PASS；
+
+12\. Minimality verifier/tests 在 main 上再次 PASS。
+
+
+
+Merge 后验证必须通过 Recorder command wrapper，
+
+并作为本任务最终 evidence 的一部分。
+
+
+
+如果 merge 后 verification FAIL：
+
+
+
+main 不得被宣称为 accepted stable state。
+
+
+
+不得通过修改测试或 evidence 伪造 PASS。
+
+
+
+按现有 recovery/governance 规则处理。
+
+
+
+\------------------------------------------------------------
+
+20.5 更新 Task / Progress / Checkpoint
+
+\------------------------------------------------------------
+
+
+
+只有 main 上 merge 后验证成功，
+
+才完成最终治理收口。
+
+
+
+更新：
+
+
+
+\- LOOP1-MIN-001 state -> done；
+
+\- \`spec/progress/current.md\`；
+
+\- Last Known Good Commit；
+
+\- Latest Checkpoint；
+
+\- durable acceptance/merge evidence；
+
+\- Recorder Run final state。
+
+
+
+建立稳定 checkpoint，例如符合现有命名规范的：
+
+
+
+\`spec/progress/checkpoints/\<date>-loop1-min-001-accepted.md\`
+
+
+
+checkpoint 至少记录：
+
+
+
+\- accepted candidate SHA；
+
+\- acceptance closure SHA；
+
+\- final main SHA；
+
+\- verifier result；
+
+\- independent reviewer PASS；
+
+\- Frozen Architecture hash unchanged；
+
+\- public contract/product scope unchanged；
+
+\- CONTRACT-001 preserved state；
+
+\- Minimality Guard effective-from commit。
+
+
+
+\------------------------------------------------------------
+
+20.6 Minimality Guard 的正式生效点
+
+\------------------------------------------------------------
+
+
+
+明确记录：
+
+
+
+Minimality Guard 只有在：
+
+
+
+accepted
+
+\+
+
+merged to main
+
+\+
+
+post-merge verification PASS
+
+
+
+之后，才成为后续 Agent 的正式 repository-level governance。
+
+
+
+记录：
+
+
+
+minimality\_effective\_from\_commit = \<final main SHA>
+
+minimality\_effective\_at = \<timestamp>
+
+
+
+不得 retroactively 声称：
+
+
+
+\- CTRL-001；
+
+\- CTRL-002；
+
+\- SPEC-001；
+
+\- CONTRACT-001 在此 commit 之前的历史工作
+
+
+
+已经受到 Minimality Guard 约束。
+
+
+
+此前数据仍保持原本的 historical condition。
+
+
+
+\------------------------------------------------------------
+
+20.7 不自动 Push，除非已有明确授权
+
+\------------------------------------------------------------
+
+
+
+本任务要求：
+
+
+
+merge into local authoritative \`main\`.
+
+
+
+不要仅因为 merge 成功就自动：
+
+
+
+\- push
+
+\- force push
+
+\- create release
+
+\- deploy
+
+
+
+如果现有 repository governance 已明确授权 Coordinator
+
+在 accepted task closure 后 push main，
+
+则遵循现有规则。
+
+
+
+否则：
+
+
+
+merge 后停止在已验证的 local main，
+
+向 Human 报告是否还需要 push。
+
+
+
+绝对禁止 force push。
+
+
+
+\============================================================
+
+21\. CONTRACT-001 后续恢复
+
+\============================================================
+
+
+
+Minimality Guard 成功进入 main 后：
+
+
+
+不要自己继续 LOOP1-CONTRACT-001。
+
+
+
+只生成/记录准确的恢复条件：
+
+
+
+\- final main SHA；
+
+\- Minimality effective commit；
+
+\- CONTRACT-001 当前 branch/worktree；
+
+\- CONTRACT-001 当前 queue/status/owner；
+
+\- 当前未提交/untracked ownership；
+
+\- CONTRACT-001 Agent 应如何安全吸收新的 main。
+
+
+
+原 CONTRACT-001 Agent 恢复时应：
+
+
+
+1\. 先检查自己的真实 worktree；
+
+2\. 保留所有已有工作；
+
+3\. 确认能安全引入最新 main；
+
+4\. 不 reset/clean/stash 他人工作；
+
+5\. 将 Minimality Guard 生效后的工作记录为新的治理条件；
+
+6\. 不重做此前正确完成的 Contract 工作；
+
+7\. 继续原 Task，而不是重新选任务。
+
+
+
+如果无法安全 fast-forward / merge 最新 main：
+
+
+
+停止并报告，
+
+不得自行破坏现场。
+
+
+
+\============================================================
+
+22\. 最终 Handoff
+
+\============================================================
+
+
+
+最终只有满足以下全部条件时，
+
+才可以向 Human 报告：
+
+
+
+\`LOOP1-MIN-001 COMPLETE\`
+
+
+
+\- independent Review PASS；
+
+\- accepted candidate committed；
+
+\- acceptance closure committed；
+
+\- successfully merged to main；
+
+\- main post-merge verification PASS；
+
+\- stable checkpoint created；
+
+\- progress/current updated；
+
+\- Recorder run valid；
+
+\- Frozen Architecture unchanged；
+
+\- product/public-contract scope unchanged；
+
+\- CONTRACT-001 preserved。
+
+
+
+最终返回：
+
+
+
+1\. Task ID；
+
+2\. accepted candidate SHA；
+
+3\. acceptance closure SHA；
+
+4\. final main SHA；
+
+5\. merge method（例如 fast-forward）；
+
+6\. Minimality effective-from commit/time；
+
+7\. independent Review evidence；
+
+8\. post-merge verification evidence；
+
+9\. checkpoint；
+
+10\. CONTRACT-001 preserved state；
+
+11\. CONTRACT-001 Agent 的安全恢复方式；
+
+12\. 是否已经 push；
+
+13\. 如未 push，是否需要 Human 授权 push；
+
+14\. blocker / limitation。
+
+
+
+然后停止。
+
+
+
+DO NOT CONTINUE LOOP1-CONTRACT-001.
+
+DO NOT IMPLEMENT PRODUCT CODE.

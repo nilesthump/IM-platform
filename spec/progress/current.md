@@ -10,13 +10,20 @@ Gate Status: NOT YET PASSED
 
 Current Batch: LOOP1-S0
 
-Current Task: LOOP1-CONTRACT-001
+Current Task: LOOP1-MIN-001
 
-Current Task State: done
+Current Task State: review
+
+## Authorized Control-Plane Insertion
+
+- `LOOP1-MIN-001` has independent Review PASS for committed candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7`, recorded in `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-c18ec53-pass.md`. It remains in `review` until safe merge to local `main` and post-merge verification.
+- `LOOP1-CONTRACT-001` is independently accepted and in `done` at closure `2a3812e0b4a23157ecd6fe341f0011ca96390229`. Its original worktree and untracked `contracts/http/schema-lint/` remain under their original ownership, untouched by this integration.
+- The Human requested that the final local `main` merge include additions from `task/LOOP1-MIN-001`. This isolated integration branch contains its independently accepted descendant `review/LOOP1-MIN-001-pass-3` and the accepted Contract closure. Local `main` has not yet advanced.
 
 ## Immediately Relevant Completed Work
 
 - Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. `LOOP1-CONTRACT-001` is now `done` under ADR-0001: independent content review passed candidate `d46ce5a`, and later Human-authorized run-local Git transport preserved all Recorder output hashes in a clean committed checkout. S0 Gate remains NOT YET PASSED.
+- The Minimality candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7` passed fresh independent review after two documented FAIL/Fix cycles. This is content acceptance, not yet post-merge acceptance; `LOOP1-MIN-001` remains in `review`.
 - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
 - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
 - `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
@@ -151,11 +158,11 @@ Current Task State: done
 
 ## Next Exact Action
 
-Coordinator: inspect the accepted `LOOP1-CONTRACT-001` closure, then select the next dependency-satisfied S0 task; at final merge include additions from `task/LOOP1-MIN-001` in `main` as Human requested. S0 Gate remains NOT YET PASSED.
+Coordinator: complete isolated integration of the independently accepted Contract and Minimality lineages, verify the committed integration state, safely fast-forward local `main`, then perform post-merge verification and independent Minimality closure. Do not start the next product task. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`4b4cb4a15f17025cb92531d24e39f84816d973fa` (committed Recorder transport and clean-checkout acceptance base); `LOOP1-CONTRACT-001` independent content Review candidate was `d46ce5a9e6ee7a7a080e0a574189b090135abdb5`.
+`2a3812e0b4a23157ecd6fe341f0011ca96390229` (accepted Contract closure); `010710dfc02642385c78dba69e04639b19d09771` (Minimality review branch with independent PASS evidence). Their integration merge is not yet committed or verified.
 
 ## Latest Checkpoint
 
@@ -163,6 +170,7 @@ Coordinator: inspect the accepted `LOOP1-CONTRACT-001` closure, then select the 
 
 ## Uncommitted Changes / Ownership
 
+- Fresh Fix Agent `/root/min001_fix2` owns only the isolated `H:\.codex\worktrees\loop1-min-001-fix2\IM-platform` verifier, task/progress/evidence edits, and its authorized Recorder prompt/run until handoff commit. Disposable synthetic tests remain only in its separate throwaway checkout.
 - Recorder acceptance closure is owned by `/root/recorder_review2` until committed; afterward the closure worktree is clean and Recorder task ownership is closed.
 - The original paused Agent retains sole ownership of the untracked `contracts/http/schema-lint/` tree in `H:\IM-platform`; resumed review work did not read, modify, copy, stash, clean, claim, or depend on it.
 - Detached review worktree `H:\.codex\worktrees\contract001-independent-review-3\IM-platform` is also out of scope and must not be touched.

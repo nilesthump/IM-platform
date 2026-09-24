@@ -1,0 +1,141 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index c83f64d..77e03b6 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -22,6 +22,7 @@ Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
++- Concurrent Human-authorized control-plane insertion `LOOP1-MIN-001` remains in `review`, separate from current product task `LOOP1-CONTRACT-001`. The first Minimality candidate `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` failed independent review because its verifier accepted contradictory policy text; FAIL closure is `ca803b789b167f6e511a5229224250ee53ea937e`. Fresh Fix Agent `/root/min001_fix` repaired only that verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; development checks and disposable contradictory/necessary-complexity controls passed. Evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Next control-plane action: finish Recorder, commit the candidate, and obtain a new fresh independent review. This is not acceptance or an effective repository-level guard.
+ - Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. The original `LOOP1-CONTRACT-001` remains unfinished in `review`, paused rather than superseded, and its ownership has not transferred.
+ - `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
+ - `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
+diff --git a/spec/tasks/review/LOOP1-MIN-001.md b/spec/tasks/review/LOOP1-MIN-001.md
+index 3c1961d..cf9a302 100644
+--- a/spec/tasks/review/LOOP1-MIN-001.md
++++ b/spec/tasks/review/LOOP1-MIN-001.md
+@@ -36,6 +36,11 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
+ - `research/prompts/P-d7268d90-c7bb-4440-9406-7a27b633f0bb/**`
+ - `research/runs/R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b/**`
+ - Additional fresh independent review Recorder prompt/run paths created by the reviewer for this task only.
++- `research/prompts/P-41263ca4-df41-4cc7-8089-58611e95c6ff/**`
++- `research/prompts/P-abd528ee-c978-4af7-8020-03fcd4b45222/**`
++- `research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/**`
++
++The Coordinator prospectively authorized the three exact Fix-cycle Recorder paths above on 2026-09-23. The first prompt is an empty registration attempt caused by an incorrect PowerShell pipeline; it remains as factual Recorder evidence. The second prompt contains the exact Fix delegation and is associated with the Fix run.
+ 
+ # Acceptance
+ 
+@@ -62,13 +67,15 @@ Establish a small, evidence-driven minimality rule for implementation and indepe
+ - Implementation Recorder: `R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b`.
+ - Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-development.md`. Minimality verifier, CTRL-002 Development, and diff check passed locally; none is acceptance.
+ - Acceptance evidence pending independent review.
++- Independent review of `4f954ea76ce694aa4f7256ef1d14bf7ed1389da8` returned FAIL because appended contradictory governance clauses were accepted by the verifier. Permanent evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-independent-review-4f954ea-fail.md`; FAIL closure: `ca803b789b167f6e511a5229224250ee53ea937e`.
++- Fresh Fix Agent `/root/min001_fix` repaired the verifier on isolated branch `fix/LOOP1-MIN-001-verifier`; prospective Recorder run `R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e`. The task verifier and CTRL-002 Development mode passed. In a disposable checkout, the independent review's exact contradictory clause was rejected (exit `1`), while a justified current transaction-boundary abstraction passed (exit `0`). A PowerShell-quoted diff check passed. Development evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md`. Independent acceptance remains pending.
+ 
+ # Handoff
+ 
+-- Implementation complete in isolated worktree `H:\.codex\worktrees\loop1-min-001\IM-platform` from accepted control-plane commit `1c274bcbf92ebcc05c1bc208386c5976437d8221`; independent review pending.
++- Original implementation in isolated worktree `H:\.codex\worktrees\loop1-min-001\IM-platform` was rejected by independent review. The Fix Agent owns only the new isolated Fix worktree; no product or Contract task path is modified.
+ - `LOOP1-CONTRACT-001` remains the separate unfinished current product task.
+ - A direct fast-forward to `main` would import unaccepted `LOOP1-CONTRACT-001` ancestors. Preserve this as a merge blocker until a safe, independently accepted reconciliation exists.
+ 
+ # Next Action
+ 
+-- Request a fresh independent review of the clean committed candidate, then resolve the main ancestry blocker without importing unfinished Contract content.
++- Complete the focused Fix cycle, then request a new fresh independent review of its clean committed candidate. Resolve the main ancestry blocker without importing unfinished Contract content.
+diff --git a/tools/verify-loop1-min-001.ps1 b/tools/verify-loop1-min-001.ps1
+index 52c774a..c15a8d0 100644
+--- a/tools/verify-loop1-min-001.ps1
++++ b/tools/verify-loop1-min-001.ps1
+@@ -29,13 +29,24 @@ if (Test-Path $contractPath) {
+         'Reviewers cannot change product requirements, public contracts, or Frozen Architecture',
+         'subordinate to Frozen Architecture'
+     )
+-    function Test-Clauses([string]$text) {
++    function Test-Policy([string]$text) {
+         foreach ($clause in $clauses) {
+             if (-not $text.Contains($clause)) { return $false }
+         }
++        # These narrow checks reject explicit permissions that negate the guard.
++        # They are representative policy controls, not a style or complexity score.
++        $contradictions = @(
++            'future.stage infrastructure[^.\r\n]{0,160}\b(may|can|allowed|permitted)\b[^.\r\n]{0,160}\b(solely|only)\b[^.\r\n]{0,160}\b(future|might|possible)\b',
++            'abstractions?[^.\r\n]{0,160}\bwithout current (requirements?|justification)\b[^.\r\n]{0,160}\b(may|can|allowed|permitted)\b',
++            'minimality[^.\r\n]{0,160}\b(overrides?|supersedes?)\b[^.\r\n]{0,160}\bFrozen Architecture\b',
++            'reviewers?[^.\r\n]{0,160}\b(may|can|allowed|permitted)\b[^.\r\n]{0,160}\b(rewrite|change|modify)\b[^.\r\n]{0,160}\b(public contracts?|contracts?)\b'
++        )
++        foreach ($pattern in $contradictions) {
++            if ([regex]::IsMatch($text, $pattern, [Text.RegularExpressions.RegexOptions]::IgnoreCase)) { return $false }
++        }
+         return $true
+     }
+-    Require (Test-Clauses $contract) 'canonical contract lacks a required governance clause'
++    Require (Test-Policy $contract) 'canonical contract lacks a required clause or contains contradictory permission'
+ }
+ $agents = Get-Content -Raw -LiteralPath $agentsPath
+ $template = Get-Content -Raw -LiteralPath $templatePath
+@@ -44,20 +55,21 @@ Require ($agents.Contains('MUST choose the simplest implementation') -and $agent
+ Require ($agents.Contains('Review Agents MUST check unnecessary complexity')) 'review instruction missing'
+ Require ($template.Contains('# Minimality') -and $template.Contains('current justification')) 'Task Template minimality prompt missing'
+ 
+-# Disposable negative controls verify that the guard fails when its essential
+-# clauses are removed. They do not alter repository artifacts or score code.
++# Exercise the same policy check against disposable contradictory clauses.
++# Necessary, currently justified complexity must still be accepted.
+ if (Test-Path $contractPath) {
+     $controls = @(
+-        @{ Name = 'future-only rationale'; Needle = 'insufficient on their own' },
+-        @{ Name = 'unjustified abstraction'; Needle = 'current approved requirements' },
+-        @{ Name = 'necessary complexity'; Needle = 'Necessary boundaries and abstractions remain valid' },
+-        @{ Name = 'architecture precedence'; Needle = 'subordinate to Frozen Architecture' },
+-        @{ Name = 'contract rewrite'; Needle = 'Reviewers cannot change product requirements, public contracts, or Frozen Architecture' }
++        @{ Name = 'future-only rationale'; Clause = 'Future-stage infrastructure may be added solely because a future stage might need it.' },
++        @{ Name = 'unjustified abstraction'; Clause = 'Abstractions without current requirements may be added for future reuse.' },
++        @{ Name = 'architecture precedence'; Clause = 'Minimality overrides Frozen Architecture when simpler.' },
++        @{ Name = 'contract rewrite'; Clause = 'Reviewers may rewrite public contracts to simplify them.' }
+     )
+     foreach ($control in $controls) {
+-        $mutant = $contract.Replace($control.Needle, '')
+-        Require (-not (Test-Clauses $mutant)) "negative control failed: $($control.Name)"
++        $mutant = "$contract`n$($control.Clause)"
++        Require (-not (Test-Policy $mutant)) "negative control failed: $($control.Name)"
+     }
++    $necessary = "$contract`nA repository abstraction is required by the current atomic transaction boundary."
++    Require (Test-Policy $necessary) 'necessary current complexity was mechanically rejected'
+ }
+ 
+ if (-not $SkipScope) {
+@@ -72,7 +84,7 @@ if (-not $SkipScope) {
+             $name -eq 'tools/verify-loop1-min-001.ps1' -or
+             $name -eq 'spec/progress/current.md' -or
+             $name -match '^spec/progress/(evidence/LOOP1-MIN-001/|checkpoints/.*loop1-min-001)' -or
+-            $name -match '^research/(prompts/P-d7268d90-c7bb-4440-9406-7a27b633f0bb/|runs/R-20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b/)'
++            $name -match '^research/(prompts/P-(d7268d90-c7bb-4440-9406-7a27b633f0bb|4784081a-43aa-4beb-b8d5-c2be9fa5c62f|41263ca4-df41-4cc7-8089-58611e95c6ff|abd528ee-c978-4af7-8020-03fcd4b45222)/|runs/R-(20260923T012916Z-b5c2c3a1-df94-402c-9360-647e21e0ea2b|20260923T014200Z-16aca9f1-8664-48d6-9af6-40e3a7bca7b4|20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e)/)'
+         Require $allowed "out-of-scope path: $name"
+     }
+ }
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-41263ca4-df41-4cc7-8089-58611e95c6ff/metadata.json
+# ?? research/prompts/P-41263ca4-df41-4cc7-8089-58611e95c6ff/prompt.txt
+# ?? research/prompts/P-abd528ee-c978-4af7-8020-03fcd4b45222/metadata.json
+# ?? research/prompts/P-abd528ee-c978-4af7-8020-03fcd4b45222/prompt.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-0edcb92a-5a0f-44f4-a4a3-36185eb2bf0f.stderr.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-0edcb92a-5a0f-44f4-a4a3-36185eb2bf0f.stdout.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-5c505c54-7e79-4916-9e77-0bfdf626272a.stderr.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-5c505c54-7e79-4916-9e77-0bfdf626272a.stdout.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-709a5441-c6ac-4525-9a2d-0f8ca07210a4.stderr.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-709a5441-c6ac-4525-9a2d-0f8ca07210a4.stdout.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-8b63dbad-bf37-4b49-a19c-ccc5e3469c4a.stderr.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-8b63dbad-bf37-4b49-a19c-ccc5e3469c4a.stdout.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-9d942aab-8a75-4828-a614-48ddff19bf9e.stderr.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-9d942aab-8a75-4828-a614-48ddff19bf9e.stdout.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-ac31bf70-62e9-4bc2-95cf-9232c0e09131.stderr.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-ac31bf70-62e9-4bc2-95cf-9232c0e09131.stdout.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-dc0ec1cf-787c-4f26-9ed8-a81bbea05b16.stderr.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/blobs/C-dc0ec1cf-787c-4f26-9ed8-a81bbea05b16.stdout.txt
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/events.jsonl
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/initial_state.json
+# ?? research/runs/R-20260923T015212Z-f95e2e89-cf8c-4ac2-b3af-7a2137c0d83e/metadata.json
+# ?? spec/progress/evidence/LOOP1-MIN-001/2026-09-23-fix-verifier-development.md
