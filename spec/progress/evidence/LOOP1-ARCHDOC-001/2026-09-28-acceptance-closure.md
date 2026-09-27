@@ -1,0 +1,15 @@
+# LOOP1-ARCHDOC-001 candidate acceptance closure
+
+- Task: `LOOP1-ARCHDOC-001`, governance-only Frozen Architecture representation migration.
+- Accepted architecture candidate: `c7db4597c30610dd76c4505bbcbaa65a3ec46779`.
+- Fresh independent Review 3: **PASS**, evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`, `2026-09-28-independent-review-c7db459-pass.md`. The reviewer used a separate clean detached checkout at the exact candidate and ran CTRL-002 Acceptance, the architecture verifier, semantic line/number audit, and visual comparison of all nine PDF figure placements.
+- Source PDF: `scalable-distributed-im-architecture.pdf`; SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`; retained **YES**; byte-for-byte unchanged **YES**.
+- New canonical Markdown: `spec/architecture/frozen-architecture.md`; actual SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`.
+- Semantic change: **false**. PDF-to-Markdown section and normative equivalence: **PASS** in the independent review. Clickable contents: 86 unique targets; architecture-semantic figures: nine Mermaid placements, including seven S0–S6 Gate PASS labels.
+- Product contracts unchanged: **YES**. Product implementation unchanged: **YES**. The independent `git diff --exit-code` for PDF, `contracts/`, backend, clients and plugins returned exit 0, and the deterministic architecture verifier checks product-scope changes from the accepted baseline.
+- Deterministic verifier: **PASS**, exit 0, run from the acceptance branch through coordinator Recorder `R-20260927T192533Z-a80d944a-f520-48fd-9d7d-8e3a1561ebbe`. It checked both real hashes, unique active Markdown path, governance routing, provenance, `semantic_change=false`, scope, and structural negative controls. CTRL-002 Development also returned exit 0; independent CTRL-002 Acceptance is recorded in Review 3 evidence.
+- Review Recorder: `R-20260927T183119Z-e901f819-1345-4543-b1f7-692698be3b61` finished PASS and independently revalidated here with 20 events. Coordinator closure Recorder `R-20260927T192533Z-a80d944a-f520-48fd-9d7d-8e3a1561ebbe` finished PASS and `validate-run` returned exit 0 with 20 events. `validate-repository` returned exit 0 after that finish. An earlier repository validation while the coordinator run was still open correctly returned exit 1 for a partial run; no evidence was edited to mask it.
+- The earlier first candidate FAIL and second figure-label FAIL remain historical evidence. Review 2's interrupted, uncommitted Recorder is not represented as PASS; only its verbatim authored FAIL report is retained.
+- Approved ADR: `spec/architecture/decisions/ADR-0002-frozen-architecture-canonical-markdown-migration.md`. Independent acceptance uses the temporary S0 mechanism of ADR-0001 because CI-001 is not operational.
+
+This closure accepts the reviewed candidate for safe fast-forward merge. The PDF remains historically authoritative until this closure is merged to `main` and post-merge verification passes. Task `done`, canonical effective commit/time, and stable checkpoint are recorded only after that post-merge PASS.

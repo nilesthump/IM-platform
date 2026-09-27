@@ -25,6 +25,7 @@ Current Task State: review
 - Fix prompt `P-9548431c-8181-4f5a-9598-1142c6215300`, run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`; recorded semantic extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. The Fix run finished and validated PASS with 14 events; a run-local Git attribute preserved all 19 staged Recorder files byte-for-byte. This is development evidence; fresh independent review remains pending.
 - PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
 - The second fresh reviewer identified a missing seventh `Gate PASS` label in candidate `4770214`'s Figure 15-1; its authored FAIL report is retained verbatim, while its interrupted Recorder run remains unfinished. Fresh Fix Agent `/root/archdoc_fix2` repaired that diagram, its real Markdown hash, and a focused deterministic regression on isolated branch `fix/LOOP1-ARCHDOC-001-gate-label`. Task remains `review` pending a different fresh independent reviewer. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`.
+- Fresh independent Review 3 accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean checkout. Its semantic/diagram review, CTRL-002 Acceptance, hash/scope verifier and Recorder all passed; evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`. Candidate acceptance closure is being committed on isolated branch `accept/LOOP1-ARCHDOC-001`; Markdown authority remains conditional on merge and post-merge verification.
 
 ## Authorized Control-Plane Insertion
 
@@ -174,7 +175,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate a different fresh independent clean-checkout Reviewer for the committed Figure 15-1 fix. If PASS, satisfy ADR-0001 acceptance and only then prepare accepted merge and post-merge verification. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
+Finish the coordinator Recorder and commit candidate acceptance closure. Verify that clean closure, fast-forward clean local `main` only if it remains an ancestor, perform post-merge verification, then record effective commit/time and a stable checkpoint and move this task to `done`. Markdown authority is not effective before post-merge PASS. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -189,8 +190,7 @@ Delegate a different fresh independent clean-checkout Reviewer for the committed
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
-- The original migration worktree `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` is outside this Fix Agent's ownership. The isolated Fix worktree `H:\.codex\worktrees\archdoc-fix-1\IM-platform` and its task-owned Recorder artifacts belong to `/root/archdoc_fix1` until committed review handoff; temporary audit files are removed before commit.
-- The Figure 15-1 fix worktree `H:\.codex\worktrees\archdoc-fix-2\IM-platform` and task-owned Recorder artifacts belong to `/root/archdoc_fix2` until clean committed handoff. The interrupted second-review worktree remains untouched.
+- Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The acceptance branch at `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` and its new task-owned closure evidence/Recorder artifacts are owned by the Coordinator until committed. The interrupted second-review worktree remains untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
