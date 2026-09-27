@@ -1,0 +1,147 @@
+diff --git a/spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md b/spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md
+new file mode 100644
+index 0000000..ae67515
+--- /dev/null
++++ b/spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md
+@@ -0,0 +1,12 @@
++# LOOP1-ARCHDOC-001 stable main checkpoint
++
++- Migration task: `LOOP1-ARCHDOC-001` (Governance / Architecture Documentation Migration).
++- Accepted candidate: `c7db4597c30610dd76c4505bbcbaa65a3ec46779`; acceptance closure and effective-from commit: `566ee352f818f6beb2ca7d991c25eecc07f752e7`.
++- Old canonical: `scalable-distributed-im-architecture.pdf`, SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
++- New canonical: `spec/architecture/frozen-architecture.md`, SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`.
++- Semantic change: **NONE**. PDF retained: **YES**. PDF unchanged: **YES**. Product Contracts unchanged: **YES**. Product implementation unchanged: **YES**.
++- Independent Review: **PASS** at `0f9286629bfa72a82137fe94bf39472f188f0f6e`, with full figure/section/normative evidence in `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-independent-review-c7db459-pass.md`.
++- Deterministic verifier: **PASS** on `main` after fast-forward. Post-merge product/PDF diff and CTRL-001 baseline: **PASS**. Review and acceptance-closure Recorder runs: **PASS** and valid. The post-merge Recorder run must be finished and validated before this checkpoint is committed.
++- Architecture effective timestamp: `2026-09-27T19:41:30Z` (UTC), after accepted merge and post-merge verification PASS. The PDF remains the immutable pre-migration authority snapshot; Markdown is active authority from the effective commit onward. Subsequent Markdown changes still require Frozen Architecture ACP/ADR approval.
++- Detailed acceptance and post-merge evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-acceptance-closure.md` and `2026-09-28-post-main-merge.md`. First and second candidate FAIL evidence remains untouched.
++- Recovery state: local `main` carries the task closure; S0 Gate remains NOT YET PASSED because other S0 tasks remain incomplete. The unrelated original `H:\IM-platform` worktree and its other-Agent-owned untracked directory were not modified.
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 86f1c07..46fdca3 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -12,7 +12,7 @@ Current Batch: LOOP1-S0
+ 
+ Current Task: LOOP1-ARCHDOC-001
+ 
+-Current Task State: review
++Current Task State: done
+ 
+ ## Authorized Frozen Architecture Representation Migration
+ 
+@@ -25,7 +25,8 @@ Current Task State: review
+ - Fix prompt `P-9548431c-8181-4f5a-9598-1142c6215300`, run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`; recorded semantic extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. The Fix run finished and validated PASS with 14 events; a run-local Git attribute preserved all 19 staged Recorder files byte-for-byte. This is development evidence; fresh independent review remains pending.
+ - PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
+ - The second fresh reviewer identified a missing seventh `Gate PASS` label in candidate `4770214`'s Figure 15-1; its authored FAIL report is retained verbatim, while its interrupted Recorder run remains unfinished. Fresh Fix Agent `/root/archdoc_fix2` repaired that diagram, its real Markdown hash, and a focused deterministic regression on isolated branch `fix/LOOP1-ARCHDOC-001-gate-label`. Task remains `review` pending a different fresh independent reviewer. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`.
+-- Fresh independent Review 3 accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean checkout. Its semantic/diagram review, CTRL-002 Acceptance, hash/scope verifier and Recorder all passed; evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`. Candidate acceptance closure is being committed on isolated branch `accept/LOOP1-ARCHDOC-001`; Markdown authority remains conditional on merge and post-merge verification.
++- Fresh independent Review 3 accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean checkout. Its semantic/diagram review, CTRL-002 Acceptance, hash/scope verifier and Recorder all passed; evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`. The candidate acceptance closure was subsequently committed and merged at `566ee352f818f6beb2ca7d991c25eecc07f752e7`.
++- Candidate acceptance closure `566ee352f818f6beb2ca7d991c25eecc07f752e7` was verified clean and fast-forwarded to clean local `main`. The post-merge architecture verifier, immutable PDF and Product scope diff, and CTRL-001 baseline passed. Markdown is effective canonical authority from that commit at `2026-09-27T19:41:30Z` UTC; the PDF remains immutable historical provenance. Task closure and stable checkpoint are being committed on `main`; S0 Gate remains NOT YET PASSED.
+ 
+ ## Authorized Control-Plane Insertion
+ 
+@@ -175,22 +176,22 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Finish the coordinator Recorder and commit candidate acceptance closure. Verify that clean closure, fast-forward clean local `main` only if it remains an ancestor, perform post-merge verification, then record effective commit/time and a stable checkpoint and move this task to `done`. Markdown authority is not effective before post-merge PASS. S0 Gate remains NOT YET PASSED.
++Finish and validate the post-merge Recorder, commit the task `done` transition and stable checkpoint, then run final clean-main CTRL-002 Acceptance, architecture hash/scope verification and Recorder repository validation. The migration task is complete only after those checks pass. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+-`abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a` (clean local `main` at migration branch point; previous accepted integration PASS closure `09cac596ca527fa80b187c63e5beb8308e946762`).
++`566ee352f818f6beb2ca7d991c25eecc07f752e7` (clean accepted migration closure on local `main`; the final checkpoint commit is pending clean verification).
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-09-24-loop1-min-001-main-accepted.md`
++`spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md`
+ 
+ ## Uncommitted Changes / Ownership
+ 
+ - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
+ - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
+ - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
+-- Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The acceptance branch at `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` and its new task-owned closure evidence/Recorder artifacts are owned by the Coordinator until committed. The interrupted second-review worktree remains untouched.
++- Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The Coordinator owns only the task `done` transition, post-merge evidence, checkpoint, current recovery update, and post-merge Recorder artifacts on local `main` until committed. The interrupted second-review worktree remains untouched.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-post-main-merge.md b/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-post-main-merge.md
+new file mode 100644
+index 0000000..5026d24
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-post-main-merge.md
+@@ -0,0 +1,14 @@
++# LOOP1-ARCHDOC-001 post-merge verification
++
++- Accepted architecture candidate: `c7db4597c30610dd76c4505bbcbaa65a3ec46779`.
++- Fresh independent Review 3: **PASS**, evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`; clean detached Acceptance and section/figure/normative comparison are recorded in `2026-09-28-independent-review-c7db459-pass.md`.
++- Candidate acceptance closure: `566ee352f818f6beb2ca7d991c25eecc07f752e7` and `2026-09-28-acceptance-closure.md`. The closure checkout was clean; CTRL-002 Acceptance and the architecture verifier both returned exit 0 after the commit.
++- Local `main` before merge: `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`, branch `main`, clean, and an ancestor of the closure commit. `git merge --ff-only 566ee352f818f6beb2ca7d991c25eecc07f752e7` returned exit 0 and advanced local `main` to exactly `566ee352f818f6beb2ca7d991c25eecc07f752e7`. No reset, rebase, force push, or shared-worktree takeover occurred.
++- Post-merge `tools/verify-frozen-architecture.ps1 -BaseCommit abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`: **PASS**, exit 0 on `main`. It checked PDF existence/real SHA-256, canonical Markdown existence/real SHA-256, unique path, governance authority, historical PDF provenance, representation-only metadata, product-scope diff, and structural negative controls.
++- Post-merge `git diff --exit-code abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a HEAD -- scalable-distributed-im-architecture.pdf contracts backend clients plugins`: **PASS**, exit 0. Product Contracts unchanged **YES**; Product implementation unchanged **YES**; PDF byte-for-byte unchanged **YES**.
++- Post-merge `tools/verify-loop1-ctrl-001.ps1`: **PASS**, exit 0. Clean committed CTRL-002 Acceptance was already PASS on the closure before merge; final main clean-checkout Acceptance is required after this checkpoint is committed.
++- Old canonical PDF path: `scalable-distributed-im-architecture.pdf`; SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`; historical immutable snapshot retained **YES**.
++- New canonical Markdown path: `spec/architecture/frozen-architecture.md`; SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`; semantic change **false**. The active frozen-hash target is the Markdown hash. The PDF hash remains separate provenance.
++- Canonical authority effective from commit: `566ee352f818f6beb2ca7d991c25eecc07f752e7`. Canonical authority effective at: `2026-09-27T19:41:30Z`, after accepted fast-forward and the post-merge architecture, product-scope, and baseline verifiers returned PASS on `main`. Earlier commits retain their historical PDF authority.
++- Post-merge Recorder prompt `P-28f9a0bc-7ef6-4a04-abbd-b6d8721f948a`, run `R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae`, group `full_governance`, capture mode `prospective_resume` because the merge preceded run start. Its real run status and validation are to be recorded before this checkpoint commit. No missing pre-run timing or tool trace is fabricated.
++- Local `main` is not pushed to a remote by this task. S0 Gate remains NOT YET PASSED.
+diff --git a/spec/tasks/review/LOOP1-ARCHDOC-001.md b/spec/tasks/done/LOOP1-ARCHDOC-001.md
+similarity index 90%
+rename from spec/tasks/review/LOOP1-ARCHDOC-001.md
+rename to spec/tasks/done/LOOP1-ARCHDOC-001.md
+index 8bed0a8..41ddf21 100644
+--- a/spec/tasks/review/LOOP1-ARCHDOC-001.md
++++ b/spec/tasks/done/LOOP1-ARCHDOC-001.md
+@@ -1,7 +1,7 @@
+ ---
+ task_id: LOOP1-ARCHDOC-001
+ title: Migrate Frozen Architecture canonical source from PDF to Markdown
+-status: review
++status: done
+ owner: /root
+ stage: S0
+ gate: S0
+@@ -83,14 +83,15 @@ Migrate the immutable Frozen Architecture PDF to one repository-native Markdown
+ - Fresh Fix Agent `/root/archdoc_fix2` placed one `Gate PASS` label in each of the seven stage nodes in Figure 15-1 and restored the six unlabelled progression arrows shown by the PDF. It changed no other architecture figure or product scope. New canonical Markdown SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`; PDF remains `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. The verifier now rejects a missing S6 label. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`; prompt `P-9103b54f-c9bd-45a4-b968-b99ca558b5ef`, run `R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b`.
+ - Fresh independent Review Agent `/root/archdoc_review3` accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean committed checkout. It checked all nine PDF figure placements, 64/64 normative lines, numbers, 86 clickable anchors, the immutable PDF, product scope, CTRL-002 Acceptance, and the architecture verifier. PASS evidence is `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-independent-review-c7db459-pass.md`, committed at `0f9286629bfa72a82137fe94bf39472f188f0f6e`; Review Recorder `R-20260927T183119Z-e901f819-1345-4543-b1f7-692698be3b61` finished PASS and validated. The Reviewer did not self-transition the task or merge.
+ - Candidate acceptance closure: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-acceptance-closure.md`. Coordinator Recorder `R-20260927T192533Z-a80d944a-f520-48fd-9d7d-8e3a1561ebbe` is prospective-resume for closure, linked to the original task run. Its verifier and review-run validation passed. This run finished PASS and `validate-run` passed (20 events); repository validation then passed. A repository validation attempt while this run was still open correctly returned partial-run exit 1 and remains visible in the event stream.
++- Acceptance closure `566ee352f818f6beb2ca7d991c25eecc07f752e7` was verified from a clean committed checkout, then local clean `main` fast-forwarded to it. Post-merge architecture verifier, PDF/Product scope diff, and CTRL-001 baseline returned PASS. Canonical Markdown effective from that commit at `2026-09-27T19:41:30Z` UTC; no historical evidence was rewritten. Post-merge evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-post-main-merge.md`; stable checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md`.
+ 
+ 
+ # Handoff
+ 
+-- Base: clean local `main` commit `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`. Candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` and independent PASS closure `0f9286629bfa72a82137fe94bf39472f188f0f6e` are isolated on the migration history. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains untouched and owned by another agent.
++- Base: clean local `main` commit `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`. Candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779`, independent PASS `0f9286629bfa72a82137fe94bf39472f188f0f6e`, and acceptance closure `566ee352f818f6beb2ca7d991c25eecc07f752e7` are on local `main`. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains untouched and owned by another agent.
+ - Recorder runs: implementation `R-20260924T065732Z-5b072546-5f38-480d-9ae7-2786a0b77c43` and continuation `R-20260927T122147Z-09acf128-7271-40df-bfa5-a1741633c9cc`.
+ - No product architecture conflict; canonical representation change requires the minimal Human-approved ADR under PDF section 2.1.
+ 
+ # Next Action
+ 
+-- Finish and validate the coordinator Recorder, commit candidate acceptance closure on the isolated branch, then verify the clean closure. If local `main` remains clean and an ancestor, fast-forward only. Run post-merge checks before declaring Markdown effective; record the effective commit/time and stable checkpoint, then move this Task to `done`.
++- Finish and validate the post-merge Recorder, commit this task closure and checkpoint on `main`, then run final clean-main CTRL-002 Acceptance and architecture/hash/scope verification. No further migration implementation is pending.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-28f9a0bc-7ef6-4a04-abbd-b6d8721f948a/metadata.json
+# ?? research/prompts/P-28f9a0bc-7ef6-4a04-abbd-b6d8721f948a/prompt.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-210ca450-8f6d-4750-af5b-b56eb0e855bf.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-210ca450-8f6d-4750-af5b-b56eb0e855bf.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-23b930b0-f412-4f49-aad1-31770a6a6d2b.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-23b930b0-f412-4f49-aad1-31770a6a6d2b.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-48836b4a-3cfa-4434-9459-49a4903c43f0.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-48836b4a-3cfa-4434-9459-49a4903c43f0.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-842178b9-4882-4a72-95ba-824c587dcf17.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-842178b9-4882-4a72-95ba-824c587dcf17.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-9de3e17e-207a-41ef-98b0-1d61ad858289.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-9de3e17e-207a-41ef-98b0-1d61ad858289.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-acb87980-9419-49e8-aec6-d2c3b31c7035.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-acb87980-9419-49e8-aec6-d2c3b31c7035.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-ae2119e6-1b10-45cf-a0aa-995a6743a07e.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-ae2119e6-1b10-45cf-a0aa-995a6743a07e.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-cde9fbc6-b673-4048-9753-6061dae15032.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-cde9fbc6-b673-4048-9753-6061dae15032.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-e37e0c0e-7010-447a-a451-62406093c7de.stderr.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/blobs/C-e37e0c0e-7010-447a-a451-62406093c7de.stdout.txt
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/events.jsonl
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/initial_state.json
+# ?? research/runs/R-20260927T193954Z-33279075-a5bf-46ad-b249-3de59c34bbae/metadata.json

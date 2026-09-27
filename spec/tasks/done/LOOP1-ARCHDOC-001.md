@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-ARCHDOC-001
 title: Migrate Frozen Architecture canonical source from PDF to Markdown
-status: review
+status: done
 owner: /root
 stage: S0
 gate: S0
@@ -83,14 +83,15 @@ Migrate the immutable Frozen Architecture PDF to one repository-native Markdown 
 - Fresh Fix Agent `/root/archdoc_fix2` placed one `Gate PASS` label in each of the seven stage nodes in Figure 15-1 and restored the six unlabelled progression arrows shown by the PDF. It changed no other architecture figure or product scope. New canonical Markdown SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`; PDF remains `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. The verifier now rejects a missing S6 label. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`; prompt `P-9103b54f-c9bd-45a4-b968-b99ca558b5ef`, run `R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b`.
 - Fresh independent Review Agent `/root/archdoc_review3` accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean committed checkout. It checked all nine PDF figure placements, 64/64 normative lines, numbers, 86 clickable anchors, the immutable PDF, product scope, CTRL-002 Acceptance, and the architecture verifier. PASS evidence is `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-independent-review-c7db459-pass.md`, committed at `0f9286629bfa72a82137fe94bf39472f188f0f6e`; Review Recorder `R-20260927T183119Z-e901f819-1345-4543-b1f7-692698be3b61` finished PASS and validated. The Reviewer did not self-transition the task or merge.
 - Candidate acceptance closure: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-acceptance-closure.md`. Coordinator Recorder `R-20260927T192533Z-a80d944a-f520-48fd-9d7d-8e3a1561ebbe` is prospective-resume for closure, linked to the original task run. Its verifier and review-run validation passed. This run finished PASS and `validate-run` passed (20 events); repository validation then passed. A repository validation attempt while this run was still open correctly returned partial-run exit 1 and remains visible in the event stream.
+- Acceptance closure `566ee352f818f6beb2ca7d991c25eecc07f752e7` was verified from a clean committed checkout, then local clean `main` fast-forwarded to it. Post-merge architecture verifier, PDF/Product scope diff, and CTRL-001 baseline returned PASS. Canonical Markdown effective from that commit at `2026-09-27T19:41:30Z` UTC; no historical evidence was rewritten. Post-merge evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-post-main-merge.md`; stable checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md`.
 
 
 # Handoff
 
-- Base: clean local `main` commit `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`. Candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` and independent PASS closure `0f9286629bfa72a82137fe94bf39472f188f0f6e` are isolated on the migration history. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains untouched and owned by another agent.
+- Base: clean local `main` commit `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`. Candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779`, independent PASS `0f9286629bfa72a82137fe94bf39472f188f0f6e`, and acceptance closure `566ee352f818f6beb2ca7d991c25eecc07f752e7` are on local `main`. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains untouched and owned by another agent.
 - Recorder runs: implementation `R-20260924T065732Z-5b072546-5f38-480d-9ae7-2786a0b77c43` and continuation `R-20260927T122147Z-09acf128-7271-40df-bfa5-a1741633c9cc`.
 - No product architecture conflict; canonical representation change requires the minimal Human-approved ADR under PDF section 2.1.
 
 # Next Action
 
-- Finish and validate the coordinator Recorder, commit candidate acceptance closure on the isolated branch, then verify the clean closure. If local `main` remains clean and an ancestor, fast-forward only. Run post-merge checks before declaring Markdown effective; record the effective commit/time and stable checkpoint, then move this Task to `done`.
+- Commit this task closure and checkpoint on `main`, then run final clean-main CTRL-002 Acceptance, architecture/hash/scope verification and Recorder repository validation. No further migration implementation is pending.

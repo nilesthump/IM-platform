@@ -12,7 +12,7 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-ARCHDOC-001
 
-Current Task State: review
+Current Task State: done
 
 ## Authorized Frozen Architecture Representation Migration
 
@@ -25,7 +25,8 @@ Current Task State: review
 - Fix prompt `P-9548431c-8181-4f5a-9598-1142c6215300`, run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`; recorded semantic extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. The Fix run finished and validated PASS with 14 events; a run-local Git attribute preserved all 19 staged Recorder files byte-for-byte. This is development evidence; fresh independent review remains pending.
 - PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
 - The second fresh reviewer identified a missing seventh `Gate PASS` label in candidate `4770214`'s Figure 15-1; its authored FAIL report is retained verbatim, while its interrupted Recorder run remains unfinished. Fresh Fix Agent `/root/archdoc_fix2` repaired that diagram, its real Markdown hash, and a focused deterministic regression on isolated branch `fix/LOOP1-ARCHDOC-001-gate-label`. Task remains `review` pending a different fresh independent reviewer. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`.
-- Fresh independent Review 3 accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean checkout. Its semantic/diagram review, CTRL-002 Acceptance, hash/scope verifier and Recorder all passed; evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`. Candidate acceptance closure is being committed on isolated branch `accept/LOOP1-ARCHDOC-001`; Markdown authority remains conditional on merge and post-merge verification.
+- Fresh independent Review 3 accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean checkout. Its semantic/diagram review, CTRL-002 Acceptance, hash/scope verifier and Recorder all passed; evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`. The candidate acceptance closure was subsequently committed and merged at `566ee352f818f6beb2ca7d991c25eecc07f752e7`.
+- Candidate acceptance closure `566ee352f818f6beb2ca7d991c25eecc07f752e7` was verified clean and fast-forwarded to clean local `main`. The post-merge architecture verifier, immutable PDF and Product scope diff, and CTRL-001 baseline passed. Markdown is effective canonical authority from that commit at `2026-09-27T19:41:30Z` UTC; the PDF remains immutable historical provenance. Task closure and stable checkpoint are being committed on `main`; S0 Gate remains NOT YET PASSED.
 
 ## Authorized Control-Plane Insertion
 
@@ -175,22 +176,22 @@ Current Task State: review
 
 ## Next Exact Action
 
-Finish the coordinator Recorder and commit candidate acceptance closure. Verify that clean closure, fast-forward clean local `main` only if it remains an ancestor, perform post-merge verification, then record effective commit/time and a stable checkpoint and move this task to `done`. Markdown authority is not effective before post-merge PASS. S0 Gate remains NOT YET PASSED.
+Commit the task `done` transition and stable checkpoint, then run final clean-main CTRL-002 Acceptance, architecture hash/scope verification and Recorder repository validation. The migration task is complete only after those checks pass. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a` (clean local `main` at migration branch point; previous accepted integration PASS closure `09cac596ca527fa80b187c63e5beb8308e946762`).
+`566ee352f818f6beb2ca7d991c25eecc07f752e7` (clean accepted migration closure on local `main`; the final checkpoint commit is pending clean verification).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-24-loop1-min-001-main-accepted.md`
+`spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md`
 
 ## Uncommitted Changes / Ownership
 
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
-- Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The acceptance branch at `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` and its new task-owned closure evidence/Recorder artifacts are owned by the Coordinator until committed. The interrupted second-review worktree remains untouched.
+- Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The Coordinator owns only the task `done` transition, post-merge evidence, checkpoint, current recovery update, and post-merge Recorder artifacts on local `main` until committed. The interrupted second-review worktree remains untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
