@@ -36,6 +36,60 @@ if ($hash -eq $previousHash) { $errors.Add('Markdown and PDF hashes must be sepa
 if ($migration -ne 'representation_only' -or $semantic -ne 'false' -or $taskId -ne 'LOOP1-ARCHDOC-001') { $errors.Add('Representation-only migration metadata mismatch.') }
 Sha $canonical $hash 'Canonical Markdown'
 Sha $previous $previousHash 'Historical PDF'
+function Get-StructuralErrors([string]$doc) {
+    $issues = [System.Collections.Generic.List[string]]::new()
+    $fence = [string]::new([char]96, 3)
+    if ($doc -match '(?m)^## 原 PDF 第 \d+ 页\s*$' -or ([regex]::Matches($doc, '(?m)^' + [regex]::Escape($fence) + 'text\s*$')).Count -ge 20) {
+        $issues.Add('Canonical document is a page-fenced PDF text layout.')
+    }
+    foreach ($chapter in 0..21) {
+        if ($doc -notmatch "(?m)^## $chapter\. \S") { $issues.Add("Missing native Markdown chapter $chapter.") }
+    }
+    foreach ($appendix in @('A','B')) {
+        if ($doc -notmatch "(?m)^## 附录 $appendix\. \S") { $issues.Add("Missing native Markdown appendix $appendix.") }
+    }
+    $links = [regex]::Matches($doc, '(?m)^\s*- \[[^\]]+\]\(#([a-z0-9-]+)\)')
+    $anchors = [regex]::Matches($doc, '(?m)^<a id="([a-z0-9-]+)"></a>$')
+    $linkIds = @($links | ForEach-Object { $_.Groups[1].Value })
+    $anchorIds = @($anchors | ForEach-Object { $_.Groups[1].Value })
+    if ($linkIds.Count -lt 80 -or $linkIds.Count -ne $anchorIds.Count) { $issues.Add('Clickable table of contents is incomplete.') }
+    if (@($linkIds | Sort-Object -Unique).Count -ne $linkIds.Count -or @($anchorIds | Sort-Object -Unique).Count -ne $anchorIds.Count) {
+        $issues.Add('Table-of-contents anchors are not unique.')
+    }
+    foreach ($id in $linkIds) {
+        if ($id -notin $anchorIds) { $issues.Add("TOC target missing: $id") }
+    }
+    $mermaid = [regex]::Matches($doc, '(?ms)^' + [regex]::Escape($fence) + 'mermaid\r?\n(.*?)^' + [regex]::Escape($fence) + '\s*$')
+    if ($mermaid.Count -ne 9) { $issues.Add("Expected nine readable Mermaid figures; found $($mermaid.Count).") }
+    foreach ($figure in @('0-1','3-1','4-1','5-1','6-1','9-1','12-1','14-1','15-1')) {
+        if ($doc -notmatch [regex]::Escape("图 $figure")) { $issues.Add("Missing figure caption $figure.") }
+    }
+    if (([regex]::Matches($doc, '(?m)^\s*NATS --> PG\s*$')).Count -ne 2) {
+        $issues.Add('Repeated deployment figures must retain the original NATS to PostgreSQL arrow.')
+    }
+    if (([regex]::Matches($doc, '(?m)^\| [^|]+ \|')).Count -lt 100) {
+        $issues.Add('Native Markdown architecture tables are incomplete.')
+    }
+    return $issues
+}
+$architecture = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'spec/architecture/frozen-architecture.md')
+foreach ($issue in @(Get-StructuralErrors $architecture)) { $errors.Add($issue) }
+# In-memory controls reject the prior layout, a lost index entry, and missing figures.
+$fence = [string]::new([char]96, 3)
+$oldLayoutMutant = ((1..28 | ForEach-Object { '## 原 PDF 第 ' + $_ + ' 页' + [Environment]::NewLine + $fence + 'text' + [Environment]::NewLine + 'PDF text' + [Environment]::NewLine + $fence }) -join [Environment]::NewLine)
+if (@(Get-StructuralErrors $oldLayoutMutant | Where-Object { $_ -match 'page-fenced' }).Count -eq 0) {
+    $errors.Add('Structural negative control accepted the old page-fenced layout.')
+}
+$missingTocMutant = $architecture -replace '(?m)^\s*- \[0\. 执行摘要\]\(#section-0\).*\r?\n', ''
+if (@(Get-StructuralErrors $missingTocMutant).Count -eq 0) {
+    $errors.Add('Structural negative control accepted a missing clickable TOC entry.')
+}
+$fence = [string]::new([char]96, 3)
+$missingDiagramMutant = $architecture.Replace($fence + 'mermaid', $fence + 'text')
+if (@(Get-StructuralErrors $missingDiagramMutant).Count -eq 0) {
+    $errors.Add('Structural negative control accepted missing Mermaid diagrams.')
+}
+
 $candidates = @(Get-ChildItem -LiteralPath (Join-Path $root 'spec/architecture') -File -Filter '*.md' | Where-Object { $_.Name -notin @('README.md','baseline.md') })
 if ($candidates.Count -ne 1 -or $candidates[0].Name -ne 'frozen-architecture.md') { $errors.Add('Canonical Markdown path is not unique.') }
 $index = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'spec/architecture/README.md')

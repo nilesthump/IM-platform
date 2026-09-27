@@ -5,7 +5,7 @@
 - status: Frozen and architect-approved
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `a41871e6596b79d37973d6747af233b91f098ba072bb648940b56ec5777ac9d8`
+- sha256: `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`

@@ -20,6 +20,9 @@ Current Task State: review
 - Isolated branch `task/LOOP1-ARCHDOC-001` starts at clean local `main` commit `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`; original `H:\IM-platform` and its other-Agent-owned untracked directory remain untouched.
 - Prospective Recorder prompt `P-f0a652e5-89aa-4cad-84f2-578b28973d40`, run `R-20260924T065732Z-5b072546-5f38-480d-9ae7-2786a0b77c43`, group `full_governance`.
 - The 2026-09-27 continuation is linked to prompt `P-a61d816d-9e7f-4e01-8a8c-1a1e80fdd87b`, run `R-20260927T122147Z-09acf128-7271-40df-bfa5-a1741633c9cc`, capture mode `prospective_resume`; the pre-run same-turn Git transport audit is not represented as fully prospective. All 36 initial-run output blobs now match staged bytes after a run-local `-text -eol` transport rule and re-indexing; the prior automatic approval attempt failed because the approval system hit a usage limit, and the same approval path later succeeded.
+- Fresh independent review rejected the first canonical Markdown candidate at `bc42205de19777ca033d14707b48d450a298a021`: it preserved text inside 28 fenced page dumps rather than native Markdown. The FAIL closure `5f117a41bf2f906fcb0f490e0f87352ad19aadb7` and evidence remain permanent.
+- Fresh isolated Fix Agent `/root/archdoc_fix1` repaired the source into 86 clickable TOC entries and anchors, 25 native tables, lists and nine in-place Mermaid diagrams. New Markdown SHA-256 `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`; PDF SHA-256 remains `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. Both NATS → PostgreSQL arrows are retained with ambiguity noted.
+- Fix prompt `P-9548431c-8181-4f5a-9598-1142c6215300`, run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`; recorded semantic extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. The Fix run finished and validated PASS with 14 events; a run-local Git attribute preserved all 19 staged Recorder files byte-for-byte. This is development evidence; fresh independent review remains pending.
 - PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
 
 ## Authorized Control-Plane Insertion
@@ -170,7 +173,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Commit the verified `LOOP1-ARCHDOC-001` candidate with validated Recorder artifacts, then delegate fresh independent clean-checkout Review. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
+Delegate a different fresh independent clean-checkout Reviewer for the committed native-Markdown Fix candidate, including all 28 PDF pages and nine figures. If PASS, satisfy ADR-0001 acceptance and only then prepare accepted merge and post-merge verification. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -185,7 +188,7 @@ Commit the verified `LOOP1-ARCHDOC-001` candidate with validated Recorder artifa
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
-- Current uncommitted migration files and this task's Recorder prompt/run in `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` are owned by `/root` until candidate handoff. The temporary exact-prompt input file is Recorder setup only and must be removed before commit.
+- The original migration worktree `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` is outside this Fix Agent's ownership. The isolated Fix worktree `H:\.codex\worktrees\archdoc-fix-1\IM-platform` and its task-owned Recorder artifacts belong to `/root/archdoc_fix1` until committed review handoff; temporary audit files are removed before commit.
 
 ## Architecture Conflicts / ACP / ADR
 
