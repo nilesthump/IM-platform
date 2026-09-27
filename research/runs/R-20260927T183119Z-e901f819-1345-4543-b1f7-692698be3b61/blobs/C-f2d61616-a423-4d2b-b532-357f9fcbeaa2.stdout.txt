@@ -1,0 +1,101 @@
+PDF body lines >=12 chars: 572; unmatched literal-normalized lines: 148
+p5: 架构基线 v1.0 | Frozen Architecture                                                                              Loop 1 执行版
+p5: Web                           Desktop                     Mobile                   Plugin UI Host
+p5: 临时内存态                           SQLite                     SQLite                声明式 UI + Render Bundle
+p5: TLS Proxy / Gateway                      Core 模块化单体                     Plugin Host
+p5: HTTPS + WSS                           Auth / IM / Sync              WASM Sandbox
+p5: 事实来源 + Outbox                                实时事件总线
+p5: 业务                  账号、搜索、最小好友、唯一私聊、最小群聊、纯文本、 音视频、文件、朋友圈、超级群、陌生人拉群
+p5: 客户端                 Web 临时态；Desktop/Mobile SQLite、离线历史、              Web 本地历史数据库；离线创建需要服务端确认的业
+p5: optimistic write                                 务操作
+p5: 基础设施                PostgreSQL、Core NATS、TLS Proxy、Docker            为“看起来分布式”而预先加入 Redis/Kafka/分库分表
+p5: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                5
+p6: 架构基线 v1.0 | Frozen Architecture                                                                     Loop 1 执行版
+p6: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                       6
+p7: 架构基线 v1.0 | Frozen Architecture                                                                              Loop 1 执行版
+p7: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                7
+p8: 架构基线 v1.0 | Frozen Architecture                                                                                 Loop 1 执行版
+p8: Web                            Desktop                        Mobile                  Plugin UI Host
+p8: 临时内存态                            SQLite                        SQLite               声明式 UI + Render Bundle
+p8: TLS Proxy / Gateway                         Core 模块化单体                     Plugin Host
+p8: HTTPS + WSS                              Auth / IM / Sync              WASM Sandbox
+p8: 事实来源 + Outbox                                    实时事件总线
+p8: gateway               TLS 之后的 WSS 生命周期、auth.bind、session/cache 校            好友/群成员规则、消息持久化、插件业务逻辑
+p8: core                  Auth、Session、User、Friendship、Conversation、            不可信插件执行；大量 socket 连接状态
+p8: plugin-host           WASM runtime、事件分派、Query/Action 代理、资源限                 直接访问数据库/文件/任意网络；成为 IM 主链单点
+p8: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                   8
+p9: 架构基线 v1.0 | Frozen Architecture                                                                                                Loop 1 执行版
+p9: User                                   Session                      Friendship                           Conversation
+p9: 1 : 0..3                                                            pair -> direct
+p9: user_id                                    M : N/ epoch
+p9: client_type                    low_user / high_user                    DIRECT / GROUP
+p9: username / display_name                   ACTIVE / REVOKED                  UNIQUE pair                            seq allocator
+p9: Message                      PluginInstance                         PluginArtifact
+p9: ConversationMember          1:N                                                                    N:1
+p9: request_id / seq                active / desired                      version / hashes
+p9: TEXT / PLUGIN                       status                              immutable
+p9: OutboxEvent                       PluginKV
+p9: aggregate / payload               schema_version
+p9: published_at                 conversation scope
+p9: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                                      9
+p10: 架构基线 v1.0 | Frozen Architecture                                                                                                  Loop 1 执行版
+p10: 发送端                       Gateway               Core                      PostgreSQL                   Outbox/NATS                接收端
+p10: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                                       10
+p11: 架构基线 v1.0 | Frozen Architecture                                                                                    Loop 1 执行版
+p11: Web                 无聊天 DB；Memory only                  不补聊天历史；登录后获取           HTTPS 登录 -> WSS auth.bind -> 仅展示
+p11: 当前好友/会话状态              本会话实时数据
+p11: Desktop             按账号独立 SQLite + OS secure            支持                     先读 SQLite 立即渲染，再后台同步
+p11: Mobile              按账号独立 SQLite + OS secure            支持                     先读 SQLite 立即渲染，再后台同步
+p11: 启动                                 连接                          用户状态同步                         消息缺口同步
+p11: 读取 SQLite 并渲染                        HTTPS + WSS                   user_sync_cursor               conversation seq
+p11: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                      11
+p12: 架构基线 v1.0 | Frozen Architecture                                                                  Loop 1 执行版
+p12: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                   12
+p13: 架构基线 v1.0 | Frozen Architecture                                                                  Loop 1 执行版
+p13: Events               message.created、member.joined、plugin        仅订阅 manifest 声明且已授权的事件
+p13: UI Host              Page/Modal/Panel/Menu/Form/Toolbar/Messag   完整 UI 扩展能力不等于宿主 OS 权限
+p13: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                   13
+p14: 架构基线 v1.0 | Frozen Architecture                                                                                  Loop 1 执行版
+p14: UPLOADED                  VALIDATING             VERIFIED                INSTALLING        ENABLED
+p14: PURGED               RETAINED               UNINSTALLED        DISABLED
+p14: VALIDATION / INSTALL / RUNTIME / ROLLBACK_FAILED                  旧版保持 ENABLED -> 快照/迁移/健康检查 -> 原子切换；失败回滚
+p14: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                   14
+p15: 架构基线 v1.0 | Frozen Architecture                                                   Loop 1 执行版
+p15: 面向十万级在线连接的可扩展分布式即时通信平台                                                                    15
+p16: 架构基线 v1.0 | Frozen Architecture                                                                                Loop 1 执行版
+p16: HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、                    框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部
+p16: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                 16
+p17: 架构基线 v1.0 | Frozen Architecture                                                                               Loop 1 执行版
+p17: 读取上下文              恢复仓库状态                 PLAN           IMPLEMENT        TEST                 REVIEW   HANDOFF
+p17: 仅在 task.allowed_paths 内修改               current.md + checkpoint + tests
+p17: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                 17
+p18: 架构基线 v1.0 | Frozen Architecture                                                                  Loop 1 执行版
+p18: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                   18
+p19: 架构基线 v1.0 | Frozen Architecture                                                                                                             Loop 1 执行版
+p19: Diff 分类                           backend/go/**                        backend/java/**                         contracts/** / DB
+p19: Go CI                                Java CI                             全平台兼容矩阵
+p19: unit + integration                    unit + integration                      Go + Java + clients
+p19: contract                              contract                           plugin + migration
+p19: 可重复制品                                                                  Release Gate
+p19: 镜像 / 客户端                                                             manifest + rollback
+p19: contracts/**、数据库迁移、shared                       Go + Java + Web + Desktop + Mobile + old client fixtures + plugin fixtures + migration compatibility
+p19: 面向十万级在线连接的可扩展分布式即时通信平台                                                                                                                                  19
+p20: 架构基线 v1.0 | Frozen Architecture                                                                                              Loop 1 执行版
+p20: S0                   S1                 S2                     S3                S4              S5                  S6
+p20: 控制面                 Go 纵切              客户端同步                 Java 等价            插件平台             工程硬化                5k RC
+p20: W1                  W2-3               W4-5                   W6-7              W8-9             W10               W11-12
+p20: Gate PASS            Gate PASS           Gate PASS           Gate PASS           Gate PASS        Gate PASS          Gate PASS
+p20: S0 控制面           W1              Monorepo、spec/contracts/tasks/progress、CI       新 Agent 仅靠控制面可定位项目、状态、下一任
+p20: skeleton、Compose、PostgreSQL/NATS/TLS；           务；契约 lint 与 skeleton CI PASS
+p20: S1 Go 纵向链        W2-3            注册/登录、WSS、搜索、好友、唯一私聊、文                          A 搜索/添加 B 后发 hello，B 实时收到；
+p20: 路                                本发送、ACK、持久化、Outbox、NATS                         contract/integration PASS
+p20: S2 客户端与          W4-5            Desktop/Mobile SQLite、optimistic write、retry、   ACK 丢失重试不重复；离线 101..500 完整恢复；
+p20: Sync                             双层 cursor、离线恢复；Web 最简实时态                        FAILED 可被 Sync 收敛为 SENT
+p20: S3 Java 等价       W6-7            Auth/Session/User/Friend/Conversation/Message   两 profile 同一 Golden Tests PASS；客户端零改动
+p20: /Sync/Outbox/NATS                               切换
+p20: S4 插件平台          W8-9            Registry、Manifest、Permission、WASM、UI            两个 fixture 在三端与双后端兼容；sandbox/权限
+p20: Host、Render Bundle、生命周期、Echo/Poll               负例 PASS
+p20: S5 工程硬化          W10             path-aware CI、compatibility matrix、             Compatibility CI 可复现；无硬编码跳过；回滚演
+p20: migration/plugin tests、Release Manifest、        练 PASS
+p20: S6 性能与 RC        W11-12          500/1000/2500/5000 阶梯压测、profile、修复、             单机 5k authenticated WSS Gate PASS；正确性零
+p20: soak、RC、architecture snapshot                   红线违例；RC 可回滚
