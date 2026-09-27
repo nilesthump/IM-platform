@@ -827,17 +827,17 @@ Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从
 
 ```mermaid
 flowchart LR
-  S0["S0<br/>控制面<br/>W1"] -->|"Gate PASS"| S1["S1<br/>Go 纵切<br/>W2-3"]
-  S1 -->|"Gate PASS"| S2["S2<br/>客户端同步<br/>W4-5"]
-  S2 -->|"Gate PASS"| S3["S3<br/>Java 等价<br/>W6-7"]
-  S3 -->|"Gate PASS"| S4["S4<br/>插件平台<br/>W8-9"]
-  S4 -->|"Gate PASS"| S5["S5<br/>工程硬化<br/>W10"]
-  S5 -->|"Gate PASS"| S6["S6<br/>5k RC<br/>W11-12"]
+  S0["S0<br/>控制面<br/>W1<br/>Gate PASS"] --> S1["S1<br/>Go 纵切<br/>W2-3<br/>Gate PASS"]
+  S1 --> S2["S2<br/>客户端同步<br/>W4-5<br/>Gate PASS"]
+  S2 --> S3["S3<br/>Java 等价<br/>W6-7<br/>Gate PASS"]
+  S3 --> S4["S4<br/>插件平台<br/>W8-9<br/>Gate PASS"]
+  S4 --> S5["S5<br/>工程硬化<br/>W10<br/>Gate PASS"]
+  S5 --> S6["S6<br/>5k RC<br/>W11-12<br/>Gate PASS"]
 ```
 
 > 提前通过即立即进入下一阶段；任何必需项失败则留在当前阶段修复。周数仅是预算窗口。
 >
-> 图 15-1 依赖图而非固定甘特图。周数表示预算窗口；Gate 决定实际前进时间。原图在 S0 至 S6 七个阶段下方均标有 Gate PASS；连线上的标签表示逐阶段通过，末阶段的 Gate PASS 仍须单独判定。
+> 图 15-1 依赖图而非固定甘特图。周数表示预算窗口；Gate 决定实际前进时间。原图在 S0 至 S6 七个阶段下方均标有 Gate PASS；此处分别置于对应阶段节点的末行，阶段间箭头仍只表示原图的前进方向。
 
 #### Execution Policy
 

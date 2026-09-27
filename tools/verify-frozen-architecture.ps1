@@ -61,6 +61,19 @@ function Get-StructuralErrors([string]$doc) {
     }
     $mermaid = [regex]::Matches($doc, '(?ms)^' + [regex]::Escape($fence) + 'mermaid\r?\n(.*?)^' + [regex]::Escape($fence) + '\s*$')
     if ($mermaid.Count -ne 9) { $issues.Add("Expected nine readable Mermaid figures; found $($mermaid.Count).") }
+    $stageFigure = [regex]::Match($doc, '(?ms)^## 15\..*?^' + [regex]::Escape($fence) + 'mermaid\r?\n(.*?)^' + [regex]::Escape($fence))
+    if (-not $stageFigure.Success) { $issues.Add('Missing Loop 1 stage figure 15-1.') }
+    else {
+        $stageGraph = $stageFigure.Groups[1].Value
+        if (([regex]::Matches($stageGraph, 'Gate PASS')).Count -ne 7 -or ([regex]::Matches($stageGraph, '-->')).Count -ne 6) {
+            $issues.Add('Figure 15-1 must retain seven stage Gate PASS labels and six progression arrows.')
+        }
+        foreach ($stage in 0..6) {
+            if ($stageGraph -notmatch ('S' + $stage + '\["[^"\r\n]*<br/>Gate PASS"\]')) {
+                $issues.Add("Figure 15-1 is missing the Gate PASS label for S$stage.")
+            }
+        }
+    }
     foreach ($figure in @('0-1','3-1','4-1','5-1','6-1','9-1','12-1','14-1','15-1')) {
         if ($doc -notmatch [regex]::Escape("图 $figure")) { $issues.Add("Missing figure caption $figure.") }
     }
@@ -88,6 +101,10 @@ $fence = [string]::new([char]96, 3)
 $missingDiagramMutant = $architecture.Replace($fence + 'mermaid', $fence + 'text')
 if (@(Get-StructuralErrors $missingDiagramMutant).Count -eq 0) {
     $errors.Add('Structural negative control accepted missing Mermaid diagrams.')
+}
+$missingFinalGateMutant = $architecture.Replace('W11-12<br/>Gate PASS', 'W11-12')
+if (@(Get-StructuralErrors $missingFinalGateMutant | Where-Object { $_ -match 'Figure 15-1' }).Count -eq 0) {
+    $errors.Add('Structural negative control accepted missing S6 Gate PASS in Figure 15-1.')
 }
 
 $candidates = @(Get-ChildItem -LiteralPath (Join-Path $root 'spec/architecture') -File -Filter '*.md' | Where-Object { $_.Name -notin @('README.md','baseline.md') })

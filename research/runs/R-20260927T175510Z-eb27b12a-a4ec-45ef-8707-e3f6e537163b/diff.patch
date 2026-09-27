@@ -1,0 +1,210 @@
+diff --git a/spec/architecture/baseline.md b/spec/architecture/baseline.md
+index 3236b76..9387e57 100644
+--- a/spec/architecture/baseline.md
++++ b/spec/architecture/baseline.md
+@@ -5,7 +5,7 @@
+ - status: Frozen and architect-approved
+ - canonical_format: `markdown`
+ - repository_path: `spec/architecture/frozen-architecture.md`
+-- sha256: `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`
++- sha256: `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`
+ - previous_canonical_format: `pdf`
+ - previous_repository_path: `scalable-distributed-im-architecture.pdf`
+ - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
+diff --git a/spec/architecture/frozen-architecture.md b/spec/architecture/frozen-architecture.md
+index b82d986..1f5f909 100644
+--- a/spec/architecture/frozen-architecture.md
++++ b/spec/architecture/frozen-architecture.md
+@@ -827,17 +827,17 @@ Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从
+ 
+ ```mermaid
+ flowchart LR
+-  S0["S0<br/>控制面<br/>W1"] -->|"Gate PASS"| S1["S1<br/>Go 纵切<br/>W2-3"]
+-  S1 -->|"Gate PASS"| S2["S2<br/>客户端同步<br/>W4-5"]
+-  S2 -->|"Gate PASS"| S3["S3<br/>Java 等价<br/>W6-7"]
+-  S3 -->|"Gate PASS"| S4["S4<br/>插件平台<br/>W8-9"]
+-  S4 -->|"Gate PASS"| S5["S5<br/>工程硬化<br/>W10"]
+-  S5 -->|"Gate PASS"| S6["S6<br/>5k RC<br/>W11-12"]
++  S0["S0<br/>控制面<br/>W1<br/>Gate PASS"] --> S1["S1<br/>Go 纵切<br/>W2-3<br/>Gate PASS"]
++  S1 --> S2["S2<br/>客户端同步<br/>W4-5<br/>Gate PASS"]
++  S2 --> S3["S3<br/>Java 等价<br/>W6-7<br/>Gate PASS"]
++  S3 --> S4["S4<br/>插件平台<br/>W8-9<br/>Gate PASS"]
++  S4 --> S5["S5<br/>工程硬化<br/>W10<br/>Gate PASS"]
++  S5 --> S6["S6<br/>5k RC<br/>W11-12<br/>Gate PASS"]
+ ```
+ 
+ > 提前通过即立即进入下一阶段；任何必需项失败则留在当前阶段修复。周数仅是预算窗口。
+ >
+-> 图 15-1 依赖图而非固定甘特图。周数表示预算窗口；Gate 决定实际前进时间。原图在 S0 至 S6 七个阶段下方均标有 Gate PASS；连线上的标签表示逐阶段通过，末阶段的 Gate PASS 仍须单独判定。
++> 图 15-1 依赖图而非固定甘特图。周数表示预算窗口；Gate 决定实际前进时间。原图在 S0 至 S6 七个阶段下方均标有 Gate PASS；此处分别置于对应阶段节点的末行，阶段间箭头仍只表示原图的前进方向。
+ 
+ #### Execution Policy
+ 
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index fde815d..e36d4f8 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -24,6 +24,7 @@ Current Task State: review
+ - Fresh isolated Fix Agent `/root/archdoc_fix1` repaired the source into 86 clickable TOC entries and anchors, 25 native tables, lists and nine in-place Mermaid diagrams. New Markdown SHA-256 `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`; PDF SHA-256 remains `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. Both NATS → PostgreSQL arrows are retained with ambiguity noted.
+ - Fix prompt `P-9548431c-8181-4f5a-9598-1142c6215300`, run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`; recorded semantic extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. The Fix run finished and validated PASS with 14 events; a run-local Git attribute preserved all 19 staged Recorder files byte-for-byte. This is development evidence; fresh independent review remains pending.
+ - PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
++- The second fresh reviewer identified a missing seventh `Gate PASS` label in candidate `4770214`'s Figure 15-1; its authored FAIL report is retained verbatim, while its interrupted Recorder run remains unfinished. Fresh Fix Agent `/root/archdoc_fix2` repaired that diagram, its real Markdown hash, and a focused deterministic regression on isolated branch `fix/LOOP1-ARCHDOC-001-gate-label`. Task remains `review` pending a different fresh independent reviewer. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`.
+ 
+ ## Authorized Control-Plane Insertion
+ 
+@@ -173,7 +174,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Delegate a different fresh independent clean-checkout Reviewer for the committed native-Markdown Fix candidate, including all 28 PDF pages and nine figures. If PASS, satisfy ADR-0001 acceptance and only then prepare accepted merge and post-merge verification. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
++Commit the focused Figure 15-1 fix with validated Recorder artifacts, then delegate a different fresh independent clean-checkout Reviewer. If PASS, satisfy ADR-0001 acceptance and only then prepare accepted merge and post-merge verification. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -189,6 +190,7 @@ Delegate a different fresh independent clean-checkout Reviewer for the committed
+ - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
+ - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
+ - The original migration worktree `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` is outside this Fix Agent's ownership. The isolated Fix worktree `H:\.codex\worktrees\archdoc-fix-1\IM-platform` and its task-owned Recorder artifacts belong to `/root/archdoc_fix1` until committed review handoff; temporary audit files are removed before commit.
++- The Figure 15-1 fix worktree `H:\.codex\worktrees\archdoc-fix-2\IM-platform` and task-owned Recorder artifacts belong to `/root/archdoc_fix2` until clean committed handoff. The interrupted second-review worktree remains untouched.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md b/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md
+new file mode 100644
+index 0000000..400bcfa
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md
+@@ -0,0 +1,18 @@
++# LOOP1-ARCHDOC-001 Figure 15-1 fix development evidence
++
++- Fresh Fix Agent: `/root/archdoc_fix2`; isolated managed worktree and branch `fix/LOOP1-ARCHDOC-001-gate-label`, based on exact candidate `4770214e36844334048c357508d626326944b452`. This is development evidence, not independent acceptance.
++- The immutable PDF page 20 shows S0–S6 boxes, six unlabelled left-to-right progression arrows, and a distinct `Gate PASS` label below every stage. The repaired Mermaid retains the seven stages and six arrows, places `Gate PASS` on each corresponding stage node's final line, and adds no terminal arrow or new stage. The clickable TOC and the other eight Mermaid figures are unchanged.
++- PDF SHA-256 before and after: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. Repaired Markdown SHA-256, separately computed: `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`. The baseline manifest records both values in distinct active and historical fields.
++- The prior independent reviewer's authored FAIL report was copied byte-for-byte from its interrupted worktree; source and copied SHA-256 are both `50bff40e2c3d98d6c09c7864017bef60b2eed8b286d47444d15004c049f82e2c`. That review Recorder is unfinished and is not presented as validated acceptance evidence. The earlier independent FAIL history is unchanged.
++- Prospective Fix Recorder prompt: `P-9103b54f-c9bd-45a4-b968-b99ca558b5ef`; run: `R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b`; experiment group `full_governance`. The prompt captures the latest exact Human steering and links to the original migration prompt already registered by the coordinator. One quoted shell edit failed before touching files; the final narrow patch and subsequent verifier results are visible in the run and Git diff.
++
++## Development verification
++
++| Exact command or check | Result |
++| --- | --- |
++| `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1 -BaseCommit abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`, through Recorder | PASS, exit 0 after repair; real PDF and Markdown hashes, one active canonical path, governance, product diff, and focused S6-label negative control. |
++| Bundled Python `spec/progress/evidence/LOOP1-ARCHDOC-001/semantic-audit.py`, through Recorder | PASS, exit 0; PDF extraction 28/28; 86 clickable targets, nine figures, key normative and numeric tokens; actual hashes printed. |
++| `pwsh -NoProfile -File tools/verify-loop1-ctrl-001.ps1`, through Recorder | PASS, exit 0; architecture routing and repository baseline. |
++| `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`, through Recorder | PASS, exit 0; expressly non-acceptance mode. |
++
++Remaining: finish and validate this Fix Recorder run, commit the narrow candidate cleanly, and obtain a different fresh independent clean-checkout semantic review with Acceptance-mode verification. No self-acceptance is claimed.
+diff --git a/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-independent-review-4770214-fail.md b/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-independent-review-4770214-fail.md
+new file mode 100644
+index 0000000..3bda33f
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-independent-review-4770214-fail.md
+@@ -0,0 +1,26 @@
++# LOOP1-ARCHDOC-001 independent review: FAIL
++
++- Reviewer: `/root/archdoc_review2`, fresh context, independent of implementation `/root/archdoc_fix1` and prior reviewer.
++- Reviewed commit: `4770214e36844334048c357508d626326944b452` (`fix/LOOP1-ARCHDOC-001-native-markdown`). Review evidence branch: `review/LOOP1-ARCHDOC-001-fail-2`.
++- Base/diff: accepted local `main` `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a..4770214e36844334048c357508d626326944b452`; repair range `5f117a41bf2f906fcb0f490e0f87352ad19aadb7..4770214e36844334048c357508d626326944b452`.
++- Clean method: managed fresh detached checkout `H:\.codex\worktrees\archdoc-clean-acceptance-2\IM-platform` at exact reviewed SHA. `git status --porcelain=v1` was empty before and after Acceptance. The review Recorder/evidence lived in a separate checkout. No candidate code was modified.
++- Review Recorder: `R-20260927T165345Z-7f097083-6629-4c5b-9bee-8b844070b6c4`, prompt `P-a414172f-74f0-4715-8a4c-ded75496e225`.
++
++## Blocking finding
++
++The immutable PDF page 20, Fig 15-1, places **seven** visible `Gate PASS` labels under stages S0, S1, S2, S3, S4, S5 and S6. The canonical Markdown Mermaid figure at `spec/architecture/frozen-architecture.md:829-835` uses `Gate PASS` only as labels on its **six** S0→S1 through S5→S6 edges. There is no label for the final S6 Gate PASS. The user's explicit figure-label preservation requirement and Task acceptance for semantic faithfulness therefore fail. The surrounding S6 acceptance prose does not restore the missing figure label. Preserve the seven stage labels in a readable figure without changing the architecture's Gate meaning, then obtain a new independent review.
++
++## Checks and scope
++
++| Exact command, invoked through `tools/research/recorder.py run-command` | Exit | Elapsed | Result |
++| --- | ---: | ---: | --- |
++| `pwsh -NoProfile -File H:\.codex\worktrees\archdoc-clean-acceptance-2\IM-platform\tools\verify-loop1-ctrl-002.ps1 -Mode Acceptance` | 0 | 1132.603 ms | Local Acceptance verifier PASS on clean candidate; does not override semantic FAIL. |
++| `pwsh -NoProfile -File H:\.codex\worktrees\archdoc-clean-acceptance-2\IM-platform\tools\verify-frozen-architecture.ps1 -BaseCommit abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a` | 0 | 783.1188 ms | Both actual hashes, authority metadata, scope and built-in structural negatives PASS. |
++| `pwsh -NoProfile -File H:\.codex\worktrees\archdoc-clean-acceptance-2\IM-platform\tools\verify-loop1-ctrl-001.ps1` | 0 | 796.4635 ms | Baseline PASS. |
++| `pdftoppm -f 1 -l 28 -r 110 -png H:\.codex\worktrees\archdoc-clean-acceptance-2\IM-platform\scalable-distributed-im-architecture.pdf spec/progress/evidence/LOOP1-ARCHDOC-001/_review2_tmp/page` | 0 | 2976.9022 ms | All 28 pages rendered for visual inspection; temporary images removed. |
++
++- PDF SHA-256 is `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`; Markdown actual SHA-256 is `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`. Manifest separates active Markdown hash from historical PDF provenance; ADR-0002 limits migration to representation and defers effectiveness until accepted merge/post-merge PASS.
++- The 86 TOC links resolve to 86 unique explicit anchors immediately before Markdown headings. Nine Mermaid blocks and two `NATS --> PG` edges are present. The verifier rejects its in-memory old fenced layout, missing TOC entry and missing-diagram controls. The prior FAIL evidence file is unchanged.
++- Visual comparison covered PDF pages 1–28, including nine figure locations (pages 5, 8, 9, 10, 11, 14, 17, 19, 20). The page text comparison was a heuristic audit because PDF line wrapping and table layout differ from native Markdown; no other definite normative/numeric change was established before this blocking finding. Mermaid rendering was unavailable in this checkout, so a fresh reviewer should verify final figure rendering after repair.
++- Diff from accepted base has no changes in `contracts/`, backend, clients, plugins, `spec/domain/`, `spec/invariants/`, `spec/acceptance/`, or the PDF; prior historical evidence remains unchanged. No product code or public contract change was observed.
++- Result: **FAIL**. Current task remains `review`; S0 Gate remains NOT YET PASSED. This clean-checkout verifier PASS is local evidence only and cannot accept the candidate.
+diff --git a/spec/tasks/review/LOOP1-ARCHDOC-001.md b/spec/tasks/review/LOOP1-ARCHDOC-001.md
+index 4fc00c7..05873b1 100644
+--- a/spec/tasks/review/LOOP1-ARCHDOC-001.md
++++ b/spec/tasks/review/LOOP1-ARCHDOC-001.md
+@@ -79,6 +79,8 @@ Migrate the immutable Frozen Architecture PDF to one repository-native Markdown
+ - The independent reviewer rejected candidate `bc42205de19777ca033d14707b48d450a298a021` because the 28 fenced PDF pages were not native Markdown. Permanent FAIL evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-independent-review-bc42205-fail.md`; closure commit `5f117a41bf2f906fcb0f490e0f87352ad19aadb7`.
+ - Fresh Fix Agent `/root/archdoc_fix1` repaired the canonical document into 86 native chapter/section/appendix anchors with clickable TOC, 25 tables, lists and nine Mermaid figures. PDF arrows, labels and standalone figure boxes were visually audited; both NATS → PostgreSQL arrows and their ambiguity are retained. New Markdown SHA-256 `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`; the PDF provenance hash is unchanged.
+ - Deterministic verifier now rejects a synthetic 28-page fenced layout, a lost clickable index entry and missing diagrams. Recorder-wrapped 28/28 exact PDF text extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development all PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. Prompt `P-9548431c-8181-4f5a-9598-1142c6215300`; run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`. The Fix run finished and validated PASS with 14 events; a run-local byte-preservation attribute resolved four Git-normalized stdout blob mismatches, and all 19 staged Recorder files now match working bytes. These are development results only.
++- The second fresh reviewer found that Figure 15-1 placed only six `Gate PASS` labels on stage arrows while the PDF has seven labels below S0–S6. Its authored FAIL evidence was copied verbatim as `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-independent-review-4770214-fail.md` (SHA-256 `50bff40e2c3d98d6c09c7864017bef60b2eed8b286d47444d15004c049f82e2c`); that interrupted review's Recorder remains unfinished and is not claimed as valid acceptance evidence.
++- Fresh Fix Agent `/root/archdoc_fix2` placed one `Gate PASS` label in each of the seven stage nodes in Figure 15-1 and restored the six unlabelled progression arrows shown by the PDF. It changed no other architecture figure or product scope. New canonical Markdown SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`; PDF remains `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. The verifier now rejects a missing S6 label. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`; prompt `P-9103b54f-c9bd-45a4-b968-b99ca558b5ef`, run `R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b`.
+ 
+ 
+ # Handoff
+@@ -89,4 +91,4 @@ Migrate the immutable Frozen Architecture PDF to one repository-native Markdown
+ 
+ # Next Action
+ 
+-- Different fresh independent Review Agent: review the committed Fix candidate from a clean isolated checkout, compare all 28 PDF pages including diagram arrows/labels, task tables, normative strength, hashes and scope; run deterministic and Acceptance-mode verification, and issue PASS/FAIL evidence without Fix Agent self-acceptance.
++- Different fresh independent Review Agent: review the committed Figure 15-1 repair from a clean isolated checkout, compare the PDF's seven stage Gate labels and all architecture semantics, run deterministic and Acceptance-mode verification, and issue new PASS/FAIL evidence without Fix Agent self-acceptance.
+diff --git a/tools/verify-frozen-architecture.ps1 b/tools/verify-frozen-architecture.ps1
+index 9fd0655..7a122b1 100644
+--- a/tools/verify-frozen-architecture.ps1
++++ b/tools/verify-frozen-architecture.ps1
+@@ -61,6 +61,19 @@ function Get-StructuralErrors([string]$doc) {
+     }
+     $mermaid = [regex]::Matches($doc, '(?ms)^' + [regex]::Escape($fence) + 'mermaid\r?\n(.*?)^' + [regex]::Escape($fence) + '\s*$')
+     if ($mermaid.Count -ne 9) { $issues.Add("Expected nine readable Mermaid figures; found $($mermaid.Count).") }
++    $stageFigure = [regex]::Match($doc, '(?ms)^## 15\..*?^' + [regex]::Escape($fence) + 'mermaid\r?\n(.*?)^' + [regex]::Escape($fence))
++    if (-not $stageFigure.Success) { $issues.Add('Missing Loop 1 stage figure 15-1.') }
++    else {
++        $stageGraph = $stageFigure.Groups[1].Value
++        if (([regex]::Matches($stageGraph, 'Gate PASS')).Count -ne 7 -or ([regex]::Matches($stageGraph, '-->')).Count -ne 6) {
++            $issues.Add('Figure 15-1 must retain seven stage Gate PASS labels and six progression arrows.')
++        }
++        foreach ($stage in 0..6) {
++            if ($stageGraph -notmatch ('S' + $stage + '\["[^"\r\n]*<br/>Gate PASS"\]')) {
++                $issues.Add("Figure 15-1 is missing the Gate PASS label for S$stage.")
++            }
++        }
++    }
+     foreach ($figure in @('0-1','3-1','4-1','5-1','6-1','9-1','12-1','14-1','15-1')) {
+         if ($doc -notmatch [regex]::Escape("图 $figure")) { $issues.Add("Missing figure caption $figure.") }
+     }
+@@ -89,6 +102,10 @@ $missingDiagramMutant = $architecture.Replace($fence + 'mermaid', $fence + 'text
+ if (@(Get-StructuralErrors $missingDiagramMutant).Count -eq 0) {
+     $errors.Add('Structural negative control accepted missing Mermaid diagrams.')
+ }
++$missingFinalGateMutant = $architecture.Replace('W11-12<br/>Gate PASS', 'W11-12')
++if (@(Get-StructuralErrors $missingFinalGateMutant | Where-Object { $_ -match 'Figure 15-1' }).Count -eq 0) {
++    $errors.Add('Structural negative control accepted missing S6 Gate PASS in Figure 15-1.')
++}
+ 
+ $candidates = @(Get-ChildItem -LiteralPath (Join-Path $root 'spec/architecture') -File -Filter '*.md' | Where-Object { $_.Name -notin @('README.md','baseline.md') })
+ if ($candidates.Count -ne 1 -or $candidates[0].Name -ne 'frozen-architecture.md') { $errors.Add('Canonical Markdown path is not unique.') }
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-9103b54f-c9bd-45a4-b968-b99ca558b5ef/metadata.json
+# ?? research/prompts/P-9103b54f-c9bd-45a4-b968-b99ca558b5ef/prompt.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-0272935d-18a0-42ed-996e-3d70f1f810ec.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-0272935d-18a0-42ed-996e-3d70f1f810ec.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-041db5c7-a924-45d1-ace0-5e39e93110cc.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-041db5c7-a924-45d1-ace0-5e39e93110cc.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-04a37547-8784-435c-b22c-c83610e297ae.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-04a37547-8784-435c-b22c-c83610e297ae.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-2a2fe2cf-e8d7-4ae5-9413-4ce2d6c4af53.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-2a2fe2cf-e8d7-4ae5-9413-4ce2d6c4af53.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-37d83002-6983-459d-8870-a0c0860a0246.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-37d83002-6983-459d-8870-a0c0860a0246.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-7384f1d2-00cf-4b25-9b11-3a2863347fb6.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-7384f1d2-00cf-4b25-9b11-3a2863347fb6.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-ab6dda4b-3a0f-46e5-be3b-32a3fda6ab2e.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-ab6dda4b-3a0f-46e5-be3b-32a3fda6ab2e.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-e26ac443-480c-482f-8902-3184566270c5.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-e26ac443-480c-482f-8902-3184566270c5.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-e8a22075-5727-4a26-902d-69f17560230f.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-e8a22075-5727-4a26-902d-69f17560230f.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-ed1ed647-f6cb-488a-8c43-83524aa2d0d7.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-ed1ed647-f6cb-488a-8c43-83524aa2d0d7.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-ff55edc3-e964-41dc-a138-2bd61f9c2ec4.stderr.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/blobs/C-ff55edc3-e964-41dc-a138-2bd61f9c2ec4.stdout.txt
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/events.jsonl
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/initial_state.json
+# ?? research/runs/R-20260927T175510Z-eb27b12a-a4ec-45ef-8707-e3f6e537163b/metadata.json

@@ -24,6 +24,7 @@ Current Task State: review
 - Fresh isolated Fix Agent `/root/archdoc_fix1` repaired the source into 86 clickable TOC entries and anchors, 25 native tables, lists and nine in-place Mermaid diagrams. New Markdown SHA-256 `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`; PDF SHA-256 remains `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. Both NATS → PostgreSQL arrows are retained with ambiguity noted.
 - Fix prompt `P-9548431c-8181-4f5a-9598-1142c6215300`, run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`; recorded semantic extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. The Fix run finished and validated PASS with 14 events; a run-local Git attribute preserved all 19 staged Recorder files byte-for-byte. This is development evidence; fresh independent review remains pending.
 - PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
+- The second fresh reviewer identified a missing seventh `Gate PASS` label in candidate `4770214`'s Figure 15-1; its authored FAIL report is retained verbatim, while its interrupted Recorder run remains unfinished. Fresh Fix Agent `/root/archdoc_fix2` repaired that diagram, its real Markdown hash, and a focused deterministic regression on isolated branch `fix/LOOP1-ARCHDOC-001-gate-label`. Task remains `review` pending a different fresh independent reviewer. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`.
 
 ## Authorized Control-Plane Insertion
 
@@ -173,7 +174,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate a different fresh independent clean-checkout Reviewer for the committed native-Markdown Fix candidate, including all 28 PDF pages and nine figures. If PASS, satisfy ADR-0001 acceptance and only then prepare accepted merge and post-merge verification. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
+Delegate a different fresh independent clean-checkout Reviewer for the committed Figure 15-1 fix. If PASS, satisfy ADR-0001 acceptance and only then prepare accepted merge and post-merge verification. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -189,6 +190,7 @@ Delegate a different fresh independent clean-checkout Reviewer for the committed
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
 - The original migration worktree `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` is outside this Fix Agent's ownership. The isolated Fix worktree `H:\.codex\worktrees\archdoc-fix-1\IM-platform` and its task-owned Recorder artifacts belong to `/root/archdoc_fix1` until committed review handoff; temporary audit files are removed before commit.
+- The Figure 15-1 fix worktree `H:\.codex\worktrees\archdoc-fix-2\IM-platform` and task-owned Recorder artifacts belong to `/root/archdoc_fix2` until clean committed handoff. The interrupted second-review worktree remains untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
