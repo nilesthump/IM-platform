@@ -10,9 +10,17 @@ Gate Status: NOT YET PASSED
 
 Current Batch: LOOP1-S0
 
-Current Task: LOOP1-MIN-001
+Current Task: LOOP1-ARCHDOC-001
 
-Current Task State: done
+Current Task State: review
+
+## Authorized Frozen Architecture Representation Migration
+
+- Human Architect explicitly authorized `LOOP1-ARCHDOC-001`, a governance-only canonical-source migration from the immutable PDF to Markdown. The source PDF SHA-256 before candidate work is `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
+- Isolated branch `task/LOOP1-ARCHDOC-001` starts at clean local `main` commit `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`; original `H:\IM-platform` and its other-Agent-owned untracked directory remain untouched.
+- Prospective Recorder prompt `P-f0a652e5-89aa-4cad-84f2-578b28973d40`, run `R-20260924T065732Z-5b072546-5f38-480d-9ae7-2786a0b77c43`, group `full_governance`.
+- The 2026-09-27 continuation is linked to prompt `P-a61d816d-9e7f-4e01-8a8c-1a1e80fdd87b`, run `R-20260927T122147Z-09acf128-7271-40df-bfa5-a1741633c9cc`, capture mode `prospective_resume`; the pre-run same-turn Git transport audit is not represented as fully prospective. All 36 initial-run output blobs now match staged bytes after a run-local `-text -eol` transport rule and re-indexing; the prior automatic approval attempt failed because the approval system hit a usage limit, and the same approval path later succeeded.
+- PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
 
 ## Authorized Control-Plane Insertion
 
@@ -162,11 +170,11 @@ Current Task State: done
 
 ## Next Exact Action
 
-`LOOP1-MIN-001` is accepted and merged locally. In a new authorized task context, select the next dependency-satisfied S0 task; do not start new product work as part of this merge closure. S0 Gate remains NOT YET PASSED.
+Commit the verified `LOOP1-ARCHDOC-001` candidate with validated Recorder artifacts, then delegate fresh independent clean-checkout Review. The Markdown authority is not effective before accepted merge and post-merge PASS. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`09cac596ca527fa80b187c63e5beb8308e946762` (clean local-main independent integration PASS closure); it contains accepted Contract closure `2a3812e0b4a23157ecd6fe341f0011ca96390229` and requested Minimality task lineage.
+`abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a` (clean local `main` at migration branch point; previous accepted integration PASS closure `09cac596ca527fa80b187c63e5beb8308e946762`).
 
 ## Latest Checkpoint
 
@@ -177,7 +185,8 @@ Current Task State: done
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
+- Current uncommitted migration files and this task's Recorder prompt/run in `H:\.codex\worktrees\loop1-archdoc-001\IM-platform` are owned by `/root` until candidate handoff. The temporary exact-prompt input file is Recorder setup only and must be removed before commit.
 
 ## Architecture Conflicts / ACP / ADR
 
-- None. Recorder is a non-product research/governance control plane and does not alter Frozen Product Architecture. ADR-0001 remains the approved temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.
+- ADR-0002 records Human-approved representation-only canonical-source migration; no Product Architecture semantic change is authorized. ADR-0001 remains the temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.

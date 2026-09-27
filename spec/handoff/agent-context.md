@@ -10,7 +10,7 @@ This repository implements **Scalable Distributed Instant Messaging Platform for
 - Frozen Architecture and approved ADRs MUST NOT be silently changed by implementation agents. Conflicts are recorded as `BLOCKED_BY_ARCHITECTURE` with the smallest decision question.
 - `contracts/` is the sole machine-verifiable authority for public HTTP, WSS, error, database, sync, and plugin contracts. Implementations conform to contracts; they do not define them.
 - Start by following the exact read and inspection order in `AGENTS.md`: this file, current progress, the exact Current Task resolved across all five queues, referenced authority inputs, repository state, then minimum baseline verification. A task under `review/` remains current even when `active/` is empty.
-- Resolve the repository-resident Frozen Architecture through `spec/architecture/README.md` and verify its manifest hash before relying on it.
+- Resolve the repository-resident canonical Frozen Architecture Markdown through `spec/architecture/README.md` and verify its manifest hash before relying on it. The PDF is an immutable historical snapshot with a separate provenance hash.
 - A Task Spec's `allowed_paths` is a hard write boundary. Preserve unknown or other-agent uncommitted work.
 - CI is an independent judge. Local verification is evidence, not final Gate PASS. Until LOOP1-CI-001 is operational and done, only the architect-approved bootstrap acceptance ADR may substitute a fresh independent clean-checkout review for the unavailable CI role; development mode and self-review never qualify.
 

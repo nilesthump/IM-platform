@@ -9,7 +9,7 @@ Before doing any work, every agent MUST read and inspect, in this order:
 1. `spec/handoff/agent-context.md`.
 2. `spec/progress/current.md`.
 3. Read the `Current Task` ID and resolve that exact ID across `spec/tasks/{review,active,ready,backlog,done}/`. It MUST exist in exactly one queue and its declared status MUST match that queue. Resume by actual state: `review` completes the independent review/fix cycle; `active` continues implementation; `ready` may activate only when dependencies and inputs are satisfied; `backlog` remains blocked on prerequisites; `done` permits selection of the next dependency-satisfied task. Never select work merely because `active/` is empty. Select another task only when the current task is complete and no unfinished current task exists.
-4. Every architecture document, approved ADR or frozen decision, domain document, invariant, acceptance criterion, and contract referenced by the current Task Spec.
+4. Every architecture document, approved ADR or frozen decision, domain document, invariant, acceptance criterion, and contract referenced by the current Task Spec. First resolve and hash-check the canonical Frozen Architecture Markdown through `spec/architecture/README.md` and `spec/architecture/baseline.md`. The retained PDF is historical provenance.
 5. `git status`.
 6. The current diff.
 7. Recent commits.

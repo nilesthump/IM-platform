@@ -232,7 +232,7 @@ if (Test-Path -LiteralPath $architectureIndexPath) {
                     [void](Invoke-Git @('ls-files', '--error-unmatch', '--', $artifactRelative) 'tracked Frozen Architecture artifact')
                     [void](Invoke-Git @('cat-file', '-e', ":$artifactRelative") 'staged/committed Frozen Architecture blob')
                     $trackedPdfs = @(Invoke-Git @('ls-files', '--', '*.pdf') 'tracked PDF authority inventory')
-                    if ($trackedPdfs.Count -ne 1 -or $trackedPdfs[0] -ne $artifactRelative) { Add-Failure "Expected exactly one tracked architecture PDF ($artifactRelative); found: $($trackedPdfs -join ', ')" }
+                    if ($trackedPdfs.Count -ne 1 -or $trackedPdfs[0] -ne 'scalable-distributed-im-architecture.pdf') { Add-Failure "Expected exactly one retained historical architecture PDF; found: $($trackedPdfs -join ', ')" }
                 }
             }
         }
@@ -292,6 +292,11 @@ if (Test-Path -LiteralPath (Join-Path $repoRoot '.github/workflows') -PathType C
     if ($ciTask.Count -ne 1 -or $ciTask[0].Directory.Name -in @('backlog', 'ready')) {
         Add-Failure '.github/workflows exists before LOOP1-CI-001 is active.'
     }
+}
+
+if (Test-Path -LiteralPath (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1') -PathType Leaf) {
+    $architectureResult = @(& (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1') 2>&1)
+    if ($LASTEXITCODE -ne 0) { Add-Failure "Frozen Architecture migration verification failed: $($architectureResult -join ' ')" }
 }
 
 if ($failures.Count -gt 0) {

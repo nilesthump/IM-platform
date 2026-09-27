@@ -1,0 +1,1215 @@
+你现在进入 \`IM-platform\` 仓库。
+
+这是 Human Architect 明确授权的一次：
+
+Frozen Architecture Canonical-Source Migration
+
+任务。
+
+目标：
+
+将当前：
+
+\`scalable-distributed-im-architecture.pdf\`
+
+所承载的 Frozen Architecture，
+忠实转换为 repository-native Markdown canonical source，
+
+并将 Frozen Architecture 的正式冻结完整性校验
+从：
+
+PDF SHA-256
+
+迁移为：
+
+Markdown SHA-256。
+
+重要：
+
+PDF 不删除。
+PDF 不覆盖。
+PDF 不重新生成。
+PDF 不修改。
+
+PDF 必须作为 migration 前的历史冻结快照永久保留。
+
+本任务只迁移：
+
+canonical representation / authority / frozen hash target
+
+不改变任何 Product Architecture semantics。
+
+\============================================================
+0\. 核心定义
+\============================================================
+
+本任务不是：
+
+“重新设计架构”。
+
+不是：
+
+“优化 PDF 内容”。
+
+不是：
+
+“重新整理出一版更合理的架构”。
+
+不是：
+
+“根据当前实现修正文档”。
+
+而是：
+
+Frozen Architecture representation migration.
+
+必须满足：
+
+Old canonical content
+≈ semantically identical
+New canonical content
+
+迁移前：
+
+PDF
+→ Frozen Architecture canonical source
+→ PDF SHA-256
+
+迁移后：
+
+Markdown
+→ Frozen Architecture canonical source
+→ MD SHA-256
+
+同时：
+
+PDF
+→ retained immutable historical snapshot
+→ original PDF SHA-256 retained as provenance
+
+绝对禁止：
+
+把 PDF 的 SHA-256 值直接声明成 Markdown 文件的 SHA-256。
+
+两个不同字节序列必须拥有各自真实计算出的 hash。
+
+\============================================================
+1\. 先恢复真实仓库状态
+\============================================================
+
+严格遵循当前 \`AGENTS.md\` recovery sequence。
+
+至少读取：
+
+1\. \`AGENTS.md\`
+2\. \`spec/handoff/agent-context.md\`
+3\. \`spec/progress/current.md\`
+4\. Current Task
+5\. task queues
+6\. Frozen Architecture
+7\. approved ADRs
+8\. architecture README / index
+9\. governance rules
+10\. Research Recorder documentation
+11\. \`git status\`
+12\. current HEAD
+13\. current branch
+14\. staged / unstaged diff
+15\. untracked files
+16\. recent commits
+17\. Last Known Good Commit
+18\. latest stable checkpoint
+
+确认：
+
+\- 当前 PDF 的真实路径；
+\- PDF 当前是否仍为 Frozen Architecture canonical artifact；
+\- 当前 PDF SHA-256；
+\- 哪些文件引用 PDF 作为 architecture authority；
+\- 哪些 verifier / scripts 校验 PDF hash；
+\- 哪些 task / checkpoint / evidence 保存了 PDF hash；
+\- 是否存在 active writer；
+\- 当前是否存在未提交工作。
+
+不得根据 Human 提供的旧摘要覆盖 repository truth。
+
+\============================================================
+2\. Writer Safety
+\============================================================
+
+本任务不得干扰其他 active Product / Contract Agent。
+
+如果 authoritative worktree 当前被其他 write-capable Agent 使用：
+
+不要直接写它。
+
+建立：
+
+fresh branch
+\+
+isolated worktree
+
+起点必须是最新：
+
+clean
+\+
+committed
+\+
+accepted
+
+baseline。
+
+不得：
+
+\- reset 其他 Agent 工作；
+\- stash 他人工作；
+\- clean 他人文件；
+\- rebase shared history；
+\- force checkout；
+\- 接管其他 Task。
+
+\============================================================
+3\. Recorder
+\============================================================
+
+这是 Instrumentation Epoch 之后的新治理任务。
+
+在任何 write-capable change 之前：
+
+1\. 注册 Human 当前这整条 Prompt 的真实文本；
+2\. 获取 prompt\_id；
+3\. start prospective Recorder run；
+4\. experiment\_group 使用当前 full governance 条件；
+5\. 后续 extraction verification / hashing / tests / git verification
+&#x20;  尽可能通过 Recorder command wrapper。
+
+不得伪造：
+
+\- prompt
+\- timing
+\- tokens
+\- cost
+\- model metadata
+\- tool traces
+
+不可观察则记录：
+
+\`unavailable\`
+
+\============================================================
+4\. Task Classification
+\============================================================
+
+建立一个独立 Control/Governance Task。
+
+建议 ID：
+
+\`LOOP1-ARCHDOC-001\`
+
+如果当前仓库命名规范要求其他格式，
+使用符合现有规范的等价 ID。
+
+Task Goal：
+
+Migrate Frozen Architecture canonical representation
+from immutable PDF to repository-native Markdown
+without changing architecture semantics.
+
+这是：
+
+Governance / Architecture Documentation Migration
+
+不是：
+
+Product Architecture Change。
+
+\============================================================
+5\. 首先判断是否需要 ADR / ACP
+\============================================================
+
+当前 Frozen Architecture 对自身拥有最高架构 authority。
+
+因此：
+
+changing the canonical source
+
+本身可能属于 governance-level architecture change。
+
+必须检查当前 Frozen Architecture Change Protocol。
+
+如果现有规则要求：
+
+ACP / ADR
+
+才能改变：
+
+\- architecture authority；
+\- canonical artifact；
+\- frozen-hash target；
+
+则必须先创建最小 ADR / ACP。
+
+该 ADR 只允许批准：
+
+“canonical representation migration”
+
+不得借机修改任何产品架构。
+
+建议记录：
+
+Before:
+&#x20; canonical = scalable-distributed-im-architecture.pdf
+
+After:
+&#x20; canonical = \<markdown-path>
+
+Reason:
+&#x20; repository-native diffability,
+&#x20; reviewability,
+&#x20; Agent accessibility,
+&#x20; deterministic text validation.
+
+Non-goals:
+&#x20; no semantic architecture change.
+
+如果当前 governance 已允许这种 representation-only migration
+而不需要 ADR：
+
+记录依据。
+
+不得自行跳过现有 authority process。
+
+\============================================================
+6\. Source PDF 必须保持 immutable
+\============================================================
+
+源文件：
+
+\`scalable-distributed-im-architecture.pdf\`
+
+必须保持 byte-for-byte unchanged。
+
+在任何修改前计算：
+
+SHA-256(PDF)
+
+保存为：
+
+\`source\_pdf\_sha256\`
+
+后续任务结束时再次计算。
+
+必须：
+
+before\_pdf\_sha256
+\==
+after\_pdf\_sha256
+
+否则任务 FAIL。
+
+严禁：
+
+\- overwrite PDF；
+\- regenerate PDF；
+\- normalize PDF；
+\- metadata rewrite；
+\- compression rewrite；
+\- rename/delete PDF without explicit approved governance reason。
+
+默认：
+
+保留原文件名和路径。
+
+\============================================================
+7\. Markdown Canonical Path
+\============================================================
+
+选择一个明确、稳定、repository-native 的 canonical path。
+
+优先服从现有 architecture directory。
+
+例如：
+
+\`spec/architecture/frozen-architecture.md\`
+
+或：
+
+\`spec/architecture/architecture.md\`
+
+不要无理由新增多层目录。
+
+最终必须只有一个明确：
+
+Canonical Frozen Architecture Markdown
+
+不得同时出现多个“都算 canonical”的 Markdown 文件。
+
+\============================================================
+8\. PDF → Markdown 转换原则
+\============================================================
+
+Markdown 必须忠实表达 PDF 中所有 architecture semantics。
+
+必须保留：
+
+\- document title；
+\- version；
+\- Loop scope；
+\- goals；
+\- non-goals；
+\- Frozen Decisions；
+\- authority hierarchy；
+\- change governance；
+\- architecture components；
+\- message flow；
+\- ACK semantics；
+\- transaction semantics；
+\- Outbox；
+\- NATS role；
+\- sequence semantics；
+\- Sync semantics；
+\- client local-state semantics；
+\- authentication；
+\- WSS state；
+\- plugin architecture；
+\- security boundaries；
+\- contracts；
+\- Go / Java equivalence requirements；
+\- Golden Contract Tests；
+\- Agent development loop；
+\- CI/CD；
+\- deployment；
+\- migration；
+\- rollback；
+\- acceptance gates；
+\- all architecture-relevant tables；
+\- all architecture-relevant lists；
+\- all explicit constraints。
+
+不得：
+
+\- 总结；
+\- 缩写；
+\- “优化措辞”导致语义改变；
+\- 修复认为不合理的架构；
+\- 删除重复内容；
+\- 把 normative MUST 改成 SHOULD；
+\- 把 SHOULD 改成 MUST；
+\- 修改数字；
+\- 修改版本；
+\- 修改容量目标；
+\- 修改 ACK timing；
+\- 修改 idempotency semantics；
+\- 修改 plugin security；
+\- 修改 Loop 1 / Loop 2 boundary。
+
+\============================================================
+9\. Markdown Formatting 可以变化，但语义不能变化
+\============================================================
+
+允许 representation changes：
+
+PDF heading
+→ Markdown heading
+
+PDF table
+→ Markdown table
+
+PDF bullets
+→ Markdown bullets
+
+diagram text
+→ fenced text / Mermaid
+ONLY IF semantics are preserved exactly
+
+page breaks
+→ omitted
+
+header/footer
+→ omitted if purely visual
+
+允许修复：
+
+PDF extraction 导致的明显断行、分页、字体编码问题。
+
+但不能：
+
+根据推测填补 PDF 未明确表达的信息。
+
+如果 PDF 某处存在真正 ambiguity：
+
+保留原语义，
+不要自行解释。
+
+必要时记录：
+
+\`migration\_note\`
+
+但不要修改正文语义。
+
+\============================================================
+10\. 图表处理
+\============================================================
+
+对于 PDF 中的图：
+
+优先判断是否属于：
+
+A. decorative / purely visual
+
+或：
+
+B. architecture-semantic diagram
+
+如果属于 B：
+
+Markdown 必须保留等价信息。
+
+可以：
+
+\- 使用 Mermaid；
+\- 使用 textual diagram；
+\- 保留图片引用；
+
+但必须验证所有：
+
+nodes
+edges
+direction
+labels
+boundaries
+responsibilities
+
+不发生语义改变。
+
+如果无法无损转换为 Mermaid：
+
+宁可保留原图引用 + textual description，
+
+不要凭理解重新设计图。
+
+\============================================================
+11\. 建立 Migration Provenance
+\============================================================
+
+必须建立一个小型、机器可读 migration record。
+
+优先使用现有 governance manifest 机制。
+
+如果不存在，可以创建最小文件，例如：
+
+\`spec/architecture/FROZEN\_ARCHITECTURE.json\`
+
+建议结构：
+
+{
+&#x20; "schema\_version": "1.0",
+&#x20; "canonical\_format": "markdown",
+&#x20; "canonical\_path": "spec/architecture/frozen-architecture.md",
+&#x20; "canonical\_sha256": "\<REAL\_MD\_SHA256>",
+
+&#x20; "previous\_canonical": {
+&#x20;   "format": "pdf",
+&#x20;   "path": "scalable-distributed-im-architecture.pdf",
+&#x20;   "sha256": "\<REAL\_PDF\_SHA256>"
+&#x20; },
+
+&#x20; "migration": {
+&#x20;   "type": "representation\_only",
+&#x20;   "semantic\_change": false,
+&#x20;   "task\_id": "LOOP1-ARCHDOC-001",
+&#x20;   "effective\_from\_commit": "\<set-at-acceptance>",
+&#x20;   "accepted\_at": "\<set-at-acceptance>"
+&#x20; }
+}
+
+具体字段可根据现有 repository schema 调整。
+
+不要建立复杂 metadata framework。
+
+\============================================================
+12\. “Frozen Hash Transfer”的准确语义
+\============================================================
+
+迁移前：
+
+frozen\_architecture\_hash
+\=
+SHA256(PDF)
+
+迁移后：
+
+frozen\_architecture\_hash
+\=
+SHA256(MD)
+
+但必须保留：
+
+previous\_frozen\_architecture\_hash
+\=
+SHA256(PDF)
+
+因此：
+
+不是：
+
+MD\_SHA256 = PDF\_SHA256
+
+而是：
+
+authority(hash\_target):
+PDF → MD
+
+Provenance:
+PDF\_SHA256 retained forever.
+
+\============================================================
+13\. 更新 Authority References
+\============================================================
+
+检查所有 repository-level authority references。
+
+包括但不限于：
+
+\- AGENTS.md
+\- architecture README
+\- handoff
+\- task template
+\- progress docs
+\- checkpoint template
+\- verifier
+\- scripts
+\- CI checks
+\- architecture hash validation
+\- acceptance instructions
+
+迁移后：
+
+Agent 必须优先读取：
+
+Markdown canonical architecture
+
+而不是解析 PDF。
+
+PDF 只能作为：
+
+historical immutable snapshot / visual archival artifact
+
+不得继续作为 active canonical authority。
+
+\============================================================
+14\. 不要删除 PDF References 的历史证据
+\============================================================
+
+历史：
+
+checkpoints
+evidence
+review records
+Recorder traces
+
+如果当时真实记录的是：
+
+PDF hash
+
+不得修改历史记录。
+
+不要 retroactively 把旧证据中的 PDF 改成 MD。
+
+历史事实必须保持：
+
+At that time canonical architecture = PDF.
+
+迁移只从新的 effective commit 向前生效。
+
+\============================================================
+15\. Hash Validation
+\============================================================
+
+建立 deterministic verifier。
+
+至少验证：
+
+A.
+source PDF exists.
+
+B.
+source PDF SHA-256 equals recorded historical PDF hash.
+
+C.
+canonical Markdown exists.
+
+D.
+SHA-256(Markdown) equals manifest canonical\_sha256.
+
+E.
+canonical path is unique.
+
+F.
+governance points to Markdown.
+
+G.
+PDF still exists.
+
+H.
+PDF bytes unchanged.
+
+I.
+PDF is no longer active canonical source.
+
+J.
+previous PDF hash remains recorded.
+
+K.
+no Product Contract changed.
+
+L.
+no Product implementation changed.
+
+M.
+Frozen architecture semantic migration is declared:
+\`semantic\_change = false\`
+
+\============================================================
+16\. Semantic Equivalence Verification
+\============================================================
+
+必须进行 PDF ↔ Markdown semantic equivalence review。
+
+不得只验证文件存在和 hash。
+
+至少建立一份 architecture-section checklist。
+
+逐节验证：
+
+\- title/version
+\- scope
+\- Loop 1
+\- Loop 2
+\- non-goals
+\- Frozen Decisions
+\- authority
+\- ACP/ADR process
+\- components
+\- DB truth
+\- message lifecycle
+\- ACK
+\- idempotency
+\- sequence
+\- Outbox
+\- NATS
+\- Sync
+\- local SQLite behavior
+\- Web behavior
+\- auth
+\- WSS
+\- plugin system
+\- security
+\- public contracts
+\- dual backend
+\- Agent workflow
+\- CI
+\- release
+\- migration
+\- rollback
+\- acceptance
+
+每一项必须：
+
+PDF semantics == MD semantics
+
+如果发现 mismatch：
+
+fix Markdown conversion
+
+而不是修改 PDF。
+
+\============================================================
+17\. 特别保护 Normative Language
+\============================================================
+
+转换时特别检查：
+
+MUST
+MUST NOT
+SHALL
+禁止
+必须
+不得
+只有
+允许
+应
+可
+
+等规范性语义。
+
+例如：
+
+“只有压测证明竞争不可接受时才通过 ADR 评估”
+
+不得转换成：
+
+“以后可以考虑优化”。
+
+强度变化属于 semantic change。
+
+\============================================================
+18\. 不要 Reverse-Author Architecture
+\============================================================
+
+禁止：
+
+根据当前代码反向修改 Markdown。
+
+Canonical Markdown 必须来自：
+
+Frozen PDF
+
+而不是：
+
+Current implementation.
+
+即使当前代码：
+
+\- 尚未实现某项架构；
+\- 与架构不同；
+\- 更先进；
+\- 更简单；
+
+也不能借 migration 修正文档。
+
+Architecture migration ≠ architecture reconciliation.
+
+\============================================================
+19\. Minimality
+\============================================================
+
+本迁移任务自身必须 minimal。
+
+不要为了 Markdown migration 引入：
+
+\- database
+\- document CMS
+\- rendering service
+\- website
+\- documentation generator framework
+\- new build platform
+\- custom AST system
+\- LLM semantic database
+
+优先：
+
+Markdown
+\+
+small manifest
+\+
+small deterministic verifier
+\+
+review evidence
+
+如果已有工具可复用：
+
+复用。
+
+\============================================================
+20\. 产品范围绝对禁止修改
+\============================================================
+
+本任务不得改变：
+
+\- HTTP contracts
+\- WSS contracts
+\- DB contracts
+\- plugin-api
+\- backend
+\- clients
+\- message semantics
+\- ACK semantics
+\- idempotency
+\- Sync
+\- session
+\- auth
+\- plugin security
+\- database schema
+\- business logic
+
+任何此类变化：
+
+FAIL / out of scope.
+
+\============================================================
+21\. Candidate Completion
+\============================================================
+
+Implementation 完成后必须：
+
+1\. run deterministic verifier；
+2\. compute final PDF hash；
+3\. compute MD hash；
+4\. verify source PDF unchanged；
+5\. verify Product Contracts unchanged；
+6\. verify Product implementation unchanged；
+7\. verify architecture references updated；
+8\. Recorder validate；
+9\. commit candidate；
+10\. produce durable migration evidence。
+
+不得 self-accept。
+
+\============================================================
+22\. Fresh Independent Review
+\============================================================
+
+必须使用 fresh independent Review Agent。
+
+Reviewer 必须独立检查：
+
+1\. PDF 是否完全未修改；
+2\. Markdown 是否完整；
+3\. 是否存在遗漏 section；
+4\. 是否存在 normative language weakening/strengthening；
+5\. 是否存在数字变化；
+6\. 是否存在架构语义变化；
+7\. 是否存在 Agent 自己“优化”架构；
+8\. 是否正确迁移 canonical authority；
+9\. 是否正确迁移 hash target；
+10\. 是否保留旧 PDF hash；
+11\. 是否保留 PDF artifact；
+12\. 是否错误篡改历史 evidence；
+13\. governance 是否从此读取 Markdown；
+14\. verifier 是否 deterministic；
+15\. 产品代码/contract 是否零变化；
+16\. migration 本身是否过度设计。
+
+如果 FAIL：
+
+fresh Fix Agent
+→ fix Markdown/governance migration only
+→ fresh independent Reviewer
+
+不得 self-accept。
+
+\============================================================
+23\. Acceptance Closure
+\============================================================
+
+Independent Review PASS 后建立 acceptance closure。
+
+至少记录：
+
+\- task\_id
+\- accepted candidate SHA
+\- old PDF path
+\- old PDF SHA-256
+\- new canonical Markdown path
+\- new Markdown SHA-256
+\- semantic\_change = false
+\- PDF retained = true
+\- PDF unchanged = true
+\- Product Contracts unchanged = true
+\- Product implementation unchanged = true
+\- independent review PASS
+\- verifier PASS
+\- Recorder PASS
+
+\============================================================
+24\. Merge to main
+\============================================================
+
+只有：
+
+fresh independent Review PASS
+\+
+acceptance closure complete
+
+之后才能 merge to main。
+
+优先：
+
+fast-forward only
+
+如果 main 已分叉：
+
+不要 force。
+
+如果 reconciliation 改变 candidate 内容：
+
+旧 Review PASS 不再覆盖新内容。
+
+必须重新：
+
+verify
+→ fresh Review
+→ acceptance closure
+
+然后才可 merge。
+
+\============================================================
+25\. Post-Merge Verification
+\============================================================
+
+main 合入后再次验证：
+
+1\. main clean；
+2\. final main SHA；
+3\. PDF exists；
+4\. PDF SHA unchanged；
+5\. Markdown exists；
+6\. Markdown SHA matches canonical manifest；
+7\. Markdown is active canonical Frozen Architecture；
+8\. PDF is historical snapshot；
+9\. architecture authority references point to Markdown；
+10\. verifier PASS；
+11\. Product Contracts unchanged；
+12\. Product implementation unchanged；
+13\. Recorder run valid。
+
+\============================================================
+26\. Frozen Authority Effective Point
+\============================================================
+
+只有：
+
+accepted
+\+
+merged to main
+\+
+post-merge verifier PASS
+
+之后：
+
+Markdown 才正式成为 Frozen Architecture canonical source。
+
+记录：
+
+\`canonical\_architecture\_effective\_from\_commit\`
+
+以及：
+
+\`canonical\_architecture\_effective\_at\`
+
+迁移前：
+
+PDF remains historically authoritative.
+
+迁移后：
+
+Markdown becomes authoritative.
+
+不得 retroactively 改写过去。
+
+\============================================================
+27\. Checkpoint
+\============================================================
+
+建立 stable checkpoint。
+
+至少记录：
+
+Migration task
+Old canonical:
+&#x20; PDF path
+&#x20; PDF SHA-256
+
+New canonical:
+&#x20; Markdown path
+&#x20; Markdown SHA-256
+
+Semantic change:
+&#x20; NONE
+
+PDF retained:
+&#x20; YES
+
+PDF unchanged:
+&#x20; YES
+
+Effective commit:
+&#x20; \<SHA>
+
+Independent Review:
+&#x20; PASS
+
+Verifier:
+&#x20; PASS
+
+\============================================================
+28\. 后续 Agent 行为
+\============================================================
+
+迁移生效后：
+
+所有 future Agent recovery 应优先读取：
+
+Canonical Markdown Frozen Architecture.
+
+不应再要求 Agent 为理解架构首先解析 PDF。
+
+PDF 用于：
+
+\- historical snapshot；
+\- visual/reference copy；
+\- migration provenance。
+
+如果 Markdown 与 PDF 日后出现差异：
+
+Markdown 是迁移后 active authority。
+
+但任何对 Markdown Frozen Architecture 的后续修改：
+
+仍必须经过现有 ACP / ADR / Frozen Architecture Change Protocol。
+
+不能因为它变成 \`.md\` 就允许普通 Agent 直接修改。
+
+\============================================================
+29\. PDF 的长期状态
+\============================================================
+
+PDF 不删除。
+
+建议明确标识其状态：
+
+Historical Frozen Snapshot
+Pre-Markdown Canonical Architecture
+Immutable
+
+如果仓库支持 README/index，
+注明：
+
+This PDF is retained as the immutable pre-migration architecture snapshot.
+The repository-native Markdown file is the active canonical Frozen Architecture
+from commit \<effective commit> onward.
+
+不要在 PDF 文件本身写入 metadata。
+
+\============================================================
+30\. 最终 Acceptance Criteria
+\============================================================
+
+本任务只有全部满足才算 COMPLETE：
+
+1\. PDF retained.
+2\. PDF byte-for-byte unchanged.
+3\. Original PDF SHA-256 preserved.
+4\. Markdown canonical architecture created.
+5\. Markdown represents full PDF architecture semantics.
+6\. No architecture semantic changes.
+7\. Normative language preserved.
+8\. Numeric values preserved.
+9\. Frozen decisions preserved.
+10\. Authority hierarchy preserved.
+11\. Canonical authority migrated PDF → MD.
+12\. Frozen hash target migrated PDF hash → MD hash.
+13\. Both hashes remain recorded.
+14\. Historical evidence untouched.
+15\. Governance references updated.
+16\. Future Agent recovery points to MD.
+17\. Product Contracts unchanged.
+18\. Product implementation unchanged.
+19\. Deterministic verifier PASS.
+20\. Semantic equivalence review PASS.
+21\. Recorder valid.
+22\. Fresh independent Review PASS.
+23\. Acceptance closure complete.
+24\. Safely merged to main.
+25\. Post-merge verification PASS.
+26\. Stable checkpoint created.
+27\. Effective commit/time recorded.
+
+\============================================================
+31\. 最终 Handoff
+\============================================================
+
+完成后只向 Human 返回：
+
+1\. Task ID
+2\. prompt\_id
+3\. run\_id
+4\. source PDF path
+5\. source PDF SHA-256
+6\. source PDF unchanged: YES/NO
+7\. canonical Markdown path
+8\. canonical Markdown SHA-256
+9\. semantic change: YES/NO
+10\. canonical authority before
+11\. canonical authority after
+12\. migration manifest path
+13\. ADR/ACP created: YES/NO + path
+14\. accepted candidate SHA
+15\. acceptance closure SHA
+16\. final main SHA
+17\. architecture effective-from commit
+18\. architecture effective timestamp
+19\. semantic equivalence verification result
+20\. independent Review result/evidence
+21\. deterministic verifier result
+22\. Product Contracts unchanged: YES/NO
+23\. Product implementation unchanged: YES/NO
+24\. checkpoint path
+25\. pushed to remote: YES/NO
+26\. blockers / limitations
+
+然后停止。
+
+\============================================================
+32\. Absolute Prohibitions
+\============================================================
+
+ABSOLUTELY DO NOT:
+
+\- delete the PDF
+\- overwrite the PDF
+\- regenerate the PDF
+\- modify PDF metadata
+\- assign PDF hash to Markdown
+\- silently change architecture semantics
+\- summarize instead of migrate
+\- modernize architecture during migration
+\- change ACK semantics
+\- change contracts
+\- change invariants
+\- change product code
+\- reverse-author architecture from implementation
+\- rewrite historical evidence
+\- retroactively replace PDF hashes in old checkpoints
+\- self-review
+\- self-accept
+\- force merge
+\- force push
+\- fabricate semantic equivalence
+\- fabricate hashes
+\- fabricate Recorder evidence
+
+\============================================================
+33\. Guiding Rule
+\============================================================
+
+This task changes the representation of authority,
+not the meaning of the architecture.
+
+Before:
+
+PDF bytes
+→ PDF SHA-256
+→ canonical Frozen Architecture
+
+After:
+
+Markdown bytes
+→ Markdown SHA-256
+→ canonical Frozen Architecture
+
+And permanently retained:
+
+PDF bytes
+→ original PDF SHA-256
+→ immutable historical provenance
+
+Now begin with repository recovery,
+Recorder initialization,
+and exact calculation of the current source PDF SHA-256.
+
+Do not write any migration files until the current architecture authority,
+source PDF identity,
+hash-validation mechanism,
+and required ADR/ACP process are known.

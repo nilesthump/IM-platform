@@ -3,8 +3,15 @@
 - baseline_title: 面向十万级在线连接的可扩展分布式即时通信平台
 - version: v1.0
 - status: Frozen and architect-approved
-- repository_path: `scalable-distributed-im-architecture.pdf`
-- sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
+- canonical_format: `markdown`
+- repository_path: `spec/architecture/frozen-architecture.md`
+- sha256: `a41871e6596b79d37973d6747af233b91f098ba072bb648940b56ec5777ac9d8`
+- previous_canonical_format: `pdf`
+- previous_repository_path: `scalable-distributed-im-architecture.pdf`
+- previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
+- migration_type: `representation_only`
+- semantic_change: `false`
+- migration_task_id: `LOOP1-ARCHDOC-001`
 - baseline_date: 2026-09-19
 
-The artifact is immutable. Implementation, contracts, repository-native specifications, indexes, and ADRs do not supersede it. An approved ADR may clarify or change architecture only through the documented process; it must not modify the baseline artifact bytes.
+The Markdown artifact is the single active canonical Frozen Architecture after the accepted migration is merged to `main` and post-merge verification passes. It remains frozen and may change only through the approved architecture change process. The PDF is retained byte-for-byte as the immutable pre-migration historical snapshot; its SHA-256 is provenance, not the Markdown hash. Historical evidence remains unchanged. Implementation, contracts, indexes, and ordinary task specifications do not supersede the active canonical artifact.

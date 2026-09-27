@@ -213,7 +213,8 @@ def capture_git(repo: Path) -> dict:
 
 def authority_snapshot(repo: Path, task_id: str) -> dict:
     candidates = ["AGENTS.md", "spec/handoff/agent-context.md", "spec/progress/current.md",
-                  "spec/architecture/README.md", "spec/architecture/baseline.md", "scalable-distributed-im-architecture.pdf"]
+                  "spec/architecture/README.md", "spec/architecture/baseline.md",
+                  "spec/architecture/frozen-architecture.md", "scalable-distributed-im-architecture.pdf"]
     candidates += str(git(repo, "ls-files", "spec/architecture/decisions", "spec/domain", "spec/invariants", "spec/acceptance", "contracts")).splitlines()
     candidates += [p.relative_to(repo).as_posix() for p in (repo / "spec/tasks").glob(f"*/{task_id}.md")]
     files = {}

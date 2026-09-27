@@ -16,6 +16,7 @@ $requiredFiles = @(
     'CLAUDE.md',
     'README.md',
     'scalable-distributed-im-architecture.pdf',
+    'spec/architecture/frozen-architecture.md',
     'spec/architecture/README.md',
     'spec/architecture/baseline.md',
     'spec/architecture/decisions/ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md',
@@ -89,7 +90,7 @@ foreach ($taskId in $expectedTasks) {
 
 $architectureFiles = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'spec/architecture') -File -Recurse | ForEach-Object { $_.FullName.Substring($repoRoot.Length + 1).Replace('\', '/') })
 $unexpectedArchitectureFiles = @($architectureFiles | Where-Object {
-    $_ -notin @('spec/architecture/README.md', 'spec/architecture/baseline.md', 'spec/architecture/decisions/.gitkeep') -and
+    $_ -notin @('spec/architecture/README.md', 'spec/architecture/baseline.md', 'spec/architecture/frozen-architecture.md', 'spec/architecture/decisions/.gitkeep') -and
     $_ -notmatch '^spec/architecture/decisions/ADR-[0-9]{4}-.+\.md$'
 })
 if ($unexpectedArchitectureFiles.Count -gt 0) {
@@ -127,3 +128,5 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Output "PASS: LOOP1-CTRL-001 repository structure and governance checks succeeded ($($requiredFiles.Count) files, $($requiredDirectories.Count) directories, $($expectedTasks.Count) tracked S0 tasks)."
+& (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1')
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
