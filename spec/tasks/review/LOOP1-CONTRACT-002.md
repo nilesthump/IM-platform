@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
 status: review
-owner: /root/contract002_impl
+owner: /root/contract002_fix1
 stage: S0
 gate: S0
 ---
@@ -65,6 +65,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - Fresh Implementation Agent authored the strict WSS v1 JSON Schema, protocol semantics, deterministic generator/verifier, and 8 positive/10 negative shared Go/Java golden scenarios. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`. Prospective Recorder run: `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. Development evidence is not independent acceptance.
 
 - Fresh independent Review Agent `/root/contract002_review1` returned FAIL for clean committed candidate `55670c2`: in-memory negative controls found that `check_scenario` accepts wrong-Conversation delivery, omitted `session.revoked`, omitted negative auth rejection, and `message.created` before COMMIT. Baseline WSS verifier and clean detached CTRL-002 Acceptance passed, so those checks do not establish required behavioral assertions. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. The task remains unfinished in `review`; S0 Gate is not passed.
+- Fresh Fix Agent `/root/contract002_fix1` added direct checks for all four review gaps and nine in-memory mutation regressions while preserving the five passing controls. Generator/fixture comparison and CTRL-002 Development passed; development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md`; Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`. This is not acceptance. Last known good baseline remains `7484901b3915535f60941a01116b730a845bd47d`.
 
 # Handoff
 
@@ -73,4 +74,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Fresh Fix Agent repairs the independently demonstrated missing delivery/auth/revocation fixture assertions at candidate `55670c2`, then a different fresh independent Review Agent repeats negative controls from a clean committed checkout. Keep in `review`; do not mark `done` on development evidence.
+- A different fresh independent Review Agent reviews the committed Fix candidate and repeats negative controls from a clean checkout. Keep in `review` pending independent PASS; do not mark `done` on development evidence.

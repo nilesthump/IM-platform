@@ -21,6 +21,7 @@ Current Task State: review
 - `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
 - Activation Recorder run `R-20260928T005917Z-da1e7bcf-0952-4664-b76d-b699a2b59840` uses `prospective_resume`; its recorded CTRL-002 Development check passed after correcting two task recovery fields. This is not acceptance evidence.
 - Fresh Implementation Agent `/root/contract002_impl` completed a strict WSS v1 envelope schema and deterministic shared Go/Java golden vectors in isolated branch `task/LOOP1-CONTRACT-002`. The generator/verifier passes 8 positive, 10 negative, and 11 malformed-wire mutation controls. Fresh independent Review Agent `/root/contract002_review1` rejected candidate `55670c2` after finding four missing behavioral assertions in the fixture verifier: wrong-Conversation fan-out, omitted revocation event, omitted negative auth rejection, and `message.created` before COMMIT were accepted by in-memory mutations. The baseline verifier and clean detached CTRL-002 Acceptance passed but do not cover these violations. The task remains in `review` for fresh Fix then fresh Review; S0 Gate remains NOT YET PASSED. Review evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`; implementation Recorder run `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+- Fresh Fix Agent `/root/contract002_fix1` repaired the four WSS fixture verifier gaps and committed nine in-memory mutation controls, retaining the five previously passing controls. Generator/fixture comparison and CTRL-002 Development PASS are recorded in `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md`; fix Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`. Independent review of the clean Fix candidate remains required; S0 Gate remains NOT YET PASSED. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
 
 ## Authorized Frozen Architecture Representation Migration
 
@@ -184,7 +185,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh Fix Agent repairs the four independently demonstrated WSS fixture verification gaps on `LOOP1-CONTRACT-002`, commits a clean candidate, then a different fresh independent Review Agent repeats acceptance and negative controls. S0 Gate remains NOT YET PASSED.
+A different fresh independent Review Agent reviews the clean committed `LOOP1-CONTRACT-002` Fix candidate, repeating acceptance and negative controls. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -200,7 +201,7 @@ Fresh Fix Agent repairs the four independently demonstrated WSS fixture verifica
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
 - Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The Coordinator owns only the task `done` transition, post-merge evidence, checkpoint, current recovery update, and post-merge Recorder artifacts on local `main` until committed. The interrupted second-review worktree remains untouched.
-- Fresh Implementation Agent `/root/contract002_impl` owns the current isolated Contract 002 changes until clean candidate commit; independent reviewer and Coordinator own the subsequent review/closure. The original checkout's untracked HTTP schema-lint directory belongs to the paused Agent and was not accessed.
+- Fresh Fix Agent `/root/contract002_fix1` owns the current isolated Contract 002 verifier, task recovery, evidence, and Recorder changes until clean candidate commit; independent reviewer and Coordinator own the subsequent review/closure. The original checkout's untracked HTTP schema-lint directory belongs to the paused Agent and was not accessed.
 
 ## Architecture Conflicts / ACP / ADR
 

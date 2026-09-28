@@ -187,6 +187,9 @@ def check_scenario(s):
         commit = timeline.index("COMMIT") if "COMMIT" in timeline else -1
         if commit < 0 or any(i < commit for i, event in enumerate(timeline) if event == "SUCCESS_ACK"):
             raise Invalid("success ACK before durable commit")
+    if "MESSAGE_CREATED" in timeline:
+        if "COMMIT" not in timeline or timeline.index("MESSAGE_CREATED") < timeline.index("COMMIT"):
+            raise Invalid("message.created before durable commit")
     if "ROLLBACK" in timeline and ("COMMIT" in timeline or "SUCCESS_ACK" in timeline):
         raise Invalid("rollback followed by committed outcome")
     if "MEMBER_DENIED" in timeline or "AUTH_DENIED" in timeline:
@@ -219,6 +222,49 @@ def check_scenario(s):
         first, second = [step["out"][0]["payload"] for step in s["steps"]]
         if first["messageId"] == second["messageId"] or first["conversationId"] == second["conversationId"]:
             raise Invalid("conversation identity collision")
+    if s["id"] in ("stale-epoch-bind", "expired-token-bind", "wrong-client-type-bind", "invalid-signature-bind"):
+        codes = {"stale-epoch-bind": "AUTH_SESSION_EPOCH_STALE", "expired-token-bind": "AUTH_TOKEN_EXPIRED", "wrong-client-type-bind": "AUTH_CLIENT_TYPE_MISMATCH", "invalid-signature-bind": "AUTH_TOKEN_INVALID"}
+        outputs = s["steps"][0]["out"]
+        if len(outputs) != 1 or outputs[0]["type"] != "auth.ack" or outputs[0]["payload"].get("status") != "rejected" or outputs[0]["payload"]["error"]["code"] != codes[s["id"]]:
+            raise Invalid("invalid bind must emit its rejection")
+    if s["id"] == "wrong-conversation-fanout":
+        if s["given"]["localMemberOf"] == s["given"]["eventConversation"]:
+            raise Invalid("wrong-Conversation control has no mismatch")
+        if any(output["type"] == "message.created" for step in s["steps"] for output in step["out"]) or e["clientMaterializations"] != 0:
+            raise Invalid("wrong-Conversation message delivered")
+    if s["id"] == "revoked-socket":
+        if s["steps"][0]["out"] != [s["steps"][0]["in"]] or s["steps"][1]["out"] or e["socket"] != "CLOSED":
+            raise Invalid("revoked socket must emit event and close before further sends")
+
+
+def negative_behavior_controls():
+    """Committed regressions independent of generated fixture byte comparison."""
+    by_id = {s["id"]: s for s in fixtures()["scenarios"]}
+
+    def move_before_commit(s, event):
+        s["timeline"].remove(event)
+        s["timeline"].insert(s["timeline"].index("COMMIT"), event)
+
+    changes = [
+        ("wrong-conversation-fanout", lambda s: s["steps"][0]["out"].append(copy.deepcopy(s["steps"][0]["in"]))),
+        ("revoked-socket", lambda s: s["steps"][0]["out"].clear()),
+        ("invalid-signature-bind", lambda s: s["steps"][0]["out"].clear()),
+        ("durable-send-and-created", lambda s: move_before_commit(s, "MESSAGE_CREATED")),
+        ("durable-send-and-created", lambda s: move_before_commit(s, "SUCCESS_ACK")),
+        ("rollback-before-ack", lambda s: s["steps"][0]["out"].append(ack())),
+        ("idempotent-retry", lambda s: s["steps"][1]["out"][0]["payload"].update(messageId=M2)),
+        ("non-member-send", lambda s: s["steps"][0]["out"].append(ack())),
+        ("unauthenticated-send", lambda s: s["steps"][0]["out"].append(ack())),
+    ]
+    for case_id, mutate in changes:
+        changed = copy.deepcopy(by_id[case_id])
+        mutate(changed)
+        try:
+            check_scenario(changed)
+        except Invalid:
+            continue
+        raise Invalid(f"behavior control accepted invalid mutation: {case_id}")
+    return len(changes)
 
 
 def negative_schema_controls():
@@ -266,6 +312,7 @@ def main():
     for scenario in expected["scenarios"]:
         check_scenario(scenario)
     count = negative_schema_controls()
+    behavior_count = negative_behavior_controls()
     encoded = json.dumps(expected, ensure_ascii=False, indent=2) + "\n"
     if args.write:
         FIXTURE.parent.mkdir(parents=True, exist_ok=True)
@@ -277,7 +324,7 @@ def main():
         raise Invalid("golden fixture mismatch")
     positives = sum(s["polarity"] == "positive" for s in actual["scenarios"])
     negatives = len(actual["scenarios"]) - positives
-    print(f"PASS WSS v1: {positives} positive, {negatives} negative shared Go/Java scenarios; {count} schema mutations rejected")
+    print(f"PASS WSS v1: {positives} positive, {negatives} negative shared Go/Java scenarios; {count} schema and {behavior_count} behavior mutations rejected")
 
 
 if __name__ == "__main__":
