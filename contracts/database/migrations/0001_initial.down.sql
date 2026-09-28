@@ -1,0 +1,15 @@
+DROP TABLE user_sync_events;
+DROP TABLE outbox_events;
+DROP TABLE messages;
+DROP TABLE plugin_kv;
+DROP TABLE plugin_instances;
+DROP TRIGGER plugin_artifact_no_delete ON plugin_artifacts;
+DROP FUNCTION reject_plugin_artifact_delete();
+DROP TRIGGER plugin_artifact_immutable ON plugin_artifacts;
+DROP FUNCTION reject_plugin_artifact_mutation();
+DROP TABLE plugin_artifacts;
+DROP TABLE conversation_members;
+DROP TABLE friendships;
+DROP TABLE conversations;
+DROP TABLE sessions;
+DROP TABLE users;

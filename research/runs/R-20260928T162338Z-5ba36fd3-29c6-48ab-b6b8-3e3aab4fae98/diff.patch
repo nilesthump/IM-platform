@@ -1,0 +1,76 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 19c27f3..195228b 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: active
+ 
+ ## Current Contract Work
+ 
++- `LOOP1-DB-001` implementation candidate adds the canonical PostgreSQL schema, standalone migration runner, uniqueness and forward/rollback integration tests. Static development tests and CTRL-002 Development passed; runtime PostgreSQL integration is pending because `psql` is absent and Docker daemon unavailable. Development evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`; Recorder run `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`. Task remains active, S0 Gate NOT YET PASSED; fresh independent review and PostgreSQL execution are next.
+ - DB activation Recorder run `R-20260928T155726Z-e6831664-d89d-46e2-b0e6-21753ebb56fe` finished and validated (8 events). CTRL-002 Development initially failed on a missing architecture resolver reference in the DB Task Spec, then passed after the reference was added; both outcomes are preserved at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-activation-development.md`. Task remains `active`; S0 Gate NOT YET PASSED.
+ - `LOOP1-DB-001` is active in isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`; all three Contract dependencies are independently accepted and done. Scope: canonical PostgreSQL schema, application-independent migration runner, uniqueness and forward/rollback tests. S0 Gate NOT YET PASSED.
+ - Clean local `main` fast-forwarded to Contract 003 accepted closure `7faadd75b4e195e6b8e8ba8e08f635a18036d497`. Post-integration Contract 003, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository checks passed; `main` stayed clean. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-main-integration.md`; prospective Recorder run `R-20260928T151354Z-d20e8aaa-1145-4e22-bec1-b0a4279824e6` finished and validated. S0 Gate NOT YET PASSED.
+@@ -226,7 +227,7 @@ Current Task State: active
+ 
+ ## Next Exact Action
+ 
+-Coordinator: register DB task Recorder run, commit the activation recovery state, then delegate a fresh DB Implementation Agent and later an independent Review Agent. S0 Gate remains NOT YET PASSED.
++Coordinator: arrange a fresh independent DB Review Agent on the clean implementation candidate, with a disposable PostgreSQL database and `psql` for forward, uniqueness, and rollback execution; then follow ADR-0001 acceptance or fix cycle. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -238,6 +239,7 @@ Coordinator: register DB task Recorder run, commit the activation recovery state
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh DB Implementation Agent `/root/db001_impl` owns only task-allowed database schema/runner/tests, Task Spec/current recovery, development evidence, and task-linked prompt/Recorder run until its candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
+ - Coordinator `/root` owns only DB task queue activation, Task Spec/current recovery updates, and task-linked Recorder activation artifacts until committed. No DB schema or migration file has changed. The original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+ - Coordinator `/root` owns only Contract 003 local-main integration evidence, current/checkpoint/task recovery update, and linked Recorder integration artifacts until committed. Accepted Contract 003 product files and local `main` are clean; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+ - Fresh independent Reviewer `/root/contract003_review3` owns only task-linked PASS evidence, an independent negative probe, Task Spec/current recovery updates, prompt and Recorder run until committed. It changed no product contract or runtime file. The separate detached Acceptance checkout remains clean at `15b2477`; original `H:\IM-platform\contracts\http\schema-lint` was untouched.
+diff --git a/spec/tasks/active/LOOP1-DB-001.md b/spec/tasks/active/LOOP1-DB-001.md
+index 24953f0..eac94aa 100644
+--- a/spec/tasks/active/LOOP1-DB-001.md
++++ b/spec/tasks/active/LOOP1-DB-001.md
+@@ -55,13 +55,15 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
+ 
+ # Evidence
+ 
++- Implementation candidate adds `contracts/database/migrations/0001_initial.{up,down}.sql`, standalone `migrate.py`, database README, and `tests/database/test_migrations.py`. Required primary/unique constraints cover user/client session slots, normalized friendship and DIRECT pairs, GROUP create identity, Conversation members, Conversation request and sequence identities, one `message.created` outbox event per message, and immutable plugin artifact versions. Migration SQL and ledger entry execute in one PostgreSQL transaction under an advisory lock. No application module or public HTTP/WSS/Sync/Plugin contract was changed.
++- Development Recorder run `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`; exact commands/results and PostgreSQL environment limitation are recorded at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`. Runtime PostgreSQL schema/uniqueness/forward/rollback verification remains pending because this host has no `psql` and Docker daemon is unavailable. Development checks are not independent acceptance.
+ - Activation Recorder run `R-20260928T155726Z-e6831664-d89d-46e2-b0e6-21753ebb56fe` finished and validated PASS (8 events). The first CTRL-002 Development recovery attempt failed because this Task Spec lacked an architecture resolver reference; after adding it, the same command passed with exit 0. Both results and exact durations are at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-activation-development.md`. This is development recovery, not independent acceptance.
+ - Dependencies `LOOP1-CONTRACT-001`, `LOOP1-CONTRACT-002`, and `LOOP1-CONTRACT-003` are independently accepted and `done` on clean local `main` at `f25807e`. Contract 003 post-integration Sync/Plugin, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository verification passed. S0 Gate remains NOT YET PASSED.
+ 
+ # Handoff
+ 
+-- Coordinator activated the dependency-satisfied task on isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`. Implementation, independent review, and task acceptance remain pending.
++- Coordinator activated the dependency-satisfied task on isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`. Implementation candidate is committed for fresh independent review; runtime PostgreSQL verification and task acceptance remain pending. Last known accepted base is `f25807e`; the implementation commit is a review candidate only. No uncommitted task changes are intended after handoff.
+ 
+ # Next Action
+ 
+-- Register task-linked Recorder instrumentation and delegate a fresh Implementation Agent for canonical database schema, standalone migration runner, and deterministic forward/rollback and uniqueness tests within allowed paths. Then request fresh independent review under ADR-0001.
++- Fresh independent Review Agent: use a clean committed checkout, run database tests with `DB_TEST_ENABLE=1` against a disposable PostgreSQL database with `psql` available, inspect constraint/rollback behavior, run CTRL-002 Acceptance and Recorder validation, and record exact result under ADR-0001. On FAIL, retain unfinished task and delegate a fresh Fix Agent; on PASS, Coordinator may close acceptance.
+
+# Untracked paths observed; content intentionally not captured
+# ?? contracts/database/README.md
+# ?? contracts/database/migrate.py
+# ?? contracts/database/migrations/0001_initial.down.sql
+# ?? contracts/database/migrations/0001_initial.up.sql
+# ?? research/prompts/LOOP1-DB-001-implementation.txt
+# ?? research/prompts/P-b8bc631f-a42a-4608-97ee-d08f993e7dfa/metadata.json
+# ?? research/prompts/P-b8bc631f-a42a-4608-97ee-d08f993e7dfa/prompt.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-3e19f202-f64b-4e44-bf55-d7acd338ed67.stderr.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-3e19f202-f64b-4e44-bf55-d7acd338ed67.stdout.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-6bb13ca7-d39e-4116-a9b6-429805747988.stderr.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-6bb13ca7-d39e-4116-a9b6-429805747988.stdout.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-bc78c05b-e479-42e0-9bad-1c03862e3bc7.stderr.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-bc78c05b-e479-42e0-9bad-1c03862e3bc7.stdout.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-df707f22-01c8-4ad0-b439-56fa38714753.stderr.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-df707f22-01c8-4ad0-b439-56fa38714753.stdout.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-efdbc101-f170-45f1-a877-6000da0b0406.stderr.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/blobs/C-efdbc101-f170-45f1-a877-6000da0b0406.stdout.txt
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/events.jsonl
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/initial_state.json
+# ?? research/runs/R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98/metadata.json
+# ?? spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md
+# ?? tests/database/__pycache__/test_migrations.cpython-312.pyc
+# ?? tests/database/test_migrations.py

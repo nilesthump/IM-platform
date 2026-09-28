@@ -1,0 +1,10 @@
+# LOOP1-DB-001 implementation development evidence
+
+- Branch: `task/LOOP1-DB-001`; accepted starting base: `f25807eb0e744336626d39b94fd8e3a2078cc6be`; task activation commit: `ccdae59`.
+- Recorder prompt: `P-b8bc631f-a42a-4608-97ee-d08f993e7dfa`; prospective implementation run: `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`.
+- Candidate adds one reversible PostgreSQL migration, application-independent Python/psql runner, and database tests. The migration runner uses a transaction, advisory lock, checksum ledger, and explicit data-loss acknowledgement for down.
+- Baseline command: `tools/research/recorder.ps1 run-command --run-id R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98 -- pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`; exit 0, PASS before schema editing.
+- Final available database command: `tools/research/recorder.ps1 run-command --run-id R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98 -- C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest discover -s tests/database -v`; exit 0, 2 static tests PASS, 1 PostgreSQL integration test SKIPPED. The integration test covers migration forward/idempotence, session/friend/direct/message/outbox/artifact uniqueness, artifact immutability, rollback, and second forward/rollback cycle when enabled.
+- CTRL-002 Development during editing: same Recorder prefix with `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`; exit 0, PASS. This is not Acceptance.
+- Environment: `Get-Command postgres,psql,pg_ctl,initdb` found no local executables; `docker info` failed because Docker daemon pipe was absent. No disposable PostgreSQL endpoint was supplied. Therefore SQL runtime, uniqueness, and forward/rollback tests are unverified here, despite static checks passing.
+- Required next review action: run `DB_TEST_ENABLE=1` database tests with `psql` against a disposable PostgreSQL database, then independent clean-checkout CTRL-002 Acceptance under ADR-0001. S0 Gate is not passed. Original checkout's untracked HTTP schema-lint belongs to another Agent and was untouched.
