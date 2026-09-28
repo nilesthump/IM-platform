@@ -1,0 +1,546 @@
+{
+  "fixtureVersion": "1.0",
+  "profile": "go",
+  "outcomes": {
+    "manifest-valid": {
+      "last": "VALID"
+    },
+    "manifest-unknown-capability": {
+      "error": "INVALID"
+    },
+    "manifest-duplicate-permission": {
+      "error": "INVALID"
+    },
+    "gap-out-of-order-duplicate": {
+      "contiguous": 2,
+      "messages": {
+        "1": "50000000-0000-4000-8000-000000000001",
+        "2": "50000000-0000-4000-8000-000000000002"
+      },
+      "timeline": [
+        {
+          "op": "sync.message",
+          "cursor": "0",
+          "contiguous": 0,
+          "messages": {
+            "2": "50000000-0000-4000-8000-000000000002"
+          },
+          "userState": {},
+          "last": "APPLIED"
+        },
+        {
+          "op": "sync.message",
+          "cursor": "0",
+          "contiguous": 0,
+          "messages": {
+            "2": "50000000-0000-4000-8000-000000000002"
+          },
+          "userState": {},
+          "last": "APPLIED"
+        },
+        {
+          "op": "sync.message",
+          "cursor": "0",
+          "contiguous": 2,
+          "messages": {
+            "1": "50000000-0000-4000-8000-000000000001",
+            "2": "50000000-0000-4000-8000-000000000002"
+          },
+          "userState": {},
+          "last": "APPLIED"
+        }
+      ]
+    },
+    "gap-stops": {
+      "contiguous": 0,
+      "messages": {
+        "2": "50000000-0000-4000-8000-000000000002"
+      }
+    },
+    "failed-to-sent-terminal": {
+      "local": {
+        "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+      },
+      "last": "SENT"
+    },
+    "message-rollback-and-retry": {
+      "contiguous": 1,
+      "messages": {
+        "1": "50000000-0000-4000-8000-000000000001"
+      },
+      "timeline": [
+        {
+          "op": "sync.message",
+          "cursor": "0",
+          "contiguous": 0,
+          "messages": {},
+          "userState": {},
+          "last": "ROLLED_BACK"
+        },
+        {
+          "op": "sync.message",
+          "cursor": "0",
+          "contiguous": 1,
+          "messages": {
+            "1": "50000000-0000-4000-8000-000000000001"
+          },
+          "userState": {},
+          "last": "APPLIED"
+        }
+      ]
+    },
+    "user-rollback-and-retry": {
+      "cursor": "1",
+      "messages": {},
+      "userState": {
+        "friend.changed/10000000-0000-4000-8000-000000000001": 1
+      },
+      "timeline": [
+        {
+          "op": "sync.user",
+          "cursor": "0",
+          "contiguous": 0,
+          "messages": {},
+          "userState": {},
+          "last": "ROLLED_BACK"
+        },
+        {
+          "op": "sync.user",
+          "cursor": "1",
+          "contiguous": 0,
+          "messages": {},
+          "userState": {
+            "friend.changed/10000000-0000-4000-8000-000000000001": 1
+          },
+          "last": "APPLIED"
+        }
+      ]
+    },
+    "user-friend.changed": {
+      "cursor": "1",
+      "contiguous": 0
+    },
+    "user-conversation.changed": {
+      "cursor": "1",
+      "contiguous": 0
+    },
+    "user-membership.changed": {
+      "cursor": "1",
+      "contiguous": 0
+    },
+    "user-plugin.changed": {
+      "cursor": "1",
+      "contiguous": 0
+    },
+    "message-event-in-user-cursor": {
+      "error": "INVALID"
+    },
+    "sequence-collision": {
+      "error": "INVALID"
+    },
+    "request-identity-collision": {
+      "error": "INVALID"
+    },
+    "per-conversation-independent-sequence": {
+      "conversations": {
+        "30000000-0000-4000-8000-000000000001": {
+          "contiguous": 1,
+          "messages": {
+            "1": "50000000-0000-4000-8000-000000000001"
+          }
+        },
+        "30000000-0000-4000-8000-000000000002": {
+          "contiguous": 1,
+          "messages": {
+            "1": "50000000-0000-4000-8000-000000000008"
+          }
+        }
+      }
+    },
+    "allow-event-subscribe": {
+      "last": "ALLOWED"
+    },
+    "deny-event-subscribe-capability": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "deny-event-subscribe-permission": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "allow-query": {
+      "last": "ALLOWED"
+    },
+    "deny-query-capability": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "deny-query-permission": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "allow-action": {
+      "last": "ALLOWED"
+    },
+    "deny-action-capability": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "deny-action-permission": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "allow-ui-host": {
+      "last": "ALLOWED"
+    },
+    "deny-ui-host-capability": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "deny-ui-host-permission": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "deny-direct-core-db": {
+      "last": "DENIED"
+    },
+    "query-read-only-paginated": {
+      "last": "ALLOWED",
+      "sideEffects": 0
+    },
+    "query-over-limit": {
+      "last": "DENIED"
+    },
+    "query-mutation": {
+      "last": "DENIED",
+      "sideEffects": 0
+    },
+    "action-retry-audited": {
+      "last": "ALLOWED",
+      "sideEffects": 1,
+      "auditAttempts": 2,
+      "auditLog": [
+        {
+          "requestId": "40000000-0000-4000-8000-000000000001",
+          "authorizedAtExecution": true,
+          "outcome": "ALLOWED",
+          "sideEffectApplied": true
+        },
+        {
+          "requestId": "40000000-0000-4000-8000-000000000001",
+          "authorizedAtExecution": true,
+          "outcome": "ALLOWED",
+          "sideEffectApplied": false
+        }
+      ]
+    },
+    "action-revoked-at-execution": {
+      "last": "DENIED",
+      "sideEffects": 1,
+      "auditAttempts": 2,
+      "auditLog": [
+        {
+          "requestId": "40000000-0000-4000-8000-000000000001",
+          "authorizedAtExecution": true,
+          "outcome": "ALLOWED",
+          "sideEffectApplied": true
+        },
+        {
+          "requestId": "40000000-0000-4000-8000-000000000001",
+          "authorizedAtExecution": false,
+          "outcome": "DENIED",
+          "sideEffectApplied": false
+        }
+      ]
+    },
+    "artifact-verified": {
+      "last": "VERIFIED"
+    },
+    "immutable-packageHash": {
+      "last": "REJECTED"
+    },
+    "immutable-backendHash": {
+      "last": "REJECTED"
+    },
+    "immutable-rendererHash": {
+      "last": "REJECTED"
+    },
+    "artifact-version-split": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-hash": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-signature": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-manifest": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-compatibility": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-permission": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-size": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-csp": {
+      "last": "REJECTED"
+    },
+    "renderer-reject-entry": {
+      "last": "REJECTED"
+    },
+    "renderer-unsafe-sandbox": {
+      "error": "INVALID"
+    },
+    "renderer-bridge-sandbox": {
+      "last": "ALLOWED"
+    },
+    "renderer-runtime-deny-database": {
+      "last": "DENIED"
+    },
+    "renderer-runtime-deny-core_internal": {
+      "last": "DENIED"
+    },
+    "renderer-runtime-deny-server_file": {
+      "last": "DENIED"
+    },
+    "renderer-runtime-deny-os_resource": {
+      "last": "DENIED"
+    },
+    "renderer-runtime-deny-arbitrary_network": {
+      "last": "DENIED"
+    },
+    "renderer-runtime-deny-unmediated": {
+      "last": "DENIED"
+    },
+    "wasm-deny-database": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-deny-server_file": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-deny-arbitrary_network": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-deny-other_plugin_memory": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-limit-cpu_time": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-limit-memory": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-limit-concurrency": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-limit-storage": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-limit-network": {
+      "last": "DENIED",
+      "failureCount": 1
+    },
+    "wasm-auto-disable": {
+      "last": "AUTO_DISABLED",
+      "autoDisabled": true,
+      "failureCount": 3
+    },
+    "upgrade-atomic-switch": {
+      "last": "SWITCHED",
+      "activeVersion": "2.0.0",
+      "oldVersionServed": false,
+      "dataPreserved": true,
+      "upgradeTrace": [
+        {
+          "stage": "snapshot",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "migration",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "backend_health",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "renderer_health",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "atomic_switch",
+          "oldVersionServed": true
+        }
+      ]
+    },
+    "upgrade-fail-snapshot": {
+      "last": "ROLLED_BACK",
+      "activeVersion": "1.0.0",
+      "oldVersionServed": true,
+      "snapshotRestored": true,
+      "dataPreserved": true,
+      "upgradeTrace": [
+        {
+          "stage": "snapshot",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "restore_snapshot",
+          "oldVersionServed": true
+        }
+      ]
+    },
+    "upgrade-fail-migration": {
+      "last": "ROLLED_BACK",
+      "activeVersion": "1.0.0",
+      "oldVersionServed": true,
+      "snapshotRestored": true,
+      "dataPreserved": true,
+      "upgradeTrace": [
+        {
+          "stage": "snapshot",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "migration",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "restore_snapshot",
+          "oldVersionServed": true
+        }
+      ]
+    },
+    "upgrade-fail-backend_health": {
+      "last": "ROLLED_BACK",
+      "activeVersion": "1.0.0",
+      "oldVersionServed": true,
+      "snapshotRestored": true,
+      "dataPreserved": true,
+      "upgradeTrace": [
+        {
+          "stage": "snapshot",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "migration",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "backend_health",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "restore_snapshot",
+          "oldVersionServed": true
+        }
+      ]
+    },
+    "upgrade-fail-renderer_health": {
+      "last": "ROLLED_BACK",
+      "activeVersion": "1.0.0",
+      "oldVersionServed": true,
+      "snapshotRestored": true,
+      "dataPreserved": true,
+      "upgradeTrace": [
+        {
+          "stage": "snapshot",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "migration",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "backend_health",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "renderer_health",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "restore_snapshot",
+          "oldVersionServed": true
+        }
+      ]
+    },
+    "upgrade-fail-atomic_switch": {
+      "last": "ROLLED_BACK",
+      "activeVersion": "1.0.0",
+      "oldVersionServed": true,
+      "snapshotRestored": true,
+      "dataPreserved": true,
+      "upgradeTrace": [
+        {
+          "stage": "snapshot",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "migration",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "backend_health",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "renderer_health",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "atomic_switch",
+          "oldVersionServed": true
+        },
+        {
+          "stage": "restore_snapshot",
+          "oldVersionServed": true
+        }
+      ]
+    },
+    "upgrade-version-split": {
+      "last": "REJECTED",
+      "activeVersion": "1.0.0"
+    },
+    "disable-preserves-data": {
+      "last": "DISABLED",
+      "dataPreserved": true
+    },
+    "uninstall-retained": {
+      "last": "RETAINED",
+      "dataPreserved": true
+    },
+    "purge-deny-explicit": {
+      "last": "DENIED",
+      "dataPreserved": true
+    },
+    "purge-deny-elevated": {
+      "last": "DENIED",
+      "dataPreserved": true
+    },
+    "purge-deny-audited": {
+      "last": "DENIED",
+      "dataPreserved": true
+    },
+    "purge-deny-retention_confirmed": {
+      "last": "DENIED",
+      "dataPreserved": true
+    },
+    "purge-explicit-authorized": {
+      "last": "PURGED",
+      "dataPreserved": false
+    }
+  }
+}

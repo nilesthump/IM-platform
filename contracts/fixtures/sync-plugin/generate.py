@@ -19,6 +19,8 @@ def artifact(**changes):
     x={"apiVersion":"1.0","type":"artifact","pluginId":P,"version":"1.0.0","packageHash":"a"*64,"backendHash":"b"*64,"rendererHash":"c"*64,"signature":"fixture-signature","manifestValid":True,"compatible":True,"permissionsApproved":True,"resourceSizeOk":True,"cspValid":True,"entryPointValid":True,"sandbox":"iframe"}
     x.update(changes); return x
 cases=[]
+def sync_snap(op,last,cursor="0",contiguous=0,messages=None,user_state=None):
+    return {"op":op,"cursor":cursor,"contiguous":contiguous,"messages":messages or {},"userState":user_state or {},"last":last}
 def add(i,p,r,s,e=None,error=False):
     x={"id":i,"polarity":p,"rules":r,"steps":s}
     if e is not None:x["expect"]=e
@@ -30,11 +32,11 @@ add("manifest-valid","positive",["SP-A-005"],[{"op":"plugin.manifest","manifest"
 add("manifest-unknown-capability","negative",["SP-A-005"],[{"op":"plugin.manifest","manifest":dict(manifest,capabilities=["core_db"])}],error=True)
 add("manifest-duplicate-permission","negative",["SP-A-005"],[{"op":"plugin.manifest","manifest":dict(manifest,permissions=["query.messages","query.messages"])}],error=True)
 
-add("gap-out-of-order-duplicate","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(n)} for n in (2,2,1)],{"contiguous":2,"messages":{"1":M(1),"2":M(2)}})
+add("gap-out-of-order-duplicate","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(n)} for n in (2,2,1)],{"contiguous":2,"messages":{"1":M(1),"2":M(2)},"timeline":[sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",contiguous=2,messages={"1":M(1),"2":M(2)})]})
 add("gap-stops","negative",["SP-A-001"],[{"op":"sync.message","message":msg(2)}],{"contiguous":0,"messages":{"2":M(2)}})
 add("failed-to-sent-terminal","positive",["SP-A-002"],[{"op":"local.failed","conversationId":C,"requestId":R},{"op":"sync.message","message":msg(1)},{"op":"local.failed","conversationId":C,"requestId":R}],{"local":{C+"/"+R:"SENT"},"last":"SENT"})
-add("message-rollback-and-retry","positive",["SP-A-003"],[{"op":"sync.message","message":msg(1),"fault":"before_commit"},{"op":"sync.message","message":msg(1)}],{"contiguous":1,"messages":{"1":M(1)}})
-add("user-rollback-and-retry","positive",["SP-A-003","SP-A-004"],[{"op":"sync.user","page":user(),"fault":"before_commit"},{"op":"sync.user","page":user()}],{"cursor":"1","messages":{}})
+add("message-rollback-and-retry","positive",["SP-A-003"],[{"op":"sync.message","message":msg(1),"fault":"before_commit"},{"op":"sync.message","message":msg(1)}],{"contiguous":1,"messages":{"1":M(1)},"timeline":[sync_snap("sync.message","ROLLED_BACK"),sync_snap("sync.message","APPLIED",contiguous=1,messages={"1":M(1)})]})
+add("user-rollback-and-retry","positive",["SP-A-003","SP-A-004"],[{"op":"sync.user","page":user(),"fault":"before_commit"},{"op":"sync.user","page":user()}],{"cursor":"1","messages":{},"userState":{"friend.changed/"+U:1},"timeline":[sync_snap("sync.user","ROLLED_BACK"),sync_snap("sync.user","APPLIED",cursor="1",user_state={"friend.changed/"+U:1})]})
 for kind in ("friend.changed","conversation.changed","membership.changed","plugin.changed"):
     add("user-"+kind,"positive",["SP-A-004"],[{"op":"sync.user","page":user(kind)}],{"cursor":"1","contiguous":0})
 add("message-event-in-user-cursor","negative",["SP-A-004"],[{"op":"sync.user","page":user("message.created")}],error=True)
@@ -55,8 +57,11 @@ add("query-read-only-paginated","positive",["SP-A-006"],[q],{"last":"ALLOWED","s
 add("query-over-limit","negative",["SP-A-006"],[dict(q,call=dict(q["call"],pageSize=101))],{"last":"DENIED"})
 add("query-mutation","negative",["SP-A-006"],[dict(q,mutates=True)],{"last":"DENIED","sideEffects":0})
 a={"op":"plugin.call","call":call("action","send_message"),"capabilities":["actions"],"permissions":["action.send_message"],"authorizedAtExecution":True}
-add("action-retry-audited","positive",["SP-A-006","SP-A-013"],[a,a],{"last":"ALLOWED","sideEffects":1,"auditAttempts":2})
-add("action-revoked-at-execution","negative",["SP-A-006","SP-A-013"],[a,dict(a,authorizedAtExecution=False)],{"last":"DENIED","sideEffects":1,"auditAttempts":2})
+audit_allowed={"requestId":R,"authorizedAtExecution":True,"outcome":"ALLOWED","sideEffectApplied":True}
+audit_retry={"requestId":R,"authorizedAtExecution":True,"outcome":"ALLOWED","sideEffectApplied":False}
+audit_denied={"requestId":R,"authorizedAtExecution":False,"outcome":"DENIED","sideEffectApplied":False}
+add("action-retry-audited","positive",["SP-A-006","SP-A-013"],[a,a],{"last":"ALLOWED","sideEffects":1,"auditAttempts":2,"auditLog":[audit_allowed,audit_retry]})
+add("action-revoked-at-execution","negative",["SP-A-006","SP-A-013"],[a,dict(a,authorizedAtExecution=False)],{"last":"DENIED","sideEffects":1,"auditAttempts":2,"auditLog":[audit_allowed,audit_denied]})
 
 b={"op":"plugin.artifact","artifact":artifact(),"hashValid":True,"signatureValid":True}
 add("artifact-verified","positive",["SP-A-007","SP-A-008"],[b],{"last":"VERIFIED"})
@@ -78,9 +83,14 @@ for resource in ("cpu_time","memory","concurrency","storage","network"):
 add("wasm-auto-disable","negative",["SP-A-009"],[{"op":"plugin.wasm","timeout":True}]*3,{"last":"AUTO_DISABLED","autoDisabled":True,"failureCount":3})
 
 up={"op":"plugin.upgrade","backendVersion":"2.0.0","rendererVersion":"2.0.0"}
-add("upgrade-atomic-switch","positive",["SP-A-010"],[up],{"last":"SWITCHED","activeVersion":"2.0.0","oldVersionServed":False,"dataPreserved":True})
+stages=("snapshot","migration","backend_health","renderer_health","atomic_switch")
+def upgrade_trace(fail=None):
+    trace=[{"stage":s,"oldVersionServed":True} for s in stages[:stages.index(fail)+1] if fail] if fail else [{"stage":s,"oldVersionServed":True} for s in stages]
+    if fail: trace.append({"stage":"restore_snapshot","oldVersionServed":True})
+    return trace
+add("upgrade-atomic-switch","positive",["SP-A-010"],[up],{"last":"SWITCHED","activeVersion":"2.0.0","oldVersionServed":False,"dataPreserved":True,"upgradeTrace":upgrade_trace()})
 for stage in ("snapshot","migration","backend_health","renderer_health","atomic_switch"):
-    add("upgrade-fail-"+stage,"negative",["SP-A-010"],[dict(up,failAt=stage)],{"last":"ROLLED_BACK","activeVersion":"1.0.0","oldVersionServed":True,"snapshotRestored":True,"dataPreserved":True})
+    add("upgrade-fail-"+stage,"negative",["SP-A-010"],[dict(up,failAt=stage)],{"last":"ROLLED_BACK","activeVersion":"1.0.0","oldVersionServed":True,"snapshotRestored":True,"dataPreserved":True,"upgradeTrace":upgrade_trace(stage)})
 add("upgrade-version-split","negative",["SP-A-007","SP-A-010"],[dict(up,rendererVersion="3.0.0")],{"last":"REJECTED","activeVersion":"1.0.0"})
 
 add("disable-preserves-data","positive",["SP-A-011"],[{"op":"plugin.lifecycle","action":"DISABLE"}],{"last":"DISABLED","dataPreserved":True})

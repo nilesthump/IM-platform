@@ -160,7 +160,40 @@
         "messages": {
           "1": "50000000-0000-4000-8000-000000000001",
           "2": "50000000-0000-4000-8000-000000000002"
-        }
+        },
+        "timeline": [
+          {
+            "op": "sync.message",
+            "cursor": "0",
+            "contiguous": 0,
+            "messages": {
+              "2": "50000000-0000-4000-8000-000000000002"
+            },
+            "userState": {},
+            "last": "APPLIED"
+          },
+          {
+            "op": "sync.message",
+            "cursor": "0",
+            "contiguous": 0,
+            "messages": {
+              "2": "50000000-0000-4000-8000-000000000002"
+            },
+            "userState": {},
+            "last": "APPLIED"
+          },
+          {
+            "op": "sync.message",
+            "cursor": "0",
+            "contiguous": 2,
+            "messages": {
+              "1": "50000000-0000-4000-8000-000000000001",
+              "2": "50000000-0000-4000-8000-000000000002"
+            },
+            "userState": {},
+            "last": "APPLIED"
+          }
+        ]
       }
     },
     {
@@ -276,7 +309,27 @@
         "contiguous": 1,
         "messages": {
           "1": "50000000-0000-4000-8000-000000000001"
-        }
+        },
+        "timeline": [
+          {
+            "op": "sync.message",
+            "cursor": "0",
+            "contiguous": 0,
+            "messages": {},
+            "userState": {},
+            "last": "ROLLED_BACK"
+          },
+          {
+            "op": "sync.message",
+            "cursor": "0",
+            "contiguous": 1,
+            "messages": {
+              "1": "50000000-0000-4000-8000-000000000001"
+            },
+            "userState": {},
+            "last": "APPLIED"
+          }
+        ]
       }
     },
     {
@@ -329,7 +382,30 @@
       ],
       "expect": {
         "cursor": "1",
-        "messages": {}
+        "messages": {},
+        "userState": {
+          "friend.changed/10000000-0000-4000-8000-000000000001": 1
+        },
+        "timeline": [
+          {
+            "op": "sync.user",
+            "cursor": "0",
+            "contiguous": 0,
+            "messages": {},
+            "userState": {},
+            "last": "ROLLED_BACK"
+          },
+          {
+            "op": "sync.user",
+            "cursor": "1",
+            "contiguous": 0,
+            "messages": {},
+            "userState": {
+              "friend.changed/10000000-0000-4000-8000-000000000001": 1
+            },
+            "last": "APPLIED"
+          }
+        ]
       }
     },
     {
@@ -1167,7 +1243,21 @@
       "expect": {
         "last": "ALLOWED",
         "sideEffects": 1,
-        "auditAttempts": 2
+        "auditAttempts": 2,
+        "auditLog": [
+          {
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "authorizedAtExecution": true,
+            "outcome": "ALLOWED",
+            "sideEffectApplied": true
+          },
+          {
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "authorizedAtExecution": true,
+            "outcome": "ALLOWED",
+            "sideEffectApplied": false
+          }
+        ]
       }
     },
     {
@@ -1220,7 +1310,21 @@
       "expect": {
         "last": "DENIED",
         "sideEffects": 1,
-        "auditAttempts": 2
+        "auditAttempts": 2,
+        "auditLog": [
+          {
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "authorizedAtExecution": true,
+            "outcome": "ALLOWED",
+            "sideEffectApplied": true
+          },
+          {
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "authorizedAtExecution": false,
+            "outcome": "DENIED",
+            "sideEffectApplied": false
+          }
+        ]
       }
     },
     {
@@ -2092,7 +2196,29 @@
         "last": "SWITCHED",
         "activeVersion": "2.0.0",
         "oldVersionServed": false,
-        "dataPreserved": true
+        "dataPreserved": true,
+        "upgradeTrace": [
+          {
+            "stage": "snapshot",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "migration",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "backend_health",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "renderer_health",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "atomic_switch",
+            "oldVersionServed": true
+          }
+        ]
       }
     },
     {
@@ -2114,7 +2240,17 @@
         "activeVersion": "1.0.0",
         "oldVersionServed": true,
         "snapshotRestored": true,
-        "dataPreserved": true
+        "dataPreserved": true,
+        "upgradeTrace": [
+          {
+            "stage": "snapshot",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "restore_snapshot",
+            "oldVersionServed": true
+          }
+        ]
       }
     },
     {
@@ -2136,7 +2272,21 @@
         "activeVersion": "1.0.0",
         "oldVersionServed": true,
         "snapshotRestored": true,
-        "dataPreserved": true
+        "dataPreserved": true,
+        "upgradeTrace": [
+          {
+            "stage": "snapshot",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "migration",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "restore_snapshot",
+            "oldVersionServed": true
+          }
+        ]
       }
     },
     {
@@ -2158,7 +2308,25 @@
         "activeVersion": "1.0.0",
         "oldVersionServed": true,
         "snapshotRestored": true,
-        "dataPreserved": true
+        "dataPreserved": true,
+        "upgradeTrace": [
+          {
+            "stage": "snapshot",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "migration",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "backend_health",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "restore_snapshot",
+            "oldVersionServed": true
+          }
+        ]
       }
     },
     {
@@ -2180,7 +2348,29 @@
         "activeVersion": "1.0.0",
         "oldVersionServed": true,
         "snapshotRestored": true,
-        "dataPreserved": true
+        "dataPreserved": true,
+        "upgradeTrace": [
+          {
+            "stage": "snapshot",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "migration",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "backend_health",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "renderer_health",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "restore_snapshot",
+            "oldVersionServed": true
+          }
+        ]
       }
     },
     {
@@ -2202,7 +2392,33 @@
         "activeVersion": "1.0.0",
         "oldVersionServed": true,
         "snapshotRestored": true,
-        "dataPreserved": true
+        "dataPreserved": true,
+        "upgradeTrace": [
+          {
+            "stage": "snapshot",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "migration",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "backend_health",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "renderer_health",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "atomic_switch",
+            "oldVersionServed": true
+          },
+          {
+            "stage": "restore_snapshot",
+            "oldVersionServed": true
+          }
+        ]
       }
     },
     {

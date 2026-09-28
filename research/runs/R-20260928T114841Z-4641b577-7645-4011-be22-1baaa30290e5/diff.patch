@@ -1,0 +1,725 @@
+diff --git a/contracts/fixtures/sync-plugin/generate.py b/contracts/fixtures/sync-plugin/generate.py
+index 97abebf..ae39241 100644
+--- a/contracts/fixtures/sync-plugin/generate.py
++++ b/contracts/fixtures/sync-plugin/generate.py
+@@ -19,6 +19,8 @@ def artifact(**changes):
+     x={"apiVersion":"1.0","type":"artifact","pluginId":P,"version":"1.0.0","packageHash":"a"*64,"backendHash":"b"*64,"rendererHash":"c"*64,"signature":"fixture-signature","manifestValid":True,"compatible":True,"permissionsApproved":True,"resourceSizeOk":True,"cspValid":True,"entryPointValid":True,"sandbox":"iframe"}
+     x.update(changes); return x
+ cases=[]
++def sync_snap(op,last,cursor="0",contiguous=0,messages=None,user_state=None):
++    return {"op":op,"cursor":cursor,"contiguous":contiguous,"messages":messages or {},"userState":user_state or {},"last":last}
+ def add(i,p,r,s,e=None,error=False):
+     x={"id":i,"polarity":p,"rules":r,"steps":s}
+     if e is not None:x["expect"]=e
+@@ -30,11 +32,11 @@ add("manifest-valid","positive",["SP-A-005"],[{"op":"plugin.manifest","manifest"
+ add("manifest-unknown-capability","negative",["SP-A-005"],[{"op":"plugin.manifest","manifest":dict(manifest,capabilities=["core_db"])}],error=True)
+ add("manifest-duplicate-permission","negative",["SP-A-005"],[{"op":"plugin.manifest","manifest":dict(manifest,permissions=["query.messages","query.messages"])}],error=True)
+ 
+-add("gap-out-of-order-duplicate","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(n)} for n in (2,2,1)],{"contiguous":2,"messages":{"1":M(1),"2":M(2)}})
++add("gap-out-of-order-duplicate","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(n)} for n in (2,2,1)],{"contiguous":2,"messages":{"1":M(1),"2":M(2)},"timeline":[sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",contiguous=2,messages={"1":M(1),"2":M(2)})]})
+ add("gap-stops","negative",["SP-A-001"],[{"op":"sync.message","message":msg(2)}],{"contiguous":0,"messages":{"2":M(2)}})
+ add("failed-to-sent-terminal","positive",["SP-A-002"],[{"op":"local.failed","conversationId":C,"requestId":R},{"op":"sync.message","message":msg(1)},{"op":"local.failed","conversationId":C,"requestId":R}],{"local":{C+"/"+R:"SENT"},"last":"SENT"})
+-add("message-rollback-and-retry","positive",["SP-A-003"],[{"op":"sync.message","message":msg(1),"fault":"before_commit"},{"op":"sync.message","message":msg(1)}],{"contiguous":1,"messages":{"1":M(1)}})
+-add("user-rollback-and-retry","positive",["SP-A-003","SP-A-004"],[{"op":"sync.user","page":user(),"fault":"before_commit"},{"op":"sync.user","page":user()}],{"cursor":"1","messages":{}})
++add("message-rollback-and-retry","positive",["SP-A-003"],[{"op":"sync.message","message":msg(1),"fault":"before_commit"},{"op":"sync.message","message":msg(1)}],{"contiguous":1,"messages":{"1":M(1)},"timeline":[sync_snap("sync.message","ROLLED_BACK"),sync_snap("sync.message","APPLIED",contiguous=1,messages={"1":M(1)})]})
++add("user-rollback-and-retry","positive",["SP-A-003","SP-A-004"],[{"op":"sync.user","page":user(),"fault":"before_commit"},{"op":"sync.user","page":user()}],{"cursor":"1","messages":{},"userState":{"friend.changed/"+U:1},"timeline":[sync_snap("sync.user","ROLLED_BACK"),sync_snap("sync.user","APPLIED",cursor="1",user_state={"friend.changed/"+U:1})]})
+ for kind in ("friend.changed","conversation.changed","membership.changed","plugin.changed"):
+     add("user-"+kind,"positive",["SP-A-004"],[{"op":"sync.user","page":user(kind)}],{"cursor":"1","contiguous":0})
+ add("message-event-in-user-cursor","negative",["SP-A-004"],[{"op":"sync.user","page":user("message.created")}],error=True)
+@@ -55,8 +57,11 @@ add("query-read-only-paginated","positive",["SP-A-006"],[q],{"last":"ALLOWED","s
+ add("query-over-limit","negative",["SP-A-006"],[dict(q,call=dict(q["call"],pageSize=101))],{"last":"DENIED"})
+ add("query-mutation","negative",["SP-A-006"],[dict(q,mutates=True)],{"last":"DENIED","sideEffects":0})
+ a={"op":"plugin.call","call":call("action","send_message"),"capabilities":["actions"],"permissions":["action.send_message"],"authorizedAtExecution":True}
+-add("action-retry-audited","positive",["SP-A-006","SP-A-013"],[a,a],{"last":"ALLOWED","sideEffects":1,"auditAttempts":2})
+-add("action-revoked-at-execution","negative",["SP-A-006","SP-A-013"],[a,dict(a,authorizedAtExecution=False)],{"last":"DENIED","sideEffects":1,"auditAttempts":2})
++audit_allowed={"requestId":R,"authorizedAtExecution":True,"outcome":"ALLOWED","sideEffectApplied":True}
++audit_retry={"requestId":R,"authorizedAtExecution":True,"outcome":"ALLOWED","sideEffectApplied":False}
++audit_denied={"requestId":R,"authorizedAtExecution":False,"outcome":"DENIED","sideEffectApplied":False}
++add("action-retry-audited","positive",["SP-A-006","SP-A-013"],[a,a],{"last":"ALLOWED","sideEffects":1,"auditAttempts":2,"auditLog":[audit_allowed,audit_retry]})
++add("action-revoked-at-execution","negative",["SP-A-006","SP-A-013"],[a,dict(a,authorizedAtExecution=False)],{"last":"DENIED","sideEffects":1,"auditAttempts":2,"auditLog":[audit_allowed,audit_denied]})
+ 
+ b={"op":"plugin.artifact","artifact":artifact(),"hashValid":True,"signatureValid":True}
+ add("artifact-verified","positive",["SP-A-007","SP-A-008"],[b],{"last":"VERIFIED"})
+@@ -78,9 +83,14 @@ for resource in ("cpu_time","memory","concurrency","storage","network"):
+ add("wasm-auto-disable","negative",["SP-A-009"],[{"op":"plugin.wasm","timeout":True}]*3,{"last":"AUTO_DISABLED","autoDisabled":True,"failureCount":3})
+ 
+ up={"op":"plugin.upgrade","backendVersion":"2.0.0","rendererVersion":"2.0.0"}
+-add("upgrade-atomic-switch","positive",["SP-A-010"],[up],{"last":"SWITCHED","activeVersion":"2.0.0","oldVersionServed":False,"dataPreserved":True})
++stages=("snapshot","migration","backend_health","renderer_health","atomic_switch")
++def upgrade_trace(fail=None):
++    trace=[{"stage":s,"oldVersionServed":True} for s in stages[:stages.index(fail)+1] if fail] if fail else [{"stage":s,"oldVersionServed":True} for s in stages]
++    if fail: trace.append({"stage":"restore_snapshot","oldVersionServed":True})
++    return trace
++add("upgrade-atomic-switch","positive",["SP-A-010"],[up],{"last":"SWITCHED","activeVersion":"2.0.0","oldVersionServed":False,"dataPreserved":True,"upgradeTrace":upgrade_trace()})
+ for stage in ("snapshot","migration","backend_health","renderer_health","atomic_switch"):
+-    add("upgrade-fail-"+stage,"negative",["SP-A-010"],[dict(up,failAt=stage)],{"last":"ROLLED_BACK","activeVersion":"1.0.0","oldVersionServed":True,"snapshotRestored":True,"dataPreserved":True})
++    add("upgrade-fail-"+stage,"negative",["SP-A-010"],[dict(up,failAt=stage)],{"last":"ROLLED_BACK","activeVersion":"1.0.0","oldVersionServed":True,"snapshotRestored":True,"dataPreserved":True,"upgradeTrace":upgrade_trace(stage)})
+ add("upgrade-version-split","negative",["SP-A-007","SP-A-010"],[dict(up,rendererVersion="3.0.0")],{"last":"REJECTED","activeVersion":"1.0.0"})
+ 
+ add("disable-preserves-data","positive",["SP-A-011"],[{"op":"plugin.lifecycle","action":"DISABLE"}],{"last":"DISABLED","dataPreserved":True})
+diff --git a/contracts/fixtures/sync-plugin/golden.json b/contracts/fixtures/sync-plugin/golden.json
+index e4c444a..cca58c2 100644
+--- a/contracts/fixtures/sync-plugin/golden.json
++++ b/contracts/fixtures/sync-plugin/golden.json
+@@ -160,7 +160,40 @@
+         "messages": {
+           "1": "50000000-0000-4000-8000-000000000001",
+           "2": "50000000-0000-4000-8000-000000000002"
+-        }
++        },
++        "timeline": [
++          {
++            "op": "sync.message",
++            "cursor": "0",
++            "contiguous": 0,
++            "messages": {
++              "2": "50000000-0000-4000-8000-000000000002"
++            },
++            "userState": {},
++            "last": "APPLIED"
++          },
++          {
++            "op": "sync.message",
++            "cursor": "0",
++            "contiguous": 0,
++            "messages": {
++              "2": "50000000-0000-4000-8000-000000000002"
++            },
++            "userState": {},
++            "last": "APPLIED"
++          },
++          {
++            "op": "sync.message",
++            "cursor": "0",
++            "contiguous": 2,
++            "messages": {
++              "1": "50000000-0000-4000-8000-000000000001",
++              "2": "50000000-0000-4000-8000-000000000002"
++            },
++            "userState": {},
++            "last": "APPLIED"
++          }
++        ]
+       }
+     },
+     {
+@@ -276,7 +309,27 @@
+         "contiguous": 1,
+         "messages": {
+           "1": "50000000-0000-4000-8000-000000000001"
+-        }
++        },
++        "timeline": [
++          {
++            "op": "sync.message",
++            "cursor": "0",
++            "contiguous": 0,
++            "messages": {},
++            "userState": {},
++            "last": "ROLLED_BACK"
++          },
++          {
++            "op": "sync.message",
++            "cursor": "0",
++            "contiguous": 1,
++            "messages": {
++              "1": "50000000-0000-4000-8000-000000000001"
++            },
++            "userState": {},
++            "last": "APPLIED"
++          }
++        ]
+       }
+     },
+     {
+@@ -329,7 +382,30 @@
+       ],
+       "expect": {
+         "cursor": "1",
+-        "messages": {}
++        "messages": {},
++        "userState": {
++          "friend.changed/10000000-0000-4000-8000-000000000001": 1
++        },
++        "timeline": [
++          {
++            "op": "sync.user",
++            "cursor": "0",
++            "contiguous": 0,
++            "messages": {},
++            "userState": {},
++            "last": "ROLLED_BACK"
++          },
++          {
++            "op": "sync.user",
++            "cursor": "1",
++            "contiguous": 0,
++            "messages": {},
++            "userState": {
++              "friend.changed/10000000-0000-4000-8000-000000000001": 1
++            },
++            "last": "APPLIED"
++          }
++        ]
+       }
+     },
+     {
+@@ -1167,7 +1243,21 @@
+       "expect": {
+         "last": "ALLOWED",
+         "sideEffects": 1,
+-        "auditAttempts": 2
++        "auditAttempts": 2,
++        "auditLog": [
++          {
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "authorizedAtExecution": true,
++            "outcome": "ALLOWED",
++            "sideEffectApplied": true
++          },
++          {
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "authorizedAtExecution": true,
++            "outcome": "ALLOWED",
++            "sideEffectApplied": false
++          }
++        ]
+       }
+     },
+     {
+@@ -1220,7 +1310,21 @@
+       "expect": {
+         "last": "DENIED",
+         "sideEffects": 1,
+-        "auditAttempts": 2
++        "auditAttempts": 2,
++        "auditLog": [
++          {
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "authorizedAtExecution": true,
++            "outcome": "ALLOWED",
++            "sideEffectApplied": true
++          },
++          {
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "authorizedAtExecution": false,
++            "outcome": "DENIED",
++            "sideEffectApplied": false
++          }
++        ]
+       }
+     },
+     {
+@@ -2092,7 +2196,29 @@
+         "last": "SWITCHED",
+         "activeVersion": "2.0.0",
+         "oldVersionServed": false,
+-        "dataPreserved": true
++        "dataPreserved": true,
++        "upgradeTrace": [
++          {
++            "stage": "snapshot",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "migration",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "backend_health",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "renderer_health",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "atomic_switch",
++            "oldVersionServed": true
++          }
++        ]
+       }
+     },
+     {
+@@ -2114,7 +2240,17 @@
+         "activeVersion": "1.0.0",
+         "oldVersionServed": true,
+         "snapshotRestored": true,
+-        "dataPreserved": true
++        "dataPreserved": true,
++        "upgradeTrace": [
++          {
++            "stage": "snapshot",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "restore_snapshot",
++            "oldVersionServed": true
++          }
++        ]
+       }
+     },
+     {
+@@ -2136,7 +2272,21 @@
+         "activeVersion": "1.0.0",
+         "oldVersionServed": true,
+         "snapshotRestored": true,
+-        "dataPreserved": true
++        "dataPreserved": true,
++        "upgradeTrace": [
++          {
++            "stage": "snapshot",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "migration",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "restore_snapshot",
++            "oldVersionServed": true
++          }
++        ]
+       }
+     },
+     {
+@@ -2158,7 +2308,25 @@
+         "activeVersion": "1.0.0",
+         "oldVersionServed": true,
+         "snapshotRestored": true,
+-        "dataPreserved": true
++        "dataPreserved": true,
++        "upgradeTrace": [
++          {
++            "stage": "snapshot",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "migration",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "backend_health",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "restore_snapshot",
++            "oldVersionServed": true
++          }
++        ]
+       }
+     },
+     {
+@@ -2180,7 +2348,29 @@
+         "activeVersion": "1.0.0",
+         "oldVersionServed": true,
+         "snapshotRestored": true,
+-        "dataPreserved": true
++        "dataPreserved": true,
++        "upgradeTrace": [
++          {
++            "stage": "snapshot",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "migration",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "backend_health",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "renderer_health",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "restore_snapshot",
++            "oldVersionServed": true
++          }
++        ]
+       }
+     },
+     {
+@@ -2202,7 +2392,33 @@
+         "activeVersion": "1.0.0",
+         "oldVersionServed": true,
+         "snapshotRestored": true,
+-        "dataPreserved": true
++        "dataPreserved": true,
++        "upgradeTrace": [
++          {
++            "stage": "snapshot",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "migration",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "backend_health",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "renderer_health",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "atomic_switch",
++            "oldVersionServed": true
++          },
++          {
++            "stage": "restore_snapshot",
++            "oldVersionServed": true
++          }
++        ]
+       }
+     },
+     {
+diff --git a/contracts/plugin-api/README.md b/contracts/plugin-api/README.md
+index cbc62a3..930c148 100644
+--- a/contracts/plugin-api/README.md
++++ b/contracts/plugin-api/README.md
+@@ -10,4 +10,6 @@ A renderer loads only after package hash, signature, manifest schema, API compat
+ 
+ WASM denies database, server-file, arbitrary-network, and other-plugin-memory access by default. CPU/time, memory, concurrency, storage, and network limits are enforced; three consecutive timeout, panic, or limit violations trigger AUTO_DISABLED. Plugin artifact lifecycle and Conversation instance lifecycle remain distinct. During upgrade the old version serves until snapshot, migration, backend and renderer health checks, and atomic switch succeed. Any failed stage restores the snapshot and leaves the old version serving. DISABLE preserves data; UNINSTALL defaults to RETAINED; PURGE requires an explicit, elevated, audited, retention-confirmed operation.
+ 
+-Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check all Go and Java expected outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; the verifier compares both profiles to those outcomes and runs malformed-wire and wrong-outcome controls.
++Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; observable Sync checkpoints record rollback, materialized user state, the gap before repair, and retry. Action fixtures record every authorization/audit result, and upgrade fixtures record each attempted stage while the old version serves.
++
++`contracts/fixtures/sync-plugin/profile-outcomes/go.json` and `java.json` are separately stored normalized **contract vectors** for the two planned backend profiles. The verifier checks each artifact's complete case set against the canonical expected outcome and rejects a divergent value in either profile. These static vectors were initially populated from the canonical fixture expectations; they are not outputs from Go or Java backend execution, because neither backend exists at this stage. Backend conformance must replace or validate these observations when those implementations arrive. The verifier also runs malformed-wire, wrong-outcome, seven scenario mutation, and profile-divergence controls.
+diff --git a/contracts/plugin-api/verify.py b/contracts/plugin-api/verify.py
+index 3152cf7..a3db8f4 100644
+--- a/contracts/plugin-api/verify.py
++++ b/contracts/plugin-api/verify.py
+@@ -13,6 +13,7 @@ SYNC = json.loads((ROOT / "websocket/sync-v1.schema.json").read_text(encoding="u
+ PLUGIN = json.loads((ROOT / "plugin-api/v1.schema.json").read_text(encoding="utf-8"))
+ POLICY = json.loads((ROOT / "plugin-api/policy-v1.json").read_text(encoding="utf-8"))
+ FIXTURE = ROOT / "fixtures/sync-plugin/golden.json"
++PROFILE_DIR = FIXTURE.parent / "profile-outcomes"
+ ALLOWED = {"$schema", "$id", "title", "description", "$defs", "$ref", "type", "const", "enum", "oneOf", "allOf", "required", "properties", "additionalProperties", "items", "minLength", "maxLength", "minimum", "maximum", "format", "maxItems", "minItems", "uniqueItems"}
+ 
+ 
+@@ -120,12 +121,16 @@ def validate(value, schema, root, path="$"):
+ 
+ 
+ def run(case):
+-    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "local": {}, "sideEffects": 0, "auditAttempts": 0, "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
++    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "userState": {}, "local": {}, "sideEffects": 0, "auditAttempts": 0, "auditLog": [], "timeline": [], "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "upgradeTrace": [], "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
+     state.update(copy.deepcopy(case.get("initial", {})))
+     seen_actions = set()
+-    seen_events = set()
++    seen_events = {}
+     artifact_hashes = {}
+     request_messages = {}
++    message_payloads = {}
++    def record_sync(op):
++        fields = ("cursor", "contiguous", "messages", "userState", "last")
++        state["timeline"].append({"op": op, **{key: copy.deepcopy(state[key]) for key in fields}})
+     for step in case["steps"]:
+         op = step["op"]
+         if op == "sync.user":
+@@ -133,39 +138,54 @@ def run(case):
+             validate(page, SYNC, SYNC)
+             if page["type"] != "sync.user.page":
+                 raise Invalid("sync.user requires user page")
+-            if step.get("fault") == "before_commit":
+-                state["last"] = "ROLLED_BACK"
+-                continue
++            staged_events = copy.deepcopy(seen_events)
++            staged_user = copy.deepcopy(state["userState"])
+             for event in page["events"]:
+                 if event["kind"] not in ("friend.changed", "conversation.changed", "membership.changed", "plugin.changed"):
+                     raise Invalid("message event in user cursor")
+-                seen_events.add(event["eventId"])
++                if event["eventId"] in staged_events and staged_events[event["eventId"]] != event:
++                    raise Invalid("conflicting user event")
++                staged_events[event["eventId"]] = copy.deepcopy(event)
++                staged_user[event["kind"] + "/" + event["subjectId"]] = event["revision"]
++            if step.get("fault") == "before_commit":
++                state["last"] = "ROLLED_BACK"
++                record_sync(op)
++                continue
++            seen_events = staged_events
++            state["userState"] = staged_user
+             state["cursor"] = page["nextCursor"]
+             state["last"] = "APPLIED"
++            record_sync(op)
+         elif op == "sync.message":
+             msg = step["message"]
+             validate(msg, SYNC["$defs"]["Message"], SYNC)
+-            if step.get("fault") == "before_commit":
+-                state["last"] = "ROLLED_BACK"
+-                continue
+             if msg["conversationId"] != case.get("conversationId", msg["conversationId"]):
+                 raise Invalid("wrong conversation")
+-            conv = state["conversations"].setdefault(msg["conversationId"], {"contiguous": 0, "messages": {}})
++            conv = copy.deepcopy(state["conversations"].get(msg["conversationId"], {"contiguous": 0, "messages": {}}))
+             key = str(msg["seq"])
+             prior = conv["messages"].get(key)
+             if prior and prior != msg["messageId"]:
+                 raise Invalid("sequence collision")
+             identity = msg["conversationId"] + "/" + msg["requestId"]
+-            if identity in request_messages and request_messages[identity] != msg["messageId"]:
++            if identity in request_messages and request_messages[identity] != msg:
+                 raise Invalid("request identity collision")
+-            request_messages[identity] = msg["messageId"]
++            if msg["messageId"] in message_payloads and message_payloads[msg["messageId"]] != msg:
++                raise Invalid("message identity collision")
+             conv["messages"][key] = msg["messageId"]
+             while str(conv["contiguous"] + 1) in conv["messages"]:
+                 conv["contiguous"] += 1
+-            state["messages"] = conv["messages"]
++            if step.get("fault") == "before_commit":
++                state["last"] = "ROLLED_BACK"
++                record_sync(op)
++                continue
++            request_messages[identity] = copy.deepcopy(msg)
++            message_payloads[msg["messageId"]] = copy.deepcopy(msg)
++            state["conversations"][msg["conversationId"]] = conv
++            state["messages"] = copy.deepcopy(conv["messages"])
+             state["contiguous"] = conv["contiguous"]
+             state["local"][identity] = "SENT"
+             state["last"] = "APPLIED"
++            record_sync(op)
+         elif op == "local.failed":
+             identity = step["conversationId"] + "/" + step["requestId"]
+             if state["local"].get(identity) != "SENT":
+@@ -185,11 +205,14 @@ def run(case):
+             if typ == "action":
+                 state["auditAttempts"] += 1
+                 allowed = allowed and step.get("authorizedAtExecution", False)
++                applied = False
+                 if allowed:
+                     identity = call["pluginId"] + "/" + call["conversationId"] + "/" + call["requestId"]
+                     if identity not in seen_actions:
+                         state["sideEffects"] += 1
+                         seen_actions.add(identity)
++                        applied = True
++                state["auditLog"].append({"requestId": call["requestId"], "authorizedAtExecution": step.get("authorizedAtExecution") is True, "outcome": "ALLOWED" if allowed else "DENIED", "sideEffectApplied": applied})
+             state["last"] = "ALLOWED" if allowed else "DENIED"
+         elif op == "plugin.manifest":
+             validate(step["manifest"], PLUGIN, PLUGIN)
+@@ -234,13 +257,18 @@ def run(case):
+                 raise Invalid("unknown upgrade stage")
+             if step.get("backendVersion") != step.get("rendererVersion"):
+                 state["last"] = "REJECTED"
+-            elif failed:
+-                state["snapshotRestored"] = True
+-                state["last"] = "ROLLED_BACK"
+             else:
+-                state["activeVersion"] = step["backendVersion"]
+-                state["oldVersionServed"] = False
+-                state["last"] = "SWITCHED"
++                for stage in stages:
++                    state["upgradeTrace"].append({"stage": stage, "oldVersionServed": state["oldVersionServed"]})
++                    if failed == stage:
++                        state["upgradeTrace"].append({"stage": "restore_snapshot", "oldVersionServed": True})
++                        state["snapshotRestored"] = True
++                        state["last"] = "ROLLED_BACK"
++                        break
++                    if stage == "atomic_switch":
++                        state["activeVersion"] = step["backendVersion"]
++                        state["oldVersionServed"] = False
++                        state["last"] = "SWITCHED"
+         elif op == "plugin.lifecycle":
+             action = step["action"]
+             if action in ("DISABLE", "UNINSTALL"):
+@@ -258,6 +286,34 @@ def run(case):
+     return {key: state[key] for key in case["expect"]}
+ 
+ 
++def check_profile_outcome(profile, case_id, actual, canonical):
++    if actual != canonical:
++        raise Invalid(f"{profile}/{case_id}: normalized outcome differs from canonical")
++
++
++def check_negative_mutations(cases):
++    by_id = {case["id"]: case for case in cases}
++    mutations = [
++        ("gap-out-of-order-duplicate", lambda c: c["steps"].insert(0, c["steps"].pop(2))),
++        ("message-rollback-and-retry", lambda c: c["steps"][0].pop("fault")),
++        ("user-rollback-and-retry", lambda c: c["steps"][0].pop("fault")),
++        ("gap-out-of-order-duplicate", lambda c: c["steps"][1]["message"]["content"].__setitem__("text", "conflicting-payload")),
++        ("gap-out-of-order-duplicate", lambda c: c["steps"][2]["message"].update({k: c["steps"][0]["message"][k] for k in ("messageId", "requestId")})),
++        ("action-retry-audited", lambda c: c["steps"][0].__setitem__("authorizedAtExecution", False)),
++        ("upgrade-fail-migration", lambda c: c["steps"][0].__setitem__("failAt", "snapshot")),
++    ]
++    for case_id, mutate in mutations:
++        case = copy.deepcopy(by_id[case_id])
++        mutate(case)
++        try:
++            actual = run(case)
++        except Invalid:
++            continue
++        if actual == case["expect"]:
++            raise Invalid(f"{case_id}: invalid mutation preserved expected result")
++    return len(mutations)
++
++
+ def verify():
+     for schema in (SYNC, PLUGIN):
+         lint(schema, schema)
+@@ -272,29 +328,50 @@ def verify():
+         raise Invalid("duplicate case IDs")
+     covered = set()
+     positives = negatives = 0
++    by_id = {case["id"]: case for case in cases}
++    profile_results = {}
++    for profile in fixtures["profiles"]:
++        artifact = json.loads((PROFILE_DIR / f"{profile}.json").read_text(encoding="utf-8"))
++        if artifact.get("profile") != profile or artifact.get("fixtureVersion") != fixtures["fixtureVersion"]:
++            raise Invalid(f"{profile}: outcome artifact identity/version mismatch")
++        outcomes = artifact.get("outcomes")
++        if not isinstance(outcomes, dict) or set(outcomes) != set(by_id):
++            raise Invalid(f"{profile}: missing or extra normalized outcomes")
++        profile_results[profile] = outcomes
+     for case in cases:
+         if case["polarity"] not in ("positive", "negative") or not case["rules"]:
+             raise Invalid(f"{case['id']}: invalid polarity or missing rules")
+         covered.update(case["rules"])
+         positives += case["polarity"] == "positive"
+         negatives += case["polarity"] == "negative"
++        if case.get("expectError"):
++            try:
++                run(copy.deepcopy(case))
++            except Invalid:
++                canonical = {"error": "INVALID"}
++            else:
++                raise Invalid(f"{case['id']}: expected contract rejection")
++        else:
++            canonical = run(copy.deepcopy(case))
++            if canonical != case["expect"]:
++                raise Invalid(f"{case['id']}: expected {case['expect']}, got {canonical}")
+         for profile in fixtures["profiles"]:
+-            if case.get("expectError"):
+-                try:
+-                    run(copy.deepcopy(case))
+-                except Invalid:
+-                    continue
+-                raise Invalid(f"{profile}/{case['id']}: expected contract rejection")
+-            actual = run(copy.deepcopy(case))
+-            if actual != case["expect"]:
+-                raise Invalid(f"{profile}/{case['id']}: expected {case['expect']}, got {actual}")
++            check_profile_outcome(profile, case["id"], profile_results[profile][case["id"]], canonical)
+     required = {f"SP-A-{i:03d}" for i in range(1, 14)}
+     if not required <= covered:
+         raise Invalid(f"missing acceptance coverage {required-covered}")
+-    # Controls prove schema and scenario oracle reject malformed or wrong outcomes.
++    mutation_count = check_negative_mutations(cases)
++    # Controls prove schema, scenario, and independently stored profile outcomes reject mutations.
+     bad = copy.deepcopy(cases[0]); bad["expect"]["last"] = "NEVER"
+     if run(bad) == bad["expect"]:
+         raise Invalid("outcome mutation accepted")
++    for profile in fixtures["profiles"]:
++        try:
++            check_profile_outcome(profile, cases[0]["id"], {"last": "DIVERGED"}, profile_results[profile][cases[0]["id"]])
++        except Invalid:
++            pass
++        else:
++            raise Invalid(f"{profile}: profile divergence control accepted")
+     malformed = {"syncVersion":"1.0","type":"sync.user.page","requestId":"not-a-uuid","events":[],"nextCursor":"1","hasMore":False}
+     try:
+         validate(malformed, SYNC, SYNC)
+@@ -302,7 +379,7 @@ def verify():
+         pass
+     else:
+         raise Invalid("malformed Sync UUID accepted")
+-    print(f"PASS: Sync/Plugin v1 schemas, {len(cases)} shared Go/Java cases ({positives} positive, {negatives} negative), SP-A-001..013, 2 mutation controls")
++    print(f"PASS: Sync/Plugin v1 schemas, {len(cases)} distinct Go/Java outcome artifacts ({positives} positive, {negatives} negative), SP-A-001..013, {mutation_count + 4} mutation controls")
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 8c2d29f..a270ae0 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh Fix Agent `/root/contract003_fix1` repaired the Contract 003 fixture oracle after independent Review 1 FAIL. Staged rollback/retry and gap checkpoints, full Message identity checks, per-attempt Action audit, and ordered upgrade trace now reject all seven committed reviewer mutations. The task verifier passes 79 cases and 11 controls; CTRL-002 Development passes. Distinct Go/Java static normalized contract-vector files now receive separate comparison, but neither is a backend execution result; fresh independent review must decide whether these satisfy SP-A-012 at S0 contract freeze. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`.
+ - Fresh independent Review Agent `/root/contract003_review1` rejected clean Contract 003 candidate `9a14f63`: baseline schema/fixture verification and clean detached CTRL-002 Acceptance passed, but six of seven independent negative mutations retained the expected output and profile parity is tautological. Findings cover atomic rollback/materialization, conflicting duplicates, per-attempt Action authorization, upgrade stages, and distinct Go/Java outcomes. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
+ - Contract 003 moved to `review` after clean implementation candidate `9a14f63`. Coordinator Recorder run `R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd` finished and validated with 6 events; CTRL-002 Development passed after the move. Exact handoff: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition.md`. Fresh independent acceptance remains pending; S0 Gate NOT YET PASSED.
+ - Fresh Implementation Agent `/root/contract003_impl` completed clean Contract 003 candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`: canonical Sync v1 and Plugin API v1 schemas, permission/limit/lifecycle policy, and 79 shared Go/Java golden cases covering SP-A-001..013. The final recorded schema/fixture verifier passed with exit 0; CTRL-002 Development passed with exit 0. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The task is now in `review` for a fresh independent agent; S0 Gate NOT YET PASSED.
+@@ -183,6 +184,7 @@ Current Task State: review
+ 
+ ## Changed Files or Migrations
+ 
++- Contract 003 Fix 1 changes `contracts/plugin-api/verify.py` and README, `contracts/fixtures/sync-plugin/generate.py` and `golden.json`, and adds separate `profile-outcomes/go.json` and `java.json`; task-linked evidence/Recorder and recovery files are updated. No schema, migration, runtime, HTTP/WSS, or Frozen Architecture file changes.
+ - The accepted earlier Research task added the Recorder control plane under `research/**`, `tools/research/**`, and `tests/research/**`. The current integration combines accepted Contract and Minimality lineages and adds task-owned integration Recorder/evidence and recovery-state changes; it adds no IM product implementation.
+ - `contracts/http/auth-user-friend.openapi.json` is the canonical OpenAPI 3.1 Auth/User/Friend contract with separate credential-bound WEB/native refresh operations and operation/status-specific error codes; `contracts/http/verify-auth-user-friend.ps1` cross-validates it with fixtures and runs mutation regressions.
+ - The obsolete `contracts/http/auth-user-friend.openapi.structure.schema.json` was removed. The task verifier now uses `contracts/http/openapi-3.1-2026-08-03.schema.json`, an offline standalone validator, and nine structural negative regressions. OAI's structural schema does not validate all embedded Schema Object content or every prose rule.
+@@ -198,6 +200,7 @@ Current Task State: review
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
++- Contract 003 Review 1 FAIL remains permanent. Fix 1's static Go/Java outcome vectors are contract baselines initially populated from canonical expectations, not independent backend outputs. The fresh reviewer must decide the S0 interpretation of SP-A-012; development PASS does not close the task.
+ - Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
+ - All activity before the Instrumentation Epoch is bootstrap, retrospective backfill, or pilot evidence and must not be represented as complete prospective trace data.
+ - `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
+@@ -214,7 +217,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Delegate a fresh Fix Agent for the Contract 003 independent findings, then a different fresh Review Agent. Keep task in `review`; rerun deterministic contract verification and clean detached CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
++Finish and validate the Contract 003 Fix 1 Recorder run, commit a clean candidate, then delegate a different fresh Review Agent. Reviewer must inspect the profile-vector provenance and resolve the SP-A-012 acceptance interpretation, rerun deterministic contract verification and the seven-case probe, and use a clean detached checkout for CTRL-002 Acceptance. Keep task in `review`; S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -226,6 +229,7 @@ Delegate a fresh Fix Agent for the Contract 003 independent findings, then a dif
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/contract003_fix1` owns only task-allowed verifier, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory belongs to another agent and was untouched.
+ - Fresh independent Reviewer `/root/contract003_review1` owns only task-linked FAIL evidence/probe, task/current recovery updates, prompt and Recorder run until review closure is committed. It changed no product contract file. The separate detached Acceptance checkout remains clean at candidate `9a14f63`. The original `H:\IM-platform` untracked HTTP schema-lint directory was not accessed.
+ - Coordinator `/root` owns only the Contract 003 review queue transition, current/task recovery update, and linked Recorder handoff artifacts until the transition commit. The fresh Implementation Agent committed its clean candidate and owns no uncommitted changes. The original `H:\IM-platform` untracked HTTP schema-lint directory remains solely owned by the paused Agent and untouched.
+ - Coordinator `/root` completed Contract 003 queue activation in the clean activation commit; Implementation Agent ownership of the candidate is recorded above.
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-003.md b/spec/tasks/review/LOOP1-CONTRACT-003.md
+index 1d93045..5332b9c 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-003.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-003.md
+@@ -59,6 +59,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Evidence
+ 
++- Fresh Fix Agent `/root/contract003_fix1` repaired Review 1's oracle findings: staged local materialization and rollback/retry checkpoints, the intermediate gap, full Message identity, each Action attempt's authorization/audit, and ordered upgrade stages/rollback. Separately stored Go/Java normalized contract vectors are checked against canonical outcomes with divergence controls. These are static vectors initially populated from canonical fixtures, not backend execution evidence. The committed review probe rejects 7/7 invalid mutations; the verifier passes 79 cases and 11 mutation controls; CTRL-002 Development passes. This is development evidence only. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`. Acceptance ambiguity: does SP-A-012 at S0 contract freeze require live backend-produced outcomes, or are distinct static profile contract vectors sufficient pending backend implementation?
+ - Fresh independent Review Agent `/root/contract003_review1` rejected exact candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`. The baseline verifier and clean detached CTRL-002 Acceptance passed, but six of seven in-memory negative mutations retained the expected fixture result: rollback was unobserved, conflicting duplicate content was accepted, first-attempt Action authorization was masked, and upgrade failure stages were interchangeable. The profile loop also repeats one Python oracle without distinct Go/Java outcomes. Task stays `review`; S0 Gate NOT YET PASSED. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; probe: `spec/progress/evidence/LOOP1-CONTRACT-003/review1-negative-probe.py`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
+ - Coordinator review-state transition preserves implementation candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`. CTRL-002 Development passed after the queue move; linked Recorder run `R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd` finished and validated (6 events). Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition.md`. Independent acceptance remains pending.
+ - Fresh Implementation Agent `/root/contract003_impl` added canonical Sync v1 and Plugin API v1 schemas, a machine-readable permission/limit/lifecycle policy, and deterministic shared Go/Java fixtures. Its verifier checks schema structure and values, exact expected outcomes for 79 cases (22 positive, 57 negative), and acceptance IDs SP-A-001 through SP-A-013. It also checks fixture source consistency and two malformed/outcome mutation controls. Development command `python contracts/plugin-api/verify.py` passed with exit 0 (118.3817 ms for the final recorded run). `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0 (1039.2365 ms for the final recorded run). These are development results, not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`.
+@@ -67,8 +68,9 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Handoff
+ 
++- Fix 1 owns only task-allowed oracle/fixture/README changes and linked evidence/Recorder/recovery updates until its clean candidate commit. The task stays `review`; the Fix Agent has not self-accepted. The original `H:\IM-platform` other-Agent-owned untracked HTTP schema-lint directory was untouched.
+ - Candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff` failed fresh independent review despite clean-checkout CTRL-002 Acceptance. The reviewer changed only task-linked evidence, probe, recovery files, and Recorder artifacts; no product contract file. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
+ 
+ # Next Action
+ 
+-- Coordinator delegates a fresh Fix Agent to repair the independent findings recorded in `2026-09-28-independent-review1-9a14f63-fail.md`, then a different fresh independent Review Agent. Keep task in `review`; do not claim acceptance or Gate PASS from baseline checks.
++- Finish and validate the Fix 1 Recorder run, commit a clean candidate, then delegate a different fresh independent Review Agent. That reviewer must resolve the static-profile-vector interpretation, inspect the exact candidate, run the task verifier and review probe, and run clean detached CTRL-002 Acceptance under ADR-0001. Keep task in `review`; do not claim acceptance or Gate PASS from development checks.
+
+# Untracked paths observed; content intentionally not captured
+# ?? contracts/fixtures/sync-plugin/profile-outcomes/go.json
+# ?? contracts/fixtures/sync-plugin/profile-outcomes/java.json
+# ?? research/prompts/LOOP1-CONTRACT-003-fix1.txt
+# ?? research/prompts/P-2aa3cab5-dd8e-4588-8781-f662d006ce1d/metadata.json
+# ?? research/prompts/P-2aa3cab5-dd8e-4588-8781-f662d006ce1d/prompt.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-3def6c99-d594-408a-9658-72411aa1cdec.stderr.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-3def6c99-d594-408a-9658-72411aa1cdec.stdout.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-51f93e8b-3673-49da-a9ad-5a9b6bcc2f95.stderr.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-51f93e8b-3673-49da-a9ad-5a9b6bcc2f95.stdout.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-67dc0fad-4b2a-498c-ad84-461897acc80e.stderr.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-67dc0fad-4b2a-498c-ad84-461897acc80e.stdout.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-7343b596-dfd0-4310-8a1f-ee0d2292418d.stderr.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-7343b596-dfd0-4310-8a1f-ee0d2292418d.stdout.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-7ee6e79c-150d-407b-90ba-709a6f055df8.stderr.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-7ee6e79c-150d-407b-90ba-709a6f055df8.stdout.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-b1ec5224-e2ce-4071-9d8c-45e40accd150.stderr.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-b1ec5224-e2ce-4071-9d8c-45e40accd150.stdout.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-c340347f-104a-4c85-bf51-bf37aeb06fca.stderr.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/blobs/C-c340347f-104a-4c85-bf51-bf37aeb06fca.stdout.txt
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/events.jsonl
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/initial_state.json
+# ?? research/runs/R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md

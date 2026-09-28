@@ -13,6 +13,7 @@ SYNC = json.loads((ROOT / "websocket/sync-v1.schema.json").read_text(encoding="u
 PLUGIN = json.loads((ROOT / "plugin-api/v1.schema.json").read_text(encoding="utf-8"))
 POLICY = json.loads((ROOT / "plugin-api/policy-v1.json").read_text(encoding="utf-8"))
 FIXTURE = ROOT / "fixtures/sync-plugin/golden.json"
+PROFILE_DIR = FIXTURE.parent / "profile-outcomes"
 ALLOWED = {"$schema", "$id", "title", "description", "$defs", "$ref", "type", "const", "enum", "oneOf", "allOf", "required", "properties", "additionalProperties", "items", "minLength", "maxLength", "minimum", "maximum", "format", "maxItems", "minItems", "uniqueItems"}
 
 
@@ -120,12 +121,16 @@ def validate(value, schema, root, path="$"):
 
 
 def run(case):
-    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "local": {}, "sideEffects": 0, "auditAttempts": 0, "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
+    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "userState": {}, "local": {}, "sideEffects": 0, "auditAttempts": 0, "auditLog": [], "timeline": [], "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "upgradeTrace": [], "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
     state.update(copy.deepcopy(case.get("initial", {})))
     seen_actions = set()
-    seen_events = set()
+    seen_events = {}
     artifact_hashes = {}
     request_messages = {}
+    message_payloads = {}
+    def record_sync(op):
+        fields = ("cursor", "contiguous", "messages", "userState", "last")
+        state["timeline"].append({"op": op, **{key: copy.deepcopy(state[key]) for key in fields}})
     for step in case["steps"]:
         op = step["op"]
         if op == "sync.user":
@@ -133,39 +138,54 @@ def run(case):
             validate(page, SYNC, SYNC)
             if page["type"] != "sync.user.page":
                 raise Invalid("sync.user requires user page")
-            if step.get("fault") == "before_commit":
-                state["last"] = "ROLLED_BACK"
-                continue
+            staged_events = copy.deepcopy(seen_events)
+            staged_user = copy.deepcopy(state["userState"])
             for event in page["events"]:
                 if event["kind"] not in ("friend.changed", "conversation.changed", "membership.changed", "plugin.changed"):
                     raise Invalid("message event in user cursor")
-                seen_events.add(event["eventId"])
+                if event["eventId"] in staged_events and staged_events[event["eventId"]] != event:
+                    raise Invalid("conflicting user event")
+                staged_events[event["eventId"]] = copy.deepcopy(event)
+                staged_user[event["kind"] + "/" + event["subjectId"]] = event["revision"]
+            if step.get("fault") == "before_commit":
+                state["last"] = "ROLLED_BACK"
+                record_sync(op)
+                continue
+            seen_events = staged_events
+            state["userState"] = staged_user
             state["cursor"] = page["nextCursor"]
             state["last"] = "APPLIED"
+            record_sync(op)
         elif op == "sync.message":
             msg = step["message"]
             validate(msg, SYNC["$defs"]["Message"], SYNC)
-            if step.get("fault") == "before_commit":
-                state["last"] = "ROLLED_BACK"
-                continue
             if msg["conversationId"] != case.get("conversationId", msg["conversationId"]):
                 raise Invalid("wrong conversation")
-            conv = state["conversations"].setdefault(msg["conversationId"], {"contiguous": 0, "messages": {}})
+            conv = copy.deepcopy(state["conversations"].get(msg["conversationId"], {"contiguous": 0, "messages": {}}))
             key = str(msg["seq"])
             prior = conv["messages"].get(key)
             if prior and prior != msg["messageId"]:
                 raise Invalid("sequence collision")
             identity = msg["conversationId"] + "/" + msg["requestId"]
-            if identity in request_messages and request_messages[identity] != msg["messageId"]:
+            if identity in request_messages and request_messages[identity] != msg:
                 raise Invalid("request identity collision")
-            request_messages[identity] = msg["messageId"]
+            if msg["messageId"] in message_payloads and message_payloads[msg["messageId"]] != msg:
+                raise Invalid("message identity collision")
             conv["messages"][key] = msg["messageId"]
             while str(conv["contiguous"] + 1) in conv["messages"]:
                 conv["contiguous"] += 1
-            state["messages"] = conv["messages"]
+            if step.get("fault") == "before_commit":
+                state["last"] = "ROLLED_BACK"
+                record_sync(op)
+                continue
+            request_messages[identity] = copy.deepcopy(msg)
+            message_payloads[msg["messageId"]] = copy.deepcopy(msg)
+            state["conversations"][msg["conversationId"]] = conv
+            state["messages"] = copy.deepcopy(conv["messages"])
             state["contiguous"] = conv["contiguous"]
             state["local"][identity] = "SENT"
             state["last"] = "APPLIED"
+            record_sync(op)
         elif op == "local.failed":
             identity = step["conversationId"] + "/" + step["requestId"]
             if state["local"].get(identity) != "SENT":
@@ -185,11 +205,14 @@ def run(case):
             if typ == "action":
                 state["auditAttempts"] += 1
                 allowed = allowed and step.get("authorizedAtExecution", False)
+                applied = False
                 if allowed:
                     identity = call["pluginId"] + "/" + call["conversationId"] + "/" + call["requestId"]
                     if identity not in seen_actions:
                         state["sideEffects"] += 1
                         seen_actions.add(identity)
+                        applied = True
+                state["auditLog"].append({"requestId": call["requestId"], "authorizedAtExecution": step.get("authorizedAtExecution") is True, "outcome": "ALLOWED" if allowed else "DENIED", "sideEffectApplied": applied})
             state["last"] = "ALLOWED" if allowed else "DENIED"
         elif op == "plugin.manifest":
             validate(step["manifest"], PLUGIN, PLUGIN)
@@ -234,13 +257,18 @@ def run(case):
                 raise Invalid("unknown upgrade stage")
             if step.get("backendVersion") != step.get("rendererVersion"):
                 state["last"] = "REJECTED"
-            elif failed:
-                state["snapshotRestored"] = True
-                state["last"] = "ROLLED_BACK"
             else:
-                state["activeVersion"] = step["backendVersion"]
-                state["oldVersionServed"] = False
-                state["last"] = "SWITCHED"
+                for stage in stages:
+                    state["upgradeTrace"].append({"stage": stage, "oldVersionServed": state["oldVersionServed"]})
+                    if failed == stage:
+                        state["upgradeTrace"].append({"stage": "restore_snapshot", "oldVersionServed": True})
+                        state["snapshotRestored"] = True
+                        state["last"] = "ROLLED_BACK"
+                        break
+                    if stage == "atomic_switch":
+                        state["activeVersion"] = step["backendVersion"]
+                        state["oldVersionServed"] = False
+                        state["last"] = "SWITCHED"
         elif op == "plugin.lifecycle":
             action = step["action"]
             if action in ("DISABLE", "UNINSTALL"):
@@ -258,6 +286,34 @@ def run(case):
     return {key: state[key] for key in case["expect"]}
 
 
+def check_profile_outcome(profile, case_id, actual, canonical):
+    if actual != canonical:
+        raise Invalid(f"{profile}/{case_id}: normalized outcome differs from canonical")
+
+
+def check_negative_mutations(cases):
+    by_id = {case["id"]: case for case in cases}
+    mutations = [
+        ("gap-out-of-order-duplicate", lambda c: c["steps"].insert(0, c["steps"].pop(2))),
+        ("message-rollback-and-retry", lambda c: c["steps"][0].pop("fault")),
+        ("user-rollback-and-retry", lambda c: c["steps"][0].pop("fault")),
+        ("gap-out-of-order-duplicate", lambda c: c["steps"][1]["message"]["content"].__setitem__("text", "conflicting-payload")),
+        ("gap-out-of-order-duplicate", lambda c: c["steps"][2]["message"].update({k: c["steps"][0]["message"][k] for k in ("messageId", "requestId")})),
+        ("action-retry-audited", lambda c: c["steps"][0].__setitem__("authorizedAtExecution", False)),
+        ("upgrade-fail-migration", lambda c: c["steps"][0].__setitem__("failAt", "snapshot")),
+    ]
+    for case_id, mutate in mutations:
+        case = copy.deepcopy(by_id[case_id])
+        mutate(case)
+        try:
+            actual = run(case)
+        except Invalid:
+            continue
+        if actual == case["expect"]:
+            raise Invalid(f"{case_id}: invalid mutation preserved expected result")
+    return len(mutations)
+
+
 def verify():
     for schema in (SYNC, PLUGIN):
         lint(schema, schema)
@@ -272,29 +328,50 @@ def verify():
         raise Invalid("duplicate case IDs")
     covered = set()
     positives = negatives = 0
+    by_id = {case["id"]: case for case in cases}
+    profile_results = {}
+    for profile in fixtures["profiles"]:
+        artifact = json.loads((PROFILE_DIR / f"{profile}.json").read_text(encoding="utf-8"))
+        if artifact.get("profile") != profile or artifact.get("fixtureVersion") != fixtures["fixtureVersion"]:
+            raise Invalid(f"{profile}: outcome artifact identity/version mismatch")
+        outcomes = artifact.get("outcomes")
+        if not isinstance(outcomes, dict) or set(outcomes) != set(by_id):
+            raise Invalid(f"{profile}: missing or extra normalized outcomes")
+        profile_results[profile] = outcomes
     for case in cases:
         if case["polarity"] not in ("positive", "negative") or not case["rules"]:
             raise Invalid(f"{case['id']}: invalid polarity or missing rules")
         covered.update(case["rules"])
         positives += case["polarity"] == "positive"
         negatives += case["polarity"] == "negative"
+        if case.get("expectError"):
+            try:
+                run(copy.deepcopy(case))
+            except Invalid:
+                canonical = {"error": "INVALID"}
+            else:
+                raise Invalid(f"{case['id']}: expected contract rejection")
+        else:
+            canonical = run(copy.deepcopy(case))
+            if canonical != case["expect"]:
+                raise Invalid(f"{case['id']}: expected {case['expect']}, got {canonical}")
         for profile in fixtures["profiles"]:
-            if case.get("expectError"):
-                try:
-                    run(copy.deepcopy(case))
-                except Invalid:
-                    continue
-                raise Invalid(f"{profile}/{case['id']}: expected contract rejection")
-            actual = run(copy.deepcopy(case))
-            if actual != case["expect"]:
-                raise Invalid(f"{profile}/{case['id']}: expected {case['expect']}, got {actual}")
+            check_profile_outcome(profile, case["id"], profile_results[profile][case["id"]], canonical)
     required = {f"SP-A-{i:03d}" for i in range(1, 14)}
     if not required <= covered:
         raise Invalid(f"missing acceptance coverage {required-covered}")
-    # Controls prove schema and scenario oracle reject malformed or wrong outcomes.
+    mutation_count = check_negative_mutations(cases)
+    # Controls prove schema, scenario, and independently stored profile outcomes reject mutations.
     bad = copy.deepcopy(cases[0]); bad["expect"]["last"] = "NEVER"
     if run(bad) == bad["expect"]:
         raise Invalid("outcome mutation accepted")
+    for profile in fixtures["profiles"]:
+        try:
+            check_profile_outcome(profile, cases[0]["id"], {"last": "DIVERGED"}, profile_results[profile][cases[0]["id"]])
+        except Invalid:
+            pass
+        else:
+            raise Invalid(f"{profile}: profile divergence control accepted")
     malformed = {"syncVersion":"1.0","type":"sync.user.page","requestId":"not-a-uuid","events":[],"nextCursor":"1","hasMore":False}
     try:
         validate(malformed, SYNC, SYNC)
@@ -302,7 +379,7 @@ def verify():
         pass
     else:
         raise Invalid("malformed Sync UUID accepted")
-    print(f"PASS: Sync/Plugin v1 schemas, {len(cases)} shared Go/Java cases ({positives} positive, {negatives} negative), SP-A-001..013, 2 mutation controls")
+    print(f"PASS: Sync/Plugin v1 schemas, {len(cases)} distinct Go/Java outcome artifacts ({positives} positive, {negatives} negative), SP-A-001..013, {mutation_count + 4} mutation controls")
 
 
 if __name__ == "__main__":

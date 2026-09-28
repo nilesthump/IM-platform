@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh Fix Agent `/root/contract003_fix1` repaired the Contract 003 fixture oracle after independent Review 1 FAIL. Staged rollback/retry and gap checkpoints, full Message identity checks, per-attempt Action audit, and ordered upgrade trace now reject all seven committed reviewer mutations. The task verifier passes 79 cases and 11 controls; CTRL-002 Development passes. Distinct Go/Java static normalized contract-vector files now receive separate comparison, but neither is a backend execution result; fresh independent review must decide whether these satisfy SP-A-012 at S0 contract freeze. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`.
 - Fresh independent Review Agent `/root/contract003_review1` rejected clean Contract 003 candidate `9a14f63`: baseline schema/fixture verification and clean detached CTRL-002 Acceptance passed, but six of seven independent negative mutations retained the expected output and profile parity is tautological. Findings cover atomic rollback/materialization, conflicting duplicates, per-attempt Action authorization, upgrade stages, and distinct Go/Java outcomes. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
 - Contract 003 moved to `review` after clean implementation candidate `9a14f63`. Coordinator Recorder run `R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd` finished and validated with 6 events; CTRL-002 Development passed after the move. Exact handoff: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition.md`. Fresh independent acceptance remains pending; S0 Gate NOT YET PASSED.
 - Fresh Implementation Agent `/root/contract003_impl` completed clean Contract 003 candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`: canonical Sync v1 and Plugin API v1 schemas, permission/limit/lifecycle policy, and 79 shared Go/Java golden cases covering SP-A-001..013. The final recorded schema/fixture verifier passed with exit 0; CTRL-002 Development passed with exit 0. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The task is now in `review` for a fresh independent agent; S0 Gate NOT YET PASSED.
@@ -183,6 +184,7 @@ Current Task State: review
 
 ## Changed Files or Migrations
 
+- Contract 003 Fix 1 changes `contracts/plugin-api/verify.py` and README, `contracts/fixtures/sync-plugin/generate.py` and `golden.json`, and adds separate `profile-outcomes/go.json` and `java.json`; task-linked evidence/Recorder and recovery files are updated. No schema, migration, runtime, HTTP/WSS, or Frozen Architecture file changes.
 - The accepted earlier Research task added the Recorder control plane under `research/**`, `tools/research/**`, and `tests/research/**`. The current integration combines accepted Contract and Minimality lineages and adds task-owned integration Recorder/evidence and recovery-state changes; it adds no IM product implementation.
 - `contracts/http/auth-user-friend.openapi.json` is the canonical OpenAPI 3.1 Auth/User/Friend contract with separate credential-bound WEB/native refresh operations and operation/status-specific error codes; `contracts/http/verify-auth-user-friend.ps1` cross-validates it with fixtures and runs mutation regressions.
 - The obsolete `contracts/http/auth-user-friend.openapi.structure.schema.json` was removed. The task verifier now uses `contracts/http/openapi-3.1-2026-08-03.schema.json`, an offline standalone validator, and nine structural negative regressions. OAI's structural schema does not validate all embedded Schema Object content or every prose rule.
@@ -198,6 +200,7 @@ Current Task State: review
 
 ## Known Failures, Risks, and Assumptions
 
+- Contract 003 Review 1 FAIL remains permanent. Fix 1's static Go/Java outcome vectors are contract baselines initially populated from canonical expectations, not independent backend outputs. The fresh reviewer must decide the S0 interpretation of SP-A-012; development PASS does not close the task.
 - Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
 - All activity before the Instrumentation Epoch is bootstrap, retrospective backfill, or pilot evidence and must not be represented as complete prospective trace data.
 - `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
@@ -214,7 +217,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate a fresh Fix Agent for the Contract 003 independent findings, then a different fresh Review Agent. Keep task in `review`; rerun deterministic contract verification and clean detached CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
+Commit a clean Contract 003 Fix 1 candidate, then delegate a different fresh Review Agent. The Fix Recorder run finished and validated with 18 events. Reviewer must inspect the profile-vector provenance and resolve the SP-A-012 acceptance interpretation, rerun deterministic contract verification and the seven-case probe, and use a clean detached checkout for CTRL-002 Acceptance. Keep task in `review`; S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -226,6 +229,7 @@ Delegate a fresh Fix Agent for the Contract 003 independent findings, then a dif
 
 ## Uncommitted Changes / Ownership
 
+- Fresh Fix Agent `/root/contract003_fix1` owns only task-allowed verifier, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory belongs to another agent and was untouched.
 - Fresh independent Reviewer `/root/contract003_review1` owns only task-linked FAIL evidence/probe, task/current recovery updates, prompt and Recorder run until review closure is committed. It changed no product contract file. The separate detached Acceptance checkout remains clean at candidate `9a14f63`. The original `H:\IM-platform` untracked HTTP schema-lint directory was not accessed.
 - Coordinator `/root` owns only the Contract 003 review queue transition, current/task recovery update, and linked Recorder handoff artifacts until the transition commit. The fresh Implementation Agent committed its clean candidate and owns no uncommitted changes. The original `H:\IM-platform` untracked HTTP schema-lint directory remains solely owned by the paused Agent and untouched.
 - Coordinator `/root` completed Contract 003 queue activation in the clean activation commit; Implementation Agent ownership of the candidate is recorded above.
