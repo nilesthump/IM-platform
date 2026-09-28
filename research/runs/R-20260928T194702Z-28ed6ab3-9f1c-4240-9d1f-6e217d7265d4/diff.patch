@@ -1,0 +1,85 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 4fa861a..968fb40 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: active
+ 
+ ## Current Contract Work
+ 
++- `LOOP1-CI-001` implementation candidate adds `ci/classify.py`, `ci/check_gate.py`, GitHub Actions job skeletons, and 11 path/gate tests. Shared contract/database/SDK paths fan out to all profiles and clients plus old-client/plugin/migration compatibility. The selected-job gate rejects selected jobs that fail, cancel, or skip. Local development checks pass; independent review and actual GitHub CI execution are pending. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-implementation-development.md`; Recorder `R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4`. S0 Gate NOT YET PASSED.
++
+ - `LOOP1-CI-001` activated on isolated branch from verified clean local `main` `10406be`; Infra dependency is independently accepted and `done`. Scope: path-aware CI classification, job skeletons, and path matrix tests. No CI product file changed at activation. S0 Gate NOT YET PASSED.
+ 
+ - Fresh independent Reviewer `/root/infra001_review1` passed Infra 001 candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean detached handoff checkout `c9a3345`: Go and Java profile smokes each passed PostgreSQL migration, Core NATS, HTTPS health, and WSS Upgrade through Caddy TLS 1.3. Frozen hashes, implementation Recorder integrity, profile isolation/port-exposure probe, and detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task is `done` after Coordinator closure; S0 Gate NOT YET PASSED.
+@@ -240,7 +242,7 @@ Current Task State: active
+ 
+ ## Next Exact Action
+ 
+-Fresh Implementation Agent: implement the path-aware CI skeleton on `task/LOOP1-CI-001`, run task verification, then hand off a clean candidate for independent review. S0 Gate remains NOT YET PASSED.
++Coordinator: move the clean `LOOP1-CI-001` candidate from `active` to `review` and delegate fresh independent review in a clean checkout. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -252,6 +254,7 @@ Fresh Implementation Agent: implement the path-aware CI skeleton on `task/LOOP1-
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Implementation Agent `/root/ci001_impl` owns only task-allowed CI classifier/workflow/tests, CI Task Spec/current recovery, task-linked development evidence, prompt and Recorder artifacts until candidate commit. Generated `ci/__pycache__` was verified and removed. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
+ - Fresh independent Reviewer `/root/infra001_review1` owns only task-linked PASS evidence, Task Spec/current recovery, prompt and Recorder artifacts until committed. Product files and the separate detached Acceptance checkout remain clean; original `H:\IM-platform\contracts\http\schema-lint` was untouched.
+ - Fresh Implementation Agent `/root/infra001_impl` owns only task-allowed Compose/TLS, Go/Java non-business placeholders, infrastructure smoke, task/current recovery, development evidence, and linked Recorder artifacts until committed as a clean candidate. The original `H:\IM-platform\contracts\http\schema-lint` belongs to the paused Agent and was untouched.
+ - Coordinator `/root` owns only Infra queue activation, task/current recovery update, and task-linked activation Recorder evidence until committed. No product infrastructure path is changed; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
+diff --git a/spec/tasks/active/LOOP1-CI-001.md b/spec/tasks/active/LOOP1-CI-001.md
+index c6961aa..73afaf9 100644
+--- a/spec/tasks/active/LOOP1-CI-001.md
++++ b/spec/tasks/active/LOOP1-CI-001.md
+@@ -49,14 +49,18 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Fresh Implementation Agent `/root/ci001_impl` built the path-aware classifier, full shared fan-out, GitHub Actions job skeletons and a selected-job gate. Eleven classifier/gate unit tests pass, including a real Git deletion case; Go compile, both Compose configurations, HTTP/WSS/Sync/Plugin verifiers, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4`. This is local development evidence; the workflow has not yet run on GitHub and independent review/acceptance remains pending. No product behavior, contract, migration, or Frozen Architecture file changed.
++
+ - Activation prompt `P-7892975a-f2c8-4bfd-85d4-b11926c0b759`, Recorder run `R-20260928T193552Z-5891a0f5-0fe0-4415-8492-4b997360cc3c`; CTRL-002 Development and frozen-hash verification passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-activation-development.md`. This is not independent acceptance.
+ 
+ - Dependency `LOOP1-INFRA-001` is independently accepted and `done` on verified clean local `main` `10406be70bf66482836164400cd5b8be07709c58`; both profile smokes, frozen hashes, Recorder repository, and CTRL-002 Acceptance passed after integration. S0 Gate remains NOT YET PASSED.
+ 
+ # Handoff
+ 
++- Implementation files are confined to `ci/**`, `.github/workflows/**`, and `tests/ci/**`. Client source is absent at S0; each client job rejects future source until its actual test command is added. The Go/Java jobs similarly reject unexpected future source. Shared changes select Go, Java, every client, old-client/plugin/migration compatibility, and shared contract checks. The selected-job gate rejects skipped, failed, or cancelled selected jobs. The development candidate will be committed clean for a fresh independent reviewer under ADR-0001.
++
+ - Coordinator activated this task on isolated branch `task/LOOP1-CI-001` from clean local `main` `10406be70bf66482836164400cd5b8be07709c58`. Fresh Implementation Agent will take product CI work. No product CI file has changed.
+ 
+ # Next Action
+ 
+-- Fresh Implementation Agent: implement only the allowed path classifier, job skeletons, and meaningful path-matrix tests; record development verification, then hand off a clean candidate for fresh independent review.
++- Coordinator: move the clean implementation candidate to `review`, then delegate fresh independent review and clean-checkout acceptance. Do not treat local tests or the pending GitHub workflow as CI Gate PASS.
+
+# Untracked paths observed; content intentionally not captured
+# ?? .github/workflows/ci.yml
+# ?? ci/check_gate.py
+# ?? ci/classify.py
+# ?? research/prompts/P-7364469f-04df-4e28-b1d5-897f2c3ab5ea/metadata.json
+# ?? research/prompts/P-7364469f-04df-4e28-b1d5-897f2c3ab5ea/prompt.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-04b9f293-2800-445e-88d0-a09da6121e7e.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-04b9f293-2800-445e-88d0-a09da6121e7e.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-3617d950-3d69-419d-a9f8-e6f06de1ff35.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-3617d950-3d69-419d-a9f8-e6f06de1ff35.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-71c23ff9-299b-4444-b29f-d7f955ea76a7.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-71c23ff9-299b-4444-b29f-d7f955ea76a7.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-7ddf1cb8-7564-48f6-b0fe-867ead86aa44.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-7ddf1cb8-7564-48f6-b0fe-867ead86aa44.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-891a6881-6350-4220-a447-1ae93b49657f.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-891a6881-6350-4220-a447-1ae93b49657f.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-8f3738e9-6b91-493c-aa43-cc21cdb81375.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-8f3738e9-6b91-493c-aa43-cc21cdb81375.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-a7517336-0c52-4f65-b7b1-583ba46083a9.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-a7517336-0c52-4f65-b7b1-583ba46083a9.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-c56aaea8-4775-4a57-a68d-a0db9348c794.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-c56aaea8-4775-4a57-a68d-a0db9348c794.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-f15b7d9e-7e4a-4416-b74d-11895145c07b.stderr.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/blobs/C-f15b7d9e-7e4a-4416-b74d-11895145c07b.stdout.txt
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/events.jsonl
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/initial_state.json
+# ?? research/runs/R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-implementation-development.md
+# ?? tests/ci/test_classify.py
+# ?? tests/ci/test_gate.py

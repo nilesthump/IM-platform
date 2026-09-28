@@ -1,0 +1,198 @@
+name: Loop 1 CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.paths.outputs.go }}
+      java: ${{ steps.paths.outputs.java }}
+      web: ${{ steps.paths.outputs.web }}
+      desktop: ${{ steps.paths.outputs.desktop }}
+      mobile: ${{ steps.paths.outputs.mobile }}
+      shared: ${{ steps.paths.outputs.shared }}
+      old_client: ${{ steps.paths.outputs.old_client }}
+      plugin: ${{ steps.paths.outputs.plugin }}
+      migration: ${{ steps.paths.outputs.migration }}
+      compatibility: ${{ steps.paths.outputs.compatibility }}
+      deploy: ${{ steps.paths.outputs.deploy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify clean repository recovery
+        shell: pwsh
+        run: ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance
+      - name: Test path matrix
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -m unittest discover -s tests/ci -v
+      - name: Classify full diff, including deletions
+        id: paths
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        shell: bash
+        run: |
+          base="$BASE_SHA"
+          if [[ -z "$base" || "$base" =~ ^0+$ ]]; then
+            base=$(git hash-object -t tree /dev/null)
+          fi
+          python3 ci/classify.py --base "$base" --head "$HEAD_SHA" --github-output "$GITHUB_OUTPUT"
+
+  go:
+    needs: classify
+    if: needs.classify.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Go S0 compile and test
+        run: |
+          test "$(find backend/go -type f ! -name main.go ! -name Dockerfile | wc -l)" -eq 0 || { echo 'Go source grew; add package lint/unit/integration/contract commands'; exit 1; }
+          test -z "$(gofmt -l backend/go/main.go)"
+          go test backend/go/main.go
+
+  java:
+    needs: classify
+    if: needs.classify.outputs.java == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Java S0 compile
+        run: |
+          test "$(find backend/java -type f ! -name InfraPlaceholder.java ! -name Dockerfile | wc -l)" -eq 0 || { echo 'Java source grew; add lint/unit/integration/contract commands'; exit 1; }
+          javac -d "$RUNNER_TEMP" backend/java/InfraPlaceholder.java
+
+  web:
+    needs: classify
+    if: needs.classify.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Web S0 skeleton boundary
+        run: test ! -d clients/web || { echo 'Web source exists; add its unit/build/protocol/plugin UI CI command'; exit 1; }
+
+  desktop:
+    needs: classify
+    if: needs.classify.outputs.desktop == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Desktop S0 skeleton boundary
+        run: test ! -d clients/desktop || { echo 'Desktop source exists; add its SQLite/protocol CI command'; exit 1; }
+
+  mobile:
+    needs: classify
+    if: needs.classify.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mobile S0 skeleton boundary
+        run: test ! -d clients/mobile || { echo 'Mobile source exists; add its SQLite/protocol CI command'; exit 1; }
+
+  shared:
+    needs: classify
+    if: needs.classify.outputs.shared == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: HTTP, WSS, Sync and Plugin contracts
+        shell: pwsh
+        run: |
+          ./contracts/http/verify-auth-user-friend.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 contracts/websocket/verify.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 contracts/plugin-api/verify.py
+          exit $LASTEXITCODE
+
+  compatibility:
+    needs: classify
+    if: needs.classify.outputs.compatibility == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: im_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d im_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: ci-only-password
+      PGDATABASE: im_ci
+      PYTHONDONTWRITEBYTECODE: '1'
+      DB_TEST_ENABLE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Shared fixture compatibility and migration
+        run: |
+          python3 contracts/websocket/verify.py
+          python3 contracts/plugin-api/verify.py
+          python3 -m unittest discover -s tests/database -v
+      - name: Future client and plugin fixture boundary
+        run: |
+          test ! -d clients/web || { echo 'Client compatibility command required'; exit 1; }
+          test ! -d clients/desktop || { echo 'Desktop compatibility command required'; exit 1; }
+          test ! -d clients/mobile || { echo 'Mobile compatibility command required'; exit 1; }
+
+  deploy:
+    needs: classify
+    if: needs.classify.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate both Compose profiles
+        run: |
+          docker compose -f deploy/compose.yaml --profile go config --quiet
+          docker compose -f deploy/compose.yaml --profile java config --quiet
+      - name: Frozen architecture integrity
+        shell: pwsh
+        run: ./tools/verify-frozen-architecture.ps1
+      - name: Go transport smoke
+        shell: pwsh
+        run: ./tests/infrastructure/smoke.ps1 -Profile go
+      - name: Java transport smoke
+        shell: pwsh
+        run: ./tests/infrastructure/smoke.ps1 -Profile java
+
+  gate:
+    if: always()
+    needs: [classify, go, java, web, desktop, mobile, shared, compatibility, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require every selected job to pass
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 ci/check_gate.py

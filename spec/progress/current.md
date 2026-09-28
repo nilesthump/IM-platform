@@ -16,6 +16,8 @@ Current Task State: active
 
 ## Current Contract Work
 
+- `LOOP1-CI-001` implementation candidate adds `ci/classify.py`, `ci/check_gate.py`, GitHub Actions job skeletons, and 11 path/gate tests. Shared contract/database/SDK paths fan out to all profiles and clients plus old-client/plugin/migration compatibility. The selected-job gate rejects selected jobs that fail, cancel, or skip. Local development checks pass; independent review and actual GitHub CI execution are pending. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-implementation-development.md`; Recorder `R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4`. S0 Gate NOT YET PASSED.
+
 - `LOOP1-CI-001` activated on isolated branch from verified clean local `main` `10406be`; Infra dependency is independently accepted and `done`. Scope: path-aware CI classification, job skeletons, and path matrix tests. No CI product file changed at activation. S0 Gate NOT YET PASSED.
 
 - Fresh independent Reviewer `/root/infra001_review1` passed Infra 001 candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean detached handoff checkout `c9a3345`: Go and Java profile smokes each passed PostgreSQL migration, Core NATS, HTTPS health, and WSS Upgrade through Caddy TLS 1.3. Frozen hashes, implementation Recorder integrity, profile isolation/port-exposure probe, and detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task is `done` after Coordinator closure; S0 Gate NOT YET PASSED.
@@ -240,7 +242,7 @@ Current Task State: active
 
 ## Next Exact Action
 
-Fresh Implementation Agent: implement the path-aware CI skeleton on `task/LOOP1-CI-001`, run task verification, then hand off a clean candidate for independent review. S0 Gate remains NOT YET PASSED.
+Coordinator: move the clean `LOOP1-CI-001` candidate from `active` to `review` and delegate fresh independent review in a clean checkout. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -252,6 +254,7 @@ Fresh Implementation Agent: implement the path-aware CI skeleton on `task/LOOP1-
 
 ## Uncommitted Changes / Ownership
 
+- Fresh Implementation Agent `/root/ci001_impl` owns only task-allowed CI classifier/workflow/tests, CI Task Spec/current recovery, task-linked development evidence, prompt and Recorder artifacts until candidate commit. Generated `ci/__pycache__` was verified and removed. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
 - Fresh independent Reviewer `/root/infra001_review1` owns only task-linked PASS evidence, Task Spec/current recovery, prompt and Recorder artifacts until committed. Product files and the separate detached Acceptance checkout remain clean; original `H:\IM-platform\contracts\http\schema-lint` was untouched.
 - Fresh Implementation Agent `/root/infra001_impl` owns only task-allowed Compose/TLS, Go/Java non-business placeholders, infrastructure smoke, task/current recovery, development evidence, and linked Recorder artifacts until committed as a clean candidate. The original `H:\IM-platform\contracts\http\schema-lint` belongs to the paused Agent and was untouched.
 - Coordinator `/root` owns only Infra queue activation, task/current recovery update, and task-linked activation Recorder evidence until committed. No product infrastructure path is changed; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
