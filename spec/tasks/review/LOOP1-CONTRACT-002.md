@@ -66,6 +66,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 - Fresh independent Review Agent `/root/contract002_review1` returned FAIL for clean committed candidate `55670c2`: in-memory negative controls found that `check_scenario` accepts wrong-Conversation delivery, omitted `session.revoked`, omitted negative auth rejection, and `message.created` before COMMIT. Baseline WSS verifier and clean detached CTRL-002 Acceptance passed, so those checks do not establish required behavioral assertions. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. The task remains unfinished in `review`; S0 Gate is not passed.
 - Fresh Fix Agent `/root/contract002_fix1` added direct checks for all four review gaps and nine in-memory mutation regressions while preserving the five passing controls. Generator/fixture comparison and CTRL-002 Development passed; development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md`; Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`. This is not acceptance. Last known good baseline remains `7484901b3915535f60941a01116b730a845bd47d`.
+- Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: three in-memory auth.bind mutations were accepted (omitted successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated). The four prior failures and five earlier controls now reject correctly; baseline WSS verifier, architecture hashes, and clean detached CTRL-002 Acceptance passed. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; review Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. The task stays in review.
 
 # Handoff
 
@@ -74,4 +75,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- A different fresh independent Review Agent reviews the committed Fix candidate and repeats negative controls from a clean checkout. Keep in `review` pending independent PASS; do not mark `done` on development evidence.
+- Delegate a fresh Fix Agent to assert valid auth.bind success output and authenticated state, and rejected bind unauthenticated state; retain negative controls. Then delegate a different fresh independent Reviewer on a clean committed checkout. Keep in `review` pending independent PASS.

@@ -1,0 +1,73 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index d4a093b..4c81df0 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -21,7 +21,8 @@ Current Task State: review
+ - `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
+ - Activation Recorder run `R-20260928T005917Z-da1e7bcf-0952-4664-b76d-b699a2b59840` uses `prospective_resume`; its recorded CTRL-002 Development check passed after correcting two task recovery fields. This is not acceptance evidence.
+ - Fresh Implementation Agent `/root/contract002_impl` completed a strict WSS v1 envelope schema and deterministic shared Go/Java golden vectors in isolated branch `task/LOOP1-CONTRACT-002`. The generator/verifier passes 8 positive, 10 negative, and 11 malformed-wire mutation controls. Fresh independent Review Agent `/root/contract002_review1` rejected candidate `55670c2` after finding four missing behavioral assertions in the fixture verifier: wrong-Conversation fan-out, omitted revocation event, omitted negative auth rejection, and `message.created` before COMMIT were accepted by in-memory mutations. The baseline verifier and clean detached CTRL-002 Acceptance passed but do not cover these violations. The task remains in `review` for fresh Fix then fresh Review; S0 Gate remains NOT YET PASSED. Review evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`; implementation Recorder run `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+-- Fresh Fix Agent `/root/contract002_fix1` repaired the four WSS fixture verifier gaps and committed nine in-memory mutation controls, retaining the five previously passing controls. Generator/fixture comparison and CTRL-002 Development PASS are recorded in `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md`; fix Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`. Independent review of the clean Fix candidate remains required; S0 Gate remains NOT YET PASSED. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
++- Fresh Fix Agent `/root/contract002_fix1` repaired the four prior WSS fixture verifier gaps and committed nine in-memory mutation controls; its development evidence is `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md` and Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`.
++- Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: in-memory probes accepted omission of successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated. The four earlier failures and five other controls reject correctly. WSS baseline, frozen hashes, and clean detached CTRL-002 Acceptance passed, but auth.bind state/epoch acceptance remains incomplete. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. Task remains in review; S0 Gate remains NOT YET PASSED. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+ 
+ ## Authorized Frozen Architecture Representation Migration
+ 
+@@ -185,7 +186,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-A different fresh independent Review Agent reviews the clean committed `LOOP1-CONTRACT-002` Fix candidate, repeating acceptance and negative controls. S0 Gate remains NOT YET PASSED.
++A fresh Fix Agent repairs the auth.bind success/state assertions found in independent rereview of `102b0ef`, then a different fresh independent Review Agent tests the clean committed fix. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -201,7 +202,7 @@ A different fresh independent Review Agent reviews the clean committed `LOOP1-CO
+ - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
+ - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
+ - Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The Coordinator owns only the task `done` transition, post-merge evidence, checkpoint, current recovery update, and post-merge Recorder artifacts on local `main` until committed. The interrupted second-review worktree remains untouched.
+-- Fresh Fix Agent `/root/contract002_fix1` owns the current isolated Contract 002 verifier, task recovery, evidence, and Recorder changes until clean candidate commit; independent reviewer and Coordinator own the subsequent review/closure. The original checkout's untracked HTTP schema-lint directory belongs to the paused Agent and was not accessed.
++- Fresh independent Reviewer `/root/contract002_review2` owns only the task-authorized FAIL evidence, probe, Recorder run, and recovery updates in the isolated Contract 002 branch until committed. Product files remain at reviewed candidate `102b0ef`. The original checkout's untracked HTTP schema-lint directory belongs to the paused Agent and was not accessed.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-002.md b/spec/tasks/review/LOOP1-CONTRACT-002.md
+index 30a9814..4a3f04e 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-002.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-002.md
+@@ -66,6 +66,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ - Fresh independent Review Agent `/root/contract002_review1` returned FAIL for clean committed candidate `55670c2`: in-memory negative controls found that `check_scenario` accepts wrong-Conversation delivery, omitted `session.revoked`, omitted negative auth rejection, and `message.created` before COMMIT. Baseline WSS verifier and clean detached CTRL-002 Acceptance passed, so those checks do not establish required behavioral assertions. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. The task remains unfinished in `review`; S0 Gate is not passed.
+ - Fresh Fix Agent `/root/contract002_fix1` added direct checks for all four review gaps and nine in-memory mutation regressions while preserving the five passing controls. Generator/fixture comparison and CTRL-002 Development passed; development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md`; Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`. This is not acceptance. Last known good baseline remains `7484901b3915535f60941a01116b730a845bd47d`.
++- Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: three in-memory auth.bind mutations were accepted (omitted successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated). The four prior failures and five earlier controls now reject correctly; baseline WSS verifier, architecture hashes, and clean detached CTRL-002 Acceptance passed. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; review Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. The task stays in review.
+ 
+ # Handoff
+ 
+@@ -74,4 +75,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Next Action
+ 
+-- A different fresh independent Review Agent reviews the committed Fix candidate and repeats negative controls from a clean checkout. Keep in `review` pending independent PASS; do not mark `done` on development evidence.
++- Delegate a fresh Fix Agent to assert valid auth.bind success output and authenticated state, and rejected bind unauthenticated state; retain negative controls. Then delegate a different fresh independent Reviewer on a clean committed checkout. Keep in `review` pending independent PASS.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-5b71ecfc-3d84-41a1-a874-0060f7087eaa/metadata.json
+# ?? research/prompts/P-5b71ecfc-3d84-41a1-a874-0060f7087eaa/prompt.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/.gitattributes
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-0acc9416-da48-4b38-89ad-2988e0e3d032.stderr.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-0acc9416-da48-4b38-89ad-2988e0e3d032.stdout.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-15b5fe1d-0338-4d0b-ab40-8cd2c4fb0af8.stderr.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-15b5fe1d-0338-4d0b-ab40-8cd2c4fb0af8.stdout.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-4b13a008-c968-4eb5-be15-d3c088b1ff1e.stderr.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-4b13a008-c968-4eb5-be15-d3c088b1ff1e.stdout.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-abea444f-23a7-44a1-8c66-560f2471440c.stderr.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-abea444f-23a7-44a1-8c66-560f2471440c.stdout.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-c06d22b2-c3ae-42cb-8f28-7f93fdac79e9.stderr.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-c06d22b2-c3ae-42cb-8f28-7f93fdac79e9.stdout.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-fca523b8-2b49-4550-9d4c-17b70cb1ab14.stderr.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/blobs/C-fca523b8-2b49-4550-9d4c-17b70cb1ab14.stdout.txt
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/events.jsonl
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/initial_state.json
+# ?? research/runs/R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-mutations.py
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-prompt.txt

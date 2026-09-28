@@ -1,0 +1,13 @@
+REJECT wrong-conversation-delivery: wrong-Conversation message delivered
+REJECT omitted-revocation: revoked socket must emit event and close before further sends
+REJECT omitted-invalid-signature-rejection: invalid bind must emit its rejection
+REJECT created-before-commit: message.created before durable commit
+REJECT ack-before-commit: success ACK before durable commit
+REJECT rollback-success: ACK frames disagree with transaction timeline
+REJECT unstable-retry: unstable retry
+REJECT nonmember-success: ACK frames disagree with transaction timeline
+REJECT preauth-success: ACK frames disagree with transaction timeline
+ACCEPT INVALID omitted-valid-bind-ack
+ACCEPT INVALID valid-bind-wrong-state
+ACCEPT INVALID stale-epoch-success-state
+REJECTED 9/12 invalid behavior mutations
