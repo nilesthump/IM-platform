@@ -64,6 +64,8 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - Recorder-wrapped CTRL-002 Development initially rejected a short Last Known Good Commit and missing verification entry point, then passed after both records were corrected. Development PASS is not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-activation.md`.
 - Fresh Implementation Agent authored the strict WSS v1 JSON Schema, protocol semantics, deterministic generator/verifier, and 8 positive/10 negative shared Go/Java golden scenarios. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`. Prospective Recorder run: `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. Development evidence is not independent acceptance.
 
+- Fresh independent Review Agent `/root/contract002_review1` returned FAIL for clean committed candidate `55670c2`: in-memory negative controls found that `check_scenario` accepts wrong-Conversation delivery, omitted `session.revoked`, omitted negative auth rejection, and `message.created` before COMMIT. Baseline WSS verifier and clean detached CTRL-002 Acceptance passed, so those checks do not establish required behavioral assertions. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. The task remains unfinished in `review`; S0 Gate is not passed.
+
 # Handoff
 
 - Activated from clean `main` commit `7484901` on `task/LOOP1-CONTRACT-002`. The original checkout's untracked `contracts/http/schema-lint/` remains owned by the paused Agent and was not touched.
@@ -71,4 +73,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Fresh independent Review Agent inspects the clean committed candidate, runs the WSS verifier and CTRL-002 Acceptance plus scope/negative controls, and records PASS/FAIL under ADR-0001. Do not move this task to `done` on implementation evidence alone.
+- Fresh Fix Agent repairs the independently demonstrated missing delivery/auth/revocation fixture assertions at candidate `55670c2`, then a different fresh independent Review Agent repeats negative controls from a clean committed checkout. Keep in `review`; do not mark `done` on development evidence.

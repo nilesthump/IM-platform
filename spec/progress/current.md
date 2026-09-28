@@ -20,7 +20,7 @@ Current Task State: review
 - `LOOP1-ARCHDOC-001` is `done`; its accepted canonical Markdown hash, historical PDF hash, architecture verifier, CTRL-002 Acceptance recovery, and Recorder repository validation passed before this activation. S0 Gate remains NOT YET PASSED.
 - `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
 - Activation Recorder run `R-20260928T005917Z-da1e7bcf-0952-4664-b76d-b699a2b59840` uses `prospective_resume`; its recorded CTRL-002 Development check passed after correcting two task recovery fields. This is not acceptance evidence.
-- Fresh Implementation Agent `/root/contract002_impl` completed a strict WSS v1 envelope schema and deterministic shared Go/Java golden vectors in isolated branch `task/LOOP1-CONTRACT-002`. The generator/verifier passes 8 positive, 10 negative, and 11 malformed-wire mutation controls. The task is in `review` pending a different fresh independent Review Agent; development checks are not acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+- Fresh Implementation Agent `/root/contract002_impl` completed a strict WSS v1 envelope schema and deterministic shared Go/Java golden vectors in isolated branch `task/LOOP1-CONTRACT-002`. The generator/verifier passes 8 positive, 10 negative, and 11 malformed-wire mutation controls. Fresh independent Review Agent `/root/contract002_review1` rejected candidate `55670c2` after finding four missing behavioral assertions in the fixture verifier: wrong-Conversation fan-out, omitted revocation event, omitted negative auth rejection, and `message.created` before COMMIT were accepted by in-memory mutations. The baseline verifier and clean detached CTRL-002 Acceptance passed but do not cover these violations. The task remains in `review` for fresh Fix then fresh Review; S0 Gate remains NOT YET PASSED. Review evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`; implementation Recorder run `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
 
 ## Authorized Frozen Architecture Representation Migration
 
@@ -184,7 +184,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh independent Review Agent inspects the clean committed `LOOP1-CONTRACT-002` candidate, runs the WSS generator/verifier and CTRL-002 Acceptance plus negative controls and scope checks, then records PASS/FAIL under ADR-0001. S0 Gate remains NOT YET PASSED.
+Fresh Fix Agent repairs the four independently demonstrated WSS fixture verification gaps on `LOOP1-CONTRACT-002`, commits a clean candidate, then a different fresh independent Review Agent repeats acceptance and negative controls. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 

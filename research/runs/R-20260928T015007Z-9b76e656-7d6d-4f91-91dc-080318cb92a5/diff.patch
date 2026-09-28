@@ -1,0 +1,66 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index b001158..44d0a87 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -20,7 +20,7 @@ Current Task State: review
+ - `LOOP1-ARCHDOC-001` is `done`; its accepted canonical Markdown hash, historical PDF hash, architecture verifier, CTRL-002 Acceptance recovery, and Recorder repository validation passed before this activation. S0 Gate remains NOT YET PASSED.
+ - `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
+ - Activation Recorder run `R-20260928T005917Z-da1e7bcf-0952-4664-b76d-b699a2b59840` uses `prospective_resume`; its recorded CTRL-002 Development check passed after correcting two task recovery fields. This is not acceptance evidence.
+-- Fresh Implementation Agent `/root/contract002_impl` completed a strict WSS v1 envelope schema and deterministic shared Go/Java golden vectors in isolated branch `task/LOOP1-CONTRACT-002`. The generator/verifier passes 8 positive, 10 negative, and 11 malformed-wire mutation controls. The task is in `review` pending a different fresh independent Review Agent; development checks are not acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
++- Fresh Implementation Agent `/root/contract002_impl` completed a strict WSS v1 envelope schema and deterministic shared Go/Java golden vectors in isolated branch `task/LOOP1-CONTRACT-002`. The generator/verifier passes 8 positive, 10 negative, and 11 malformed-wire mutation controls. Fresh independent Review Agent `/root/contract002_review1` rejected candidate `55670c2` after finding four missing behavioral assertions in the fixture verifier: wrong-Conversation fan-out, omitted revocation event, omitted negative auth rejection, and `message.created` before COMMIT were accepted by in-memory mutations. The baseline verifier and clean detached CTRL-002 Acceptance passed but do not cover these violations. The task remains in `review` for fresh Fix then fresh Review; S0 Gate remains NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+ 
+ ## Authorized Frozen Architecture Representation Migration
+ 
+@@ -184,7 +184,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Fresh independent Review Agent inspects the clean committed `LOOP1-CONTRACT-002` candidate, runs the WSS generator/verifier and CTRL-002 Acceptance plus negative controls and scope checks, then records PASS/FAIL under ADR-0001. S0 Gate remains NOT YET PASSED.
++Fresh Fix Agent repairs the four independently demonstrated WSS fixture verification gaps on `LOOP1-CONTRACT-002`, commits a clean candidate, then a different fresh independent Review Agent repeats acceptance and negative controls. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -205,3 +205,4 @@ Fresh independent Review Agent inspects the clean committed `LOOP1-CONTRACT-002`
+ ## Architecture Conflicts / ACP / ADR
+ 
+ - ADR-0002 records Human-approved representation-only canonical-source migration; no Product Architecture semantic change is authorized. ADR-0001 remains the temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.
++
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-002.md b/spec/tasks/review/LOOP1-CONTRACT-002.md
+index e54ee5c..d34b2d2 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-002.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-002.md
+@@ -64,6 +64,8 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ - Recorder-wrapped CTRL-002 Development initially rejected a short Last Known Good Commit and missing verification entry point, then passed after both records were corrected. Development PASS is not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-activation.md`.
+ - Fresh Implementation Agent authored the strict WSS v1 JSON Schema, protocol semantics, deterministic generator/verifier, and 8 positive/10 negative shared Go/Java golden scenarios. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`. Prospective Recorder run: `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. Development evidence is not independent acceptance.
+ 
++- Fresh independent Review Agent `/root/contract002_review1` returned FAIL for clean committed candidate `55670c2`: in-memory negative controls found that `check_scenario` accepts wrong-Conversation delivery, omitted `session.revoked`, omitted negative auth rejection, and `message.created` before COMMIT. Baseline WSS verifier and clean detached CTRL-002 Acceptance passed, so those checks do not establish required behavioral assertions. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. The task remains unfinished in `review`; S0 Gate is not passed.
++
+ # Handoff
+ 
+ - Activated from clean `main` commit `7484901` on `task/LOOP1-CONTRACT-002`. The original checkout's untracked `contracts/http/schema-lint/` remains owned by the paused Agent and was not touched.
+@@ -71,4 +73,5 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Next Action
+ 
+-- Fresh independent Review Agent inspects the clean committed candidate, runs the WSS verifier and CTRL-002 Acceptance plus scope/negative controls, and records PASS/FAIL under ADR-0001. Do not move this task to `done` on implementation evidence alone.
++- Fresh Fix Agent repairs the independently demonstrated missing delivery/auth/revocation fixture assertions at candidate `55670c2`, then a different fresh independent Review Agent repeats negative controls from a clean committed checkout. Keep in `review`; do not mark `done` on development evidence.
++
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-793369bb-8663-49e2-80f1-f857d06d7a05/metadata.json
+# ?? research/prompts/P-793369bb-8663-49e2-80f1-f857d06d7a05/prompt.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-320e50c8-a59c-4182-bfb3-88984cd6a37a.stderr.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-320e50c8-a59c-4182-bfb3-88984cd6a37a.stdout.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-82b52c4a-98eb-4fbc-809c-136be4ddc395.stderr.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-82b52c4a-98eb-4fbc-809c-136be4ddc395.stdout.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-8dab3247-d537-4118-8ce8-24c72ae0e25b.stderr.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-8dab3247-d537-4118-8ce8-24c72ae0e25b.stdout.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-b9323434-5877-40e3-a5fc-7e2ef61297d3.stderr.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-b9323434-5877-40e3-a5fc-7e2ef61297d3.stdout.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-e2734f32-4c5b-4c1c-87d9-808ba0eb1858.stderr.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/blobs/C-e2734f32-4c5b-4c1c-87d9-808ba0eb1858.stdout.txt
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/events.jsonl
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/initial_state.json
+# ?? research/runs/R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-prompt.txt

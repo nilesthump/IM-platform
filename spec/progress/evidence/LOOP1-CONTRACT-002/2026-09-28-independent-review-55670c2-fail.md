@@ -1,0 +1,30 @@
+# LOOP1-CONTRACT-002 independent review: FAIL
+
+- Reviewer: fresh `/root/contract002_review1`, with no implementation or fix ownership; reviewed committed candidate `55670c2b3f6fab5a557daf60d2b507aef6451565` on branch `task/LOOP1-CONTRACT-002`, diff `6e5c1220ad0838a69d6b81930e2dade52c68c517..55670c2b3f6fab5a557daf60d2b507aef6451565`.
+- Candidate checkout was clean before review; separate clean detached checkout `H:\.codex\worktrees\contract002-review-clean\IM-platform` remained at the exact SHA with empty `git status` before and after Acceptance. Review artifacts are task-scoped in the candidate checkout.
+- Authority: canonical Markdown SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`; historical PDF SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`; both match the manifest. Architecture, approved ADRs, messaging domain/invariants/acceptance, shared HTTP/errors, and Minimality Contract inspected. No Frozen Architecture conflict or unnecessary complexity found. No product contract changed by reviewer.
+- Review Recorder prompt `P-793369bb-8663-49e2-80f1-f857d06d7a05`, run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. Pre-run mandatory recovery/authority inspection is not a complete prospective trace; review checks thereafter were recorded. The first attempt through `recorder.ps1 run-command` failed PowerShell argument binding without executing a check; the bundled Python 3 Recorder entry point was used thereafter.
+
+## Verification
+
+| Exact command / method | Exit | Elapsed | Result |
+| --- | ---: | ---: | --- |
+| Bundled Python 3 `tools/research/recorder.py run-command --run-id <review-run> -- <bundled-python3> contracts/websocket/verify.py` | 0 | 62 ms | Baseline PASS: 8 positive, 10 negative shared scenarios; 11 wire mutations rejected. |
+| Same recorder, `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` in review checkout | 1 | 1109 ms | Correctly refused dirty Recorder checkout; not acceptance evidence. |
+| Same recorder, `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1` | 0 | 688 ms | Both architecture hashes PASS. |
+| Same recorder, bundled Python 3 `-c` in-memory scenario mutations | 0 | 63 ms | Five expected rejections; four invalid mutations unexpectedly accepted. The command reports each individual outcome; exit 0 means the probe ran, not that the contract passed. |
+| Same recorder, `pwsh -NoProfile -Command "Set-Location -LiteralPath 'H:\.codex\worktrees\contract002-review-clean\IM-platform'; & 'tools/verify-loop1-ctrl-002.ps1' -Mode Acceptance"` | 0 | 1172 ms | Clean committed detached candidate Acceptance PASS; task remains review. |
+| Bundled Python 3 `tools/research/recorder.py validate-run --run-id R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1` | 0 | unrecorded | Implementation Recorder run structurally valid, 24 events. |
+| `git diff --check 6e5c122..55670c2 -- contracts/websocket contracts/fixtures/websocket spec/tasks spec/progress/current.md spec/progress/evidence/LOOP1-CONTRACT-002` | 0 | unrecorded | Product/recovery diff whitespace PASS. |
+| Byte compare 20 implementation Recorder output blobs against `git show HEAD:<path>` | 0 | unrecorded | 20/20 exact committed bytes. |
+
+## Findings
+
+1. **Blocking — negative and delivery fixtures lack independent behavioral assertions.** `contracts/websocket/verify.py` `check_scenario` validates frame shape and a few timeline/count properties, but does not enforce the expected behavior for several named negative scenarios. In-memory copies of the generator scenarios were mutated without editing candidate files. It unexpectedly accepted: an added `message.created` output to `wrong-conversation-fanout` (violates MSG-I-004/MSG-A-007); removal of `session.revoked` output from `revoked-socket` (violates frozen WSS state sequence); removal of the rejected `auth.ack` from `invalid-signature-bind` (negative bind not actually checked); and `MESSAGE_CREATED` moved before `COMMIT` in `durable-send-and-created` (fan-out of uncommitted data). The verifier's byte comparison against its own generated fixture detects fixture drift, but cannot detect these violations when generator expectations or scenario logic change. The contract tests therefore do not establish the required negative/durable event behavior. Add direct state/output assertions or independent, committed mutation regressions for these conditions; retain all four rejected cases in the fixture set.
+2. **Passing controls:** moving `SUCCESS_ACK` before `COMMIT`, appending success after rollback, changing a same-key retry ACK, and adding success ACK to nonmember or unauthenticated send were all rejected. The result narrows the failure to uncovered delivery/auth/revocation semantics; it does not reject the schema itself.
+3. **Nonblocking scope decision:** Frozen chapter 4's Message model includes `TEXT / PLUGIN`, while the candidate WSS `MessageSend`/`MessageCreated` schema permits `TEXT` only. This does not block Task 002 because Task 003 owns Plugin API v1, explicitly allows `contracts/websocket/**`, and depends on accepted Task 002. The present README labels this as a future versioned Plugin contract. Task 003 must add the required Plugin content contract before its own acceptance and preserve the frozen semantics.
+4. **Minimality:** the schema, single standard-library generator/verifier, and shared fixture add no external dependency, service, framework, or speculative abstraction. No deletion requested on minimality grounds.
+
+## Disposition
+
+**FAIL** for candidate `55670c2`. Retain `LOOP1-CONTRACT-002` in `review`; do not merge, push, or mark done. Delegate a fresh Fix Agent to strengthen scenario assertions/tests without changing frozen semantics, then a different fresh Review Agent. The original `H:\IM-platform` untracked `contracts/http/schema-lint/` was not accessed. S0 Gate remains NOT YET PASSED. Review Recorder finished FAIL and validated with 14 events. Its 10 staged output blobs match working bytes exactly (10/10), protected by a run-local `blobs/.gitattributes` transport rule.
