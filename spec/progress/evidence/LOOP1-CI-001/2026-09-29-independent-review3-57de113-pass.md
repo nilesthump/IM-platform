@@ -1,0 +1,21 @@
+# LOOP1-CI-001 independent Review 3: PASS
+
+- Reviewer: fresh `/root/ci001_review3`, distinct from Implementation `/root/ci001_impl`, Fix 1 `/root/ci001_fix1`, Fix 2 `/root/ci001_fix2`, prior reviewers, and Coordinator `/root`. I changed no CI product code and did not self-accept implementation.
+- Exact candidate: `57de113614a754afc69f39a7971d02197a984df2` on `task/LOOP1-CI-001`; product diff range `10406be70bf66482836164400cd5b8be07709c58..57de113614a754afc69f39a7971d02197a984df2`.
+- Clean-state method: newly created detached Git worktree `H:\.codex\worktrees\ci001-review3-clean` at the exact candidate. `git status --short --branch` returned only `## HEAD (no branch)` before and after verification. `git rev-parse HEAD` matched the candidate. The test interpreter used `-B`; no cleanup was necessary.
+- Research Recorder: prompt `P-aec0e475-d4bd-469c-b315-2f1ee5a84301`, run `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`, related to Fix 2. Mandatory reads, static inspection, and checkout creation preceded registration, so `prospective_resume` marks incomplete pre-Recorder work. Command IDs and exact argv are in the run. A PowerShell wrapper invocation failed before command execution because its parser rejected `run-command`; subsequent commands used the Recorder's Python entry point, with the clean checkout as `--repo` and task branch `research/` as `--research-root`.
+
+| Exact command in clean checkout | Exit | Elapsed | Result |
+| --- | ---: | ---: | --- |
+| `C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -B -m unittest discover -s tests/ci -v` | 0 | 1734 ms | 12 CI path/gate tests PASS |
+| `pwsh -NoProfile -File ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` | 0 | 1078 ms | Five queues, including tracked backlog marker, and clean recovery PASS |
+| `pwsh -NoProfile -File ./tools/verify-frozen-architecture.ps1` | 0 | 703 ms | Canonical Markdown and historical PDF hashes PASS |
+| `C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -B spec/progress/evidence/LOOP1-CI-001/review2-negative-probe.py` | 0 | 484 ms | Prior shared-rename bypass repaired; 24 gate controls PASS |
+| `pwsh -NoProfile -File ./tools/research/recorder.ps1 validate-repository` | 0 | 984 ms | Committed Recorder repository integrity PASS |
+| `C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -B H:\.codex\worktrees\loop1-s0-contracts\IM-platform\spec\progress\evidence\LOOP1-CI-001\review3-negative-probe.py` | 0 | 500 ms | Independent SDK rename, path isolation, and 24 selected fail/cancel/skip controls PASS |
+
+## Judgment
+
+The classifier reads both source and destination of a shared contract/database/SDK rename through `git diff --no-renames --name-only -z`. Shared paths select Go, Java, all clients, shared contract checks, old-client/plugin/migration compatibility; deploy/CI paths select deploy validation. The independent probe also checks local Go/client routing and unrelated docs. The workflow's classify job runs clean-checkout recovery and the path tests before job selection; selected jobs feed the always-running gate. The gate rejects failure, cancellation, or skip for each selected job, classifier failure, and unexpected success for unselected jobs. The backlog marker is present in the committed clean checkout. The product change is limited to authorized CI files and tests; no future product implementation, new dependency, public contract, migration, Frozen Architecture, or unjustified abstraction was introduced under the Minimality Contract.
+
+**Independent review PASS under ADR-0001.** This is task review evidence, not proof that the GitHub workflow has executed or that S0 Gate has passed. Keep the task in `review` until Coordinator verifies an actual GitHub Actions run and completes acceptance closure. Last known good independently accepted main remains `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only this report, independent probe, task/current handoff edits, and linked Recorder artifacts until the review commit; the detached checkout remains clean. Original `H:\IM-platform\contracts\http\schema-lint` was untouched under another Agent's ownership.

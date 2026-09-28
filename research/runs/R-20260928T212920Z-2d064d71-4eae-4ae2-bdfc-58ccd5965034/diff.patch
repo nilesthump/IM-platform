@@ -1,0 +1,72 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 3abd78d..c062a79 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh independent CI Review 3 **PASS** for clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: five-queue CTRL-002 Acceptance, 12 CI tests, prior rename regression, independent SDK rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Actual GitHub workflow execution and Coordinator acceptance closure remain pending; task stays `review`, S0 Gate NOT YET PASSED.
++
+ - Fresh Fix 2 for `LOOP1-CI-001` exposes both source and destination of renames using Git `--no-renames`; contract, database, and SDK move-away regressions and the former Review 2 probe pass. Clean detached commit `4dc41b5` passed CTRL-002 Acceptance, 12 path/gate tests, and frozen hashes. Fix-Agent development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`; Recorder `R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958`. Task stays `review`; fresh independent review, actual GitHub workflow execution, and S0 Gate remain pending.
+ - Fresh independent CI Review 2 **FAIL** at clean detached candidate `f508750`: backlog queue marker and CTRL-002 Acceptance pass, but a shared contract renamed to an unclassified path schedules no compatibility jobs because Git reports only the destination. Eleven CI tests, independent gate controls, frozen hashes, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md`; Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task stays `review`; S0 Gate NOT YET PASSED.
+ - Fresh Fix Agent `/root/ci001_fix1` committed the exact authorized backlog marker at `ba0bbe7`. A new clean detached checkout passed CTRL-002 Acceptance (all five queues present), 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`; linked Recorder `R-20260928T204018Z-fa44f3d6-9105-4273-b08b-e5f61aa5088b`. Task stays in `review`; fresh independent re-review and actual GitHub workflow execution remain pending. S0 Gate NOT YET PASSED.
+@@ -248,7 +250,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Coordinator: delegate a different fresh independent Review Agent for the Fix 2 clean committed candidate. After acceptance, arrange actual GitHub workflow execution. S0 Gate NOT YET PASSED.
++Coordinator: verify Review 3 PASS evidence, arrange and inspect actual GitHub workflow execution for the reviewed candidate, then close `LOOP1-CI-001` only if applicable acceptance passes. S0 Gate NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -260,6 +262,8 @@ Coordinator: delegate a different fresh independent Review Agent for the Fix 2 c
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh independent Reviewer `/root/ci001_review3` owns only Review 3 PASS evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. CI product files and the separate detached Acceptance checkout remain clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
++
+ - Fresh Fix Agent `/root/ci001_fix2` owns only task-allowed classifier/test changes, task/current recovery, task-linked development evidence, prompt, and Recorder artifacts until the candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+ - Fresh independent Reviewer `/root/ci001_review2` owns only task-linked FAIL evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. The separate detached Acceptance checkout remains clean at `f508750`; original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+ - Fresh Fix Agent `/root/ci001_fix1` includes only task-linked development evidence, task/current recovery edits, prompt, and Recorder artifacts in the final candidate commit; no fix-owned uncommitted changes remain at handoff. The separate detached verification checkout is clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+diff --git a/spec/tasks/review/LOOP1-CI-001.md b/spec/tasks/review/LOOP1-CI-001.md
+index a06c8cd..224ca32 100644
+--- a/spec/tasks/review/LOOP1-CI-001.md
++++ b/spec/tasks/review/LOOP1-CI-001.md
+@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Fresh independent Review 3 `/root/ci001_review3` **PASS** at clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: CTRL-002 Acceptance, all 12 CI tests, prior rename probe, new independent SDK-rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. The clean checkout stayed clean. Exact commands, exits, elapsed times, scope/minimality judgment, and independence are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; review Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Task remains `review` pending actual GitHub workflow run and Coordinator closure; S0 Gate NOT YET PASSED.
++
+ - Fresh Fix 2 changes Git diff collection to `--no-renames`, exposing both the removed source and added destination of a rename. Regression tests cover moves from contract, database, and SDK trees to unclassified docs paths; all 12 path/gate tests and the former Review 2 negative probe pass. CTRL-002 Acceptance, 12 tests, and frozen hashes pass from a clean detached checkout of `4dc41b5`; exact commands and Recorder run are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`. This Fix-Agent run is not independent acceptance; the task remains `review` and S0 Gate is NOT YET PASSED.
+ - Fresh independent Review 2 `/root/ci001_review2` returned **FAIL** at clean detached candidate `f508750`: the backlog marker repairs CTRL-002 Acceptance, but a rename from `contracts/wire.json` to `docs/wire.json` is reported only by its destination, so the classifier schedules no compatibility jobs. Eleven CI tests, 24 gate status controls, frozen hashes, and Recorder integrity passed. Exact evidence/probe: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md` and `review2-negative-probe.py`; review Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task remains `review`; actual GitHub workflow execution and S0 Gate remain pending.
+ - Fresh Fix Agent `/root/ci001_fix1` added only the prospectively authorized zero-byte `spec/tasks/backlog/.gitkeep` marker at `ba0bbe7`. A new detached clean checkout passed CTRL-002 Acceptance, 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Exact commands, exits, elapsed times, clean-state method, and linked Recorder: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`. This remains development evidence; fresh independent re-review and an actual GitHub workflow run are pending. S0 Gate NOT YET PASSED.
+@@ -75,4 +77,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Next Action
+ 
+-- Coordinator: delegate a different fresh independent reviewer for the Fix 2 clean committed candidate, then arrange actual GitHub workflow execution. Actual CI and S0 Gate remain pending.
++- Coordinator: verify this independent review evidence, arrange and inspect actual GitHub workflow execution for the reviewed candidate, then complete task acceptance closure if all required jobs pass. S0 Gate remains pending.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-aec0e475-d4bd-469c-b315-2f1ee5a84301/metadata.json
+# ?? research/prompts/P-aec0e475-d4bd-469c-b315-2f1ee5a84301/prompt.txt
+# ?? research/prompts/loop1-ci-001-independent-review3-visible.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-746b08f1-01fb-4f56-9d71-83d012986603.stderr.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-746b08f1-01fb-4f56-9d71-83d012986603.stdout.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-7d3f8891-1cc2-49bf-a000-ff940fc6d1a7.stderr.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-7d3f8891-1cc2-49bf-a000-ff940fc6d1a7.stdout.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-c27ed68d-9339-4a2b-8977-572da335116f.stderr.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-c27ed68d-9339-4a2b-8977-572da335116f.stdout.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-e7dfb747-e27b-47d4-a0eb-baf553310402.stderr.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-e7dfb747-e27b-47d4-a0eb-baf553310402.stdout.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-f1de3098-5eb6-4b66-b161-bf07d0b28f48.stderr.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-f1de3098-5eb6-4b66-b161-bf07d0b28f48.stdout.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-f2b463e0-4bac-484e-839f-fe592281196b.stderr.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/blobs/C-f2b463e0-4bac-484e-839f-fe592281196b.stdout.txt
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/events.jsonl
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/initial_state.json
+# ?? research/runs/R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md
+# ?? spec/progress/evidence/LOOP1-CI-001/review3-negative-probe.py

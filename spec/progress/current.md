@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh independent CI Review 3 **PASS** for clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: five-queue CTRL-002 Acceptance, 12 CI tests, prior rename regression, independent SDK rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Actual GitHub workflow execution and Coordinator acceptance closure remain pending; task stays `review`, S0 Gate NOT YET PASSED.
+
 - Fresh Fix 2 for `LOOP1-CI-001` exposes both source and destination of renames using Git `--no-renames`; contract, database, and SDK move-away regressions and the former Review 2 probe pass. Clean detached commit `4dc41b5` passed CTRL-002 Acceptance, 12 path/gate tests, and frozen hashes. Fix-Agent development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`; Recorder `R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958`. Task stays `review`; fresh independent review, actual GitHub workflow execution, and S0 Gate remain pending.
 - Fresh independent CI Review 2 **FAIL** at clean detached candidate `f508750`: backlog queue marker and CTRL-002 Acceptance pass, but a shared contract renamed to an unclassified path schedules no compatibility jobs because Git reports only the destination. Eleven CI tests, independent gate controls, frozen hashes, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md`; Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task stays `review`; S0 Gate NOT YET PASSED.
 - Fresh Fix Agent `/root/ci001_fix1` committed the exact authorized backlog marker at `ba0bbe7`. A new clean detached checkout passed CTRL-002 Acceptance (all five queues present), 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`; linked Recorder `R-20260928T204018Z-fa44f3d6-9105-4273-b08b-e5f61aa5088b`. Task stays in `review`; fresh independent re-review and actual GitHub workflow execution remain pending. S0 Gate NOT YET PASSED.
@@ -248,7 +250,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator: delegate a different fresh independent Review Agent for the Fix 2 clean committed candidate. After acceptance, arrange actual GitHub workflow execution. S0 Gate NOT YET PASSED.
+Coordinator: verify Review 3 PASS evidence, arrange and inspect actual GitHub workflow execution for the reviewed candidate, then close `LOOP1-CI-001` only if applicable acceptance passes. S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -259,6 +261,8 @@ Coordinator: delegate a different fresh independent Review Agent for the Fix 2 c
 `spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md` (independently accepted Infra skeleton, integrated and verified on clean local `main`).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh independent Reviewer `/root/ci001_review3` owns only Review 3 PASS evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. CI product files and the separate detached Acceptance checkout remain clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
 
 - Fresh Fix Agent `/root/ci001_fix2` owns only task-allowed classifier/test changes, task/current recovery, task-linked development evidence, prompt, and Recorder artifacts until the candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
 - Fresh independent Reviewer `/root/ci001_review2` owns only task-linked FAIL evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. The separate detached Acceptance checkout remains clean at `f508750`; original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
