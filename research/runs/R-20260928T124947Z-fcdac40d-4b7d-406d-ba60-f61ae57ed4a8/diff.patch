@@ -1,0 +1,87 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 3130aaf..66a0cd8 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b1`: seven prior probes, baseline verifier, frozen hashes, Fix Recorder integrity and detached CTRL-002 Acceptance passed, but two new mutations were accepted. The SP-A-002 case does not observe a prior FAILED item; the SP-A-006 Query contract/fixture does not model a page response. Static Go/Java vector interpretation for SP-A-012 remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
+ - Fresh Fix Agent `/root/contract003_fix1` repaired the Contract 003 fixture oracle after independent Review 1 FAIL. Staged rollback/retry and gap checkpoints, full Message identity checks, per-attempt Action audit, and ordered upgrade trace now reject all seven committed reviewer mutations. The task verifier passes 79 cases and 11 controls; CTRL-002 Development passes. Distinct Go/Java static normalized contract-vector files now receive separate comparison, but neither is a backend execution result; fresh independent review must decide whether these satisfy SP-A-012 at S0 contract freeze. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`.
+ - Fresh independent Review Agent `/root/contract003_review1` rejected clean Contract 003 candidate `9a14f63`: baseline schema/fixture verification and clean detached CTRL-002 Acceptance passed, but six of seven independent negative mutations retained the expected output and profile parity is tautological. Findings cover atomic rollback/materialization, conflicting duplicates, per-attempt Action authorization, upgrade stages, and distinct Go/Java outcomes. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
+ - Contract 003 moved to `review` after clean implementation candidate `9a14f63`. Coordinator Recorder run `R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd` finished and validated with 6 events; CTRL-002 Development passed after the move. Exact handoff: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition.md`. Fresh independent acceptance remains pending; S0 Gate NOT YET PASSED.
+@@ -200,6 +201,7 @@ Current Task State: review
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
++- Contract 003 Review 2 FAIL is permanent: SP-A-002 prior FAILED state and SP-A-006 paginated Query outcome are not asserted; `review2-negative-probe.py` accepts 2/2 invalid mutations. A fresh Fix/Review cycle is required. SP-A-012's S0 static-vector acceptance meaning is the smallest remaining interpretation question; static vectors are not backend-produced results.
+ - Contract 003 Review 1 FAIL remains permanent. Fix 1's static Go/Java outcome vectors are contract baselines initially populated from canonical expectations, not independent backend outputs. The fresh reviewer must decide the S0 interpretation of SP-A-012; development PASS does not close the task.
+ - Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
+ - All activity before the Instrumentation Epoch is bootstrap, retrospective backfill, or pilot evidence and must not be represented as complete prospective trace data.
+@@ -217,7 +219,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Commit a clean Contract 003 Fix 1 candidate, then delegate a different fresh Review Agent. The Fix Recorder run finished and validated with 18 events. Reviewer must inspect the profile-vector provenance and resolve the SP-A-012 acceptance interpretation, rerun deterministic contract verification and the seven-case probe, and use a clean detached checkout for CTRL-002 Acceptance. Keep task in `review`; S0 Gate remains NOT YET PASSED.
++Delegate a fresh Contract 003 Fix Agent for SP-A-002 prior FAILED-state observability and SP-A-006 Query page response contract/fixture. Preserve both permanent negative probes. Resolve the SP-A-012 S0 static-vector interpretation before PASS, then delegate a different fresh independent reviewer. Keep task in `review`; S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -229,6 +231,7 @@ Commit a clean Contract 003 Fix 1 candidate, then delegate a different fresh Rev
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh independent Reviewer `/root/contract003_review2` owns only task-linked FAIL evidence/probe, Task Spec/current recovery update, prompt and Recorder artifacts until review closure commit. No product contract file changed. The separate detached Acceptance checkout is clean at `56c14b1`; original `H:\IM-platform` HTTP schema-lint was untouched.
+ - Fresh Fix Agent `/root/contract003_fix1` owns only task-allowed verifier, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory belongs to another agent and was untouched.
+ - Fresh independent Reviewer `/root/contract003_review1` owns only task-linked FAIL evidence/probe, task/current recovery updates, prompt and Recorder run until review closure is committed. It changed no product contract file. The separate detached Acceptance checkout remains clean at candidate `9a14f63`. The original `H:\IM-platform` untracked HTTP schema-lint directory was not accessed.
+ - Coordinator `/root` owns only the Contract 003 review queue transition, current/task recovery update, and linked Recorder handoff artifacts until the transition commit. The fresh Implementation Agent committed its clean candidate and owns no uncommitted changes. The original `H:\IM-platform` untracked HTTP schema-lint directory remains solely owned by the paused Agent and untouched.
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-003.md b/spec/tasks/review/LOOP1-CONTRACT-003.md
+index acf2ecc..f5b78ba 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-003.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-003.md
+@@ -59,6 +59,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Evidence
+ 
++- Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b18a3378ebaade1b4ad4fe85e26aa2f474b`. Task verifier, all seven prior probes, frozen hashes, Fix Recorder integrity, and clean detached CTRL-002 Acceptance passed. Two new mutations are accepted: removing the initial locally FAILED state in SP-A-002 and adding an unbounded simulated Query response to SP-A-006's request-only pagination case. SP-A-012's S0 static-vector interpretation remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; probe: `spec/progress/evidence/LOOP1-CONTRACT-003/review2-negative-probe.py`; review Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
+ - Fresh Fix Agent `/root/contract003_fix1` repaired Review 1's oracle findings: staged local materialization and rollback/retry checkpoints, the intermediate gap, full Message identity, each Action attempt's authorization/audit, and ordered upgrade stages/rollback. Separately stored Go/Java normalized contract vectors are checked against canonical outcomes with divergence controls. These are static vectors initially populated from canonical fixtures, not backend execution evidence. The committed review probe rejects 7/7 invalid mutations; the verifier passes 79 cases and 11 mutation controls; CTRL-002 Development passes. This is development evidence only. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`. Acceptance ambiguity: does SP-A-012 at S0 contract freeze require live backend-produced outcomes, or are distinct static profile contract vectors sufficient pending backend implementation?
+ - Fresh independent Review Agent `/root/contract003_review1` rejected exact candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`. The baseline verifier and clean detached CTRL-002 Acceptance passed, but six of seven in-memory negative mutations retained the expected fixture result: rollback was unobserved, conflicting duplicate content was accepted, first-attempt Action authorization was masked, and upgrade failure stages were interchangeable. The profile loop also repeats one Python oracle without distinct Go/Java outcomes. Task stays `review`; S0 Gate NOT YET PASSED. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; probe: `spec/progress/evidence/LOOP1-CONTRACT-003/review1-negative-probe.py`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
+ - Coordinator review-state transition preserves implementation candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`. CTRL-002 Development passed after the queue move; linked Recorder run `R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd` finished and validated (6 events). Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition.md`. Independent acceptance remains pending.
+@@ -68,9 +69,10 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Handoff
+ 
++- Candidate `56c14b18a3378ebaade1b4ad4fe85e26aa2f474b` failed fresh independent Review 2 despite clean-checkout CTRL-002 Acceptance. Reviewer changed only task-linked probe, evidence, prompt, Recorder and recovery files. Detached Acceptance checkout remained clean. Original other-Agent-owned HTTP schema-lint directory was untouched.
+ - Fix 1 owns only task-allowed oracle/fixture/README changes and linked evidence/Recorder/recovery updates until its clean candidate commit. The task stays `review`; the Fix Agent has not self-accepted. The original `H:\IM-platform` other-Agent-owned untracked HTTP schema-lint directory was untouched.
+ - Candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff` failed fresh independent review despite clean-checkout CTRL-002 Acceptance. The reviewer changed only task-linked evidence, probe, recovery files, and Recorder artifacts; no product contract file. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
+ 
+ # Next Action
+ 
+-- Commit a clean Fix 1 candidate, then delegate a different fresh independent Review Agent. The Fix Recorder run finished and validated with 18 events. Reviewer must resolve the static-profile-vector interpretation, inspect the exact candidate, run the task verifier and review probe, and run clean detached CTRL-002 Acceptance under ADR-0001. Keep task in `review`; do not claim acceptance or Gate PASS from development checks.
++- Delegate a fresh Fix Agent to make the SP-A-002 prior FAILED state observable and the SP-A-006 Query page response machine-verifiable. Preserve both permanent FAIL probes. Resolve the narrow SP-A-012 S0 profile-vector acceptance interpretation, then delegate a different fresh Review Agent and rerun clean detached CTRL-002 Acceptance. Keep task `review`; do not claim Task or Gate PASS.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/LOOP1-CONTRACT-003-review2.txt
+# ?? research/prompts/P-820a014e-77e7-4d02-bd59-53719e9519dc/metadata.json
+# ?? research/prompts/P-820a014e-77e7-4d02-bd59-53719e9519dc/prompt.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-258c31ed-dccb-4417-bb0a-a8bfe6f73a7f.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-258c31ed-dccb-4417-bb0a-a8bfe6f73a7f.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-34153ea8-bf75-473b-acd9-db7e3a65eb73.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-34153ea8-bf75-473b-acd9-db7e3a65eb73.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-4b95af9c-67f6-4b04-a10c-0eaad86788d2.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-4b95af9c-67f6-4b04-a10c-0eaad86788d2.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-4c3053ab-7068-45a2-bb88-0deea2419223.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-4c3053ab-7068-45a2-bb88-0deea2419223.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-4c99309b-6147-4122-ab24-8232ab478179.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-4c99309b-6147-4122-ab24-8232ab478179.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-50b2f8f3-5cdd-4690-b132-bb2948ef8c28.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-50b2f8f3-5cdd-4690-b132-bb2948ef8c28.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-eb827853-530b-4764-a765-9c97408e74b7.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-eb827853-530b-4764-a765-9c97408e74b7.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-f63d3cb9-9f65-4a0d-998a-781521a01098.stderr.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/blobs/C-f63d3cb9-9f65-4a0d-998a-781521a01098.stdout.txt
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/events.jsonl
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/initial_state.json
+# ?? research/runs/R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md
+# ?? spec/progress/evidence/LOOP1-CONTRACT-003/review2-negative-probe.py
