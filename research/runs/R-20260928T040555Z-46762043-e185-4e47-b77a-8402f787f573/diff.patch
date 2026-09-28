@@ -1,0 +1,69 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index d57fd67..6831968 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -26,6 +26,7 @@ Current Task State: review
+ - Fresh Fix Agent `/root/contract002_fix2` repaired the three auth.bind assertions without changing canonical schema or fixture bytes. WSS verifier PASS with 12 behavior controls, committed independent probe rejected 12/12 invalid mutations, and CTRL-002 Development PASS. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-auth-bind-fix-development.md`; Recorder run `R-20260928T024701Z-63b628c9-0944-46da-b52b-c2f97020a7ee`. This is not acceptance. The next action is independent review of the clean fix commit; task remains in `review` and S0 Gate remains NOT YET PASSED.
+ - Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: committed 12-case probe rejected 12/12, but broader independent fixture mutation audit found 21/24 invalid output/state/timeline outcomes accepted by `check_scenario`. Clean detached CTRL-002 Acceptance, WSS baseline, architecture hashes, and Fix Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains in `review`; S0 Gate remains NOT YET PASSED. Original `H:\IM-platform` untracked HTTP schema-lint directory was untouched.
+ - Fresh Fix Agent `/root/contract002_fix3` added independent named-case outcome and transaction assertions plus direct frame/request relationships. Development WSS baseline, prior 12-case probe, broad 24-case probe, and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-systemic-fixture-fix-development.md`; Recorder run `R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2`. Canonical schema and fixture bytes remain unchanged. Task stays in `review` pending a different fresh independent Reviewer; S0 Gate remains NOT YET PASSED.
++- Fresh independent Review Agent `/root/contract002_review4` rejected clean candidate `cb24c4c`: despite baseline, prior 12/24 mutation probes, frozen hash verification, and clean detached CTRL-002 Acceptance passing, a new precondition probe found 0/9 invalid `given` mutations rejected. Committed ACKs remained accepted for unauthenticated/nonmember/rolled-back premises. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-cb24c4c-fail.md`; Recorder run `R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573`. Task remains in `review`; S0 Gate remains NOT YET PASSED.
+ 
+ ## Authorized Frozen Architecture Representation Migration
+ 
+@@ -192,7 +193,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-A different fresh independent Review Agent inspects the committed systemic WSS fix, repeats both adversarial probes, and runs clean-checkout CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
++A fresh Fix Agent asserts material WSS scenario preconditions and adds regressions, then a different fresh independent Reviewer reruns all probes and clean-checkout CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -212,6 +213,7 @@ A different fresh independent Review Agent inspects the committed systemic WSS f
+ - Fresh Fix Agent `/root/contract002_fix2` owns the WSS verifier fix and its task-linked evidence, Recorder prompt/run, Task Spec, and current-state update until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
+ - Fresh independent Reviewer `/root/contract002_review3` owns only the broad negative-control probe, FAIL report, task/current recovery update, and task-linked Recorder artifacts until its review closure commit; no product file was changed. The clean detached Acceptance checkout remains at candidate `1da1b40` and clean. The original checkout's untracked HTTP schema-lint directory was not accessed.
+ - Fresh Fix Agent `/root/contract002_fix3` owns the WSS verifier repair, task/current recovery updates, and task-linked evidence/Recorder artifacts until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
++- Fresh independent Reviewer `/root/contract002_review4` owns only task-linked FAIL evidence, its negative-control probe, Recorder artifacts, and recovery updates until its review closure commit. It changed no product contract file. Its detached Acceptance checkout remains clean at `cb24c4c`. The original checkout's untracked HTTP schema-lint directory was not accessed.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-002.md b/spec/tasks/review/LOOP1-CONTRACT-002.md
+index b993871..6b578d1 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-002.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-002.md
+@@ -70,6 +70,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ - Fresh Fix Agent `/root/contract002_fix2` added direct valid-bind acknowledgement and authenticated-state assertions, rejected-bind unauthenticated-state assertions, and three permanent behavior mutations. WSS verifier rejected 12 behavior mutations; the committed independent probe rejected 12/12 invalid outcomes; CTRL-002 Development passed. This is development evidence only. Details: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-auth-bind-fix-development.md`; Recorder run `R-20260928T024701Z-63b628c9-0944-46da-b52b-c2f97020a7ee`.
+ - Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: a broader in-memory audit of every fixture's declared output/state/timeline expectations found `check_scenario` accepted 21/24 invalid mutations, including missing created fan-out, wrong committed ACK sequence, duplicate GROUP persistence, double materialization, permanent Sync gap, and wrong bound identity/epoch. The committed prior 12-case probe rejected 12/12, baseline WSS verifier passed, and clean detached CTRL-002 Acceptance passed, but these do not establish the unasserted semantics. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md` and `2026-09-28-independent-review3-mutations.py`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains `review`; S0 Gate NOT YET PASSED.
+ - Fresh Fix Agent `/root/contract002_fix3` added independent named-case outcomes, transaction timelines, and direct request/output relationships to the WSS verifier. Development checks pass: baseline 8 positive/10 negative and 11 schema/12 behavior mutations, prior probe 12/12, broad Review 3 probe 24/24, and CTRL-002 Development. Canonical schema and fixture bytes remain unchanged. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-systemic-fixture-fix-development.md`; Recorder run `R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2`. This is not independent acceptance.
++- Fresh independent Review Agent `/root/contract002_review4` rejected clean candidate `cb24c4c`: a new in-memory precondition audit found 0/9 invalid `given` mutations rejected, including committed ACK on an unauthenticated socket, nonmember or declared rollback, and valid bind on a declared invalid token. Baseline, prior 12/24 probes, frozen hash verifier, and clean detached CTRL-002 Acceptance passed, but these do not establish premise-to-outcome correctness. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-cb24c4c-fail.md` and `2026-09-28-independent-review4-mutations.py`; Recorder run `R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573`. Task remains in `review` and S0 Gate NOT YET PASSED.
+ 
+ # Handoff
+ 
+@@ -78,4 +79,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Next Action
+ 
+-- Delegate a different fresh independent Reviewer to inspect the clean committed fix candidate, repeat the broad probe, and run clean-checkout Acceptance. Keep in `review` pending independent PASS.
++- Delegate a fresh Fix Agent to assert material scenario `given` preconditions against output/state/timeline outcomes, then a different fresh independent Reviewer to repeat all probes and clean-checkout Acceptance. Keep in `review` pending independent PASS.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-a6760d2f-5f60-4e31-b3d5-24073780b9fe/metadata.json
+# ?? research/prompts/P-a6760d2f-5f60-4e31-b3d5-24073780b9fe/prompt.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-5ab7d8a8-d4b7-4b0d-a83e-54ae318b6b3f.stderr.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-5ab7d8a8-d4b7-4b0d-a83e-54ae318b6b3f.stdout.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-7318f589-a1c8-464f-a2bb-9821ddd31c9c.stderr.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-7318f589-a1c8-464f-a2bb-9821ddd31c9c.stdout.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-92dc25d7-c189-497e-86b5-e1ae9248093f.stderr.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-92dc25d7-c189-497e-86b5-e1ae9248093f.stdout.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-b904e89e-2ed2-4906-8e6f-5cb7ccfe170f.stderr.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-b904e89e-2ed2-4906-8e6f-5cb7ccfe170f.stdout.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-cd3b2dc9-debf-49a2-aa4a-00ac5bd82e4b.stderr.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-cd3b2dc9-debf-49a2-aa4a-00ac5bd82e4b.stdout.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-f2d0c691-d182-4d52-a5c7-89ca007b7f9a.stderr.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/blobs/C-f2d0c691-d182-4d52-a5c7-89ca007b7f9a.stdout.txt
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/events.jsonl
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/initial_state.json
+# ?? research/runs/R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-cb24c4c-fail.md
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-mutations.py
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-prompt.txt
