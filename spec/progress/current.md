@@ -24,6 +24,7 @@ Current Task State: review
 - Fresh Fix Agent `/root/contract002_fix1` repaired the four prior WSS fixture verifier gaps and committed nine in-memory mutation controls; its development evidence is `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md` and Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`.
 - Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: in-memory probes accepted omission of successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated. The four earlier failures and five other controls reject correctly. WSS baseline, frozen hashes, and clean detached CTRL-002 Acceptance passed, but auth.bind state/epoch acceptance remains incomplete. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. Task remains in review; S0 Gate remains NOT YET PASSED. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
 - Fresh Fix Agent `/root/contract002_fix2` repaired the three auth.bind assertions without changing canonical schema or fixture bytes. WSS verifier PASS with 12 behavior controls, committed independent probe rejected 12/12 invalid mutations, and CTRL-002 Development PASS. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-auth-bind-fix-development.md`; Recorder run `R-20260928T024701Z-63b628c9-0944-46da-b52b-c2f97020a7ee`. This is not acceptance. The next action is independent review of the clean fix commit; task remains in `review` and S0 Gate remains NOT YET PASSED.
+- Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: committed 12-case probe rejected 12/12, but broader independent fixture mutation audit found 21/24 invalid output/state/timeline outcomes accepted by `check_scenario`. Clean detached CTRL-002 Acceptance, WSS baseline, architecture hashes, and Fix Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains in `review`; S0 Gate remains NOT YET PASSED. Original `H:\IM-platform` untracked HTTP schema-lint directory was untouched.
 
 ## Authorized Frozen Architecture Representation Migration
 
@@ -190,7 +191,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-A different fresh independent Review Agent tests the clean committed auth.bind fix with the committed mutation probe and clean-checkout Acceptance verification. S0 Gate remains NOT YET PASSED.
+A fresh Fix Agent repairs the systemic WSS fixture assertion gaps identified by independent Review 3, then a different fresh Review Agent repeats the broad adversarial probe and clean-checkout Acceptance. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -208,6 +209,7 @@ A different fresh independent Review Agent tests the clean committed auth.bind f
 - Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The Coordinator owns only the task `done` transition, post-merge evidence, checkpoint, current recovery update, and post-merge Recorder artifacts on local `main` until committed. The interrupted second-review worktree remains untouched.
 - Fresh independent Reviewer `/root/contract002_review2` committed the task-authorized FAIL evidence, probe, Recorder run, and recovery updates on the isolated Contract 002 branch; no pending reviewer changes remain. Product files remain at reviewed candidate `102b0ef`. The original checkout's untracked HTTP schema-lint directory belongs to the paused Agent and was not accessed.
 - Fresh Fix Agent `/root/contract002_fix2` owns the WSS verifier fix and its task-linked evidence, Recorder prompt/run, Task Spec, and current-state update until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
+- Fresh independent Reviewer `/root/contract002_review3` owns only the broad negative-control probe, FAIL report, task/current recovery update, and task-linked Recorder artifacts until its review closure commit; no product file was changed. The clean detached Acceptance checkout remains at candidate `1da1b40` and clean. The original checkout's untracked HTTP schema-lint directory was not accessed.
 
 ## Architecture Conflicts / ACP / ADR
 

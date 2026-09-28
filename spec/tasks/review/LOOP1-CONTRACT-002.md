@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
 status: review
-owner: /root/contract002_fix2
+owner: /root/contract002_review3
 stage: S0
 gate: S0
 ---
@@ -68,6 +68,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - Fresh Fix Agent `/root/contract002_fix1` added direct checks for all four review gaps and nine in-memory mutation regressions while preserving the five passing controls. Generator/fixture comparison and CTRL-002 Development passed; development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md`; Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`. This is not acceptance. Last known good baseline remains `7484901b3915535f60941a01116b730a845bd47d`.
 - Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: three in-memory auth.bind mutations were accepted (omitted successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated). The four prior failures and five earlier controls now reject correctly; baseline WSS verifier, architecture hashes, and clean detached CTRL-002 Acceptance passed. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; review Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. The task stays in review.
 - Fresh Fix Agent `/root/contract002_fix2` added direct valid-bind acknowledgement and authenticated-state assertions, rejected-bind unauthenticated-state assertions, and three permanent behavior mutations. WSS verifier rejected 12 behavior mutations; the committed independent probe rejected 12/12 invalid outcomes; CTRL-002 Development passed. This is development evidence only. Details: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-auth-bind-fix-development.md`; Recorder run `R-20260928T024701Z-63b628c9-0944-46da-b52b-c2f97020a7ee`.
+- Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: a broader in-memory audit of every fixture's declared output/state/timeline expectations found `check_scenario` accepted 21/24 invalid mutations, including missing created fan-out, wrong committed ACK sequence, duplicate GROUP persistence, double materialization, permanent Sync gap, and wrong bound identity/epoch. The committed prior 12-case probe rejected 12/12, baseline WSS verifier passed, and clean detached CTRL-002 Acceptance passed, but these do not establish the unasserted semantics. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md` and `2026-09-28-independent-review3-mutations.py`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains `review`; S0 Gate NOT YET PASSED.
 
 # Handoff
 
@@ -76,4 +77,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Delegate a different fresh independent Reviewer to inspect the exact clean committed candidate, repeat the committed in-memory auth.bind probe, and run applicable acceptance verification. Keep in `review` pending independent PASS.
+- Delegate a fresh Fix Agent to enforce all declared scenario outcomes independently of generated fixture byte equality, retain adversarial regressions, and then delegate a different fresh independent Reviewer. Keep in `review` pending independent PASS.
