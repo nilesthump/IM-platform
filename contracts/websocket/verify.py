@@ -222,10 +222,19 @@ def check_scenario(s):
         first, second = [step["out"][0]["payload"] for step in s["steps"]]
         if first["messageId"] == second["messageId"] or first["conversationId"] == second["conversationId"]:
             raise Invalid("conversation identity collision")
+    if s["id"] == "bind-valid-session":
+        outputs = s["steps"][0]["out"]
+        if (s["given"]["socket"] != "UNAUTHENTICATED" or e["socket"] != "AUTHENTICATED"
+                or len(outputs) != 1 or outputs[0]["type"] != "auth.ack"
+                or outputs[0]["payload"].get("status") != "bound"):
+            raise Invalid("valid bind must acknowledge and authenticate socket")
     if s["id"] in ("stale-epoch-bind", "expired-token-bind", "wrong-client-type-bind", "invalid-signature-bind"):
         codes = {"stale-epoch-bind": "AUTH_SESSION_EPOCH_STALE", "expired-token-bind": "AUTH_TOKEN_EXPIRED", "wrong-client-type-bind": "AUTH_CLIENT_TYPE_MISMATCH", "invalid-signature-bind": "AUTH_TOKEN_INVALID"}
         outputs = s["steps"][0]["out"]
-        if len(outputs) != 1 or outputs[0]["type"] != "auth.ack" or outputs[0]["payload"].get("status") != "rejected" or outputs[0]["payload"]["error"]["code"] != codes[s["id"]]:
+        if (s["given"]["socket"] != "UNAUTHENTICATED" or e["socket"] != "UNAUTHENTICATED"
+                or len(outputs) != 1 or outputs[0]["type"] != "auth.ack"
+                or outputs[0]["payload"].get("status") != "rejected"
+                or outputs[0]["payload"]["error"]["code"] != codes[s["id"]]):
             raise Invalid("invalid bind must emit its rejection")
     if s["id"] == "wrong-conversation-fanout":
         if s["given"]["localMemberOf"] == s["given"]["eventConversation"]:
@@ -255,6 +264,9 @@ def negative_behavior_controls():
         ("idempotent-retry", lambda s: s["steps"][1]["out"][0]["payload"].update(messageId=M2)),
         ("non-member-send", lambda s: s["steps"][0]["out"].append(ack())),
         ("unauthenticated-send", lambda s: s["steps"][0]["out"].append(ack())),
+        ("bind-valid-session", lambda s: s["steps"][0]["out"].clear()),
+        ("bind-valid-session", lambda s: s["expect"].update(socket="UNAUTHENTICATED")),
+        ("stale-epoch-bind", lambda s: s["expect"].update(socket="AUTHENTICATED")),
     ]
     for case_id, mutate in changes:
         changed = copy.deepcopy(by_id[case_id])
