@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh Fix Agent `/root/contract002_portability_fix` repaired the post-main checkout failure with fixture-local `golden.json -text` at `59bc411`. Disposable clean worktrees with `core.autocrlf=true` and `false` both retained the original golden blob bytes and passed WSS verification. Five prior independent mutation probe sets, the WSS baseline, frozen architecture hash verifier, and CTRL-002 Development passed. The golden fixture and WSS schema/semantics are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. The task remains `review` for fresh independent review; S0 Gate remains NOT YET PASSED.
 - `LOOP1-CONTRACT-002` is independently accepted under ADR-0001 at exact reviewed candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`, with PASS report committed at `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The separate clean detached CTRL-002 Acceptance, WSS verifier, five prior probe sets, ten new controls, architecture hashes, scope audit, and Review Recorder validation passed. Coordinator closure evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`.
 - Local `main` fast-forwarded to closure `4d27d56975d355144f24c945e0de030184758fa2`, but clean post-merge WSS verification failed because `core.autocrlf=true` changed `golden.json` working-file bytes. Task 002 is reopened in `review`; the earlier candidate PASS and closure remain historical evidence, while `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md` records the integration failure. `origin/main` remains at `7484901b3915535f60941a01116b730a845bd47d`; no new remote push occurred. S0 Gate remains NOT YET PASSED.
 - Clean `main` at `7484901` was pushed to `origin/main` on 2026-09-28 and used as the base for isolated branch `task/LOOP1-CONTRACT-002`.
@@ -206,7 +207,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate a fresh Fix Agent for the golden fixture Git checkout line-ending mismatch, then a different fresh Review Agent. Repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
+Delegate a different fresh independent Review Agent for the clean portability-fix candidate. On PASS, repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -218,6 +219,7 @@ Delegate a fresh Fix Agent for the golden fixture Git checkout line-ending misma
 
 ## Uncommitted Changes / Ownership
 
+- Fresh Fix Agent `/root/contract002_portability_fix` owns only the fixture-local transport rule, committed checkout regression, Task Spec/current recovery updates, task-linked development evidence, and Recorder prompt/run until the clean review-candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory remains untouched.
 - Coordinator owns only the Contract 002 post-main-merge FAIL evidence, correction from `done` back to `review`, current recovery update, and linked Recorder artifacts until committed. No product contract file is uncommitted. Clean local `main` contains the failed integration at `4d27d56`; repair will move forward after fresh Fix/Review.
 - Coordinator owns only the Contract 002 `done` transition, acceptance evidence, checkpoint, current recovery update, and linked Recorder artifacts until committed; no product contract file is uncommitted. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains owned by the paused Agent and untouched.
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.

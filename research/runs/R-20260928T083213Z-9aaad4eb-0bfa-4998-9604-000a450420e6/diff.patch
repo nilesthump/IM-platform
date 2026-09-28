@@ -1,0 +1,137 @@
+diff --git a/contracts/fixtures/websocket/.gitattributes b/contracts/fixtures/websocket/.gitattributes
+new file mode 100644
+index 0000000..99aa611
+--- /dev/null
++++ b/contracts/fixtures/websocket/.gitattributes
+@@ -0,0 +1,2 @@
++# Keep the generated golden fixture byte-for-byte identical on every checkout.
++golden.json -text
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 60ee71d..4640902 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh Fix Agent `/root/contract002_portability_fix` repaired the post-main checkout failure with fixture-local `golden.json -text` at `59bc411`. Disposable clean worktrees with `core.autocrlf=true` and `false` both retained the original golden blob bytes and passed WSS verification. Five prior independent mutation probe sets, the WSS baseline, frozen architecture hash verifier, and CTRL-002 Development passed. The golden fixture and WSS schema/semantics are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. The task remains `review` for fresh independent review; S0 Gate remains NOT YET PASSED.
+ - `LOOP1-CONTRACT-002` is independently accepted under ADR-0001 at exact reviewed candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`, with PASS report committed at `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The separate clean detached CTRL-002 Acceptance, WSS verifier, five prior probe sets, ten new controls, architecture hashes, scope audit, and Review Recorder validation passed. Coordinator closure evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`.
+ - Local `main` fast-forwarded to closure `4d27d56975d355144f24c945e0de030184758fa2`, but clean post-merge WSS verification failed because `core.autocrlf=true` changed `golden.json` working-file bytes. Task 002 is reopened in `review`; the earlier candidate PASS and closure remain historical evidence, while `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md` records the integration failure. `origin/main` remains at `7484901b3915535f60941a01116b730a845bd47d`; no new remote push occurred. S0 Gate remains NOT YET PASSED.
+ - Clean `main` at `7484901` was pushed to `origin/main` on 2026-09-28 and used as the base for isolated branch `task/LOOP1-CONTRACT-002`.
+@@ -206,7 +207,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Delegate a fresh Fix Agent for the golden fixture Git checkout line-ending mismatch, then a different fresh Review Agent. Repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
++Delegate a different fresh independent Review Agent for the clean portability-fix candidate. On PASS, repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -218,6 +219,7 @@ Delegate a fresh Fix Agent for the golden fixture Git checkout line-ending misma
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/contract002_portability_fix` owns only the fixture-local transport rule, committed checkout regression, Task Spec/current recovery updates, task-linked development evidence, and Recorder prompt/run until the clean review-candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory remains untouched.
+ - Coordinator owns only the Contract 002 post-main-merge FAIL evidence, correction from `done` back to `review`, current recovery update, and linked Recorder artifacts until committed. No product contract file is uncommitted. Clean local `main` contains the failed integration at `4d27d56`; repair will move forward after fresh Fix/Review.
+ - Coordinator owns only the Contract 002 `done` transition, acceptance evidence, checkpoint, current recovery update, and linked Recorder artifacts until committed; no product contract file is uncommitted. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains owned by the paused Agent and untouched.
+ - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
+diff --git a/spec/progress/evidence/LOOP1-CONTRACT-002/verify-checkout-portability.ps1 b/spec/progress/evidence/LOOP1-CONTRACT-002/verify-checkout-portability.ps1
+new file mode 100644
+index 0000000..9f92c68
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-CONTRACT-002/verify-checkout-portability.ps1
+@@ -0,0 +1,40 @@
++[CmdletBinding()]
++param()
++
++$ErrorActionPreference = 'Stop'
++$repo = (git rev-parse --show-toplevel).Trim()
++if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve repository root' }
++$python = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
++if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'Bundled Python is unavailable' }
++$fixture = 'contracts/fixtures/websocket/golden.json'
++$tempRoot = Join-Path ([IO.Path]::GetTempPath()) ('LOOP1-CONTRACT-002-portability-' + [guid]::NewGuid().ToString('N'))
++New-Item -ItemType Directory -Path $tempRoot | Out-Null
++
++try {
++    foreach ($setting in @('true', 'false')) {
++        $checkout = Join-Path $tempRoot $setting
++        & git -C $repo -c "core.autocrlf=$setting" worktree add --detach $checkout HEAD
++        if ($LASTEXITCODE -ne 0) { throw "Failed to create $setting checkout" }
++
++        $worktreeHash = (& git -C $checkout hash-object --no-filters -- $fixture).Trim()
++        $blobHash = (& git -C $checkout rev-parse "HEAD:$fixture").Trim()
++        if ($LASTEXITCODE -ne 0 -or $worktreeHash -ne $blobHash) {
++            throw "Fixture bytes differ from committed blob with core.autocrlf=$setting"
++        }
++        $status = (& git -C $checkout status --porcelain=v1)
++        if ($LASTEXITCODE -ne 0 -or $status) { throw "Checkout is not clean with core.autocrlf=$setting" }
++        & $python (Join-Path $checkout 'contracts/websocket/verify.py')
++        if ($LASTEXITCODE -ne 0) { throw "WSS verification failed with core.autocrlf=$setting" }
++        Write-Output "PASS core.autocrlf=$setting fixture=$blobHash clean=true"
++    }
++}
++finally {
++    foreach ($setting in @('true', 'false')) {
++        $checkout = Join-Path $tempRoot $setting
++        if (Test-Path -LiteralPath $checkout) {
++            & git -C $repo worktree remove --force $checkout
++            if ($LASTEXITCODE -ne 0) { Write-Warning "Could not remove disposable worktree $checkout" }
++        }
++    }
++    Remove-Item -LiteralPath $tempRoot -Force -ErrorAction SilentlyContinue
++}
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-002.md b/spec/tasks/review/LOOP1-CONTRACT-002.md
+index 5314de9..c4f66dc 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-002.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-002.md
+@@ -84,6 +84,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ - Fresh independent Review Agent `/root/contract002_review7` returned PASS for exact clean candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b` under ADR-0001's separate detached clean-checkout mechanism. WSS baseline, all five prior probe sets, 10 new focused controls, canonical hashes, CTRL-002 Acceptance, protected-path scope, Fix 6 raw Recorder bytes, and Review 7 Recorder validation passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review7-5d5afdd-pass.md`; run `R-20260928T062353Z-39bc4b6e-2cc6-4610-940b-1e93949d211b`. The task remains `review` until Coordinator acceptance closure; S0 Gate remains NOT YET PASSED.
+ - Coordinator accepted the independent PASS closure at review evidence commit `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The reviewed product candidate is exactly `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`; no reviewer or coordinator product edits followed it. Durable coordinator evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`; stable contract checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-contract-002-accepted.md`. This Task is `done`; S0 Gate remains NOT YET PASSED.
+ - Post-merge verification on clean local `main` failed after fast-forward to `4d27d56975d355144f24c945e0de030184758fa2`: the WSS verifier rejects `golden.json` because this checkout's `core.autocrlf=true` changed its working-file bytes. The working-file and committed blob hashes differ while Git status is empty. The Coordinator's integration Recorder run `R-20260928T073255Z-e600d2fc-b716-4570-a306-f0fb681c70a6` finished FAIL and validated. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md`. The prior clean-candidate Review PASS remains historical content evidence, but the task is reopened in `review` until portability is fixed and freshly reviewed. Local `main` contains the failed integration; `origin/main` remains at `7484901` and was not pushed.
++- Fresh Fix Agent `/root/contract002_portability_fix` added a fixture-local `golden.json -text` rule. The committed generator and golden bytes are unchanged. A committed regression creates disposable clean checkouts with `core.autocrlf=true` and `false`, verifies working bytes against the Git blob, and runs the WSS verifier in both. Both pass at fix commit `59bc411`; the five prior independent probe sets, local WSS baseline, frozen architecture verifier, and CTRL-002 Development also pass. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder prompt `P-1e0f7ed9-541e-4fe6-b5de-89e8a3485513`, run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. This remains development evidence pending fresh independent review.
+ 
+ # Handoff
+ 
+@@ -92,4 +93,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Next Action
+ 
+-- Delegate a fresh Fix Agent for the golden fixture's checkout line-ending portability, then a different fresh independent Review Agent. Repeat clean local-main post-merge WSS, architecture, CTRL-002 Acceptance, and Recorder checks before returning this task to `done`. Do not activate `LOOP1-CONTRACT-003` yet. S0 Gate remains NOT YET PASSED.
++- Have a different fresh independent Review Agent inspect the clean portability-fix candidate, including clean checkout behavior with both line-ending settings and CTRL-002 Acceptance. If accepted, the Coordinator repeats clean local-main post-merge WSS, architecture, CTRL-002 Acceptance, and Recorder checks before returning this task to `done`. Do not activate `LOOP1-CONTRACT-003` yet. S0 Gate remains NOT YET PASSED.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-1e0f7ed9-541e-4fe6-b5de-89e8a3485513/metadata.json
+# ?? research/prompts/P-1e0f7ed9-541e-4fe6-b5de-89e8a3485513/prompt.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-08c5026e-5932-4086-9f16-b49ad0e304b8.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-08c5026e-5932-4086-9f16-b49ad0e304b8.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-5f17e7f4-2e8d-4e80-be2d-0b0c74a31b36.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-5f17e7f4-2e8d-4e80-be2d-0b0c74a31b36.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6ce58ed7-4321-4ed3-b3ec-2aa7c69c2716.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6ce58ed7-4321-4ed3-b3ec-2aa7c69c2716.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6f5d3acb-1547-494c-b8dc-b8fbedcf6616.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6f5d3acb-1547-494c-b8dc-b8fbedcf6616.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-710bdcc0-d84c-4f2d-8b42-cce2cf19d60e.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-710bdcc0-d84c-4f2d-8b42-cce2cf19d60e.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-90dd6fa0-da4a-4d7c-bc66-6c48b977fbb6.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-90dd6fa0-da4a-4d7c-bc66-6c48b977fbb6.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-917a05ca-43e1-438a-b1e0-5a2a24aca8e3.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-917a05ca-43e1-438a-b1e0-5a2a24aca8e3.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a4041386-0773-4506-8566-f6f9bda0fd81.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a4041386-0773-4506-8566-f6f9bda0fd81.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a5c95c5f-531f-405d-a739-641fb76e9658.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a5c95c5f-531f-405d-a739-641fb76e9658.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ad345506-225e-4e3d-ae4c-7d8fbfed8e60.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ad345506-225e-4e3d-ae4c-7d8fbfed8e60.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-c4fc47cb-e376-4aa5-829b-4f3fb22dea8e.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-c4fc47cb-e376-4aa5-829b-4f3fb22dea8e.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-d3f5ece8-5d33-41f4-b712-589472ebdf0b.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-d3f5ece8-5d33-41f4-b712-589472ebdf0b.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ebeed87e-af9b-4e61-bae5-0a581333eb31.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ebeed87e-af9b-4e61-bae5-0a581333eb31.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-fbe6eb17-3aca-4cbe-b12c-8c7674385cf9.stderr.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-fbe6eb17-3aca-4cbe-b12c-8c7674385cf9.stdout.txt
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/events.jsonl
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/initial_state.json
+# ?? research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md
