@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-INFRA-001
 title: Establish Compose, PostgreSQL, NATS, and TLS proxy skeleton
-status: active
+status: review
 owner: /root
 stage: S0
 gate: S0
@@ -59,4 +59,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator: move this clean implementation candidate to `review`, then delegate a fresh independent Review Agent to run exact clean-checkout profile smokes and acceptance under ADR-0001. Do not claim Task or S0 Gate PASS from development output.
+- Fresh independent Review Agent: inspect candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean committed checkout; verify scope and minimality, both profile smokes through TLS, frozen architecture hashes, Recorder integrity, and CTRL-002 Acceptance under ADR-0001.
