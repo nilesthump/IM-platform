@@ -1,0 +1,88 @@
+diff --git a/contracts/database/migrations/0001_initial.up.sql b/contracts/database/migrations/0001_initial.up.sql
+index f02a367..a65de90 100644
+--- a/contracts/database/migrations/0001_initial.up.sql
++++ b/contracts/database/migrations/0001_initial.up.sql
+@@ -34,7 +34,8 @@ CREATE TABLE conversations (
+     created_at timestamptz NOT NULL DEFAULT now(),
+     CHECK ((kind = 'DIRECT' AND direct_user_low_id IS NOT NULL AND direct_user_high_id IS NOT NULL
+             AND direct_user_low_id < direct_user_high_id AND group_create_request_id IS NULL)
+-        OR (kind = 'GROUP' AND direct_user_low_id IS NULL AND direct_user_high_id IS NULL)),
++        OR (kind = 'GROUP' AND direct_user_low_id IS NULL AND direct_user_high_id IS NULL
++            AND group_create_request_id IS NOT NULL)),
+     UNIQUE (conversation_id, direct_user_low_id, direct_user_high_id),
+     UNIQUE (direct_user_low_id, direct_user_high_id),
+     UNIQUE (created_by, group_create_request_id)
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 195228b..e341621 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,7 +16,7 @@ Current Task State: active
+ 
+ ## Current Contract Work
+ 
+-- `LOOP1-DB-001` implementation candidate adds the canonical PostgreSQL schema, standalone migration runner, uniqueness and forward/rollback integration tests. Static development tests and CTRL-002 Development passed; runtime PostgreSQL integration is pending because `psql` is absent and Docker daemon unavailable. Development evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`; Recorder run `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`. Task remains active, S0 Gate NOT YET PASSED; fresh independent review and PostgreSQL execution are next.
++- `LOOP1-DB-001` implementation candidate adds the canonical PostgreSQL schema, standalone migration runner, uniqueness and forward/rollback integration tests. A linked fix requires GROUP create request identity and tests its rejection/uniqueness. Static development tests and CTRL-002 Development passed; runtime PostgreSQL integration is pending because `psql` is absent and Docker daemon unavailable. Development evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`; Recorder runs `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98` and `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1`. Task remains active, S0 Gate NOT YET PASSED; fresh independent review and PostgreSQL execution are next.
+ - DB activation Recorder run `R-20260928T155726Z-e6831664-d89d-46e2-b0e6-21753ebb56fe` finished and validated (8 events). CTRL-002 Development initially failed on a missing architecture resolver reference in the DB Task Spec, then passed after the reference was added; both outcomes are preserved at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-activation-development.md`. Task remains `active`; S0 Gate NOT YET PASSED.
+ - `LOOP1-DB-001` is active in isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`; all three Contract dependencies are independently accepted and done. Scope: canonical PostgreSQL schema, application-independent migration runner, uniqueness and forward/rollback tests. S0 Gate NOT YET PASSED.
+ - Clean local `main` fast-forwarded to Contract 003 accepted closure `7faadd75b4e195e6b8e8ba8e08f635a18036d497`. Post-integration Contract 003, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository checks passed; `main` stayed clean. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-main-integration.md`; prospective Recorder run `R-20260928T151354Z-d20e8aaa-1145-4e22-bec1-b0a4279824e6` finished and validated. S0 Gate NOT YET PASSED.
+diff --git a/spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md b/spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md
+index ac663a3..492251c 100644
+--- a/spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md
++++ b/spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md
+@@ -8,3 +8,5 @@
+ - CTRL-002 Development during editing: same Recorder prefix with `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`; exit 0, PASS. This is not Acceptance.
+ - Environment: `Get-Command postgres,psql,pg_ctl,initdb` found no local executables; `docker info` failed because Docker daemon pipe was absent. No disposable PostgreSQL endpoint was supplied. Therefore SQL runtime, uniqueness, and forward/rollback tests are unverified here, despite static checks passing.
+ - Required next review action: run `DB_TEST_ENABLE=1` database tests with `psql` against a disposable PostgreSQL database, then independent clean-checkout CTRL-002 Acceptance under ADR-0001. S0 Gate is not passed. Original checkout's untracked HTTP schema-lint belongs to another Agent and was untouched.
++- Follow-up fix: GROUP rows now require `group_create_request_id`, and PostgreSQL cases reject missing and duplicate GROUP create identities. This is recorded separately under linked fix run `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1`; runtime PostgreSQL verification remains pending.
++- Fix verification: `tools/research/recorder.ps1 run-command --run-id R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1 -- C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest discover -s tests/database -v`; exit 0, 2 PASS, 1 PostgreSQL integration SKIPPED. The same Recorder prefix with `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`; exit 0, PASS. Runtime constraint behavior is still unverified pending PostgreSQL.
+diff --git a/spec/tasks/active/LOOP1-DB-001.md b/spec/tasks/active/LOOP1-DB-001.md
+index eac94aa..ce42531 100644
+--- a/spec/tasks/active/LOOP1-DB-001.md
++++ b/spec/tasks/active/LOOP1-DB-001.md
+@@ -55,8 +55,9 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
+ 
+ # Evidence
+ 
+-- Implementation candidate adds `contracts/database/migrations/0001_initial.{up,down}.sql`, standalone `migrate.py`, database README, and `tests/database/test_migrations.py`. Required primary/unique constraints cover user/client session slots, normalized friendship and DIRECT pairs, GROUP create identity, Conversation members, Conversation request and sequence identities, one `message.created` outbox event per message, and immutable plugin artifact versions. Migration SQL and ledger entry execute in one PostgreSQL transaction under an advisory lock. No application module or public HTTP/WSS/Sync/Plugin contract was changed.
++- Implementation candidate adds `contracts/database/migrations/0001_initial.{up,down}.sql`, standalone `migrate.py`, database README, and `tests/database/test_migrations.py`. Required primary/unique constraints cover user/client session slots, normalized friendship and DIRECT pairs, non-null GROUP create identity, Conversation members, Conversation request and sequence identities, one `message.created` outbox event per message, and immutable plugin artifact versions. Migration SQL and ledger entry execute in one PostgreSQL transaction under an advisory lock. No application module or public HTTP/WSS/Sync/Plugin contract was changed.
+ - Development Recorder run `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`; exact commands/results and PostgreSQL environment limitation are recorded at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`. Runtime PostgreSQL schema/uniqueness/forward/rollback verification remains pending because this host has no `psql` and Docker daemon is unavailable. Development checks are not independent acceptance.
++- Linked GROUP create idempotency fix Recorder run `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1` adds non-null GROUP request identity and negative cases; revised candidate requires fresh independent review.
+ - Activation Recorder run `R-20260928T155726Z-e6831664-d89d-46e2-b0e6-21753ebb56fe` finished and validated PASS (8 events). The first CTRL-002 Development recovery attempt failed because this Task Spec lacked an architecture resolver reference; after adding it, the same command passed with exit 0. Both results and exact durations are at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-activation-development.md`. This is development recovery, not independent acceptance.
+ - Dependencies `LOOP1-CONTRACT-001`, `LOOP1-CONTRACT-002`, and `LOOP1-CONTRACT-003` are independently accepted and `done` on clean local `main` at `f25807e`. Contract 003 post-integration Sync/Plugin, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository verification passed. S0 Gate remains NOT YET PASSED.
+ 
+diff --git a/tests/database/test_migrations.py b/tests/database/test_migrations.py
+index 4d44879..f326869 100644
+--- a/tests/database/test_migrations.py
++++ b/tests/database/test_migrations.py
+@@ -90,6 +90,18 @@ class PostgreSQLMigrationTests(unittest.TestCase):
+             VALUES ('00000000-0000-0000-0000-000000000022','DIRECT','00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001');
+           RAISE EXCEPTION 'duplicate direct pair accepted';
+         EXCEPTION WHEN unique_violation THEN NULL; END $$;
++        DO $$ BEGIN
++          INSERT INTO conversations(conversation_id,kind,created_by)
++            VALUES ('00000000-0000-0000-0000-000000000023','GROUP','00000000-0000-0000-0000-000000000001');
++          RAISE EXCEPTION 'GROUP without create request accepted';
++        EXCEPTION WHEN check_violation THEN NULL; END $$;
++        INSERT INTO conversations(conversation_id,kind,created_by,group_create_request_id)
++          VALUES ('00000000-0000-0000-0000-000000000023','GROUP','00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000024');
++        DO $$ BEGIN
++          INSERT INTO conversations(conversation_id,kind,created_by,group_create_request_id)
++            VALUES ('00000000-0000-0000-0000-000000000025','GROUP','00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000024');
++          RAISE EXCEPTION 'duplicate GROUP create accepted';
++        EXCEPTION WHEN unique_violation THEN NULL; END $$;
+         INSERT INTO friendships(user_low_id,user_high_id,direct_conversation_id)
+           VALUES ('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000021');
+         DO $$ BEGIN
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/LOOP1-DB-001-group-idempotency-fix.txt
+# ?? research/prompts/P-9c0a5df5-5ee0-4441-9dee-fecc610987c3/metadata.json
+# ?? research/prompts/P-9c0a5df5-5ee0-4441-9dee-fecc610987c3/prompt.txt
+# ?? research/runs/R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1/blobs/C-43e45837-cf90-45a3-b252-a5f7b5648500.stderr.txt
+# ?? research/runs/R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1/blobs/C-43e45837-cf90-45a3-b252-a5f7b5648500.stdout.txt
+# ?? research/runs/R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1/blobs/C-febea82b-e1e3-40c5-8372-15ea33ee9a33.stderr.txt
+# ?? research/runs/R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1/blobs/C-febea82b-e1e3-40c5-8372-15ea33ee9a33.stdout.txt
+# ?? research/runs/R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1/events.jsonl
+# ?? research/runs/R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1/initial_state.json
+# ?? research/runs/R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1/metadata.json
+# ?? tests/database/__pycache__/test_migrations.cpython-312.pyc

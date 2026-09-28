@@ -90,6 +90,18 @@ class PostgreSQLMigrationTests(unittest.TestCase):
             VALUES ('00000000-0000-0000-0000-000000000022','DIRECT','00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000001');
           RAISE EXCEPTION 'duplicate direct pair accepted';
         EXCEPTION WHEN unique_violation THEN NULL; END $$;
+        DO $$ BEGIN
+          INSERT INTO conversations(conversation_id,kind,created_by)
+            VALUES ('00000000-0000-0000-0000-000000000023','GROUP','00000000-0000-0000-0000-000000000001');
+          RAISE EXCEPTION 'GROUP without create request accepted';
+        EXCEPTION WHEN check_violation THEN NULL; END $$;
+        INSERT INTO conversations(conversation_id,kind,created_by,group_create_request_id)
+          VALUES ('00000000-0000-0000-0000-000000000023','GROUP','00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000024');
+        DO $$ BEGIN
+          INSERT INTO conversations(conversation_id,kind,created_by,group_create_request_id)
+            VALUES ('00000000-0000-0000-0000-000000000025','GROUP','00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000024');
+          RAISE EXCEPTION 'duplicate GROUP create accepted';
+        EXCEPTION WHEN unique_violation THEN NULL; END $$;
         INSERT INTO friendships(user_low_id,user_high_id,direct_conversation_id)
           VALUES ('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000021');
         DO $$ BEGIN

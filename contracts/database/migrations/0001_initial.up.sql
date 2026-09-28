@@ -34,7 +34,8 @@ CREATE TABLE conversations (
     created_at timestamptz NOT NULL DEFAULT now(),
     CHECK ((kind = 'DIRECT' AND direct_user_low_id IS NOT NULL AND direct_user_high_id IS NOT NULL
             AND direct_user_low_id < direct_user_high_id AND group_create_request_id IS NULL)
-        OR (kind = 'GROUP' AND direct_user_low_id IS NULL AND direct_user_high_id IS NULL)),
+        OR (kind = 'GROUP' AND direct_user_low_id IS NULL AND direct_user_high_id IS NULL
+            AND group_create_request_id IS NOT NULL)),
     UNIQUE (conversation_id, direct_user_low_id, direct_user_high_id),
     UNIQUE (direct_user_low_id, direct_user_high_id),
     UNIQUE (created_by, group_create_request_id)
