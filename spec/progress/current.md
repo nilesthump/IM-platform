@@ -10,12 +10,13 @@ Gate Status: NOT YET PASSED
 
 Current Batch: LOOP1-S0
 
-Current Task: LOOP1-DB-001
+Current Task: LOOP1-INFRA-001
 
-Current Task State: done
+Current Task State: active
 
 ## Current Contract Work
 
+- `LOOP1-INFRA-001` is `active` on isolated branch `task/LOOP1-INFRA-001` from accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. DB dependency is independently accepted and `done`; infrastructure product work awaits a fresh Implementation Agent. Frozen architecture and CTRL-002 Development passed after correcting the DB integration handoff's abbreviated Last Known Good Commit. Docker Compose v5.1.4 is available. Activation Recorder `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` validated PASS; details at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. S0 Gate NOT YET PASSED.
 - `LOOP1-DB-001` accepted closure is integrated on clean local `main` at `016f429`. Post-integration PostgreSQL 16 tests passed 3/3, frozen architecture and CTRL-002 Acceptance passed, and committed Recorder repository artifacts validated. Integration Recorder `R-20260928T180300Z-e2553a57-4a18-4214-a83f-0c04f4859b5a` validated PASS; exact evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-main-integration.md`. The disposable DB test container was stopped. S0 Gate NOT YET PASSED.
 - `LOOP1-DB-001` is `done` after fresh independent Review 1 PASS at clean product candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d`. Actual PostgreSQL 16 tests passed 3/3; independent negative probes, frozen hashes, scope, Recorder integrity, and clean detached CTRL-002 Acceptance passed. Coordinator closure Recorder `R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e` validated PASS; `done` queue CTRL-002 Development exited 0. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md` and `2026-09-29-acceptance-closure.md`; checkpoint `spec/progress/checkpoints/2026-09-29-loop1-db-001-accepted.md`. S0 Gate NOT YET PASSED.
 - Fresh independent Reviewer `/root/db001_review1` passed clean implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` under ADR-0001. Three PostgreSQL 16 tests, independent constraint/down/atomicity probes, frozen hashes, implementation Recorder integrity, and detached CTRL-002 Acceptance at review handoff `a9c491d` passed. Disposable PostgreSQL container was removed. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; review Recorder `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. Task stays `review` for Coordinator closure; S0 Gate NOT YET PASSED.
@@ -232,11 +233,11 @@ Current Task State: done
 
 ## Next Exact Action
 
-Coordinator: commit DB integration evidence, fast-forward clean local `main` to include it, then activate dependency-satisfied `LOOP1-INFRA-001` with a fresh Implementation Agent. S0 Gate remains NOT YET PASSED.
+Coordinator: complete Infra activation verification and Recorder handoff, commit the clean activation, then delegate a fresh Implementation Agent for the Compose/PostgreSQL/NATS/TLS skeleton. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`016f429` (independently accepted DB closure integrated and post-integration verified on clean local `main`; integration evidence commit pending).
+`3e4d0f3cb3030731345288f677d2048d72651fd5` (independently accepted DB closure and post-integration evidence on clean local `main`; Infra activation is pending).
 
 ## Latest Checkpoint
 
@@ -244,6 +245,7 @@ Coordinator: commit DB integration evidence, fast-forward clean local `main` to 
 
 ## Uncommitted Changes / Ownership
 
+- Coordinator `/root` owns only Infra queue activation, task/current recovery update, and task-linked activation Recorder evidence until committed. No product infrastructure path is changed; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
 - Coordinator `/root` owns only DB local-main integration evidence, the linked Recorder prompt/run, and recovery update until committed. Local `main` is clean at the accepted DB closure; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
 - Coordinator `/root` owns only DB `done` queue transition, accepted checkpoint/evidence, current recovery update, and linked Recorder closure artifacts until committed. All DB migration/runner/test files are clean at the independently reviewed candidate; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
 - Fresh independent Reviewer `/root/db001_review1` owns only task-linked PASS evidence and probe, Task Spec/current recovery, and linked prompt/Recorder artifacts until committed. The separate detached Acceptance checkout is clean at `a9c491d`; no product schema, runner, test, or original `H:\IM-platform\contracts\http\schema-lint` file was touched.
