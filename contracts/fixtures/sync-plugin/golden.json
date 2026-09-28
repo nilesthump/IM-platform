@@ -1,0 +1,2367 @@
+{
+  "fixtureVersion": "1.0",
+  "profiles": [
+    "go",
+    "java"
+  ],
+  "cases": [
+    {
+      "id": "manifest-valid",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.manifest",
+          "manifest": {
+            "apiVersion": "1.0",
+            "type": "manifest",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "capabilities": [
+              "events",
+              "queries",
+              "actions",
+              "ui"
+            ],
+            "permissions": [
+              "event.message.created",
+              "query.messages",
+              "action.send_message",
+              "ui.panel"
+            ],
+            "backendEntry": "backend/plugin.wasm",
+            "rendererEntry": "ui/render.bundle.js"
+          }
+        }
+      ],
+      "expect": {
+        "last": "VALID"
+      }
+    },
+    {
+      "id": "manifest-unknown-capability",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.manifest",
+          "manifest": {
+            "apiVersion": "1.0",
+            "type": "manifest",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "capabilities": [
+              "core_db"
+            ],
+            "permissions": [
+              "event.message.created",
+              "query.messages",
+              "action.send_message",
+              "ui.panel"
+            ],
+            "backendEntry": "backend/plugin.wasm",
+            "rendererEntry": "ui/render.bundle.js"
+          }
+        }
+      ],
+      "expectError": true
+    },
+    {
+      "id": "manifest-duplicate-permission",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.manifest",
+          "manifest": {
+            "apiVersion": "1.0",
+            "type": "manifest",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "capabilities": [
+              "events",
+              "queries",
+              "actions",
+              "ui"
+            ],
+            "permissions": [
+              "query.messages",
+              "query.messages"
+            ],
+            "backendEntry": "backend/plugin.wasm",
+            "rendererEntry": "ui/render.bundle.js"
+          }
+        }
+      ],
+      "expectError": true
+    },
+    {
+      "id": "gap-out-of-order-duplicate",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-001",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 2,
+            "messageId": "50000000-0000-4000-8000-000000000002",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000002",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-2"
+            }
+          }
+        },
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 2,
+            "messageId": "50000000-0000-4000-8000-000000000002",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000002",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-2"
+            }
+          }
+        },
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000001",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "contiguous": 2,
+        "messages": {
+          "1": "50000000-0000-4000-8000-000000000001",
+          "2": "50000000-0000-4000-8000-000000000002"
+        }
+      }
+    },
+    {
+      "id": "gap-stops",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-001"
+      ],
+      "steps": [
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 2,
+            "messageId": "50000000-0000-4000-8000-000000000002",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000002",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-2"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "contiguous": 0,
+        "messages": {
+          "2": "50000000-0000-4000-8000-000000000002"
+        }
+      }
+    },
+    {
+      "id": "failed-to-sent-terminal",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-002"
+      ],
+      "steps": [
+        {
+          "op": "local.failed",
+          "conversationId": "30000000-0000-4000-8000-000000000001",
+          "requestId": "40000000-0000-4000-8000-000000000001"
+        },
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000001",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        },
+        {
+          "op": "local.failed",
+          "conversationId": "30000000-0000-4000-8000-000000000001",
+          "requestId": "40000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "expect": {
+        "local": {
+          "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+        },
+        "last": "SENT"
+      }
+    },
+    {
+      "id": "message-rollback-and-retry",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-003"
+      ],
+      "steps": [
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000001",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          },
+          "fault": "before_commit"
+        },
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000001",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "contiguous": 1,
+        "messages": {
+          "1": "50000000-0000-4000-8000-000000000001"
+        }
+      }
+    },
+    {
+      "id": "user-rollback-and-retry",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-003",
+        "SP-A-004"
+      ],
+      "steps": [
+        {
+          "op": "sync.user",
+          "page": {
+            "syncVersion": "1.0",
+            "type": "sync.user.page",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "events": [
+              {
+                "eventId": "50000000-0000-4000-8000-000000000009",
+                "cursor": "1",
+                "kind": "friend.changed",
+                "subjectId": "10000000-0000-4000-8000-000000000001",
+                "revision": 1
+              }
+            ],
+            "nextCursor": "1",
+            "hasMore": false
+          },
+          "fault": "before_commit"
+        },
+        {
+          "op": "sync.user",
+          "page": {
+            "syncVersion": "1.0",
+            "type": "sync.user.page",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "events": [
+              {
+                "eventId": "50000000-0000-4000-8000-000000000009",
+                "cursor": "1",
+                "kind": "friend.changed",
+                "subjectId": "10000000-0000-4000-8000-000000000001",
+                "revision": 1
+              }
+            ],
+            "nextCursor": "1",
+            "hasMore": false
+          }
+        }
+      ],
+      "expect": {
+        "cursor": "1",
+        "messages": {}
+      }
+    },
+    {
+      "id": "user-friend.changed",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-004"
+      ],
+      "steps": [
+        {
+          "op": "sync.user",
+          "page": {
+            "syncVersion": "1.0",
+            "type": "sync.user.page",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "events": [
+              {
+                "eventId": "50000000-0000-4000-8000-000000000009",
+                "cursor": "1",
+                "kind": "friend.changed",
+                "subjectId": "10000000-0000-4000-8000-000000000001",
+                "revision": 1
+              }
+            ],
+            "nextCursor": "1",
+            "hasMore": false
+          }
+        }
+      ],
+      "expect": {
+        "cursor": "1",
+        "contiguous": 0
+      }
+    },
+    {
+      "id": "user-conversation.changed",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-004"
+      ],
+      "steps": [
+        {
+          "op": "sync.user",
+          "page": {
+            "syncVersion": "1.0",
+            "type": "sync.user.page",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "events": [
+              {
+                "eventId": "50000000-0000-4000-8000-000000000009",
+                "cursor": "1",
+                "kind": "conversation.changed",
+                "subjectId": "10000000-0000-4000-8000-000000000001",
+                "revision": 1
+              }
+            ],
+            "nextCursor": "1",
+            "hasMore": false
+          }
+        }
+      ],
+      "expect": {
+        "cursor": "1",
+        "contiguous": 0
+      }
+    },
+    {
+      "id": "user-membership.changed",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-004"
+      ],
+      "steps": [
+        {
+          "op": "sync.user",
+          "page": {
+            "syncVersion": "1.0",
+            "type": "sync.user.page",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "events": [
+              {
+                "eventId": "50000000-0000-4000-8000-000000000009",
+                "cursor": "1",
+                "kind": "membership.changed",
+                "subjectId": "10000000-0000-4000-8000-000000000001",
+                "revision": 1
+              }
+            ],
+            "nextCursor": "1",
+            "hasMore": false
+          }
+        }
+      ],
+      "expect": {
+        "cursor": "1",
+        "contiguous": 0
+      }
+    },
+    {
+      "id": "user-plugin.changed",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-004"
+      ],
+      "steps": [
+        {
+          "op": "sync.user",
+          "page": {
+            "syncVersion": "1.0",
+            "type": "sync.user.page",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "events": [
+              {
+                "eventId": "50000000-0000-4000-8000-000000000009",
+                "cursor": "1",
+                "kind": "plugin.changed",
+                "subjectId": "10000000-0000-4000-8000-000000000001",
+                "revision": 1
+              }
+            ],
+            "nextCursor": "1",
+            "hasMore": false
+          }
+        }
+      ],
+      "expect": {
+        "cursor": "1",
+        "contiguous": 0
+      }
+    },
+    {
+      "id": "message-event-in-user-cursor",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-004"
+      ],
+      "steps": [
+        {
+          "op": "sync.user",
+          "page": {
+            "syncVersion": "1.0",
+            "type": "sync.user.page",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "events": [
+              {
+                "eventId": "50000000-0000-4000-8000-000000000009",
+                "cursor": "1",
+                "kind": "message.created",
+                "subjectId": "10000000-0000-4000-8000-000000000001",
+                "revision": 1
+              }
+            ],
+            "nextCursor": "1",
+            "hasMore": false
+          }
+        }
+      ],
+      "expectError": true
+    },
+    {
+      "id": "sequence-collision",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-001"
+      ],
+      "steps": [
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000001",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        },
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000003",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        }
+      ],
+      "expectError": true
+    },
+    {
+      "id": "request-identity-collision",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-001",
+        "SP-A-002"
+      ],
+      "steps": [
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000001",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        },
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 2,
+            "messageId": "50000000-0000-4000-8000-000000000002",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-2"
+            }
+          }
+        }
+      ],
+      "expectError": true
+    },
+    {
+      "id": "per-conversation-independent-sequence",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-001",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000001",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        },
+        {
+          "op": "sync.message",
+          "message": {
+            "conversationId": "30000000-0000-4000-8000-000000000002",
+            "seq": 1,
+            "messageId": "50000000-0000-4000-8000-000000000008",
+            "senderId": "10000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-09-28T00:00:01Z",
+            "content": {
+              "kind": "TEXT",
+              "text": "message-1"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "conversations": {
+          "30000000-0000-4000-8000-000000000001": {
+            "contiguous": 1,
+            "messages": {
+              "1": "50000000-0000-4000-8000-000000000001"
+            }
+          },
+          "30000000-0000-4000-8000-000000000002": {
+            "contiguous": 1,
+            "messages": {
+              "1": "50000000-0000-4000-8000-000000000008"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "allow-event-subscribe",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "event.subscribe",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "event": "message.created"
+          },
+          "capabilities": [
+            "events"
+          ],
+          "permissions": [
+            "event.message.created"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "ALLOWED"
+      }
+    },
+    {
+      "id": "deny-event-subscribe-capability",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "event.subscribe",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "event": "message.created"
+          },
+          "capabilities": [],
+          "permissions": [
+            "event.message.created"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "deny-event-subscribe-permission",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "event.subscribe",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "event": "message.created"
+          },
+          "capabilities": [
+            "events"
+          ],
+          "permissions": [],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "allow-query",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 20,
+            "pageToken": ""
+          },
+          "capabilities": [
+            "queries"
+          ],
+          "permissions": [
+            "query.messages"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "ALLOWED"
+      }
+    },
+    {
+      "id": "deny-query-capability",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 20,
+            "pageToken": ""
+          },
+          "capabilities": [],
+          "permissions": [
+            "query.messages"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "deny-query-permission",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 20,
+            "pageToken": ""
+          },
+          "capabilities": [
+            "queries"
+          ],
+          "permissions": [],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "allow-action",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "action",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "action": "send_message",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001"
+          },
+          "capabilities": [
+            "actions"
+          ],
+          "permissions": [
+            "action.send_message"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "ALLOWED"
+      }
+    },
+    {
+      "id": "deny-action-capability",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "action",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "action": "send_message",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001"
+          },
+          "capabilities": [],
+          "permissions": [
+            "action.send_message"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "deny-action-permission",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "action",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "action": "send_message",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001"
+          },
+          "capabilities": [
+            "actions"
+          ],
+          "permissions": [],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "allow-ui-host",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "ui.host",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "slot": "panel"
+          },
+          "capabilities": [
+            "ui"
+          ],
+          "permissions": [
+            "ui.panel"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "ALLOWED"
+      }
+    },
+    {
+      "id": "deny-ui-host-capability",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "ui.host",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "slot": "panel"
+          },
+          "capabilities": [],
+          "permissions": [
+            "ui.panel"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "deny-ui-host-permission",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005",
+        "SP-A-012"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "ui.host",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "slot": "panel"
+          },
+          "capabilities": [
+            "ui"
+          ],
+          "permissions": [],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "deny-direct-core-db",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-005"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 20,
+            "pageToken": ""
+          },
+          "capabilities": [
+            "queries"
+          ],
+          "permissions": [
+            "query.messages"
+          ],
+          "directAccess": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "query-read-only-paginated",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-006"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 20,
+            "pageToken": ""
+          },
+          "capabilities": [
+            "queries"
+          ],
+          "permissions": [
+            "query.messages"
+          ]
+        }
+      ],
+      "expect": {
+        "last": "ALLOWED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "query-over-limit",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-006"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 101,
+            "pageToken": ""
+          },
+          "capabilities": [
+            "queries"
+          ],
+          "permissions": [
+            "query.messages"
+          ]
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "query-mutation",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-006"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 20,
+            "pageToken": ""
+          },
+          "capabilities": [
+            "queries"
+          ],
+          "permissions": [
+            "query.messages"
+          ],
+          "mutates": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 0
+      }
+    },
+    {
+      "id": "action-retry-audited",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-006",
+        "SP-A-013"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "action",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "action": "send_message",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001"
+          },
+          "capabilities": [
+            "actions"
+          ],
+          "permissions": [
+            "action.send_message"
+          ],
+          "authorizedAtExecution": true
+        },
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "action",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "action": "send_message",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001"
+          },
+          "capabilities": [
+            "actions"
+          ],
+          "permissions": [
+            "action.send_message"
+          ],
+          "authorizedAtExecution": true
+        }
+      ],
+      "expect": {
+        "last": "ALLOWED",
+        "sideEffects": 1,
+        "auditAttempts": 2
+      }
+    },
+    {
+      "id": "action-revoked-at-execution",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-006",
+        "SP-A-013"
+      ],
+      "steps": [
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "action",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "action": "send_message",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001"
+          },
+          "capabilities": [
+            "actions"
+          ],
+          "permissions": [
+            "action.send_message"
+          ],
+          "authorizedAtExecution": true
+        },
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "action",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "action": "send_message",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestId": "40000000-0000-4000-8000-000000000001"
+          },
+          "capabilities": [
+            "actions"
+          ],
+          "permissions": [
+            "action.send_message"
+          ],
+          "authorizedAtExecution": false
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "sideEffects": 1,
+        "auditAttempts": 2
+      }
+    },
+    {
+      "id": "artifact-verified",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-007",
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "VERIFIED"
+      }
+    },
+    {
+      "id": "immutable-packageHash",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-007"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        },
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "immutable-backendHash",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-007"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        },
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "immutable-rendererHash",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-007"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        },
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "artifact-version-split",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-007"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true,
+          "rendererVersion": "2.0.0"
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-hash",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": false,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-signature",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": false
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-manifest",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": false,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-compatibility",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": false,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-permission",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": false,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-size",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": false,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-csp",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": false,
+            "entryPointValid": true,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-reject-entry",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": false,
+            "sandbox": "iframe"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expect": {
+        "last": "REJECTED"
+      }
+    },
+    {
+      "id": "renderer-unsafe-sandbox",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.artifact",
+          "artifact": {
+            "apiVersion": "1.0",
+            "type": "artifact",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "signature": "fixture-signature",
+            "manifestValid": true,
+            "compatible": true,
+            "permissionsApproved": true,
+            "resourceSizeOk": true,
+            "cspValid": true,
+            "entryPointValid": true,
+            "sandbox": "host_native"
+          },
+          "hashValid": true,
+          "signatureValid": true
+        }
+      ],
+      "expectError": true
+    },
+    {
+      "id": "renderer-bridge-sandbox",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.renderer_runtime",
+          "sandbox": "iframe",
+          "throughBridge": true,
+          "resource": "ui.host"
+        }
+      ],
+      "expect": {
+        "last": "ALLOWED"
+      }
+    },
+    {
+      "id": "renderer-runtime-deny-database",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.renderer_runtime",
+          "sandbox": "iframe",
+          "throughBridge": true,
+          "resource": "database"
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "renderer-runtime-deny-core_internal",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.renderer_runtime",
+          "sandbox": "iframe",
+          "throughBridge": true,
+          "resource": "core_internal"
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "renderer-runtime-deny-server_file",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.renderer_runtime",
+          "sandbox": "iframe",
+          "throughBridge": true,
+          "resource": "server_file"
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "renderer-runtime-deny-os_resource",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.renderer_runtime",
+          "sandbox": "iframe",
+          "throughBridge": true,
+          "resource": "os_resource"
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "renderer-runtime-deny-arbitrary_network",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.renderer_runtime",
+          "sandbox": "iframe",
+          "throughBridge": true,
+          "resource": "arbitrary_network"
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "renderer-runtime-deny-unmediated",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-008"
+      ],
+      "steps": [
+        {
+          "op": "plugin.renderer_runtime",
+          "sandbox": "isolated_webview",
+          "throughBridge": false,
+          "resource": "ui.host"
+        }
+      ],
+      "expect": {
+        "last": "DENIED"
+      }
+    },
+    {
+      "id": "wasm-deny-database",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "database"
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-deny-server_file",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "server_file"
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-deny-arbitrary_network",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "arbitrary_network"
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-deny-other_plugin_memory",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "other_plugin_memory"
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-limit-cpu_time",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "cpu_time",
+          "overLimit": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-limit-memory",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "memory",
+          "overLimit": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-limit-concurrency",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "concurrency",
+          "overLimit": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-limit-storage",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "storage",
+          "overLimit": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-limit-network",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "resource": "network",
+          "overLimit": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "failureCount": 1
+      }
+    },
+    {
+      "id": "wasm-auto-disable",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-009"
+      ],
+      "steps": [
+        {
+          "op": "plugin.wasm",
+          "timeout": true
+        },
+        {
+          "op": "plugin.wasm",
+          "timeout": true
+        },
+        {
+          "op": "plugin.wasm",
+          "timeout": true
+        }
+      ],
+      "expect": {
+        "last": "AUTO_DISABLED",
+        "autoDisabled": true,
+        "failureCount": 3
+      }
+    },
+    {
+      "id": "upgrade-atomic-switch",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-010"
+      ],
+      "steps": [
+        {
+          "op": "plugin.upgrade",
+          "backendVersion": "2.0.0",
+          "rendererVersion": "2.0.0"
+        }
+      ],
+      "expect": {
+        "last": "SWITCHED",
+        "activeVersion": "2.0.0",
+        "oldVersionServed": false,
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "upgrade-fail-snapshot",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-010"
+      ],
+      "steps": [
+        {
+          "op": "plugin.upgrade",
+          "backendVersion": "2.0.0",
+          "rendererVersion": "2.0.0",
+          "failAt": "snapshot"
+        }
+      ],
+      "expect": {
+        "last": "ROLLED_BACK",
+        "activeVersion": "1.0.0",
+        "oldVersionServed": true,
+        "snapshotRestored": true,
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "upgrade-fail-migration",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-010"
+      ],
+      "steps": [
+        {
+          "op": "plugin.upgrade",
+          "backendVersion": "2.0.0",
+          "rendererVersion": "2.0.0",
+          "failAt": "migration"
+        }
+      ],
+      "expect": {
+        "last": "ROLLED_BACK",
+        "activeVersion": "1.0.0",
+        "oldVersionServed": true,
+        "snapshotRestored": true,
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "upgrade-fail-backend_health",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-010"
+      ],
+      "steps": [
+        {
+          "op": "plugin.upgrade",
+          "backendVersion": "2.0.0",
+          "rendererVersion": "2.0.0",
+          "failAt": "backend_health"
+        }
+      ],
+      "expect": {
+        "last": "ROLLED_BACK",
+        "activeVersion": "1.0.0",
+        "oldVersionServed": true,
+        "snapshotRestored": true,
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "upgrade-fail-renderer_health",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-010"
+      ],
+      "steps": [
+        {
+          "op": "plugin.upgrade",
+          "backendVersion": "2.0.0",
+          "rendererVersion": "2.0.0",
+          "failAt": "renderer_health"
+        }
+      ],
+      "expect": {
+        "last": "ROLLED_BACK",
+        "activeVersion": "1.0.0",
+        "oldVersionServed": true,
+        "snapshotRestored": true,
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "upgrade-fail-atomic_switch",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-010"
+      ],
+      "steps": [
+        {
+          "op": "plugin.upgrade",
+          "backendVersion": "2.0.0",
+          "rendererVersion": "2.0.0",
+          "failAt": "atomic_switch"
+        }
+      ],
+      "expect": {
+        "last": "ROLLED_BACK",
+        "activeVersion": "1.0.0",
+        "oldVersionServed": true,
+        "snapshotRestored": true,
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "upgrade-version-split",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-007",
+        "SP-A-010"
+      ],
+      "steps": [
+        {
+          "op": "plugin.upgrade",
+          "backendVersion": "2.0.0",
+          "rendererVersion": "3.0.0"
+        }
+      ],
+      "expect": {
+        "last": "REJECTED",
+        "activeVersion": "1.0.0"
+      }
+    },
+    {
+      "id": "disable-preserves-data",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-011"
+      ],
+      "steps": [
+        {
+          "op": "plugin.lifecycle",
+          "action": "DISABLE"
+        }
+      ],
+      "expect": {
+        "last": "DISABLED",
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "uninstall-retained",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-011"
+      ],
+      "steps": [
+        {
+          "op": "plugin.lifecycle",
+          "action": "UNINSTALL"
+        }
+      ],
+      "expect": {
+        "last": "RETAINED",
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "purge-deny-explicit",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-011"
+      ],
+      "steps": [
+        {
+          "op": "plugin.lifecycle",
+          "action": "PURGE",
+          "explicit": false,
+          "elevated": true,
+          "audited": true,
+          "retention_confirmed": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "purge-deny-elevated",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-011"
+      ],
+      "steps": [
+        {
+          "op": "plugin.lifecycle",
+          "action": "PURGE",
+          "explicit": true,
+          "elevated": false,
+          "audited": true,
+          "retention_confirmed": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "purge-deny-audited",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-011"
+      ],
+      "steps": [
+        {
+          "op": "plugin.lifecycle",
+          "action": "PURGE",
+          "explicit": true,
+          "elevated": true,
+          "audited": false,
+          "retention_confirmed": true
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "purge-deny-retention_confirmed",
+      "polarity": "negative",
+      "rules": [
+        "SP-A-011"
+      ],
+      "steps": [
+        {
+          "op": "plugin.lifecycle",
+          "action": "PURGE",
+          "explicit": true,
+          "elevated": true,
+          "audited": true,
+          "retention_confirmed": false
+        }
+      ],
+      "expect": {
+        "last": "DENIED",
+        "dataPreserved": true
+      }
+    },
+    {
+      "id": "purge-explicit-authorized",
+      "polarity": "positive",
+      "rules": [
+        "SP-A-011"
+      ],
+      "steps": [
+        {
+          "op": "plugin.lifecycle",
+          "action": "PURGE",
+          "explicit": true,
+          "elevated": true,
+          "audited": true,
+          "retention_confirmed": true
+        }
+      ],
+      "expect": {
+        "last": "PURGED",
+        "dataPreserved": false
+      }
+    }
+  ]
+}

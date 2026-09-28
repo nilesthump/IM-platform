@@ -1,0 +1,16 @@
+{
+  "apiVersion": "1.0",
+  "maxQueryPageSize": 100,
+  "autoDisableAfterConsecutiveFailures": 3,
+  "capabilityForType": {"event.subscribe":"events","query":"queries","action":"actions","ui.host":"ui"},
+  "permissionForEvent": {"message.created":"event.message.created","member.joined":"event.member.joined","plugin.lifecycle":"event.plugin.lifecycle"},
+  "permissionForQuery": {"conversation":"query.conversation","members":"query.members","messages":"query.messages","friendship":"query.friendship"},
+  "permissionForAction": {"send_message":"action.send_message","plugin_state":"action.plugin_state","ui":"action.ui"},
+  "permissionForSlot": {"page":"ui.page","modal":"ui.modal","panel":"ui.panel","menu":"ui.menu","form":"ui.form","toolbar":"ui.toolbar","message_renderer":"ui.message_renderer"},
+  "rendererChecks": ["packageHash","signature","manifestValid","compatible","permissionsApproved","resourceSizeOk","cspValid","entryPointValid"],
+  "rendererSandboxes": ["iframe","isolated_webview"],
+  "wasmDeniedResources": ["database","server_file","arbitrary_network","other_plugin_memory"],
+  "wasmLimitedResources": ["cpu_time","memory","concurrency","storage","network"],
+  "upgradeStages": ["snapshot","migration","backend_health","renderer_health","atomic_switch"],
+  "purgeRequirements": ["explicit","elevated","audited","retention_confirmed"]
+}

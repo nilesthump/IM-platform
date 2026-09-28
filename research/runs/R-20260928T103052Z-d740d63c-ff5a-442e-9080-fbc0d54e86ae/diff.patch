@@ -1,0 +1,3031 @@
+diff --git a/contracts/fixtures/sync-plugin/.gitattributes b/contracts/fixtures/sync-plugin/.gitattributes
+new file mode 100644
+index 0000000..562ad14
+--- /dev/null
++++ b/contracts/fixtures/sync-plugin/.gitattributes
+@@ -0,0 +1 @@
++golden.json -text
+diff --git a/contracts/fixtures/sync-plugin/generate.py b/contracts/fixtures/sync-plugin/generate.py
+new file mode 100644
+index 0000000..97abebf
+--- /dev/null
++++ b/contracts/fixtures/sync-plugin/generate.py
+@@ -0,0 +1,96 @@
++#!/usr/bin/env python3
++"""Deterministic shared Go/Java Sync and Plugin API v1 vectors."""
++import json
++from pathlib import Path
++
++HERE = Path(__file__).resolve().parent
++U="10000000-0000-4000-8000-000000000001"; C="30000000-0000-4000-8000-000000000001"; R="40000000-0000-4000-8000-000000000001"; P="60000000-0000-4000-8000-000000000001"
++M=lambda n:f"50000000-0000-4000-8000-{n:012d}"
++def msg(n): return {"conversationId":C,"seq":n,"messageId":M(n),"senderId":U,"requestId":f"40000000-0000-4000-8000-{n:012d}","createdAt":"2026-09-28T00:00:01Z","content":{"kind":"TEXT","text":f"message-{n}"}}
++def user(kind="friend.changed"): return {"syncVersion":"1.0","type":"sync.user.page","requestId":R,"events":[{"eventId":M(9),"cursor":"1","kind":kind,"subjectId":U,"revision":1}],"nextCursor":"1","hasMore":False}
++def call(t,n):
++    x={"apiVersion":"1.0","type":t,"pluginId":P,"version":"1.0.0"}
++    if t=="event.subscribe": x["event"]=n
++    if t=="query": x.update(query=n,conversationId=C,pageSize=20,pageToken="")
++    if t=="action": x.update(action=n,conversationId=C,requestId=R)
++    if t=="ui.host": x["slot"]=n
++    return x
++def artifact(**changes):
++    x={"apiVersion":"1.0","type":"artifact","pluginId":P,"version":"1.0.0","packageHash":"a"*64,"backendHash":"b"*64,"rendererHash":"c"*64,"signature":"fixture-signature","manifestValid":True,"compatible":True,"permissionsApproved":True,"resourceSizeOk":True,"cspValid":True,"entryPointValid":True,"sandbox":"iframe"}
++    x.update(changes); return x
++cases=[]
++def add(i,p,r,s,e=None,error=False):
++    x={"id":i,"polarity":p,"rules":r,"steps":s}
++    if e is not None:x["expect"]=e
++    if error:x["expectError"]=True
++    cases.append(x)
++
++manifest={"apiVersion":"1.0","type":"manifest","pluginId":P,"version":"1.0.0","capabilities":["events","queries","actions","ui"],"permissions":["event.message.created","query.messages","action.send_message","ui.panel"],"backendEntry":"backend/plugin.wasm","rendererEntry":"ui/render.bundle.js"}
++add("manifest-valid","positive",["SP-A-005"],[{"op":"plugin.manifest","manifest":manifest}],{"last":"VALID"})
++add("manifest-unknown-capability","negative",["SP-A-005"],[{"op":"plugin.manifest","manifest":dict(manifest,capabilities=["core_db"])}],error=True)
++add("manifest-duplicate-permission","negative",["SP-A-005"],[{"op":"plugin.manifest","manifest":dict(manifest,permissions=["query.messages","query.messages"])}],error=True)
++
++add("gap-out-of-order-duplicate","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(n)} for n in (2,2,1)],{"contiguous":2,"messages":{"1":M(1),"2":M(2)}})
++add("gap-stops","negative",["SP-A-001"],[{"op":"sync.message","message":msg(2)}],{"contiguous":0,"messages":{"2":M(2)}})
++add("failed-to-sent-terminal","positive",["SP-A-002"],[{"op":"local.failed","conversationId":C,"requestId":R},{"op":"sync.message","message":msg(1)},{"op":"local.failed","conversationId":C,"requestId":R}],{"local":{C+"/"+R:"SENT"},"last":"SENT"})
++add("message-rollback-and-retry","positive",["SP-A-003"],[{"op":"sync.message","message":msg(1),"fault":"before_commit"},{"op":"sync.message","message":msg(1)}],{"contiguous":1,"messages":{"1":M(1)}})
++add("user-rollback-and-retry","positive",["SP-A-003","SP-A-004"],[{"op":"sync.user","page":user(),"fault":"before_commit"},{"op":"sync.user","page":user()}],{"cursor":"1","messages":{}})
++for kind in ("friend.changed","conversation.changed","membership.changed","plugin.changed"):
++    add("user-"+kind,"positive",["SP-A-004"],[{"op":"sync.user","page":user(kind)}],{"cursor":"1","contiguous":0})
++add("message-event-in-user-cursor","negative",["SP-A-004"],[{"op":"sync.user","page":user("message.created")}],error=True)
++add("sequence-collision","negative",["SP-A-001"],[{"op":"sync.message","message":msg(1)},{"op":"sync.message","message":dict(msg(1),messageId=M(3))}],error=True)
++add("request-identity-collision","negative",["SP-A-001","SP-A-002"],[{"op":"sync.message","message":msg(1)},{"op":"sync.message","message":dict(msg(2),requestId=R)}],error=True)
++other="30000000-0000-4000-8000-000000000002"
++add("per-conversation-independent-sequence","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(1)},{"op":"sync.message","message":dict(msg(1),conversationId=other,messageId=M(8))}],{"conversations":{C:{"contiguous":1,"messages":{"1":M(1)}},other:{"contiguous":1,"messages":{"1":M(8)}}}})
++
++for t,n,cap,perm in (("event.subscribe","message.created","events","event.message.created"),("query","messages","queries","query.messages"),("action","send_message","actions","action.send_message"),("ui.host","panel","ui","ui.panel")):
++    s={"op":"plugin.call","call":call(t,n),"capabilities":[cap],"permissions":[perm],"authorizedAtExecution":True}
++    tag=t.replace(".","-")
++    add("allow-"+tag,"positive",["SP-A-005","SP-A-012"],[s],{"last":"ALLOWED"})
++    add("deny-"+tag+"-capability","negative",["SP-A-005"],[dict(s,capabilities=[])],{"last":"DENIED","sideEffects":0})
++    add("deny-"+tag+"-permission","negative",["SP-A-005","SP-A-012"],[dict(s,permissions=[])],{"last":"DENIED","sideEffects":0})
++add("deny-direct-core-db","negative",["SP-A-005"],[{"op":"plugin.call","call":call("query","messages"),"capabilities":["queries"],"permissions":["query.messages"],"directAccess":True}],{"last":"DENIED"})
++q={"op":"plugin.call","call":call("query","messages"),"capabilities":["queries"],"permissions":["query.messages"]}
++add("query-read-only-paginated","positive",["SP-A-006"],[q],{"last":"ALLOWED","sideEffects":0})
++add("query-over-limit","negative",["SP-A-006"],[dict(q,call=dict(q["call"],pageSize=101))],{"last":"DENIED"})
++add("query-mutation","negative",["SP-A-006"],[dict(q,mutates=True)],{"last":"DENIED","sideEffects":0})
++a={"op":"plugin.call","call":call("action","send_message"),"capabilities":["actions"],"permissions":["action.send_message"],"authorizedAtExecution":True}
++add("action-retry-audited","positive",["SP-A-006","SP-A-013"],[a,a],{"last":"ALLOWED","sideEffects":1,"auditAttempts":2})
++add("action-revoked-at-execution","negative",["SP-A-006","SP-A-013"],[a,dict(a,authorizedAtExecution=False)],{"last":"DENIED","sideEffects":1,"auditAttempts":2})
++
++b={"op":"plugin.artifact","artifact":artifact(),"hashValid":True,"signatureValid":True}
++add("artifact-verified","positive",["SP-A-007","SP-A-008"],[b],{"last":"VERIFIED"})
++for field in ("packageHash","backendHash","rendererHash"):
++    add("immutable-"+field,"negative",["SP-A-007"],[b,dict(b,artifact=artifact(**{field:"d"*64}))],{"last":"REJECTED"})
++add("artifact-version-split","negative",["SP-A-007"],[dict(b,rendererVersion="2.0.0")],{"last":"REJECTED"})
++for label,delta in (("hash",{"hashValid":False}),("signature",{"signatureValid":False}),("manifest",{"artifact":artifact(manifestValid=False)}),("compatibility",{"artifact":artifact(compatible=False)}),("permission",{"artifact":artifact(permissionsApproved=False)}),("size",{"artifact":artifact(resourceSizeOk=False)}),("csp",{"artifact":artifact(cspValid=False)}),("entry",{"artifact":artifact(entryPointValid=False)})):
++    add("renderer-reject-"+label,"negative",["SP-A-008"],[dict(b,**delta)],{"last":"REJECTED"})
++add("renderer-unsafe-sandbox","negative",["SP-A-008"],[dict(b,artifact=artifact(sandbox="host_native"))],error=True)
++add("renderer-bridge-sandbox","positive",["SP-A-008"],[{"op":"plugin.renderer_runtime","sandbox":"iframe","throughBridge":True,"resource":"ui.host"}],{"last":"ALLOWED"})
++for resource in ("database","core_internal","server_file","os_resource","arbitrary_network"):
++    add("renderer-runtime-deny-"+resource,"negative",["SP-A-008"],[{"op":"plugin.renderer_runtime","sandbox":"iframe","throughBridge":True,"resource":resource}],{"last":"DENIED"})
++add("renderer-runtime-deny-unmediated","negative",["SP-A-008"],[{"op":"plugin.renderer_runtime","sandbox":"isolated_webview","throughBridge":False,"resource":"ui.host"}],{"last":"DENIED"})
++
++for resource in ("database","server_file","arbitrary_network","other_plugin_memory"):
++    add("wasm-deny-"+resource,"negative",["SP-A-009"],[{"op":"plugin.wasm","resource":resource}],{"last":"DENIED","failureCount":1})
++for resource in ("cpu_time","memory","concurrency","storage","network"):
++    add("wasm-limit-"+resource,"negative",["SP-A-009"],[{"op":"plugin.wasm","resource":resource,"overLimit":True}],{"last":"DENIED","failureCount":1})
++add("wasm-auto-disable","negative",["SP-A-009"],[{"op":"plugin.wasm","timeout":True}]*3,{"last":"AUTO_DISABLED","autoDisabled":True,"failureCount":3})
++
++up={"op":"plugin.upgrade","backendVersion":"2.0.0","rendererVersion":"2.0.0"}
++add("upgrade-atomic-switch","positive",["SP-A-010"],[up],{"last":"SWITCHED","activeVersion":"2.0.0","oldVersionServed":False,"dataPreserved":True})
++for stage in ("snapshot","migration","backend_health","renderer_health","atomic_switch"):
++    add("upgrade-fail-"+stage,"negative",["SP-A-010"],[dict(up,failAt=stage)],{"last":"ROLLED_BACK","activeVersion":"1.0.0","oldVersionServed":True,"snapshotRestored":True,"dataPreserved":True})
++add("upgrade-version-split","negative",["SP-A-007","SP-A-010"],[dict(up,rendererVersion="3.0.0")],{"last":"REJECTED","activeVersion":"1.0.0"})
++
++add("disable-preserves-data","positive",["SP-A-011"],[{"op":"plugin.lifecycle","action":"DISABLE"}],{"last":"DISABLED","dataPreserved":True})
++add("uninstall-retained","positive",["SP-A-011"],[{"op":"plugin.lifecycle","action":"UNINSTALL"}],{"last":"RETAINED","dataPreserved":True})
++for missing in ("explicit","elevated","audited","retention_confirmed"):
++    req={k:True for k in ("explicit","elevated","audited","retention_confirmed")};req[missing]=False
++    add("purge-deny-"+missing,"negative",["SP-A-011"],[dict(op="plugin.lifecycle",action="PURGE",**req)],{"last":"DENIED","dataPreserved":True})
++add("purge-explicit-authorized","positive",["SP-A-011"],[{"op":"plugin.lifecycle","action":"PURGE","explicit":True,"elevated":True,"audited":True,"retention_confirmed":True}],{"last":"PURGED","dataPreserved":False})
++
++if __name__=="__main__":
++    with (HERE/"golden.json").open("w",encoding="utf-8",newline="\n") as target:
++        target.write(json.dumps({"fixtureVersion":"1.0","profiles":["go","java"],"cases":cases},indent=2)+"\n")
++    print(f"wrote {len(cases)} cases")
+diff --git a/contracts/fixtures/sync-plugin/golden.json b/contracts/fixtures/sync-plugin/golden.json
+new file mode 100644
+index 0000000..e4c444a
+--- /dev/null
++++ b/contracts/fixtures/sync-plugin/golden.json
+@@ -0,0 +1,2367 @@
++{
++  "fixtureVersion": "1.0",
++  "profiles": [
++    "go",
++    "java"
++  ],
++  "cases": [
++    {
++      "id": "manifest-valid",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.manifest",
++          "manifest": {
++            "apiVersion": "1.0",
++            "type": "manifest",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "capabilities": [
++              "events",
++              "queries",
++              "actions",
++              "ui"
++            ],
++            "permissions": [
++              "event.message.created",
++              "query.messages",
++              "action.send_message",
++              "ui.panel"
++            ],
++            "backendEntry": "backend/plugin.wasm",
++            "rendererEntry": "ui/render.bundle.js"
++          }
++        }
++      ],
++      "expect": {
++        "last": "VALID"
++      }
++    },
++    {
++      "id": "manifest-unknown-capability",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.manifest",
++          "manifest": {
++            "apiVersion": "1.0",
++            "type": "manifest",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "capabilities": [
++              "core_db"
++            ],
++            "permissions": [
++              "event.message.created",
++              "query.messages",
++              "action.send_message",
++              "ui.panel"
++            ],
++            "backendEntry": "backend/plugin.wasm",
++            "rendererEntry": "ui/render.bundle.js"
++          }
++        }
++      ],
++      "expectError": true
++    },
++    {
++      "id": "manifest-duplicate-permission",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.manifest",
++          "manifest": {
++            "apiVersion": "1.0",
++            "type": "manifest",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "capabilities": [
++              "events",
++              "queries",
++              "actions",
++              "ui"
++            ],
++            "permissions": [
++              "query.messages",
++              "query.messages"
++            ],
++            "backendEntry": "backend/plugin.wasm",
++            "rendererEntry": "ui/render.bundle.js"
++          }
++        }
++      ],
++      "expectError": true
++    },
++    {
++      "id": "gap-out-of-order-duplicate",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-001",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 2,
++            "messageId": "50000000-0000-4000-8000-000000000002",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000002",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-2"
++            }
++          }
++        },
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 2,
++            "messageId": "50000000-0000-4000-8000-000000000002",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000002",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-2"
++            }
++          }
++        },
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000001",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        }
++      ],
++      "expect": {
++        "contiguous": 2,
++        "messages": {
++          "1": "50000000-0000-4000-8000-000000000001",
++          "2": "50000000-0000-4000-8000-000000000002"
++        }
++      }
++    },
++    {
++      "id": "gap-stops",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-001"
++      ],
++      "steps": [
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 2,
++            "messageId": "50000000-0000-4000-8000-000000000002",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000002",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-2"
++            }
++          }
++        }
++      ],
++      "expect": {
++        "contiguous": 0,
++        "messages": {
++          "2": "50000000-0000-4000-8000-000000000002"
++        }
++      }
++    },
++    {
++      "id": "failed-to-sent-terminal",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-002"
++      ],
++      "steps": [
++        {
++          "op": "local.failed",
++          "conversationId": "30000000-0000-4000-8000-000000000001",
++          "requestId": "40000000-0000-4000-8000-000000000001"
++        },
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000001",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        },
++        {
++          "op": "local.failed",
++          "conversationId": "30000000-0000-4000-8000-000000000001",
++          "requestId": "40000000-0000-4000-8000-000000000001"
++        }
++      ],
++      "expect": {
++        "local": {
++          "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
++        },
++        "last": "SENT"
++      }
++    },
++    {
++      "id": "message-rollback-and-retry",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-003"
++      ],
++      "steps": [
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000001",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          },
++          "fault": "before_commit"
++        },
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000001",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        }
++      ],
++      "expect": {
++        "contiguous": 1,
++        "messages": {
++          "1": "50000000-0000-4000-8000-000000000001"
++        }
++      }
++    },
++    {
++      "id": "user-rollback-and-retry",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-003",
++        "SP-A-004"
++      ],
++      "steps": [
++        {
++          "op": "sync.user",
++          "page": {
++            "syncVersion": "1.0",
++            "type": "sync.user.page",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "events": [
++              {
++                "eventId": "50000000-0000-4000-8000-000000000009",
++                "cursor": "1",
++                "kind": "friend.changed",
++                "subjectId": "10000000-0000-4000-8000-000000000001",
++                "revision": 1
++              }
++            ],
++            "nextCursor": "1",
++            "hasMore": false
++          },
++          "fault": "before_commit"
++        },
++        {
++          "op": "sync.user",
++          "page": {
++            "syncVersion": "1.0",
++            "type": "sync.user.page",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "events": [
++              {
++                "eventId": "50000000-0000-4000-8000-000000000009",
++                "cursor": "1",
++                "kind": "friend.changed",
++                "subjectId": "10000000-0000-4000-8000-000000000001",
++                "revision": 1
++              }
++            ],
++            "nextCursor": "1",
++            "hasMore": false
++          }
++        }
++      ],
++      "expect": {
++        "cursor": "1",
++        "messages": {}
++      }
++    },
++    {
++      "id": "user-friend.changed",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-004"
++      ],
++      "steps": [
++        {
++          "op": "sync.user",
++          "page": {
++            "syncVersion": "1.0",
++            "type": "sync.user.page",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "events": [
++              {
++                "eventId": "50000000-0000-4000-8000-000000000009",
++                "cursor": "1",
++                "kind": "friend.changed",
++                "subjectId": "10000000-0000-4000-8000-000000000001",
++                "revision": 1
++              }
++            ],
++            "nextCursor": "1",
++            "hasMore": false
++          }
++        }
++      ],
++      "expect": {
++        "cursor": "1",
++        "contiguous": 0
++      }
++    },
++    {
++      "id": "user-conversation.changed",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-004"
++      ],
++      "steps": [
++        {
++          "op": "sync.user",
++          "page": {
++            "syncVersion": "1.0",
++            "type": "sync.user.page",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "events": [
++              {
++                "eventId": "50000000-0000-4000-8000-000000000009",
++                "cursor": "1",
++                "kind": "conversation.changed",
++                "subjectId": "10000000-0000-4000-8000-000000000001",
++                "revision": 1
++              }
++            ],
++            "nextCursor": "1",
++            "hasMore": false
++          }
++        }
++      ],
++      "expect": {
++        "cursor": "1",
++        "contiguous": 0
++      }
++    },
++    {
++      "id": "user-membership.changed",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-004"
++      ],
++      "steps": [
++        {
++          "op": "sync.user",
++          "page": {
++            "syncVersion": "1.0",
++            "type": "sync.user.page",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "events": [
++              {
++                "eventId": "50000000-0000-4000-8000-000000000009",
++                "cursor": "1",
++                "kind": "membership.changed",
++                "subjectId": "10000000-0000-4000-8000-000000000001",
++                "revision": 1
++              }
++            ],
++            "nextCursor": "1",
++            "hasMore": false
++          }
++        }
++      ],
++      "expect": {
++        "cursor": "1",
++        "contiguous": 0
++      }
++    },
++    {
++      "id": "user-plugin.changed",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-004"
++      ],
++      "steps": [
++        {
++          "op": "sync.user",
++          "page": {
++            "syncVersion": "1.0",
++            "type": "sync.user.page",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "events": [
++              {
++                "eventId": "50000000-0000-4000-8000-000000000009",
++                "cursor": "1",
++                "kind": "plugin.changed",
++                "subjectId": "10000000-0000-4000-8000-000000000001",
++                "revision": 1
++              }
++            ],
++            "nextCursor": "1",
++            "hasMore": false
++          }
++        }
++      ],
++      "expect": {
++        "cursor": "1",
++        "contiguous": 0
++      }
++    },
++    {
++      "id": "message-event-in-user-cursor",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-004"
++      ],
++      "steps": [
++        {
++          "op": "sync.user",
++          "page": {
++            "syncVersion": "1.0",
++            "type": "sync.user.page",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "events": [
++              {
++                "eventId": "50000000-0000-4000-8000-000000000009",
++                "cursor": "1",
++                "kind": "message.created",
++                "subjectId": "10000000-0000-4000-8000-000000000001",
++                "revision": 1
++              }
++            ],
++            "nextCursor": "1",
++            "hasMore": false
++          }
++        }
++      ],
++      "expectError": true
++    },
++    {
++      "id": "sequence-collision",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-001"
++      ],
++      "steps": [
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000001",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        },
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000003",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        }
++      ],
++      "expectError": true
++    },
++    {
++      "id": "request-identity-collision",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-001",
++        "SP-A-002"
++      ],
++      "steps": [
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000001",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        },
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 2,
++            "messageId": "50000000-0000-4000-8000-000000000002",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-2"
++            }
++          }
++        }
++      ],
++      "expectError": true
++    },
++    {
++      "id": "per-conversation-independent-sequence",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-001",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000001",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        },
++        {
++          "op": "sync.message",
++          "message": {
++            "conversationId": "30000000-0000-4000-8000-000000000002",
++            "seq": 1,
++            "messageId": "50000000-0000-4000-8000-000000000008",
++            "senderId": "10000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001",
++            "createdAt": "2026-09-28T00:00:01Z",
++            "content": {
++              "kind": "TEXT",
++              "text": "message-1"
++            }
++          }
++        }
++      ],
++      "expect": {
++        "conversations": {
++          "30000000-0000-4000-8000-000000000001": {
++            "contiguous": 1,
++            "messages": {
++              "1": "50000000-0000-4000-8000-000000000001"
++            }
++          },
++          "30000000-0000-4000-8000-000000000002": {
++            "contiguous": 1,
++            "messages": {
++              "1": "50000000-0000-4000-8000-000000000008"
++            }
++          }
++        }
++      }
++    },
++    {
++      "id": "allow-event-subscribe",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "event.subscribe",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "event": "message.created"
++          },
++          "capabilities": [
++            "events"
++          ],
++          "permissions": [
++            "event.message.created"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "ALLOWED"
++      }
++    },
++    {
++      "id": "deny-event-subscribe-capability",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "event.subscribe",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "event": "message.created"
++          },
++          "capabilities": [],
++          "permissions": [
++            "event.message.created"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "deny-event-subscribe-permission",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "event.subscribe",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "event": "message.created"
++          },
++          "capabilities": [
++            "events"
++          ],
++          "permissions": [],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "allow-query",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 20,
++            "pageToken": ""
++          },
++          "capabilities": [
++            "queries"
++          ],
++          "permissions": [
++            "query.messages"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "ALLOWED"
++      }
++    },
++    {
++      "id": "deny-query-capability",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 20,
++            "pageToken": ""
++          },
++          "capabilities": [],
++          "permissions": [
++            "query.messages"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "deny-query-permission",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 20,
++            "pageToken": ""
++          },
++          "capabilities": [
++            "queries"
++          ],
++          "permissions": [],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "allow-action",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "action",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "action": "send_message",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001"
++          },
++          "capabilities": [
++            "actions"
++          ],
++          "permissions": [
++            "action.send_message"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "ALLOWED"
++      }
++    },
++    {
++      "id": "deny-action-capability",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "action",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "action": "send_message",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001"
++          },
++          "capabilities": [],
++          "permissions": [
++            "action.send_message"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "deny-action-permission",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "action",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "action": "send_message",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001"
++          },
++          "capabilities": [
++            "actions"
++          ],
++          "permissions": [],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "allow-ui-host",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "ui.host",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "slot": "panel"
++          },
++          "capabilities": [
++            "ui"
++          ],
++          "permissions": [
++            "ui.panel"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "ALLOWED"
++      }
++    },
++    {
++      "id": "deny-ui-host-capability",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "ui.host",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "slot": "panel"
++          },
++          "capabilities": [],
++          "permissions": [
++            "ui.panel"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "deny-ui-host-permission",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005",
++        "SP-A-012"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "ui.host",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "slot": "panel"
++          },
++          "capabilities": [
++            "ui"
++          ],
++          "permissions": [],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "deny-direct-core-db",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-005"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 20,
++            "pageToken": ""
++          },
++          "capabilities": [
++            "queries"
++          ],
++          "permissions": [
++            "query.messages"
++          ],
++          "directAccess": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "query-read-only-paginated",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-006"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 20,
++            "pageToken": ""
++          },
++          "capabilities": [
++            "queries"
++          ],
++          "permissions": [
++            "query.messages"
++          ]
++        }
++      ],
++      "expect": {
++        "last": "ALLOWED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "query-over-limit",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-006"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 101,
++            "pageToken": ""
++          },
++          "capabilities": [
++            "queries"
++          ],
++          "permissions": [
++            "query.messages"
++          ]
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "query-mutation",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-006"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 20,
++            "pageToken": ""
++          },
++          "capabilities": [
++            "queries"
++          ],
++          "permissions": [
++            "query.messages"
++          ],
++          "mutates": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 0
++      }
++    },
++    {
++      "id": "action-retry-audited",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-006",
++        "SP-A-013"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "action",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "action": "send_message",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001"
++          },
++          "capabilities": [
++            "actions"
++          ],
++          "permissions": [
++            "action.send_message"
++          ],
++          "authorizedAtExecution": true
++        },
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "action",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "action": "send_message",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001"
++          },
++          "capabilities": [
++            "actions"
++          ],
++          "permissions": [
++            "action.send_message"
++          ],
++          "authorizedAtExecution": true
++        }
++      ],
++      "expect": {
++        "last": "ALLOWED",
++        "sideEffects": 1,
++        "auditAttempts": 2
++      }
++    },
++    {
++      "id": "action-revoked-at-execution",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-006",
++        "SP-A-013"
++      ],
++      "steps": [
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "action",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "action": "send_message",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001"
++          },
++          "capabilities": [
++            "actions"
++          ],
++          "permissions": [
++            "action.send_message"
++          ],
++          "authorizedAtExecution": true
++        },
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "action",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "action": "send_message",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestId": "40000000-0000-4000-8000-000000000001"
++          },
++          "capabilities": [
++            "actions"
++          ],
++          "permissions": [
++            "action.send_message"
++          ],
++          "authorizedAtExecution": false
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "sideEffects": 1,
++        "auditAttempts": 2
++      }
++    },
++    {
++      "id": "artifact-verified",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-007",
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "VERIFIED"
++      }
++    },
++    {
++      "id": "immutable-packageHash",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-007"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        },
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "immutable-backendHash",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-007"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        },
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "immutable-rendererHash",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-007"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        },
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "artifact-version-split",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-007"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true,
++          "rendererVersion": "2.0.0"
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-hash",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": false,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-signature",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": false
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-manifest",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": false,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-compatibility",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": false,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-permission",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": false,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-size",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": false,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-csp",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": false,
++            "entryPointValid": true,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-reject-entry",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": false,
++            "sandbox": "iframe"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expect": {
++        "last": "REJECTED"
++      }
++    },
++    {
++      "id": "renderer-unsafe-sandbox",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.artifact",
++          "artifact": {
++            "apiVersion": "1.0",
++            "type": "artifact",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "packageHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "backendHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "rendererHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++            "signature": "fixture-signature",
++            "manifestValid": true,
++            "compatible": true,
++            "permissionsApproved": true,
++            "resourceSizeOk": true,
++            "cspValid": true,
++            "entryPointValid": true,
++            "sandbox": "host_native"
++          },
++          "hashValid": true,
++          "signatureValid": true
++        }
++      ],
++      "expectError": true
++    },
++    {
++      "id": "renderer-bridge-sandbox",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.renderer_runtime",
++          "sandbox": "iframe",
++          "throughBridge": true,
++          "resource": "ui.host"
++        }
++      ],
++      "expect": {
++        "last": "ALLOWED"
++      }
++    },
++    {
++      "id": "renderer-runtime-deny-database",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.renderer_runtime",
++          "sandbox": "iframe",
++          "throughBridge": true,
++          "resource": "database"
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "renderer-runtime-deny-core_internal",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.renderer_runtime",
++          "sandbox": "iframe",
++          "throughBridge": true,
++          "resource": "core_internal"
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "renderer-runtime-deny-server_file",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.renderer_runtime",
++          "sandbox": "iframe",
++          "throughBridge": true,
++          "resource": "server_file"
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "renderer-runtime-deny-os_resource",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.renderer_runtime",
++          "sandbox": "iframe",
++          "throughBridge": true,
++          "resource": "os_resource"
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "renderer-runtime-deny-arbitrary_network",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.renderer_runtime",
++          "sandbox": "iframe",
++          "throughBridge": true,
++          "resource": "arbitrary_network"
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "renderer-runtime-deny-unmediated",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-008"
++      ],
++      "steps": [
++        {
++          "op": "plugin.renderer_runtime",
++          "sandbox": "isolated_webview",
++          "throughBridge": false,
++          "resource": "ui.host"
++        }
++      ],
++      "expect": {
++        "last": "DENIED"
++      }
++    },
++    {
++      "id": "wasm-deny-database",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "database"
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-deny-server_file",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "server_file"
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-deny-arbitrary_network",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "arbitrary_network"
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-deny-other_plugin_memory",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "other_plugin_memory"
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-limit-cpu_time",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "cpu_time",
++          "overLimit": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-limit-memory",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "memory",
++          "overLimit": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-limit-concurrency",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "concurrency",
++          "overLimit": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-limit-storage",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "storage",
++          "overLimit": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-limit-network",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "resource": "network",
++          "overLimit": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "failureCount": 1
++      }
++    },
++    {
++      "id": "wasm-auto-disable",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-009"
++      ],
++      "steps": [
++        {
++          "op": "plugin.wasm",
++          "timeout": true
++        },
++        {
++          "op": "plugin.wasm",
++          "timeout": true
++        },
++        {
++          "op": "plugin.wasm",
++          "timeout": true
++        }
++      ],
++      "expect": {
++        "last": "AUTO_DISABLED",
++        "autoDisabled": true,
++        "failureCount": 3
++      }
++    },
++    {
++      "id": "upgrade-atomic-switch",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-010"
++      ],
++      "steps": [
++        {
++          "op": "plugin.upgrade",
++          "backendVersion": "2.0.0",
++          "rendererVersion": "2.0.0"
++        }
++      ],
++      "expect": {
++        "last": "SWITCHED",
++        "activeVersion": "2.0.0",
++        "oldVersionServed": false,
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "upgrade-fail-snapshot",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-010"
++      ],
++      "steps": [
++        {
++          "op": "plugin.upgrade",
++          "backendVersion": "2.0.0",
++          "rendererVersion": "2.0.0",
++          "failAt": "snapshot"
++        }
++      ],
++      "expect": {
++        "last": "ROLLED_BACK",
++        "activeVersion": "1.0.0",
++        "oldVersionServed": true,
++        "snapshotRestored": true,
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "upgrade-fail-migration",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-010"
++      ],
++      "steps": [
++        {
++          "op": "plugin.upgrade",
++          "backendVersion": "2.0.0",
++          "rendererVersion": "2.0.0",
++          "failAt": "migration"
++        }
++      ],
++      "expect": {
++        "last": "ROLLED_BACK",
++        "activeVersion": "1.0.0",
++        "oldVersionServed": true,
++        "snapshotRestored": true,
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "upgrade-fail-backend_health",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-010"
++      ],
++      "steps": [
++        {
++          "op": "plugin.upgrade",
++          "backendVersion": "2.0.0",
++          "rendererVersion": "2.0.0",
++          "failAt": "backend_health"
++        }
++      ],
++      "expect": {
++        "last": "ROLLED_BACK",
++        "activeVersion": "1.0.0",
++        "oldVersionServed": true,
++        "snapshotRestored": true,
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "upgrade-fail-renderer_health",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-010"
++      ],
++      "steps": [
++        {
++          "op": "plugin.upgrade",
++          "backendVersion": "2.0.0",
++          "rendererVersion": "2.0.0",
++          "failAt": "renderer_health"
++        }
++      ],
++      "expect": {
++        "last": "ROLLED_BACK",
++        "activeVersion": "1.0.0",
++        "oldVersionServed": true,
++        "snapshotRestored": true,
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "upgrade-fail-atomic_switch",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-010"
++      ],
++      "steps": [
++        {
++          "op": "plugin.upgrade",
++          "backendVersion": "2.0.0",
++          "rendererVersion": "2.0.0",
++          "failAt": "atomic_switch"
++        }
++      ],
++      "expect": {
++        "last": "ROLLED_BACK",
++        "activeVersion": "1.0.0",
++        "oldVersionServed": true,
++        "snapshotRestored": true,
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "upgrade-version-split",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-007",
++        "SP-A-010"
++      ],
++      "steps": [
++        {
++          "op": "plugin.upgrade",
++          "backendVersion": "2.0.0",
++          "rendererVersion": "3.0.0"
++        }
++      ],
++      "expect": {
++        "last": "REJECTED",
++        "activeVersion": "1.0.0"
++      }
++    },
++    {
++      "id": "disable-preserves-data",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-011"
++      ],
++      "steps": [
++        {
++          "op": "plugin.lifecycle",
++          "action": "DISABLE"
++        }
++      ],
++      "expect": {
++        "last": "DISABLED",
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "uninstall-retained",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-011"
++      ],
++      "steps": [
++        {
++          "op": "plugin.lifecycle",
++          "action": "UNINSTALL"
++        }
++      ],
++      "expect": {
++        "last": "RETAINED",
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "purge-deny-explicit",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-011"
++      ],
++      "steps": [
++        {
++          "op": "plugin.lifecycle",
++          "action": "PURGE",
++          "explicit": false,
++          "elevated": true,
++          "audited": true,
++          "retention_confirmed": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "purge-deny-elevated",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-011"
++      ],
++      "steps": [
++        {
++          "op": "plugin.lifecycle",
++          "action": "PURGE",
++          "explicit": true,
++          "elevated": false,
++          "audited": true,
++          "retention_confirmed": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "purge-deny-audited",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-011"
++      ],
++      "steps": [
++        {
++          "op": "plugin.lifecycle",
++          "action": "PURGE",
++          "explicit": true,
++          "elevated": true,
++          "audited": false,
++          "retention_confirmed": true
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "purge-deny-retention_confirmed",
++      "polarity": "negative",
++      "rules": [
++        "SP-A-011"
++      ],
++      "steps": [
++        {
++          "op": "plugin.lifecycle",
++          "action": "PURGE",
++          "explicit": true,
++          "elevated": true,
++          "audited": true,
++          "retention_confirmed": false
++        }
++      ],
++      "expect": {
++        "last": "DENIED",
++        "dataPreserved": true
++      }
++    },
++    {
++      "id": "purge-explicit-authorized",
++      "polarity": "positive",
++      "rules": [
++        "SP-A-011"
++      ],
++      "steps": [
++        {
++          "op": "plugin.lifecycle",
++          "action": "PURGE",
++          "explicit": true,
++          "elevated": true,
++          "audited": true,
++          "retention_confirmed": true
++        }
++      ],
++      "expect": {
++        "last": "PURGED",
++        "dataPreserved": false
++      }
++    }
++  ]
++}
+diff --git a/contracts/plugin-api/README.md b/contracts/plugin-api/README.md
+new file mode 100644
+index 0000000..cbc62a3
+--- /dev/null
++++ b/contracts/plugin-api/README.md
+@@ -0,0 +1,13 @@
++# Canonical Sync and Plugin API v1 contracts
++
++`../websocket/sync-v1.schema.json` defines the four Sync v1 wire objects: user request/page and Conversation request/page. `v1.schema.json` defines Plugin API v1 manifests, Event subscriptions, Queries, Actions, UI Host calls, and immutable artifact descriptors. `policy-v1.json` fixes the capability and permission map, Query page limit, renderer preflight and sandbox choices, WASM denials and limit classes, upgrade stages, and purge requirements. These files under `contracts/` are the public machine-verifiable authority. The verifier and golden vectors live beside them; implementations must conform to the contracts.
++
++The user cursor is opaque and advances only with friend, Conversation, membership, or plugin state. Message pages use a per-Conversation sequence. A client materializes data and advances the corresponding cursor or contiguous sequence in one transaction. A failed transaction changes neither. Duplicate and out-of-order Messages upsert by `(conversationId, requestId)`, `messageId`, and `(conversationId, seq)`; a conflicting identity is rejected. `contiguous_seq` advances only across a complete prefix. A locally FAILED item with the same Conversation and request identity becomes SENT, and SENT never regresses to FAILED. Web remains memory-only; Desktop and Mobile render account-scoped local materialized state before background Sync.
++
++Each Plugin API surface requires both its declared capability and current permission. Queries are read-only, paginated, and limited to 100 items per page. Actions are re-authorized at execution, use `(pluginId, conversationId, requestId)` as the idempotency identity, and leave an audit record for every attempt. The Host bridge is the only route to Core data or actions; no direct Core or database access is granted.
++
++A renderer loads only after package hash, signature, manifest schema, API compatibility, permission, resource size, CSP, and entry-point checks succeed. It executes in a sandbox iframe or isolated WebView and reaches UI Host only through the mediated bridge. The verifier's renderer runtime cases reject direct host-sensitive resource access. A `(pluginId, version)` artifact is immutable: package, backend, and renderer hashes cannot change under that identity. Backend and renderer versions must match. Messages referring to Plugin content must retain the referenced renderer version and fallback TEXT. WSS v1's existing `message.send` remains TEXT-only; this contract does not change it.
++
++WASM denies database, server-file, arbitrary-network, and other-plugin-memory access by default. CPU/time, memory, concurrency, storage, and network limits are enforced; three consecutive timeout, panic, or limit violations trigger AUTO_DISABLED. Plugin artifact lifecycle and Conversation instance lifecycle remain distinct. During upgrade the old version serves until snapshot, migration, backend and renderer health checks, and atomic switch succeed. Any failed stage restores the snapshot and leaves the old version serving. DISABLE preserves data; UNINSTALL defaults to RETAINED; PURGE requires an explicit, elevated, audited, retention-confirmed operation.
++
++Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check all Go and Java expected outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; the verifier compares both profiles to those outcomes and runs malformed-wire and wrong-outcome controls.
+diff --git a/contracts/plugin-api/policy-v1.json b/contracts/plugin-api/policy-v1.json
+new file mode 100644
+index 0000000..6a64194
+--- /dev/null
++++ b/contracts/plugin-api/policy-v1.json
+@@ -0,0 +1,16 @@
++{
++  "apiVersion": "1.0",
++  "maxQueryPageSize": 100,
++  "autoDisableAfterConsecutiveFailures": 3,
++  "capabilityForType": {"event.subscribe":"events","query":"queries","action":"actions","ui.host":"ui"},
++  "permissionForEvent": {"message.created":"event.message.created","member.joined":"event.member.joined","plugin.lifecycle":"event.plugin.lifecycle"},
++  "permissionForQuery": {"conversation":"query.conversation","members":"query.members","messages":"query.messages","friendship":"query.friendship"},
++  "permissionForAction": {"send_message":"action.send_message","plugin_state":"action.plugin_state","ui":"action.ui"},
++  "permissionForSlot": {"page":"ui.page","modal":"ui.modal","panel":"ui.panel","menu":"ui.menu","form":"ui.form","toolbar":"ui.toolbar","message_renderer":"ui.message_renderer"},
++  "rendererChecks": ["packageHash","signature","manifestValid","compatible","permissionsApproved","resourceSizeOk","cspValid","entryPointValid"],
++  "rendererSandboxes": ["iframe","isolated_webview"],
++  "wasmDeniedResources": ["database","server_file","arbitrary_network","other_plugin_memory"],
++  "wasmLimitedResources": ["cpu_time","memory","concurrency","storage","network"],
++  "upgradeStages": ["snapshot","migration","backend_health","renderer_health","atomic_switch"],
++  "purgeRequirements": ["explicit","elevated","audited","retention_confirmed"]
++}
+diff --git a/contracts/plugin-api/v1.schema.json b/contracts/plugin-api/v1.schema.json
+new file mode 100644
+index 0000000..8e5ae6c
+--- /dev/null
++++ b/contracts/plugin-api/v1.schema.json
+@@ -0,0 +1,21 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://im.example/contracts/plugin-api/v1.schema.json",
++  "title": "Plugin API v1 public contract",
++  "description": "All calls pass through an authorized Host bridge. No direct Core, database, server-file, arbitrary-network, OS, or other-plugin-memory access is exposed.",
++  "oneOf": [
++    {"$ref":"#/$defs/Manifest"},{"$ref":"#/$defs/EventSubscription"},
++    {"$ref":"#/$defs/Query"},{"$ref":"#/$defs/Action"},
++    {"$ref":"#/$defs/UIHost"},{"$ref":"#/$defs/Artifact"}
++  ],
++  "$defs": {
++    "Id":{"type":"string","format":"uuid"},
++    "Hash":{"type":"string","minLength":64,"maxLength":64},
++    "Manifest":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","capabilities","permissions","backendEntry","rendererEntry"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"manifest"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"capabilities":{"type":"array","uniqueItems":true,"items":{"enum":["events","queries","actions","ui"]}},"permissions":{"type":"array","uniqueItems":true,"items":{"enum":["event.message.created","event.member.joined","event.plugin.lifecycle","query.conversation","query.members","query.messages","query.friendship","action.send_message","action.plugin_state","action.ui","ui.page","ui.modal","ui.panel","ui.menu","ui.form","ui.toolbar","ui.message_renderer"]}},"backendEntry":{"type":"string","minLength":1},"rendererEntry":{"type":"string","minLength":1}}},
++    "EventSubscription":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","event"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"event.subscribe"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"event":{"enum":["message.created","member.joined","plugin.lifecycle"]}}},
++    "Query":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","query","conversationId","pageSize","pageToken"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"query"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"query":{"enum":["conversation","members","messages","friendship"]},"conversationId":{"$ref":"#/$defs/Id"},"pageSize":{"type":"integer","minimum":1},"pageToken":{"type":"string"}}},
++    "Action":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","action","conversationId","requestId"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"action"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"action":{"enum":["send_message","plugin_state","ui"]},"conversationId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"}}},
++    "UIHost":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","slot"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"ui.host"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"slot":{"enum":["page","modal","panel","menu","form","toolbar","message_renderer"]}}},
++    "Artifact":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","packageHash","backendHash","rendererHash","signature","manifestValid","compatible","permissionsApproved","resourceSizeOk","cspValid","entryPointValid","sandbox"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"artifact"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"packageHash":{"$ref":"#/$defs/Hash"},"backendHash":{"$ref":"#/$defs/Hash"},"rendererHash":{"$ref":"#/$defs/Hash"},"signature":{"type":"string","minLength":1},"manifestValid":{"type":"boolean"},"compatible":{"type":"boolean"},"permissionsApproved":{"type":"boolean"},"resourceSizeOk":{"type":"boolean"},"cspValid":{"type":"boolean"},"entryPointValid":{"type":"boolean"},"sandbox":{"enum":["iframe","isolated_webview"]}}}
++  }
++}
+diff --git a/contracts/plugin-api/verify.py b/contracts/plugin-api/verify.py
+new file mode 100644
+index 0000000..3152cf7
+--- /dev/null
++++ b/contracts/plugin-api/verify.py
+@@ -0,0 +1,313 @@
++#!/usr/bin/env python3
++"""Offline schema and deterministic Sync/Plugin v1 fixture verifier."""
++import copy
++import datetime
++import json
++import pathlib
++import runpy
++import sys
++import uuid
++
++ROOT = pathlib.Path(__file__).resolve().parents[1]
++SYNC = json.loads((ROOT / "websocket/sync-v1.schema.json").read_text(encoding="utf-8"))
++PLUGIN = json.loads((ROOT / "plugin-api/v1.schema.json").read_text(encoding="utf-8"))
++POLICY = json.loads((ROOT / "plugin-api/policy-v1.json").read_text(encoding="utf-8"))
++FIXTURE = ROOT / "fixtures/sync-plugin/golden.json"
++ALLOWED = {"$schema", "$id", "title", "description", "$defs", "$ref", "type", "const", "enum", "oneOf", "allOf", "required", "properties", "additionalProperties", "items", "minLength", "maxLength", "minimum", "maximum", "format", "maxItems", "minItems", "uniqueItems"}
++
++
++class Invalid(Exception):
++    pass
++
++
++def lint(node, root, path="$", stack=()):
++    if not isinstance(node, dict) or set(node) - ALLOWED:
++        raise Invalid(f"{path}: malformed or unsupported schema keywords {set(node) - ALLOWED if isinstance(node, dict) else node}")
++    if "type" in node and node["type"] not in ("object", "array", "string", "integer", "boolean"):
++        raise Invalid(f"{path}: unsupported type")
++    if "format" in node and node["format"] not in ("uuid", "date-time"):
++        raise Invalid(f"{path}: unsupported format")
++    for key in ("$schema", "$id", "title", "description", "format"):
++        if key in node and not isinstance(node[key], str):
++            raise Invalid(f"{path}.{key}: expected string")
++    for key in ("$defs", "properties"):
++        if key in node and not isinstance(node[key], dict):
++            raise Invalid(f"{path}.{key}: expected object")
++    if "required" in node and (not isinstance(node["required"], list) or any(not isinstance(x, str) for x in node["required"]) or len(node["required"]) != len(set(node["required"]))):
++        raise Invalid(f"{path}.required: expected unique strings")
++    for key in ("oneOf", "allOf"):
++        if key in node and (not isinstance(node[key], list) or not node[key]):
++            raise Invalid(f"{path}.{key}: expected nonempty array")
++    if "enum" in node and (not isinstance(node["enum"], list) or not node["enum"]):
++        raise Invalid(f"{path}.enum: expected nonempty array")
++    for key in ("minimum", "maximum", "minLength", "maxLength", "minItems", "maxItems"):
++        if key in node and (type(node[key]) is not int or node[key] < 0):
++            raise Invalid(f"{path}.{key}: expected nonnegative integer")
++    for key in ("additionalProperties", "uniqueItems"):
++        if key in node and type(node[key]) is not bool:
++            raise Invalid(f"{path}.{key}: expected boolean")
++    if "$ref" in node:
++        ref = node["$ref"]
++        if not isinstance(ref, str) or not ref.startswith("#/$defs/") or ref[8:] not in root.get("$defs", {}):
++            raise Invalid(f"{path}: unresolved local reference")
++    for group in ("$defs", "properties"):
++        for key, child in node.get(group, {}).items():
++            lint(child, root, f"{path}.{group}.{key}", stack)
++    if "items" in node:
++        lint(node["items"], root, f"{path}.items", stack)
++    for group in ("oneOf", "allOf"):
++        for i, child in enumerate(node.get(group, [])):
++            lint(child, root, f"{path}.{group}[{i}]", stack)
++
++
++def validate(value, schema, root, path="$"):
++    if "$ref" in schema:
++        return validate(value, root["$defs"][schema["$ref"][8:]], root, path)
++    for child in schema.get("allOf", []):
++        validate(value, child, root, path)
++    if "oneOf" in schema:
++        matches = 0
++        for child in schema["oneOf"]:
++            try:
++                validate(value, child, root, path)
++                matches += 1
++            except Invalid:
++                pass
++        if matches != 1:
++            raise Invalid(f"{path}: oneOf matched {matches} branches")
++    if "const" in schema and (type(value) is not type(schema["const"]) or value != schema["const"]):
++        raise Invalid(f"{path}: const mismatch")
++    if "enum" in schema and value not in schema["enum"]:
++        raise Invalid(f"{path}: enum mismatch")
++    kind = schema.get("type")
++    if kind == "object":
++        if not isinstance(value, dict):
++            raise Invalid(f"{path}: expected object")
++        if set(schema.get("required", [])) - set(value):
++            raise Invalid(f"{path}: missing {set(schema['required']) - set(value)}")
++        props = schema.get("properties", {})
++        if schema.get("additionalProperties") is False and set(value) - set(props):
++            raise Invalid(f"{path}: unknown properties {set(value)-set(props)}")
++        for key in set(value) & set(props):
++            validate(value[key], props[key], root, f"{path}.{key}")
++    elif kind == "array":
++        if not isinstance(value, list) or len(value) < schema.get("minItems", 0) or len(value) > schema.get("maxItems", sys.maxsize):
++            raise Invalid(f"{path}: invalid array")
++        if schema.get("uniqueItems") and len({json.dumps(v, sort_keys=True) for v in value}) != len(value):
++            raise Invalid(f"{path}: duplicate items")
++        for i, child in enumerate(value):
++            validate(child, schema["items"], root, f"{path}[{i}]")
++    elif kind == "string":
++        if not isinstance(value, str) or not schema.get("minLength", 0) <= len(value) <= schema.get("maxLength", sys.maxsize):
++            raise Invalid(f"{path}: invalid string")
++        if schema.get("format") == "uuid":
++            try:
++                if str(uuid.UUID(value)) != value:
++                    raise ValueError()
++            except ValueError as exc:
++                raise Invalid(f"{path}: invalid UUID") from exc
++        if schema.get("format") == "date-time":
++            try:
++                if datetime.datetime.fromisoformat(value.replace("Z", "+00:00")).tzinfo is None:
++                    raise ValueError()
++            except ValueError as exc:
++                raise Invalid(f"{path}: invalid timestamp") from exc
++    elif kind == "integer":
++        if type(value) is not int or not schema.get("minimum", -sys.maxsize) <= value <= schema.get("maximum", sys.maxsize):
++            raise Invalid(f"{path}: invalid integer")
++    elif kind == "boolean" and type(value) is not bool:
++        raise Invalid(f"{path}: expected boolean")
++
++
++def run(case):
++    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "local": {}, "sideEffects": 0, "auditAttempts": 0, "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
++    state.update(copy.deepcopy(case.get("initial", {})))
++    seen_actions = set()
++    seen_events = set()
++    artifact_hashes = {}
++    request_messages = {}
++    for step in case["steps"]:
++        op = step["op"]
++        if op == "sync.user":
++            page = step["page"]
++            validate(page, SYNC, SYNC)
++            if page["type"] != "sync.user.page":
++                raise Invalid("sync.user requires user page")
++            if step.get("fault") == "before_commit":
++                state["last"] = "ROLLED_BACK"
++                continue
++            for event in page["events"]:
++                if event["kind"] not in ("friend.changed", "conversation.changed", "membership.changed", "plugin.changed"):
++                    raise Invalid("message event in user cursor")
++                seen_events.add(event["eventId"])
++            state["cursor"] = page["nextCursor"]
++            state["last"] = "APPLIED"
++        elif op == "sync.message":
++            msg = step["message"]
++            validate(msg, SYNC["$defs"]["Message"], SYNC)
++            if step.get("fault") == "before_commit":
++                state["last"] = "ROLLED_BACK"
++                continue
++            if msg["conversationId"] != case.get("conversationId", msg["conversationId"]):
++                raise Invalid("wrong conversation")
++            conv = state["conversations"].setdefault(msg["conversationId"], {"contiguous": 0, "messages": {}})
++            key = str(msg["seq"])
++            prior = conv["messages"].get(key)
++            if prior and prior != msg["messageId"]:
++                raise Invalid("sequence collision")
++            identity = msg["conversationId"] + "/" + msg["requestId"]
++            if identity in request_messages and request_messages[identity] != msg["messageId"]:
++                raise Invalid("request identity collision")
++            request_messages[identity] = msg["messageId"]
++            conv["messages"][key] = msg["messageId"]
++            while str(conv["contiguous"] + 1) in conv["messages"]:
++                conv["contiguous"] += 1
++            state["messages"] = conv["messages"]
++            state["contiguous"] = conv["contiguous"]
++            state["local"][identity] = "SENT"
++            state["last"] = "APPLIED"
++        elif op == "local.failed":
++            identity = step["conversationId"] + "/" + step["requestId"]
++            if state["local"].get(identity) != "SENT":
++                state["local"][identity] = "FAILED"
++            state["last"] = state["local"][identity]
++        elif op == "plugin.call":
++            call = step["call"]
++            validate(call, PLUGIN, PLUGIN)
++            typ = call["type"]
++            cap = POLICY["capabilityForType"][typ]
++            field = {"event.subscribe": "event", "query": "query", "action": "action", "ui.host": "slot"}[typ]
++            permission = {"event.subscribe": "permissionForEvent", "query": "permissionForQuery", "action": "permissionForAction", "ui.host": "permissionForSlot"}[typ]
++            required = POLICY[permission][call[field]]
++            allowed = cap in step.get("capabilities", []) and required in step.get("permissions", []) and not step.get("directAccess", False)
++            if typ == "query" and (call["pageSize"] > POLICY["maxQueryPageSize"] or step.get("mutates", False)):
++                allowed = False
++            if typ == "action":
++                state["auditAttempts"] += 1
++                allowed = allowed and step.get("authorizedAtExecution", False)
++                if allowed:
++                    identity = call["pluginId"] + "/" + call["conversationId"] + "/" + call["requestId"]
++                    if identity not in seen_actions:
++                        state["sideEffects"] += 1
++                        seen_actions.add(identity)
++            state["last"] = "ALLOWED" if allowed else "DENIED"
++        elif op == "plugin.manifest":
++            validate(step["manifest"], PLUGIN, PLUGIN)
++            if step["manifest"]["type"] != "manifest":
++                raise Invalid("expected Plugin manifest")
++            state["last"] = "VALID"
++        elif op == "plugin.artifact":
++            artifact = step["artifact"]
++            validate(artifact, PLUGIN, PLUGIN)
++            identity = artifact["pluginId"] + "/" + artifact["version"]
++            hashes = [artifact[k] for k in ("packageHash", "backendHash", "rendererHash")]
++            checks = all(artifact[k] for k in POLICY["rendererChecks"] if k != "packageHash")
++            checks = checks and step.get("hashValid", False) and step.get("signatureValid", False) and artifact["sandbox"] in POLICY["rendererSandboxes"]
++            checks = checks and step.get("backendVersion", artifact["version"]) == artifact["version"] and step.get("rendererVersion", artifact["version"]) == artifact["version"]
++            if identity in artifact_hashes and artifact_hashes[identity] != hashes:
++                checks = False
++            if checks:
++                artifact_hashes[identity] = hashes
++            state["last"] = "VERIFIED" if checks else "REJECTED"
++        elif op == "plugin.wasm":
++            resource = step.get("resource")
++            violation = resource in POLICY["wasmDeniedResources"] or (resource in POLICY["wasmLimitedResources"] and step.get("overLimit", False)) or step.get("timeout", False) or step.get("panic", False)
++            if violation:
++                state["failureCount"] += 1
++                if state["failureCount"] >= POLICY["autoDisableAfterConsecutiveFailures"]:
++                    state["autoDisabled"] = True
++                state["last"] = "AUTO_DISABLED" if state["autoDisabled"] else "DENIED"
++            elif state["autoDisabled"]:
++                state["last"] = "DENIED"
++            else:
++                state["failureCount"] = 0
++                state["last"] = "ALLOWED"
++        elif op == "plugin.renderer_runtime":
++            sandbox = step.get("sandbox")
++            resource = step.get("resource")
++            permitted = sandbox in POLICY["rendererSandboxes"] and step.get("throughBridge") is True and resource not in ("database", "core_internal", "server_file", "os_resource", "arbitrary_network")
++            state["last"] = "ALLOWED" if permitted else "DENIED"
++        elif op == "plugin.upgrade":
++            stages = POLICY["upgradeStages"]
++            failed = step.get("failAt")
++            if failed is not None and failed not in stages:
++                raise Invalid("unknown upgrade stage")
++            if step.get("backendVersion") != step.get("rendererVersion"):
++                state["last"] = "REJECTED"
++            elif failed:
++                state["snapshotRestored"] = True
++                state["last"] = "ROLLED_BACK"
++            else:
++                state["activeVersion"] = step["backendVersion"]
++                state["oldVersionServed"] = False
++                state["last"] = "SWITCHED"
++        elif op == "plugin.lifecycle":
++            action = step["action"]
++            if action in ("DISABLE", "UNINSTALL"):
++                state["last"] = "DISABLED" if action == "DISABLE" else "RETAINED"
++            elif action == "PURGE":
++                if all(step.get(k) is True for k in POLICY["purgeRequirements"]):
++                    state["dataPreserved"] = False
++                    state["last"] = "PURGED"
++                else:
++                    state["last"] = "DENIED"
++            else:
++                raise Invalid("unknown lifecycle action")
++        else:
++            raise Invalid(f"unknown operation {op}")
++    return {key: state[key] for key in case["expect"]}
++
++
++def verify():
++    for schema in (SYNC, PLUGIN):
++        lint(schema, schema)
++    fixtures = json.loads(FIXTURE.read_text(encoding="utf-8"))
++    source_cases = runpy.run_path(str(FIXTURE.parent / "generate.py"))["cases"]
++    if fixtures.get("cases") != source_cases:
++        raise Invalid("golden vectors differ from deterministic source")
++    if fixtures.get("fixtureVersion") != "1.0" or fixtures.get("profiles") != ["go", "java"]:
++        raise Invalid("fixture version or profile list mismatch")
++    cases = fixtures["cases"]
++    if len({c["id"] for c in cases}) != len(cases):
++        raise Invalid("duplicate case IDs")
++    covered = set()
++    positives = negatives = 0
++    for case in cases:
++        if case["polarity"] not in ("positive", "negative") or not case["rules"]:
++            raise Invalid(f"{case['id']}: invalid polarity or missing rules")
++        covered.update(case["rules"])
++        positives += case["polarity"] == "positive"
++        negatives += case["polarity"] == "negative"
++        for profile in fixtures["profiles"]:
++            if case.get("expectError"):
++                try:
++                    run(copy.deepcopy(case))
++                except Invalid:
++                    continue
++                raise Invalid(f"{profile}/{case['id']}: expected contract rejection")
++            actual = run(copy.deepcopy(case))
++            if actual != case["expect"]:
++                raise Invalid(f"{profile}/{case['id']}: expected {case['expect']}, got {actual}")
++    required = {f"SP-A-{i:03d}" for i in range(1, 14)}
++    if not required <= covered:
++        raise Invalid(f"missing acceptance coverage {required-covered}")
++    # Controls prove schema and scenario oracle reject malformed or wrong outcomes.
++    bad = copy.deepcopy(cases[0]); bad["expect"]["last"] = "NEVER"
++    if run(bad) == bad["expect"]:
++        raise Invalid("outcome mutation accepted")
++    malformed = {"syncVersion":"1.0","type":"sync.user.page","requestId":"not-a-uuid","events":[],"nextCursor":"1","hasMore":False}
++    try:
++        validate(malformed, SYNC, SYNC)
++    except Invalid:
++        pass
++    else:
++        raise Invalid("malformed Sync UUID accepted")
++    print(f"PASS: Sync/Plugin v1 schemas, {len(cases)} shared Go/Java cases ({positives} positive, {negatives} negative), SP-A-001..013, 2 mutation controls")
++
++
++if __name__ == "__main__":
++    try:
++        verify()
++    except (Invalid, KeyError, TypeError, ValueError) as exc:
++        print(f"FAIL: {exc}", file=sys.stderr)
++        sys.exit(1)
+diff --git a/contracts/websocket/sync-v1.schema.json b/contracts/websocket/sync-v1.schema.json
+new file mode 100644
+index 0000000..2b2aebc
+--- /dev/null
++++ b/contracts/websocket/sync-v1.schema.json
+@@ -0,0 +1,22 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "$id": "https://im.example/contracts/websocket/sync-v1.schema.json",
++  "title": "Sync v1 request and response contract",
++  "description": "User cursor carries only low-frequency friend, conversation, membership and plugin state. Message history uses a per-conversation sequence. Cursor and materialized data commit atomically on a client.",
++  "oneOf": [
++    {"$ref":"#/$defs/UserRequest"}, {"$ref":"#/$defs/UserPage"},
++    {"$ref":"#/$defs/ConversationRequest"}, {"$ref":"#/$defs/ConversationPage"}
++  ],
++  "$defs": {
++    "Id": {"type":"string","format":"uuid"},
++    "Seq": {"type":"integer","minimum":0},
++    "PositiveSeq": {"type":"integer","minimum":1},
++    "Cursor": {"type":"string","minLength":1,"maxLength":256},
++    "UserRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","cursor","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.request"},"requestId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"limit":{"type":"integer","minimum":1}}},
++    "UserEvent": {"type":"object","additionalProperties":false,"required":["eventId","cursor","kind","subjectId","revision"],"properties":{"eventId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"kind":{"enum":["friend.changed","conversation.changed","membership.changed","plugin.changed"]},"subjectId":{"$ref":"#/$defs/Id"},"revision":{"$ref":"#/$defs/PositiveSeq"}}},
++    "UserPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","events","nextCursor","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.page"},"requestId":{"$ref":"#/$defs/Id"},"events":{"type":"array","items":{"$ref":"#/$defs/UserEvent"}},"nextCursor":{"$ref":"#/$defs/Cursor"},"hasMore":{"type":"boolean"}}},
++    "ConversationRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","afterSeq","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.request"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"afterSeq":{"$ref":"#/$defs/Seq"},"limit":{"type":"integer","minimum":1}}},
++    "Message": {"type":"object","additionalProperties":false,"required":["conversationId","seq","messageId","senderId","requestId","createdAt","content"],"properties":{"conversationId":{"$ref":"#/$defs/Id"},"seq":{"$ref":"#/$defs/PositiveSeq"},"messageId":{"$ref":"#/$defs/Id"},"senderId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"},"createdAt":{"type":"string","format":"date-time"},"content":{"type":"object","additionalProperties":false,"required":["kind","text"],"properties":{"kind":{"const":"TEXT"},"text":{"type":"string","minLength":1,"maxLength":4096}}}}},
++    "ConversationPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","messages","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.page"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"messages":{"type":"array","items":{"$ref":"#/$defs/Message"}},"hasMore":{"type":"boolean"}}}
++  }
++}
+diff --git a/research/prompts/LOOP1-CONTRACT-003-implementation.txt b/research/prompts/LOOP1-CONTRACT-003-implementation.txt
+new file mode 100644
+index 0000000..b23e0e7
+--- /dev/null
++++ b/research/prompts/LOOP1-CONTRACT-003-implementation.txt
+@@ -0,0 +1,2 @@
++Task: LOOP1-CONTRACT-003 implementation, 2026-09-28.
++Implement canonical machine-verifiable Sync and Plugin API v1 contracts plus deterministic Go/Java positive and negative fixtures and verifier, covering SP-A-001 through SP-A-013, in isolated branch task/LOOP1-CONTRACT-003. Follow AGENTS.md startup, architecture and allowed paths. Use task-linked Recorder prospective run, verify, commit clean candidate, update Task Spec and current progress with durable development evidence. Do not self-accept or move to done. Preserve unrelated work in original checkout.
+diff --git a/research/prompts/P-e3c27030-ff25-4817-b0ce-df92e75f741e/metadata.json b/research/prompts/P-e3c27030-ff25-4817-b0ce-df92e75f741e/metadata.json
+new file mode 100644
+index 0000000..3c23898
+--- /dev/null
++++ b/research/prompts/P-e3c27030-ff25-4817-b0ce-df92e75f741e/metadata.json
+@@ -0,0 +1,13 @@
++{
++  "associated_run_id": "R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae",
++  "prompt_capture": "full",
++  "prompt_id": "P-e3c27030-ff25-4817-b0ce-df92e75f741e",
++  "prompt_sha256": "144a4f0dc76ce9f00212457dc4fa9706e1e6d71a1b8421f681205a1b64175d59",
++  "prompt_source": "human",
++  "recorder_schema_version": "1.0.0",
++  "registered_at": "2026-09-28T10:30:17.522600Z",
++  "secret_redaction_applied": false,
++  "system_prompt_capture": "unavailable",
++  "task_id": "LOOP1-CONTRACT-003",
++  "template_version": "unavailable"
++}
+diff --git a/research/prompts/P-e3c27030-ff25-4817-b0ce-df92e75f741e/prompt.txt b/research/prompts/P-e3c27030-ff25-4817-b0ce-df92e75f741e/prompt.txt
+new file mode 100644
+index 0000000..b23e0e7
+--- /dev/null
++++ b/research/prompts/P-e3c27030-ff25-4817-b0ce-df92e75f741e/prompt.txt
+@@ -0,0 +1,2 @@
++Task: LOOP1-CONTRACT-003 implementation, 2026-09-28.
++Implement canonical machine-verifiable Sync and Plugin API v1 contracts plus deterministic Go/Java positive and negative fixtures and verifier, covering SP-A-001 through SP-A-013, in isolated branch task/LOOP1-CONTRACT-003. Follow AGENTS.md startup, architecture and allowed paths. Use task-linked Recorder prospective run, verify, commit clean candidate, update Task Spec and current progress with durable development evidence. Do not self-accept or move to done. Preserve unrelated work in original checkout.
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 16d3ffd..af6bc67 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: active
+ 
+ ## Current Contract Work
+ 
++- Fresh Implementation Agent `/root/contract003_impl` completed the Contract 003 candidate in isolated branch `task/LOOP1-CONTRACT-003`: canonical Sync v1 and Plugin API v1 schemas, permission/limit/lifecycle policy, and 79 shared Go/Java golden cases covering SP-A-001..013. The final recorded schema/fixture verifier passed with exit 0; CTRL-002 Development passed with exit 0. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The task remains `active` pending fresh independent review; S0 Gate NOT YET PASSED.
+ - Contract 003 activation Recorder run `R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df` finished and validated PASS (8 events). `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0 in 1057.2144 ms; this is recovery evidence, not acceptance. The exact activation commands and initial failed recovery attempt are recorded in the run.
+ - `LOOP1-CONTRACT-003` was selected by dependency satisfaction after clean local-main Contract 002 closure `eb9ebea` passed WSS, CTRL-002 Acceptance, and Recorder repository validation. Its exact Task Spec is now active in branch `task/LOOP1-CONTRACT-003`. Scope: machine-verifiable Sync and Plugin API v1 contracts and duplicate/out-of-order/gap/permission fixtures. S0 Gate NOT YET PASSED.
+ - `LOOP1-CONTRACT-002` is independently accepted and locally integrated. Fresh portability Review PASS covers clean checkouts with both `core.autocrlf` settings. Local `main` at `fb789509bb9d28dc224b0b1a623a65478f7b7ebc` needed one refresh of its previously converted clean fixture from the exact committed blob. It then passed WSS, frozen architecture, and clean CTRL-002 Acceptance. Integration Recorder run `R-20260928T093047Z-78a476e3-1352-4f6b-844b-e06cf8a75bfb`; closure evidence `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-acceptance-closure.md`. Task is `done`; S0 Gate NOT YET PASSED.
+@@ -211,7 +212,7 @@ Current Task State: active
+ 
+ ## Next Exact Action
+ 
+-Register task-linked Recorder instrumentation and delegate a fresh Contract 003 Implementation Agent; then run a fresh independent review and repair cycle until accepted. S0 Gate remains NOT YET PASSED.
++Delegate a fresh independent Review Agent for the exact clean Contract 003 candidate commit. Audit canonical schema/policy and all SP-A-001..013 fixture assertions with negative mutations; run clean detached CTRL-002 Acceptance under ADR-0001. On FAIL, delegate a fresh Fix Agent and another fresh Reviewer. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -223,7 +224,8 @@ Register task-linked Recorder instrumentation and delegate a fresh Contract 003
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-- Coordinator `/root` owns only Contract 003 queue activation, Task Spec/current recovery updates, and task-linked Recorder artifacts until committed. No Contract 003 product file has changed.
++- Fresh Implementation Agent `/root/contract003_impl` owns only Contract 003 allowed-path contract/fixture files, task/current handoff, development evidence, and task-linked Recorder artifacts until the clean candidate commit. After the commit it owns no uncommitted changes. The original `H:\IM-platform` untracked HTTP schema-lint directory remains solely owned by the paused Agent and untouched.
++- Coordinator `/root` completed Contract 003 queue activation in the clean activation commit; Implementation Agent ownership of the candidate is recorded above.
+ - Coordinator `/root` owns only Contract 002 closure evidence, queue/progress transition, checkpoint, and task-linked Recorder artifacts until committed. Local `main` is clean; the original checkout's unrelated untracked HTTP schema-lint directory remains under its paused Agent's ownership and untouched.
+ - Fresh independent Reviewer `/root/contract002_portability_review` owns only task-linked PASS evidence, byte-integrity audit, task/current recovery updates, and linked Recorder artifacts until the review closure commit. No product file was edited. The separate detached Acceptance checkout remains clean.
+ 
+diff --git a/spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md b/spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md
+new file mode 100644
+index 0000000..51ab28e
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md
+@@ -0,0 +1,12 @@
++# LOOP1-CONTRACT-003 implementation development evidence
++
++- Branch: `task/LOOP1-CONTRACT-003`; activation base: `2b329ef` (local-main contract base `eb9ebea`). Candidate SHA is recorded in the implementation handoff after commit.
++- Agent: fresh Implementation Agent `/root/contract003_impl`, the sole writer for this implementation. This is development evidence and does not assert independent acceptance.
++- Frozen Markdown SHA-256: `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`, matching `spec/architecture/baseline.md`; retained PDF SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`, also matching the manifest.
++- Recorder prompt `P-e3c27030-ff25-4817-b0ce-df92e75f741e`; prospective implementation run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The run was started before baseline verification or implementation edits; command timing and output hashes are in its event stream.
++- `python contracts/fixtures/sync-plugin/generate.py`: exit 0, 66.1184 ms on the final recorded generation, wrote 79 shared cases. The generator emits LF bytes and the fixture-local `golden.json -text` rule preserves those bytes across Git checkout settings.
++- `python contracts/plugin-api/verify.py`: exit 0, 118.3817 ms on the final recorded verification. PASS: Sync/Plugin v1 schemas, 79 shared Go/Java cases (22 positive, 57 negative), all SP-A-001..013, two mutation controls. Prior intermediate runs also passed and remain in the Recorder.
++- `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`: exit 0, 1039.2365 ms on the final recorded run. This is a dirty-worktree recovery check, not independent acceptance.
++- Contract files: `contracts/websocket/sync-v1.schema.json`, `contracts/plugin-api/v1.schema.json`, `contracts/plugin-api/policy-v1.json`, `contracts/plugin-api/README.md`, `contracts/plugin-api/verify.py`, and `contracts/fixtures/sync-plugin/`. No existing public contract or Frozen Architecture file changed.
++- Known limitation: fixture execution is a deterministic contract oracle. Real Go and Java profiles, client SQLite transactions, WASM and renderer sandboxes, and installed CI do not yet exist at S0. The future profile and runtime implementations must execute the same golden vectors and enforce the declared boundaries. Fresh independent review must challenge the verifier and canonical choices before acceptance.
++- Next action: independent clean-checkout review under ADR-0001, including negative mutation probes and CTRL-002 Acceptance, then Coordinator closure only on PASS.
+diff --git a/spec/tasks/active/LOOP1-CONTRACT-003.md b/spec/tasks/active/LOOP1-CONTRACT-003.md
+index 8eae17c..d452ab7 100644
+--- a/spec/tasks/active/LOOP1-CONTRACT-003.md
++++ b/spec/tasks/active/LOOP1-CONTRACT-003.md
+@@ -59,13 +59,14 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Evidence
+ 
++- Fresh Implementation Agent `/root/contract003_impl` added canonical Sync v1 and Plugin API v1 schemas, a machine-readable permission/limit/lifecycle policy, and deterministic shared Go/Java fixtures. Its verifier checks schema structure and values, exact expected outcomes for 79 cases (22 positive, 57 negative), and acceptance IDs SP-A-001 through SP-A-013. It also checks fixture source consistency and two malformed/outcome mutation controls. Development command `python contracts/plugin-api/verify.py` passed with exit 0 (118.3817 ms for the final recorded run). `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0 (1039.2365 ms for the final recorded run). These are development results, not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`.
+ - Dependencies `LOOP1-CONTRACT-002` and `LOOP1-SPEC-001` are independently accepted and `done` on clean local `main` at `eb9ebea`. Frozen architecture, WSS, CTRL-002 Acceptance, and Recorder repository checks passed on that checkout before activation. S0 Gate remains NOT YET PASSED.
+ - Activation Recorder run `R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df` finished and validated PASS with 8 events. The current checkout's `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0; this is recovery evidence, not Task acceptance.
+ 
+ # Handoff
+ 
+-- Coordinator activated the dependency-satisfied task in a clean isolated branch `task/LOOP1-CONTRACT-003` from local `main` at `eb9ebea`. Implementation, review, and acceptance remain pending.
++- Implementation is complete in isolated branch `task/LOOP1-CONTRACT-003`; the task remains active pending a fresh independent reviewer and clean-checkout acceptance. No Frozen Architecture, approved ADR, existing HTTP/WSS contract, public ACK semantics, or product runtime was changed. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
+ 
+ # Next Action
+ 
+-- Register and start the task-linked Research Recorder run; delegate a fresh Implementation Agent for canonical Sync and Plugin API v1 contracts and deterministic fixtures within allowed paths. Then request a fresh independent Review Agent under ADR-0001.
++- Coordinator delegates a fresh independent Review Agent to audit the exact clean candidate commit, challenge schemas and fixture oracle with negative mutations, run a clean detached CTRL-002 Acceptance check under ADR-0001, and record independent PASS or FAIL. On FAIL, retain unfinished state and delegate a fresh Fix Agent.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-08688842-b67f-4071-9b7b-b0c4c092fef1.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-08688842-b67f-4071-9b7b-b0c4c092fef1.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-1918b456-265a-4c56-90d1-f48077a5f9d6.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-1918b456-265a-4c56-90d1-f48077a5f9d6.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-3ea524d0-5ae6-435f-a887-fbadb9d3ac65.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-3ea524d0-5ae6-435f-a887-fbadb9d3ac65.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-69822ee0-9d18-4389-be92-348d9b937214.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-69822ee0-9d18-4389-be92-348d9b937214.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-6bdd6cbe-024c-4bab-9a78-9a112e467283.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-6bdd6cbe-024c-4bab-9a78-9a112e467283.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-76fc2f44-1095-4769-8c9b-1e9a6c41799a.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-76fc2f44-1095-4769-8c9b-1e9a6c41799a.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-8ac90535-5fba-46f3-8f03-d1ffdd9054c0.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-8ac90535-5fba-46f3-8f03-d1ffdd9054c0.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-ad0db87a-f5d2-4ef6-8621-d6f4599b8d1c.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-ad0db87a-f5d2-4ef6-8621-d6f4599b8d1c.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-bc5c58c7-3262-4bc6-a348-9ebc9008fe9b.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-bc5c58c7-3262-4bc6-a348-9ebc9008fe9b.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-bdcf57bf-4b7b-46e6-8653-3eec577517e6.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-bdcf57bf-4b7b-46e6-8653-3eec577517e6.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-bf2cd43c-3b19-4573-9f45-e12343088f8c.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-bf2cd43c-3b19-4573-9f45-e12343088f8c.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-f2148d02-4a0f-4d36-b462-174bf597245a.stderr.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/blobs/C-f2148d02-4a0f-4d36-b462-174bf597245a.stdout.txt
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/events.jsonl
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/initial_state.json
+# ?? research/runs/R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae/metadata.json

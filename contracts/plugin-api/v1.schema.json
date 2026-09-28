@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/plugin-api/v1.schema.json",
+  "title": "Plugin API v1 public contract",
+  "description": "All calls pass through an authorized Host bridge. No direct Core, database, server-file, arbitrary-network, OS, or other-plugin-memory access is exposed.",
+  "oneOf": [
+    {"$ref":"#/$defs/Manifest"},{"$ref":"#/$defs/EventSubscription"},
+    {"$ref":"#/$defs/Query"},{"$ref":"#/$defs/Action"},
+    {"$ref":"#/$defs/UIHost"},{"$ref":"#/$defs/Artifact"}
+  ],
+  "$defs": {
+    "Id":{"type":"string","format":"uuid"},
+    "Hash":{"type":"string","minLength":64,"maxLength":64},
+    "Manifest":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","capabilities","permissions","backendEntry","rendererEntry"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"manifest"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"capabilities":{"type":"array","uniqueItems":true,"items":{"enum":["events","queries","actions","ui"]}},"permissions":{"type":"array","uniqueItems":true,"items":{"enum":["event.message.created","event.member.joined","event.plugin.lifecycle","query.conversation","query.members","query.messages","query.friendship","action.send_message","action.plugin_state","action.ui","ui.page","ui.modal","ui.panel","ui.menu","ui.form","ui.toolbar","ui.message_renderer"]}},"backendEntry":{"type":"string","minLength":1},"rendererEntry":{"type":"string","minLength":1}}},
+    "EventSubscription":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","event"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"event.subscribe"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"event":{"enum":["message.created","member.joined","plugin.lifecycle"]}}},
+    "Query":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","query","conversationId","pageSize","pageToken"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"query"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"query":{"enum":["conversation","members","messages","friendship"]},"conversationId":{"$ref":"#/$defs/Id"},"pageSize":{"type":"integer","minimum":1},"pageToken":{"type":"string"}}},
+    "Action":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","action","conversationId","requestId"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"action"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"action":{"enum":["send_message","plugin_state","ui"]},"conversationId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"}}},
+    "UIHost":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","slot"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"ui.host"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"slot":{"enum":["page","modal","panel","menu","form","toolbar","message_renderer"]}}},
+    "Artifact":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","packageHash","backendHash","rendererHash","signature","manifestValid","compatible","permissionsApproved","resourceSizeOk","cspValid","entryPointValid","sandbox"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"artifact"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"packageHash":{"$ref":"#/$defs/Hash"},"backendHash":{"$ref":"#/$defs/Hash"},"rendererHash":{"$ref":"#/$defs/Hash"},"signature":{"type":"string","minLength":1},"manifestValid":{"type":"boolean"},"compatible":{"type":"boolean"},"permissionsApproved":{"type":"boolean"},"resourceSizeOk":{"type":"boolean"},"cspValid":{"type":"boolean"},"entryPointValid":{"type":"boolean"},"sandbox":{"enum":["iframe","isolated_webview"]}}}
+  }
+}

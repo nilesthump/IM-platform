@@ -1,0 +1,12 @@
+# LOOP1-CONTRACT-003 implementation development evidence
+
+- Branch: `task/LOOP1-CONTRACT-003`; activation base: `2b329ef` (local-main contract base `eb9ebea`). Candidate SHA is recorded in the implementation handoff after commit.
+- Agent: fresh Implementation Agent `/root/contract003_impl`, the sole writer for this implementation. This is development evidence and does not assert independent acceptance.
+- Frozen Markdown SHA-256: `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`, matching `spec/architecture/baseline.md`; retained PDF SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`, also matching the manifest.
+- Recorder prompt `P-e3c27030-ff25-4817-b0ce-df92e75f741e`; prospective implementation run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The run was started before baseline verification or implementation edits; command timing and output hashes are in its event stream.
+- `python contracts/fixtures/sync-plugin/generate.py`: exit 0, 66.1184 ms on the final recorded generation, wrote 79 shared cases. The generator emits LF bytes and the fixture-local `golden.json -text` rule preserves those bytes across Git checkout settings.
+- `python contracts/plugin-api/verify.py`: exit 0, 118.3817 ms on the final recorded verification. PASS: Sync/Plugin v1 schemas, 79 shared Go/Java cases (22 positive, 57 negative), all SP-A-001..013, two mutation controls. Prior intermediate runs also passed and remain in the Recorder.
+- `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`: exit 0, 1039.2365 ms on the final recorded run. This is a dirty-worktree recovery check, not independent acceptance.
+- Contract files: `contracts/websocket/sync-v1.schema.json`, `contracts/plugin-api/v1.schema.json`, `contracts/plugin-api/policy-v1.json`, `contracts/plugin-api/README.md`, `contracts/plugin-api/verify.py`, and `contracts/fixtures/sync-plugin/`. No existing public contract or Frozen Architecture file changed.
+- Known limitation: fixture execution is a deterministic contract oracle. Real Go and Java profiles, client SQLite transactions, WASM and renderer sandboxes, and installed CI do not yet exist at S0. The future profile and runtime implementations must execute the same golden vectors and enforce the declared boundaries. Fresh independent review must challenge the verifier and canonical choices before acceptance.
+- Next action: independent clean-checkout review under ADR-0001, including negative mutation probes and CTRL-002 Acceptance, then Coordinator closure only on PASS.
