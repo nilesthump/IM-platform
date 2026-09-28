@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-INFRA-001
 title: Establish Compose, PostgreSQL, NATS, and TLS proxy skeleton
-status: review
-owner: /root
+status: done
+owner: /root/infra001_review1
 stage: S0
 gate: S0
 ---
@@ -61,4 +61,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator: record accepted closure, move this exact task from `review` to `done`, preserve independent acceptance evidence, and select the next dependency-satisfied task. No product repair is pending.
+- Coordinator: integrate the accepted Infra closure into clean local `main`, recheck the resulting tree, and activate the next dependency-satisfied S0 task (`LOOP1-CI-001`). S0 Gate is not yet passed.

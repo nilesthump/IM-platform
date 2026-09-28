@@ -1,0 +1,132 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 78ebef2..24fcbe7 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -12,11 +12,11 @@ Current Batch: LOOP1-S0
+ 
+ Current Task: LOOP1-INFRA-001
+ 
+-Current Task State: review
++Current Task State: done
+ 
+ ## Current Contract Work
+ 
+-- Fresh independent Reviewer `/root/infra001_review1` passed Infra 001 candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean detached handoff checkout `c9a3345`: Go and Java profile smokes each passed PostgreSQL migration, Core NATS, HTTPS health, and WSS Upgrade through Caddy TLS 1.3. Frozen hashes, implementation Recorder integrity, profile isolation/port-exposure probe, and detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task remains `review` for Coordinator closure; S0 Gate NOT YET PASSED.
++- Fresh independent Reviewer `/root/infra001_review1` passed Infra 001 candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean detached handoff checkout `c9a3345`: Go and Java profile smokes each passed PostgreSQL migration, Core NATS, HTTPS health, and WSS Upgrade through Caddy TLS 1.3. Frozen hashes, implementation Recorder integrity, profile isolation/port-exposure probe, and detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task is `done` after Coordinator closure; S0 Gate NOT YET PASSED.
+ - Fresh `LOOP1-INFRA-001` Implementation Agent completed a task-scoped Compose skeleton with separate Go/Java profiles, PostgreSQL, Core NATS, canonical migration, and Caddy TLS proxy. Both disposable profile smokes passed real HTTPS and WSS Upgrade through TLS 1.3, plus migration and NATS checks; frozen architecture and CTRL-002 Development passed. Development evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. Task is `review`; independent clean-checkout acceptance is pending. S0 Gate NOT YET PASSED.
+ - `LOOP1-INFRA-001` is `active` on isolated branch `task/LOOP1-INFRA-001` from accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. DB dependency is independently accepted and `done`; infrastructure product work awaits a fresh Implementation Agent. Frozen architecture and CTRL-002 Development passed after correcting the DB integration handoff's abbreviated Last Known Good Commit. Docker Compose v5.1.4 is available. Activation Recorder `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` validated PASS; details at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. S0 Gate NOT YET PASSED.
+ - `LOOP1-DB-001` accepted closure is integrated on clean local `main` at `016f429`. Post-integration PostgreSQL 16 tests passed 3/3, frozen architecture and CTRL-002 Acceptance passed, and committed Recorder repository artifacts validated. Integration Recorder `R-20260928T180300Z-e2553a57-4a18-4214-a83f-0c04f4859b5a` validated PASS; exact evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-main-integration.md`. The disposable DB test container was stopped. S0 Gate NOT YET PASSED.
+@@ -29,7 +29,7 @@ Current Task State: review
+ - `LOOP1-DB-001` is active in isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`; all three Contract dependencies are independently accepted and done. Scope: canonical PostgreSQL schema, application-independent migration runner, uniqueness and forward/rollback tests. S0 Gate NOT YET PASSED.
+ - Clean local `main` fast-forwarded to Contract 003 accepted closure `7faadd75b4e195e6b8e8ba8e08f635a18036d497`. Post-integration Contract 003, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository checks passed; `main` stayed clean. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-main-integration.md`; prospective Recorder run `R-20260928T151354Z-d20e8aaa-1145-4e22-bec1-b0a4279824e6` finished and validated. S0 Gate NOT YET PASSED.
+ - `LOOP1-CONTRACT-003` is `done` after fresh independent Review 3 PASS at exact clean candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623`. ADR-0001 Acceptance, 79 cases/16 controls, all 16 independent negative probes across three review cycles, frozen hashes, allowed-path scope, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md` and `2026-09-28-acceptance-closure.md`; checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-contract-003-accepted.md`. S0 Gate NOT YET PASSED.
+-- Fresh independent Review Agent `/root/contract003_review3` accepted clean Fix 2 candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623` under ADR-0001. Schema/fixture verifier passed 79 cases/16 controls; Review 1, Review 2, and seven fresh invalid mutations all rejected; frozen hashes, scope, Fix 2 Recorder, and clean detached CTRL-002 Acceptance passed. SP-A-012's S0 static profile artifacts are expected contract vectors, with backend runtime parity reserved for S3. Task remains `review` for Coordinator closure; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md`; Recorder run `R-20260928T141143Z-0bf14a8e-dc44-4222-8830-64a84237e98e`.
++- Fresh independent Review Agent `/root/contract003_review3` accepted clean Fix 2 candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623` under ADR-0001. Schema/fixture verifier passed 79 cases/16 controls; Review 1, Review 2, and seven fresh invalid mutations all rejected; frozen hashes, scope, Fix 2 Recorder, and clean detached CTRL-002 Acceptance passed. SP-A-012's S0 static profile artifacts are expected contract vectors, with backend runtime parity reserved for S3. Task is `done` after Coordinator closure; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md`; Recorder run `R-20260928T141143Z-0bf14a8e-dc44-4222-8830-64a84237e98e`.
+ - Fresh Fix Agent `/root/contract003_fix2` repaired Review 2's two concrete findings in the isolated Contract 003 checkout. The FAILED local item and SENT convergence are observed at each step with one local item; Query v1 has bounded `query.page` responses and linked read-only pagination fixtures. Verifier passes 79 cases/16 controls; Review 1 and Review 2 probes reject all 7 and 2 invalid mutations; CTRL-002 Development passes. Independent acceptance is pending, and SP-A-012 S0 static-vector interpretation remains unresolved. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix2-development.md`; Recorder run `R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c`. Task remains `review`; S0 Gate NOT YET PASSED.
+ - Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b1`: seven prior probes, baseline verifier, frozen hashes, Fix Recorder integrity and detached CTRL-002 Acceptance passed, but two new mutations were accepted. The SP-A-002 case does not observe a prior FAILED item; the SP-A-006 Query contract/fixture does not model a page response. Static Go/Java vector interpretation for SP-A-012 remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
+ - Fresh Fix Agent `/root/contract003_fix1` repaired the Contract 003 fixture oracle after independent Review 1 FAIL. Staged rollback/retry and gap checkpoints, full Message identity checks, per-attempt Action audit, and ordered upgrade trace now reject all seven committed reviewer mutations. The task verifier passes 79 cases and 11 controls; CTRL-002 Development passes. Distinct Go/Java static normalized contract-vector files now receive separate comparison, but neither is a backend execution result; fresh independent review must decide whether these satisfy SP-A-012 at S0 contract freeze. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`.
+@@ -238,15 +238,15 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Coordinator: accept independently reviewed Infra 001, move the exact task from `review` to `done`, record closure and recovery, then select the next dependency-satisfied task. S0 Gate remains NOT YET PASSED.
++Coordinator: integrate accepted Infra 001 into clean local `main`, verify the integrated tree, then activate dependency-satisfied `LOOP1-CI-001`. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+-`3e4d0f3cb3030731345288f677d2048d72651fd5` (independently accepted DB closure and post-integration evidence on clean local `main`; Infra candidate now has independent review PASS but awaits accepted closure and integration).
++`cc9db714d50d6d05aa34e52ee1ef21dff2741ad7` (clean independently reviewed Infra branch; integration into local `main` remains pending).
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-09-29-loop1-db-001-accepted.md` (accepted PostgreSQL migration/schema transition, integrated and verified on clean local `main`).
++`spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md` (independently accepted Infra skeleton; local `main` integration pending).
+ 
+ ## Uncommitted Changes / Ownership
+ 
+diff --git a/spec/tasks/review/LOOP1-INFRA-001.md b/spec/tasks/review/LOOP1-INFRA-001.md
+deleted file mode 100644
+index c81c632..0000000
+--- a/spec/tasks/review/LOOP1-INFRA-001.md
++++ /dev/null
+@@ -1,64 +0,0 @@
+----
+-task_id: LOOP1-INFRA-001
+-title: Establish Compose, PostgreSQL, NATS, and TLS proxy skeleton
+-status: review
+-owner: /root
+-stage: S0
+-gate: S0
+----
+-
+-# Goal
+-
+-Create the Go/Java profile Compose skeleton with shared PostgreSQL, Core NATS, and a real TLS entrypoint.
+-
+-# Inputs
+-
+-- Architecture Baseline v1.0 chapters 1, 3, 5, 7, 11, 15, 19 and appendix A, resolved through `spec/architecture/README.md` and its canonical Markdown manifest. Apply approved ADRs.
+-- Canonical contracts and database migration runner.
+-
+-# Dependencies
+-
+-- LOOP1-DB-001 done.
+-
+-# Allowed Paths
+-
+-- `deploy/**`
+-- Non-business profile placeholders under `backend/go/**` and `backend/java/**`
+-- Infrastructure smoke tests under `tests/**`
+-- `spec/tasks/**/LOOP1-INFRA-001.md`
+-- `spec/progress/current.md`
+-
+-The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOOP1-INFRA-001/**`, accepted checkpoint `spec/progress/checkpoints/*loop1-infra-001*.md`, and this task's `research/prompts/**` and `research/runs/**` artifacts for instrumentation, review, and handoff only. These paths do not authorize product-scope expansion.
+-
+-# Acceptance
+-
+-- A clean checkout can start each backend profile separately with PostgreSQL, NATS, and TLS proxy.
+-- Smoke checks traverse the real TLS entrypoint.
+-
+-# Forbidden
+-
+-- Implement product business modules.
+-- Mix Go and Java profiles in one runtime profile.
+-- Introduce Redis, Kafka, Kubernetes, or other unapproved infrastructure.
+-
+-# Verification
+-
+-- Run clean-checkout Compose configuration and profile smoke verification.
+-- Run `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development; Acceptance must run only from a clean committed independent checkout.
+-
+-# Evidence
+-
+-- Fresh independent Review 1 PASS: clean detached `c9a33450c817dfe174b4113ae3431bc8326d5b3e` checkout accepted product candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` under ADR-0001. Both Go and Java profile smokes traversed Caddy TLS 1.3 and verified migration, NATS, HTTPS health, and WSS Upgrade. Frozen hashes, implementation Recorder integrity, profile isolation/public-port negative probe, and detached CTRL-002 Acceptance passed. Exact commands, exit codes, elapsed times, clean state, diff ranges, and review limitations are at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task remains `review` for Coordinator closure.
+-- Implementation development: separate Go and Java Compose profiles each started PostgreSQL 16, Core NATS, canonical migration, three non-business backend units, and a Caddy TLS proxy in disposable isolated projects. Both profile smokes passed real HTTPS health and WebSocket Upgrade over TLS 1.3. Frozen architecture hash and CTRL-002 Development passed. See `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md` and Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. These are implementation evidence only; fresh independent clean-checkout review is required.
+-- Activation prompt `P-cf192254-2cdd-4cd1-9944-79cb3708fadc`, Recorder run `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` finished and validated PASS (10 events). CTRL-002 Development recovered task in `active`; frozen architecture hashes passed; Docker Compose v5.1.4 is available. Pre-run activation steps and the corrected stale abbreviated commit are disclosed at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. This is not independent acceptance.
+-- Dependency `LOOP1-DB-001` is independently accepted and `done` at clean local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`; post-integration PostgreSQL tests, frozen hashes, CTRL-002 Acceptance, and Recorder repository validation passed. S0 Gate remains NOT YET PASSED.
+-
+-# Handoff
+-
+-- Fresh independent Reviewer `/root/infra001_review1` owns only task-linked PASS evidence, task/current recovery, prompt and Recorder artifacts until committed. It changed no product file. Separate detached Acceptance checkout remained clean at `c9a3345`; original `H:\IM-platform` untracked schema-lint tree was untouched.
+-- Fresh Implementation Agent `/root/infra001_impl` owns only the allowed Compose/TLS skeleton, Go/Java non-business placeholders, infrastructure smoke, task/current updates, development evidence, and task-linked Recorder artifacts through the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint tree was untouched.
+-- Coordinator `/root` activated on isolated branch `task/LOOP1-INFRA-001` from clean accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. Fresh Implementation Agent to take product work after activation handoff. No product infrastructure file changed at activation; Coordinator owns only this task/current/evidence/Recorder activation set until committed. Original checkout's untracked `contracts/http/schema-lint` remains under a paused Agent's sole ownership and untouched.
+-
+-# Next Action
+-
+-- Coordinator: record accepted closure, move this exact task from `review` to `done`, preserve independent acceptance evidence, and select the next dependency-satisfied task. No product repair is pending.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-6d27c46d-ab90-450f-a63b-a313056979a4/metadata.json
+# ?? research/prompts/P-6d27c46d-ab90-450f-a63b-a313056979a4/prompt.txt
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/blobs/C-16175436-6a7d-4880-b518-10196cb902d0.stderr.txt
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/blobs/C-16175436-6a7d-4880-b518-10196cb902d0.stdout.txt
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/blobs/C-2fb99f30-275c-4324-b37c-df16ea60b320.stderr.txt
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/blobs/C-2fb99f30-275c-4324-b37c-df16ea60b320.stdout.txt
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/blobs/C-c58279cb-0119-43bc-adb1-43986ee72ed2.stderr.txt
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/blobs/C-c58279cb-0119-43bc-adb1-43986ee72ed2.stdout.txt
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/events.jsonl
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/initial_state.json
+# ?? research/runs/R-20260928T192313Z-a95e52d0-488a-477e-a449-bd15d30961c8/metadata.json
+# ?? spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md
+# ?? spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-acceptance-closure.md
+# ?? spec/tasks/done/LOOP1-INFRA-001.md
