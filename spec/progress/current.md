@@ -33,6 +33,8 @@ Current Task State: review
 
 - Fresh Fix Agent `/root/contract002_fix5` asserted that out-of-order seq 2/1 events belong to one Conversation and added a permanent cross-Conversation mutation. WSS verification passed with 11 schema/25 behavior controls, prior 12/24/9 probes and Review 5's focused probe all rejected invalid mutations, CTRL-002 Development and scope/diff checks passed. Canonical schema/fixtures unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-cross-conversation-fix-development.md`; Recorder run `R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb`. Task remains `review` for fresh independent review; S0 Gate NOT YET PASSED.
 
+- Fresh independent Review Agent `/root/contract002_review6` rejected clean candidate `dfc31e5`: the verifier accepts two different Messages/sequences under one sender/Conversation/request identity; a separate in-memory schema type mutation also passed lint. Baseline, prior probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 5 Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review6-dfc31e5-fail.md`; Recorder run `R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a`. Task stays `review`; S0 Gate NOT YET PASSED.
+
 ## Authorized Frozen Architecture Representation Migration
 
 - Human Architect explicitly authorized `LOOP1-ARCHDOC-001`, a governance-only canonical-source migration from the immutable PDF to Markdown. The source PDF SHA-256 before candidate work is `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
@@ -198,7 +200,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-A different fresh independent Reviewer checks the clean Fix 5 candidate, including the cross-Conversation probe and clean-checkout Acceptance. S0 Gate remains NOT YET PASSED.
+A fresh Fix Agent repairs Review 6 idempotency and schema-lint findings, then a different fresh Reviewer checks a clean candidate. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
