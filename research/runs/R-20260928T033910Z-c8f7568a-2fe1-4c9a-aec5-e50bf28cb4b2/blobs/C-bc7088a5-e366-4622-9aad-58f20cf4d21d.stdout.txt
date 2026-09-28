@@ -1,0 +1,25 @@
+REJECT bind-wrong-user: bind-valid-session: bound identity, client, or epoch mismatch
+REJECT bind-wrong-epoch: bind-valid-session: bound identity, client, or epoch mismatch
+REJECT durable-missing-created: durable-send-and-created: expected committed ACK and created event
+REJECT durable-ack-wrong-seq: durable-send-and-created: ACK conversation or first sequence mismatch
+REJECT durable-created-wrong-message: durable-send-and-created: created event differs from committed ACK
+REJECT durable-zero-persistence: durable-send-and-created: declared state differs from required outcome
+REJECT durable-no-seq-allocation: durable-send-and-created: transaction timeline differs from required outcome
+ACCEPT INVALID retry-stable-wrong-ack
+REJECT retry-duplicate-persistence: idempotent-retry: declared state differs from required outcome
+REJECT cross-conversation-wrong-ack: same-request-different-conversation: ACK conversation mismatch
+REJECT group-duplicate-message: group-single-message: declared state differs from required outcome
+REJECT duplicate-fanout-double-materialization: duplicate-fanout: declared state differs from required outcome
+REJECT out-of-order-permanent-gap: out-of-order-fanout: declared state differs from required outcome
+REJECT ping-before-bind-authenticated: ping-before-bind: declared state differs from required outcome
+REJECT ping-no-pong: ping-before-bind: expected one pong
+REJECT preauth-wrong-rejection-code: unauthenticated-send: rejection code mismatch
+REJECT nonmember-wrong-rejection-code: non-member-send: rejection code mismatch
+REJECT rollback-persisted-message: rollback-before-ack: declared state differs from required outcome
+REJECT conflicting-retry-false-outcome: conflicting-retry: declared state differs from required outcome
+REJECT expired-token-wrong-rejection: invalid bind must emit its rejection
+REJECT wrong-client-type-wrong-rejection: invalid bind must emit its rejection
+REJECT invalid-signature-wrong-rejection: invalid bind must emit its rejection
+REJECT wrong-conversation-false-expected-flag: wrong-conversation-fanout: declared state differs from required outcome
+REJECT revoked-persisted-message: revoked-socket: declared state differs from required outcome
+REJECTED 23/24 independent invalid mutations

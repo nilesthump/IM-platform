@@ -174,6 +174,136 @@ def fixtures():
     return {"fixtureVersion": "1.0", "contractVersion": "1.0", "profiles": ["go", "java"], "scenarios": scenarios}
 
 
+# These are the normative outcomes of the named contract cases, independent of
+# the fixture generator and its checked-in serialization. In particular, an
+# expected count or flag cannot be changed to excuse a bad frame or timeline.
+OUTCOMES = {
+    "bind-valid-session": {"socket": "AUTHENTICATED", "messages": 0, "outbox": 0},
+    "durable-send-and-created": {"messages": 1, "outbox": 1, "seq": [1], "ackAfterCommit": True, "wrongConversationDelivery": False},
+    "idempotent-retry": {"messages": 1, "outbox": 1, "seq": [1], "stableAck": True},
+    "same-request-different-conversation": {"messages": 2, "outbox": 2, "messageIdsGloballyUnique": True, "conversationSeq": {C1: [1], C2: [1]}},
+    "group-single-message": {"messages": 1, "outbox": 1, "localFanoutIndependent": True},
+    "duplicate-fanout": {"messages": 1, "outbox": 1, "clientMaterializations": 1, "syncProvidesEventualCompleteness": True},
+    "out-of-order-fanout": {"messages": 2, "outbox": 2, "clientMaterializations": 2, "contiguousSeqAfterSync": 2, "permanentSeqGap": False},
+    "ping-before-bind": {"socket": "UNAUTHENTICATED"},
+    "unauthenticated-send": {"messages": 0, "outbox": 0, "successAck": False},
+    "non-member-send": {"messages": 0, "outbox": 0, "successAck": False},
+    "rollback-before-ack": {"messages": 0, "outbox": 0, "seq": [], "successAck": False},
+    "conflicting-retry": {"messages": 1, "outbox": 1, "seq": [1], "secondSuccessAck": False},
+    "stale-epoch-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
+    "expired-token-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
+    "wrong-client-type-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
+    "invalid-signature-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
+    "wrong-conversation-fanout": {"messages": 1, "outbox": 1, "clientMaterializations": 0, "wrongConversationDelivery": False},
+    "revoked-socket": {"socket": "CLOSED", "messages": 0, "outbox": 0, "successAck": False},
+}
+
+TRANSACTIONS = {
+    "durable-send-and-created": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "MESSAGE_CREATED"),
+    "idempotent-retry": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "IDEMPOTENCY_HIT", "SUCCESS_ACK"),
+    "group-single-message": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "LOCAL_FANOUT"),
+    "rollback-before-ack": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "ROLLBACK", "REJECTED_ACK"),
+    "non-member-send": ("MEMBER_DENIED", "REJECTED_ACK"),
+    "unauthenticated-send": ("AUTH_DENIED", "REJECTED_ACK"),
+    "conflicting-retry": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "IDEMPOTENCY_CONFLICT", "REJECTED_ACK"),
+}
+
+
+def check_declared_behavior(s):
+    case_id = s["id"]
+    if case_id not in OUTCOMES or s["expect"] != OUTCOMES[case_id]:
+        raise Invalid(f"{case_id}: declared state differs from required outcome")
+    if tuple(s["timeline"]) != TRANSACTIONS.get(case_id, ()):
+        raise Invalid(f"{case_id}: transaction timeline differs from required outcome")
+    steps = s["steps"]
+
+    def require(condition, reason):
+        if not condition:
+            raise Invalid(f"{case_id}: {reason}")
+
+    def response(step, kind, status=None):
+        require(len(step["out"]) == 1 and step["out"][0]["type"] == kind, f"expected one {kind}")
+        result = step["out"][0]
+        require(result["requestId"] == step["in"]["requestId"], "response request identity mismatch")
+        if status is not None:
+            require(result["payload"]["status"] == status, "response status mismatch")
+        return result["payload"]
+
+    def committed(step):
+        require(step["in"]["type"] == "message.send", "expected message.send")
+        value = response(step, "message.ack", "committed")
+        require(value["conversationId"] == step["in"]["payload"]["conversationId"], "ACK conversation mismatch")
+        return value
+
+    def rejected(step, code):
+        require(step["in"]["type"] == "message.send", "expected message.send")
+        value = response(step, "message.ack", "rejected")
+        require(value["error"]["code"] == code, "rejection code mismatch")
+
+    if case_id == "bind-valid-session":
+        require(len(steps) == 1 and steps[0]["in"]["type"] == "auth.bind", "expected one bind")
+        value = response(steps[0], "auth.ack", "bound")
+        require(value["userId"] == U and value["sessionId"] == S and value["clientType"] == "WEB" and value["sessionEpoch"] == 1, "bound identity, client, or epoch mismatch")
+    elif case_id == "durable-send-and-created":
+        require(len(steps) == 1 and len(steps[0]["out"]) == 2, "expected committed ACK and created event")
+        request = steps[0]["in"]
+        first, second = steps[0]["out"]
+        require(request["type"] == "message.send" and first["type"] == "message.ack" and second["type"] == "message.created", "send output sequence mismatch")
+        ack_value, event = first["payload"], second["payload"]
+        require(ack_value["status"] == "committed" and first["requestId"] == request["requestId"], "committed ACK missing")
+        require(ack_value["conversationId"] == request["payload"]["conversationId"] and ack_value["seq"] == 1, "ACK conversation or first sequence mismatch")
+        require(all(ack_value[name] == event[name] for name in ("conversationId", "messageId", "seq", "createdAt")), "created event differs from committed ACK")
+        require(second["requestId"] == request["requestId"] and event["content"] == request["payload"]["content"] and event["senderId"] == U, "created event differs from send")
+    elif case_id in ("idempotent-retry", "conflicting-retry"):
+        require(len(steps) == 2 and steps[0]["in"]["type"] == steps[1]["in"]["type"] == "message.send", "expected two sends")
+        first = committed(steps[0])
+        require(first["messageId"] == M1 and first["seq"] == 1, "first committed identity or sequence mismatch")
+        require(steps[0]["in"]["requestId"] == steps[1]["in"]["requestId"] and steps[0]["in"]["payload"]["conversationId"] == steps[1]["in"]["payload"]["conversationId"], "retry key changed")
+        if case_id == "idempotent-retry":
+            require(steps[0]["in"] == steps[1]["in"], "idempotent retry request changed")
+            require(committed(steps[1]) == first, "retry ACK differs from first commit")
+        else:
+            require(steps[0]["in"]["payload"]["content"] != steps[1]["in"]["payload"]["content"], "conflict content did not change")
+            rejected(steps[1], "MESSAGE_REQUEST_CONFLICT")
+    elif case_id == "same-request-different-conversation":
+        require(len(steps) == 2, "expected two conversation sends")
+        first, second = (committed(step) for step in steps)
+        require(steps[0]["in"]["requestId"] == steps[1]["in"]["requestId"], "request identity changed")
+        require(steps[0]["in"]["payload"]["conversationId"] != steps[1]["in"]["payload"]["conversationId"], "Conversations must differ")
+        require(first["messageId"] != second["messageId"] and first["seq"] == second["seq"] == 1, "cross-Conversation identity or sequence mismatch")
+    elif case_id == "group-single-message":
+        require(len(steps) == 1 and s["given"]["conversationType"] == "GROUP" and s["given"]["memberCount"] > 1, "expected group send")
+        require(committed(steps[0])["seq"] == 1, "group first sequence mismatch")
+    elif case_id in ("duplicate-fanout", "out-of-order-fanout"):
+        require(len(steps) == (1 if case_id == "duplicate-fanout" else 2), "fan-out step count mismatch")
+        for step in steps:
+            require(step["in"]["type"] == "message.created" and all(out == step["in"] for out in step["out"]), "fan-out event mismatch")
+        if case_id == "duplicate-fanout":
+            require(len(steps[0]["out"]) == 2 and steps[0]["in"]["payload"]["seq"] == 1, "duplicate delivery control mismatch")
+        else:
+            require(all(len(step["out"]) == 1 for step in steps), "out-of-order delivery mismatch")
+            require([step["in"]["payload"]["seq"] for step in steps] == [2, 1], "out-of-order sequence mismatch")
+            require(steps[0]["in"]["payload"]["messageId"] != steps[1]["in"]["payload"]["messageId"], "distinct sequences need distinct messages")
+    elif case_id == "ping-before-bind":
+        require(len(steps) == 1 and steps[0]["in"]["type"] == "ping", "expected pre-bind ping")
+        response(steps[0], "pong")
+    elif case_id in ("unauthenticated-send", "non-member-send", "rollback-before-ack"):
+        require(len(steps) == 1, "expected one rejected send")
+        codes = {"unauthenticated-send": "AUTH_REQUIRED", "non-member-send": "AUTHORIZATION_DENIED", "rollback-before-ack": "MESSAGE_COMMIT_FAILED"}
+        rejected(steps[0], codes[case_id])
+        require((case_id != "non-member-send" or s["given"]["member"] is False), "non-member control missing")
+    elif case_id in ("stale-epoch-bind", "expired-token-bind", "wrong-client-type-bind", "invalid-signature-bind"):
+        require(len(steps) == 1 and steps[0]["in"]["type"] == "auth.bind", "expected rejected bind")
+        codes = {"stale-epoch-bind": "AUTH_SESSION_EPOCH_STALE", "expired-token-bind": "AUTH_TOKEN_EXPIRED", "wrong-client-type-bind": "AUTH_CLIENT_TYPE_MISMATCH", "invalid-signature-bind": "AUTH_TOKEN_INVALID"}
+        require(response(steps[0], "auth.ack", "rejected")["error"]["code"] == codes[case_id], "bind rejection code mismatch")
+    elif case_id == "wrong-conversation-fanout":
+        require(len(steps) == 1 and steps[0]["in"]["type"] == "message.created", "expected foreign event")
+        require(s["given"]["localMemberOf"] != steps[0]["in"]["payload"]["conversationId"] == s["given"]["eventConversation"] and steps[0]["out"] == [], "foreign Conversation delivered")
+    elif case_id == "revoked-socket":
+        require(len(steps) == 2 and steps[0]["in"]["type"] == "session.revoked" and steps[0]["out"] == [steps[0]["in"]], "revocation event missing")
+        require(steps[1]["in"]["type"] == "message.send" and steps[1]["out"] == [], "closed socket emitted send response")
+
+
 def check_scenario(s):
     if not s["id"] or s["polarity"] not in ("positive", "negative") or not s["steps"]:
         raise Invalid("invalid scenario metadata")
@@ -244,6 +374,7 @@ def check_scenario(s):
     if s["id"] == "revoked-socket":
         if s["steps"][0]["out"] != [s["steps"][0]["in"]] or s["steps"][1]["out"] or e["socket"] != "CLOSED":
             raise Invalid("revoked socket must emit event and close before further sends")
+    check_declared_behavior(s)
 
 
 def negative_behavior_controls():

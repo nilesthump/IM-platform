@@ -1,0 +1,232 @@
+diff --git a/contracts/websocket/verify.py b/contracts/websocket/verify.py
+index 997e611..7116e83 100644
+--- a/contracts/websocket/verify.py
++++ b/contracts/websocket/verify.py
+@@ -174,6 +174,136 @@ def fixtures():
+     return {"fixtureVersion": "1.0", "contractVersion": "1.0", "profiles": ["go", "java"], "scenarios": scenarios}
+ 
+ 
++# These are the normative outcomes of the named contract cases, independent of
++# the fixture generator and its checked-in serialization. In particular, an
++# expected count or flag cannot be changed to excuse a bad frame or timeline.
++OUTCOMES = {
++    "bind-valid-session": {"socket": "AUTHENTICATED", "messages": 0, "outbox": 0},
++    "durable-send-and-created": {"messages": 1, "outbox": 1, "seq": [1], "ackAfterCommit": True, "wrongConversationDelivery": False},
++    "idempotent-retry": {"messages": 1, "outbox": 1, "seq": [1], "stableAck": True},
++    "same-request-different-conversation": {"messages": 2, "outbox": 2, "messageIdsGloballyUnique": True, "conversationSeq": {C1: [1], C2: [1]}},
++    "group-single-message": {"messages": 1, "outbox": 1, "localFanoutIndependent": True},
++    "duplicate-fanout": {"messages": 1, "outbox": 1, "clientMaterializations": 1, "syncProvidesEventualCompleteness": True},
++    "out-of-order-fanout": {"messages": 2, "outbox": 2, "clientMaterializations": 2, "contiguousSeqAfterSync": 2, "permanentSeqGap": False},
++    "ping-before-bind": {"socket": "UNAUTHENTICATED"},
++    "unauthenticated-send": {"messages": 0, "outbox": 0, "successAck": False},
++    "non-member-send": {"messages": 0, "outbox": 0, "successAck": False},
++    "rollback-before-ack": {"messages": 0, "outbox": 0, "seq": [], "successAck": False},
++    "conflicting-retry": {"messages": 1, "outbox": 1, "seq": [1], "secondSuccessAck": False},
++    "stale-epoch-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
++    "expired-token-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
++    "wrong-client-type-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
++    "invalid-signature-bind": {"socket": "UNAUTHENTICATED", "messages": 0},
++    "wrong-conversation-fanout": {"messages": 1, "outbox": 1, "clientMaterializations": 0, "wrongConversationDelivery": False},
++    "revoked-socket": {"socket": "CLOSED", "messages": 0, "outbox": 0, "successAck": False},
++}
++
++TRANSACTIONS = {
++    "durable-send-and-created": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "MESSAGE_CREATED"),
++    "idempotent-retry": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "IDEMPOTENCY_HIT", "SUCCESS_ACK"),
++    "group-single-message": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "LOCAL_FANOUT"),
++    "rollback-before-ack": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "ROLLBACK", "REJECTED_ACK"),
++    "non-member-send": ("MEMBER_DENIED", "REJECTED_ACK"),
++    "unauthenticated-send": ("AUTH_DENIED", "REJECTED_ACK"),
++    "conflicting-retry": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "IDEMPOTENCY_CONFLICT", "REJECTED_ACK"),
++}
++
++
++def check_declared_behavior(s):
++    case_id = s["id"]
++    if case_id not in OUTCOMES or s["expect"] != OUTCOMES[case_id]:
++        raise Invalid(f"{case_id}: declared state differs from required outcome")
++    if tuple(s["timeline"]) != TRANSACTIONS.get(case_id, ()):
++        raise Invalid(f"{case_id}: transaction timeline differs from required outcome")
++    steps = s["steps"]
++
++    def require(condition, reason):
++        if not condition:
++            raise Invalid(f"{case_id}: {reason}")
++
++    def response(step, kind, status=None):
++        require(len(step["out"]) == 1 and step["out"][0]["type"] == kind, f"expected one {kind}")
++        result = step["out"][0]
++        require(result["requestId"] == step["in"]["requestId"], "response request identity mismatch")
++        if status is not None:
++            require(result["payload"]["status"] == status, "response status mismatch")
++        return result["payload"]
++
++    def committed(step):
++        require(step["in"]["type"] == "message.send", "expected message.send")
++        value = response(step, "message.ack", "committed")
++        require(value["conversationId"] == step["in"]["payload"]["conversationId"], "ACK conversation mismatch")
++        return value
++
++    def rejected(step, code):
++        require(step["in"]["type"] == "message.send", "expected message.send")
++        value = response(step, "message.ack", "rejected")
++        require(value["error"]["code"] == code, "rejection code mismatch")
++
++    if case_id == "bind-valid-session":
++        require(len(steps) == 1 and steps[0]["in"]["type"] == "auth.bind", "expected one bind")
++        value = response(steps[0], "auth.ack", "bound")
++        require(value["userId"] == U and value["sessionId"] == S and value["clientType"] == "WEB" and value["sessionEpoch"] == 1, "bound identity, client, or epoch mismatch")
++    elif case_id == "durable-send-and-created":
++        require(len(steps) == 1 and len(steps[0]["out"]) == 2, "expected committed ACK and created event")
++        request = steps[0]["in"]
++        first, second = steps[0]["out"]
++        require(request["type"] == "message.send" and first["type"] == "message.ack" and second["type"] == "message.created", "send output sequence mismatch")
++        ack_value, event = first["payload"], second["payload"]
++        require(ack_value["status"] == "committed" and first["requestId"] == request["requestId"], "committed ACK missing")
++        require(ack_value["conversationId"] == request["payload"]["conversationId"] and ack_value["seq"] == 1, "ACK conversation or first sequence mismatch")
++        require(all(ack_value[name] == event[name] for name in ("conversationId", "messageId", "seq", "createdAt")), "created event differs from committed ACK")
++        require(second["requestId"] == request["requestId"] and event["content"] == request["payload"]["content"] and event["senderId"] == U, "created event differs from send")
++    elif case_id in ("idempotent-retry", "conflicting-retry"):
++        require(len(steps) == 2 and steps[0]["in"]["type"] == steps[1]["in"]["type"] == "message.send", "expected two sends")
++        first = committed(steps[0])
++        require(first["messageId"] == M1 and first["seq"] == 1, "first committed identity or sequence mismatch")
++        require(steps[0]["in"]["requestId"] == steps[1]["in"]["requestId"] and steps[0]["in"]["payload"]["conversationId"] == steps[1]["in"]["payload"]["conversationId"], "retry key changed")
++        if case_id == "idempotent-retry":
++            require(steps[0]["in"] == steps[1]["in"], "idempotent retry request changed")
++            require(committed(steps[1]) == first, "retry ACK differs from first commit")
++        else:
++            require(steps[0]["in"]["payload"]["content"] != steps[1]["in"]["payload"]["content"], "conflict content did not change")
++            rejected(steps[1], "MESSAGE_REQUEST_CONFLICT")
++    elif case_id == "same-request-different-conversation":
++        require(len(steps) == 2, "expected two conversation sends")
++        first, second = (committed(step) for step in steps)
++        require(steps[0]["in"]["requestId"] == steps[1]["in"]["requestId"], "request identity changed")
++        require(steps[0]["in"]["payload"]["conversationId"] != steps[1]["in"]["payload"]["conversationId"], "Conversations must differ")
++        require(first["messageId"] != second["messageId"] and first["seq"] == second["seq"] == 1, "cross-Conversation identity or sequence mismatch")
++    elif case_id == "group-single-message":
++        require(len(steps) == 1 and s["given"]["conversationType"] == "GROUP" and s["given"]["memberCount"] > 1, "expected group send")
++        require(committed(steps[0])["seq"] == 1, "group first sequence mismatch")
++    elif case_id in ("duplicate-fanout", "out-of-order-fanout"):
++        require(len(steps) == (1 if case_id == "duplicate-fanout" else 2), "fan-out step count mismatch")
++        for step in steps:
++            require(step["in"]["type"] == "message.created" and all(out == step["in"] for out in step["out"]), "fan-out event mismatch")
++        if case_id == "duplicate-fanout":
++            require(len(steps[0]["out"]) == 2 and steps[0]["in"]["payload"]["seq"] == 1, "duplicate delivery control mismatch")
++        else:
++            require(all(len(step["out"]) == 1 for step in steps), "out-of-order delivery mismatch")
++            require([step["in"]["payload"]["seq"] for step in steps] == [2, 1], "out-of-order sequence mismatch")
++            require(steps[0]["in"]["payload"]["messageId"] != steps[1]["in"]["payload"]["messageId"], "distinct sequences need distinct messages")
++    elif case_id == "ping-before-bind":
++        require(len(steps) == 1 and steps[0]["in"]["type"] == "ping", "expected pre-bind ping")
++        response(steps[0], "pong")
++    elif case_id in ("unauthenticated-send", "non-member-send", "rollback-before-ack"):
++        require(len(steps) == 1, "expected one rejected send")
++        codes = {"unauthenticated-send": "AUTH_REQUIRED", "non-member-send": "AUTHORIZATION_DENIED", "rollback-before-ack": "MESSAGE_COMMIT_FAILED"}
++        rejected(steps[0], codes[case_id])
++        require((case_id != "non-member-send" or s["given"]["member"] is False), "non-member control missing")
++    elif case_id in ("stale-epoch-bind", "expired-token-bind", "wrong-client-type-bind", "invalid-signature-bind"):
++        require(len(steps) == 1 and steps[0]["in"]["type"] == "auth.bind", "expected rejected bind")
++        codes = {"stale-epoch-bind": "AUTH_SESSION_EPOCH_STALE", "expired-token-bind": "AUTH_TOKEN_EXPIRED", "wrong-client-type-bind": "AUTH_CLIENT_TYPE_MISMATCH", "invalid-signature-bind": "AUTH_TOKEN_INVALID"}
++        require(response(steps[0], "auth.ack", "rejected")["error"]["code"] == codes[case_id], "bind rejection code mismatch")
++    elif case_id == "wrong-conversation-fanout":
++        require(len(steps) == 1 and steps[0]["in"]["type"] == "message.created", "expected foreign event")
++        require(s["given"]["localMemberOf"] != steps[0]["in"]["payload"]["conversationId"] == s["given"]["eventConversation"] and steps[0]["out"] == [], "foreign Conversation delivered")
++    elif case_id == "revoked-socket":
++        require(len(steps) == 2 and steps[0]["in"]["type"] == "session.revoked" and steps[0]["out"] == [steps[0]["in"]], "revocation event missing")
++        require(steps[1]["in"]["type"] == "message.send" and steps[1]["out"] == [], "closed socket emitted send response")
++
++
+ def check_scenario(s):
+     if not s["id"] or s["polarity"] not in ("positive", "negative") or not s["steps"]:
+         raise Invalid("invalid scenario metadata")
+@@ -244,6 +374,7 @@ def check_scenario(s):
+     if s["id"] == "revoked-socket":
+         if s["steps"][0]["out"] != [s["steps"][0]["in"]] or s["steps"][1]["out"] or e["socket"] != "CLOSED":
+             raise Invalid("revoked socket must emit event and close before further sends")
++    check_declared_behavior(s)
+ 
+ 
+ def negative_behavior_controls():
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index fd63590..d57fd67 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -25,6 +25,7 @@ Current Task State: review
+ - Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: in-memory probes accepted omission of successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated. The four earlier failures and five other controls reject correctly. WSS baseline, frozen hashes, and clean detached CTRL-002 Acceptance passed, but auth.bind state/epoch acceptance remains incomplete. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. Task remains in review; S0 Gate remains NOT YET PASSED. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+ - Fresh Fix Agent `/root/contract002_fix2` repaired the three auth.bind assertions without changing canonical schema or fixture bytes. WSS verifier PASS with 12 behavior controls, committed independent probe rejected 12/12 invalid mutations, and CTRL-002 Development PASS. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-auth-bind-fix-development.md`; Recorder run `R-20260928T024701Z-63b628c9-0944-46da-b52b-c2f97020a7ee`. This is not acceptance. The next action is independent review of the clean fix commit; task remains in `review` and S0 Gate remains NOT YET PASSED.
+ - Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: committed 12-case probe rejected 12/12, but broader independent fixture mutation audit found 21/24 invalid output/state/timeline outcomes accepted by `check_scenario`. Clean detached CTRL-002 Acceptance, WSS baseline, architecture hashes, and Fix Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains in `review`; S0 Gate remains NOT YET PASSED. Original `H:\IM-platform` untracked HTTP schema-lint directory was untouched.
++- Fresh Fix Agent `/root/contract002_fix3` added independent named-case outcome and transaction assertions plus direct frame/request relationships. Development WSS baseline, prior 12-case probe, broad 24-case probe, and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-systemic-fixture-fix-development.md`; Recorder run `R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2`. Canonical schema and fixture bytes remain unchanged. Task stays in `review` pending a different fresh independent Reviewer; S0 Gate remains NOT YET PASSED.
+ 
+ ## Authorized Frozen Architecture Representation Migration
+ 
+@@ -191,7 +192,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-A fresh Fix Agent repairs the systemic WSS fixture assertion gaps identified by independent Review 3, then a different fresh Review Agent repeats the broad adversarial probe and clean-checkout Acceptance. S0 Gate remains NOT YET PASSED.
++A different fresh independent Review Agent inspects the committed systemic WSS fix, repeats both adversarial probes, and runs clean-checkout CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -210,6 +211,7 @@ A fresh Fix Agent repairs the systemic WSS fixture assertion gaps identified by
+ - Fresh independent Reviewer `/root/contract002_review2` committed the task-authorized FAIL evidence, probe, Recorder run, and recovery updates on the isolated Contract 002 branch; no pending reviewer changes remain. Product files remain at reviewed candidate `102b0ef`. The original checkout's untracked HTTP schema-lint directory belongs to the paused Agent and was not accessed.
+ - Fresh Fix Agent `/root/contract002_fix2` owns the WSS verifier fix and its task-linked evidence, Recorder prompt/run, Task Spec, and current-state update until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
+ - Fresh independent Reviewer `/root/contract002_review3` owns only the broad negative-control probe, FAIL report, task/current recovery update, and task-linked Recorder artifacts until its review closure commit; no product file was changed. The clean detached Acceptance checkout remains at candidate `1da1b40` and clean. The original checkout's untracked HTTP schema-lint directory was not accessed.
++- Fresh Fix Agent `/root/contract002_fix3` owns the WSS verifier repair, task/current recovery updates, and task-linked evidence/Recorder artifacts until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-002.md b/spec/tasks/review/LOOP1-CONTRACT-002.md
+index a971364..b993871 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-002.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-002.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-CONTRACT-002
+ title: Freeze WSS Envelope, Auth, and Message contracts
+ status: review
+-owner: /root/contract002_review3
++owner: /root/contract002_fix3
+ stage: S0
+ gate: S0
+ ---
+@@ -69,6 +69,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ - Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: three in-memory auth.bind mutations were accepted (omitted successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated). The four prior failures and five earlier controls now reject correctly; baseline WSS verifier, architecture hashes, and clean detached CTRL-002 Acceptance passed. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; review Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. The task stays in review.
+ - Fresh Fix Agent `/root/contract002_fix2` added direct valid-bind acknowledgement and authenticated-state assertions, rejected-bind unauthenticated-state assertions, and three permanent behavior mutations. WSS verifier rejected 12 behavior mutations; the committed independent probe rejected 12/12 invalid outcomes; CTRL-002 Development passed. This is development evidence only. Details: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-auth-bind-fix-development.md`; Recorder run `R-20260928T024701Z-63b628c9-0944-46da-b52b-c2f97020a7ee`.
+ - Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: a broader in-memory audit of every fixture's declared output/state/timeline expectations found `check_scenario` accepted 21/24 invalid mutations, including missing created fan-out, wrong committed ACK sequence, duplicate GROUP persistence, double materialization, permanent Sync gap, and wrong bound identity/epoch. The committed prior 12-case probe rejected 12/12, baseline WSS verifier passed, and clean detached CTRL-002 Acceptance passed, but these do not establish the unasserted semantics. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md` and `2026-09-28-independent-review3-mutations.py`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains `review`; S0 Gate NOT YET PASSED.
++- Fresh Fix Agent `/root/contract002_fix3` added independent named-case outcomes, transaction timelines, and direct request/output relationships to the WSS verifier. Development checks pass: baseline 8 positive/10 negative and 11 schema/12 behavior mutations, prior probe 12/12, broad Review 3 probe 24/24, and CTRL-002 Development. Canonical schema and fixture bytes remain unchanged. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-systemic-fixture-fix-development.md`; Recorder run `R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2`. This is not independent acceptance.
+ 
+ # Handoff
+ 
+@@ -77,4 +78,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Next Action
+ 
+-- Delegate a fresh Fix Agent to enforce all declared scenario outcomes independently of generated fixture byte equality, retain adversarial regressions, and then delegate a different fresh independent Reviewer. Keep in `review` pending independent PASS.
++- Delegate a different fresh independent Reviewer to inspect the clean committed fix candidate, repeat the broad probe, and run clean-checkout Acceptance. Keep in `review` pending independent PASS.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-0372bc01-e14d-4326-9e28-c0a8068b3078/metadata.json
+# ?? research/prompts/P-0372bc01-e14d-4326-9e28-c0a8068b3078/prompt.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-141bdfc7-cdd1-44a4-9a7a-b46c3cc9a643.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-141bdfc7-cdd1-44a4-9a7a-b46c3cc9a643.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-6422273b-69e7-4c30-a283-b4a77a110edb.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-6422273b-69e7-4c30-a283-b4a77a110edb.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-729dd024-1a12-4de0-8ef8-0c25f1af1204.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-729dd024-1a12-4de0-8ef8-0c25f1af1204.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-91416f70-a1fc-4c73-9b40-726fdf1eecaa.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-91416f70-a1fc-4c73-9b40-726fdf1eecaa.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-9c74fd80-d39b-4bbb-ab5e-a7cad12ba657.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-9c74fd80-d39b-4bbb-ab5e-a7cad12ba657.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-bc7088a5-e366-4622-9aad-58f20cf4d21d.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-bc7088a5-e366-4622-9aad-58f20cf4d21d.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-db7f0d52-efb6-4eeb-8d9a-4d06b208d89a.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-db7f0d52-efb6-4eeb-8d9a-4d06b208d89a.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-eef7c415-7436-4755-9715-153e1f829b66.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-eef7c415-7436-4755-9715-153e1f829b66.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-fe1b878d-e66a-4855-97e5-cd84262a9b97.stderr.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/blobs/C-fe1b878d-e66a-4855-97e5-cd84262a9b97.stdout.txt
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/events.jsonl
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/initial_state.json
+# ?? research/runs/R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix3-prompt.txt
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-systemic-fixture-fix-development.md
