@@ -78,6 +78,36 @@ class PathMatrixTests(unittest.TestCase):
             finally:
                 os.chdir(previous)
 
+    def test_git_diff_includes_both_sides_of_shared_renames(self):
+        for source in ("contracts/wire.json", "database/schema.sql", "sdk/types.json"):
+            with self.subTest(source=source), tempfile.TemporaryDirectory() as temp:
+                root = pathlib.Path(temp)
+                subprocess.run(["git", "init", "-q", str(root)], check=True)
+                subprocess.run(["git", "-C", str(root), "config", "user.name", "CI test"], check=True)
+                subprocess.run(["git", "-C", str(root), "config", "user.email", "ci@example.invalid"], check=True)
+                old = root / source
+                old.parent.mkdir(parents=True)
+                old.write_text("unique fixture content\n", encoding="utf-8")
+                subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+                subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
+                base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+                new = root / "docs" / old.name
+                new.parent.mkdir()
+                old.rename(new)
+                subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
+                subprocess.run(["git", "-C", str(root), "commit", "-qm", "rename"], check=True)
+                head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+                previous = pathlib.Path.cwd()
+                try:
+                    import os
+                    os.chdir(root)
+                    paths = classify_module.diff_paths(base, head)
+                finally:
+                    os.chdir(previous)
+                self.assertCountEqual(paths, [source, f"docs/{old.name}"])
+                selected = {job for job, enabled in classify_module.classify(paths).items() if enabled}
+                self.assertEqual(selected, classify_module.FULL_COMPATIBILITY)
+
     def test_unrelated_files_do_not_schedule_product_jobs(self):
         self.assert_jobs("README.md", set())
 

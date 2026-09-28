@@ -51,7 +51,7 @@ def classify(paths):
 
 def diff_paths(base, head):
     result = subprocess.run(
-        ["git", "diff", "--name-only", "-z", base, head, "--"],
+        ["git", "diff", "--no-renames", "--name-only", "-z", base, head, "--"],
         check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
     )
     return [os.fsdecode(path) for path in result.stdout.split(b"\0") if path]

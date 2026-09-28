@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh Fix 2 for `LOOP1-CI-001` exposes both source and destination of renames using Git `--no-renames`; contract, database, and SDK move-away regressions, 12 path/gate tests, the former Review 2 probe, CTRL-002 Development, and frozen hashes pass locally. Development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`; Recorder `R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958`. Task stays `review`; fresh independent review, actual GitHub workflow execution, and S0 Gate remain pending.
 - Fresh independent CI Review 2 **FAIL** at clean detached candidate `f508750`: backlog queue marker and CTRL-002 Acceptance pass, but a shared contract renamed to an unclassified path schedules no compatibility jobs because Git reports only the destination. Eleven CI tests, independent gate controls, frozen hashes, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md`; Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task stays `review`; S0 Gate NOT YET PASSED.
 - Fresh Fix Agent `/root/ci001_fix1` committed the exact authorized backlog marker at `ba0bbe7`. A new clean detached checkout passed CTRL-002 Acceptance (all five queues present), 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`; linked Recorder `R-20260928T204018Z-fa44f3d6-9105-4273-b08b-e5f61aa5088b`. Task stays in `review`; fresh independent re-review and actual GitHub workflow execution remain pending. S0 Gate NOT YET PASSED.
 
@@ -247,7 +248,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator: delegate a fresh Fix Agent to repair shared-path rename classification and add a regression, then delegate a different fresh independent Review Agent. After acceptance, arrange actual GitHub workflow execution. S0 Gate NOT YET PASSED.
+Coordinator: delegate a different fresh independent Review Agent for the Fix 2 clean committed candidate. After acceptance, arrange actual GitHub workflow execution. S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -259,6 +260,7 @@ Coordinator: delegate a fresh Fix Agent to repair shared-path rename classificat
 
 ## Uncommitted Changes / Ownership
 
+- Fresh Fix Agent `/root/ci001_fix2` owns only task-allowed classifier/test changes, task/current recovery, task-linked development evidence, prompt, and Recorder artifacts until the candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
 - Fresh independent Reviewer `/root/ci001_review2` owns only task-linked FAIL evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. The separate detached Acceptance checkout remains clean at `f508750`; original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
 - Fresh Fix Agent `/root/ci001_fix1` includes only task-linked development evidence, task/current recovery edits, prompt, and Recorder artifacts in the final candidate commit; no fix-owned uncommitted changes remain at handoff. The separate detached verification checkout is clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
 

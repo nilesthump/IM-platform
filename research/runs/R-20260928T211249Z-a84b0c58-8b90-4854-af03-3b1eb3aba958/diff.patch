@@ -1,0 +1,120 @@
+diff --git a/ci/classify.py b/ci/classify.py
+index 12cf20d..944653f 100644
+--- a/ci/classify.py
++++ b/ci/classify.py
+@@ -51,7 +51,7 @@ def classify(paths):
+ 
+ def diff_paths(base, head):
+     result = subprocess.run(
+-        ["git", "diff", "--name-only", "-z", base, head, "--"],
++        ["git", "diff", "--no-renames", "--name-only", "-z", base, head, "--"],
+         check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+     )
+     return [os.fsdecode(path) for path in result.stdout.split(b"\0") if path]
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 343f1a6..b367a1b 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh Fix 2 for `LOOP1-CI-001` exposes both source and destination of renames using Git `--no-renames`; contract, database, and SDK move-away regressions, 12 path/gate tests, the former Review 2 probe, CTRL-002 Development, and frozen hashes pass locally. Development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`; Recorder `R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958`. Task stays `review`; fresh independent review, actual GitHub workflow execution, and S0 Gate remain pending.
+ - Fresh independent CI Review 2 **FAIL** at clean detached candidate `f508750`: backlog queue marker and CTRL-002 Acceptance pass, but a shared contract renamed to an unclassified path schedules no compatibility jobs because Git reports only the destination. Eleven CI tests, independent gate controls, frozen hashes, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md`; Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task stays `review`; S0 Gate NOT YET PASSED.
+ - Fresh Fix Agent `/root/ci001_fix1` committed the exact authorized backlog marker at `ba0bbe7`. A new clean detached checkout passed CTRL-002 Acceptance (all five queues present), 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`; linked Recorder `R-20260928T204018Z-fa44f3d6-9105-4273-b08b-e5f61aa5088b`. Task stays in `review`; fresh independent re-review and actual GitHub workflow execution remain pending. S0 Gate NOT YET PASSED.
+ 
+@@ -247,7 +248,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Coordinator: delegate a fresh Fix Agent to repair shared-path rename classification and add a regression, then delegate a different fresh independent Review Agent. After acceptance, arrange actual GitHub workflow execution. S0 Gate NOT YET PASSED.
++Coordinator: delegate a different fresh independent Review Agent for the Fix 2 clean committed candidate. After acceptance, arrange actual GitHub workflow execution. S0 Gate NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -259,6 +260,7 @@ Coordinator: delegate a fresh Fix Agent to repair shared-path rename classificat
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/ci001_fix2` owns only task-allowed classifier/test changes, task/current recovery, task-linked development evidence, prompt, and Recorder artifacts until the candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+ - Fresh independent Reviewer `/root/ci001_review2` owns only task-linked FAIL evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. The separate detached Acceptance checkout remains clean at `f508750`; original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+ - Fresh Fix Agent `/root/ci001_fix1` includes only task-linked development evidence, task/current recovery edits, prompt, and Recorder artifacts in the final candidate commit; no fix-owned uncommitted changes remain at handoff. The separate detached verification checkout is clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+ 
+diff --git a/spec/tasks/review/LOOP1-CI-001.md b/spec/tasks/review/LOOP1-CI-001.md
+index e861014..0b92af8 100644
+--- a/spec/tasks/review/LOOP1-CI-001.md
++++ b/spec/tasks/review/LOOP1-CI-001.md
+@@ -50,6 +50,7 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Fresh Fix 2 changes Git diff collection to `--no-renames`, exposing both the removed source and added destination of a rename. Regression tests cover moves from contract, database, and SDK trees to unclassified docs paths; all 12 path/gate tests and the former Review 2 negative probe pass. CTRL-002 Development and frozen hashes pass. Exact development commands and Recorder run are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`. This is not independent acceptance; the task remains `review` and S0 Gate is NOT YET PASSED.
+ - Fresh independent Review 2 `/root/ci001_review2` returned **FAIL** at clean detached candidate `f508750`: the backlog marker repairs CTRL-002 Acceptance, but a rename from `contracts/wire.json` to `docs/wire.json` is reported only by its destination, so the classifier schedules no compatibility jobs. Eleven CI tests, 24 gate status controls, frozen hashes, and Recorder integrity passed. Exact evidence/probe: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md` and `review2-negative-probe.py`; review Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task remains `review`; actual GitHub workflow execution and S0 Gate remain pending.
+ - Fresh Fix Agent `/root/ci001_fix1` added only the prospectively authorized zero-byte `spec/tasks/backlog/.gitkeep` marker at `ba0bbe7`. A new detached clean checkout passed CTRL-002 Acceptance, 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Exact commands, exits, elapsed times, clean-state method, and linked Recorder: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`. This remains development evidence; fresh independent re-review and an actual GitHub workflow run are pending. S0 Gate NOT YET PASSED.
+ 
+@@ -74,4 +75,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Next Action
+ 
+-- Coordinator: delegate a fresh Fix Agent to include both sides of a shared-path rename in classification and add a regression, then a different fresh independent reviewer. Actual GitHub workflow execution remains required before operational CI and Stage Gate acceptance.
++- Coordinator: delegate a different fresh independent reviewer for the Fix 2 clean committed candidate, then arrange actual GitHub workflow execution. Actual CI and S0 Gate remain pending.
+diff --git a/tests/ci/test_classify.py b/tests/ci/test_classify.py
+index 1a760a5..00b63cc 100644
+--- a/tests/ci/test_classify.py
++++ b/tests/ci/test_classify.py
+@@ -78,6 +78,36 @@ class PathMatrixTests(unittest.TestCase):
+             finally:
+                 os.chdir(previous)
+ 
++    def test_git_diff_includes_both_sides_of_shared_renames(self):
++        for source in ("contracts/wire.json", "database/schema.sql", "sdk/types.json"):
++            with self.subTest(source=source), tempfile.TemporaryDirectory() as temp:
++                root = pathlib.Path(temp)
++                subprocess.run(["git", "init", "-q", str(root)], check=True)
++                subprocess.run(["git", "-C", str(root), "config", "user.name", "CI test"], check=True)
++                subprocess.run(["git", "-C", str(root), "config", "user.email", "ci@example.invalid"], check=True)
++                old = root / source
++                old.parent.mkdir(parents=True)
++                old.write_text("unique fixture content\n", encoding="utf-8")
++                subprocess.run(["git", "-C", str(root), "add", "."], check=True)
++                subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
++                base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
++                new = root / "docs" / old.name
++                new.parent.mkdir()
++                old.rename(new)
++                subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
++                subprocess.run(["git", "-C", str(root), "commit", "-qm", "rename"], check=True)
++                head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
++                previous = pathlib.Path.cwd()
++                try:
++                    import os
++                    os.chdir(root)
++                    paths = classify_module.diff_paths(base, head)
++                finally:
++                    os.chdir(previous)
++                self.assertCountEqual(paths, [source, f"docs/{old.name}"])
++                selected = {job for job, enabled in classify_module.classify(paths).items() if enabled}
++                self.assertEqual(selected, classify_module.FULL_COMPATIBILITY)
++
+     def test_unrelated_files_do_not_schedule_product_jobs(self):
+         self.assert_jobs("README.md", set())
+ 
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-88e2f805-f0ca-4087-a588-964ed523aec2/metadata.json
+# ?? research/prompts/P-88e2f805-f0ca-4087-a588-964ed523aec2/prompt.txt
+# ?? research/prompts/loop1-ci-001-fix2-visible.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-23e5aa71-3008-4dbc-9d02-58cc6bc11283.stderr.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-23e5aa71-3008-4dbc-9d02-58cc6bc11283.stdout.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-a1a8e6b8-55b6-4cba-ae81-4f8d076b545f.stderr.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-a1a8e6b8-55b6-4cba-ae81-4f8d076b545f.stdout.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-a5d057c5-f2c4-4938-917d-053a0df71d7d.stderr.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-a5d057c5-f2c4-4938-917d-053a0df71d7d.stdout.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-b7ee9f6e-df49-42cb-8ba3-632a5fb9d87a.stderr.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-b7ee9f6e-df49-42cb-8ba3-632a5fb9d87a.stdout.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-c95be9a1-dd7f-492b-b596-89e9a53ddf8c.stderr.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/blobs/C-c95be9a1-dd7f-492b-b596-89e9a53ddf8c.stdout.txt
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/events.jsonl
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/initial_state.json
+# ?? research/runs/R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md

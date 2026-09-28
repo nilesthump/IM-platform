@@ -50,6 +50,7 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Fresh Fix 2 changes Git diff collection to `--no-renames`, exposing both the removed source and added destination of a rename. Regression tests cover moves from contract, database, and SDK trees to unclassified docs paths; all 12 path/gate tests and the former Review 2 negative probe pass. CTRL-002 Development and frozen hashes pass. Exact development commands and Recorder run are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`. This is not independent acceptance; the task remains `review` and S0 Gate is NOT YET PASSED.
 - Fresh independent Review 2 `/root/ci001_review2` returned **FAIL** at clean detached candidate `f508750`: the backlog marker repairs CTRL-002 Acceptance, but a rename from `contracts/wire.json` to `docs/wire.json` is reported only by its destination, so the classifier schedules no compatibility jobs. Eleven CI tests, 24 gate status controls, frozen hashes, and Recorder integrity passed. Exact evidence/probe: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md` and `review2-negative-probe.py`; review Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task remains `review`; actual GitHub workflow execution and S0 Gate remain pending.
 - Fresh Fix Agent `/root/ci001_fix1` added only the prospectively authorized zero-byte `spec/tasks/backlog/.gitkeep` marker at `ba0bbe7`. A new detached clean checkout passed CTRL-002 Acceptance, 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Exact commands, exits, elapsed times, clean-state method, and linked Recorder: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`. This remains development evidence; fresh independent re-review and an actual GitHub workflow run are pending. S0 Gate NOT YET PASSED.
 
@@ -74,4 +75,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator: delegate a fresh Fix Agent to include both sides of a shared-path rename in classification and add a regression, then a different fresh independent reviewer. Actual GitHub workflow execution remains required before operational CI and Stage Gate acceptance.
+- Coordinator: delegate a different fresh independent reviewer for the Fix 2 clean committed candidate, then arrange actual GitHub workflow execution. Actual CI and S0 Gate remain pending.
