@@ -10,11 +10,13 @@ Gate Status: NOT YET PASSED
 
 Current Batch: LOOP1-S0
 
-Current Task: LOOP1-INFRA-001
+Current Task: LOOP1-CI-001
 
-Current Task State: done
+Current Task State: active
 
 ## Current Contract Work
+
+- `LOOP1-CI-001` activated on isolated branch from verified clean local `main` `10406be`; Infra dependency is independently accepted and `done`. Scope: path-aware CI classification, job skeletons, and path matrix tests. No CI product file changed at activation. S0 Gate NOT YET PASSED.
 
 - Fresh independent Reviewer `/root/infra001_review1` passed Infra 001 candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean detached handoff checkout `c9a3345`: Go and Java profile smokes each passed PostgreSQL migration, Core NATS, HTTPS health, and WSS Upgrade through Caddy TLS 1.3. Frozen hashes, implementation Recorder integrity, profile isolation/port-exposure probe, and detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task is `done` after Coordinator closure; S0 Gate NOT YET PASSED.
 - Fresh `LOOP1-INFRA-001` Implementation Agent completed a task-scoped Compose skeleton with separate Go/Java profiles, PostgreSQL, Core NATS, canonical migration, and Caddy TLS proxy. Both disposable profile smokes passed real HTTPS and WSS Upgrade through TLS 1.3, plus migration and NATS checks; frozen architecture and CTRL-002 Development passed. Development evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. Task is `review`; independent clean-checkout acceptance is pending. S0 Gate NOT YET PASSED.
@@ -238,11 +240,11 @@ Current Task State: done
 
 ## Next Exact Action
 
-Coordinator: activate dependency-satisfied `LOOP1-CI-001` from verified clean local `main`; keep S0 Gate NOT YET PASSED until real CI and the full Gate checklist pass.
+Fresh Implementation Agent: implement the path-aware CI skeleton on `task/LOOP1-CI-001`, run task verification, then hand off a clean candidate for independent review. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`3bf17b18215ca6d85d6cfc9432c3f7fbc280a6a6` (clean local `main` with Infra accepted closure; both post-integration profile smokes and acceptance recovery passed).
+`10406be70bf66482836164400cd5b8be07709c58` (clean local `main` with accepted Infra integration evidence; CI implementation remains unaccepted).
 
 ## Latest Checkpoint
 

@@ -1,0 +1,9 @@
+# LOOP1-CI-001 activation development evidence
+
+- Coordinator `/root` selected the next dependency-satisfied task after `LOOP1-INFRA-001` independent acceptance and clean local-main integration. Local `main` base: `10406be70bf66482836164400cd5b8be07709c58`; isolated branch: `task/LOOP1-CI-001`. Initial branch was clean. S0 Gate remains NOT YET PASSED.
+- Task moved exactly once from `backlog` to `active`. Allowed product scope is `ci/**`, `.github/workflows/**`, and CI tests under `tests/**`; no product CI file changed during activation. Coordinator prospectively authorized only task-linked evidence/checkpoint/Recorder paths in the Task Spec.
+- Prompt `P-7892975a-f2c8-4bfd-85d4-b11926c0b759`; activation Recorder run `R-20260928T193552Z-5891a0f5-0fe0-4415-8492-4b997360cc3c` uses `prospective_resume` with incomplete pre-run trace.
+- `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`: exit `0`, recovered `LOOP1-CI-001` in `active`; development-only, not acceptance.
+- `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`: exit `0`, canonical Markdown SHA-256 `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`, historical PDF SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
+- An initial attempt to write this evidence before its directory existed failed; the directory was created and the file was saved. No task artifact was overwritten.
+- Next exact action: fresh Implementation Agent builds path-aware classifier/job skeleton and meaningful path-matrix tests, records development checks, and commits clean candidate for fresh independent review. Last known good accepted commit `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns this activation-only uncommitted set until committed; original `H:\IM-platform\contracts\http\schema-lint` is paused-Agent-owned and untouched.
