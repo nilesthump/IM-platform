@@ -1,0 +1,88 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index aa48d67..c9e3478 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -12,10 +12,11 @@ Current Batch: LOOP1-S0
+ 
+ Current Task: LOOP1-DB-001
+ 
+-Current Task State: review
++Current Task State: done
+ 
+ ## Current Contract Work
+ 
++- `LOOP1-DB-001` is `done` after fresh independent Review 1 PASS at clean product candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d`. Actual PostgreSQL 16 tests passed 3/3; independent negative probes, frozen hashes, scope, Recorder integrity, and clean detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md` and `2026-09-29-acceptance-closure.md`; checkpoint `spec/progress/checkpoints/2026-09-29-loop1-db-001-accepted.md`. S0 Gate NOT YET PASSED.
+ - Fresh independent Reviewer `/root/db001_review1` passed clean implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` under ADR-0001. Three PostgreSQL 16 tests, independent constraint/down/atomicity probes, frozen hashes, implementation Recorder integrity, and detached CTRL-002 Acceptance at review handoff `a9c491d` passed. Disposable PostgreSQL container was removed. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; review Recorder `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. Task stays `review` for Coordinator closure; S0 Gate NOT YET PASSED.
+ - DB review-state Recorder run `R-20260928T171255Z-1eb5541f-d2e0-41c8-a583-5b721eb3ff78` finished and validated (8 events). A disposable PostgreSQL 16 run passed all 3 database tests; CTRL-002 Development recovered the task in `review`. Exact local evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. Fresh clean-checkout independent Acceptance remains pending; S0 Gate NOT YET PASSED.
+ - DB implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` is in `review`. A disposable PostgreSQL 16 container and locally built Python-plus-psql test image are running without a host port; a local development run passed all 3 database tests, including actual forward/uniqueness/rollback. Fresh independent clean-checkout execution remains pending. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. S0 Gate NOT YET PASSED.
+@@ -230,18 +231,19 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Coordinator: inspect the independent DB PASS evidence and validated Recorder run, move LOOP1-DB-001 to `done` under ADR-0001, update recovery and checkpoint, and select the next dependency-satisfied S0 task. S0 Gate remains NOT YET PASSED.
++Coordinator: commit DB accepted closure, integrate it to clean local `main`, run post-integration PostgreSQL and recovery checks, then activate dependency-satisfied `LOOP1-INFRA-001`. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+-`f25807eb0e744336626d39b94fd8e3a2078cc6be` (clean local `main` with independently accepted Contract 003 and its validated integration record; DB task activation is not yet accepted).
++`7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` (independently accepted DB product candidate from clean detached checkout; local `main` integration remains pending).
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-09-28-loop1-contract-003-accepted.md` (accepted Sync and Plugin API v1 contract transition, integrated and verified on clean local `main`).
++`spec/progress/checkpoints/2026-09-29-loop1-db-001-accepted.md` (accepted PostgreSQL migration/schema transition; local-main integration remains pending).
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Coordinator `/root` owns only DB `done` queue transition, accepted checkpoint/evidence, current recovery update, and linked Recorder closure artifacts until committed. All DB migration/runner/test files are clean at the independently reviewed candidate; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+ - Fresh independent Reviewer `/root/db001_review1` owns only task-linked PASS evidence and probe, Task Spec/current recovery, and linked prompt/Recorder artifacts until committed. The separate detached Acceptance checkout is clean at `a9c491d`; no product schema, runner, test, or original `H:\IM-platform\contracts\http\schema-lint` file was touched.
+ - Coordinator `/root` owns only the DB review queue transition, current/task recovery update, disposable test environment, and task-linked Recorder handoff artifacts until committed. The implementation candidate is clean; the original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+ - Fresh DB Implementation Agent `/root/db001_impl` owns only task-allowed database schema/runner/tests, Task Spec/current recovery, development evidence, and task-linked prompt/Recorder run until its candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
+diff --git a/spec/tasks/review/LOOP1-DB-001.md b/spec/tasks/done/LOOP1-DB-001.md
+similarity index 81%
+rename from spec/tasks/review/LOOP1-DB-001.md
+rename to spec/tasks/done/LOOP1-DB-001.md
+index be43a5b..36cbc95 100644
+--- a/spec/tasks/review/LOOP1-DB-001.md
++++ b/spec/tasks/done/LOOP1-DB-001.md
+@@ -1,7 +1,7 @@
+ ---
+ task_id: LOOP1-DB-001
+ title: Establish canonical database schema and migration runner
+-status: review
++status: done
+ owner: /root
+ stage: S0
+ gate: S0
+@@ -55,11 +55,12 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
+ 
+ # Evidence
+ 
++- Fresh independent Review Agent `/root/db001_review1` accepted exact product candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` under ADR-0001 from a separate clean detached checkout. Actual PostgreSQL 16 forward/uniqueness/rollback tests passed 3/3; independent negative probes covered wrong-Conversation outbox, friendship linkage, destructive-down guard, and failed-migration atomicity. Frozen hashes, allowed scope, Recorder integrity, and clean detached CTRL-002 Acceptance passed. The reviewer did not implement or fix the schema. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; review closure `d9162459d9d1261402360ef22fa861fba10de192`; run `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. Task PASS; S0 Gate NOT YET PASSED.
+ - Fresh independent Review Agent `/root/db001_review1` returned PASS under ADR-0001 on exact implementation `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d`. A separate clean detached checkout passed all 3 database tests against disposable PostgreSQL 16, independent negative probes, frozen hashes, and CTRL-002 Acceptance at the committed `review` handoff. Task-level evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; Recorder run `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. No product file changed in review; S0 Gate remains NOT YET PASSED.
+ - Coordinator's task-linked Recorder run `R-20260928T171255Z-1eb5541f-d2e0-41c8-a583-5b721eb3ff78` finished and validated (8 events). A disposable PostgreSQL 16 execution passed all 3 tests with exit 0; CTRL-002 Development recovered the task in `review` with exit 0. Exact commands, durations, environment, and the pre-run trace limit are at `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. These are development results, not independent acceptance.
+ - Coordinator started disposable `postgres:16` container `im-db-001-review` without a published host port and built local `im-db-review-runtime` from cached images to provide Python 3.11 and psql 16 without downloading packages. A pre-Recorder local run of `DB_TEST_ENABLE=1 python3 -m unittest discover -s tests/database -v` passed all 3 tests, including actual PostgreSQL forward/uniqueness/rollback; it is development evidence only. A fresh independent reviewer must repeat the test from a clean committed checkout. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`.
+ - Implementation candidate adds `contracts/database/migrations/0001_initial.{up,down}.sql`, standalone `migrate.py`, database README, and `tests/database/test_migrations.py`. Required primary/unique constraints cover user/client session slots, normalized friendship and DIRECT pairs, non-null GROUP create identity, Conversation members, Conversation request and sequence identities, one `message.created` outbox event per message, and immutable plugin artifact versions. Migration SQL and ledger entry execute in one PostgreSQL transaction under an advisory lock. No application module or public HTTP/WSS/Sync/Plugin contract was changed.
+-- Development Recorder run `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`; exact commands/results and PostgreSQL environment limitation are recorded at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`. Runtime PostgreSQL schema/uniqueness/forward/rollback verification remains pending because this host has no `psql` and Docker daemon is unavailable. Development checks are not independent acceptance.
++- Development Recorder run `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`; exact commands/results and the original PostgreSQL environment limitation are recorded at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`. The limitation was resolved with a disposable Docker PostgreSQL 16 environment; fresh independent runtime acceptance is recorded above. Development checks alone were not acceptance.
+ - Linked GROUP create idempotency fix Recorder run `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1` adds non-null GROUP request identity and negative cases; revised candidate requires fresh independent review.
+ - Activation Recorder run `R-20260928T155726Z-e6831664-d89d-46e2-b0e6-21753ebb56fe` finished and validated PASS (8 events). The first CTRL-002 Development recovery attempt failed because this Task Spec lacked an architecture resolver reference; after adding it, the same command passed with exit 0. Both results and exact durations are at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-activation-development.md`. This is development recovery, not independent acceptance.
+ - Dependencies `LOOP1-CONTRACT-001`, `LOOP1-CONTRACT-002`, and `LOOP1-CONTRACT-003` are independently accepted and `done` on clean local `main` at `f25807e`. Contract 003 post-integration Sync/Plugin, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository verification passed. S0 Gate remains NOT YET PASSED.
+@@ -71,4 +72,4 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
+ 
+ # Next Action
+ 
+-- Coordinator: check the independent PASS evidence and validated Recorder run, close LOOP1-DB-001 under ADR-0001, update recovery/checkpoint, and select the next dependency-satisfied S0 task. S0 Gate remains NOT YET PASSED.
++- Coordinator: integrate the accepted DB closure into clean local `main`, verify post-integration recovery and actual PostgreSQL tests, then activate dependency-satisfied `LOOP1-INFRA-001`. S0 Gate remains NOT YET PASSED.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-472cae03-34ca-4771-a6c8-bb3a9d48660f/metadata.json
+# ?? research/prompts/P-472cae03-34ca-4771-a6c8-bb3a9d48660f/prompt.txt
+# ?? research/runs/R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e/blobs/C-142fabf4-a32d-4320-8ebd-d651b1c17e93.stderr.txt
+# ?? research/runs/R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e/blobs/C-142fabf4-a32d-4320-8ebd-d651b1c17e93.stdout.txt
+# ?? research/runs/R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e/events.jsonl
+# ?? research/runs/R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e/initial_state.json
+# ?? research/runs/R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e/metadata.json
+# ?? spec/progress/checkpoints/2026-09-29-loop1-db-001-accepted.md
+# ?? spec/progress/evidence/LOOP1-DB-001/2026-09-29-acceptance-closure-prompt.txt
+# ?? spec/progress/evidence/LOOP1-DB-001/2026-09-29-acceptance-closure.md
