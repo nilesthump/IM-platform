@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
 status: review
-owner: /root/contract002_review5
+owner: /root/contract002_fix5
 stage: S0
 gate: S0
 ---
@@ -75,6 +75,8 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 - Fresh independent Review Agent `/root/contract002_review5` rejected clean candidate `d89d4f5`: an in-memory mutation moved only the seq-1 `out-of-order-fanout` event and output to a different Conversation; `check_scenario` accepted the unchanged claim of contiguous sequence 2. Baseline, prior 12/24/9 probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 4 Recorder byte integrity passed. Durable evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review5-d89d4f5-fail.md` and `2026-09-28-independent-review5-mutations.py`; Review Recorder run `R-20260928T044144Z-c2f35c2f-7072-4b31-bd49-5b84dd1c4654`. Task remains in `review`; S0 Gate NOT YET PASSED.
 
+- Fresh Fix Agent `/root/contract002_fix5` added a direct same-Conversation assertion for the two out-of-order events and a permanent cross-Conversation mutation. The WSS verifier passed 8 positive/10 negative, 11 schema, and 25 behavior controls; the four independent probe sets rejected 12/12, 24/24, 9/9, and 1/1 invalid mutations. CTRL-002 Development and focused scope/diff checks passed. Canonical schema and golden fixtures remain unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-cross-conversation-fix-development.md`; Recorder run `R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb`. This is not independent acceptance.
+
 # Handoff
 
 - Activated from clean `main` commit `7484901` on `task/LOOP1-CONTRACT-002`. The original checkout's untracked `contracts/http/schema-lint/` remains owned by the paused Agent and was not touched.
@@ -82,4 +84,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Delegate a fresh Fix Agent to assert that out-of-order seq 2/1 events belong to the same Conversation and add a permanent negative control, then a different fresh independent Reviewer. Keep in `review` pending independent PASS.
+- Delegate a different fresh independent Reviewer to inspect the clean Fix 5 candidate, repeat the cross-Conversation probe and required acceptance checks, and record the result. Keep in `review` pending independent PASS.

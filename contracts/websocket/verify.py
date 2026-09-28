@@ -309,6 +309,7 @@ def check_declared_behavior(s):
         else:
             require(all(len(step["out"]) == 1 for step in steps), "out-of-order delivery mismatch")
             require([step["in"]["payload"]["seq"] for step in steps] == [2, 1], "out-of-order sequence mismatch")
+            require(steps[0]["in"]["payload"]["conversationId"] == steps[1]["in"]["payload"]["conversationId"], "out-of-order sequences belong to different Conversations")
             require(steps[0]["in"]["payload"]["messageId"] != steps[1]["in"]["payload"]["messageId"], "distinct sequences need distinct messages")
     elif case_id == "ping-before-bind":
         require(len(steps) == 1 and steps[0]["in"]["type"] == "ping", "expected pre-bind ping")
@@ -411,6 +412,10 @@ def negative_behavior_controls():
         s["timeline"].remove(event)
         s["timeline"].insert(s["timeline"].index("COMMIT"), event)
 
+    def move_seq_one_to_other_conversation(s):
+        s["steps"][1]["in"]["payload"]["conversationId"] = C2
+        s["steps"][1]["out"][0]["payload"]["conversationId"] = C2
+
     changes = [
         ("wrong-conversation-fanout", lambda s: s["steps"][0]["out"].append(copy.deepcopy(s["steps"][0]["in"]))),
         ("revoked-socket", lambda s: s["steps"][0]["out"].clear()),
@@ -436,6 +441,7 @@ def negative_behavior_controls():
         ("wrong-conversation-fanout", lambda s: s["given"].update(eventConversation=C1)),
         ("revoked-socket", lambda s: s["given"].pop("session")),
         ("ping-before-bind", lambda s: s["given"].update(extra="unverified premise")),
+        ("out-of-order-fanout", move_seq_one_to_other_conversation),
     ]
     for case_id, mutate in changes:
         changed = copy.deepcopy(by_id[case_id])
