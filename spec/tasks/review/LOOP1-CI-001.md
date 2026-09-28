@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Fresh Fix Agent `/root/ci001_fix1` added only the prospectively authorized zero-byte `spec/tasks/backlog/.gitkeep` marker at `ba0bbe7`. A new detached clean checkout passed CTRL-002 Acceptance, 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Exact commands, exits, elapsed times, clean-state method, and linked Recorder: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`. This remains development evidence; fresh independent re-review and an actual GitHub workflow run are pending. S0 Gate NOT YET PASSED.
+
 - Coordinator prospectively authorized only `spec/tasks/backlog/.gitkeep` after independent Review 1 clean-checkout FAIL. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-queue-marker-authorization.md`; a fresh Fix Agent must add the marker before fresh re-review.
 
 - Fresh independent Review 1 `/root/ci001_review1` returned **FAIL** at clean detached handoff `2c335cd` for product candidate `97db67e`. Eleven CI unit tests, frozen hashes, and implementation Recorder integrity passed, but clean-checkout CTRL-002 Acceptance exited 1 because `spec/tasks/backlog/` has no tracked marker after this task left the queue. The workflow's first job invokes this check, so the candidate cannot serve as an operational CI judge. Exact commands, exits, elapsed times, clean-state method, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review1-97db67e-fail.md`; review Recorder `R-20260928T202247Z-2951ca94-5b67-47a5-ba6d-c6f00f3f4a15`. Keep task in `review`; S0 Gate NOT YET PASSED.
@@ -71,4 +73,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Fresh Fix Agent: add only the authorized `spec/tasks/backlog/.gitkeep` marker, run clean-checkout recovery plus task checks, and hand off a clean committed candidate to a different fresh independent Review Agent. Actual GitHub workflow execution remains required before operational CI and Stage Gate acceptance.
+- Coordinator: delegate a different fresh independent Review Agent to verify the clean committed Fix 1 candidate and acceptance evidence. Actual GitHub workflow execution remains required before operational CI and Stage Gate acceptance.
