@@ -238,15 +238,15 @@ Current Task State: done
 
 ## Next Exact Action
 
-Coordinator: integrate accepted Infra 001 into clean local `main`, verify the integrated tree, then activate dependency-satisfied `LOOP1-CI-001`. S0 Gate remains NOT YET PASSED.
+Coordinator: activate dependency-satisfied `LOOP1-CI-001` from verified clean local `main`; keep S0 Gate NOT YET PASSED until real CI and the full Gate checklist pass.
 
 ## Last Known Good Commit
 
-`cc9db714d50d6d05aa34e52ee1ef21dff2741ad7` (clean independently reviewed Infra branch; integration into local `main` remains pending).
+`3bf17b18215ca6d85d6cfc9432c3f7fbc280a6a6` (clean local `main` with Infra accepted closure; both post-integration profile smokes and acceptance recovery passed).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md` (independently accepted Infra skeleton; local `main` integration pending).
+`spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md` (independently accepted Infra skeleton, integrated and verified on clean local `main`).
 
 ## Uncommitted Changes / Ownership
 
