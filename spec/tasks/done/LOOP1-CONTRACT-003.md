@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CONTRACT-003
 title: Freeze Sync and Plugin API v1 contracts
-status: review
+status: done
 owner: /root
 stage: S0
 gate: S0
@@ -59,6 +59,8 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Evidence
 
+- Coordinator closure Recorder run `R-20260928T144532Z-d4c17240-f552-403e-a591-30fb7e329a2f` finished and validated PASS (6 events); CTRL-002 Development observed the task in `done` with exit 0. Closure evidence and the stable checkpoint are under `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-acceptance-closure.md` and `spec/progress/checkpoints/2026-09-28-loop1-contract-003-accepted.md`. This recovery check is not the independent Acceptance basis.
+- Fresh independent Review 3 PASS at exact clean candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623` under ADR-0001. It passed 79 cases and 16 verifier controls, all 7 Review 1 probes, both Review 2 probes, 7 new reviewer probes, frozen architecture hashes, clean detached CTRL-002 Acceptance, scope, and Recorder integrity. Reviewer `/root/contract003_review3` was independent of implementation and both fixes. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md`; review closure `c9d2cb378fa995e2ad32e5bc397b84c533f921f4` and run `R-20260928T141143Z-0bf14a8e-dc44-4222-8830-64a84237e98e`. Static Go/Java outcomes are S0 contract test vectors; backend-produced parity remains future implementation work. Task acceptance is PASS; S0 Gate is NOT YET PASSED.
 - Fresh independent Review Agent `/root/contract003_review3` accepted clean Fix 2 candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623` under ADR-0001. Baseline verifier passed 79 cases/16 controls; all seven Review 1, both Review 2, and seven new negative mutations rejected; frozen hashes, Fix 2 Recorder integrity, scope, whitespace, and clean detached CTRL-002 Acceptance passed. At S0, SP-A-012's separate static Go/Java normalized artifacts are contract vectors, not backend-produced results; dual-profile runtime parity remains S3 work. Task stays `review` pending Coordinator closure; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md`; review Recorder run `R-20260928T141143Z-0bf14a8e-dc44-4222-8830-64a84237e98e`.
 - Fresh Fix Agent `/root/contract003_fix2` repaired the two Review 2 findings. SP-A-002 now asserts a single pre-existing FAILED local item, convergence to SENT on matching server identity, and terminal SENT after a later failure signal. SP-A-006 now has a machine-verifiable bounded `query.page` response and two linked read-only fixture pages. The task verifier passes 79 cases and 16 controls; Review 1 and Review 2 probes reject 7/7 and 2/2 invalid mutations; CTRL-002 Development passes. This is development evidence only, not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix2-development.md`; Recorder run `R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c`. SP-A-012 static-vector interpretation remains the narrow acceptance question.
 - Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b18a3378ebaade1b4ad4fe85e26aa2f474b`. Task verifier, all seven prior probes, frozen hashes, Fix Recorder integrity, and clean detached CTRL-002 Acceptance passed. Two new mutations are accepted: removing the initial locally FAILED state in SP-A-002 and adding an unbounded simulated Query response to SP-A-006's request-only pagination case. SP-A-012's S0 static-vector interpretation remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; probe: `spec/progress/evidence/LOOP1-CONTRACT-003/review2-negative-probe.py`; review Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
@@ -79,4 +81,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Coordinator: close independently accepted Contract 003 under ADR-0001, move this Task Spec to `done`, update progress/checkpoint, and select the next dependency-satisfied task. Keep S0 Gate NOT YET PASSED until all required tasks and Gate evidence pass.
+- Coordinator: integrate the accepted Contract 003 closure to clean local `main`, verify post-integration recovery, then activate dependency-satisfied `LOOP1-DB-001`. Keep S0 Gate NOT YET PASSED until all required tasks and Gate evidence pass.

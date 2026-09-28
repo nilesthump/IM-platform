@@ -12,10 +12,11 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CONTRACT-003
 
-Current Task State: review
+Current Task State: done
 
 ## Current Contract Work
 
+- `LOOP1-CONTRACT-003` is `done` after fresh independent Review 3 PASS at exact clean candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623`. ADR-0001 Acceptance, 79 cases/16 controls, all 16 independent negative probes across three review cycles, frozen hashes, allowed-path scope, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md` and `2026-09-28-acceptance-closure.md`; checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-contract-003-accepted.md`. S0 Gate NOT YET PASSED.
 - Fresh independent Review Agent `/root/contract003_review3` accepted clean Fix 2 candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623` under ADR-0001. Schema/fixture verifier passed 79 cases/16 controls; Review 1, Review 2, and seven fresh invalid mutations all rejected; frozen hashes, scope, Fix 2 Recorder, and clean detached CTRL-002 Acceptance passed. SP-A-012's S0 static profile artifacts are expected contract vectors, with backend runtime parity reserved for S3. Task remains `review` for Coordinator closure; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md`; Recorder run `R-20260928T141143Z-0bf14a8e-dc44-4222-8830-64a84237e98e`.
 - Fresh Fix Agent `/root/contract003_fix2` repaired Review 2's two concrete findings in the isolated Contract 003 checkout. The FAILED local item and SENT convergence are observed at each step with one local item; Query v1 has bounded `query.page` responses and linked read-only pagination fixtures. Verifier passes 79 cases/16 controls; Review 1 and Review 2 probes reject all 7 and 2 invalid mutations; CTRL-002 Development passes. Independent acceptance is pending, and SP-A-012 S0 static-vector interpretation remains unresolved. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix2-development.md`; Recorder run `R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c`. Task remains `review`; S0 Gate NOT YET PASSED.
 - Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b1`: seven prior probes, baseline verifier, frozen hashes, Fix Recorder integrity and detached CTRL-002 Acceptance passed, but two new mutations were accepted. The SP-A-002 case does not observe a prior FAILED item; the SP-A-006 Query contract/fixture does not model a page response. Static Go/Java vector interpretation for SP-A-012 remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
@@ -222,18 +223,19 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator: close the independently accepted Contract 003 candidate under ADR-0001, move the Task Spec from `review` to `done`, update recovery/checkpoint state, and select the next dependency-satisfied S0 task. S0 Gate remains NOT YET PASSED.
+Coordinator: commit Contract 003 accepted closure, integrate it to clean local `main`, run post-integration recovery checks, then activate dependency-satisfied `LOOP1-DB-001`. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`eb9ebea6dd6852acf80d7686d4592d1b98025ae4` (clean local `main` with independently accepted Contract 002, WSS, CTRL-002 Acceptance, and Recorder repository verification; Contract 003 activation is not yet accepted).
+`15b2477ca44c106e8e69b22b46eacfb7ca301623` (independently accepted Contract 003 candidate from a clean detached checkout; local `main` integration remains pending).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-28-loop1-contract-002-main-accepted.md` (accepted WSS content, portability repair, and verified local-main recovery).
+`spec/progress/checkpoints/2026-09-28-loop1-contract-003-accepted.md` (accepted Sync and Plugin API v1 contract transition; local-main integration remains pending).
 
 ## Uncommitted Changes / Ownership
 
+- Coordinator `/root` owns only Contract 003 `done` transition, accepted checkpoint/evidence, current recovery update, and linked Recorder closure artifacts until committed. All product contract and fixture files are clean at independently reviewed candidate; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
 - Fresh independent Reviewer `/root/contract003_review3` owns only task-linked PASS evidence, an independent negative probe, Task Spec/current recovery updates, prompt and Recorder run until committed. It changed no product contract or runtime file. The separate detached Acceptance checkout remains clean at `15b2477`; original `H:\IM-platform\contracts\http\schema-lint` was untouched.
 - Fresh Fix Agent `/root/contract003_fix2` owns only task-allowed contract, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until a clean candidate commit. Original `H:\IM-platform\contracts\http\schema-lint` was untouched.
 - Fresh independent Reviewer `/root/contract003_review2` owns only task-linked FAIL evidence/probe, Task Spec/current recovery update, prompt and Recorder artifacts until review closure commit. No product contract file changed. The separate detached Acceptance checkout is clean at `56c14b1`; original `H:\IM-platform` HTTP schema-lint was untouched.
