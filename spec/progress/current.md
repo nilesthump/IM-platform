@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh independent Review Agent `/root/contract002_portability_review` accepted clean candidate `57a02590b0464755c6ff2bf5187e0bb69f9ce08c`: both `core.autocrlf` clean checkouts preserved golden bytes and passed WSS; five prior probes, canonical hashes, clean detached CTRL-002 Acceptance, scope/minimality, and Fix Recorder bytes passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-independent-review-pass.md`; Review run `R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779`. Task remains `review` for Coordinator integration; S0 Gate NOT YET PASSED.
 - Fresh Fix Agent `/root/contract002_portability_fix` repaired the post-main checkout failure with fixture-local `golden.json -text` at `59bc411`. Disposable clean worktrees with `core.autocrlf=true` and `false` both retained the original golden blob bytes and passed WSS verification. Five prior independent mutation probe sets, the WSS baseline, frozen architecture hash verifier, and CTRL-002 Development passed. The golden fixture and WSS schema/semantics are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. The task remains `review` for fresh independent review; S0 Gate remains NOT YET PASSED.
 - `LOOP1-CONTRACT-002` is independently accepted under ADR-0001 at exact reviewed candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`, with PASS report committed at `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The separate clean detached CTRL-002 Acceptance, WSS verifier, five prior probe sets, ten new controls, architecture hashes, scope audit, and Review Recorder validation passed. Coordinator closure evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`.
 - Local `main` fast-forwarded to closure `4d27d56975d355144f24c945e0de030184758fa2`, but clean post-merge WSS verification failed because `core.autocrlf=true` changed `golden.json` working-file bytes. Task 002 is reopened in `review`; the earlier candidate PASS and closure remain historical evidence, while `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md` records the integration failure. `origin/main` remains at `7484901b3915535f60941a01116b730a845bd47d`; no new remote push occurred. S0 Gate remains NOT YET PASSED.
@@ -207,7 +208,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate a different fresh independent Review Agent for the clean portability-fix candidate. On PASS, repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
+Accept the fresh independent portability PASS, then repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -218,6 +219,8 @@ Delegate a different fresh independent Review Agent for the clean portability-fi
 `spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md` (Contract 002 checkpoint is retained as candidate acceptance history but was not a verified stable main recovery point).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh independent Reviewer `/root/contract002_portability_review` owns only task-linked PASS evidence, byte-integrity audit, task/current recovery updates, and linked Recorder artifacts until the review closure commit. No product file was edited. The separate detached Acceptance checkout remains clean.
 
 - Fresh Fix Agent `/root/contract002_portability_fix` owns only the fixture-local transport rule, committed checkout regression, Task Spec/current recovery updates, task-linked development evidence, and Recorder prompt/run until the clean review-candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory remains untouched.
 - Coordinator owns only the Contract 002 post-main-merge FAIL evidence, correction from `done` back to `review`, current recovery update, and linked Recorder artifacts until committed. No product contract file is uncommitted. Clean local `main` contains the failed integration at `4d27d56`; repair will move forward after fresh Fix/Review.
