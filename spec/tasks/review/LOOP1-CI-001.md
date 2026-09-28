@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CI-001
 title: Establish path-aware CI skeleton
-status: active
+status: review
 owner: /root
 stage: S0
 gate: S0
@@ -49,6 +49,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Coordinator review transition from clean candidate `97db67e` passed CTRL-002 Development recovery; the correctly linked Recorder run and an unused disclosed instrumentation FAIL are at `spec/progress/evidence/LOOP1-CI-001/2026-09-29-review-transition.md`. Independent acceptance remains pending.
+
 - Fresh Implementation Agent `/root/ci001_impl` built the path-aware classifier, full shared fan-out, GitHub Actions job skeletons and a selected-job gate. Eleven classifier/gate unit tests pass, including a real Git deletion case; Go compile, both Compose configurations, HTTP/WSS/Sync/Plugin verifiers, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4`. This is local development evidence; the workflow has not yet run on GitHub and independent review/acceptance remains pending. No product behavior, contract, migration, or Frozen Architecture file changed.
 
 - Activation prompt `P-7892975a-f2c8-4bfd-85d4-b11926c0b759`, Recorder run `R-20260928T193552Z-5891a0f5-0fe0-4415-8492-4b997360cc3c`; CTRL-002 Development and frozen-hash verification passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-activation-development.md`. This is not independent acceptance.
@@ -64,4 +66,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator: move the clean implementation candidate to `review`, then delegate fresh independent review and clean-checkout acceptance. Do not treat local tests or the pending GitHub workflow as CI Gate PASS.
+- Fresh independent Review Agent: review clean candidate `97db67ebead3e8d98ee966cc52d23a5e69377381` under ADR-0001; inspect scope, matrix, workflow/gate behavior, clean-checkout tests, frozen hashes and Recorder integrity. A real GitHub workflow run remains necessary for operational CI and Stage Gate.

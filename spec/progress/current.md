@@ -12,7 +12,7 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CI-001
 
-Current Task State: active
+Current Task State: review
 
 ## Current Contract Work
 
@@ -242,7 +242,7 @@ Current Task State: active
 
 ## Next Exact Action
 
-Coordinator: move the clean `LOOP1-CI-001` candidate from `active` to `review` and delegate fresh independent review in a clean checkout. S0 Gate remains NOT YET PASSED.
+Fresh independent Review Agent: review clean CI candidate `97db67ebead3e8d98ee966cc52d23a5e69377381`, run path matrix and workflow gate checks, and apply ADR-0001 acceptance. Actual GitHub workflow remains pending; S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 
