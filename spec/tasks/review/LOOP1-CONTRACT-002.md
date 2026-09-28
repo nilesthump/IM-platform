@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
 status: review
-owner: /root/contract002_fix4
+owner: /root/contract002_review5
 stage: S0
 gate: S0
 ---
@@ -73,6 +73,8 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - Fresh independent Review Agent `/root/contract002_review4` rejected clean candidate `cb24c4c`: a new in-memory precondition audit found 0/9 invalid `given` mutations rejected, including committed ACK on an unauthenticated socket, nonmember or declared rollback, and valid bind on a declared invalid token. Baseline, prior 12/24 probes, frozen hash verifier, and clean detached CTRL-002 Acceptance passed, but these do not establish premise-to-outcome correctness. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-cb24c4c-fail.md` and `2026-09-28-independent-review4-mutations.py`; Recorder run `R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573`. Task remains in `review` and S0 Gate NOT YET PASSED.
 - Fresh Fix Agent `/root/contract002_fix4` asserted exact, independently stated `given` premises for all 18 named scenarios and added 12 permanent precondition mutations. Baseline WSS verification passed with 11 schema and 24 behavior controls; the prior independent 12/24 probes and Review 4's 9-case precondition probe rejected 12/12, 24/24, and 9/9 invalid mutations. CTRL-002 Development and focused scope/diff checks passed. Canonical schema and golden fixtures remain unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-precondition-fix-development.md`; Recorder run `R-20260928T042440Z-2abf26e1-ad46-4d62-b224-42f747519427`. This is not independent acceptance.
 
+- Fresh independent Review Agent `/root/contract002_review5` rejected clean candidate `d89d4f5`: an in-memory mutation moved only the seq-1 `out-of-order-fanout` event and output to a different Conversation; `check_scenario` accepted the unchanged claim of contiguous sequence 2. Baseline, prior 12/24/9 probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 4 Recorder byte integrity passed. Durable evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review5-d89d4f5-fail.md` and `2026-09-28-independent-review5-mutations.py`; Review Recorder run `R-20260928T044144Z-c2f35c2f-7072-4b31-bd49-5b84dd1c4654`. Task remains in `review`; S0 Gate NOT YET PASSED.
+
 # Handoff
 
 - Activated from clean `main` commit `7484901` on `task/LOOP1-CONTRACT-002`. The original checkout's untracked `contracts/http/schema-lint/` remains owned by the paused Agent and was not touched.
@@ -80,4 +82,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Delegate a different fresh independent Reviewer to inspect the exact Fix 4 candidate, repeat all probes, and run clean-checkout CTRL-002 Acceptance. Keep in `review` pending independent PASS.
+- Delegate a fresh Fix Agent to assert that out-of-order seq 2/1 events belong to the same Conversation and add a permanent negative control, then a different fresh independent Reviewer. Keep in `review` pending independent PASS.

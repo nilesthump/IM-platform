@@ -29,6 +29,8 @@ Current Task State: review
 - Fresh independent Review Agent `/root/contract002_review4` rejected clean candidate `cb24c4c`: despite baseline, prior 12/24 mutation probes, frozen hash verification, and clean detached CTRL-002 Acceptance passing, a new precondition probe found 0/9 invalid `given` mutations rejected. Committed ACKs remained accepted for unauthenticated/nonmember/rolled-back premises. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-cb24c4c-fail.md`; Recorder run `R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573`. Task remains in `review`; S0 Gate remains NOT YET PASSED.
 - Fresh Fix Agent `/root/contract002_fix4` added independent exact `given` assertions for all 18 scenarios and 12 permanent premise mutations. Baseline WSS verifier passed with 11 schema/24 behavior controls; all three committed independent probes rejected 12/12, 24/24, and 9/9 invalid mutations. CTRL-002 Development and scope/diff checks passed; this is development evidence only. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-precondition-fix-development.md`; Recorder run `R-20260928T042440Z-2abf26e1-ad46-4d62-b224-42f747519427`. Task remains in `review`; S0 Gate remains NOT YET PASSED.
 
+- Fresh independent Review Agent `/root/contract002_review5` rejected clean candidate `d89d4f5`: the verifier accepts an out-of-order seq-1 event reassigned to another Conversation while still claiming contiguous sequence 2. Baseline and prior 12/24/9 probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 4 Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review5-d89d4f5-fail.md`; Recorder run `R-20260928T044144Z-c2f35c2f-7072-4b31-bd49-5b84dd1c4654`. Task remains `review`; S0 Gate NOT YET PASSED.
+
 ## Authorized Frozen Architecture Representation Migration
 
 - Human Architect explicitly authorized `LOOP1-ARCHDOC-001`, a governance-only canonical-source migration from the immutable PDF to Markdown. The source PDF SHA-256 before candidate work is `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
@@ -194,7 +196,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-A different fresh independent Reviewer inspects the clean Fix 4 candidate, reruns all three committed probes, and runs clean-checkout CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
+A fresh Fix Agent repairs the out-of-order cross-Conversation verifier gap and adds a permanent negative control, then a different fresh independent Reviewer checks the new candidate. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -216,6 +218,8 @@ A different fresh independent Reviewer inspects the clean Fix 4 candidate, rerun
 - Fresh Fix Agent `/root/contract002_fix3` owns the WSS verifier repair, task/current recovery updates, and task-linked evidence/Recorder artifacts until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
 - Fresh independent Reviewer `/root/contract002_review4` owns only task-linked FAIL evidence, its negative-control probe, Recorder artifacts, and recovery updates until its review closure commit. It changed no product contract file. Its detached Acceptance checkout remains clean at `cb24c4c`. The original checkout's untracked HTTP schema-lint directory was not accessed.
 - Fresh Fix Agent `/root/contract002_fix4` owns the WSS premise-verifier repair, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
+
+- Fresh independent Reviewer `/root/contract002_review5` owns only the focused probe, FAIL evidence, task/current recovery updates, and task-linked Recorder artifacts until its review closure commit; no product contract file was changed. Detached Acceptance checkout remained clean at `d89d4f5`. Original untracked HTTP schema-lint directory was untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
