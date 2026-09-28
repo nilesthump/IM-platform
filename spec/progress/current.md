@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh independent Reviewer `/root/db001_review1` passed clean implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` under ADR-0001. Three PostgreSQL 16 tests, independent constraint/down/atomicity probes, frozen hashes, implementation Recorder integrity, and detached CTRL-002 Acceptance at review handoff `a9c491d` passed. Disposable PostgreSQL container was removed. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; review Recorder `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. Task stays `review` for Coordinator closure; S0 Gate NOT YET PASSED.
 - DB review-state Recorder run `R-20260928T171255Z-1eb5541f-d2e0-41c8-a583-5b721eb3ff78` finished and validated (8 events). A disposable PostgreSQL 16 run passed all 3 database tests; CTRL-002 Development recovered the task in `review`. Exact local evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. Fresh clean-checkout independent Acceptance remains pending; S0 Gate NOT YET PASSED.
 - DB implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` is in `review`. A disposable PostgreSQL 16 container and locally built Python-plus-psql test image are running without a host port; a local development run passed all 3 database tests, including actual forward/uniqueness/rollback. Fresh independent clean-checkout execution remains pending. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. S0 Gate NOT YET PASSED.
 - `LOOP1-DB-001` implementation candidate adds the canonical PostgreSQL schema, standalone migration runner, uniqueness and forward/rollback integration tests. A linked fix requires GROUP create request identity and tests its rejection/uniqueness. Initial static development tests and CTRL-002 Development passed; the prior PostgreSQL environment limitation was resolved after Docker started. Development evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`; Recorder runs `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98` and `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1`. Task is in review; S0 Gate NOT YET PASSED.
@@ -229,7 +230,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator: commit DB review-state handoff, then delegate a fresh independent DB Review Agent to repeat PostgreSQL forward, uniqueness, and rollback tests from a clean candidate checkout and follow ADR-0001 acceptance or fix cycle. S0 Gate remains NOT YET PASSED.
+Coordinator: inspect the independent DB PASS evidence and validated Recorder run, move LOOP1-DB-001 to `done` under ADR-0001, update recovery and checkpoint, and select the next dependency-satisfied S0 task. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -241,6 +242,7 @@ Coordinator: commit DB review-state handoff, then delegate a fresh independent D
 
 ## Uncommitted Changes / Ownership
 
+- Fresh independent Reviewer `/root/db001_review1` owns only task-linked PASS evidence and probe, Task Spec/current recovery, and linked prompt/Recorder artifacts until committed. The separate detached Acceptance checkout is clean at `a9c491d`; no product schema, runner, test, or original `H:\IM-platform\contracts\http\schema-lint` file was touched.
 - Coordinator `/root` owns only the DB review queue transition, current/task recovery update, disposable test environment, and task-linked Recorder handoff artifacts until committed. The implementation candidate is clean; the original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
 - Fresh DB Implementation Agent `/root/db001_impl` owns only task-allowed database schema/runner/tests, Task Spec/current recovery, development evidence, and task-linked prompt/Recorder run until its candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
 - Coordinator `/root` owns only DB task queue activation, Task Spec/current recovery updates, and task-linked Recorder activation artifacts until committed. No DB schema or migration file has changed. The original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
