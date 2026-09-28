@@ -55,6 +55,7 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
 
 # Evidence
 
+- Clean local `main` fast-forwarded to DB acceptance closure `016f429`; actual PostgreSQL 16 tests passed 3/3 again, frozen hashes, CTRL-002 Acceptance, Recorder repository validation, and clean status passed. Task-linked integration Recorder `R-20260928T180300Z-e2553a57-4a18-4214-a83f-0c04f4859b5a` validated PASS. Exact evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-main-integration.md`. S0 Gate NOT YET PASSED.
 - Coordinator closure Recorder `R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e` validated PASS (6 events), with `done` queue CTRL-002 Development exit 0. Closure record: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-acceptance-closure.md`.
 - Fresh independent Review Agent `/root/db001_review1` accepted exact product candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` under ADR-0001 from a separate clean detached checkout. Actual PostgreSQL 16 forward/uniqueness/rollback tests passed 3/3; independent negative probes covered wrong-Conversation outbox, friendship linkage, destructive-down guard, and failed-migration atomicity. Frozen hashes, allowed scope, Recorder integrity, and clean detached CTRL-002 Acceptance passed. The reviewer did not implement or fix the schema. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; review closure `d9162459d9d1261402360ef22fa861fba10de192`; run `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. Task PASS; S0 Gate NOT YET PASSED.
 - Fresh independent Review Agent `/root/db001_review1` returned PASS under ADR-0001 on exact implementation `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d`. A separate clean detached checkout passed all 3 database tests against disposable PostgreSQL 16, independent negative probes, frozen hashes, and CTRL-002 Acceptance at the committed `review` handoff. Task-level evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; Recorder run `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. No product file changed in review; S0 Gate remains NOT YET PASSED.
@@ -73,4 +74,4 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
 
 # Next Action
 
-- Coordinator: integrate the accepted DB closure into clean local `main`, verify post-integration recovery and actual PostgreSQL tests, then activate dependency-satisfied `LOOP1-INFRA-001`. S0 Gate remains NOT YET PASSED.
+- Coordinator: commit DB integration evidence, fast-forward clean local `main` to include it, then activate dependency-satisfied `LOOP1-INFRA-001`. S0 Gate remains NOT YET PASSED.
