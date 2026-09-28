@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CONTRACT-003
 title: Freeze Sync and Plugin API v1 contracts
-status: active
+status: review
 owner: /root
 stage: S0
 gate: S0
@@ -59,13 +59,14 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Evidence
 
+- Coordinator review-state transition preserves implementation candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`. CTRL-002 Development passed after the queue move; linked Recorder run `R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd` finished and validated (6 events). Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition.md`. Independent acceptance remains pending.
 - Fresh Implementation Agent `/root/contract003_impl` added canonical Sync v1 and Plugin API v1 schemas, a machine-readable permission/limit/lifecycle policy, and deterministic shared Go/Java fixtures. Its verifier checks schema structure and values, exact expected outcomes for 79 cases (22 positive, 57 negative), and acceptance IDs SP-A-001 through SP-A-013. It also checks fixture source consistency and two malformed/outcome mutation controls. Development command `python contracts/plugin-api/verify.py` passed with exit 0 (118.3817 ms for the final recorded run). `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0 (1039.2365 ms for the final recorded run). These are development results, not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`.
 - Dependencies `LOOP1-CONTRACT-002` and `LOOP1-SPEC-001` are independently accepted and `done` on clean local `main` at `eb9ebea`. Frozen architecture, WSS, CTRL-002 Acceptance, and Recorder repository checks passed on that checkout before activation. S0 Gate remains NOT YET PASSED.
 - Activation Recorder run `R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df` finished and validated PASS with 8 events. The current checkout's `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0; this is recovery evidence, not Task acceptance.
 
 # Handoff
 
-- Implementation is complete in isolated branch `task/LOOP1-CONTRACT-003`; the task remains active pending a fresh independent reviewer and clean-checkout acceptance. No Frozen Architecture, approved ADR, existing HTTP/WSS contract, public ACK semantics, or product runtime was changed. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
+- Implementation is complete at clean candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff` in isolated branch `task/LOOP1-CONTRACT-003`. The task is in `review` pending a fresh independent reviewer and clean-checkout acceptance. No Frozen Architecture, approved ADR, existing HTTP/WSS contract, public ACK semantics, or product runtime was changed. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
 
 # Next Action
 

@@ -1,0 +1,62 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index af6bc67..3857cad 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -12,11 +12,11 @@ Current Batch: LOOP1-S0
+ 
+ Current Task: LOOP1-CONTRACT-003
+ 
+-Current Task State: active
++Current Task State: review
+ 
+ ## Current Contract Work
+ 
+-- Fresh Implementation Agent `/root/contract003_impl` completed the Contract 003 candidate in isolated branch `task/LOOP1-CONTRACT-003`: canonical Sync v1 and Plugin API v1 schemas, permission/limit/lifecycle policy, and 79 shared Go/Java golden cases covering SP-A-001..013. The final recorded schema/fixture verifier passed with exit 0; CTRL-002 Development passed with exit 0. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The task remains `active` pending fresh independent review; S0 Gate NOT YET PASSED.
++- Fresh Implementation Agent `/root/contract003_impl` completed clean Contract 003 candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`: canonical Sync v1 and Plugin API v1 schemas, permission/limit/lifecycle policy, and 79 shared Go/Java golden cases covering SP-A-001..013. The final recorded schema/fixture verifier passed with exit 0; CTRL-002 Development passed with exit 0. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The task is now in `review` for a fresh independent agent; S0 Gate NOT YET PASSED.
+ - Contract 003 activation Recorder run `R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df` finished and validated PASS (8 events). `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0 in 1057.2144 ms; this is recovery evidence, not acceptance. The exact activation commands and initial failed recovery attempt are recorded in the run.
+ - `LOOP1-CONTRACT-003` was selected by dependency satisfaction after clean local-main Contract 002 closure `eb9ebea` passed WSS, CTRL-002 Acceptance, and Recorder repository validation. Its exact Task Spec is now active in branch `task/LOOP1-CONTRACT-003`. Scope: machine-verifiable Sync and Plugin API v1 contracts and duplicate/out-of-order/gap/permission fixtures. S0 Gate NOT YET PASSED.
+ - `LOOP1-CONTRACT-002` is independently accepted and locally integrated. Fresh portability Review PASS covers clean checkouts with both `core.autocrlf` settings. Local `main` at `fb789509bb9d28dc224b0b1a623a65478f7b7ebc` needed one refresh of its previously converted clean fixture from the exact committed blob. It then passed WSS, frozen architecture, and clean CTRL-002 Acceptance. Integration Recorder run `R-20260928T093047Z-78a476e3-1352-4f6b-844b-e06cf8a75bfb`; closure evidence `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-acceptance-closure.md`. Task is `done`; S0 Gate NOT YET PASSED.
+@@ -224,7 +224,7 @@ Delegate a fresh independent Review Agent for the exact clean Contract 003 candi
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-- Fresh Implementation Agent `/root/contract003_impl` owns only Contract 003 allowed-path contract/fixture files, task/current handoff, development evidence, and task-linked Recorder artifacts until the clean candidate commit. After the commit it owns no uncommitted changes. The original `H:\IM-platform` untracked HTTP schema-lint directory remains solely owned by the paused Agent and untouched.
++- Coordinator `/root` owns only the Contract 003 review queue transition, current/task recovery update, and linked Recorder handoff artifacts until the transition commit. The fresh Implementation Agent committed its clean candidate and owns no uncommitted changes. The original `H:\IM-platform` untracked HTTP schema-lint directory remains solely owned by the paused Agent and untouched.
+ - Coordinator `/root` completed Contract 003 queue activation in the clean activation commit; Implementation Agent ownership of the candidate is recorded above.
+ - Coordinator `/root` owns only Contract 002 closure evidence, queue/progress transition, checkpoint, and task-linked Recorder artifacts until committed. Local `main` is clean; the original checkout's unrelated untracked HTTP schema-lint directory remains under its paused Agent's ownership and untouched.
+ - Fresh independent Reviewer `/root/contract002_portability_review` owns only task-linked PASS evidence, byte-integrity audit, task/current recovery updates, and linked Recorder artifacts until the review closure commit. No product file was edited. The separate detached Acceptance checkout remains clean.
+diff --git a/spec/tasks/active/LOOP1-CONTRACT-003.md b/spec/tasks/review/LOOP1-CONTRACT-003.md
+similarity index 89%
+rename from spec/tasks/active/LOOP1-CONTRACT-003.md
+rename to spec/tasks/review/LOOP1-CONTRACT-003.md
+index d452ab7..9c0eb47 100644
+--- a/spec/tasks/active/LOOP1-CONTRACT-003.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-003.md
+@@ -1,7 +1,7 @@
+ ---
+ task_id: LOOP1-CONTRACT-003
+ title: Freeze Sync and Plugin API v1 contracts
+-status: active
++status: review
+ owner: /root
+ stage: S0
+ gate: S0
+@@ -65,7 +65,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Handoff
+ 
+-- Implementation is complete in isolated branch `task/LOOP1-CONTRACT-003`; the task remains active pending a fresh independent reviewer and clean-checkout acceptance. No Frozen Architecture, approved ADR, existing HTTP/WSS contract, public ACK semantics, or product runtime was changed. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
++- Implementation is complete at clean candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff` in isolated branch `task/LOOP1-CONTRACT-003`. The task is in `review` pending a fresh independent reviewer and clean-checkout acceptance. No Frozen Architecture, approved ADR, existing HTTP/WSS contract, public ACK semantics, or product runtime was changed. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
+ 
+ # Next Action
+ 
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-2d6cbb22-d6bd-4f8f-9831-2259c7cfd9f1/metadata.json
+# ?? research/prompts/P-2d6cbb22-d6bd-4f8f-9831-2259c7cfd9f1/prompt.txt
+# ?? research/runs/R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd/blobs/C-337641a4-eb36-42a9-aba0-5b2c2fcf8222.stderr.txt
+# ?? research/runs/R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd/blobs/C-337641a4-eb36-42a9-aba0-5b2c2fcf8222.stdout.txt
+# ?? research/runs/R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd/events.jsonl
+# ?? research/runs/R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd/initial_state.json
+# ?? research/runs/R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition-prompt.txt
