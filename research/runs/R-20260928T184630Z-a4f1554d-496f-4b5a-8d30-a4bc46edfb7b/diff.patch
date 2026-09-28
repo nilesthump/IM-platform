@@ -1,0 +1,85 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 1166cae..751bbbc 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: active
+ 
+ ## Current Contract Work
+ 
++- Fresh `LOOP1-INFRA-001` Implementation Agent completed a task-scoped Compose skeleton with separate Go/Java profiles, PostgreSQL, Core NATS, canonical migration, and Caddy TLS proxy. Both disposable profile smokes passed real HTTPS and WSS Upgrade through TLS 1.3, plus migration and NATS checks; frozen architecture and CTRL-002 Development passed. Development evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. Task remains `active` until Coordinator review transition; independent clean-checkout acceptance is pending. S0 Gate NOT YET PASSED.
+ - `LOOP1-INFRA-001` is `active` on isolated branch `task/LOOP1-INFRA-001` from accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. DB dependency is independently accepted and `done`; infrastructure product work awaits a fresh Implementation Agent. Frozen architecture and CTRL-002 Development passed after correcting the DB integration handoff's abbreviated Last Known Good Commit. Docker Compose v5.1.4 is available. Activation Recorder `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` validated PASS; details at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. S0 Gate NOT YET PASSED.
+ - `LOOP1-DB-001` accepted closure is integrated on clean local `main` at `016f429`. Post-integration PostgreSQL 16 tests passed 3/3, frozen architecture and CTRL-002 Acceptance passed, and committed Recorder repository artifacts validated. Integration Recorder `R-20260928T180300Z-e2553a57-4a18-4214-a83f-0c04f4859b5a` validated PASS; exact evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-main-integration.md`. The disposable DB test container was stopped. S0 Gate NOT YET PASSED.
+ - `LOOP1-DB-001` is `done` after fresh independent Review 1 PASS at clean product candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d`. Actual PostgreSQL 16 tests passed 3/3; independent negative probes, frozen hashes, scope, Recorder integrity, and clean detached CTRL-002 Acceptance passed. Coordinator closure Recorder `R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e` validated PASS; `done` queue CTRL-002 Development exited 0. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md` and `2026-09-29-acceptance-closure.md`; checkpoint `spec/progress/checkpoints/2026-09-29-loop1-db-001-accepted.md`. S0 Gate NOT YET PASSED.
+@@ -233,11 +234,11 @@ Current Task State: active
+ 
+ ## Next Exact Action
+ 
+-Coordinator: complete Infra activation verification and Recorder handoff, commit the clean activation, then delegate a fresh Implementation Agent for the Compose/PostgreSQL/NATS/TLS skeleton. S0 Gate remains NOT YET PASSED.
++Coordinator: transition the clean Infra implementation candidate from `active` to `review`; delegate a fresh independent Review Agent to inspect scope/minimality and run both profile smokes and CTRL-002 Acceptance in a clean committed checkout. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+-`3e4d0f3cb3030731345288f677d2048d72651fd5` (independently accepted DB closure and post-integration evidence on clean local `main`; Infra activation is pending).
++`3e4d0f3cb3030731345288f677d2048d72651fd5` (independently accepted DB closure and post-integration evidence on clean local `main`; Infra implementation has only development verification until fresh independent review).
+ 
+ ## Latest Checkpoint
+ 
+@@ -245,6 +246,7 @@ Coordinator: complete Infra activation verification and Recorder handoff, commit
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Implementation Agent `/root/infra001_impl` owns only task-allowed Compose/TLS, Go/Java non-business placeholders, infrastructure smoke, task/current recovery, development evidence, and linked Recorder artifacts until committed as a clean candidate. The original `H:\IM-platform\contracts\http\schema-lint` belongs to the paused Agent and was untouched.
+ - Coordinator `/root` owns only Infra queue activation, task/current recovery update, and task-linked activation Recorder evidence until committed. No product infrastructure path is changed; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
+ - Coordinator `/root` owns only DB local-main integration evidence, the linked Recorder prompt/run, and recovery update until committed. Local `main` is clean at the accepted DB closure; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
+ - Coordinator `/root` owns only DB `done` queue transition, accepted checkpoint/evidence, current recovery update, and linked Recorder closure artifacts until committed. All DB migration/runner/test files are clean at the independently reviewed candidate; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+diff --git a/spec/tasks/active/LOOP1-INFRA-001.md b/spec/tasks/active/LOOP1-INFRA-001.md
+index 5ff5178..2d80da9 100644
+--- a/spec/tasks/active/LOOP1-INFRA-001.md
++++ b/spec/tasks/active/LOOP1-INFRA-001.md
+@@ -48,13 +48,15 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Implementation development: separate Go and Java Compose profiles each started PostgreSQL 16, Core NATS, canonical migration, three non-business backend units, and a Caddy TLS proxy in disposable isolated projects. Both profile smokes passed real HTTPS health and WebSocket Upgrade over TLS 1.3. Frozen architecture hash and CTRL-002 Development passed. See `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md` and Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. These are implementation evidence only; fresh independent clean-checkout review is required.
+ - Activation prompt `P-cf192254-2cdd-4cd1-9944-79cb3708fadc`, Recorder run `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` finished and validated PASS (10 events). CTRL-002 Development recovered task in `active`; frozen architecture hashes passed; Docker Compose v5.1.4 is available. Pre-run activation steps and the corrected stale abbreviated commit are disclosed at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. This is not independent acceptance.
+ - Dependency `LOOP1-DB-001` is independently accepted and `done` at clean local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`; post-integration PostgreSQL tests, frozen hashes, CTRL-002 Acceptance, and Recorder repository validation passed. S0 Gate remains NOT YET PASSED.
+ 
+ # Handoff
+ 
++- Fresh Implementation Agent `/root/infra001_impl` owns only the allowed Compose/TLS skeleton, Go/Java non-business placeholders, infrastructure smoke, task/current updates, development evidence, and task-linked Recorder artifacts through the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint tree was untouched.
+ - Coordinator `/root` activated on isolated branch `task/LOOP1-INFRA-001` from clean accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. Fresh Implementation Agent to take product work after activation handoff. No product infrastructure file changed at activation; Coordinator owns only this task/current/evidence/Recorder activation set until committed. Original checkout's untracked `contracts/http/schema-lint` remains under a paused Agent's sole ownership and untouched.
+ 
+ # Next Action
+ 
+-- Fresh Implementation Agent: implement only the allowed Compose/TLS skeleton and meaningful smoke tests, record development verification, then hand off a clean candidate for fresh independent review. Do not claim Task or S0 Gate PASS from development output.
++- Coordinator: move this clean implementation candidate to `review`, then delegate a fresh independent Review Agent to run exact clean-checkout profile smokes and acceptance under ADR-0001. Do not claim Task or S0 Gate PASS from development output.
+
+# Untracked paths observed; content intentionally not captured
+# ?? backend/go/Dockerfile
+# ?? backend/go/main.go
+# ?? backend/java/Dockerfile
+# ?? backend/java/InfraPlaceholder.java
+# ?? deploy/Caddyfile
+# ?? deploy/README.md
+# ?? deploy/compose.yaml
+# ?? deploy/migrate.Dockerfile
+# ?? research/prompts/P-c5e10382-3faa-4cf2-89d8-1cb9feb8fcea/metadata.json
+# ?? research/prompts/P-c5e10382-3faa-4cf2-89d8-1cb9feb8fcea/prompt.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-18602ff2-b2a6-4f4f-a0a1-711e7f4b609c.stderr.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-18602ff2-b2a6-4f4f-a0a1-711e7f4b609c.stdout.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-496fdfca-6206-496e-ae1a-63549dbe45be.stderr.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-496fdfca-6206-496e-ae1a-63549dbe45be.stdout.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-a81310a8-191e-4d7d-b371-7b386d6e40ab.stderr.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-a81310a8-191e-4d7d-b371-7b386d6e40ab.stdout.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-d00a6a93-a0c8-482d-a64a-bf3e63684be8.stderr.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-d00a6a93-a0c8-482d-a64a-bf3e63684be8.stdout.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-e285708d-3b51-4f55-8d9d-990b4a434955.stderr.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-e285708d-3b51-4f55-8d9d-990b4a434955.stdout.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-ee7b5251-b3f1-4d71-8ddb-a922323ddd30.stderr.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/blobs/C-ee7b5251-b3f1-4d71-8ddb-a922323ddd30.stdout.txt
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/events.jsonl
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/initial_state.json
+# ?? research/runs/R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b/metadata.json
+# ?? spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md
+# ?? spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-prompt.txt
+# ?? tests/infrastructure/smoke.ps1

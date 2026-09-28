@@ -1,0 +1,133 @@
+name: im-loop1
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: im
+      POSTGRES_USER: im
+      POSTGRES_PASSWORD: ${IM_POSTGRES_PASSWORD:-local-development-only}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U im -d im"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  nats:
+    image: nats:2.10-alpine
+    command: ["--http_port", "8222"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8222/healthz"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  migrate:
+    build:
+      context: ..
+      dockerfile: deploy/migrate.Dockerfile
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: im
+      PGDATABASE: im
+      PGPASSWORD: ${IM_POSTGRES_PASSWORD:-local-development-only}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  gateway-go:
+    profiles: [go]
+    build:
+      context: ../backend/go
+    command: ["gateway"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      nats:
+        condition: service_healthy
+
+  core-go:
+    profiles: [go]
+    build:
+      context: ../backend/go
+    command: ["core"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      nats:
+        condition: service_healthy
+
+  plugin-host-go:
+    profiles: [go]
+    build:
+      context: ../backend/go
+    command: ["plugin-host"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  gateway-java:
+    profiles: [java]
+    build:
+      context: ../backend/java
+    command: ["gateway"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      nats:
+        condition: service_healthy
+
+  core-java:
+    profiles: [java]
+    build:
+      context: ../backend/java
+    command: ["core"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      nats:
+        condition: service_healthy
+
+  plugin-host-java:
+    profiles: [java]
+    build:
+      context: ../backend/java
+    command: ["plugin-host"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  tls-go:
+    profiles: [go]
+    image: caddy:2-alpine
+    environment:
+      UPSTREAM: gateway-go:8080
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-go-data:/data
+    ports:
+      - "${IM_HTTPS_PORT:-8443}:443"
+    depends_on:
+      - gateway-go
+
+  tls-java:
+    profiles: [java]
+    image: caddy:2-alpine
+    environment:
+      UPSTREAM: gateway-java:8080
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-java-data:/data
+    ports:
+      - "${IM_HTTPS_PORT:-8443}:443"
+    depends_on:
+      - gateway-java
+
+volumes:
+  postgres-data:
+  caddy-go-data:
+  caddy-java-data:

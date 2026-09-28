@@ -48,13 +48,15 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Implementation development: separate Go and Java Compose profiles each started PostgreSQL 16, Core NATS, canonical migration, three non-business backend units, and a Caddy TLS proxy in disposable isolated projects. Both profile smokes passed real HTTPS health and WebSocket Upgrade over TLS 1.3. Frozen architecture hash and CTRL-002 Development passed. See `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md` and Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. These are implementation evidence only; fresh independent clean-checkout review is required.
 - Activation prompt `P-cf192254-2cdd-4cd1-9944-79cb3708fadc`, Recorder run `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` finished and validated PASS (10 events). CTRL-002 Development recovered task in `active`; frozen architecture hashes passed; Docker Compose v5.1.4 is available. Pre-run activation steps and the corrected stale abbreviated commit are disclosed at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. This is not independent acceptance.
 - Dependency `LOOP1-DB-001` is independently accepted and `done` at clean local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`; post-integration PostgreSQL tests, frozen hashes, CTRL-002 Acceptance, and Recorder repository validation passed. S0 Gate remains NOT YET PASSED.
 
 # Handoff
 
+- Fresh Implementation Agent `/root/infra001_impl` owns only the allowed Compose/TLS skeleton, Go/Java non-business placeholders, infrastructure smoke, task/current updates, development evidence, and task-linked Recorder artifacts through the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint tree was untouched.
 - Coordinator `/root` activated on isolated branch `task/LOOP1-INFRA-001` from clean accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. Fresh Implementation Agent to take product work after activation handoff. No product infrastructure file changed at activation; Coordinator owns only this task/current/evidence/Recorder activation set until committed. Original checkout's untracked `contracts/http/schema-lint` remains under a paused Agent's sole ownership and untouched.
 
 # Next Action
 
-- Fresh Implementation Agent: implement only the allowed Compose/TLS skeleton and meaningful smoke tests, record development verification, then hand off a clean candidate for fresh independent review. Do not claim Task or S0 Gate PASS from development output.
+- Coordinator: move this clean implementation candidate to `review`, then delegate a fresh independent Review Agent to run exact clean-checkout profile smokes and acceptance under ADR-0001. Do not claim Task or S0 Gate PASS from development output.
