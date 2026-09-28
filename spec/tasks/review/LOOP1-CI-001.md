@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Independent Review 3 PASS is recorded, but actual GitHub Actions execution is blocked: automatic approval review rejected pushing the reviewed branch to the repository remote. No push occurred. Exact reason, target, unchanged remote state, and requested approval: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-external-ci-dispatch-blocker.md`. Task remains `review`; S0 Gate NOT YET PASSED.
+
 - Fresh independent Review 3 `/root/ci001_review3` **PASS** at clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: CTRL-002 Acceptance, all 12 CI tests, prior rename probe, new independent SDK-rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. The clean checkout stayed clean. Exact commands, exits, elapsed times, scope/minimality judgment, and independence are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; review Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Task remains `review` pending actual GitHub workflow run and Coordinator closure; S0 Gate NOT YET PASSED.
 
 - Fresh Fix 2 changes Git diff collection to `--no-renames`, exposing both the removed source and added destination of a rename. Regression tests cover moves from contract, database, and SDK trees to unclassified docs paths; all 12 path/gate tests and the former Review 2 negative probe pass. CTRL-002 Acceptance, 12 tests, and frozen hashes pass from a clean detached checkout of `4dc41b5`; exact commands and Recorder run are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`. This Fix-Agent run is not independent acceptance; the task remains `review` and S0 Gate is NOT YET PASSED.
@@ -77,4 +79,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator: verify this independent review evidence, arrange and inspect actual GitHub workflow execution for the reviewed candidate, then complete task acceptance closure if all required jobs pass. S0 Gate remains pending.
+- `BLOCKED_EXTERNAL_ACCESS`: await explicit user authorization for the exact remote branch push rejected by automatic approval review. Then run and inspect GitHub Actions, repair any failures through fresh Fix/Review, and close the task only when operational CI acceptance is established. S0 Gate remains pending.

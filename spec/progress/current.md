@@ -123,6 +123,8 @@ Current Task State: review
 
 ## Current Blockers
 
+- `BLOCKED_EXTERNAL_ACCESS`: automatic approval review rejected publishing the reviewed `task/LOOP1-CI-001` branch to `https://github.com/nilesthump/IM-platform.git` because remote ownership/trust and exact destination were not established by trusted user content. No push occurred; actual GitHub Actions has not run. Explicit approval requested for that exact branch push. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-external-ci-dispatch-blocker.md`.
+
 - No current `LOOP1-MIN-001` blocker. The prior integration FAIL remains permanent evidence; the later Human authorization did not retroactively turn that review into PASS.
 - No current `LOOP1-CONTRACT-001` blocker. Its prior Recorder Git-transport rejection and subsequent explicit Human authorization remain documented; the accepted closure preserves original run event/output bytes.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
@@ -250,7 +252,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator: verify Review 3 PASS evidence, arrange and inspect actual GitHub workflow execution for the reviewed candidate, then close `LOOP1-CI-001` only if applicable acceptance passes. S0 Gate NOT YET PASSED.
+Await explicit user authorization for the exact reviewed CI branch push rejected by automatic approval review; then run and inspect GitHub Actions, repair any failures through fresh Fix/Review, and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 
