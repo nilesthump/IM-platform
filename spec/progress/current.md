@@ -12,10 +12,11 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CONTRACT-002
 
-Current Task State: review
+Current Task State: done
 
 ## Current Contract Work
 
+- `LOOP1-CONTRACT-002` is independently accepted and locally integrated. Fresh portability Review PASS covers clean checkouts with both `core.autocrlf` settings. Local `main` at `fb789509bb9d28dc224b0b1a623a65478f7b7ebc` needed one refresh of its previously converted clean fixture from the exact committed blob. It then passed WSS, frozen architecture, and clean CTRL-002 Acceptance. Integration Recorder run `R-20260928T093047Z-78a476e3-1352-4f6b-844b-e06cf8a75bfb`; closure evidence `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-acceptance-closure.md`. Task is `done`; S0 Gate NOT YET PASSED.
 - Fresh independent Review Agent `/root/contract002_portability_review` accepted clean candidate `57a02590b0464755c6ff2bf5187e0bb69f9ce08c`: both `core.autocrlf` clean checkouts preserved golden bytes and passed WSS; five prior probes, canonical hashes, clean detached CTRL-002 Acceptance, scope/minimality, and Fix Recorder bytes passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-independent-review-pass.md`; Review run `R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779`. Task remains `review` for Coordinator integration; S0 Gate NOT YET PASSED.
 - Fresh Fix Agent `/root/contract002_portability_fix` repaired the post-main checkout failure with fixture-local `golden.json -text` at `59bc411`. Disposable clean worktrees with `core.autocrlf=true` and `false` both retained the original golden blob bytes and passed WSS verification. Five prior independent mutation probe sets, the WSS baseline, frozen architecture hash verifier, and CTRL-002 Development passed. The golden fixture and WSS schema/semantics are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. The task remains `review` for fresh independent review; S0 Gate remains NOT YET PASSED.
 - `LOOP1-CONTRACT-002` is independently accepted under ADR-0001 at exact reviewed candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`, with PASS report committed at `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The separate clean detached CTRL-002 Acceptance, WSS verifier, five prior probe sets, ten new controls, architecture hashes, scope audit, and Review Recorder validation passed. Coordinator closure evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`.
@@ -208,18 +209,19 @@ Current Task State: review
 
 ## Next Exact Action
 
-Accept the fresh independent portability PASS, then repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
+Commit Contract 002 closure and Recorder evidence, fast-forward clean local `main`, then activate dependency-satisfied `LOOP1-CONTRACT-003`. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`7484901b3915535f60941a01116b730a845bd47d` (last fully verified local/remote `main` before Contract 002 integration; candidate `5d5afdd` passed isolated content review, but the main checkout failed WSS verification).
+`fb789509bb9d28dc224b0b1a623a65478f7b7ebc` (locally verified clean `main` after independently accepted portability repair and one-time exact-blob fixture refresh; closure commit remains pending).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md` (Contract 002 checkpoint is retained as candidate acceptance history but was not a verified stable main recovery point).
+`spec/progress/checkpoints/2026-09-28-loop1-contract-002-main-accepted.md` (accepted WSS content, portability repair, and verified local-main recovery).
 
 ## Uncommitted Changes / Ownership
 
+- Coordinator `/root` owns only Contract 002 closure evidence, queue/progress transition, checkpoint, and task-linked Recorder artifacts until committed. Local `main` is clean; the original checkout's unrelated untracked HTTP schema-lint directory remains under its paused Agent's ownership and untouched.
 - Fresh independent Reviewer `/root/contract002_portability_review` owns only task-linked PASS evidence, byte-integrity audit, task/current recovery updates, and linked Recorder artifacts until the review closure commit. No product file was edited. The separate detached Acceptance checkout remains clean.
 
 - Fresh Fix Agent `/root/contract002_portability_fix` owns only the fixture-local transport rule, committed checkout regression, Task Spec/current recovery updates, task-linked development evidence, and Recorder prompt/run until the clean review-candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory remains untouched.

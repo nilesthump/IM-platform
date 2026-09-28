@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
-status: review
+status: done
 owner: /root
 stage: S0
 gate: S0
@@ -87,6 +87,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - Fresh Fix Agent `/root/contract002_portability_fix` added a fixture-local `golden.json -text` rule. The committed generator and golden bytes are unchanged. A committed regression creates disposable clean checkouts with `core.autocrlf=true` and `false`, verifies working bytes against the Git blob, and runs the WSS verifier in both. Both pass at fix commit `59bc411`; the five prior independent probe sets, local WSS baseline, frozen architecture verifier, and CTRL-002 Development also pass. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder prompt `P-1e0f7ed9-541e-4fe6-b5de-89e8a3485513`, run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. This remains development evidence pending fresh independent review.
 
 - Fresh independent Review Agent `/root/contract002_portability_review` returned PASS for clean candidate `57a02590b0464755c6ff2bf5187e0bb69f9ce08c`. Both fresh `core.autocrlf` settings preserved exact golden bytes and passed WSS; all five prior mutation probes, canonical hashes, clean detached CTRL-002 Acceptance, Fix Recorder byte audit, protected-path scope, and minimality passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-independent-review-pass.md`; review Recorder run `R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779`. This is independent review, not Coordinator closure or Stage Gate PASS.
+- Coordinator accepted that independent PASS and fast-forwarded clean local `main` to review-evidence commit `fb789509bb9d28dc224b0b1a623a65478f7b7ebc`. The existing checkout retained its pre-attribute CRLF fixture bytes, so its first WSS run failed. After confirming no user changes and matching the committed fixture blob, the Coordinator refreshed only `golden.json` from the exact Git blob. Local `main` then had empty Git status and passed WSS (8 positive, 10 negative, 18 schema and 26 behavior mutations), canonical architecture hashes, and CTRL-002 Acceptance. Integration Recorder run: `R-20260928T093047Z-78a476e3-1352-4f6b-844b-e06cf8a75bfb`; durable closure: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-acceptance-closure.md`. This Task is `done`; S0 Gate remains NOT YET PASSED.
 
 # Handoff
 
@@ -95,4 +96,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Coordinator accepts the fresh independent portability PASS and repeats clean local-main post-merge WSS, architecture, CTRL-002 Acceptance, and Recorder checks before returning this task to `done`. Do not activate `LOOP1-CONTRACT-003` yet. S0 Gate remains NOT YET PASSED.
+- Commit the accepted closure and Recorder evidence, fast-forward clean local `main`, then activate dependency-satisfied `LOOP1-CONTRACT-003`. S0 Gate remains NOT YET PASSED.

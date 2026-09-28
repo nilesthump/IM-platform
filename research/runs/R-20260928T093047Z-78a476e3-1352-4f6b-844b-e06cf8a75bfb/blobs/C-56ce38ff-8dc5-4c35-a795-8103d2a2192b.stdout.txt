@@ -1,0 +1,171 @@
+Updating 9b5210f..fb78950
+Fast-forward
+ contracts/fixtures/websocket/.gitattributes        |   2 +
+ .../metadata.json                                  |  13 +
+ .../prompt.txt                                     |   1 +
+ .../metadata.json                                  |  13 +
+ .../prompt.txt                                     |   2 +
+ .../blobs/.gitattributes                           |   1 +
+ ...08c5026e-5932-4086-9f16-b49ad0e304b8.stderr.txt |   0
+ ...08c5026e-5932-4086-9f16-b49ad0e304b8.stdout.txt |   1 +
+ ...5f17e7f4-2e8d-4e80-be2d-0b0c74a31b36.stderr.txt |   0
+ ...5f17e7f4-2e8d-4e80-be2d-0b0c74a31b36.stdout.txt |  13 +
+ ...6ce58ed7-4321-4ed3-b3ec-2aa7c69c2716.stderr.txt |   0
+ ...6ce58ed7-4321-4ed3-b3ec-2aa7c69c2716.stdout.txt |   6 +
+ ...6f5d3acb-1547-494c-b8dc-b8fbedcf6616.stderr.txt |   0
+ ...6f5d3acb-1547-494c-b8dc-b8fbedcf6616.stdout.txt |   3 +
+ ...710bdcc0-d84c-4f2d-8b42-cce2cf19d60e.stderr.txt |   0
+ ...710bdcc0-d84c-4f2d-8b42-cce2cf19d60e.stdout.txt |   2 +
+ ...90dd6fa0-da4a-4d7c-bc66-6c48b977fbb6.stderr.txt |   2 +
+ ...90dd6fa0-da4a-4d7c-bc66-6c48b977fbb6.stdout.txt |   0
+ ...917a05ca-43e1-438a-b1e0-5a2a24aca8e3.stderr.txt |   0
+ ...917a05ca-43e1-438a-b1e0-5a2a24aca8e3.stdout.txt |   1 +
+ ...a4041386-0773-4506-8566-f6f9bda0fd81.stderr.txt |   4 +
+ ...a4041386-0773-4506-8566-f6f9bda0fd81.stdout.txt |   6 +
+ ...a5c95c5f-531f-405d-a739-641fb76e9658.stderr.txt |   0
+ ...a5c95c5f-531f-405d-a739-641fb76e9658.stdout.txt |   0
+ ...ad345506-225e-4e3d-ae4c-7d8fbfed8e60.stderr.txt |   0
+ ...ad345506-225e-4e3d-ae4c-7d8fbfed8e60.stdout.txt |   1 +
+ ...c4fc47cb-e376-4aa5-829b-4f3fb22dea8e.stderr.txt |   0
+ ...c4fc47cb-e376-4aa5-829b-4f3fb22dea8e.stdout.txt |  10 +
+ ...d3f5ece8-5d33-41f4-b712-589472ebdf0b.stderr.txt |   0
+ ...d3f5ece8-5d33-41f4-b712-589472ebdf0b.stdout.txt |   3 +
+ ...ebeed87e-af9b-4e61-bae5-0a581333eb31.stderr.txt |   0
+ ...ebeed87e-af9b-4e61-bae5-0a581333eb31.stdout.txt |   1 +
+ ...fbe6eb17-3aca-4cbe-b12c-8c7674385cf9.stderr.txt |   0
+ ...fbe6eb17-3aca-4cbe-b12c-8c7674385cf9.stdout.txt |  25 ++
+ .../diff.patch                                     | 137 ++++++++++
+ .../events.jsonl                                   |  32 +++
+ .../final_state.json                               | 278 ++++++++++++++++++++
+ .../initial_state.json                             | 208 +++++++++++++++
+ .../metadata.json                                  |  32 +++
+ .../summary.json                                   |  10 +
+ .../blobs/.gitattributes                           |   1 +
+ ...061b2045-f76f-421a-907d-17c57861185c.stderr.txt |   0
+ ...061b2045-f76f-421a-907d-17c57861185c.stdout.txt |   0
+ ...3921f63c-0327-4ebd-abf5-5c8c2e96e9d6.stderr.txt |   0
+ ...3921f63c-0327-4ebd-abf5-5c8c2e96e9d6.stdout.txt |  10 +
+ ...5650423a-e64b-4acc-b574-bd033c9fc32d.stderr.txt |   0
+ ...5650423a-e64b-4acc-b574-bd033c9fc32d.stdout.txt |   0
+ ...5f34d823-3198-4563-a2af-81f77d81012e.stderr.txt |   1 +
+ ...5f34d823-3198-4563-a2af-81f77d81012e.stdout.txt |   1 +
+ ...67dd9a4f-9c6b-43a0-af92-91af9f4db775.stderr.txt |   0
+ ...67dd9a4f-9c6b-43a0-af92-91af9f4db775.stdout.txt |   2 +
+ ...6fdafadd-1f1a-4f82-bb2d-e54fa81c37ad.stderr.txt |   0
+ ...6fdafadd-1f1a-4f82-bb2d-e54fa81c37ad.stdout.txt |   1 +
+ ...6fee2448-d45a-46a4-82a7-b8896e1926f2.stderr.txt |   0
+ ...6fee2448-d45a-46a4-82a7-b8896e1926f2.stdout.txt |   0
+ ...728a56f7-9885-4621-abbc-b195cc06467c.stderr.txt |   0
+ ...728a56f7-9885-4621-abbc-b195cc06467c.stdout.txt |   0
+ ...7cd99100-f828-4ee2-8e9b-9eeaed03de2a.stderr.txt |   0
+ ...7cd99100-f828-4ee2-8e9b-9eeaed03de2a.stdout.txt |  25 ++
+ ...7e068348-e749-4bee-951c-7a0e7f372335.stderr.txt |   0
+ ...7e068348-e749-4bee-951c-7a0e7f372335.stdout.txt |   1 +
+ ...7f22e098-dc1b-4d9b-b53d-139378ad3c1f.stderr.txt |   0
+ ...7f22e098-dc1b-4d9b-b53d-139378ad3c1f.stdout.txt |   1 +
+ ...8b7bdf7d-645a-4bf7-a795-fa5860526126.stderr.txt |   2 +
+ ...8b7bdf7d-645a-4bf7-a795-fa5860526126.stdout.txt |   6 +
+ ...b236bbb9-2e53-4c02-9c8e-93f66aea4b29.stderr.txt |   0
+ ...b236bbb9-2e53-4c02-9c8e-93f66aea4b29.stdout.txt |   1 +
+ ...cab1a49a-158c-4fee-9a19-fc1b0a2e1272.stderr.txt |   0
+ ...cab1a49a-158c-4fee-9a19-fc1b0a2e1272.stdout.txt |  13 +
+ ...efbcbcc2-7c53-4e90-b594-68aee853c924.stderr.txt |   0
+ ...efbcbcc2-7c53-4e90-b594-68aee853c924.stdout.txt |   1 +
+ ...efc5f67e-1bad-480a-b8a8-d67d9933458b.stderr.txt |   0
+ ...efc5f67e-1bad-480a-b8a8-d67d9933458b.stdout.txt |   2 +
+ .../diff.patch                                     |  90 +++++++
+ .../events.jsonl                                   |  36 +++
+ .../final_state.json                               | 288 +++++++++++++++++++++
+ .../initial_state.json                             | 208 +++++++++++++++
+ .../metadata.json                                  |  32 +++
+ .../summary.json                                   |  10 +
+ spec/progress/current.md                           |   7 +-
+ .../2026-09-28-portability-fix-development.md      |  30 +++
+ ...26-09-28-portability-independent-review-pass.md |  35 +++
+ .../2026-09-28-portability-review-integrity.py     |  22 ++
+ .../verify-checkout-portability.ps1                |  40 +++
+ spec/tasks/review/LOOP1-CONTRACT-002.md            |   5 +-
+ 85 files changed, 1676 insertions(+), 2 deletions(-)
+ create mode 100644 contracts/fixtures/websocket/.gitattributes
+ create mode 100644 research/prompts/P-1e0f7ed9-541e-4fe6-b5de-89e8a3485513/metadata.json
+ create mode 100644 research/prompts/P-1e0f7ed9-541e-4fe6-b5de-89e8a3485513/prompt.txt
+ create mode 100644 research/prompts/P-84dd3735-2ae9-42ee-8f0f-a13c41dada5f/metadata.json
+ create mode 100644 research/prompts/P-84dd3735-2ae9-42ee-8f0f-a13c41dada5f/prompt.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/.gitattributes
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-08c5026e-5932-4086-9f16-b49ad0e304b8.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-08c5026e-5932-4086-9f16-b49ad0e304b8.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-5f17e7f4-2e8d-4e80-be2d-0b0c74a31b36.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-5f17e7f4-2e8d-4e80-be2d-0b0c74a31b36.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6ce58ed7-4321-4ed3-b3ec-2aa7c69c2716.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6ce58ed7-4321-4ed3-b3ec-2aa7c69c2716.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6f5d3acb-1547-494c-b8dc-b8fbedcf6616.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-6f5d3acb-1547-494c-b8dc-b8fbedcf6616.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-710bdcc0-d84c-4f2d-8b42-cce2cf19d60e.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-710bdcc0-d84c-4f2d-8b42-cce2cf19d60e.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-90dd6fa0-da4a-4d7c-bc66-6c48b977fbb6.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-90dd6fa0-da4a-4d7c-bc66-6c48b977fbb6.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-917a05ca-43e1-438a-b1e0-5a2a24aca8e3.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-917a05ca-43e1-438a-b1e0-5a2a24aca8e3.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a4041386-0773-4506-8566-f6f9bda0fd81.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a4041386-0773-4506-8566-f6f9bda0fd81.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a5c95c5f-531f-405d-a739-641fb76e9658.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-a5c95c5f-531f-405d-a739-641fb76e9658.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ad345506-225e-4e3d-ae4c-7d8fbfed8e60.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ad345506-225e-4e3d-ae4c-7d8fbfed8e60.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-c4fc47cb-e376-4aa5-829b-4f3fb22dea8e.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-c4fc47cb-e376-4aa5-829b-4f3fb22dea8e.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-d3f5ece8-5d33-41f4-b712-589472ebdf0b.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-d3f5ece8-5d33-41f4-b712-589472ebdf0b.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ebeed87e-af9b-4e61-bae5-0a581333eb31.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-ebeed87e-af9b-4e61-bae5-0a581333eb31.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-fbe6eb17-3aca-4cbe-b12c-8c7674385cf9.stderr.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/blobs/C-fbe6eb17-3aca-4cbe-b12c-8c7674385cf9.stdout.txt
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/diff.patch
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/events.jsonl
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/final_state.json
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/initial_state.json
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/metadata.json
+ create mode 100644 research/runs/R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6/summary.json
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/.gitattributes
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-061b2045-f76f-421a-907d-17c57861185c.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-061b2045-f76f-421a-907d-17c57861185c.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-3921f63c-0327-4ebd-abf5-5c8c2e96e9d6.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-3921f63c-0327-4ebd-abf5-5c8c2e96e9d6.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-5650423a-e64b-4acc-b574-bd033c9fc32d.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-5650423a-e64b-4acc-b574-bd033c9fc32d.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-5f34d823-3198-4563-a2af-81f77d81012e.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-5f34d823-3198-4563-a2af-81f77d81012e.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-67dd9a4f-9c6b-43a0-af92-91af9f4db775.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-67dd9a4f-9c6b-43a0-af92-91af9f4db775.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-6fdafadd-1f1a-4f82-bb2d-e54fa81c37ad.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-6fdafadd-1f1a-4f82-bb2d-e54fa81c37ad.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-6fee2448-d45a-46a4-82a7-b8896e1926f2.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-6fee2448-d45a-46a4-82a7-b8896e1926f2.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-728a56f7-9885-4621-abbc-b195cc06467c.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-728a56f7-9885-4621-abbc-b195cc06467c.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-7cd99100-f828-4ee2-8e9b-9eeaed03de2a.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-7cd99100-f828-4ee2-8e9b-9eeaed03de2a.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-7e068348-e749-4bee-951c-7a0e7f372335.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-7e068348-e749-4bee-951c-7a0e7f372335.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-7f22e098-dc1b-4d9b-b53d-139378ad3c1f.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-7f22e098-dc1b-4d9b-b53d-139378ad3c1f.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-8b7bdf7d-645a-4bf7-a795-fa5860526126.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-8b7bdf7d-645a-4bf7-a795-fa5860526126.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-b236bbb9-2e53-4c02-9c8e-93f66aea4b29.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-b236bbb9-2e53-4c02-9c8e-93f66aea4b29.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-cab1a49a-158c-4fee-9a19-fc1b0a2e1272.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-cab1a49a-158c-4fee-9a19-fc1b0a2e1272.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-efbcbcc2-7c53-4e90-b594-68aee853c924.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-efbcbcc2-7c53-4e90-b594-68aee853c924.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-efc5f67e-1bad-480a-b8a8-d67d9933458b.stderr.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/blobs/C-efc5f67e-1bad-480a-b8a8-d67d9933458b.stdout.txt
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/diff.patch
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/events.jsonl
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/final_state.json
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/initial_state.json
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/metadata.json
+ create mode 100644 research/runs/R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779/summary.json
+ create mode 100644 spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md
+ create mode 100644 spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-independent-review-pass.md
+ create mode 100644 spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-review-integrity.py
+ create mode 100644 spec/progress/evidence/LOOP1-CONTRACT-002/verify-checkout-portability.ps1
