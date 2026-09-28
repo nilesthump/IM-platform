@@ -15,6 +15,8 @@ def call(t,n):
     if t=="action": x.update(action=n,conversationId=C,requestId=R)
     if t=="ui.host": x["slot"]=n
     return x
+def query_page(request, items, more=False, token=""):
+    return {"apiVersion":"1.0","type":"query.page","pluginId":request["pluginId"],"version":request["version"],"query":request["query"],"conversationId":request["conversationId"],"requestPageToken":request["pageToken"],"items":items,"hasMore":more,"nextPageToken":token,"sideEffects":0}
 def artifact(**changes):
     x={"apiVersion":"1.0","type":"artifact","pluginId":P,"version":"1.0.0","packageHash":"a"*64,"backendHash":"b"*64,"rendererHash":"c"*64,"signature":"fixture-signature","manifestValid":True,"compatible":True,"permissionsApproved":True,"resourceSizeOk":True,"cspValid":True,"entryPointValid":True,"sandbox":"iframe"}
     x.update(changes); return x
@@ -34,7 +36,8 @@ add("manifest-duplicate-permission","negative",["SP-A-005"],[{"op":"plugin.manif
 
 add("gap-out-of-order-duplicate","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(n)} for n in (2,2,1)],{"contiguous":2,"messages":{"1":M(1),"2":M(2)},"timeline":[sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",contiguous=2,messages={"1":M(1),"2":M(2)})]})
 add("gap-stops","negative",["SP-A-001"],[{"op":"sync.message","message":msg(2)}],{"contiguous":0,"messages":{"2":M(2)}})
-add("failed-to-sent-terminal","positive",["SP-A-002"],[{"op":"local.failed","conversationId":C,"requestId":R},{"op":"sync.message","message":msg(1)},{"op":"local.failed","conversationId":C,"requestId":R}],{"local":{C+"/"+R:"SENT"},"last":"SENT"})
+local_id=C+"/"+R
+add("failed-to-sent-terminal","positive",["SP-A-002"],[{"op":"local.failed","conversationId":C,"requestId":R},{"op":"sync.message","message":dict(msg(1),requestId=R)},{"op":"local.failed","conversationId":C,"requestId":R}],{"local":{local_id:"SENT"},"last":"SENT","localTimeline":[{"op":"local.failed","local":{local_id:"FAILED"},"itemCount":1,"last":"FAILED"},{"op":"sync.message","local":{local_id:"SENT"},"itemCount":1,"last":"APPLIED"},{"op":"local.failed","local":{local_id:"SENT"},"itemCount":1,"last":"SENT"}]})
 add("message-rollback-and-retry","positive",["SP-A-003"],[{"op":"sync.message","message":msg(1),"fault":"before_commit"},{"op":"sync.message","message":msg(1)}],{"contiguous":1,"messages":{"1":M(1)},"timeline":[sync_snap("sync.message","ROLLED_BACK"),sync_snap("sync.message","APPLIED",contiguous=1,messages={"1":M(1)})]})
 add("user-rollback-and-retry","positive",["SP-A-003","SP-A-004"],[{"op":"sync.user","page":user(),"fault":"before_commit"},{"op":"sync.user","page":user()}],{"cursor":"1","messages":{},"userState":{"friend.changed/"+U:1},"timeline":[sync_snap("sync.user","ROLLED_BACK"),sync_snap("sync.user","APPLIED",cursor="1",user_state={"friend.changed/"+U:1})]})
 for kind in ("friend.changed","conversation.changed","membership.changed","plugin.changed"):
@@ -47,14 +50,20 @@ add("per-conversation-independent-sequence","positive",["SP-A-001","SP-A-012"],[
 
 for t,n,cap,perm in (("event.subscribe","message.created","events","event.message.created"),("query","messages","queries","query.messages"),("action","send_message","actions","action.send_message"),("ui.host","panel","ui","ui.panel")):
     s={"op":"plugin.call","call":call(t,n),"capabilities":[cap],"permissions":[perm],"authorizedAtExecution":True}
+    if t=="query": s["response"]=query_page(s["call"],[{"id":M(1)}])
     tag=t.replace(".","-")
     add("allow-"+tag,"positive",["SP-A-005","SP-A-012"],[s],{"last":"ALLOWED"})
-    add("deny-"+tag+"-capability","negative",["SP-A-005"],[dict(s,capabilities=[])],{"last":"DENIED","sideEffects":0})
-    add("deny-"+tag+"-permission","negative",["SP-A-005","SP-A-012"],[dict(s,permissions=[])],{"last":"DENIED","sideEffects":0})
+    denied_capability=dict(s,capabilities=[]); denied_capability.pop("response",None)
+    denied_permission=dict(s,permissions=[]); denied_permission.pop("response",None)
+    add("deny-"+tag+"-capability","negative",["SP-A-005"],[denied_capability],{"last":"DENIED","sideEffects":0})
+    add("deny-"+tag+"-permission","negative",["SP-A-005","SP-A-012"],[denied_permission],{"last":"DENIED","sideEffects":0})
 add("deny-direct-core-db","negative",["SP-A-005"],[{"op":"plugin.call","call":call("query","messages"),"capabilities":["queries"],"permissions":["query.messages"],"directAccess":True}],{"last":"DENIED"})
 q={"op":"plugin.call","call":call("query","messages"),"capabilities":["queries"],"permissions":["query.messages"]}
-add("query-read-only-paginated","positive",["SP-A-006"],[q],{"last":"ALLOWED","sideEffects":0})
-add("query-over-limit","negative",["SP-A-006"],[dict(q,call=dict(q["call"],pageSize=101))],{"last":"DENIED"})
+first=dict(q,response=query_page(q["call"],[{"id":M(1)},{"id":M(2)}],True,"page-2"))
+second_call=dict(q["call"],pageToken="page-2")
+second=dict(q,call=second_call,response=query_page(second_call,[{"id":M(3)}]))
+add("query-read-only-paginated","positive",["SP-A-006"],[first,second],{"last":"ALLOWED","sideEffects":0,"queryPages":[first["response"],second["response"]]})
+add("query-over-limit","negative",["SP-A-006"],[dict(q,call=dict(q["call"],pageSize=101))],error=True)
 add("query-mutation","negative",["SP-A-006"],[dict(q,mutates=True)],{"last":"DENIED","sideEffects":0})
 a={"op":"plugin.call","call":call("action","send_message"),"capabilities":["actions"],"permissions":["action.send_message"],"authorizedAtExecution":True}
 audit_allowed={"requestId":R,"authorizedAtExecution":True,"outcome":"ALLOWED","sideEffectApplied":True}

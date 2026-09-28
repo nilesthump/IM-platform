@@ -263,7 +263,33 @@
         "local": {
           "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
         },
-        "last": "SENT"
+        "last": "SENT",
+        "localTimeline": [
+          {
+            "op": "local.failed",
+            "local": {
+              "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "FAILED"
+            },
+            "itemCount": 1,
+            "last": "FAILED"
+          },
+          {
+            "op": "sync.message",
+            "local": {
+              "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+            },
+            "itemCount": 1,
+            "last": "APPLIED"
+          },
+          {
+            "op": "local.failed",
+            "local": {
+              "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+            },
+            "itemCount": 1,
+            "last": "SENT"
+          }
+        ]
       }
     },
     {
@@ -815,7 +841,24 @@
           "permissions": [
             "query.messages"
           ],
-          "authorizedAtExecution": true
+          "authorizedAtExecution": true,
+          "response": {
+            "apiVersion": "1.0",
+            "type": "query.page",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestPageToken": "",
+            "items": [
+              {
+                "id": "50000000-0000-4000-8000-000000000001"
+              }
+            ],
+            "hasMore": false,
+            "nextPageToken": "",
+            "sideEffects": 0
+          }
         }
       ],
       "expect": {
@@ -1121,12 +1164,107 @@
           ],
           "permissions": [
             "query.messages"
-          ]
+          ],
+          "response": {
+            "apiVersion": "1.0",
+            "type": "query.page",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestPageToken": "",
+            "items": [
+              {
+                "id": "50000000-0000-4000-8000-000000000001"
+              },
+              {
+                "id": "50000000-0000-4000-8000-000000000002"
+              }
+            ],
+            "hasMore": true,
+            "nextPageToken": "page-2",
+            "sideEffects": 0
+          }
+        },
+        {
+          "op": "plugin.call",
+          "call": {
+            "apiVersion": "1.0",
+            "type": "query",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "pageSize": 20,
+            "pageToken": "page-2"
+          },
+          "capabilities": [
+            "queries"
+          ],
+          "permissions": [
+            "query.messages"
+          ],
+          "response": {
+            "apiVersion": "1.0",
+            "type": "query.page",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestPageToken": "page-2",
+            "items": [
+              {
+                "id": "50000000-0000-4000-8000-000000000003"
+              }
+            ],
+            "hasMore": false,
+            "nextPageToken": "",
+            "sideEffects": 0
+          }
         }
       ],
       "expect": {
         "last": "ALLOWED",
-        "sideEffects": 0
+        "sideEffects": 0,
+        "queryPages": [
+          {
+            "apiVersion": "1.0",
+            "type": "query.page",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestPageToken": "",
+            "items": [
+              {
+                "id": "50000000-0000-4000-8000-000000000001"
+              },
+              {
+                "id": "50000000-0000-4000-8000-000000000002"
+              }
+            ],
+            "hasMore": true,
+            "nextPageToken": "page-2",
+            "sideEffects": 0
+          },
+          {
+            "apiVersion": "1.0",
+            "type": "query.page",
+            "pluginId": "60000000-0000-4000-8000-000000000001",
+            "version": "1.0.0",
+            "query": "messages",
+            "conversationId": "30000000-0000-4000-8000-000000000001",
+            "requestPageToken": "page-2",
+            "items": [
+              {
+                "id": "50000000-0000-4000-8000-000000000003"
+              }
+            ],
+            "hasMore": false,
+            "nextPageToken": "",
+            "sideEffects": 0
+          }
+        ]
       }
     },
     {
@@ -1156,9 +1294,7 @@
           ]
         }
       ],
-      "expect": {
-        "last": "DENIED"
-      }
+      "expectError": true
     },
     {
       "id": "query-mutation",

@@ -1,0 +1,623 @@
+diff --git a/contracts/fixtures/sync-plugin/generate.py b/contracts/fixtures/sync-plugin/generate.py
+index ae39241..d69676e 100644
+--- a/contracts/fixtures/sync-plugin/generate.py
++++ b/contracts/fixtures/sync-plugin/generate.py
+@@ -15,6 +15,8 @@ def call(t,n):
+     if t=="action": x.update(action=n,conversationId=C,requestId=R)
+     if t=="ui.host": x["slot"]=n
+     return x
++def query_page(request, items, more=False, token=""):
++    return {"apiVersion":"1.0","type":"query.page","pluginId":request["pluginId"],"version":request["version"],"query":request["query"],"conversationId":request["conversationId"],"requestPageToken":request["pageToken"],"items":items,"hasMore":more,"nextPageToken":token,"sideEffects":0}
+ def artifact(**changes):
+     x={"apiVersion":"1.0","type":"artifact","pluginId":P,"version":"1.0.0","packageHash":"a"*64,"backendHash":"b"*64,"rendererHash":"c"*64,"signature":"fixture-signature","manifestValid":True,"compatible":True,"permissionsApproved":True,"resourceSizeOk":True,"cspValid":True,"entryPointValid":True,"sandbox":"iframe"}
+     x.update(changes); return x
+@@ -34,7 +36,8 @@ add("manifest-duplicate-permission","negative",["SP-A-005"],[{"op":"plugin.manif
+ 
+ add("gap-out-of-order-duplicate","positive",["SP-A-001","SP-A-012"],[{"op":"sync.message","message":msg(n)} for n in (2,2,1)],{"contiguous":2,"messages":{"1":M(1),"2":M(2)},"timeline":[sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",messages={"2":M(2)}),sync_snap("sync.message","APPLIED",contiguous=2,messages={"1":M(1),"2":M(2)})]})
+ add("gap-stops","negative",["SP-A-001"],[{"op":"sync.message","message":msg(2)}],{"contiguous":0,"messages":{"2":M(2)}})
+-add("failed-to-sent-terminal","positive",["SP-A-002"],[{"op":"local.failed","conversationId":C,"requestId":R},{"op":"sync.message","message":msg(1)},{"op":"local.failed","conversationId":C,"requestId":R}],{"local":{C+"/"+R:"SENT"},"last":"SENT"})
++local_id=C+"/"+R
++add("failed-to-sent-terminal","positive",["SP-A-002"],[{"op":"local.failed","conversationId":C,"requestId":R},{"op":"sync.message","message":dict(msg(1),requestId=R)},{"op":"local.failed","conversationId":C,"requestId":R}],{"local":{local_id:"SENT"},"last":"SENT","localTimeline":[{"op":"local.failed","local":{local_id:"FAILED"},"itemCount":1,"last":"FAILED"},{"op":"sync.message","local":{local_id:"SENT"},"itemCount":1,"last":"APPLIED"},{"op":"local.failed","local":{local_id:"SENT"},"itemCount":1,"last":"SENT"}]})
+ add("message-rollback-and-retry","positive",["SP-A-003"],[{"op":"sync.message","message":msg(1),"fault":"before_commit"},{"op":"sync.message","message":msg(1)}],{"contiguous":1,"messages":{"1":M(1)},"timeline":[sync_snap("sync.message","ROLLED_BACK"),sync_snap("sync.message","APPLIED",contiguous=1,messages={"1":M(1)})]})
+ add("user-rollback-and-retry","positive",["SP-A-003","SP-A-004"],[{"op":"sync.user","page":user(),"fault":"before_commit"},{"op":"sync.user","page":user()}],{"cursor":"1","messages":{},"userState":{"friend.changed/"+U:1},"timeline":[sync_snap("sync.user","ROLLED_BACK"),sync_snap("sync.user","APPLIED",cursor="1",user_state={"friend.changed/"+U:1})]})
+ for kind in ("friend.changed","conversation.changed","membership.changed","plugin.changed"):
+@@ -47,14 +50,20 @@ add("per-conversation-independent-sequence","positive",["SP-A-001","SP-A-012"],[
+ 
+ for t,n,cap,perm in (("event.subscribe","message.created","events","event.message.created"),("query","messages","queries","query.messages"),("action","send_message","actions","action.send_message"),("ui.host","panel","ui","ui.panel")):
+     s={"op":"plugin.call","call":call(t,n),"capabilities":[cap],"permissions":[perm],"authorizedAtExecution":True}
++    if t=="query": s["response"]=query_page(s["call"],[{"id":M(1)}])
+     tag=t.replace(".","-")
+     add("allow-"+tag,"positive",["SP-A-005","SP-A-012"],[s],{"last":"ALLOWED"})
+-    add("deny-"+tag+"-capability","negative",["SP-A-005"],[dict(s,capabilities=[])],{"last":"DENIED","sideEffects":0})
+-    add("deny-"+tag+"-permission","negative",["SP-A-005","SP-A-012"],[dict(s,permissions=[])],{"last":"DENIED","sideEffects":0})
++    denied_capability=dict(s,capabilities=[]); denied_capability.pop("response",None)
++    denied_permission=dict(s,permissions=[]); denied_permission.pop("response",None)
++    add("deny-"+tag+"-capability","negative",["SP-A-005"],[denied_capability],{"last":"DENIED","sideEffects":0})
++    add("deny-"+tag+"-permission","negative",["SP-A-005","SP-A-012"],[denied_permission],{"last":"DENIED","sideEffects":0})
+ add("deny-direct-core-db","negative",["SP-A-005"],[{"op":"plugin.call","call":call("query","messages"),"capabilities":["queries"],"permissions":["query.messages"],"directAccess":True}],{"last":"DENIED"})
+ q={"op":"plugin.call","call":call("query","messages"),"capabilities":["queries"],"permissions":["query.messages"]}
+-add("query-read-only-paginated","positive",["SP-A-006"],[q],{"last":"ALLOWED","sideEffects":0})
+-add("query-over-limit","negative",["SP-A-006"],[dict(q,call=dict(q["call"],pageSize=101))],{"last":"DENIED"})
++first=dict(q,response=query_page(q["call"],[{"id":M(1)},{"id":M(2)}],True,"page-2"))
++second_call=dict(q["call"],pageToken="page-2")
++second=dict(q,call=second_call,response=query_page(second_call,[{"id":M(3)}]))
++add("query-read-only-paginated","positive",["SP-A-006"],[first,second],{"last":"ALLOWED","sideEffects":0,"queryPages":[first["response"],second["response"]]})
++add("query-over-limit","negative",["SP-A-006"],[dict(q,call=dict(q["call"],pageSize=101))],error=True)
+ add("query-mutation","negative",["SP-A-006"],[dict(q,mutates=True)],{"last":"DENIED","sideEffects":0})
+ a={"op":"plugin.call","call":call("action","send_message"),"capabilities":["actions"],"permissions":["action.send_message"],"authorizedAtExecution":True}
+ audit_allowed={"requestId":R,"authorizedAtExecution":True,"outcome":"ALLOWED","sideEffectApplied":True}
+diff --git a/contracts/fixtures/sync-plugin/golden.json b/contracts/fixtures/sync-plugin/golden.json
+index cca58c2..3116c3b 100644
+--- a/contracts/fixtures/sync-plugin/golden.json
++++ b/contracts/fixtures/sync-plugin/golden.json
+@@ -263,7 +263,33 @@
+         "local": {
+           "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+         },
+-        "last": "SENT"
++        "last": "SENT",
++        "localTimeline": [
++          {
++            "op": "local.failed",
++            "local": {
++              "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "FAILED"
++            },
++            "itemCount": 1,
++            "last": "FAILED"
++          },
++          {
++            "op": "sync.message",
++            "local": {
++              "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
++            },
++            "itemCount": 1,
++            "last": "APPLIED"
++          },
++          {
++            "op": "local.failed",
++            "local": {
++              "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
++            },
++            "itemCount": 1,
++            "last": "SENT"
++          }
++        ]
+       }
+     },
+     {
+@@ -815,7 +841,24 @@
+           "permissions": [
+             "query.messages"
+           ],
+-          "authorizedAtExecution": true
++          "authorizedAtExecution": true,
++          "response": {
++            "apiVersion": "1.0",
++            "type": "query.page",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestPageToken": "",
++            "items": [
++              {
++                "id": "50000000-0000-4000-8000-000000000001"
++              }
++            ],
++            "hasMore": false,
++            "nextPageToken": "",
++            "sideEffects": 0
++          }
+         }
+       ],
+       "expect": {
+@@ -1121,12 +1164,107 @@
+           ],
+           "permissions": [
+             "query.messages"
+-          ]
++          ],
++          "response": {
++            "apiVersion": "1.0",
++            "type": "query.page",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestPageToken": "",
++            "items": [
++              {
++                "id": "50000000-0000-4000-8000-000000000001"
++              },
++              {
++                "id": "50000000-0000-4000-8000-000000000002"
++              }
++            ],
++            "hasMore": true,
++            "nextPageToken": "page-2",
++            "sideEffects": 0
++          }
++        },
++        {
++          "op": "plugin.call",
++          "call": {
++            "apiVersion": "1.0",
++            "type": "query",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "pageSize": 20,
++            "pageToken": "page-2"
++          },
++          "capabilities": [
++            "queries"
++          ],
++          "permissions": [
++            "query.messages"
++          ],
++          "response": {
++            "apiVersion": "1.0",
++            "type": "query.page",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestPageToken": "page-2",
++            "items": [
++              {
++                "id": "50000000-0000-4000-8000-000000000003"
++              }
++            ],
++            "hasMore": false,
++            "nextPageToken": "",
++            "sideEffects": 0
++          }
+         }
+       ],
+       "expect": {
+         "last": "ALLOWED",
+-        "sideEffects": 0
++        "sideEffects": 0,
++        "queryPages": [
++          {
++            "apiVersion": "1.0",
++            "type": "query.page",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestPageToken": "",
++            "items": [
++              {
++                "id": "50000000-0000-4000-8000-000000000001"
++              },
++              {
++                "id": "50000000-0000-4000-8000-000000000002"
++              }
++            ],
++            "hasMore": true,
++            "nextPageToken": "page-2",
++            "sideEffects": 0
++          },
++          {
++            "apiVersion": "1.0",
++            "type": "query.page",
++            "pluginId": "60000000-0000-4000-8000-000000000001",
++            "version": "1.0.0",
++            "query": "messages",
++            "conversationId": "30000000-0000-4000-8000-000000000001",
++            "requestPageToken": "page-2",
++            "items": [
++              {
++                "id": "50000000-0000-4000-8000-000000000003"
++              }
++            ],
++            "hasMore": false,
++            "nextPageToken": "",
++            "sideEffects": 0
++          }
++        ]
+       }
+     },
+     {
+@@ -1156,9 +1294,7 @@
+           ]
+         }
+       ],
+-      "expect": {
+-        "last": "DENIED"
+-      }
++      "expectError": true
+     },
+     {
+       "id": "query-mutation",
+diff --git a/contracts/fixtures/sync-plugin/profile-outcomes/go.json b/contracts/fixtures/sync-plugin/profile-outcomes/go.json
+index 9628774..20ba190 100644
+--- a/contracts/fixtures/sync-plugin/profile-outcomes/go.json
++++ b/contracts/fixtures/sync-plugin/profile-outcomes/go.json
+@@ -61,7 +61,33 @@
+       "local": {
+         "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+       },
+-      "last": "SENT"
++      "last": "SENT",
++      "localTimeline": [
++        {
++          "op": "local.failed",
++          "local": {
++            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "FAILED"
++          },
++          "itemCount": 1,
++          "last": "FAILED"
++        },
++        {
++          "op": "sync.message",
++          "local": {
++            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
++          },
++          "itemCount": 1,
++          "last": "APPLIED"
++        },
++        {
++          "op": "local.failed",
++          "local": {
++            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
++          },
++          "itemCount": 1,
++          "last": "SENT"
++        }
++      ]
+     },
+     "message-rollback-and-retry": {
+       "contiguous": 1,
+@@ -206,10 +232,49 @@
+     },
+     "query-read-only-paginated": {
+       "last": "ALLOWED",
+-      "sideEffects": 0
++      "sideEffects": 0,
++      "queryPages": [
++        {
++          "apiVersion": "1.0",
++          "type": "query.page",
++          "pluginId": "60000000-0000-4000-8000-000000000001",
++          "version": "1.0.0",
++          "query": "messages",
++          "conversationId": "30000000-0000-4000-8000-000000000001",
++          "requestPageToken": "",
++          "items": [
++            {
++              "id": "50000000-0000-4000-8000-000000000001"
++            },
++            {
++              "id": "50000000-0000-4000-8000-000000000002"
++            }
++          ],
++          "hasMore": true,
++          "nextPageToken": "page-2",
++          "sideEffects": 0
++        },
++        {
++          "apiVersion": "1.0",
++          "type": "query.page",
++          "pluginId": "60000000-0000-4000-8000-000000000001",
++          "version": "1.0.0",
++          "query": "messages",
++          "conversationId": "30000000-0000-4000-8000-000000000001",
++          "requestPageToken": "page-2",
++          "items": [
++            {
++              "id": "50000000-0000-4000-8000-000000000003"
++            }
++          ],
++          "hasMore": false,
++          "nextPageToken": "",
++          "sideEffects": 0
++        }
++      ]
+     },
+     "query-over-limit": {
+-      "last": "DENIED"
++      "error": "INVALID"
+     },
+     "query-mutation": {
+       "last": "DENIED",
+diff --git a/contracts/fixtures/sync-plugin/profile-outcomes/java.json b/contracts/fixtures/sync-plugin/profile-outcomes/java.json
+index 0a3515e..bfece16 100644
+--- a/contracts/fixtures/sync-plugin/profile-outcomes/java.json
++++ b/contracts/fixtures/sync-plugin/profile-outcomes/java.json
+@@ -61,7 +61,33 @@
+       "local": {
+         "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+       },
+-      "last": "SENT"
++      "last": "SENT",
++      "localTimeline": [
++        {
++          "op": "local.failed",
++          "local": {
++            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "FAILED"
++          },
++          "itemCount": 1,
++          "last": "FAILED"
++        },
++        {
++          "op": "sync.message",
++          "local": {
++            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
++          },
++          "itemCount": 1,
++          "last": "APPLIED"
++        },
++        {
++          "op": "local.failed",
++          "local": {
++            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
++          },
++          "itemCount": 1,
++          "last": "SENT"
++        }
++      ]
+     },
+     "message-rollback-and-retry": {
+       "contiguous": 1,
+@@ -206,10 +232,49 @@
+     },
+     "query-read-only-paginated": {
+       "last": "ALLOWED",
+-      "sideEffects": 0
++      "sideEffects": 0,
++      "queryPages": [
++        {
++          "apiVersion": "1.0",
++          "type": "query.page",
++          "pluginId": "60000000-0000-4000-8000-000000000001",
++          "version": "1.0.0",
++          "query": "messages",
++          "conversationId": "30000000-0000-4000-8000-000000000001",
++          "requestPageToken": "",
++          "items": [
++            {
++              "id": "50000000-0000-4000-8000-000000000001"
++            },
++            {
++              "id": "50000000-0000-4000-8000-000000000002"
++            }
++          ],
++          "hasMore": true,
++          "nextPageToken": "page-2",
++          "sideEffects": 0
++        },
++        {
++          "apiVersion": "1.0",
++          "type": "query.page",
++          "pluginId": "60000000-0000-4000-8000-000000000001",
++          "version": "1.0.0",
++          "query": "messages",
++          "conversationId": "30000000-0000-4000-8000-000000000001",
++          "requestPageToken": "page-2",
++          "items": [
++            {
++              "id": "50000000-0000-4000-8000-000000000003"
++            }
++          ],
++          "hasMore": false,
++          "nextPageToken": "",
++          "sideEffects": 0
++        }
++      ]
+     },
+     "query-over-limit": {
+-      "last": "DENIED"
++      "error": "INVALID"
+     },
+     "query-mutation": {
+       "last": "DENIED",
+diff --git a/contracts/plugin-api/README.md b/contracts/plugin-api/README.md
+index 930c148..22b73a5 100644
+--- a/contracts/plugin-api/README.md
++++ b/contracts/plugin-api/README.md
+@@ -4,12 +4,12 @@
+ 
+ The user cursor is opaque and advances only with friend, Conversation, membership, or plugin state. Message pages use a per-Conversation sequence. A client materializes data and advances the corresponding cursor or contiguous sequence in one transaction. A failed transaction changes neither. Duplicate and out-of-order Messages upsert by `(conversationId, requestId)`, `messageId`, and `(conversationId, seq)`; a conflicting identity is rejected. `contiguous_seq` advances only across a complete prefix. A locally FAILED item with the same Conversation and request identity becomes SENT, and SENT never regresses to FAILED. Web remains memory-only; Desktop and Mobile render account-scoped local materialized state before background Sync.
+ 
+-Each Plugin API surface requires both its declared capability and current permission. Queries are read-only, paginated, and limited to 100 items per page. Actions are re-authorized at execution, use `(pluginId, conversationId, requestId)` as the idempotency identity, and leave an audit record for every attempt. The Host bridge is the only route to Core data or actions; no direct Core or database access is granted.
++Each Plugin API surface requires both its declared capability and current permission. A Query request is limited to 100 items; an allowed Query returns a `query.page` with at most the requested number of host-projected items, a matching request page token, a continuation token when `hasMore` is true, and `sideEffects: 0`. A follow-up request presents the prior continuation token. An unauthorized or invalid Query returns no page. Actions are re-authorized at execution, use `(pluginId, conversationId, requestId)` as the idempotency identity, and leave an audit record for every attempt. The Host bridge is the only route to Core data or actions; no direct Core or database access is granted.
+ 
+ A renderer loads only after package hash, signature, manifest schema, API compatibility, permission, resource size, CSP, and entry-point checks succeed. It executes in a sandbox iframe or isolated WebView and reaches UI Host only through the mediated bridge. The verifier's renderer runtime cases reject direct host-sensitive resource access. A `(pluginId, version)` artifact is immutable: package, backend, and renderer hashes cannot change under that identity. Backend and renderer versions must match. Messages referring to Plugin content must retain the referenced renderer version and fallback TEXT. WSS v1's existing `message.send` remains TEXT-only; this contract does not change it.
+ 
+ WASM denies database, server-file, arbitrary-network, and other-plugin-memory access by default. CPU/time, memory, concurrency, storage, and network limits are enforced; three consecutive timeout, panic, or limit violations trigger AUTO_DISABLED. Plugin artifact lifecycle and Conversation instance lifecycle remain distinct. During upgrade the old version serves until snapshot, migration, backend and renderer health checks, and atomic switch succeed. Any failed stage restores the snapshot and leaves the old version serving. DISABLE preserves data; UNINSTALL defaults to RETAINED; PURGE requires an explicit, elevated, audited, retention-confirmed operation.
+ 
+-Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; observable Sync checkpoints record rollback, materialized user state, the gap before repair, and retry. Action fixtures record every authorization/audit result, and upgrade fixtures record each attempted stage while the old version serves.
++Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; observable Sync checkpoints record rollback, materialized user state, the gap before repair, and retry. The local send trace records FAILED before matching Sync, SENT after Sync with one item, and terminal SENT after a later failure signal. Query fixtures observe linked result pages, item counts, and zero side effects. Action fixtures record every authorization/audit result, and upgrade fixtures record each attempted stage while the old version serves.
+ 
+ `contracts/fixtures/sync-plugin/profile-outcomes/go.json` and `java.json` are separately stored normalized **contract vectors** for the two planned backend profiles. The verifier checks each artifact's complete case set against the canonical expected outcome and rejects a divergent value in either profile. These static vectors were initially populated from the canonical fixture expectations; they are not outputs from Go or Java backend execution, because neither backend exists at this stage. Backend conformance must replace or validate these observations when those implementations arrive. The verifier also runs malformed-wire, wrong-outcome, seven scenario mutation, and profile-divergence controls.
+diff --git a/contracts/plugin-api/v1.schema.json b/contracts/plugin-api/v1.schema.json
+index 8e5ae6c..f4e0dfa 100644
+--- a/contracts/plugin-api/v1.schema.json
++++ b/contracts/plugin-api/v1.schema.json
+@@ -5,7 +5,7 @@
+   "description": "All calls pass through an authorized Host bridge. No direct Core, database, server-file, arbitrary-network, OS, or other-plugin-memory access is exposed.",
+   "oneOf": [
+     {"$ref":"#/$defs/Manifest"},{"$ref":"#/$defs/EventSubscription"},
+-    {"$ref":"#/$defs/Query"},{"$ref":"#/$defs/Action"},
++    {"$ref":"#/$defs/Query"},{"$ref":"#/$defs/QueryPage"},{"$ref":"#/$defs/Action"},
+     {"$ref":"#/$defs/UIHost"},{"$ref":"#/$defs/Artifact"}
+   ],
+   "$defs": {
+@@ -13,7 +13,8 @@
+     "Hash":{"type":"string","minLength":64,"maxLength":64},
+     "Manifest":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","capabilities","permissions","backendEntry","rendererEntry"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"manifest"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"capabilities":{"type":"array","uniqueItems":true,"items":{"enum":["events","queries","actions","ui"]}},"permissions":{"type":"array","uniqueItems":true,"items":{"enum":["event.message.created","event.member.joined","event.plugin.lifecycle","query.conversation","query.members","query.messages","query.friendship","action.send_message","action.plugin_state","action.ui","ui.page","ui.modal","ui.panel","ui.menu","ui.form","ui.toolbar","ui.message_renderer"]}},"backendEntry":{"type":"string","minLength":1},"rendererEntry":{"type":"string","minLength":1}}},
+     "EventSubscription":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","event"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"event.subscribe"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"event":{"enum":["message.created","member.joined","plugin.lifecycle"]}}},
+-    "Query":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","query","conversationId","pageSize","pageToken"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"query"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"query":{"enum":["conversation","members","messages","friendship"]},"conversationId":{"$ref":"#/$defs/Id"},"pageSize":{"type":"integer","minimum":1},"pageToken":{"type":"string"}}},
++    "Query":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","query","conversationId","pageSize","pageToken"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"query"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"query":{"enum":["conversation","members","messages","friendship"]},"conversationId":{"$ref":"#/$defs/Id"},"pageSize":{"type":"integer","minimum":1,"maximum":100},"pageToken":{"type":"string"}}},
++    "QueryPage":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","query","conversationId","requestPageToken","items","hasMore","nextPageToken","sideEffects"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"query.page"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"query":{"enum":["conversation","members","messages","friendship"]},"conversationId":{"$ref":"#/$defs/Id"},"requestPageToken":{"type":"string"},"items":{"type":"array","maxItems":100,"items":{"type":"object"}},"hasMore":{"type":"boolean"},"nextPageToken":{"type":"string"},"sideEffects":{"const":0}}},
+     "Action":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","action","conversationId","requestId"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"action"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"action":{"enum":["send_message","plugin_state","ui"]},"conversationId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"}}},
+     "UIHost":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","slot"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"ui.host"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"slot":{"enum":["page","modal","panel","menu","form","toolbar","message_renderer"]}}},
+     "Artifact":{"type":"object","additionalProperties":false,"required":["apiVersion","type","pluginId","version","packageHash","backendHash","rendererHash","signature","manifestValid","compatible","permissionsApproved","resourceSizeOk","cspValid","entryPointValid","sandbox"],"properties":{"apiVersion":{"const":"1.0"},"type":{"const":"artifact"},"pluginId":{"$ref":"#/$defs/Id"},"version":{"type":"string","minLength":1},"packageHash":{"$ref":"#/$defs/Hash"},"backendHash":{"$ref":"#/$defs/Hash"},"rendererHash":{"$ref":"#/$defs/Hash"},"signature":{"type":"string","minLength":1},"manifestValid":{"type":"boolean"},"compatible":{"type":"boolean"},"permissionsApproved":{"type":"boolean"},"resourceSizeOk":{"type":"boolean"},"cspValid":{"type":"boolean"},"entryPointValid":{"type":"boolean"},"sandbox":{"enum":["iframe","isolated_webview"]}}}
+diff --git a/contracts/plugin-api/verify.py b/contracts/plugin-api/verify.py
+index a3db8f4..c9e96c4 100644
+--- a/contracts/plugin-api/verify.py
++++ b/contracts/plugin-api/verify.py
+@@ -121,13 +121,16 @@ def validate(value, schema, root, path="$"):
+ 
+ 
+ def run(case):
+-    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "userState": {}, "local": {}, "sideEffects": 0, "auditAttempts": 0, "auditLog": [], "timeline": [], "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "upgradeTrace": [], "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
++    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "userState": {}, "local": {}, "localTimeline": [], "queryPages": [], "sideEffects": 0, "auditAttempts": 0, "auditLog": [], "timeline": [], "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "upgradeTrace": [], "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
+     state.update(copy.deepcopy(case.get("initial", {})))
+     seen_actions = set()
+     seen_events = {}
+     artifact_hashes = {}
+     request_messages = {}
+     message_payloads = {}
++    next_query_tokens = {}
++    def record_local(op):
++        state["localTimeline"].append({"op": op, "local": copy.deepcopy(state["local"]), "itemCount": len(state["local"]), "last": state["last"]})
+     def record_sync(op):
+         fields = ("cursor", "contiguous", "messages", "userState", "last")
+         state["timeline"].append({"op": op, **{key: copy.deepcopy(state[key]) for key in fields}})
+@@ -186,11 +189,13 @@ def run(case):
+             state["local"][identity] = "SENT"
+             state["last"] = "APPLIED"
+             record_sync(op)
++            record_local(op)
+         elif op == "local.failed":
+             identity = step["conversationId"] + "/" + step["requestId"]
+             if state["local"].get(identity) != "SENT":
+                 state["local"][identity] = "FAILED"
+             state["last"] = state["local"][identity]
++            record_local(op)
+         elif op == "plugin.call":
+             call = step["call"]
+             validate(call, PLUGIN, PLUGIN)
+@@ -202,6 +207,27 @@ def run(case):
+             allowed = cap in step.get("capabilities", []) and required in step.get("permissions", []) and not step.get("directAccess", False)
+             if typ == "query" and (call["pageSize"] > POLICY["maxQueryPageSize"] or step.get("mutates", False)):
+                 allowed = False
++            if typ == "query":
++                if allowed:
++                    response = step.get("response")
++                    if response is None:
++                        raise Invalid("allowed Query lacks page response")
++                    validate(response, PLUGIN["$defs"]["QueryPage"], PLUGIN)
++                    if any(response[key] != call[key] for key in ("pluginId", "version", "query", "conversationId")) or response["requestPageToken"] != call["pageToken"]:
++                        raise Invalid("Query page does not match request")
++                    if len(response["items"]) > call["pageSize"] or len(response["items"]) > POLICY["maxQueryPageSize"]:
++                        raise Invalid("Query page exceeds request or policy limit")
++                    if response["hasMore"] != bool(response["nextPageToken"]):
++                        raise Invalid("Query continuation token mismatch")
++                    key = (call["pluginId"], call["conversationId"], call["query"])
++                    if call["pageToken"] != next_query_tokens.get(key, ""):
++                        raise Invalid("Query page token does not follow prior page")
++                    next_query_tokens[key] = response["nextPageToken"]
++                    if "simulatedResponseCount" in step and step["simulatedResponseCount"] != len(response["items"]):
++                        raise Invalid("observed Query item count differs from page")
++                    state["queryPages"].append(copy.deepcopy(response))
++                elif "response" in step or "simulatedResponseCount" in step:
++                    raise Invalid("denied Query returned a page")
+             if typ == "action":
+                 state["auditAttempts"] += 1
+                 allowed = allowed and step.get("authorizedAtExecution", False)
+@@ -301,6 +327,11 @@ def check_negative_mutations(cases):
+         ("gap-out-of-order-duplicate", lambda c: c["steps"][2]["message"].update({k: c["steps"][0]["message"][k] for k in ("messageId", "requestId")})),
+         ("action-retry-audited", lambda c: c["steps"][0].__setitem__("authorizedAtExecution", False)),
+         ("upgrade-fail-migration", lambda c: c["steps"][0].__setitem__("failAt", "snapshot")),
++        ("failed-to-sent-terminal", lambda c: c["steps"].pop(0)),
++        ("query-read-only-paginated", lambda c: c["steps"][0].update({"simulatedResponseCount": 1000000})),
++        ("query-read-only-paginated", lambda c: c["steps"][0]["response"]["items"].extend({"id": "50000000-0000-4000-8000-000000000099"} for _ in range(101))),
++        ("query-read-only-paginated", lambda c: c["steps"][1]["call"].__setitem__("pageToken", "wrong-page")),
++        ("query-read-only-paginated", lambda c: c["steps"][0]["response"].__setitem__("sideEffects", 1)),
+     ]
+     for case_id, mutate in mutations:
+         case = copy.deepcopy(by_id[case_id])
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 7ac5049..a439945 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,7 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh Fix Agent `/root/contract003_fix2` repaired Review 2's two concrete findings in the isolated Contract 003 checkout. The FAILED local item and SENT convergence are observed at each step with one local item; Query v1 has bounded `query.page` responses and linked read-only pagination fixtures. Verifier passes 79 cases/16 controls; Review 1 and Review 2 probes reject all 7 and 2 invalid mutations; CTRL-002 Development passes. Independent acceptance is pending, and SP-A-012 S0 static-vector interpretation remains unresolved. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix2-development.md`; Recorder run `R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c`. Task remains `review`; S0 Gate NOT YET PASSED.
+ - Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b1`: seven prior probes, baseline verifier, frozen hashes, Fix Recorder integrity and detached CTRL-002 Acceptance passed, but two new mutations were accepted. The SP-A-002 case does not observe a prior FAILED item; the SP-A-006 Query contract/fixture does not model a page response. Static Go/Java vector interpretation for SP-A-012 remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
+ - Fresh Fix Agent `/root/contract003_fix1` repaired the Contract 003 fixture oracle after independent Review 1 FAIL. Staged rollback/retry and gap checkpoints, full Message identity checks, per-attempt Action audit, and ordered upgrade trace now reject all seven committed reviewer mutations. The task verifier passes 79 cases and 11 controls; CTRL-002 Development passes. Distinct Go/Java static normalized contract-vector files now receive separate comparison, but neither is a backend execution result; fresh independent review must decide whether these satisfy SP-A-012 at S0 contract freeze. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`.
+ - Fresh independent Review Agent `/root/contract003_review1` rejected clean Contract 003 candidate `9a14f63`: baseline schema/fixture verification and clean detached CTRL-002 Acceptance passed, but six of seven independent negative mutations retained the expected output and profile parity is tautological. Findings cover atomic rollback/materialization, conflicting duplicates, per-attempt Action authorization, upgrade stages, and distinct Go/Java outcomes. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
+@@ -220,7 +221,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Delegate a fresh Contract 003 Fix Agent for SP-A-002 prior FAILED-state observability and SP-A-006 Query page response contract/fixture. Preserve both permanent negative probes. Resolve the SP-A-012 S0 static-vector interpretation before PASS, then delegate a different fresh independent reviewer. Keep task in `review`; S0 Gate remains NOT YET PASSED.
++Delegate a fresh independent Contract 003 reviewer for the Fix 2 candidate. Run the schema/fixture verifier, both permanent negative probes, Recorder validation, and clean detached CTRL-002 Acceptance. Resolve the SP-A-012 S0 static-vector interpretation before PASS. Keep task in `review`; S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -232,6 +233,7 @@ Delegate a fresh Contract 003 Fix Agent for SP-A-002 prior FAILED-state observab
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/contract003_fix2` owns only task-allowed contract, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until a clean candidate commit. Original `H:\IM-platform\contracts\http\schema-lint` was untouched.
+ - Fresh independent Reviewer `/root/contract003_review2` owns only task-linked FAIL evidence/probe, Task Spec/current recovery update, prompt and Recorder artifacts until review closure commit. No product contract file changed. The separate detached Acceptance checkout is clean at `56c14b1`; original `H:\IM-platform` HTTP schema-lint was untouched.
+ - Fresh Fix Agent `/root/contract003_fix1` owns only task-allowed verifier, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory belongs to another agent and was untouched.
+ - Fresh independent Reviewer `/root/contract003_review1` owns only task-linked FAIL evidence/probe, task/current recovery updates, prompt and Recorder run until review closure is committed. It changed no product contract file. The separate detached Acceptance checkout remains clean at candidate `9a14f63`. The original `H:\IM-platform` untracked HTTP schema-lint directory was not accessed.
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-003.md b/spec/tasks/review/LOOP1-CONTRACT-003.md
+index f5b78ba..d6d47a2 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-003.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-003.md
+@@ -59,6 +59,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Evidence
+ 
++- Fresh Fix Agent `/root/contract003_fix2` repaired the two Review 2 findings. SP-A-002 now asserts a single pre-existing FAILED local item, convergence to SENT on matching server identity, and terminal SENT after a later failure signal. SP-A-006 now has a machine-verifiable bounded `query.page` response and two linked read-only fixture pages. The task verifier passes 79 cases and 16 controls; Review 1 and Review 2 probes reject 7/7 and 2/2 invalid mutations; CTRL-002 Development passes. This is development evidence only, not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix2-development.md`; Recorder run `R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c`. SP-A-012 static-vector interpretation remains the narrow acceptance question.
+ - Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b18a3378ebaade1b4ad4fe85e26aa2f474b`. Task verifier, all seven prior probes, frozen hashes, Fix Recorder integrity, and clean detached CTRL-002 Acceptance passed. Two new mutations are accepted: removing the initial locally FAILED state in SP-A-002 and adding an unbounded simulated Query response to SP-A-006's request-only pagination case. SP-A-012's S0 static-vector interpretation remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; probe: `spec/progress/evidence/LOOP1-CONTRACT-003/review2-negative-probe.py`; review Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
+ - Fresh Fix Agent `/root/contract003_fix1` repaired Review 1's oracle findings: staged local materialization and rollback/retry checkpoints, the intermediate gap, full Message identity, each Action attempt's authorization/audit, and ordered upgrade stages/rollback. Separately stored Go/Java normalized contract vectors are checked against canonical outcomes with divergence controls. These are static vectors initially populated from canonical fixtures, not backend execution evidence. The committed review probe rejects 7/7 invalid mutations; the verifier passes 79 cases and 11 mutation controls; CTRL-002 Development passes. This is development evidence only. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`. Acceptance ambiguity: does SP-A-012 at S0 contract freeze require live backend-produced outcomes, or are distinct static profile contract vectors sufficient pending backend implementation?
+ - Fresh independent Review Agent `/root/contract003_review1` rejected exact candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`. The baseline verifier and clean detached CTRL-002 Acceptance passed, but six of seven in-memory negative mutations retained the expected fixture result: rollback was unobserved, conflicting duplicate content was accepted, first-attempt Action authorization was masked, and upgrade failure stages were interchangeable. The profile loop also repeats one Python oracle without distinct Go/Java outcomes. Task stays `review`; S0 Gate NOT YET PASSED. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; probe: `spec/progress/evidence/LOOP1-CONTRACT-003/review1-negative-probe.py`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
+@@ -69,10 +70,11 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Handoff
+ 
++- Fix 2 owns only task-allowed contract, fixture, README, recovery, evidence, and Recorder artifacts until the clean candidate commit. The task remains `review`; no self-acceptance. The original `H:\IM-platform\contracts\http\schema-lint` was untouched.
+ - Candidate `56c14b18a3378ebaade1b4ad4fe85e26aa2f474b` failed fresh independent Review 2 despite clean-checkout CTRL-002 Acceptance. Reviewer changed only task-linked probe, evidence, prompt, Recorder and recovery files. Detached Acceptance checkout remained clean. Original other-Agent-owned HTTP schema-lint directory was untouched.
+ - Fix 1 owns only task-allowed oracle/fixture/README changes and linked evidence/Recorder/recovery updates until its clean candidate commit. The task stays `review`; the Fix Agent has not self-accepted. The original `H:\IM-platform` other-Agent-owned untracked HTTP schema-lint directory was untouched.
+ - Candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff` failed fresh independent review despite clean-checkout CTRL-002 Acceptance. The reviewer changed only task-linked evidence, probe, recovery files, and Recorder artifacts; no product contract file. The original checkout's other-Agent-owned untracked HTTP schema-lint directory remains untouched.
+ 
+ # Next Action
+ 
+-- Delegate a fresh Fix Agent to make the SP-A-002 prior FAILED state observable and the SP-A-006 Query page response machine-verifiable. Preserve both permanent FAIL probes. Resolve the narrow SP-A-012 S0 profile-vector acceptance interpretation, then delegate a different fresh Review Agent and rerun clean detached CTRL-002 Acceptance. Keep task `review`; do not claim Task or Gate PASS.
++- Delegate a fresh independent Review Agent for the Fix 2 candidate. Rerun schema/fixture verifier, both permanent probes, Recorder validation, and clean detached CTRL-002 Acceptance. Resolve the narrow SP-A-012 S0 static-vector interpretation before PASS. Keep task `review`; do not claim Task or Gate PASS from development evidence.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/LOOP1-CONTRACT-003-fix2.txt
+# ?? research/prompts/P-aee6d189-546e-42e9-b5be-0399cbecd199/metadata.json
+# ?? research/prompts/P-aee6d189-546e-42e9-b5be-0399cbecd199/prompt.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-2f3dceed-b7ef-48e2-8b4e-8df17e780916.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-2f3dceed-b7ef-48e2-8b4e-8df17e780916.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-4a280124-1394-4d58-aec6-13dc47d74a7d.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-4a280124-1394-4d58-aec6-13dc47d74a7d.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-738b74ba-f889-4f66-82bf-08f3b84f5356.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-738b74ba-f889-4f66-82bf-08f3b84f5356.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-76d53fdd-eae9-416d-8459-efcc3669e80f.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-76d53fdd-eae9-416d-8459-efcc3669e80f.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-7f63850e-78d6-4947-92be-6e10c0b11c54.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-7f63850e-78d6-4947-92be-6e10c0b11c54.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-8dc256a4-c104-48a4-9349-d83ddde6cde9.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-8dc256a4-c104-48a4-9349-d83ddde6cde9.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-a2bbd939-ae4a-497d-8510-5a8566534b77.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-a2bbd939-ae4a-497d-8510-5a8566534b77.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-b416a374-e97f-4c29-bd62-14eb36f03684.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-b416a374-e97f-4c29-bd62-14eb36f03684.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-cf79c0e7-b6ad-4721-8bca-6880f48b7737.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-cf79c0e7-b6ad-4721-8bca-6880f48b7737.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-d0e199be-d475-4152-86d3-2f7375c60de6.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-d0e199be-d475-4152-86d3-2f7375c60de6.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-e65cf989-9d9d-413e-adfd-4135557b0832.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-e65cf989-9d9d-413e-adfd-4135557b0832.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-ec5188e1-eb74-436d-a1a4-a78b328684b1.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-ec5188e1-eb74-436d-a1a4-a78b328684b1.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-f1554171-fa88-4faf-b17a-a6f54d458f1e.stderr.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/blobs/C-f1554171-fa88-4faf-b17a-a6f54d458f1e.stdout.txt
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/events.jsonl
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/initial_state.json
+# ?? research/runs/R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix2-development.md

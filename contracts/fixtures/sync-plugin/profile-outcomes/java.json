@@ -61,7 +61,33 @@
       "local": {
         "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
       },
-      "last": "SENT"
+      "last": "SENT",
+      "localTimeline": [
+        {
+          "op": "local.failed",
+          "local": {
+            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "FAILED"
+          },
+          "itemCount": 1,
+          "last": "FAILED"
+        },
+        {
+          "op": "sync.message",
+          "local": {
+            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+          },
+          "itemCount": 1,
+          "last": "APPLIED"
+        },
+        {
+          "op": "local.failed",
+          "local": {
+            "30000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001": "SENT"
+          },
+          "itemCount": 1,
+          "last": "SENT"
+        }
+      ]
     },
     "message-rollback-and-retry": {
       "contiguous": 1,
@@ -206,10 +232,49 @@
     },
     "query-read-only-paginated": {
       "last": "ALLOWED",
-      "sideEffects": 0
+      "sideEffects": 0,
+      "queryPages": [
+        {
+          "apiVersion": "1.0",
+          "type": "query.page",
+          "pluginId": "60000000-0000-4000-8000-000000000001",
+          "version": "1.0.0",
+          "query": "messages",
+          "conversationId": "30000000-0000-4000-8000-000000000001",
+          "requestPageToken": "",
+          "items": [
+            {
+              "id": "50000000-0000-4000-8000-000000000001"
+            },
+            {
+              "id": "50000000-0000-4000-8000-000000000002"
+            }
+          ],
+          "hasMore": true,
+          "nextPageToken": "page-2",
+          "sideEffects": 0
+        },
+        {
+          "apiVersion": "1.0",
+          "type": "query.page",
+          "pluginId": "60000000-0000-4000-8000-000000000001",
+          "version": "1.0.0",
+          "query": "messages",
+          "conversationId": "30000000-0000-4000-8000-000000000001",
+          "requestPageToken": "page-2",
+          "items": [
+            {
+              "id": "50000000-0000-4000-8000-000000000003"
+            }
+          ],
+          "hasMore": false,
+          "nextPageToken": "",
+          "sideEffects": 0
+        }
+      ]
     },
     "query-over-limit": {
-      "last": "DENIED"
+      "error": "INVALID"
     },
     "query-mutation": {
       "last": "DENIED",

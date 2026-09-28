@@ -121,13 +121,16 @@ def validate(value, schema, root, path="$"):
 
 
 def run(case):
-    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "userState": {}, "local": {}, "sideEffects": 0, "auditAttempts": 0, "auditLog": [], "timeline": [], "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "upgradeTrace": [], "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
+    state = {"cursor": "0", "contiguous": 0, "messages": {}, "conversations": {}, "userState": {}, "local": {}, "localTimeline": [], "queryPages": [], "sideEffects": 0, "auditAttempts": 0, "auditLog": [], "timeline": [], "activeVersion": "1.0.0", "oldVersionServed": True, "snapshotRestored": False, "upgradeTrace": [], "dataPreserved": True, "autoDisabled": False, "failureCount": 0, "last": "NONE"}
     state.update(copy.deepcopy(case.get("initial", {})))
     seen_actions = set()
     seen_events = {}
     artifact_hashes = {}
     request_messages = {}
     message_payloads = {}
+    next_query_tokens = {}
+    def record_local(op):
+        state["localTimeline"].append({"op": op, "local": copy.deepcopy(state["local"]), "itemCount": len(state["local"]), "last": state["last"]})
     def record_sync(op):
         fields = ("cursor", "contiguous", "messages", "userState", "last")
         state["timeline"].append({"op": op, **{key: copy.deepcopy(state[key]) for key in fields}})
@@ -186,11 +189,13 @@ def run(case):
             state["local"][identity] = "SENT"
             state["last"] = "APPLIED"
             record_sync(op)
+            record_local(op)
         elif op == "local.failed":
             identity = step["conversationId"] + "/" + step["requestId"]
             if state["local"].get(identity) != "SENT":
                 state["local"][identity] = "FAILED"
             state["last"] = state["local"][identity]
+            record_local(op)
         elif op == "plugin.call":
             call = step["call"]
             validate(call, PLUGIN, PLUGIN)
@@ -202,6 +207,27 @@ def run(case):
             allowed = cap in step.get("capabilities", []) and required in step.get("permissions", []) and not step.get("directAccess", False)
             if typ == "query" and (call["pageSize"] > POLICY["maxQueryPageSize"] or step.get("mutates", False)):
                 allowed = False
+            if typ == "query":
+                if allowed:
+                    response = step.get("response")
+                    if response is None:
+                        raise Invalid("allowed Query lacks page response")
+                    validate(response, PLUGIN["$defs"]["QueryPage"], PLUGIN)
+                    if any(response[key] != call[key] for key in ("pluginId", "version", "query", "conversationId")) or response["requestPageToken"] != call["pageToken"]:
+                        raise Invalid("Query page does not match request")
+                    if len(response["items"]) > call["pageSize"] or len(response["items"]) > POLICY["maxQueryPageSize"]:
+                        raise Invalid("Query page exceeds request or policy limit")
+                    if response["hasMore"] != bool(response["nextPageToken"]):
+                        raise Invalid("Query continuation token mismatch")
+                    key = (call["pluginId"], call["conversationId"], call["query"])
+                    if call["pageToken"] != next_query_tokens.get(key, ""):
+                        raise Invalid("Query page token does not follow prior page")
+                    next_query_tokens[key] = response["nextPageToken"]
+                    if "simulatedResponseCount" in step and step["simulatedResponseCount"] != len(response["items"]):
+                        raise Invalid("observed Query item count differs from page")
+                    state["queryPages"].append(copy.deepcopy(response))
+                elif "response" in step or "simulatedResponseCount" in step:
+                    raise Invalid("denied Query returned a page")
             if typ == "action":
                 state["auditAttempts"] += 1
                 allowed = allowed and step.get("authorizedAtExecution", False)
@@ -301,6 +327,11 @@ def check_negative_mutations(cases):
         ("gap-out-of-order-duplicate", lambda c: c["steps"][2]["message"].update({k: c["steps"][0]["message"][k] for k in ("messageId", "requestId")})),
         ("action-retry-audited", lambda c: c["steps"][0].__setitem__("authorizedAtExecution", False)),
         ("upgrade-fail-migration", lambda c: c["steps"][0].__setitem__("failAt", "snapshot")),
+        ("failed-to-sent-terminal", lambda c: c["steps"].pop(0)),
+        ("query-read-only-paginated", lambda c: c["steps"][0].update({"simulatedResponseCount": 1000000})),
+        ("query-read-only-paginated", lambda c: c["steps"][0]["response"]["items"].extend({"id": "50000000-0000-4000-8000-000000000099"} for _ in range(101))),
+        ("query-read-only-paginated", lambda c: c["steps"][1]["call"].__setitem__("pageToken", "wrong-page")),
+        ("query-read-only-paginated", lambda c: c["steps"][0]["response"].__setitem__("sideEffects", 1)),
     ]
     for case_id, mutate in mutations:
         case = copy.deepcopy(by_id[case_id])
