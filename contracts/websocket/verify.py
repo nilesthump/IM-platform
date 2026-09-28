@@ -31,12 +31,40 @@ class Invalid(Exception):
 def lint_schema(node, path="$", root=SCHEMA):
     """Reject unsupported schema keywords instead of silently ignoring constraints."""
     allowed = {"$schema", "$id", "title", "description", "$defs", "$ref", "type", "required", "properties", "additionalProperties", "oneOf", "allOf", "const", "enum", "format", "minLength", "maxLength", "minimum", "maxProperties"}
+    if not isinstance(node, dict):
+        raise Invalid(f"{path}: schema must be an object")
     unknown = set(node) - allowed
     if unknown:
         raise Invalid(f"{path}: unsupported schema keywords {unknown}")
+    for key in ("$schema", "$id", "title", "description"):
+        if key in node and not isinstance(node[key], str):
+            raise Invalid(f"{path}.{key}: expected string")
+    if "type" in node and node["type"] not in ("object", "string", "integer"):
+        raise Invalid(f"{path}.type: unsupported JSON Schema type")
+    if "format" in node and node["format"] not in ("uuid", "date-time"):
+        raise Invalid(f"{path}.format: unsupported format")
+    for key in ("$defs", "properties"):
+        if key in node and (not isinstance(node[key], dict) or any(not isinstance(name, str) for name in node[key])):
+            raise Invalid(f"{path}.{key}: expected named schema objects")
+    if "required" in node:
+        names = node["required"]
+        if not isinstance(names, list) or any(not isinstance(name, str) for name in names) or len(names) != len(set(names)):
+            raise Invalid(f"{path}.required: expected unique property names")
+    if "additionalProperties" in node and not isinstance(node["additionalProperties"], bool):
+        raise Invalid(f"{path}.additionalProperties: expected boolean")
+    if "enum" in node and (not isinstance(node["enum"], list) or not node["enum"]):
+        raise Invalid(f"{path}.enum: expected nonempty array")
+    for key in ("minLength", "maxLength", "maxProperties"):
+        if key in node and (type(node[key]) is not int or node[key] < 0):
+            raise Invalid(f"{path}.{key}: expected nonnegative integer")
+    if "minimum" in node and (isinstance(node["minimum"], bool) or not isinstance(node["minimum"], (int, float))):
+        raise Invalid(f"{path}.minimum: expected number")
+    for branch in ("oneOf", "allOf"):
+        if branch in node and (not isinstance(node[branch], list) or not node[branch]):
+            raise Invalid(f"{path}.{branch}: expected nonempty schema array")
     if "$ref" in node:
         ref = node["$ref"]
-        if not isinstance(ref, str) or not ref.startswith("#/$defs/") or ref.split("/")[-1] not in root["$defs"]:
+        if not isinstance(ref, str) or not ref.startswith("#/$defs/") or ref.split("/")[-1] not in root.get("$defs", {}):
             raise Invalid(f"{path}: unresolved reference {ref}")
     for name, child in node.get("$defs", {}).items():
         lint_schema(child, f"{path}.$defs.{name}", root)
@@ -311,6 +339,7 @@ def check_declared_behavior(s):
             require([step["in"]["payload"]["seq"] for step in steps] == [2, 1], "out-of-order sequence mismatch")
             require(steps[0]["in"]["payload"]["conversationId"] == steps[1]["in"]["payload"]["conversationId"], "out-of-order sequences belong to different Conversations")
             require(steps[0]["in"]["payload"]["messageId"] != steps[1]["in"]["payload"]["messageId"], "distinct sequences need distinct messages")
+            require(steps[0]["in"]["requestId"] != steps[1]["in"]["requestId"], "distinct messages share one sender/Conversation/request identity")
     elif case_id == "ping-before-bind":
         require(len(steps) == 1 and steps[0]["in"]["type"] == "ping", "expected pre-bind ping")
         response(steps[0], "pong")
@@ -416,6 +445,11 @@ def negative_behavior_controls():
         s["steps"][1]["in"]["payload"]["conversationId"] = C2
         s["steps"][1]["out"][0]["payload"]["conversationId"] = C2
 
+    def reuse_request_identity_for_distinct_message(s):
+        request_id = s["steps"][0]["in"]["requestId"]
+        s["steps"][1]["in"]["requestId"] = request_id
+        s["steps"][1]["out"][0]["requestId"] = request_id
+
     changes = [
         ("wrong-conversation-fanout", lambda s: s["steps"][0]["out"].append(copy.deepcopy(s["steps"][0]["in"]))),
         ("revoked-socket", lambda s: s["steps"][0]["out"].clear()),
@@ -442,6 +476,7 @@ def negative_behavior_controls():
         ("revoked-socket", lambda s: s["given"].pop("session")),
         ("ping-before-bind", lambda s: s["given"].update(extra="unverified premise")),
         ("out-of-order-fanout", move_seq_one_to_other_conversation),
+        ("out-of-order-fanout", reuse_request_identity_for_distinct_message),
     ]
     for case_id, mutate in changes:
         changed = copy.deepcopy(by_id[case_id])
@@ -487,7 +522,24 @@ def negative_schema_controls():
         except Invalid:
             continue
         raise Invalid(f"schema accepted invalid mutation: {changed}")
-    return len(mutations)
+    schema_changes = (
+        lambda x: x["$defs"]["MessageSend"]["allOf"][1]["properties"]["payload"].update(type="not-a-json-schema-type"),
+        lambda x: x["$defs"]["MessageSend"]["allOf"][1]["properties"]["payload"].update(type=["object", "string"]),
+        lambda x: x["$defs"]["MessageSend"]["allOf"][1].update(required="payload"),
+        lambda x: x["$defs"]["MessageSend"]["allOf"][1].update(properties=[]),
+        lambda x: x["$defs"]["MessageSend"].update(allOf=[]),
+        lambda x: x["$defs"]["MessageSend"]["allOf"][1].update(additionalProperties="false"),
+        lambda x: x["$defs"]["TextContent"]["properties"]["text"].update(minLength=-1),
+    )
+    for modify in schema_changes:
+        changed = copy.deepcopy(SCHEMA)
+        modify(changed)
+        try:
+            lint_schema(changed, root=changed)
+        except Invalid:
+            continue
+        raise Invalid("schema lint accepted malformed keyword value")
+    return len(mutations) + len(schema_changes)
 
 
 def main():

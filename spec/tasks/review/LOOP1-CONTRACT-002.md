@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
 status: review
-owner: /root/contract002_review6
+owner: /root/contract002_fix6
 stage: S0
 gate: S0
 ---
@@ -79,6 +79,8 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 - Fresh independent Review Agent `/root/contract002_review6` rejected clean candidate `dfc31e5`: an in-memory probe accepted two distinct committed messages and sequences under the same sender/Conversation/request identity in the out-of-order scenario, violating idempotency. It also found the schema linter accepts an invalid JSON Schema type. Baseline, prior 12/24/9/1 probes, frozen hashes, detached clean CTRL-002 Acceptance, scope checks, and Fix 5 Recorder byte audit passed. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review6-dfc31e5-fail.md` and `2026-09-28-independent-review6-mutations.py`; Recorder run `R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a`. Task remains in `review`; S0 Gate NOT YET PASSED.
 
+- Fresh Fix Agent `/root/contract002_fix6` added distinct request-identity assertion for two out-of-order Messages and focused schema keyword-value lint, with eight permanent mutation controls. WSS baseline and all five prior independent probe sets pass, including both Review 6 cases; CTRL-002 Development and canonical-file scope checks pass. Canonical schema and golden fixtures are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-request-identity-schema-fix-development.md`; Recorder run `R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878`. This is not independent acceptance.
+
 # Handoff
 
 - Activated from clean `main` commit `7484901` on `task/LOOP1-CONTRACT-002`. The original checkout's untracked `contracts/http/schema-lint/` remains owned by the paused Agent and was not touched.
@@ -86,4 +88,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Delegate a fresh Fix Agent for Review 6 findings, then a different fresh independent Reviewer. Keep in `review` pending independent PASS.
+- Delegate a different fresh independent Reviewer for the clean Fix 6 candidate. Keep in `review` pending independent PASS.

@@ -1,0 +1,186 @@
+diff --git a/contracts/websocket/verify.py b/contracts/websocket/verify.py
+index 7e087d6..e488574 100644
+--- a/contracts/websocket/verify.py
++++ b/contracts/websocket/verify.py
+@@ -31,12 +31,40 @@ class Invalid(Exception):
+ def lint_schema(node, path="$", root=SCHEMA):
+     """Reject unsupported schema keywords instead of silently ignoring constraints."""
+     allowed = {"$schema", "$id", "title", "description", "$defs", "$ref", "type", "required", "properties", "additionalProperties", "oneOf", "allOf", "const", "enum", "format", "minLength", "maxLength", "minimum", "maxProperties"}
++    if not isinstance(node, dict):
++        raise Invalid(f"{path}: schema must be an object")
+     unknown = set(node) - allowed
+     if unknown:
+         raise Invalid(f"{path}: unsupported schema keywords {unknown}")
++    for key in ("$schema", "$id", "title", "description"):
++        if key in node and not isinstance(node[key], str):
++            raise Invalid(f"{path}.{key}: expected string")
++    if "type" in node and node["type"] not in ("object", "string", "integer"):
++        raise Invalid(f"{path}.type: unsupported JSON Schema type")
++    if "format" in node and node["format"] not in ("uuid", "date-time"):
++        raise Invalid(f"{path}.format: unsupported format")
++    for key in ("$defs", "properties"):
++        if key in node and (not isinstance(node[key], dict) or any(not isinstance(name, str) for name in node[key])):
++            raise Invalid(f"{path}.{key}: expected named schema objects")
++    if "required" in node:
++        names = node["required"]
++        if not isinstance(names, list) or any(not isinstance(name, str) for name in names) or len(names) != len(set(names)):
++            raise Invalid(f"{path}.required: expected unique property names")
++    if "additionalProperties" in node and not isinstance(node["additionalProperties"], bool):
++        raise Invalid(f"{path}.additionalProperties: expected boolean")
++    if "enum" in node and (not isinstance(node["enum"], list) or not node["enum"]):
++        raise Invalid(f"{path}.enum: expected nonempty array")
++    for key in ("minLength", "maxLength", "maxProperties"):
++        if key in node and (type(node[key]) is not int or node[key] < 0):
++            raise Invalid(f"{path}.{key}: expected nonnegative integer")
++    if "minimum" in node and (isinstance(node["minimum"], bool) or not isinstance(node["minimum"], (int, float))):
++        raise Invalid(f"{path}.minimum: expected number")
++    for branch in ("oneOf", "allOf"):
++        if branch in node and (not isinstance(node[branch], list) or not node[branch]):
++            raise Invalid(f"{path}.{branch}: expected nonempty schema array")
+     if "$ref" in node:
+         ref = node["$ref"]
+-        if not isinstance(ref, str) or not ref.startswith("#/$defs/") or ref.split("/")[-1] not in root["$defs"]:
++        if not isinstance(ref, str) or not ref.startswith("#/$defs/") or ref.split("/")[-1] not in root.get("$defs", {}):
+             raise Invalid(f"{path}: unresolved reference {ref}")
+     for name, child in node.get("$defs", {}).items():
+         lint_schema(child, f"{path}.$defs.{name}", root)
+@@ -311,6 +339,7 @@ def check_declared_behavior(s):
+             require([step["in"]["payload"]["seq"] for step in steps] == [2, 1], "out-of-order sequence mismatch")
+             require(steps[0]["in"]["payload"]["conversationId"] == steps[1]["in"]["payload"]["conversationId"], "out-of-order sequences belong to different Conversations")
+             require(steps[0]["in"]["payload"]["messageId"] != steps[1]["in"]["payload"]["messageId"], "distinct sequences need distinct messages")
++            require(steps[0]["in"]["requestId"] != steps[1]["in"]["requestId"], "distinct messages share one sender/Conversation/request identity")
+     elif case_id == "ping-before-bind":
+         require(len(steps) == 1 and steps[0]["in"]["type"] == "ping", "expected pre-bind ping")
+         response(steps[0], "pong")
+@@ -416,6 +445,11 @@ def negative_behavior_controls():
+         s["steps"][1]["in"]["payload"]["conversationId"] = C2
+         s["steps"][1]["out"][0]["payload"]["conversationId"] = C2
+ 
++    def reuse_request_identity_for_distinct_message(s):
++        request_id = s["steps"][0]["in"]["requestId"]
++        s["steps"][1]["in"]["requestId"] = request_id
++        s["steps"][1]["out"][0]["requestId"] = request_id
++
+     changes = [
+         ("wrong-conversation-fanout", lambda s: s["steps"][0]["out"].append(copy.deepcopy(s["steps"][0]["in"]))),
+         ("revoked-socket", lambda s: s["steps"][0]["out"].clear()),
+@@ -442,6 +476,7 @@ def negative_behavior_controls():
+         ("revoked-socket", lambda s: s["given"].pop("session")),
+         ("ping-before-bind", lambda s: s["given"].update(extra="unverified premise")),
+         ("out-of-order-fanout", move_seq_one_to_other_conversation),
++        ("out-of-order-fanout", reuse_request_identity_for_distinct_message),
+     ]
+     for case_id, mutate in changes:
+         changed = copy.deepcopy(by_id[case_id])
+@@ -487,7 +522,24 @@ def negative_schema_controls():
+         except Invalid:
+             continue
+         raise Invalid(f"schema accepted invalid mutation: {changed}")
+-    return len(mutations)
++    schema_changes = (
++        lambda x: x["$defs"]["MessageSend"]["allOf"][1]["properties"]["payload"].update(type="not-a-json-schema-type"),
++        lambda x: x["$defs"]["MessageSend"]["allOf"][1]["properties"]["payload"].update(type=["object", "string"]),
++        lambda x: x["$defs"]["MessageSend"]["allOf"][1].update(required="payload"),
++        lambda x: x["$defs"]["MessageSend"]["allOf"][1].update(properties=[]),
++        lambda x: x["$defs"]["MessageSend"].update(allOf=[]),
++        lambda x: x["$defs"]["MessageSend"]["allOf"][1].update(additionalProperties="false"),
++        lambda x: x["$defs"]["TextContent"]["properties"]["text"].update(minLength=-1),
++    )
++    for modify in schema_changes:
++        changed = copy.deepcopy(SCHEMA)
++        modify(changed)
++        try:
++            lint_schema(changed, root=changed)
++        except Invalid:
++            continue
++        raise Invalid("schema lint accepted malformed keyword value")
++    return len(mutations) + len(schema_changes)
+ 
+ 
+ def main():
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 9ad0e52..075ef1b 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -35,6 +35,8 @@ Current Task State: review
+ 
+ - Fresh independent Review Agent `/root/contract002_review6` rejected clean candidate `dfc31e5`: the verifier accepts two different Messages/sequences under one sender/Conversation/request identity; a separate in-memory schema type mutation also passed lint. Baseline, prior probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 5 Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review6-dfc31e5-fail.md`; Recorder run `R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a`. Task stays `review`; S0 Gate NOT YET PASSED.
+ 
++- Fresh Fix Agent `/root/contract002_fix6` repaired the duplicate request-identity and malformed schema keyword acceptance gaps, adding eight permanent mutation controls. WSS baseline, prior 12/24/9/1 probes, Review 6's two cases, CTRL-002 Development, and canonical-file scope checks passed. Canonical schema and golden fixtures are unchanged. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-request-identity-schema-fix-development.md`; Recorder run `R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878`. Task stays `review` for a different fresh independent Reviewer; S0 Gate NOT YET PASSED.
++
+ ## Authorized Frozen Architecture Representation Migration
+ 
+ - Human Architect explicitly authorized `LOOP1-ARCHDOC-001`, a governance-only canonical-source migration from the immutable PDF to Markdown. The source PDF SHA-256 before candidate work is `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
+@@ -200,7 +202,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-A fresh Fix Agent repairs Review 6 idempotency and schema-lint findings, then a different fresh Reviewer checks a clean candidate. S0 Gate remains NOT YET PASSED.
++A different fresh independent Reviewer checks the clean Fix 6 candidate, including Review 6 probes and CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -227,6 +229,8 @@ A fresh Fix Agent repairs Review 6 idempotency and schema-lint findings, then a
+ 
+ - Fresh Fix Agent `/root/contract002_fix5` owns only the WSS verifier fix, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. Original untracked HTTP schema-lint directory was untouched.
+ 
++- Fresh Fix Agent `/root/contract002_fix6` owns only the WSS verifier fix, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. Original untracked HTTP schema-lint directory was untouched.
++
+ ## Architecture Conflicts / ACP / ADR
+ 
+ - ADR-0002 records Human-approved representation-only canonical-source migration; no Product Architecture semantic change is authorized. ADR-0001 remains the temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.
+diff --git a/spec/tasks/review/LOOP1-CONTRACT-002.md b/spec/tasks/review/LOOP1-CONTRACT-002.md
+index d7ab683..e930bf7 100644
+--- a/spec/tasks/review/LOOP1-CONTRACT-002.md
++++ b/spec/tasks/review/LOOP1-CONTRACT-002.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-CONTRACT-002
+ title: Freeze WSS Envelope, Auth, and Message contracts
+ status: review
+-owner: /root/contract002_review6
++owner: /root/contract002_fix6
+ stage: S0
+ gate: S0
+ ---
+@@ -79,6 +79,8 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ - Fresh independent Review Agent `/root/contract002_review6` rejected clean candidate `dfc31e5`: an in-memory probe accepted two distinct committed messages and sequences under the same sender/Conversation/request identity in the out-of-order scenario, violating idempotency. It also found the schema linter accepts an invalid JSON Schema type. Baseline, prior 12/24/9/1 probes, frozen hashes, detached clean CTRL-002 Acceptance, scope checks, and Fix 5 Recorder byte audit passed. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review6-dfc31e5-fail.md` and `2026-09-28-independent-review6-mutations.py`; Recorder run `R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a`. Task remains in `review`; S0 Gate NOT YET PASSED.
+ 
++- Fresh Fix Agent `/root/contract002_fix6` added distinct request-identity assertion for two out-of-order Messages and focused schema keyword-value lint, with eight permanent mutation controls. WSS baseline and all five prior independent probe sets pass, including both Review 6 cases; CTRL-002 Development and canonical-file scope checks pass. Canonical schema and golden fixtures are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-request-identity-schema-fix-development.md`; Recorder run `R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878`. This is not independent acceptance.
++
+ # Handoff
+ 
+ - Activated from clean `main` commit `7484901` on `task/LOOP1-CONTRACT-002`. The original checkout's untracked `contracts/http/schema-lint/` remains owned by the paused Agent and was not touched.
+@@ -86,4 +88,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
+ 
+ # Next Action
+ 
+-- Delegate a fresh Fix Agent for Review 6 findings, then a different fresh independent Reviewer. Keep in `review` pending independent PASS.
++- Delegate a different fresh independent Reviewer for the clean Fix 6 candidate. Keep in `review` pending independent PASS.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-8c4f0e33-9c8d-4a95-ba64-547d848fa419/metadata.json
+# ?? research/prompts/P-8c4f0e33-9c8d-4a95-ba64-547d848fa419/prompt.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-1fe57180-fec1-4139-af40-5ad077a44431.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-1fe57180-fec1-4139-af40-5ad077a44431.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-8c43d7ed-941f-4eea-97ea-8d389a7f34a8.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-8c43d7ed-941f-4eea-97ea-8d389a7f34a8.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-92647fc4-97d6-443a-ae36-6cc9999dc315.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-92647fc4-97d6-443a-ae36-6cc9999dc315.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-97aa2b9a-a72c-4837-9403-4f722421bb3e.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-97aa2b9a-a72c-4837-9403-4f722421bb3e.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-9a59be9a-aa0c-40a5-a6c2-9f1fd75871e8.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-9a59be9a-aa0c-40a5-a6c2-9f1fd75871e8.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-a9789fbd-8e6e-4996-90a3-732bb902b07e.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-a9789fbd-8e6e-4996-90a3-732bb902b07e.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-c383e8e6-7bf3-46f4-a705-9e621a6efda9.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-c383e8e6-7bf3-46f4-a705-9e621a6efda9.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-cdcc816e-605f-42ae-bc22-f4b76b715774.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-cdcc816e-605f-42ae-bc22-f4b76b715774.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-f5acceb1-89c2-4385-86e8-9d9325ce241c.stderr.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/blobs/C-f5acceb1-89c2-4385-86e8-9d9325ce241c.stdout.txt
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/events.jsonl
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/initial_state.json
+# ?? research/runs/R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix6-prompt.txt
+# ?? spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-request-identity-schema-fix-development.md

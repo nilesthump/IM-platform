@@ -35,6 +35,8 @@ Current Task State: review
 
 - Fresh independent Review Agent `/root/contract002_review6` rejected clean candidate `dfc31e5`: the verifier accepts two different Messages/sequences under one sender/Conversation/request identity; a separate in-memory schema type mutation also passed lint. Baseline, prior probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 5 Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review6-dfc31e5-fail.md`; Recorder run `R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a`. Task stays `review`; S0 Gate NOT YET PASSED.
 
+- Fresh Fix Agent `/root/contract002_fix6` repaired the duplicate request-identity and malformed schema keyword acceptance gaps, adding eight permanent mutation controls. WSS baseline, prior 12/24/9/1 probes, Review 6's two cases, CTRL-002 Development, and canonical-file scope checks passed. Canonical schema and golden fixtures are unchanged. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-request-identity-schema-fix-development.md`; Recorder run `R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878`. Task stays `review` for a different fresh independent Reviewer; S0 Gate NOT YET PASSED.
+
 ## Authorized Frozen Architecture Representation Migration
 
 - Human Architect explicitly authorized `LOOP1-ARCHDOC-001`, a governance-only canonical-source migration from the immutable PDF to Markdown. The source PDF SHA-256 before candidate work is `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
@@ -200,7 +202,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-A fresh Fix Agent repairs Review 6 idempotency and schema-lint findings, then a different fresh Reviewer checks a clean candidate. S0 Gate remains NOT YET PASSED.
+A different fresh independent Reviewer checks the clean Fix 6 candidate, including Review 6 probes and CTRL-002 Acceptance. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -226,6 +228,8 @@ A fresh Fix Agent repairs Review 6 idempotency and schema-lint findings, then a 
 - Fresh independent Reviewer `/root/contract002_review5` owns only the focused probe, FAIL evidence, task/current recovery updates, and task-linked Recorder artifacts until its review closure commit; no product contract file was changed. Detached Acceptance checkout remained clean at `d89d4f5`. Original untracked HTTP schema-lint directory was untouched.
 
 - Fresh Fix Agent `/root/contract002_fix5` owns only the WSS verifier fix, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. Original untracked HTTP schema-lint directory was untouched.
+
+- Fresh Fix Agent `/root/contract002_fix6` owns only the WSS verifier fix, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. Original untracked HTTP schema-lint directory was untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
