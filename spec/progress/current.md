@@ -10,9 +10,17 @@ Gate Status: NOT YET PASSED
 
 Current Batch: LOOP1-S0
 
-Current Task: LOOP1-ARCHDOC-001
+Current Task: LOOP1-CONTRACT-002
 
-Current Task State: done
+Current Task State: active
+
+## Current Contract Work
+
+- Clean `main` at `7484901` was pushed to `origin/main` on 2026-09-28 and used as the base for isolated branch `task/LOOP1-CONTRACT-002`.
+- `LOOP1-ARCHDOC-001` is `done`; its accepted canonical Markdown hash, historical PDF hash, architecture verifier, CTRL-002 Acceptance recovery, and Recorder repository validation passed before this activation. S0 Gate remains NOT YET PASSED.
+- `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
+- Activation Recorder run `R-20260928T005917Z-da1e7bcf-0952-4664-b76d-b699a2b59840` uses `prospective_resume`; its recorded CTRL-002 Development check passed after correcting two task recovery fields. This is not acceptance evidence.
+- No WSS contract or product implementation has changed yet. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
 
 ## Authorized Frozen Architecture Representation Migration
 
@@ -176,11 +184,11 @@ Current Task State: done
 
 ## Next Exact Action
 
-Commit the task `done` transition and stable checkpoint, then run final clean-main CTRL-002 Acceptance, architecture hash/scope verification and Recorder repository validation. The migration task is complete only after those checks pass. S0 Gate remains NOT YET PASSED.
+Register the visible continuation prompt and start a prospective Recorder run for `LOOP1-CONTRACT-002`; then implement and verify its canonical WSS contracts and hand off a clean committed candidate to a fresh independent Review Agent. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`566ee352f818f6beb2ca7d991c25eecc07f752e7` (clean accepted migration closure on local `main`; the final checkpoint commit is pending clean verification).
+`7484901b3915535f60941a01116b730a845bd47d` (clean accepted architecture migration checkpoint on local and remote `main`; baseline verifiers passed before Contract 002 activation).
 
 ## Latest Checkpoint
 
