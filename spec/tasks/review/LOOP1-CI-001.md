@@ -28,6 +28,7 @@ Create the path-aware diff classifier and Go, Java, client, shared-contract, dep
 - Minimal CI entry files at repository root if explicitly added to this Task Spec before activation
 - `spec/tasks/**/LOOP1-CI-001.md`
 - `spec/progress/current.md`
+- `spec/tasks/backlog/.gitkeep` (exact queue-presence marker only; Coordinator-authorized after clean-checkout Review 1 FAIL)
 
 The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOOP1-CI-001/**`, accepted checkpoint `spec/progress/checkpoints/*loop1-ci-001*.md`, and this task's `research/prompts/**` and `research/runs/**` artifacts for instrumentation, review, and handoff only. These paths do not authorize product-scope expansion.
 
@@ -49,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Coordinator prospectively authorized only `spec/tasks/backlog/.gitkeep` after independent Review 1 clean-checkout FAIL. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-queue-marker-authorization.md`; a fresh Fix Agent must add the marker before fresh re-review.
+
 - Fresh independent Review 1 `/root/ci001_review1` returned **FAIL** at clean detached handoff `2c335cd` for product candidate `97db67e`. Eleven CI unit tests, frozen hashes, and implementation Recorder integrity passed, but clean-checkout CTRL-002 Acceptance exited 1 because `spec/tasks/backlog/` has no tracked marker after this task left the queue. The workflow's first job invokes this check, so the candidate cannot serve as an operational CI judge. Exact commands, exits, elapsed times, clean-state method, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review1-97db67e-fail.md`; review Recorder `R-20260928T202247Z-2951ca94-5b67-47a5-ba6d-c6f00f3f4a15`. Keep task in `review`; S0 Gate NOT YET PASSED.
 
 - Coordinator review transition from clean candidate `97db67e` passed CTRL-002 Development recovery; the correctly linked Recorder run and an unused disclosed instrumentation FAIL are at `spec/progress/evidence/LOOP1-CI-001/2026-09-29-review-transition.md`. Independent acceptance remains pending.
@@ -68,4 +71,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator prospectively authorizes the exact minimal queue-marker path in this Task Spec, then delegates a fresh Fix Agent to commit that marker and rerun clean-checkout recovery. Delegate a new fresh Review Agent for the corrected candidate. Actual GitHub workflow execution is still required before operational CI and Stage Gate acceptance.
+- Fresh Fix Agent: add only the authorized `spec/tasks/backlog/.gitkeep` marker, run clean-checkout recovery plus task checks, and hand off a clean committed candidate to a different fresh independent Review Agent. Actual GitHub workflow execution remains required before operational CI and Stage Gate acceptance.

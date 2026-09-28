@@ -244,7 +244,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh independent Review Agent: review clean CI candidate `97db67ebead3e8d98ee966cc52d23a5e69377381`, run path matrix and workflow gate checks, and apply ADR-0001 acceptance. Actual GitHub workflow remains pending; S0 Gate NOT YET PASSED.
+Fresh Fix Agent: add only the prospectively authorized `spec/tasks/backlog/.gitkeep` marker, verify clean-checkout recovery, and hand off for a different fresh independent review. Actual GitHub workflow remains pending; S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 

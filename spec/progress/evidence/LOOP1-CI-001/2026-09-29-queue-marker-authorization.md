@@ -1,0 +1,7 @@
+# LOOP1-CI-001 queue-marker authorization
+
+- Independent Review 1 rejected clean product candidate `97db67ebead3e8d98ee966cc52d23a5e69377381` at committed handoff `2c335cd`; evidence: `2026-09-29-independent-review1-97db67e-fail.md`. Moving the sole backlog Task Spec to `review` left no tracked entry in `spec/tasks/backlog/`; clean checkout lacks that mandatory queue, and the new workflow's classify job fails CTRL-002 Acceptance before classification.
+- Coordinator `/root` prospectively added exactly `spec/tasks/backlog/.gitkeep` to this Task Spec's allowed paths before any Fix Agent writes the marker. This is a repository control-plane queue-presence repair, not a product CI, contract, or architecture change. No other path is authorized by this decision.
+- Recorder prompt `P-69efcee1-4cc8-47f4-99c6-983b1bdc3019`; linked run `R-20260928T203245Z-12c616a1-953c-498a-95e1-366b25a5f218` records the scope decision. Task remains `review`; independent acceptance and S0 Gate remain pending.
+- Next exact action: fresh Fix Agent commits only the marker and task-linked development evidence after clean-checkout verification, then a different fresh independent Review Agent repeats acceptance. Actual GitHub workflow execution remains required for operational CI.
+- Last known good accepted main: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns this authorization-only uncommitted set until committed. Original `H:\IM-platform\contracts\http\schema-lint` remains paused-Agent-owned and untouched.
