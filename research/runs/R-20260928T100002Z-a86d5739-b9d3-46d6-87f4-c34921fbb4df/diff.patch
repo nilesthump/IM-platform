@@ -1,0 +1,124 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index c6c04c4..8cfa59b 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -10,12 +10,13 @@ Gate Status: NOT YET PASSED
+ 
+ Current Batch: LOOP1-S0
+ 
+-Current Task: LOOP1-CONTRACT-002
++Current Task: LOOP1-CONTRACT-003
+ 
+-Current Task State: done
++Current Task State: active
+ 
+ ## Current Contract Work
+ 
++- `LOOP1-CONTRACT-003` was selected by dependency satisfaction after clean local-main Contract 002 closure `eb9ebea` passed WSS, CTRL-002 Acceptance, and Recorder repository validation. Its exact Task Spec is now active in branch `task/LOOP1-CONTRACT-003`. Scope: machine-verifiable Sync and Plugin API v1 contracts and duplicate/out-of-order/gap/permission fixtures. S0 Gate NOT YET PASSED.
+ - `LOOP1-CONTRACT-002` is independently accepted and locally integrated. Fresh portability Review PASS covers clean checkouts with both `core.autocrlf` settings. Local `main` at `fb789509bb9d28dc224b0b1a623a65478f7b7ebc` needed one refresh of its previously converted clean fixture from the exact committed blob. It then passed WSS, frozen architecture, and clean CTRL-002 Acceptance. Integration Recorder run `R-20260928T093047Z-78a476e3-1352-4f6b-844b-e06cf8a75bfb`; closure evidence `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-acceptance-closure.md`. Task is `done`; S0 Gate NOT YET PASSED.
+ - Fresh independent Review Agent `/root/contract002_portability_review` accepted clean candidate `57a02590b0464755c6ff2bf5187e0bb69f9ce08c`: both `core.autocrlf` clean checkouts preserved golden bytes and passed WSS; five prior probes, canonical hashes, clean detached CTRL-002 Acceptance, scope/minimality, and Fix Recorder bytes passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-independent-review-pass.md`; Review run `R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779`. Task remains `review` for Coordinator integration; S0 Gate NOT YET PASSED.
+ - Fresh Fix Agent `/root/contract002_portability_fix` repaired the post-main checkout failure with fixture-local `golden.json -text` at `59bc411`. Disposable clean worktrees with `core.autocrlf=true` and `false` both retained the original golden blob bytes and passed WSS verification. Five prior independent mutation probe sets, the WSS baseline, frozen architecture hash verifier, and CTRL-002 Development passed. The golden fixture and WSS schema/semantics are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. The task remains `review` for fresh independent review; S0 Gate remains NOT YET PASSED.
+@@ -209,11 +210,11 @@ Current Task State: done
+ 
+ ## Next Exact Action
+ 
+-Commit Contract 002 closure and Recorder evidence, fast-forward clean local `main`, then activate dependency-satisfied `LOOP1-CONTRACT-003`. S0 Gate remains NOT YET PASSED.
++Register task-linked Recorder instrumentation and delegate a fresh Contract 003 Implementation Agent; then run a fresh independent review and repair cycle until accepted. S0 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+-`fb789509bb9d28dc224b0b1a623a65478f7b7ebc` (locally verified clean `main` after independently accepted portability repair and one-time exact-blob fixture refresh; closure commit remains pending).
++`eb9ebea6dd6852acf80d7686d4592d1b98025ae4` (clean local `main` with independently accepted Contract 002, WSS, CTRL-002 Acceptance, and Recorder repository verification; Contract 003 activation is not yet accepted).
+ 
+ ## Latest Checkpoint
+ 
+@@ -221,6 +222,7 @@ Commit Contract 002 closure and Recorder evidence, fast-forward clean local `mai
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Coordinator `/root` owns only Contract 003 queue activation, Task Spec/current recovery updates, and task-linked Recorder artifacts until committed. No Contract 003 product file has changed.
+ - Coordinator `/root` owns only Contract 002 closure evidence, queue/progress transition, checkpoint, and task-linked Recorder artifacts until committed. Local `main` is clean; the original checkout's unrelated untracked HTTP schema-lint directory remains under its paused Agent's ownership and untouched.
+ - Fresh independent Reviewer `/root/contract002_portability_review` owns only task-linked PASS evidence, byte-integrity audit, task/current recovery updates, and linked Recorder artifacts until the review closure commit. No product file was edited. The separate detached Acceptance checkout remains clean.
+ 
+diff --git a/spec/tasks/backlog/LOOP1-CONTRACT-003.md b/spec/tasks/backlog/LOOP1-CONTRACT-003.md
+deleted file mode 100644
+index a463aba..0000000
+--- a/spec/tasks/backlog/LOOP1-CONTRACT-003.md
++++ /dev/null
+@@ -1,63 +0,0 @@
+----
+-task_id: LOOP1-CONTRACT-003
+-title: Freeze Sync and Plugin API v1 contracts
+-status: backlog
+-owner: unassigned
+-stage: S0
+-gate: S0
+----
+-
+-# Goal
+-
+-Define canonical user cursor, per-conversation sequence Sync, and Plugin API v1 Events/Queries/Actions/UI Host contracts.
+-
+-# Inputs
+-
+-- Architecture Baseline v1.0 chapters 2, 6, 8, 9, 11, 19 and appendix B, resolved through `spec/architecture/README.md`.
+-- Approved ADRs/frozen decisions in `spec/architecture/decisions/`.
+-- `spec/domain/sync-plugin.md`
+-- `spec/invariants/sync-plugin.md`
+-- `spec/acceptance/s0-sync-plugin.md`
+-- Approved HTTP, WSS, and error contracts from LOOP1-CONTRACT-001 and LOOP1-CONTRACT-002.
+-
+-# Dependencies
+-
+-- LOOP1-CONTRACT-002 done.
+-- LOOP1-SPEC-001 done.
+-
+-# Allowed Paths
+-
+-- `contracts/plugin-api/**`
+-- `contracts/websocket/**`
+-- `contracts/errors/**`
+-- `contracts/fixtures/**`
+-- Relevant `spec/domain/**`, `spec/invariants/**`, and `spec/acceptance/**`
+-- `spec/tasks/**/LOOP1-CONTRACT-003.md`
+-- `spec/progress/current.md`
+-
+-# Acceptance
+-
+-- User cursor and conversation sequence Sync contracts are machine-verifiable.
+-- Plugin API v1 Events/Queries/Actions/UI Host contracts are machine-verifiable.
+-- Fixtures cover duplicate, out-of-order, gap, and permission-denial cases.
+-
+-# Forbidden
+-
+-- Implement Sync or plugin runtime behavior.
+-- Weaken cursor, contiguous sequence, capability, permission, sandbox, or immutable-version rules.
+-
+-# Verification
+-
+-- Run schema lint and duplicate/out-of-order/gap/permission fixture tests.
+-
+-# Evidence
+-
+-- Pending.
+-
+-# Handoff
+-
+-- Unassigned; no changes yet.
+-
+-# Next Action
+-
+-- Promote only after LOOP1-CONTRACT-002 is independently accepted.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-d70f45bf-167c-4e2e-a836-56af1fb61448/metadata.json
+# ?? research/prompts/P-d70f45bf-167c-4e2e-a836-56af1fb61448/prompt.txt
+# ?? research/runs/R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df/blobs/C-20070878-14c9-459f-b301-298a6389765f.stderr.txt
+# ?? research/runs/R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df/blobs/C-20070878-14c9-459f-b301-298a6389765f.stdout.txt
+# ?? research/runs/R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df/blobs/C-21bd0853-1509-4576-9db3-edc6241bf9df.stderr.txt
+# ?? research/runs/R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df/blobs/C-21bd0853-1509-4576-9db3-edc6241bf9df.stdout.txt
+# ?? research/runs/R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df/events.jsonl
+# ?? research/runs/R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df/initial_state.json
+# ?? research/runs/R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df/metadata.json
+# ?? spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-activation-prompt.txt
+# ?? spec/tasks/active/LOOP1-CONTRACT-003.md
