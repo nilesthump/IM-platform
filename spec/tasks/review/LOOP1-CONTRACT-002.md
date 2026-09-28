@@ -2,7 +2,7 @@
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
 status: review
-owner: /root/contract002_fix3
+owner: /root/contract002_fix4
 stage: S0
 gate: S0
 ---
@@ -71,6 +71,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: a broader in-memory audit of every fixture's declared output/state/timeline expectations found `check_scenario` accepted 21/24 invalid mutations, including missing created fan-out, wrong committed ACK sequence, duplicate GROUP persistence, double materialization, permanent Sync gap, and wrong bound identity/epoch. The committed prior 12-case probe rejected 12/12, baseline WSS verifier passed, and clean detached CTRL-002 Acceptance passed, but these do not establish the unasserted semantics. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md` and `2026-09-28-independent-review3-mutations.py`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains `review`; S0 Gate NOT YET PASSED.
 - Fresh Fix Agent `/root/contract002_fix3` added independent named-case outcomes, transaction timelines, and direct request/output relationships to the WSS verifier. Development checks pass: baseline 8 positive/10 negative and 11 schema/12 behavior mutations, prior probe 12/12, broad Review 3 probe 24/24, and CTRL-002 Development. Canonical schema and fixture bytes remain unchanged. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-systemic-fixture-fix-development.md`; Recorder run `R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2`. This is not independent acceptance.
 - Fresh independent Review Agent `/root/contract002_review4` rejected clean candidate `cb24c4c`: a new in-memory precondition audit found 0/9 invalid `given` mutations rejected, including committed ACK on an unauthenticated socket, nonmember or declared rollback, and valid bind on a declared invalid token. Baseline, prior 12/24 probes, frozen hash verifier, and clean detached CTRL-002 Acceptance passed, but these do not establish premise-to-outcome correctness. Durable FAIL evidence and probe: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-cb24c4c-fail.md` and `2026-09-28-independent-review4-mutations.py`; Recorder run `R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573`. Task remains in `review` and S0 Gate NOT YET PASSED.
+- Fresh Fix Agent `/root/contract002_fix4` asserted exact, independently stated `given` premises for all 18 named scenarios and added 12 permanent precondition mutations. Baseline WSS verification passed with 11 schema and 24 behavior controls; the prior independent 12/24 probes and Review 4's 9-case precondition probe rejected 12/12, 24/24, and 9/9 invalid mutations. CTRL-002 Development and focused scope/diff checks passed. Canonical schema and golden fixtures remain unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-precondition-fix-development.md`; Recorder run `R-20260928T042440Z-2abf26e1-ad46-4d62-b224-42f747519427`. This is not independent acceptance.
 
 # Handoff
 
@@ -79,4 +80,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Delegate a fresh Fix Agent to assert material scenario `given` preconditions against output/state/timeline outcomes, then a different fresh independent Reviewer to repeat all probes and clean-checkout Acceptance. Keep in `review` pending independent PASS.
+- Delegate a different fresh independent Reviewer to inspect the exact Fix 4 candidate, repeat all probes, and run clean-checkout CTRL-002 Acceptance. Keep in `review` pending independent PASS.

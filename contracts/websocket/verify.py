@@ -198,6 +198,30 @@ OUTCOMES = {
     "revoked-socket": {"socket": "CLOSED", "messages": 0, "outbox": 0, "successAck": False},
 }
 
+# The premises are independent contract assertions, not values copied from the
+# generator. Exact keys prevent a fixture from silently adding an unverified
+# condition; exact values keep each named outcome tied to its starting state.
+GIVEN = {
+    "bind-valid-session": {"socket": "UNAUTHENTICATED", "token": "valid; signature, expiry, session ID, client type and epoch match"},
+    "durable-send-and-created": {"socket": "AUTHENTICATED", "member": True, "transaction": "message+seq+outbox committed", "conversationType": "DIRECT"},
+    "idempotent-retry": {"socket": "AUTHENTICATED", "member": True, "transaction": "first send committed; retry uses same sender/conversation/request and content"},
+    "same-request-different-conversation": {"socket": "AUTHENTICATED", "member": True, "transaction": "both committed"},
+    "group-single-message": {"socket": "AUTHENTICATED", "member": True, "transaction": "committed", "conversationType": "GROUP", "memberCount": 500},
+    "duplicate-fanout": {"socket": "AUTHENTICATED", "transaction": "already committed; duplicate NATS delivery"},
+    "out-of-order-fanout": {"socket": "AUTHENTICATED", "transaction": "two committed messages; event seq 2 arrives before seq 1"},
+    "ping-before-bind": {"socket": "UNAUTHENTICATED"},
+    "unauthenticated-send": {"socket": "UNAUTHENTICATED"},
+    "non-member-send": {"socket": "AUTHENTICATED", "member": False},
+    "rollback-before-ack": {"socket": "AUTHENTICATED", "member": True, "transaction": "rolled back before commit"},
+    "conflicting-retry": {"socket": "AUTHENTICATED", "member": True, "transaction": "first send committed; same key different content"},
+    "stale-epoch-bind": {"socket": "UNAUTHENTICATED", "token": "signed but epoch stale"},
+    "expired-token-bind": {"socket": "UNAUTHENTICATED", "token": "expired"},
+    "wrong-client-type-bind": {"socket": "UNAUTHENTICATED", "token": "signed for DESKTOP while session is WEB"},
+    "invalid-signature-bind": {"socket": "UNAUTHENTICATED", "token": "invalid signature"},
+    "wrong-conversation-fanout": {"socket": "AUTHENTICATED", "localMemberOf": C1, "eventConversation": C2},
+    "revoked-socket": {"socket": "AUTHENTICATED", "session": "replaced by newer WEB login"},
+}
+
 TRANSACTIONS = {
     "durable-send-and-created": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "MESSAGE_CREATED"),
     "idempotent-retry": ("MEMBER_AUTHORIZED", "BEGIN", "SEQ_ALLOCATED", "MESSAGE_INSERTED", "OUTBOX_INSERTED", "COMMIT", "SUCCESS_ACK", "IDEMPOTENCY_HIT", "SUCCESS_ACK"),
@@ -213,6 +237,8 @@ def check_declared_behavior(s):
     case_id = s["id"]
     if case_id not in OUTCOMES or s["expect"] != OUTCOMES[case_id]:
         raise Invalid(f"{case_id}: declared state differs from required outcome")
+    if s.get("given") != GIVEN[case_id]:
+        raise Invalid(f"{case_id}: declared preconditions differ from required premises")
     if tuple(s["timeline"]) != TRANSACTIONS.get(case_id, ()):
         raise Invalid(f"{case_id}: transaction timeline differs from required outcome")
     steps = s["steps"]
@@ -398,6 +424,18 @@ def negative_behavior_controls():
         ("bind-valid-session", lambda s: s["steps"][0]["out"].clear()),
         ("bind-valid-session", lambda s: s["expect"].update(socket="UNAUTHENTICATED")),
         ("stale-epoch-bind", lambda s: s["expect"].update(socket="AUTHENTICATED")),
+        ("durable-send-and-created", lambda s: s["given"].update(socket="UNAUTHENTICATED")),
+        ("durable-send-and-created", lambda s: s["given"].update(member=False)),
+        ("durable-send-and-created", lambda s: s["given"].update(transaction="rolled back before commit")),
+        ("idempotent-retry", lambda s: s["given"].update(socket="UNAUTHENTICATED")),
+        ("same-request-different-conversation", lambda s: s["given"].update(transaction="both rolled back")),
+        ("group-single-message", lambda s: s["given"].update(member=False)),
+        ("unauthenticated-send", lambda s: s["given"].update(socket="AUTHENTICATED")),
+        ("rollback-before-ack", lambda s: s["given"].update(transaction="committed")),
+        ("bind-valid-session", lambda s: s["given"].update(token="invalid signature")),
+        ("wrong-conversation-fanout", lambda s: s["given"].update(eventConversation=C1)),
+        ("revoked-socket", lambda s: s["given"].pop("session")),
+        ("ping-before-bind", lambda s: s["given"].update(extra="unverified premise")),
     ]
     for case_id, mutate in changes:
         changed = copy.deepcopy(by_id[case_id])
