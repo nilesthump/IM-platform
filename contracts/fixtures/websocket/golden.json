@@ -1,0 +1,1067 @@
+{
+  "fixtureVersion": "1.0",
+  "contractVersion": "1.0",
+  "profiles": [
+    "go",
+    "java"
+  ],
+  "scenarios": [
+    {
+      "id": "bind-valid-session",
+      "polarity": "positive",
+      "rules": [
+        "MSG-D-004"
+      ],
+      "given": {
+        "socket": "UNAUTHENTICATED",
+        "token": "valid; signature, expiry, session ID, client type and epoch match"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "auth.bind",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "accessToken": "fixture-access-token-not-a-credential"
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "auth.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "bound",
+                "userId": "10000000-0000-4000-8000-000000000001",
+                "sessionId": "20000000-0000-4000-8000-000000000001",
+                "clientType": "WEB",
+                "sessionEpoch": 1
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "socket": "AUTHENTICATED",
+        "messages": 0,
+        "outbox": 0
+      },
+      "timeline": []
+    },
+    {
+      "id": "durable-send-and-created",
+      "polarity": "positive",
+      "rules": [
+        "MSG-A-001",
+        "MSG-I-002",
+        "MSG-I-003"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "member": true,
+        "transaction": "message+seq+outbox committed",
+        "conversationType": "DIRECT"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "committed",
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z"
+              }
+            },
+            {
+              "protocolVersion": "1.0",
+              "type": "message.created",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "senderId": "10000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z",
+                "content": {
+                  "kind": "TEXT",
+                  "text": "hello"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 1,
+        "outbox": 1,
+        "seq": [
+          1
+        ],
+        "ackAfterCommit": true,
+        "wrongConversationDelivery": false
+      },
+      "timeline": [
+        "MEMBER_AUTHORIZED",
+        "BEGIN",
+        "SEQ_ALLOCATED",
+        "MESSAGE_INSERTED",
+        "OUTBOX_INSERTED",
+        "COMMIT",
+        "SUCCESS_ACK",
+        "MESSAGE_CREATED"
+      ]
+    },
+    {
+      "id": "idempotent-retry",
+      "polarity": "positive",
+      "rules": [
+        "MSG-A-002",
+        "MSG-I-001"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "member": true,
+        "transaction": "first send committed; retry uses same sender/conversation/request and content"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "committed",
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z"
+              }
+            }
+          ]
+        },
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "committed",
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z"
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 1,
+        "outbox": 1,
+        "seq": [
+          1
+        ],
+        "stableAck": true
+      },
+      "timeline": [
+        "MEMBER_AUTHORIZED",
+        "BEGIN",
+        "SEQ_ALLOCATED",
+        "MESSAGE_INSERTED",
+        "OUTBOX_INSERTED",
+        "COMMIT",
+        "SUCCESS_ACK",
+        "IDEMPOTENCY_HIT",
+        "SUCCESS_ACK"
+      ]
+    },
+    {
+      "id": "same-request-different-conversation",
+      "polarity": "positive",
+      "rules": [
+        "MSG-A-003"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "member": true,
+        "transaction": "both committed"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "committed",
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z"
+              }
+            }
+          ]
+        },
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000002",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "committed",
+                "conversationId": "30000000-0000-4000-8000-000000000002",
+                "messageId": "50000000-0000-4000-8000-000000000002",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:02Z"
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 2,
+        "outbox": 2,
+        "messageIdsGloballyUnique": true,
+        "conversationSeq": {
+          "30000000-0000-4000-8000-000000000001": [
+            1
+          ],
+          "30000000-0000-4000-8000-000000000002": [
+            1
+          ]
+        }
+      },
+      "timeline": []
+    },
+    {
+      "id": "group-single-message",
+      "polarity": "positive",
+      "rules": [
+        "MSG-A-006",
+        "MSG-I-007"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "member": true,
+        "transaction": "committed",
+        "conversationType": "GROUP",
+        "memberCount": 500
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "committed",
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z"
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 1,
+        "outbox": 1,
+        "localFanoutIndependent": true
+      },
+      "timeline": [
+        "MEMBER_AUTHORIZED",
+        "BEGIN",
+        "SEQ_ALLOCATED",
+        "MESSAGE_INSERTED",
+        "OUTBOX_INSERTED",
+        "COMMIT",
+        "SUCCESS_ACK",
+        "LOCAL_FANOUT"
+      ]
+    },
+    {
+      "id": "duplicate-fanout",
+      "polarity": "positive",
+      "rules": [
+        "MSG-A-005",
+        "MSG-I-005"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "transaction": "already committed; duplicate NATS delivery"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.created",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "messageId": "50000000-0000-4000-8000-000000000001",
+              "senderId": "10000000-0000-4000-8000-000000000001",
+              "seq": 1,
+              "createdAt": "2026-09-28T00:00:01Z",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.created",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "senderId": "10000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z",
+                "content": {
+                  "kind": "TEXT",
+                  "text": "hello"
+                }
+              }
+            },
+            {
+              "protocolVersion": "1.0",
+              "type": "message.created",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "senderId": "10000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z",
+                "content": {
+                  "kind": "TEXT",
+                  "text": "hello"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 1,
+        "outbox": 1,
+        "clientMaterializations": 1,
+        "syncProvidesEventualCompleteness": true
+      },
+      "timeline": []
+    },
+    {
+      "id": "out-of-order-fanout",
+      "polarity": "positive",
+      "rules": [
+        "MSG-A-005",
+        "MSG-A-007"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "transaction": "two committed messages; event seq 2 arrives before seq 1"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.created",
+            "requestId": "40000000-0000-4000-8000-000000000002",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "messageId": "50000000-0000-4000-8000-000000000002",
+              "senderId": "10000000-0000-4000-8000-000000000001",
+              "seq": 2,
+              "createdAt": "2026-09-28T00:00:02Z",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.created",
+              "requestId": "40000000-0000-4000-8000-000000000002",
+              "payload": {
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000002",
+                "senderId": "10000000-0000-4000-8000-000000000001",
+                "seq": 2,
+                "createdAt": "2026-09-28T00:00:02Z",
+                "content": {
+                  "kind": "TEXT",
+                  "text": "hello"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.created",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "messageId": "50000000-0000-4000-8000-000000000001",
+              "senderId": "10000000-0000-4000-8000-000000000001",
+              "seq": 1,
+              "createdAt": "2026-09-28T00:00:01Z",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.created",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "senderId": "10000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z",
+                "content": {
+                  "kind": "TEXT",
+                  "text": "hello"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 2,
+        "outbox": 2,
+        "clientMaterializations": 2,
+        "contiguousSeqAfterSync": 2,
+        "permanentSeqGap": false
+      },
+      "timeline": []
+    },
+    {
+      "id": "ping-before-bind",
+      "polarity": "positive",
+      "rules": [],
+      "given": {
+        "socket": "UNAUTHENTICATED"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "ping",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {}
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "pong",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {}
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "socket": "UNAUTHENTICATED"
+      },
+      "timeline": []
+    },
+    {
+      "id": "unauthenticated-send",
+      "polarity": "negative",
+      "rules": [
+        "MSG-D-004"
+      ],
+      "given": {
+        "socket": "UNAUTHENTICATED"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "AUTH_REQUIRED",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 0,
+        "outbox": 0,
+        "successAck": false
+      },
+      "timeline": [
+        "AUTH_DENIED",
+        "REJECTED_ACK"
+      ]
+    },
+    {
+      "id": "non-member-send",
+      "polarity": "negative",
+      "rules": [
+        "MSG-A-004",
+        "MSG-I-006"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "member": false
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "AUTHORIZATION_DENIED",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 0,
+        "outbox": 0,
+        "successAck": false
+      },
+      "timeline": [
+        "MEMBER_DENIED",
+        "REJECTED_ACK"
+      ]
+    },
+    {
+      "id": "rollback-before-ack",
+      "polarity": "negative",
+      "rules": [
+        "MSG-A-001",
+        "MSG-I-002"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "member": true,
+        "transaction": "rolled back before commit"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "MESSAGE_COMMIT_FAILED",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 0,
+        "outbox": 0,
+        "seq": [],
+        "successAck": false
+      },
+      "timeline": [
+        "MEMBER_AUTHORIZED",
+        "BEGIN",
+        "SEQ_ALLOCATED",
+        "MESSAGE_INSERTED",
+        "OUTBOX_INSERTED",
+        "ROLLBACK",
+        "REJECTED_ACK"
+      ]
+    },
+    {
+      "id": "conflicting-retry",
+      "polarity": "negative",
+      "rules": [
+        "MSG-I-001"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "member": true,
+        "transaction": "first send committed; same key different content"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "committed",
+                "conversationId": "30000000-0000-4000-8000-000000000001",
+                "messageId": "50000000-0000-4000-8000-000000000001",
+                "seq": 1,
+                "createdAt": "2026-09-28T00:00:01Z"
+              }
+            }
+          ]
+        },
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "changed"
+              }
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "message.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "MESSAGE_REQUEST_CONFLICT",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "messages": 1,
+        "outbox": 1,
+        "seq": [
+          1
+        ],
+        "secondSuccessAck": false
+      },
+      "timeline": [
+        "MEMBER_AUTHORIZED",
+        "BEGIN",
+        "SEQ_ALLOCATED",
+        "MESSAGE_INSERTED",
+        "OUTBOX_INSERTED",
+        "COMMIT",
+        "SUCCESS_ACK",
+        "IDEMPOTENCY_CONFLICT",
+        "REJECTED_ACK"
+      ]
+    },
+    {
+      "id": "stale-epoch-bind",
+      "polarity": "negative",
+      "rules": [],
+      "given": {
+        "socket": "UNAUTHENTICATED",
+        "token": "signed but epoch stale"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "auth.bind",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "accessToken": "fixture-access-token-not-a-credential"
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "auth.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "AUTH_SESSION_EPOCH_STALE",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "socket": "UNAUTHENTICATED",
+        "messages": 0
+      },
+      "timeline": []
+    },
+    {
+      "id": "expired-token-bind",
+      "polarity": "negative",
+      "rules": [],
+      "given": {
+        "socket": "UNAUTHENTICATED",
+        "token": "expired"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "auth.bind",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "accessToken": "fixture-access-token-not-a-credential"
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "auth.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "AUTH_TOKEN_EXPIRED",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "socket": "UNAUTHENTICATED",
+        "messages": 0
+      },
+      "timeline": []
+    },
+    {
+      "id": "wrong-client-type-bind",
+      "polarity": "negative",
+      "rules": [],
+      "given": {
+        "socket": "UNAUTHENTICATED",
+        "token": "signed for DESKTOP while session is WEB"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "auth.bind",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "accessToken": "fixture-access-token-not-a-credential"
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "auth.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "AUTH_CLIENT_TYPE_MISMATCH",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "socket": "UNAUTHENTICATED",
+        "messages": 0
+      },
+      "timeline": []
+    },
+    {
+      "id": "invalid-signature-bind",
+      "polarity": "negative",
+      "rules": [],
+      "given": {
+        "socket": "UNAUTHENTICATED",
+        "token": "invalid signature"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "auth.bind",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "accessToken": "fixture-access-token-not-a-credential"
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "auth.ack",
+              "requestId": "40000000-0000-4000-8000-000000000001",
+              "payload": {
+                "status": "rejected",
+                "error": {
+                  "code": "AUTH_TOKEN_INVALID",
+                  "message": "Request rejected"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "expect": {
+        "socket": "UNAUTHENTICATED",
+        "messages": 0
+      },
+      "timeline": []
+    },
+    {
+      "id": "wrong-conversation-fanout",
+      "polarity": "negative",
+      "rules": [
+        "MSG-I-004",
+        "MSG-A-007"
+      ],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "localMemberOf": "30000000-0000-4000-8000-000000000001",
+        "eventConversation": "30000000-0000-4000-8000-000000000002"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.created",
+            "requestId": "40000000-0000-4000-8000-000000000002",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000002",
+              "messageId": "50000000-0000-4000-8000-000000000002",
+              "senderId": "10000000-0000-4000-8000-000000000001",
+              "seq": 1,
+              "createdAt": "2026-09-28T00:00:02Z",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": []
+        }
+      ],
+      "expect": {
+        "messages": 1,
+        "outbox": 1,
+        "clientMaterializations": 0,
+        "wrongConversationDelivery": false
+      },
+      "timeline": []
+    },
+    {
+      "id": "revoked-socket",
+      "polarity": "negative",
+      "rules": [],
+      "given": {
+        "socket": "AUTHENTICATED",
+        "session": "replaced by newer WEB login"
+      },
+      "steps": [
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "session.revoked",
+            "requestId": "40000000-0000-4000-8000-000000000002",
+            "payload": {
+              "sessionId": "20000000-0000-4000-8000-000000000001",
+              "reason": "REPLACED"
+            }
+          },
+          "out": [
+            {
+              "protocolVersion": "1.0",
+              "type": "session.revoked",
+              "requestId": "40000000-0000-4000-8000-000000000002",
+              "payload": {
+                "sessionId": "20000000-0000-4000-8000-000000000001",
+                "reason": "REPLACED"
+              }
+            }
+          ]
+        },
+        {
+          "in": {
+            "protocolVersion": "1.0",
+            "type": "message.send",
+            "requestId": "40000000-0000-4000-8000-000000000001",
+            "payload": {
+              "conversationId": "30000000-0000-4000-8000-000000000001",
+              "content": {
+                "kind": "TEXT",
+                "text": "hello"
+              }
+            }
+          },
+          "out": []
+        }
+      ],
+      "expect": {
+        "socket": "CLOSED",
+        "messages": 0,
+        "outbox": 0,
+        "successAck": false
+      },
+      "timeline": []
+    }
+  ]
+}

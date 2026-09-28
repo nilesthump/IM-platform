@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
-status: active
-owner: /root
+status: review
+owner: /root/contract002_impl
 stage: S0
 gate: S0
 ---
@@ -62,11 +62,13 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - The canonical Markdown architecture and historical PDF hashes matched the baseline manifest; architecture verifier, CTRL-002 Acceptance recovery, and Recorder repository validation passed on clean `main` before activation.
 - Coordinator resumed under Recorder prompt `P-ab3f11c8-309b-4368-8ab6-5528b9634839` and run `R-20260928T005917Z-da1e7bcf-0952-4664-b76d-b699a2b59840` with `prospective_resume`; branch activation and earlier same-turn checks are explicitly outside the complete prospective trace.
 - Recorder-wrapped CTRL-002 Development initially rejected a short Last Known Good Commit and missing verification entry point, then passed after both records were corrected. Development PASS is not independent acceptance. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-activation.md`.
+- Fresh Implementation Agent authored the strict WSS v1 JSON Schema, protocol semantics, deterministic generator/verifier, and 8 positive/10 negative shared Go/Java golden scenarios. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`. Prospective Recorder run: `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. Development evidence is not independent acceptance.
 
 # Handoff
 
 - Activated from clean `main` commit `7484901` on `task/LOOP1-CONTRACT-002`. The original checkout's untracked `contracts/http/schema-lint/` remains owned by the paused Agent and was not touched.
+- No architecture conflict or new dependency. Only task-allowed product contracts/fixtures, task-linked evidence/Recorder paths, and recovery records changed. Candidate review commit and clean-state audit are reported to the Coordinator at handoff.
 
 # Next Action
 
-- Register the visible continuation prompt, start a prospective Recorder run, then implement the WSS contracts and task verifier within the allowed paths. Hand off a clean committed candidate for fresh independent review.
+- Fresh independent Review Agent inspects the clean committed candidate, runs the WSS verifier and CTRL-002 Acceptance plus scope/negative controls, and records PASS/FAIL under ADR-0001. Do not move this task to `done` on implementation evidence alone.
