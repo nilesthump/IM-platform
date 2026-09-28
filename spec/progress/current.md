@@ -12,10 +12,12 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CONTRACT-002
 
-Current Task State: review
+Current Task State: done
 
 ## Current Contract Work
 
+- `LOOP1-CONTRACT-002` is independently accepted under ADR-0001 at exact reviewed candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`, with PASS report committed at `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The separate clean detached CTRL-002 Acceptance, WSS verifier, five prior probe sets, ten new controls, architecture hashes, scope audit, and Review Recorder validation passed. Coordinator closure evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`.
+- Contract 002 transition is in the `done` queue; its stable checkpoint is `spec/progress/checkpoints/2026-09-28-loop1-contract-002-accepted.md`. Local `main` integration and post-merge verification are the next exact action. S0 Gate remains NOT YET PASSED.
 - Clean `main` at `7484901` was pushed to `origin/main` on 2026-09-28 and used as the base for isolated branch `task/LOOP1-CONTRACT-002`.
 - `LOOP1-ARCHDOC-001` is `done`; its accepted canonical Markdown hash, historical PDF hash, architecture verifier, CTRL-002 Acceptance recovery, and Recorder repository validation passed before this activation. S0 Gate remains NOT YET PASSED.
 - `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
@@ -204,18 +206,19 @@ Current Task State: review
 
 ## Next Exact Action
 
-Coordinator records accepted LOOP1-CONTRACT-002 closure, transitions to `done`, integrates reviewed candidate, and runs post-merge verification. S0 Gate remains NOT YET PASSED.
+Integrate the accepted Contract 002 closure into clean local `main`, run post-merge WSS, architecture, CTRL-002 Acceptance, and Recorder repository checks, then activate dependency-satisfied `LOOP1-CONTRACT-003`. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`7484901b3915535f60941a01116b730a845bd47d` (clean accepted architecture migration checkpoint on local and remote `main`; baseline verifiers passed before Contract 002 activation).
+`c2eba3acec6ece2ec347b536d352ddf8909081f3` (clean independently accepted Contract 002 review closure; local `main` integration pending).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md`
+`spec/progress/checkpoints/2026-09-28-loop1-contract-002-accepted.md`
 
 ## Uncommitted Changes / Ownership
 
+- Coordinator owns only the Contract 002 `done` transition, acceptance evidence, checkpoint, current recovery update, and linked Recorder artifacts until committed; no product contract file is uncommitted. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains owned by the paused Agent and untouched.
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
 - The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.

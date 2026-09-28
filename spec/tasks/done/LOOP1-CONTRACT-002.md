@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
-status: review
-owner: /root/contract002_review7
+status: done
+owner: /root
 stage: S0
 gate: S0
 ---
@@ -82,6 +82,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 - Fresh Fix Agent `/root/contract002_fix6` added distinct request-identity assertion for two out-of-order Messages and focused schema keyword-value lint, with eight permanent mutation controls. WSS baseline and all five prior independent probe sets pass, including both Review 6 cases; CTRL-002 Development and canonical-file scope checks pass. Canonical schema and golden fixtures are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-request-identity-schema-fix-development.md`; Recorder run `R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878`. This is not independent acceptance.
 
 - Fresh independent Review Agent `/root/contract002_review7` returned PASS for exact clean candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b` under ADR-0001's separate detached clean-checkout mechanism. WSS baseline, all five prior probe sets, 10 new focused controls, canonical hashes, CTRL-002 Acceptance, protected-path scope, Fix 6 raw Recorder bytes, and Review 7 Recorder validation passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review7-5d5afdd-pass.md`; run `R-20260928T062353Z-39bc4b6e-2cc6-4610-940b-1e93949d211b`. The task remains `review` until Coordinator acceptance closure; S0 Gate remains NOT YET PASSED.
+- Coordinator accepted the independent PASS closure at review evidence commit `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The reviewed product candidate is exactly `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`; no reviewer or coordinator product edits followed it. Durable coordinator evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`; stable contract checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-contract-002-accepted.md`. This Task is `done`; S0 Gate remains NOT YET PASSED.
 
 # Handoff
 
@@ -90,4 +91,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Coordinator records accepted closure, transitions this independently reviewed task to `done`, integrates the candidate, and runs post-merge verification. S0 Gate remains NOT YET PASSED.
+- Coordinator integrates the accepted closure into clean local `main`, runs post-merge verification, then selects the next dependency-satisfied S0 task (`LOOP1-CONTRACT-003`). S0 Gate remains NOT YET PASSED.
