@@ -14,3 +14,16 @@
 | `pwsh -NoProfile -File ./tools/verify-frozen-architecture.ps1` | 0 | 703 ms | Canonical Markdown and historical PDF hashes PASS |
 
 Review 1's backlog marker `spec/tasks/backlog/.gitkeep` remains tracked. The next independent reviewer must verify from a clean committed checkout, including CTRL-002 Acceptance, and judge the candidate. Actual GitHub workflow execution has not occurred. S0 Gate is NOT YET PASSED. Last known good independently accepted main: `10406be70bf66482836164400cd5b8be07709c58`. Fix Agent owns only the task-linked changes until commit; original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+
+## Clean committed development verification
+
+- Product/evidence commit: `4dc41b507ff23e2c7edb25fbcdb9930955b5abfd` on `task/LOOP1-CI-001`; diff range `10406be70bf66482836164400cd5b8be07709c58..4dc41b507ff23e2c7edb25fbcdb9930955b5abfd`.
+- Clean-state method: new isolated detached checkout `H:\.codex\worktrees\ci-rename-verification\IM-platform` at that exact commit. `git status --short --branch` returned only `## HEAD (no branch)` before and after. `git rev-parse HEAD` matched the commit. Tests ran with Python `-B`, leaving the checkout clean.
+
+| Exact command in clean detached checkout | Exit | Elapsed | Result |
+| --- | ---: | ---: | --- |
+| `pwsh -NoProfile -File ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` | 0 | 1.240 s | Five queues, including the Review 1 backlog marker, PASS |
+| `C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -B -m unittest discover -s tests/ci -v` | 0 | 1.807 s | 12 classifier/gate tests PASS |
+| `pwsh -NoProfile -File ./tools/verify-frozen-architecture.ps1` | 0 | 0.913 s | Canonical Markdown and historical PDF hashes PASS |
+
+This isolated run was performed by the Fix Agent and is still development evidence. A different fresh Review Agent must make the independent acceptance decision under ADR-0001. The final evidence-only follow-up commit must be checked clean before handoff.
