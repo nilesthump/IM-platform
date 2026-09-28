@@ -12,11 +12,13 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-DB-001
 
-Current Task State: active
+Current Task State: review
 
 ## Current Contract Work
 
-- `LOOP1-DB-001` implementation candidate adds the canonical PostgreSQL schema, standalone migration runner, uniqueness and forward/rollback integration tests. A linked fix requires GROUP create request identity and tests its rejection/uniqueness. Static development tests and CTRL-002 Development passed; runtime PostgreSQL integration is pending because `psql` is absent and Docker daemon unavailable. Development evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`; Recorder runs `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98` and `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1`. Task remains active, S0 Gate NOT YET PASSED; fresh independent review and PostgreSQL execution are next.
+- DB review-state Recorder run `R-20260928T171255Z-1eb5541f-d2e0-41c8-a583-5b721eb3ff78` finished and validated (8 events). A disposable PostgreSQL 16 run passed all 3 database tests; CTRL-002 Development recovered the task in `review`. Exact local evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. Fresh clean-checkout independent Acceptance remains pending; S0 Gate NOT YET PASSED.
+- DB implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` is in `review`. A disposable PostgreSQL 16 container and locally built Python-plus-psql test image are running without a host port; a local development run passed all 3 database tests, including actual forward/uniqueness/rollback. Fresh independent clean-checkout execution remains pending. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. S0 Gate NOT YET PASSED.
+- `LOOP1-DB-001` implementation candidate adds the canonical PostgreSQL schema, standalone migration runner, uniqueness and forward/rollback integration tests. A linked fix requires GROUP create request identity and tests its rejection/uniqueness. Initial static development tests and CTRL-002 Development passed; the prior PostgreSQL environment limitation was resolved after Docker started. Development evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`; Recorder runs `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98` and `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1`. Task is in review; S0 Gate NOT YET PASSED.
 - DB activation Recorder run `R-20260928T155726Z-e6831664-d89d-46e2-b0e6-21753ebb56fe` finished and validated (8 events). CTRL-002 Development initially failed on a missing architecture resolver reference in the DB Task Spec, then passed after the reference was added; both outcomes are preserved at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-activation-development.md`. Task remains `active`; S0 Gate NOT YET PASSED.
 - `LOOP1-DB-001` is active in isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`; all three Contract dependencies are independently accepted and done. Scope: canonical PostgreSQL schema, application-independent migration runner, uniqueness and forward/rollback tests. S0 Gate NOT YET PASSED.
 - Clean local `main` fast-forwarded to Contract 003 accepted closure `7faadd75b4e195e6b8e8ba8e08f635a18036d497`. Post-integration Contract 003, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository checks passed; `main` stayed clean. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-main-integration.md`; prospective Recorder run `R-20260928T151354Z-d20e8aaa-1145-4e22-bec1-b0a4279824e6` finished and validated. S0 Gate NOT YET PASSED.
@@ -227,7 +229,7 @@ Current Task State: active
 
 ## Next Exact Action
 
-Coordinator: arrange a fresh independent DB Review Agent on the clean implementation candidate, with a disposable PostgreSQL database and `psql` for forward, uniqueness, and rollback execution; then follow ADR-0001 acceptance or fix cycle. S0 Gate remains NOT YET PASSED.
+Coordinator: commit DB review-state handoff, then delegate a fresh independent DB Review Agent to repeat PostgreSQL forward, uniqueness, and rollback tests from a clean candidate checkout and follow ADR-0001 acceptance or fix cycle. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -239,6 +241,7 @@ Coordinator: arrange a fresh independent DB Review Agent on the clean implementa
 
 ## Uncommitted Changes / Ownership
 
+- Coordinator `/root` owns only the DB review queue transition, current/task recovery update, disposable test environment, and task-linked Recorder handoff artifacts until committed. The implementation candidate is clean; the original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
 - Fresh DB Implementation Agent `/root/db001_impl` owns only task-allowed database schema/runner/tests, Task Spec/current recovery, development evidence, and task-linked prompt/Recorder run until its candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
 - Coordinator `/root` owns only DB task queue activation, Task Spec/current recovery updates, and task-linked Recorder activation artifacts until committed. No DB schema or migration file has changed. The original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
 - Coordinator `/root` owns only Contract 003 local-main integration evidence, current/checkpoint/task recovery update, and linked Recorder integration artifacts until committed. Accepted Contract 003 product files and local `main` are clean; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.

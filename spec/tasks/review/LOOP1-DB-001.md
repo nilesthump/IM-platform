@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-DB-001
 title: Establish canonical database schema and migration runner
-status: active
+status: review
 owner: /root
 stage: S0
 gate: S0
@@ -55,6 +55,8 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
 
 # Evidence
 
+- Coordinator's task-linked Recorder run `R-20260928T171255Z-1eb5541f-d2e0-41c8-a583-5b721eb3ff78` finished and validated (8 events). A disposable PostgreSQL 16 execution passed all 3 tests with exit 0; CTRL-002 Development recovered the task in `review` with exit 0. Exact commands, durations, environment, and the pre-run trace limit are at `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. These are development results, not independent acceptance.
+- Coordinator started disposable `postgres:16` container `im-db-001-review` without a published host port and built local `im-db-review-runtime` from cached images to provide Python 3.11 and psql 16 without downloading packages. A pre-Recorder local run of `DB_TEST_ENABLE=1 python3 -m unittest discover -s tests/database -v` passed all 3 tests, including actual PostgreSQL forward/uniqueness/rollback; it is development evidence only. A fresh independent reviewer must repeat the test from a clean committed checkout. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`.
 - Implementation candidate adds `contracts/database/migrations/0001_initial.{up,down}.sql`, standalone `migrate.py`, database README, and `tests/database/test_migrations.py`. Required primary/unique constraints cover user/client session slots, normalized friendship and DIRECT pairs, non-null GROUP create identity, Conversation members, Conversation request and sequence identities, one `message.created` outbox event per message, and immutable plugin artifact versions. Migration SQL and ledger entry execute in one PostgreSQL transaction under an advisory lock. No application module or public HTTP/WSS/Sync/Plugin contract was changed.
 - Development Recorder run `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98`; exact commands/results and PostgreSQL environment limitation are recorded at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`. Runtime PostgreSQL schema/uniqueness/forward/rollback verification remains pending because this host has no `psql` and Docker daemon is unavailable. Development checks are not independent acceptance.
 - Linked GROUP create idempotency fix Recorder run `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1` adds non-null GROUP request identity and negative cases; revised candidate requires fresh independent review.
@@ -63,7 +65,7 @@ The Coordinator prospectively authorizes these task-linked evidence and Recorder
 
 # Handoff
 
-- Coordinator activated the dependency-satisfied task on isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`. Implementation candidate is committed for fresh independent review; runtime PostgreSQL verification and task acceptance remain pending. Last known accepted base is `f25807e`; the implementation commit is a review candidate only. No uncommitted task changes are intended after handoff.
+- Coordinator activated the dependency-satisfied task on isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`. Clean implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` is in `review` for fresh independent acceptance. A local PostgreSQL runtime check passed but is not independent acceptance. Last known accepted base is `f25807e`; no product file changed during the review transition.
 
 # Next Action
 
