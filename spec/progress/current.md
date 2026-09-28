@@ -16,6 +16,7 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh independent Reviewer `/root/infra001_review1` passed Infra 001 candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean detached handoff checkout `c9a3345`: Go and Java profile smokes each passed PostgreSQL migration, Core NATS, HTTPS health, and WSS Upgrade through Caddy TLS 1.3. Frozen hashes, implementation Recorder integrity, profile isolation/port-exposure probe, and detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task remains `review` for Coordinator closure; S0 Gate NOT YET PASSED.
 - Fresh `LOOP1-INFRA-001` Implementation Agent completed a task-scoped Compose skeleton with separate Go/Java profiles, PostgreSQL, Core NATS, canonical migration, and Caddy TLS proxy. Both disposable profile smokes passed real HTTPS and WSS Upgrade through TLS 1.3, plus migration and NATS checks; frozen architecture and CTRL-002 Development passed. Development evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. Task is `review`; independent clean-checkout acceptance is pending. S0 Gate NOT YET PASSED.
 - `LOOP1-INFRA-001` is `active` on isolated branch `task/LOOP1-INFRA-001` from accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. DB dependency is independently accepted and `done`; infrastructure product work awaits a fresh Implementation Agent. Frozen architecture and CTRL-002 Development passed after correcting the DB integration handoff's abbreviated Last Known Good Commit. Docker Compose v5.1.4 is available. Activation Recorder `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` validated PASS; details at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. S0 Gate NOT YET PASSED.
 - `LOOP1-DB-001` accepted closure is integrated on clean local `main` at `016f429`. Post-integration PostgreSQL 16 tests passed 3/3, frozen architecture and CTRL-002 Acceptance passed, and committed Recorder repository artifacts validated. Integration Recorder `R-20260928T180300Z-e2553a57-4a18-4214-a83f-0c04f4859b5a` validated PASS; exact evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-main-integration.md`. The disposable DB test container was stopped. S0 Gate NOT YET PASSED.
@@ -116,6 +117,7 @@ Current Task State: review
 
 ## Verification
 
+- Infra independent Review 1: `pwsh -NoProfile -File tests/infrastructure/smoke.ps1 -Profile go` and `-Profile java` each exited 0 from a clean detached checkout (30,202 ms and 17,467 ms); `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`, implementation Recorder validation, profile isolation probe, and `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` each exited 0. Exact commands and results are in the linked review evidence.
 - Fix 2 Recorder-wrapped checks: `python contracts/websocket/verify.py` PASS, exit `0`, 93 ms (8 positive, 10 negative, 11 schema and 12 behavior controls); committed rereview mutation probe PASS, exit `0`, 94 ms (12/12 rejected); `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development` PASS, exit `0`, 1641 ms. Exact command IDs and limitations are in the Fix evidence. Development mode is not independent acceptance.
 - Independent Contract 002 rereview at clean candidate `102b0ef`: WSS verifier and frozen hashes PASS, clean detached CTRL-002 Acceptance PASS; task FAIL because three auth.bind state/output negative controls were accepted. Exact commands, exits, elapsed times, and Recorder validation are in `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`.
 
@@ -199,6 +201,7 @@ Current Task State: review
 
 ## Changed Files or Migrations
 
+- Infra review adds only task-linked PASS evidence, prompt/Recorder artifacts, and task/current recovery updates. It changes no product file or migration.
 - Contract 003 Review 2 adds only a task-linked independent negative probe, FAIL evidence, prompt/Recorder run, and Task Spec/current recovery updates; no product contract, schema, migration, runtime or Frozen Architecture file changed.
 - Contract 003 Fix 1 changes `contracts/plugin-api/verify.py` and README, `contracts/fixtures/sync-plugin/generate.py` and `golden.json`, and adds separate `profile-outcomes/go.json` and `java.json`; task-linked evidence/Recorder and recovery files are updated. No schema, migration, runtime, HTTP/WSS, or Frozen Architecture file changes.
 - The accepted earlier Research task added the Recorder control plane under `research/**`, `tools/research/**`, and `tests/research/**`. The current integration combines accepted Contract and Minimality lineages and adds task-owned integration Recorder/evidence and recovery-state changes; it adds no IM product implementation.
@@ -216,6 +219,7 @@ Current Task State: review
 
 ## Known Failures, Risks, and Assumptions
 
+- Infra Review 1 found no product defect. Its Upgrade check is an S0 non-business transport probe, not proof of later auth.bind or application WebSocket semantics. The local Caddy CA is development-only.
 - Contract 003 Review 2 FAIL is permanent: SP-A-002 prior FAILED state and SP-A-006 paginated Query outcome are not asserted; `review2-negative-probe.py` accepts 2/2 invalid mutations. A fresh Fix/Review cycle is required. SP-A-012's S0 static-vector acceptance meaning is the smallest remaining interpretation question; static vectors are not backend-produced results.
 - Contract 003 Review 1 FAIL remains permanent. Fix 1's static Go/Java outcome vectors are contract baselines initially populated from canonical expectations, not independent backend outputs. The fresh reviewer must decide the S0 interpretation of SP-A-012; development PASS does not close the task.
 - Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
@@ -234,11 +238,11 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh independent Review Agent: review clean Infra candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603`, run both profile smokes, frozen architecture and Recorder checks, and CTRL-002 Acceptance under ADR-0001. S0 Gate remains NOT YET PASSED.
+Coordinator: accept independently reviewed Infra 001, move the exact task from `review` to `done`, record closure and recovery, then select the next dependency-satisfied task. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`3e4d0f3cb3030731345288f677d2048d72651fd5` (independently accepted DB closure and post-integration evidence on clean local `main`; Infra implementation has only development verification until fresh independent review).
+`3e4d0f3cb3030731345288f677d2048d72651fd5` (independently accepted DB closure and post-integration evidence on clean local `main`; Infra candidate now has independent review PASS but awaits accepted closure and integration).
 
 ## Latest Checkpoint
 
@@ -246,6 +250,7 @@ Fresh independent Review Agent: review clean Infra candidate `3cf1cf0cdfd3084794
 
 ## Uncommitted Changes / Ownership
 
+- Fresh independent Reviewer `/root/infra001_review1` owns only task-linked PASS evidence, Task Spec/current recovery, prompt and Recorder artifacts until committed. Product files and the separate detached Acceptance checkout remain clean; original `H:\IM-platform\contracts\http\schema-lint` was untouched.
 - Fresh Implementation Agent `/root/infra001_impl` owns only task-allowed Compose/TLS, Go/Java non-business placeholders, infrastructure smoke, task/current recovery, development evidence, and linked Recorder artifacts until committed as a clean candidate. The original `H:\IM-platform\contracts\http\schema-lint` belongs to the paused Agent and was untouched.
 - Coordinator `/root` owns only Infra queue activation, task/current recovery update, and task-linked activation Recorder evidence until committed. No product infrastructure path is changed; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
 - Coordinator `/root` owns only DB local-main integration evidence, the linked Recorder prompt/run, and recovery update until committed. Local `main` is clean at the accepted DB closure; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
