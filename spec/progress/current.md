@@ -12,12 +12,12 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CONTRACT-002
 
-Current Task State: done
+Current Task State: review
 
 ## Current Contract Work
 
 - `LOOP1-CONTRACT-002` is independently accepted under ADR-0001 at exact reviewed candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`, with PASS report committed at `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The separate clean detached CTRL-002 Acceptance, WSS verifier, five prior probe sets, ten new controls, architecture hashes, scope audit, and Review Recorder validation passed. Coordinator closure evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`.
-- Contract 002 transition is in the `done` queue; its stable checkpoint is `spec/progress/checkpoints/2026-09-28-loop1-contract-002-accepted.md`. Local `main` integration and post-merge verification are the next exact action. S0 Gate remains NOT YET PASSED.
+- Local `main` fast-forwarded to closure `4d27d56975d355144f24c945e0de030184758fa2`, but clean post-merge WSS verification failed because `core.autocrlf=true` changed `golden.json` working-file bytes. Task 002 is reopened in `review`; the earlier candidate PASS and closure remain historical evidence, while `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md` records the integration failure. `origin/main` remains at `7484901b3915535f60941a01116b730a845bd47d`; no new remote push occurred. S0 Gate remains NOT YET PASSED.
 - Clean `main` at `7484901` was pushed to `origin/main` on 2026-09-28 and used as the base for isolated branch `task/LOOP1-CONTRACT-002`.
 - `LOOP1-ARCHDOC-001` is `done`; its accepted canonical Markdown hash, historical PDF hash, architecture verifier, CTRL-002 Acceptance recovery, and Recorder repository validation passed before this activation. S0 Gate remains NOT YET PASSED.
 - `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
@@ -206,18 +206,19 @@ Current Task State: done
 
 ## Next Exact Action
 
-Integrate the accepted Contract 002 closure into clean local `main`, run post-merge WSS, architecture, CTRL-002 Acceptance, and Recorder repository checks, then activate dependency-satisfied `LOOP1-CONTRACT-003`. S0 Gate remains NOT YET PASSED.
+Delegate a fresh Fix Agent for the golden fixture Git checkout line-ending mismatch, then a different fresh Review Agent. Repeat clean local-main WSS, architecture, CTRL-002 Acceptance, and Recorder checks before closing Contract 002 or activating Contract 003. S0 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`c2eba3acec6ece2ec347b536d352ddf8909081f3` (clean independently accepted Contract 002 review closure; local `main` integration pending).
+`7484901b3915535f60941a01116b730a845bd47d` (last fully verified local/remote `main` before Contract 002 integration; candidate `5d5afdd` passed isolated content review, but the main checkout failed WSS verification).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-28-loop1-contract-002-accepted.md`
+`spec/progress/checkpoints/2026-09-28-loop1-archdoc-001-main-accepted.md` (Contract 002 checkpoint is retained as candidate acceptance history but was not a verified stable main recovery point).
 
 ## Uncommitted Changes / Ownership
 
+- Coordinator owns only the Contract 002 post-main-merge FAIL evidence, correction from `done` back to `review`, current recovery update, and linked Recorder artifacts until committed. No product contract file is uncommitted. Clean local `main` contains the failed integration at `4d27d56`; repair will move forward after fresh Fix/Review.
 - Coordinator owns only the Contract 002 `done` transition, acceptance evidence, checkpoint, current recovery update, and linked Recorder artifacts until committed; no product contract file is uncommitted. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains owned by the paused Agent and untouched.
 - Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
 - Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.

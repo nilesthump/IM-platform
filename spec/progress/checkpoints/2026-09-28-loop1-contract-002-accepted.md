@@ -1,5 +1,7 @@
 # LOOP1-CONTRACT-002 stable contract checkpoint
 
+Post-merge correction: this records candidate content acceptance only. Clean local-main WSS verification later failed because Git converted the golden fixture's working bytes under `core.autocrlf=true`; see `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md`. It is not a stable main recovery point until a fresh Fix/Review and post-merge PASS. `current.md` points back to the last verified Archdoc checkpoint.
+
 - Task: `LOOP1-CONTRACT-002`, independently accepted and `done` under ADR-0001.
 - Accepted product commit: `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`.
 - Independent PASS report commit: `c2eba3acec6ece2ec347b536d352ddf8909081f3`; report: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review7-5d5afdd-pass.md`.

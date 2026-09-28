@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CONTRACT-002
 title: Freeze WSS Envelope, Auth, and Message contracts
-status: done
+status: review
 owner: /root
 stage: S0
 gate: S0
@@ -83,6 +83,7 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 - Fresh independent Review Agent `/root/contract002_review7` returned PASS for exact clean candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b` under ADR-0001's separate detached clean-checkout mechanism. WSS baseline, all five prior probe sets, 10 new focused controls, canonical hashes, CTRL-002 Acceptance, protected-path scope, Fix 6 raw Recorder bytes, and Review 7 Recorder validation passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review7-5d5afdd-pass.md`; run `R-20260928T062353Z-39bc4b6e-2cc6-4610-940b-1e93949d211b`. The task remains `review` until Coordinator acceptance closure; S0 Gate remains NOT YET PASSED.
 - Coordinator accepted the independent PASS closure at review evidence commit `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The reviewed product candidate is exactly `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`; no reviewer or coordinator product edits followed it. Durable coordinator evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`; stable contract checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-contract-002-accepted.md`. This Task is `done`; S0 Gate remains NOT YET PASSED.
+- Post-merge verification on clean local `main` failed after fast-forward to `4d27d56975d355144f24c945e0de030184758fa2`: the WSS verifier rejects `golden.json` because this checkout's `core.autocrlf=true` changed its working-file bytes. The working-file and committed blob hashes differ while Git status is empty. The Coordinator's integration Recorder run `R-20260928T073255Z-e600d2fc-b716-4570-a306-f0fb681c70a6` finished FAIL and validated. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md`. The prior clean-candidate Review PASS remains historical content evidence, but the task is reopened in `review` until portability is fixed and freshly reviewed. Local `main` contains the failed integration; `origin/main` remains at `7484901` and was not pushed.
 
 # Handoff
 
@@ -91,4 +92,4 @@ The Coordinator prospectively authorizes the task-linked evidence and Recorder p
 
 # Next Action
 
-- Coordinator integrates the accepted closure into clean local `main`, runs post-merge verification, then selects the next dependency-satisfied S0 task (`LOOP1-CONTRACT-003`). S0 Gate remains NOT YET PASSED.
+- Delegate a fresh Fix Agent for the golden fixture's checkout line-ending portability, then a different fresh independent Review Agent. Repeat clean local-main post-merge WSS, architecture, CTRL-002 Acceptance, and Recorder checks before returning this task to `done`. Do not activate `LOOP1-CONTRACT-003` yet. S0 Gate remains NOT YET PASSED.
