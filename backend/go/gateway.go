@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
@@ -28,6 +29,10 @@ type envelope struct {
 	RequestID       string          `json:"requestId"`
 	Payload         json.RawMessage `json:"payload"`
 }
+
+var requestIDPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
+
+func validUUID(id string) bool { return requestIDPattern.MatchString(id) }
 
 func newHub(auth *authService) *hub {
 	return &hub{auth: auth, sessions: make(map[string]map[*connection]bool)}
@@ -98,7 +103,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 		}
 		b, _ := json.Marshal(raw)
 		var e envelope
-		if json.Unmarshal(b, &e) != nil || e.ProtocolVersion != "1.0" || e.RequestID == "" || len(e.Payload) == 0 {
+		if json.Unmarshal(b, &e) != nil || e.ProtocolVersion != "1.0" || !validUUID(e.RequestID) || len(e.Payload) == 0 {
 			return
 		}
 		if e.Type == "ping" || e.Type == "pong" {
@@ -114,7 +119,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 		if c.bound == nil {
 			if e.Type != "auth.bind" {
 				if e.Type == "message.send" {
-					_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "AUTH_REQUIRED", "message": "Authentication is required."}}))
+					_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "AUTH_REQUIRED", "message": "Request rejected"}}))
 				}
 				return
 			}
@@ -156,7 +161,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if e.Type == "message.send" {
-			_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "AUTHORIZATION_DENIED", "message": "Message sending is unavailable."}}))
+			_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "AUTHORIZATION_DENIED", "message": "Request rejected"}}))
 			continue
 		}
 		return
@@ -165,7 +170,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 
 func (s *authService) mustSign(c claims) string { t, _ := s.sign(c); return t }
 func (h *hub) reject(c *connection, id, code, message string) {
-	_ = c.send(frame("auth.ack", id, map[string]any{"status": "rejected", "error": map[string]string{"code": code, "message": message}}))
+	_ = c.send(frame("auth.ack", id, map[string]any{"status": "rejected", "error": map[string]string{"code": code, "message": "Request rejected"}}))
 }
 
 func (h *hub) watch(c *connection, cl claims) {

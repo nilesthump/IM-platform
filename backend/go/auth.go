@@ -150,6 +150,10 @@ func (s *authService) authenticate(ctx context.Context, token string) (claims, e
 	var expiry time.Time
 	err = s.db.QueryRow(ctx, `SELECT session_id, client_type, session_epoch, status, expires_at FROM sessions WHERE user_id=$1 AND client_type=$2`, c.UserID, c.ClientType).Scan(&sid, &typ, &epoch, &status, &expiry)
 	if errors.Is(err, pgx.ErrNoRows) {
+		var actualType string
+		if s.db.QueryRow(ctx, `SELECT client_type FROM sessions WHERE user_id=$1 AND session_id=$2`, c.UserID, c.SessionID).Scan(&actualType) == nil && actualType != c.ClientType {
+			return c, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Access token does not match the active client session.")
+		}
 		return c, fail(401, "AUTH_SESSION_REVOKED", "Session has been revoked.")
 	}
 	if err != nil {
@@ -162,7 +166,11 @@ func (s *authService) authenticate(ctx context.Context, token string) (claims, e
 		return c, fail(401, "AUTH_SESSION_EPOCH_STALE", "Access token carries a stale session epoch.")
 	}
 	if sid != c.SessionID || typ != c.ClientType {
-		return c, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Access token does not match the active client session.")
+		var actualType string
+		if s.db.QueryRow(ctx, `SELECT client_type FROM sessions WHERE user_id=$1 AND session_id=$2`, c.UserID, c.SessionID).Scan(&actualType) == nil && actualType != c.ClientType {
+			return c, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Access token does not match the active client session.")
+		}
+		return c, fail(401, "AUTH_TOKEN_INVALID", "Access token and session binding disagree.")
 	}
 	return c, nil
 }
@@ -216,7 +224,7 @@ func (s *authService) handler() http.Handler {
 		for key := range r.URL.Query() {
 			lower := strings.ToLower(key)
 			if strings.Contains(lower, "token") || strings.Contains(lower, "password") || strings.Contains(lower, "secret") || lower == "authorization" || lower == "cookie" {
-				writeError(w, r, fail(400, "VALIDATION_FAILED", "Authentication material is not permitted in query parameters."))
+				writeError(w, r, fail(400, "VALIDATION_FAILED", "Authentication material is forbidden in query parameters."))
 				return
 			}
 		}
@@ -262,6 +270,10 @@ func (s *authService) login(w http.ResponseWriter, r *http.Request) {
 	var v loginInput
 	if err := decode(r, &v); err != nil {
 		writeError(w, r, err)
+		return
+	}
+	if !validClient(v.ClientType) {
+		writeError(w, r, fail(400, "VALIDATION_FAILED", "clientType is invalid."))
 		return
 	}
 	if !v.valid() || len(v.Username) < 3 || len(v.Username) > 64 || !usernamePattern.MatchString(v.Username) || len(v.Password) < 12 || len(v.Password) > 256 {
@@ -434,16 +446,20 @@ func (s *authService) refresh(w http.ResponseWriter, r *http.Request, v clientIn
 		return
 	}
 	defer tx.Rollback(ctx)
-	var userID, sid, stored, status, device string
+	var userID, sid, stored, status, device, clientType string
 	var epoch int64
 	var expiry time.Time
-	err = tx.QueryRow(ctx, `SELECT user_id,session_id,refresh_token_hash,status,session_epoch,expires_at,device_id FROM sessions WHERE refresh_token_hash=$1 AND client_type=$2 FOR UPDATE`, hashToken(presented), v.ClientType).Scan(&userID, &sid, &stored, &status, &epoch, &expiry, &device)
+	err = tx.QueryRow(ctx, `SELECT user_id,session_id,refresh_token_hash,status,session_epoch,expires_at,device_id,client_type FROM sessions WHERE refresh_token_hash=$1 FOR UPDATE`, hashToken(presented)).Scan(&userID, &sid, &stored, &status, &epoch, &expiry, &device, &clientType)
 	if errors.Is(err, pgx.ErrNoRows) {
 		writeError(w, r, fail(401, "AUTH_REFRESH_REVOKED", "Refresh token has been revoked."))
 		return
 	}
 	if err != nil {
 		writeError(w, r, err)
+		return
+	}
+	if clientType != v.ClientType {
+		writeError(w, r, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Refresh credential does not belong to the declared client type."))
 		return
 	}
 	if status != "ACTIVE" || !expiry.After(s.now()) {

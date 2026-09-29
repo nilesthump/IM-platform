@@ -2,7 +2,7 @@
 task_id: LOOP1-GO-AUTH-001
 title: Implement Go Auth and Session vertical slice
 status: review
-owner: unassigned independent reviewer
+owner: fresh independent reviewer pending Fix 1 candidate
 stage: S1
 gate: S1
 ---
@@ -70,6 +70,7 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 - Implementation development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; linked Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Local Go race/integration, HTTP/WSS verifiers, frozen hashes, CTRL-002 Development, CI tests, and Compose config passed. Full local Go profile smoke stopped before service startup on Docker registry mirror HTTP 403. Hosted CI and independent review remain pending.
 - Candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed and the implementation worktree was clean at handoff. Coordinator moved the task to `review` for an independent clean-checkout reviewer; acceptance and hosted CI remain pending.
 - Independent Review 1 FAIL for candidate `a93569d`: the Go suite does not execute the canonical HTTP/WSS fixtures, and a focused WSS probe received `pong` for a non-UUID `requestId` contrary to `contracts/websocket/envelope.schema.json`. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review1-fail.md`; Recorder `R-20260929T143107Z-279b7a3e-f218-418d-925a-5a7f42e4421e` finished FAIL and integrity-valid. Task remains `review`; hosted CI is still pending.
+- Fresh Fix 1 executes the current Auth/User positive and negative fixture outcomes and applicable WSS golden scenarios in Go tests; dynamic IDs and credentials are normalized. WSS rejects malformed UUID `requestId` for every inbound envelope, including ping. Live PostgreSQL/NATS Go race tests, contract verifiers, frozen hashes, CTRL-002 Development, Go vet, and 19 CI unit tests pass locally. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-fix1-development.md`; Recorder `R-20260929T151415Z-c0d03dff-1c6a-4238-86b0-96a4f38d19e5`. This is development evidence only; fresh independent review and hosted CI remain required.
 
 # Handoff
 
@@ -77,4 +78,4 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 
 # Next Action
 
-- Coordinator delegates a fresh Fix Agent to make the Go CI/integration suite execute canonical Auth/User and WSS positive/negative fixture outcomes, reject malformed WSS envelope IDs, and cover these behaviors with focused tests. Then delegate a new independent Review Agent. Retain `review` and require applicable hosted CI before `done`. Local Go Compose smoke remains unverified because of Docker image access.
+- Commit this Fix 1 candidate, delegate a new independent Review Agent in a clean checkout, then obtain applicable hosted CI on PASS. Retain `review` until both are accepted. Local Go Compose smoke remains unverified because of Docker image access.

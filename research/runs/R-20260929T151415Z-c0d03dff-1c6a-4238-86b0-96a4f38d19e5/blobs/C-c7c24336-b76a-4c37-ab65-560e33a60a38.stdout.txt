@@ -1,0 +1,10 @@
+--- FAIL: TestCanonicalWSSPrebindFixturesAndMalformedRequestID (0.01s)
+    --- FAIL: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/unauthenticated-send (0.00s)
+        contract_fixture_test.go:370: wss.payload.error.message: got "Authentication is required.", want fixture "Request rejected"
+    --- FAIL: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/invalid-signature-bind (0.00s)
+        contract_fixture_test.go:370: wss.payload.error.message: got "Access token is invalid.", want fixture "Request rejected"
+    --- FAIL: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/expired-token-bind (0.00s)
+        contract_fixture_test.go:370: wss.payload.error.message: got "Access token has expired.", want fixture "Request rejected"
+FAIL
+FAIL	im-platform/backend/go	0.214s
+FAIL

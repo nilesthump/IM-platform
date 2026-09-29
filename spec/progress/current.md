@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh Fix 1 for `LOOP1-GO-AUTH-001` addresses independent Review 1: the Go suite now consumes canonical Auth/User positive and negative fixtures plus current Auth/Session WSS golden outcomes, normalizes dynamic IDs/credentials, and rejects malformed UUID WSS request IDs including ping. Fixture execution exposed and repaired HTTP/WSS error-outcome mismatches. Live disposable PostgreSQL/NATS `go test -race -count=1 ./...`, HTTP/WSS contract verifiers, frozen hashes, CTRL-002 Development, Go vet, and 19 CI tests pass locally. Four Windows symlink subcases remain skipped; local full Compose Go smoke remains unverified after the prior Docker mirror 403. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-fix1-development.md`; Recorder `R-20260929T151415Z-c0d03dff-1c6a-4238-86b0-96a4f38d19e5`. Task stays `review`; next is a new independent clean-checkout Review Agent and applicable hosted CI. Last independently accepted base remains S0 `main` `09cec96`; this Fix Agent owns only task-allowed changes until clean candidate commit.
+
 - Independent Review 1 of `LOOP1-GO-AUTH-001` candidate `a93569d` **FAIL** in a separate clean detached checkout: the Go suite/CI does not execute canonical HTTP/WSS positive and negative fixtures, and a focused negative probe showed `gateway.go` emits `pong` for a non-UUID WSS `requestId`. Go unit/race, HTTP/WSS artifact verifiers, frozen hashes, and 19 CI tests passed locally; the live DB/NATS Go test was skipped in this reviewer environment, and full Compose remains unverified. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review1-fail.md`; reviewer Recorder `R-20260929T143107Z-279b7a3e-f218-418d-925a-5a7f42e4421e` finished FAIL and integrity-valid, with pre-run startup activity explicitly disclosed in evidence. Task stays `review`; next exact action is a fresh Fix Agent, a new independent review, and real hosted CI before `done`. Last independently accepted base remains S0 `main` `09cec96`; reviewer owns only the task-linked review evidence/recovery/Recorder artifacts until committed. Latest stable checkpoint remains the S0 remote-main Gate PASS checkpoint.
 
 - `LOOP1-GO-AUTH-001` candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed with a clean worktree and strict CTRL-002 Acceptance recovery PASS. Local Go race/integration, PostgreSQL/NATS Outbox, HTTP/WSS contracts, frozen hashes, CI unit tests, and Compose config pass. Full Go Compose smoke did not start because the configured Docker mirror returned HTTP 403 for its Go builder image. The task is now in `review`; a fresh independent reviewer and real hosted CI are required before `done`. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; implementation Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab` validated with 30 events.
@@ -301,7 +303,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate `LOOP1-GO-AUTH-001` candidate `a93569d` to a fresh independent Review Agent in a clean checkout. Resolve any FAIL through fresh Fix/Review; on Review PASS, obtain applicable real hosted CI before task acceptance. S1 Gate remains NOT YET PASSED.
+Commit the Go Auth Fix 1 candidate, then delegate it to a new independent Review Agent in a clean checkout. Resolve any FAIL through fresh Fix/Review; on Review PASS, obtain applicable real hosted CI before task acceptance. S1 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -312,6 +314,8 @@ Delegate `LOOP1-GO-AUTH-001` candidate `a93569d` to a fresh independent Review A
 `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md` (S0 Gate PASS recovery point on verified remote-main merge).
 
 ## Uncommitted Changes / Ownership
+
+- Fix Agent `/root/go_auth_fix1` owns only the Go Auth runtime/test repair, this task/current recovery update, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. No architecture, contracts, migration, Java, client, or original `H:\IM-platform` unknown untracked file was changed.
 
 - Coordinator owns only the Go Auth `active` to `review` task/progress transition, linked handoff evidence and Recorder artifacts until this transition is committed. Implementation Agent handed off a clean committed product candidate at `a93569d`; original `H:/IM-platform` unknown untracked files remain untouched.
 - Implementation Agent `/root/go_auth_impl` owns no uncommitted changes and removed its disposable PostgreSQL/NATS containers and temporary config after verification.
