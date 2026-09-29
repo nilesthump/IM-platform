@@ -1,0 +1,74 @@
+---
+task_id: LOOP1-GO-AUTH-001
+title: Implement Go Auth and Session vertical slice
+status: active
+owner: unassigned
+stage: S1
+gate: S1
+---
+
+# Goal
+
+Implement Go registration/login, refresh, logout, Session slot and epoch handling, and WSS `auth.bind` against the frozen HTTP/WSS contracts and canonical database migration.
+
+# Inputs
+
+- Frozen Architecture v1.0 chapters 2, 4, 7, 11, 19 and appendix B, resolved and hash-checked through `spec/architecture/README.md`.
+- Approved ADRs in `spec/architecture/decisions/` and `spec/governance/minimality.md`.
+- `spec/domain/auth-user-friend.md`, `spec/invariants/auth-user-friend.md`, `spec/acceptance/s0-auth-user-friend.md`.
+- `contracts/http/`, `contracts/errors/`, `contracts/websocket/`, relevant fixtures under `contracts/fixtures/`, and `contracts/database/`.
+
+# Dependencies
+
+- S0 Gate PASS on merged `main`.
+- `LOOP1-CI-001`, `LOOP1-INFRA-001`, `LOOP1-DB-001`, and all three Contract tasks `done`.
+
+# Allowed Paths
+
+- `backend/go/**`
+- Go Auth/Session integration tests under `tests/go/**`
+- `ci/**`, `.github/workflows/ci.yml`, and `tests/ci/**` only to replace the S0 Go placeholder boundary with actual Go build/test/contract execution; preserve other jobs and Gate semantics.
+- `spec/tasks/**/LOOP1-GO-AUTH-001.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-GO-AUTH-001/**`
+- `spec/progress/checkpoints/*loop1-go-auth-001*.md`
+- `research/prompts/**` and `research/runs/**` only for Recorder artifacts linked to this task.
+
+The Coordinator prospectively authorized the exact task-linked evidence, checkpoint, and Recorder paths at S1 activation. No path here authorizes changes to architecture, public contracts, migrations, or other backends.
+
+# Acceptance
+
+- Go HTTP behavior matches the canonical Auth/User contract and shared errors for registration, login, refresh, and logout.
+- Three client-type slots can coexist; same-slot login atomically revokes the prior Session and advances epoch. Old tokens cannot bind or reconnect; successful logout revokes Session and Refresh Token and closes its WSS connection.
+- WSS remains unauthenticated until valid `auth.bind`, rejects non-allowed pre-bind operations, and binds user, Session and client type. Same-slot replacement emits `session.revoked` before close.
+- PostgreSQL is authoritative; secrets never enter URL query, logs, traces, or error responses. Production transport stays behind HTTPS/WSS/TLS.
+- Deterministic Go contract/integration tests exercise positive and negative fixtures, transaction rollback, revocation, epoch, and refresh-token handling. Applicable real CI passes after independent review.
+
+# Forbidden
+
+- Change Frozen Architecture, public contracts, database migration, ACK/Sync/Plugin semantics, or security boundary.
+- Implement social, messages, Java, clients, or future-stage mechanisms.
+- Treat a local test PASS or self-review as acceptance.
+
+# Minimality
+
+Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skeleton, and canonical fixtures. Add dependencies or layers only for a present contract, transaction, security, or test need; record their justification in evidence.
+
+# Verification
+
+- Run the existing HTTP and WSS contract verifiers and Go Auth/Session integration suite, including failure and concurrency cases.
+- Run frozen-architecture verification and `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development.
+- Fresh independent review must use a clean committed checkout and applicable real CI. Do not use ADR-0001 bootstrap acceptance: it expired at S0.
+
+# Evidence
+
+- Entry checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md`; clean S0 `main` at `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
+- Coordinator activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; Recorder run `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`. This is development/recovery evidence, not independent task acceptance. Implementation evidence pending.
+
+# Handoff
+
+- New isolated branch `task/LOOP1-GO-AUTH-001` starts from the clean S0 checkpoint. No product implementation has been made at activation. The Coordinator owns only the S1 batch/task/progress activation records until committed.
+
+# Next Action
+
+- Fresh Implementation Agent: run the mandatory startup sequence, register a prospective Recorder run, then implement the bounded Go Auth/Session slice. Hand off a clean committed candidate for a different independent Review Agent.

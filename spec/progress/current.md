@@ -2,19 +2,21 @@
 
 Current Loop: Loop 1
 
-Current Stage: S0
+Current Stage: S1
 
-Current Gate: S0
+Current Gate: S1
 
-Gate Status: PASS
+Gate Status: NOT YET PASSED (S0 PASS retained)
 
-Current Batch: LOOP1-S0
+Current Batch: LOOP1-S1
 
-Current Task: LOOP1-CI-001
+Current Task: LOOP1-GO-AUTH-001
 
-Current Task State: done
+Current Task State: active
 
 ## Current Contract Work
+
+- S1 was explicitly authorized by the Human after S0 completion. An isolated clean checkout of `main` `09cec968f64faf0db319aea8d9c21d4fffe8ec49` passed CTRL-002 Acceptance, canonical Frozen Architecture hash verification, HTTP, WSS, and Sync/Plugin contract verification. The 19 local CI tests passed when granted temporary-directory access (five Windows symlink subcases skipped); hosted S0 full matrix PASS remains the Gate entry authority. New `spec/batches/LOOP1-S1.md` and four architecture-listed S1 Task Specs define dependency order; `LOOP1-GO-AUTH-001` is first and active. No S1 product code has changed. Activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; partial-resume Recorder `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`.
 
 - Final S0 remote sync: `git ls-remote origin main` confirms `origin/main` at `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to the clean local `main` before this governance record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA: classify and selected-job gate passed; the documentation-only diff correctly skipped profile jobs. The earlier merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071`. All nine S0 tasks remain done and **S0 Gate PASS** stands. Final sync evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`. S1 remains inactive.
 
@@ -293,11 +295,11 @@ Current Task State: done
 
 ## Next Exact Action
 
-Return control at S0 Gate PASS. The next work is separate S1 Stage selection after its batch manifest and dependency-satisfied task are resolved and that Stage action is authorized; S1 is inactive.
+Delegate `LOOP1-GO-AUTH-001` to a fresh Implementation Agent from the committed S1 activation branch. Require clean committed independent review and real CI before task acceptance. S1 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67` (remote-synchronized S0 Gate checkpoint, hosted main CI PASS at this SHA; prior merged-main full matrix and post-integration checks PASS).
+`09cec968f64faf0db319aea8d9c21d4fffe8ec49` (clean local S0 Gate PASS `main` used as the S1 activation base; hosted merged-main full matrix PASS was at `485a071`, and later main CI PASS was recorded at `8dc64ad`).
 
 ## Latest Checkpoint
 
@@ -305,7 +307,8 @@ Return control at S0 Gate PASS. The next work is separate S1 Stage selection aft
 
 ## Uncommitted Changes / Ownership
 
-- Final governance sync writer owns only this current-state update, CI Task Spec, task-linked final remote evidence, and linked Recorder prompt/run until the local commit. The original `H:/IM-platform` checkout is untouched. After commit, this isolated worktree is expected to be clean; the governance record commit is local and is not itself the hosted-CI SHA.
+- S1 Coordinator owns only the new batch and four task specifications, this recovery update, task-linked activation evidence and Recorder artifacts until the activation commit. The separate original `H:/IM-platform` checkout and its unknown untracked files remain untouched. No S1 product file has changed.
+- Historical S0 final governance sync ownership below was closed by its clean `main` commit.
 
 - Coordinator post-PR integration agent owns only this current-state update, CI Task Spec, S0 Gate evidence/checkpoint, and linked Recorder prompt/run until local commit. Product, architecture, contracts, migration and original `H:/IM-platform` untracked files were untouched. After local commit, no uncommitted changes are expected.
 
