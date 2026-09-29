@@ -1,0 +1,60 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 70ee78d..5e5a069 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh independent hosted-CI workflow-fix Review PASS locally for `LOOP1-GO-AUTH-001` candidate `8eed78b` in a separate clean detached clone. Strict CTRL-002 Acceptance, CI tests, HTTP/WSS and frozen-hash verifiers passed; an independent negative control reintroduced old job-level `runner.temp` and the regression failed as intended, then was restored exactly. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-independent-review-pass.md`; Recorder `R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3`. Task remains `review`; new applicable hosted CI PASS is required before `done`. S1 Gate NOT YET PASSED. Reviewer owns only task-linked review evidence/recovery/Recorder artifacts until committed; original `H:\IM-platform` unknown files remain untouched.
++
+ - Fresh Go Auth hosted-CI Fix Agent moved the invalid deploy job-level `runner.temp` reference into the configuration preparation step and propagated its value through `GITHUB_ENV`; added a regression that detects the prior invalid placement. Local CI tests, HTTP/WSS verifiers, frozen hashes, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-fix-development.md`; Recorder `R-20260929T164238Z-6215f0a2-b090-4e45-8137-32eb19fa60e7`. Task stays `review`; next is fresh independent review and a new hosted CI run. S1 Gate NOT YET PASSED.
+ 
+ - User-approved push of Go Auth review closure `ab81dd54fd3b6f4593bdacd89a08f28997e8c70c` to the remote task branch succeeded and remote SHA matched despite a reported Windows `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed immediately with zero jobs. The new deploy job-level `${{ runner.temp }}` expression is not permitted by GitHub's official context table; this is the leading workflow-validation cause. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; fresh Fix/Review and a new hosted CI run are required. S1 Gate NOT YET PASSED.
+@@ -309,7 +311,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Delegate a different fresh independent Review Agent for the committed workflow-context fix candidate, then obtain a new applicable real hosted CI PASS before moving Go Auth to `done`. S1 Gate remains NOT YET PASSED.
++Obtain a new applicable real hosted CI run for the independently reviewed Go Auth workflow-fix closure; record its exact result and move Go Auth to `done` only after PASS. S1 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+diff --git a/spec/tasks/review/LOOP1-GO-AUTH-001.md b/spec/tasks/review/LOOP1-GO-AUTH-001.md
+index 97c34f8..442e50e 100644
+--- a/spec/tasks/review/LOOP1-GO-AUTH-001.md
++++ b/spec/tasks/review/LOOP1-GO-AUTH-001.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-GO-AUTH-001
+ title: Implement Go Auth and Session vertical slice
+ status: review
+-owner: Coordinator pending applicable hosted CI after independent Review 2 PASS
++owner: Coordinator pending applicable hosted CI after independent workflow-fix review PASS
+ stage: S1
+ gate: S1
+ ---
+@@ -74,6 +74,7 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
+ - Fresh independent Review 2 PASS locally at clean detached candidate `c645014eb5964de36cf7c19dc32d8108c58de732`: live PostgreSQL/NATS Go race tests, both canonical artifact verifiers, frozen hashes, strict CTRL-002 Acceptance, CI tests, Go vet, both Compose configurations, and independent HTTP fixture and WSS UUID negative-control mutations passed. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review2-pass.md`; Recorder `R-20260929T161307Z-fd438d62-f0ab-4d98-a031-b47933469e3a` finished PASS and validated with 29 events. Hosted CI remains required before `done`.
+ - User-approved remote task-branch push of review closure `ab81dd5` succeeded and was verified at the exact remote SHA despite a reported `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed before any jobs started. The new deploy job-level `runner.temp` expression violates GitHub's documented context availability and is the leading cause; exact evidence and qualification are at `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; a fresh Fix/Review and new hosted run are required.
+ - Fresh Fix Agent moved `runner.temp` to the permitted deploy preparation step environment and propagated the resolved directory to later steps using `GITHUB_ENV`. A deterministic CI regression rejects the prior invalid job-level expression. Local CI unit tests (21, four Windows symlink skips), HTTP/WSS verifiers, frozen hashes, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-fix-development.md`; Recorder `R-20260929T164238Z-6215f0a2-b090-4e45-8137-32eb19fa60e7`. Independent review and hosted CI remain required.
++- Fresh independent workflow-fix Review PASS locally at clean detached candidate `8eed78bb1d5763edec349358fb538d32549ad187`. Strict CTRL-002 Acceptance, 21 CI tests, HTTP/WSS verifiers, frozen hashes, scoped diff, and Fix Recorder integrity passed; an independent mutation reintroducing the invalid job-level expression made the regression fail and was restored exactly. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-independent-review-pass.md`; Review Recorder `R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3`. A new real hosted CI PASS is required before `done`.
+ 
+ # Handoff
+ 
+@@ -81,4 +82,4 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
+ 
+ # Next Action
+ 
+-- A different fresh Review Agent verifies the clean committed workflow-context fix candidate, then obtain a new real hosted CI PASS before moving this task to `done`. Local Go Compose smoke remains unverified because of Docker image access.
++- Coordinator obtains a new real hosted CI run at the reviewed closure and records its exact result; move this task to `done` only after applicable hosted PASS. Local Go Compose smoke remains unverified because of Docker image access.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/LOOP1-GO-AUTH-001-hosted-ci-review.txt
+# ?? research/prompts/P-a13cdcc5-e614-4959-838f-527737c3c3f9/metadata.json
+# ?? research/prompts/P-a13cdcc5-e614-4959-838f-527737c3c3f9/prompt.txt
+# ?? research/runs/R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3/blobs/C-cd852138-115e-4273-8d0e-9f53bed55f77.stderr.txt
+# ?? research/runs/R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3/blobs/C-cd852138-115e-4273-8d0e-9f53bed55f77.stdout.txt
+# ?? research/runs/R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3/events.jsonl
+# ?? research/runs/R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3/initial_state.json
+# ?? research/runs/R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-independent-review-pass.md
