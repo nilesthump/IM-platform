@@ -2,7 +2,7 @@
 task_id: LOOP1-GO-AUTH-001
 title: Implement Go Auth and Session vertical slice
 status: review
-owner: fresh independent reviewer pending Fix 1 candidate
+owner: Coordinator pending applicable hosted CI after independent Review 2 PASS
 stage: S1
 gate: S1
 ---
@@ -71,6 +71,7 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 - Candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed and the implementation worktree was clean at handoff. Coordinator moved the task to `review` for an independent clean-checkout reviewer; acceptance and hosted CI remain pending.
 - Independent Review 1 FAIL for candidate `a93569d`: the Go suite does not execute the canonical HTTP/WSS fixtures, and a focused WSS probe received `pong` for a non-UUID `requestId` contrary to `contracts/websocket/envelope.schema.json`. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review1-fail.md`; Recorder `R-20260929T143107Z-279b7a3e-f218-418d-925a-5a7f42e4421e` finished FAIL and integrity-valid. Task remains `review`; hosted CI is still pending.
 - Fresh Fix 1 executes the current Auth/User positive and negative fixture outcomes and applicable WSS golden scenarios in Go tests; dynamic IDs and credentials are normalized. WSS rejects malformed UUID `requestId` for every inbound envelope, including ping. Live PostgreSQL/NATS Go race tests, contract verifiers, frozen hashes, CTRL-002 Development, Go vet, and 19 CI unit tests pass locally. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-fix1-development.md`; Recorder `R-20260929T151415Z-c0d03dff-1c6a-4238-86b0-96a4f38d19e5`. This is development evidence only; fresh independent review and hosted CI remain required.
+- Fresh independent Review 2 PASS locally at clean detached candidate `c645014eb5964de36cf7c19dc32d8108c58de732`: live PostgreSQL/NATS Go race tests, both canonical artifact verifiers, frozen hashes, strict CTRL-002 Acceptance, CI tests, Go vet, both Compose configurations, and independent HTTP fixture and WSS UUID negative-control mutations passed. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review2-pass.md`; Recorder `R-20260929T161307Z-fd438d62-f0ab-4d98-a031-b47933469e3a` finished PASS and validated with 29 events. Hosted CI remains required before `done`.
 
 # Handoff
 
@@ -78,4 +79,4 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 
 # Next Action
 
-- Commit this Fix 1 candidate, delegate a new independent Review Agent in a clean checkout, then obtain applicable hosted CI on PASS. Retain `review` until both are accepted. Local Go Compose smoke remains unverified because of Docker image access.
+- Coordinator obtains applicable real hosted CI at the reviewed candidate/closure, records independent acceptance, then moves this task to `done` and selects the next dependency-satisfied S1 task. Retain `review` until CI passes; a CI failure starts a fresh Fix/Review cycle. Local Go Compose smoke remains unverified because of Docker image access.

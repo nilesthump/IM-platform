@@ -1,0 +1,8 @@
+--- FAIL: TestCanonicalAuthHTTPFixtures (0.60s)
+    --- FAIL: TestCanonicalAuthHTTPFixtures/invalid-credentials (0.04s)
+        contract_fixture_test.go:308: POST /v1/auth/login: status 401, want fixture 418: {"error":{"code":"AUTH_INVALID_CREDENTIALS","message":"Credentials are invalid."},"requestId":"bc401ec8-7d67-4bca-b131-9337477b9bb0"}
+FAIL
+FAIL	im-platform/backend/go	0.759s
+FAIL
+
+PASS: changed canonical HTTP expected status caused the live Go fixture test to fail
