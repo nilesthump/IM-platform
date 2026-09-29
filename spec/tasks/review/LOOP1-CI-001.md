@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Fresh Fix 4 added exactly two Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`. Two genuinely separate clones without machine-local `info/attributes`, with `core.autocrlf=true` and `false`, both pass strict CTRL-002 Acceptance with zero status entries. All 42 historical blob object IDs and raw checkout bytes match; both original Recorder runs validate. Twelve CI tests pass. This remains Fix Agent development evidence pending fresh independent review and hosted CI. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Fix 4 Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Task `review`, S0 Gate NOT YET PASSED.
+
 - Coordinator prospectively authorized the two exact historical Recorder `blobs/.gitattributes` paths above after hosted diagnostic run `36521060867` identified 17 checkout-modified stdout blobs. The repair must preserve every historical blob Git object ID and Recorder validation result, and pass a fresh clone with no machine-local `info/attributes` overrides. No broader `research/**` write permission is granted.
 
 - User-approved diagnostic branch push `0e6ce82` triggered actual GitHub Actions run `36521060867`, which **FAIL** with 17 modified historical Recorder stdout blobs immediately after checkout. Machine-local Git info attributes masked those bytes in local clean checkouts; repository `research/.gitattributes` applies LF checkout. The strict CTRL-002 Acceptance and gate rejected the dirty tree. Exact run/cause: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`. Fresh Fix/Review required; task `review`, S0 Gate NOT YET PASSED.
@@ -91,4 +93,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Fresh Fix Agent repairs the confirmed historical Recorder blob checkout/attribute issue without altering evidence bytes or weakening CTRL-002 Acceptance, then a different fresh Review Agent verifies a truly clean portable checkout. Obtain a passing actual GitHub workflow before closure. S0 Gate remains pending.
+- A different fresh Review Agent verifies Fix 4's clean portable checkout, unchanged historical blob bytes, scope, and strict Acceptance. Then obtain a passing actual GitHub workflow before closure. S0 Gate remains pending.

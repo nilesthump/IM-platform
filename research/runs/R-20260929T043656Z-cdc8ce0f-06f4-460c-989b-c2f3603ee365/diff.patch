@@ -1,0 +1,96 @@
+diff --git a/research/runs/R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb/blobs/.gitattributes b/research/runs/R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb/blobs/.gitattributes
+new file mode 100644
+index 0000000..dec0de8
+--- /dev/null
++++ b/research/runs/R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb/blobs/.gitattributes
+@@ -0,0 +1 @@
++*.txt -text -eol
+diff --git a/research/runs/R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a/blobs/.gitattributes b/research/runs/R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a/blobs/.gitattributes
+new file mode 100644
+index 0000000..dec0de8
+--- /dev/null
++++ b/research/runs/R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a/blobs/.gitattributes
+@@ -0,0 +1 @@
++*.txt -text -eol
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index f3fbef7..c6ef50f 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh Fix 4 repaired the hosted checkout failure with two exact Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`; no historical blob bytes changed. Independent clones with `core.autocrlf=true` and `false`, no `info/attributes`, both passed strict CTRL-002 Acceptance with zero status entries; 42 raw blob bytes matched Git objects, both historical runs validated, and 12 CI tests passed. Fix Agent development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Next exact action: fresh independent Review Agent of the clean final candidate, then a new hosted CI run. Task stays `review`; S0 Gate NOT YET PASSED. Last accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Fix Agent owns only task evidence/current/spec and linked Recorder artifacts until final candidate commit.
++
+ - User approved pushing independently reviewed `0e6ce82`; the fast-forward push to `origin/task/LOOP1-CI-001` succeeded without changing remote `main`. Hosted run [36521060867](https://github.com/nilesthump/IM-platform/actions/runs/36521060867) **FAIL**: diagnostic reported 17 modified historical Recorder stdout blobs in two runs immediately after checkout. `research/.gitattributes` LF checkout and machine-local `H:/IM-platform/.git/info/attributes` overrides explain local/hosted difference; no evidence blobs were edited. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`; Coordinator Recorder `R-20260929T041815Z-f8cae6b3-1867-4628-9ef6-6dec868928c5`. Next exact action: fresh Fix Agent repairs portable checkout integrity under task authority; independent Review Agent verifies clean clone, then another hosted run. Task remains `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns task evidence/current/spec and linked Recorder changes until committed.
+ 
+ - Fresh independent CI Review 4 **PASS** for diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: clean detached CTRL-002 Acceptance, 12 CI tests, frozen hashes, scope and no-weakening review passed. The diagnostic reports the same Git porcelain entries used by Acceptance before its unchanged check. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. This accepts diagnostic suitability only. Next exact action: Coordinator obtains a new hosted run to identify the dirty entries, then delegates a fresh Fix/Review cycle if necessary. Task stays `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only review evidence, task/current edits, and linked Recorder artifacts until committed.
+@@ -268,7 +270,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Fresh independent review of Fix 3's clean diagnostic candidate; then obtain a new hosted run, read its porcelain status, repair the exact cause through a fresh Fix/Review cycle, and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
++Fresh independent review of Fix 4's clean portable checkout candidate; then obtain a passing hosted GitHub Actions run and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -280,6 +282,8 @@ Fresh independent review of Fix 3's clean diagnostic candidate; then obtain a ne
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/ci001_fix4` owns only two exact Coordinator-authorized historical Recorder transport rules, Task Spec/current recovery, task-linked development evidence, and its own prompt/run until the final candidate commit. Historical Recorder blob bytes and original `H:\IM-platform\contracts\http\schema-lint` were untouched.
++
+ - Fresh Fix Agent `/root/ci001_fix3` owns only the CI workflow diagnostic, task/current recovery, linked evidence, and Recorder prompt/run until candidate commit. No unrelated or original `H:\IM-platform\contracts\http\schema-lint` work was touched.
+ 
+ - Fresh independent Reviewer `/root/ci001_review3` owns only Review 3 PASS evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. CI product files and the separate detached Acceptance checkout remain clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+diff --git a/spec/tasks/review/LOOP1-CI-001.md b/spec/tasks/review/LOOP1-CI-001.md
+index cb1e9d3..2c6e490 100644
+--- a/spec/tasks/review/LOOP1-CI-001.md
++++ b/spec/tasks/review/LOOP1-CI-001.md
+@@ -29,6 +29,8 @@ Create the path-aware diff classifier and Go, Java, client, shared-contract, dep
+ - `spec/tasks/**/LOOP1-CI-001.md`
+ - `spec/progress/current.md`
+ - `spec/tasks/backlog/.gitkeep` (exact queue-presence marker only; Coordinator-authorized after clean-checkout Review 1 FAIL)
++- `research/runs/R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb/blobs/.gitattributes` (exact portable Git transport metadata only; Coordinator-authorized after hosted run 36521060867 exposed CRLF blob checkout dirt)
++- `research/runs/R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a/blobs/.gitattributes` (same exact transport repair; historical Recorder blob bytes must remain unchanged)
+ 
+ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOOP1-CI-001/**`, accepted checkpoint `spec/progress/checkpoints/*loop1-ci-001*.md`, and this task's `research/prompts/**` and `research/runs/**` artifacts for instrumentation, review, and handoff only. These paths do not authorize product-scope expansion.
+ 
+@@ -50,6 +52,10 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Fresh Fix 4 added exactly two Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`. Two genuinely separate clones without machine-local `info/attributes`, with `core.autocrlf=true` and `false`, both pass strict CTRL-002 Acceptance with zero status entries. All 42 historical blob object IDs and raw checkout bytes match; both original Recorder runs validate. Twelve CI tests pass. This remains Fix Agent development evidence pending fresh independent review and hosted CI. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Fix 4 Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Task `review`, S0 Gate NOT YET PASSED.
++
++- Coordinator prospectively authorized the two exact historical Recorder `blobs/.gitattributes` paths above after hosted diagnostic run `36521060867` identified 17 checkout-modified stdout blobs. The repair must preserve every historical blob Git object ID and Recorder validation result, and pass a fresh clone with no machine-local `info/attributes` overrides. No broader `research/**` write permission is granted.
++
+ - User-approved diagnostic branch push `0e6ce82` triggered actual GitHub Actions run `36521060867`, which **FAIL** with 17 modified historical Recorder stdout blobs immediately after checkout. Machine-local Git info attributes masked those bytes in local clean checkouts; repository `research/.gitattributes` applies LF checkout. The strict CTRL-002 Acceptance and gate rejected the dirty tree. Exact run/cause: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`. Fresh Fix/Review required; task `review`, S0 Gate NOT YET PASSED.
+ 
+ - Fresh independent Review 4 `/root/ci001_review4` **PASS** for exact clean detached diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: CTRL-002 Acceptance with zero status entries, 12 CI tests, frozen hashes, no-weakening/scope/minimality inspection, and Fix 3 Recorder validity passed. The only product change prints Git porcelain status before unchanged Acceptance, to identify the dirty path in a new hosted run. Exact commands, exits, elapsed times, clean-state method, branch/diff range, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; review Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. Hosted root cause is unknown; task remains `review`, S0 Gate NOT YET PASSED.
+@@ -87,4 +93,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Next Action
+ 
+-- Fresh Fix Agent repairs the confirmed historical Recorder blob checkout/attribute issue without altering evidence bytes or weakening CTRL-002 Acceptance, then a different fresh Review Agent verifies a truly clean portable checkout. Obtain a passing actual GitHub workflow before closure. S0 Gate remains pending.
++- A different fresh Review Agent verifies Fix 4's clean portable checkout, unchanged historical blob bytes, scope, and strict Acceptance. Then obtain a passing actual GitHub workflow before closure. S0 Gate remains pending.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-49450b77-dcfc-42ea-92de-2d3c48044b8a/metadata.json
+# ?? research/prompts/P-49450b77-dcfc-42ea-92de-2d3c48044b8a/prompt.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/.gitattributes
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-08ae5140-3b66-4197-a03d-02a189b766b2.stderr.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-08ae5140-3b66-4197-a03d-02a189b766b2.stdout.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-1f563aa4-dc0d-42c9-a68a-80c9b0d45c92.stderr.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-1f563aa4-dc0d-42c9-a68a-80c9b0d45c92.stdout.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-2b75523f-a087-4922-963a-fef52052b117.stderr.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-2b75523f-a087-4922-963a-fef52052b117.stdout.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-3ddb6b4f-651a-4c9e-8394-c5ed8bb22016.stderr.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-3ddb6b4f-651a-4c9e-8394-c5ed8bb22016.stdout.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-d23062ac-87c9-4996-86d4-1e965b2625f3.stderr.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-d23062ac-87c9-4996-86d4-1e965b2625f3.stdout.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-fe91843a-99e4-4870-b36d-437c95cbe91d.stderr.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/blobs/C-fe91843a-99e4-4870-b36d-437c95cbe91d.stdout.txt
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/events.jsonl
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/initial_state.json
+# ?? research/runs/R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md

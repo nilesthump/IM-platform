@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh Fix 4 repaired the hosted checkout failure with two exact Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`; no historical blob bytes changed. Independent clones with `core.autocrlf=true` and `false`, no `info/attributes`, both passed strict CTRL-002 Acceptance with zero status entries; all 42 blob files matched their Git objects byte-for-byte, both historical runs validated, and 12 CI tests passed. Fix Agent development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Next exact action: fresh independent Review Agent of the clean final candidate, then a new hosted CI run. Task stays `review`; S0 Gate NOT YET PASSED. Last accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Fix Agent changes are contained in the clean committed candidate.
+
 - User approved pushing independently reviewed `0e6ce82`; the fast-forward push to `origin/task/LOOP1-CI-001` succeeded without changing remote `main`. Hosted run [36521060867](https://github.com/nilesthump/IM-platform/actions/runs/36521060867) **FAIL**: diagnostic reported 17 modified historical Recorder stdout blobs in two runs immediately after checkout. `research/.gitattributes` LF checkout and machine-local `H:/IM-platform/.git/info/attributes` overrides explain local/hosted difference; no evidence blobs were edited. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`; Coordinator Recorder `R-20260929T041815Z-f8cae6b3-1867-4628-9ef6-6dec868928c5`. Next exact action: fresh Fix Agent repairs portable checkout integrity under task authority; independent Review Agent verifies clean clone, then another hosted run. Task remains `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns task evidence/current/spec and linked Recorder changes until committed.
 
 - Fresh independent CI Review 4 **PASS** for diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: clean detached CTRL-002 Acceptance, 12 CI tests, frozen hashes, scope and no-weakening review passed. The diagnostic reports the same Git porcelain entries used by Acceptance before its unchanged check. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. This accepts diagnostic suitability only. Next exact action: Coordinator obtains a new hosted run to identify the dirty entries, then delegates a fresh Fix/Review cycle if necessary. Task stays `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only review evidence, task/current edits, and linked Recorder artifacts until committed.
@@ -268,7 +270,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh independent review of Fix 3's clean diagnostic candidate; then obtain a new hosted run, read its porcelain status, repair the exact cause through a fresh Fix/Review cycle, and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
+Fresh independent review of Fix 4's clean portable checkout candidate; then obtain a passing hosted GitHub Actions run and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -279,6 +281,8 @@ Fresh independent review of Fix 3's clean diagnostic candidate; then obtain a ne
 `spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md` (independently accepted Infra skeleton, integrated and verified on clean local `main`).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh Fix Agent `/root/ci001_fix4` committed only two exact Coordinator-authorized historical Recorder transport rules, Task Spec/current recovery, task-linked development evidence, and its own prompt/run. No Fix 4 changes remain uncommitted; historical Recorder blob bytes and original `H:\IM-platform\contracts\http\schema-lint` were untouched.
 
 - Fresh Fix Agent `/root/ci001_fix3` owns only the CI workflow diagnostic, task/current recovery, linked evidence, and Recorder prompt/run until candidate commit. No unrelated or original `H:\IM-platform\contracts\http\schema-lint` work was touched.
 
