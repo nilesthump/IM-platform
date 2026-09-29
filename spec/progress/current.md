@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- User-approved push of Go Auth review closure `ab81dd54fd3b6f4593bdacd89a08f28997e8c70c` to the remote task branch succeeded and remote SHA matched despite a reported Windows `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed immediately with zero jobs. The new deploy job-level `${{ runner.temp }}` expression is not permitted by GitHub's official context table; this is the leading workflow-validation cause. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; fresh Fix/Review and a new hosted CI run are required. S1 Gate NOT YET PASSED.
+
 - Fresh independent Review 2 of `LOOP1-GO-AUTH-001` candidate `c645014` **PASS locally** in a clean detached checkout. Live migrated PostgreSQL/NATS Go race tests execute canonical Auth/WSS fixtures; independent negative controls prove HTTP fixture outcomes and WSS UUID rejection are test-enforced. HTTP/WSS verifiers, frozen hashes, strict CTRL-002 Acceptance, CI tests, Go vet, and Compose configuration checks passed. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review2-pass.md`; Recorder `R-20260929T161307Z-fd438d62-f0ab-4d98-a031-b47933469e3a` finished PASS and integrity-valid (29 events). Task remains `review`; applicable real hosted CI is the next acceptance action, and S1 Gate has not passed. Last independently accepted base remains S0 `main` `09cec96`. Reviewer owns only task-linked review evidence/recovery/Recorder artifacts until committed; original `H:\IM-platform` unknown files remain untouched.
 
 - Fresh Fix 1 for `LOOP1-GO-AUTH-001` addresses independent Review 1: the Go suite now consumes canonical Auth/User positive and negative fixtures plus current Auth/Session WSS golden outcomes, normalizes dynamic IDs/credentials, and rejects malformed UUID WSS request IDs including ping. Fixture execution exposed and repaired HTTP/WSS error-outcome mismatches. Live disposable PostgreSQL/NATS `go test -race -count=1 ./...`, HTTP/WSS contract verifiers, frozen hashes, CTRL-002 Development, Go vet, and 19 CI tests pass locally. Four Windows symlink subcases remain skipped; local full Compose Go smoke remains unverified after the prior Docker mirror 403. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-fix1-development.md`; Recorder `R-20260929T151415Z-c0d03dff-1c6a-4238-86b0-96a4f38d19e5`. Task stays `review`; next is a new independent clean-checkout Review Agent and applicable hosted CI. Last independently accepted base remains S0 `main` `09cec96`; this Fix Agent owns only task-allowed changes until clean candidate commit.
@@ -305,7 +307,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Commit the Go Auth Review 2 local PASS closure, then obtain applicable real hosted CI at the reviewed candidate/closure before moving this task to `done`. Resolve any hosted FAIL through fresh Fix/Review. S1 Gate remains NOT YET PASSED.
+Delegate a fresh Fix Agent for the invalid deploy job-level `runner.temp` expression and focused workflow-context regression, then a different fresh independent Review Agent. Obtain a new applicable real hosted CI PASS before moving Go Auth to `done`. S1 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -317,7 +319,8 @@ Commit the Go Auth Review 2 local PASS closure, then obtain applicable real host
 
 ## Uncommitted Changes / Ownership
 
-- Fresh independent Reviewer `/root/go_auth_review2` owns only task-linked Review 2 PASS evidence, two reviewer negative-control probes, this Task Spec/current recovery update, and linked prompt/Recorder artifacts until clean review closure commit. Its separate detached candidate checkout is clean; no product, contract, migration, architecture, Java, client, or original `H:\IM-platform` unknown file changed.
+- Coordinator owns only this hosted CI FAIL evidence, Task Spec/current recovery update, linked prompt and Recorder run until the diagnostic closure commit. The reviewed Go Auth product candidate and original `H:\IM-platform` unknown files remain unchanged.
+- Review 2 closure was committed cleanly at `ab81dd5`; its prior reviewer ownership is closed.
 
 - Fix Agent `/root/go_auth_fix1` owns only the Go Auth runtime/test repair, this task/current recovery update, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. No architecture, contracts, migration, Java, client, or original `H:\IM-platform` unknown untracked file was changed.
 

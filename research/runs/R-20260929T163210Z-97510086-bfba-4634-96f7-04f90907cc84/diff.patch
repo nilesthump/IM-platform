@@ -1,0 +1,69 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index a6ad853..94ccf92 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- User-approved push of Go Auth review closure `ab81dd54fd3b6f4593bdacd89a08f28997e8c70c` to the remote task branch succeeded and remote SHA matched despite a reported Windows `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed immediately with zero jobs. The new deploy job-level `${{ runner.temp }}` expression is not permitted by GitHub's official context table; this is the leading workflow-validation cause. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; fresh Fix/Review and a new hosted CI run are required. S1 Gate NOT YET PASSED.
++
+ - Fresh independent Review 2 of `LOOP1-GO-AUTH-001` candidate `c645014` **PASS locally** in a clean detached checkout. Live migrated PostgreSQL/NATS Go race tests execute canonical Auth/WSS fixtures; independent negative controls prove HTTP fixture outcomes and WSS UUID rejection are test-enforced. HTTP/WSS verifiers, frozen hashes, strict CTRL-002 Acceptance, CI tests, Go vet, and Compose configuration checks passed. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review2-pass.md`; Recorder `R-20260929T161307Z-fd438d62-f0ab-4d98-a031-b47933469e3a` finished PASS and integrity-valid (29 events). Task remains `review`; applicable real hosted CI is the next acceptance action, and S1 Gate has not passed. Last independently accepted base remains S0 `main` `09cec96`. Reviewer owns only task-linked review evidence/recovery/Recorder artifacts until committed; original `H:\IM-platform` unknown files remain untouched.
+ 
+ - Fresh Fix 1 for `LOOP1-GO-AUTH-001` addresses independent Review 1: the Go suite now consumes canonical Auth/User positive and negative fixtures plus current Auth/Session WSS golden outcomes, normalizes dynamic IDs/credentials, and rejects malformed UUID WSS request IDs including ping. Fixture execution exposed and repaired HTTP/WSS error-outcome mismatches. Live disposable PostgreSQL/NATS `go test -race -count=1 ./...`, HTTP/WSS contract verifiers, frozen hashes, CTRL-002 Development, Go vet, and 19 CI tests pass locally. Four Windows symlink subcases remain skipped; local full Compose Go smoke remains unverified after the prior Docker mirror 403. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-fix1-development.md`; Recorder `R-20260929T151415Z-c0d03dff-1c6a-4238-86b0-96a4f38d19e5`. Task stays `review`; next is a new independent clean-checkout Review Agent and applicable hosted CI. Last independently accepted base remains S0 `main` `09cec96`; this Fix Agent owns only task-allowed changes until clean candidate commit.
+@@ -305,7 +307,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Commit the Go Auth Review 2 local PASS closure, then obtain applicable real hosted CI at the reviewed candidate/closure before moving this task to `done`. Resolve any hosted FAIL through fresh Fix/Review. S1 Gate remains NOT YET PASSED.
++Delegate a fresh Fix Agent for the invalid deploy job-level `runner.temp` expression and focused workflow-context regression, then a different fresh independent Review Agent. Obtain a new applicable real hosted CI PASS before moving Go Auth to `done`. S1 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -317,7 +319,8 @@ Commit the Go Auth Review 2 local PASS closure, then obtain applicable real host
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-- Fresh independent Reviewer `/root/go_auth_review2` owns only task-linked Review 2 PASS evidence, two reviewer negative-control probes, this Task Spec/current recovery update, and linked prompt/Recorder artifacts until clean review closure commit. Its separate detached candidate checkout is clean; no product, contract, migration, architecture, Java, client, or original `H:\IM-platform` unknown file changed.
++- Coordinator owns only this hosted CI FAIL evidence, Task Spec/current recovery update, linked prompt and Recorder run until the diagnostic closure commit. The reviewed Go Auth product candidate and original `H:\IM-platform` unknown files remain unchanged.
++- Review 2 closure was committed cleanly at `ab81dd5`; its prior reviewer ownership is closed.
+ 
+ - Fix Agent `/root/go_auth_fix1` owns only the Go Auth runtime/test repair, this task/current recovery update, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. No architecture, contracts, migration, Java, client, or original `H:\IM-platform` unknown untracked file was changed.
+ 
+diff --git a/spec/tasks/review/LOOP1-GO-AUTH-001.md b/spec/tasks/review/LOOP1-GO-AUTH-001.md
+index ed09b59..fb027f1 100644
+--- a/spec/tasks/review/LOOP1-GO-AUTH-001.md
++++ b/spec/tasks/review/LOOP1-GO-AUTH-001.md
+@@ -72,6 +72,7 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
+ - Independent Review 1 FAIL for candidate `a93569d`: the Go suite does not execute the canonical HTTP/WSS fixtures, and a focused WSS probe received `pong` for a non-UUID `requestId` contrary to `contracts/websocket/envelope.schema.json`. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review1-fail.md`; Recorder `R-20260929T143107Z-279b7a3e-f218-418d-925a-5a7f42e4421e` finished FAIL and integrity-valid. Task remains `review`; hosted CI is still pending.
+ - Fresh Fix 1 executes the current Auth/User positive and negative fixture outcomes and applicable WSS golden scenarios in Go tests; dynamic IDs and credentials are normalized. WSS rejects malformed UUID `requestId` for every inbound envelope, including ping. Live PostgreSQL/NATS Go race tests, contract verifiers, frozen hashes, CTRL-002 Development, Go vet, and 19 CI unit tests pass locally. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-fix1-development.md`; Recorder `R-20260929T151415Z-c0d03dff-1c6a-4238-86b0-96a4f38d19e5`. This is development evidence only; fresh independent review and hosted CI remain required.
+ - Fresh independent Review 2 PASS locally at clean detached candidate `c645014eb5964de36cf7c19dc32d8108c58de732`: live PostgreSQL/NATS Go race tests, both canonical artifact verifiers, frozen hashes, strict CTRL-002 Acceptance, CI tests, Go vet, both Compose configurations, and independent HTTP fixture and WSS UUID negative-control mutations passed. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review2-pass.md`; Recorder `R-20260929T161307Z-fd438d62-f0ab-4d98-a031-b47933469e3a` finished PASS and validated with 29 events. Hosted CI remains required before `done`.
++- User-approved remote task-branch push of review closure `ab81dd5` succeeded and was verified at the exact remote SHA despite a reported `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed before any jobs started. The new deploy job-level `runner.temp` expression violates GitHub's documented context availability and is the leading cause; exact evidence and qualification are at `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; a fresh Fix/Review and new hosted run are required.
+ 
+ # Handoff
+ 
+@@ -79,4 +80,4 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
+ 
+ # Next Action
+ 
+-- Coordinator obtains applicable real hosted CI at the reviewed candidate/closure, records independent acceptance, then moves this task to `done` and selects the next dependency-satisfied S1 task. Retain `review` until CI passes; a CI failure starts a fresh Fix/Review cycle. Local Go Compose smoke remains unverified because of Docker image access.
++- Fresh Fix Agent repairs the invalid GitHub Actions deploy job context expression with a focused regression, then a different fresh Review Agent verifies the clean candidate. Obtain a new real hosted CI PASS before moving this task to `done`. Local Go Compose smoke remains unverified because of Docker image access.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-5789a4c4-f8fd-43b1-804f-6e0816ddad26/metadata.json
+# ?? research/prompts/P-5789a4c4-f8fd-43b1-804f-6e0816ddad26/prompt.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-42db61a7-03a4-45b0-8396-0497b6c0913c.stderr.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-42db61a7-03a4-45b0-8396-0497b6c0913c.stdout.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-78d716ea-d086-4a15-9e80-e4559f00a45d.stderr.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-78d716ea-d086-4a15-9e80-e4559f00a45d.stdout.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-af967db2-eaf9-40a9-85e6-f92eb92bf137.stderr.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-af967db2-eaf9-40a9-85e6-f92eb92bf137.stdout.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-bd2b3aea-5249-4281-ac6a-b56098c3f7df.stderr.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-bd2b3aea-5249-4281-ac6a-b56098c3f7df.stdout.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-f68ee38b-0a1a-45b1-8fb0-7ff1da79be36.stderr.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/blobs/C-f68ee38b-0a1a-45b1-8fb0-7ff1da79be36.stdout.txt
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/events.jsonl
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/initial_state.json
+# ?? research/runs/R-20260929T163210Z-97510086-bfba-4634-96f7-04f90907cc84/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md
+# ?? spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-visible-prompt.txt
