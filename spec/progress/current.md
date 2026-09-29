@@ -16,6 +16,8 @@ Current Task State: done
 
 ## Current Contract Work
 
+- Final S0 remote sync: `git ls-remote origin main` confirms `origin/main` at `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to the clean local `main` before this governance record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA: classify and selected-job gate passed; the documentation-only diff correctly skipped profile jobs. The earlier merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071`. All nine S0 tasks remain done and **S0 Gate PASS** stands. Final sync evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`. S1 remains inactive.
+
 - Remote PR #1 is merged at 485a071bc80afb1b6f3c252779444e1be275c562; isolated local main safely fast-forwarded to exact origin/main. Hosted main Actions [36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) completed success with classify, Go, Java, Web, Desktop, Mobile, shared, compatibility, deploy and gate all successful. Post-merge local frozen hashes, recovery, S0 spec/HTTP/WSS/Sync/Plugin verifiers and 19 CI tests passed (five Windows real-symlink subcases skipped; hosted Linux matrix passed). All nine S0 tasks remain done. **S0 Gate PASS**; evidence: spec/progress/evidence/LOOP1-CI-001/2026-09-29-remote-main-s0-gate-reevaluation.md; latest checkpoint: spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md. S1 remains inactive.
 
 
@@ -291,17 +293,19 @@ Current Task State: done
 
 ## Next Exact Action
 
-Coordinator pushes the local documentation/evidence checkpoint commit to `origin/main`, verifies its hosted CI result, then returns control at S0 Gate PASS. S1 selection is a separate dependency-satisfied Stage action.
+Return control at S0 Gate PASS. The next work is separate S1 Stage selection after its batch manifest and dependency-satisfied task are resolved and that Stage action is authorized; S1 is inactive.
 
 ## Last Known Good Commit
 
-`485a071bc80afb1b6f3c252779444e1be275c562` (merged remote-main PR #1 commit, full hosted matrix PASS, local post-integration Gate checks PASS; documentation/evidence checkpoint commit follows).
+`8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67` (remote-synchronized S0 Gate checkpoint, hosted main CI PASS at this SHA; prior merged-main full matrix and post-integration checks PASS).
 
 ## Latest Checkpoint
 
 `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md` (S0 Gate PASS recovery point on verified remote-main merge).
 
 ## Uncommitted Changes / Ownership
+
+- Final governance sync writer owns only this current-state update, CI Task Spec, task-linked final remote evidence, and linked Recorder prompt/run until the local commit. The original `H:/IM-platform` checkout is untouched. After commit, this isolated worktree is expected to be clean; the governance record commit is local and is not itself the hosted-CI SHA.
 
 - Coordinator post-PR integration agent owns only this current-state update, CI Task Spec, S0 Gate evidence/checkpoint, and linked Recorder prompt/run until local commit. Product, architecture, contracts, migration and original `H:/IM-platform` untracked files were untouched. After local commit, no uncommitted changes are expected.
 

@@ -1,0 +1,73 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 5ccf1c7..7370c64 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: done
+ 
+ ## Current Contract Work
+ 
++- Final S0 remote sync: `git ls-remote origin main` confirms `origin/main` at `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to the clean local `main` before this governance record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA: classify and selected-job gate passed; the documentation-only diff correctly skipped profile jobs. The earlier merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071`. All nine S0 tasks remain done and **S0 Gate PASS** stands. Final sync evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`. S1 remains inactive.
++
+ - Remote PR #1 is merged at 485a071bc80afb1b6f3c252779444e1be275c562; isolated local main safely fast-forwarded to exact origin/main. Hosted main Actions [36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) completed success with classify, Go, Java, Web, Desktop, Mobile, shared, compatibility, deploy and gate all successful. Post-merge local frozen hashes, recovery, S0 spec/HTTP/WSS/Sync/Plugin verifiers and 19 CI tests passed (five Windows real-symlink subcases skipped; hosted Linux matrix passed). All nine S0 tasks remain done. **S0 Gate PASS**; evidence: spec/progress/evidence/LOOP1-CI-001/2026-09-29-remote-main-s0-gate-reevaluation.md; latest checkpoint: spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md. S1 remains inactive.
+ 
+ 
+@@ -291,11 +293,11 @@ Current Task State: done
+ 
+ ## Next Exact Action
+ 
+-Coordinator pushes the local documentation/evidence checkpoint commit to `origin/main`, verifies its hosted CI result, then returns control at S0 Gate PASS. S1 selection is a separate dependency-satisfied Stage action.
++Return control at S0 Gate PASS. The next work is separate S1 Stage selection after its batch manifest and dependency-satisfied task are resolved and that Stage action is authorized; S1 is inactive.
+ 
+ ## Last Known Good Commit
+ 
+-`485a071bc80afb1b6f3c252779444e1be275c562` (merged remote-main PR #1 commit, full hosted matrix PASS, local post-integration Gate checks PASS; documentation/evidence checkpoint commit follows).
++`8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67` (remote-synchronized S0 Gate checkpoint, hosted main CI PASS at this SHA; prior merged-main full matrix and post-integration checks PASS).
+ 
+ ## Latest Checkpoint
+ 
+@@ -303,6 +305,8 @@ Coordinator pushes the local documentation/evidence checkpoint commit to `origin
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Final governance sync writer owns only this current-state update, CI Task Spec, task-linked final remote evidence, and linked Recorder prompt/run until the local commit. The original `H:/IM-platform` checkout is untouched. After commit, this isolated worktree is expected to be clean; the governance record commit is local and is not itself the hosted-CI SHA.
++
+ - Coordinator post-PR integration agent owns only this current-state update, CI Task Spec, S0 Gate evidence/checkpoint, and linked Recorder prompt/run until local commit. Product, architecture, contracts, migration and original `H:/IM-platform` untracked files were untouched. After local commit, no uncommitted changes are expected.
+ 
+ - Coordinator closure writer `/root/ci_placeholder_closure` owned only CI task queue move, the then-current recovery update, task-linked hosted evidence, and its prompt/Recorder artifacts until its commit. Review closure `3235996` is committed; no product or original `H:\IM-platform` file was edited here. Generated Python bytecode caches from local tests are owned by this closure run and will be removed before commit.
+diff --git a/spec/tasks/done/LOOP1-CI-001.md b/spec/tasks/done/LOOP1-CI-001.md
+index 1aa9402..55fd2c7 100644
+--- a/spec/tasks/done/LOOP1-CI-001.md
++++ b/spec/tasks/done/LOOP1-CI-001.md
+@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Final remote sync **PASS**: `git ls-remote origin main` returned `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to clean local `main` before this record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA; classify and selected-job gate passed, while profile jobs were correctly skipped for the documentation-only diff. The preceding merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071bc80afb1b6f3c252779444e1be275c562`. S0 Gate **PASS** stands with all nine S0 tasks `done`, and S1 remains inactive. Durable evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`; latest historical checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md`; linked Recorder `R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5`. Last Known Good Commit: `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`. Governance record changes are locally committed after verification; no product or authority paths changed. Next: separate S1 Stage selection only after its manifest and dependency-satisfied task are resolved and the Stage action is authorized.
++
+ - Post-PR remote-main S0 Gate **PASS**: PR #1 merged at 485a071bc80afb1b6f3c252779444e1be275c562; clean isolated local main fast-forwarded to that exact origin/main. Hosted main Actions [36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) completed success for all ten jobs, including both profile smokes, compatibility, and selected-job gate. Local frozen hashes, recovery, S0 spec/HTTP/WSS/Sync/Plugin verifiers and 19 CI tests passed, with five real-symlink Windows subcases skipped but hosted Linux matrix successful. All nine S0 tasks remain done; no contract, authority, migration, backend or deploy path changed in the merge. Evidence: spec/progress/evidence/LOOP1-CI-001/2026-09-29-remote-main-s0-gate-reevaluation.md; checkpoint: spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md; Recorder R-20260929T094727Z-9394dc7c-0aee-45bb-88a3-ff602ef9d4f6. Last Known Good Commit: 485a071bc80afb1b6f3c252779444e1be275c562. Coordinator owns only these documentation/evidence and Recorder artifacts until committed. Next: push local checkpoint commit and verify remote CI; S1 inactive.
+ 
+ 
+@@ -112,4 +114,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Next Action
+ 
+-- Push the local S0 Gate evidence/checkpoint commit to `origin/main` and verify hosted CI. Keep S1 inactive until a separate dependency-satisfied Stage action.
++- Return control at S0 Gate PASS. Resolve the S1 batch manifest and a dependency-satisfied next task in a separately authorized Stage action; S1 remains inactive.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-e07f7ab6-4f1b-43f0-b7e1-547367e71fea/metadata.json
+# ?? research/prompts/P-e07f7ab6-4f1b-43f0-b7e1-547367e71fea/prompt.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-1944ede3-464b-410b-b236-4303808843c2.stderr.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-1944ede3-464b-410b-b236-4303808843c2.stdout.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-257f57f2-0d9c-439a-a6bc-2c7e0ad77655.stderr.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-257f57f2-0d9c-439a-a6bc-2c7e0ad77655.stdout.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-8f7fda16-87bf-40ca-9ee1-0d990f838690.stderr.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-8f7fda16-87bf-40ca-9ee1-0d990f838690.stdout.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-971e447f-6e28-4212-9c2e-7b66c8370823.stderr.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-971e447f-6e28-4212-9c2e-7b66c8370823.stdout.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-de9a4488-23d4-4806-8edb-e166d35a63c0.stderr.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/blobs/C-de9a4488-23d4-4806-8edb-e166d35a63c0.stdout.txt
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/events.jsonl
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/initial_state.json
+# ?? research/runs/R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md

@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Final remote sync **PASS**: `git ls-remote origin main` returned `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to clean local `main` before this record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA; classify and selected-job gate passed, while profile jobs were correctly skipped for the documentation-only diff. The preceding merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071bc80afb1b6f3c252779444e1be275c562`. S0 Gate **PASS** stands with all nine S0 tasks `done`, and S1 remains inactive. Durable evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`; latest historical checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md`; linked Recorder `R-20260929T102259Z-2399002f-07b6-45c8-9fc3-45cdd3645ca5`. Last Known Good Commit: `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`. Governance record changes are locally committed after verification; no product or authority paths changed. Next: separate S1 Stage selection only after its manifest and dependency-satisfied task are resolved and the Stage action is authorized.
+
 - Post-PR remote-main S0 Gate **PASS**: PR #1 merged at 485a071bc80afb1b6f3c252779444e1be275c562; clean isolated local main fast-forwarded to that exact origin/main. Hosted main Actions [36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) completed success for all ten jobs, including both profile smokes, compatibility, and selected-job gate. Local frozen hashes, recovery, S0 spec/HTTP/WSS/Sync/Plugin verifiers and 19 CI tests passed, with five real-symlink Windows subcases skipped but hosted Linux matrix successful. All nine S0 tasks remain done; no contract, authority, migration, backend or deploy path changed in the merge. Evidence: spec/progress/evidence/LOOP1-CI-001/2026-09-29-remote-main-s0-gate-reevaluation.md; checkpoint: spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md; Recorder R-20260929T094727Z-9394dc7c-0aee-45bb-88a3-ff602ef9d4f6. Last Known Good Commit: 485a071bc80afb1b6f3c252779444e1be275c562. Coordinator owns only these documentation/evidence and Recorder artifacts until committed. Next: push local checkpoint commit and verify remote CI; S1 inactive.
 
 
@@ -112,4 +114,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Push the local S0 Gate evidence/checkpoint commit to `origin/main` and verify hosted CI. Keep S1 inactive until a separate dependency-satisfied Stage action.
+- Return control at S0 Gate PASS. Resolve the S1 batch manifest and a dependency-satisfied next task in a separately authorized Stage action; S1 remains inactive.
