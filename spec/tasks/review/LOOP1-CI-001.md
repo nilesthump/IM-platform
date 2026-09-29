@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Fresh Fix 3 added a checkout-status diagnostic before unchanged CTRL-002 Acceptance in the `classify` job. The failed hosted run did not expose the offending porcelain entries, and a clean local PowerShell probe did not reproduce the suspected empty-output bug; the exact hosted cause is still unknown. Twelve path/gate tests and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. This is a diagnostic candidate, not a repair PASS. Task stays `review`; independent review and a new hosted run are required.
+
 - User approved and the reviewed `f07e353` branch was pushed to `origin/task/LOOP1-CI-001`. Actual GitHub Actions run `36515716353` **FAIL**: the classify job's CTRL-002 Acceptance check reported a dirty checkout; the gate rejected it. The offending status entries are not in the log yet. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`. Fresh Fix Agent diagnosis and a new independent review are required. Task stays `review`; S0 Gate NOT YET PASSED.
 
 - Independent Review 3 PASS is recorded, but actual GitHub Actions execution is blocked: automatic approval review rejected pushing the reviewed branch to the repository remote. No push occurred. Exact reason, target, unchanged remote state, and requested approval: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-external-ci-dispatch-blocker.md`. Task remains `review`; S0 Gate NOT YET PASSED.
@@ -81,4 +83,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Diagnose GitHub Actions run `36515716353` dirty-checkout failure with a fresh Fix Agent, repair within task scope, run a new independent review, then obtain a passing actual workflow run and close task acceptance. S0 Gate remains pending.
+- A fresh independent Review Agent checks the task-scoped diagnostic candidate; after its review, the Coordinator obtains a new hosted run to reveal exact Git porcelain status. A fresh Fix/Review cycle then repairs the root cause before operational CI acceptance. S0 Gate remains pending.

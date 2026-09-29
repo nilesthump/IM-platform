@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh Fix 3 added a diagnostic step in `.github/workflows/ci.yml` to print the exact checkout Git porcelain status before the unchanged CTRL-002 Acceptance check. The hosted failure's entries remain unknown; 12 local CI tests and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. Task stays `review`, Gate NOT YET PASSED. Next: fresh independent review, then a new hosted diagnostic run; repair the identified cause in another Fix/Review cycle.
+
 - User approved pushing reviewed CI commit `f07e353` to `origin/task/LOOP1-CI-001`; push succeeded without changing remote `main`. Actual GitHub Actions run [36515716353](https://github.com/nilesthump/IM-platform/actions/runs/36515716353) **FAIL**: classify job's CTRL-002 Acceptance check found a dirty checkout and the gate rejected the failed job. Exact offending status entries are not logged. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`; Coordinator Recorder `R-20260929T030511Z-4f60e75a-68e1-4f64-8516-b71c024a15c2` finalized FAIL and validated. Next exact action: fresh Fix Agent diagnoses and repairs this CI checkout failure, then a different fresh Review Agent checks a clean candidate. Task stays `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns only the task evidence/current/spec and linked Recorder changes until committed.
 
 - Fresh independent CI Review 3 **PASS** for clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: five-queue CTRL-002 Acceptance, 12 CI tests, prior rename regression, independent SDK rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Actual GitHub workflow execution and Coordinator acceptance closure remain pending; task stays `review`, S0 Gate NOT YET PASSED.
@@ -125,13 +127,17 @@ Current Task State: review
 
 ## Current Blockers
 
-- `BLOCKED_EXTERNAL_ACCESS`: automatic approval review rejected publishing the reviewed `task/LOOP1-CI-001` branch to `https://github.com/nilesthump/IM-platform.git` because remote ownership/trust and exact destination were not established by trusted user content. No push occurred; actual GitHub Actions has not run. Explicit approval requested for that exact branch push. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-external-ci-dispatch-blocker.md`.
+- Hosted CI run `36515716353` failed CTRL-002 Acceptance with nonempty Git status, but its log omitted the entries. The exact cause awaits the diagnostic workflow run. The prior external-access block was resolved by explicit Human approval of the reviewed `f07e353` push. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`.
 
 - No current `LOOP1-MIN-001` blocker. The prior integration FAIL remains permanent evidence; the later Human authorization did not retroactively turn that review into PASS.
 - No current `LOOP1-CONTRACT-001` blocker. Its prior Recorder Git-transport rejection and subsequent explicit Human authorization remain documented; the accepted closure preserves original run event/output bytes.
 - Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
 
 ## Verification
+
+- Command: `C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest discover -s tests/ci -v`
+  - Result: Fix 3 development PASS, 12/12 tests, exit 0. CTRL-002 Development also exited 0; neither is independent acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`
 
 - Infra independent Review 1: `pwsh -NoProfile -File tests/infrastructure/smoke.ps1 -Profile go` and `-Profile java` each exited 0 from a clean detached checkout (30,202 ms and 17,467 ms); `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`, implementation Recorder validation, profile isolation probe, and `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` each exited 0. Exact commands and results are in the linked review evidence.
 - Fix 2 Recorder-wrapped checks: `python contracts/websocket/verify.py` PASS, exit `0`, 93 ms (8 positive, 10 negative, 11 schema and 12 behavior controls); committed rereview mutation probe PASS, exit `0`, 94 ms (12/12 rejected); `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development` PASS, exit `0`, 1641 ms. Exact command IDs and limitations are in the Fix evidence. Development mode is not independent acceptance.
@@ -217,6 +223,8 @@ Current Task State: review
 
 ## Changed Files or Migrations
 
+- Fix 3 diagnostic candidate changes only `.github/workflows/ci.yml`, the CI Task Spec/current recovery state, task-linked evidence, and Recorder artifacts. It changes no migration, contract, or product behavior.
+
 - Infra review adds only task-linked PASS evidence, prompt/Recorder artifacts, and task/current recovery updates. It changes no product file or migration.
 - Contract 003 Review 2 adds only a task-linked independent negative probe, FAIL evidence, prompt/Recorder run, and Task Spec/current recovery updates; no product contract, schema, migration, runtime or Frozen Architecture file changed.
 - Contract 003 Fix 1 changes `contracts/plugin-api/verify.py` and README, `contracts/fixtures/sync-plugin/generate.py` and `golden.json`, and adds separate `profile-outcomes/go.json` and `java.json`; task-linked evidence/Recorder and recovery files are updated. No schema, migration, runtime, HTTP/WSS, or Frozen Architecture file changes.
@@ -234,6 +242,8 @@ Current Task State: review
 - Independent closure adds only the Research Instrumentation Epoch, durable PASS evidence, accepted checkpoint, Research Task transition to `done`, and recovery-state updates.
 
 ## Known Failures, Risks, and Assumptions
+
+- Hosted CI run `36515716353` failed clean-checkout Acceptance; existing logs omit porcelain status. Fix 3 only adds an observable diagnostic. It is incomplete until a fresh hosted run identifies the entries and a repair passes independent review and actual CI.
 
 - Infra Review 1 found no product defect. Its Upgrade check is an S0 non-business transport probe, not proof of later auth.bind or application WebSocket semantics. The local Caddy CA is development-only.
 - Contract 003 Review 2 FAIL is permanent: SP-A-002 prior FAILED state and SP-A-006 paginated Query outcome are not asserted; `review2-negative-probe.py` accepts 2/2 invalid mutations. A fresh Fix/Review cycle is required. SP-A-012's S0 static-vector acceptance meaning is the smallest remaining interpretation question; static vectors are not backend-produced results.
@@ -254,7 +264,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Await explicit user authorization for the exact reviewed CI branch push rejected by automatic approval review; then run and inspect GitHub Actions, repair any failures through fresh Fix/Review, and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
+Fresh independent review of Fix 3's clean diagnostic candidate; then obtain a new hosted run, read its porcelain status, repair the exact cause through a fresh Fix/Review cycle, and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -265,6 +275,8 @@ Await explicit user authorization for the exact reviewed CI branch push rejected
 `spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md` (independently accepted Infra skeleton, integrated and verified on clean local `main`).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh Fix Agent `/root/ci001_fix3` owns only the CI workflow diagnostic, task/current recovery, linked evidence, and Recorder prompt/run until candidate commit. No unrelated or original `H:\IM-platform\contracts\http\schema-lint` work was touched.
 
 - Fresh independent Reviewer `/root/ci001_review3` owns only Review 3 PASS evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. CI product files and the separate detached Acceptance checkout remain clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
 

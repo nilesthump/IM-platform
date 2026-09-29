@@ -27,6 +27,13 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Diagnose checkout status
+        shell: pwsh
+        run: |
+          $status = @(git -c core.excludesFile=.git/info/exclude status --porcelain=v1 --untracked-files=all 2>&1)
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Host "checkout_status_entries=$($status.Count)"
+          foreach ($entry in $status) { Write-Host "checkout_status=$entry" }
       - name: Verify clean repository recovery
         shell: pwsh
         run: ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance
