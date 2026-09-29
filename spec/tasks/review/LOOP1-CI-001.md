@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- User-approved diagnostic branch push `0e6ce82` triggered actual GitHub Actions run `36521060867`, which **FAIL** with 17 modified historical Recorder stdout blobs immediately after checkout. Machine-local Git info attributes masked those bytes in local clean checkouts; repository `research/.gitattributes` applies LF checkout. The strict CTRL-002 Acceptance and gate rejected the dirty tree. Exact run/cause: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`. Fresh Fix/Review required; task `review`, S0 Gate NOT YET PASSED.
+
 - Fresh independent Review 4 `/root/ci001_review4` **PASS** for exact clean detached diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: CTRL-002 Acceptance with zero status entries, 12 CI tests, frozen hashes, no-weakening/scope/minimality inspection, and Fix 3 Recorder validity passed. The only product change prints Git porcelain status before unchanged Acceptance, to identify the dirty path in a new hosted run. Exact commands, exits, elapsed times, clean-state method, branch/diff range, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; review Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. Hosted root cause is unknown; task remains `review`, S0 Gate NOT YET PASSED.
 
 - Fresh Fix 3 added a checkout-status diagnostic before unchanged CTRL-002 Acceptance in the `classify` job. The failed hosted run did not expose the offending porcelain entries, and a clean local PowerShell probe did not reproduce the suspected empty-output bug; the exact hosted cause is still unknown. Twelve path/gate tests and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. This is a diagnostic candidate, not a repair PASS. Task stays `review`; independent review and a new hosted run are required.
@@ -85,4 +87,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator obtains a new hosted run on the independently reviewed diagnostic candidate to reveal exact Git porcelain status. A fresh Fix/Review cycle then repairs the root cause before operational CI acceptance if the run still fails. S0 Gate remains pending.
+- Fresh Fix Agent repairs the confirmed historical Recorder blob checkout/attribute issue without altering evidence bytes or weakening CTRL-002 Acceptance, then a different fresh Review Agent verifies a truly clean portable checkout. Obtain a passing actual GitHub workflow before closure. S0 Gate remains pending.
