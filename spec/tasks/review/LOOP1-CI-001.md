@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CI-001
 title: Establish path-aware CI skeleton
-status: done
-owner: /root
+status: review
+owner: /root/ci_placeholder_fix
 stage: S0
 gate: S0
 ---
@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Post-push full-matrix hosted GitHub Actions [36532087481](https://github.com/nilesthump/IM-platform/actions/runs/36532087481) **FAIL** on `origin/main` `686dbf2`: the existing S0 boundary commands interpret tracked `.gitkeep` markers as new Go/Java source and the tracked client placeholder directories as implemented clients. The earlier research-only hosted PASS did not select these profile jobs. S0 Gate PASS at this commit is invalidated; this task reopens in `review`. The Fix Agent candidate changes only the CI boundary checks, plus regression tests, and is local development evidence pending fresh independent review and a new full-matrix hosted CI PASS. Exact local evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-placeholder-fix-development.md`; Recorder run `R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492`.
+
 - S0 Stage Gate evaluation on integrated clean local `main` `037c88c` passed current recovery, frozen hashes, S0 spec/contract/CI verifiers, and both Go/Java PostgreSQL/NATS/TLS 1.3 smokes. The actual CI run and independent Review 5 remain the acceptance basis for this task. Gate evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-gate-evaluation.md`; stable checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md`. Remote `main` was not pushed; S1 remains inactive.
 
 - Operational CI acceptance **PASS**: user-approved reviewed evidence commit `9d1abc1` ran on GitHub Actions [36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147). Clean checkout, strict CTRL-002 Acceptance, 12 path/gate tests, classifier, and selected-job gate passed. This push selected no profile jobs because only research transport/review paths changed; independent matrix tests cover classification. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-operational-ci-acceptance.md`. Independent Review 5 accepted `0621f2b`; task moves `review -> done`. ADR-0001 bootstrap acceptance expires. S0 Stage Gate still requires clean main integration/evaluation.
@@ -99,4 +101,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Return control at S0 Gate PASS after final clean post-commit verification. Remote `main` synchronization requires separate authorization; S1 remains inactive in this batch.
+- Fresh independent reviewer examines the clean fix candidate and verifies the boundary checker rejects real new source while allowing only S0 markers. On PASS, Coordinator arranges a full-matrix hosted CI run, then reevaluates the S0 Gate and recovery checkpoint. This Fix Agent cannot accept its own work. S1 remains inactive.

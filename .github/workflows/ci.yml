@@ -66,7 +66,7 @@ jobs:
           go-version: '1.23'
       - name: Go S0 compile and test
         run: |
-          test "$(find backend/go -type f ! -name main.go ! -name Dockerfile | wc -l)" -eq 0 || { echo 'Go source grew; add package lint/unit/integration/contract commands'; exit 1; }
+          python3 ci/check_s0_boundary.py go
           test -z "$(gofmt -l backend/go/main.go)"
           go test backend/go/main.go
 
@@ -82,7 +82,7 @@ jobs:
           java-version: '21'
       - name: Java S0 compile
         run: |
-          test "$(find backend/java -type f ! -name InfraPlaceholder.java ! -name Dockerfile | wc -l)" -eq 0 || { echo 'Java source grew; add lint/unit/integration/contract commands'; exit 1; }
+          python3 ci/check_s0_boundary.py java
           javac -d "$RUNNER_TEMP" backend/java/InfraPlaceholder.java
 
   web:
@@ -92,7 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Web S0 skeleton boundary
-        run: test ! -d clients/web || { echo 'Web source exists; add its unit/build/protocol/plugin UI CI command'; exit 1; }
+        run: python3 ci/check_s0_boundary.py web
 
   desktop:
     needs: classify
@@ -101,7 +101,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Desktop S0 skeleton boundary
-        run: test ! -d clients/desktop || { echo 'Desktop source exists; add its SQLite/protocol CI command'; exit 1; }
+        run: python3 ci/check_s0_boundary.py desktop
 
   mobile:
     needs: classify
@@ -110,7 +110,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Mobile S0 skeleton boundary
-        run: test ! -d clients/mobile || { echo 'Mobile source exists; add its SQLite/protocol CI command'; exit 1; }
+        run: python3 ci/check_s0_boundary.py mobile
 
   shared:
     needs: classify
@@ -168,9 +168,9 @@ jobs:
           python3 -m unittest discover -s tests/database -v
       - name: Future client and plugin fixture boundary
         run: |
-          test ! -d clients/web || { echo 'Client compatibility command required'; exit 1; }
-          test ! -d clients/desktop || { echo 'Desktop compatibility command required'; exit 1; }
-          test ! -d clients/mobile || { echo 'Mobile compatibility command required'; exit 1; }
+          python3 ci/check_s0_boundary.py web
+          python3 ci/check_s0_boundary.py desktop
+          python3 ci/check_s0_boundary.py mobile
 
   deploy:
     needs: classify
