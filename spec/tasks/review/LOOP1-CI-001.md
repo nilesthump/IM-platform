@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- User approved and the reviewed `f07e353` branch was pushed to `origin/task/LOOP1-CI-001`. Actual GitHub Actions run `36515716353` **FAIL**: the classify job's CTRL-002 Acceptance check reported a dirty checkout; the gate rejected it. The offending status entries are not in the log yet. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`. Fresh Fix Agent diagnosis and a new independent review are required. Task stays `review`; S0 Gate NOT YET PASSED.
+
 - Independent Review 3 PASS is recorded, but actual GitHub Actions execution is blocked: automatic approval review rejected pushing the reviewed branch to the repository remote. No push occurred. Exact reason, target, unchanged remote state, and requested approval: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-external-ci-dispatch-blocker.md`. Task remains `review`; S0 Gate NOT YET PASSED.
 
 - Fresh independent Review 3 `/root/ci001_review3` **PASS** at clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: CTRL-002 Acceptance, all 12 CI tests, prior rename probe, new independent SDK-rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. The clean checkout stayed clean. Exact commands, exits, elapsed times, scope/minimality judgment, and independence are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; review Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Task remains `review` pending actual GitHub workflow run and Coordinator closure; S0 Gate NOT YET PASSED.
@@ -79,4 +81,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- `BLOCKED_EXTERNAL_ACCESS`: await explicit user authorization for the exact remote branch push rejected by automatic approval review. Then run and inspect GitHub Actions, repair any failures through fresh Fix/Review, and close the task only when operational CI acceptance is established. S0 Gate remains pending.
+- Diagnose GitHub Actions run `36515716353` dirty-checkout failure with a fresh Fix Agent, repair within task scope, run a new independent review, then obtain a passing actual workflow run and close task acceptance. S0 Gate remains pending.
