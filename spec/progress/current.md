@@ -12,9 +12,11 @@ Current Batch: LOOP1-S1
 
 Current Task: LOOP1-GO-AUTH-001
 
-Current Task State: active
+Current Task State: review
 
 ## Current Contract Work
+
+- `LOOP1-GO-AUTH-001` candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed with a clean worktree and strict CTRL-002 Acceptance recovery PASS. Local Go race/integration, PostgreSQL/NATS Outbox, HTTP/WSS contracts, frozen hashes, CI unit tests, and Compose config pass. Full Go Compose smoke did not start because the configured Docker mirror returned HTTP 403 for its Go builder image. The task is now in `review`; a fresh independent reviewer and real hosted CI are required before `done`. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; implementation Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab` validated with 30 events.
 
 - Fresh Go Auth Implementation Agent has implemented and locally verified the bounded S1 Auth/Session slice on `task/LOOP1-GO-AUTH-001`: PostgreSQL registration/login/refresh/logout and three slots, WSS bind/revocation, durable revocation Outbox relay through NATS, config-file credentials, and Go CI adaptation. Go race/integration with disposable PostgreSQL/NATS, HTTP/WSS contracts, frozen hashes, CTRL-002 Development, 19 CI tests, and Compose config pass. Local full Compose Go smoke could not fetch `golang:1.25-alpine` because the configured Docker mirror returned HTTP 403 before service startup. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Human explicitly approved the exact `deploy/compose.yaml` config-file mount amendment; prior automatic approval rejection remains disclosed. This is not independent acceptance or S1 Gate PASS.
 
@@ -297,7 +299,7 @@ Current Task State: active
 
 ## Next Exact Action
 
-After the Implementation Agent's clean candidate commit, move `LOOP1-GO-AUTH-001` from `active` to `review` and delegate a fresh independent Review Agent. Review the exact committed diff in a clean checkout, then obtain applicable real hosted CI before acceptance. S1 Gate remains NOT YET PASSED.
+Delegate `LOOP1-GO-AUTH-001` candidate `a93569d` to a fresh independent Review Agent in a clean checkout. Resolve any FAIL through fresh Fix/Review; on Review PASS, obtain applicable real hosted CI before task acceptance. S1 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -309,7 +311,8 @@ After the Implementation Agent's clean candidate commit, move `LOOP1-GO-AUTH-001
 
 ## Uncommitted Changes / Ownership
 
-- Fresh Implementation Agent `/root/go_auth_impl` owns only task-allowed Go Auth/Session source and tests, Go CI/boundary adaptation, the Human-approved exact Go Compose config mounts, Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. The local disposable PostgreSQL and NATS test containers and temporary test config are owned by this run and are not repository changes; they will be removed after verification. Original `H:/IM-platform` unknown untracked files remain untouched.
+- Coordinator owns only the Go Auth `active` to `review` task/progress transition, linked handoff evidence and Recorder artifacts until this transition is committed. Implementation Agent handed off a clean committed product candidate at `a93569d`; original `H:/IM-platform` unknown untracked files remain untouched.
+- Implementation Agent `/root/go_auth_impl` owns no uncommitted changes and removed its disposable PostgreSQL/NATS containers and temporary config after verification.
 
 - S1 Coordinator owns only the new batch and four task specifications, this recovery update, task-linked activation evidence and Recorder artifacts until the activation commit. The separate original `H:/IM-platform` checkout and its unknown untracked files remain untouched. No S1 product file has changed.
 - Historical S0 final governance sync ownership below was closed by its clean `main` commit.

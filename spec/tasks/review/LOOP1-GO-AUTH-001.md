@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-GO-AUTH-001
 title: Implement Go Auth and Session vertical slice
-status: active
-owner: unassigned
+status: review
+owner: unassigned independent reviewer
 stage: S1
 gate: S1
 ---
@@ -68,6 +68,7 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 - Entry checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md`; clean S0 `main` at `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
 - Coordinator activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; Recorder run `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`. This is development/recovery evidence, not independent task acceptance. Implementation evidence pending.
 - Implementation development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; linked Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Local Go race/integration, HTTP/WSS verifiers, frozen hashes, CTRL-002 Development, CI tests, and Compose config passed. Full local Go profile smoke stopped before service startup on Docker registry mirror HTTP 403. Hosted CI and independent review remain pending.
+- Candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed and the implementation worktree was clean at handoff. Coordinator moved the task to `review` for an independent clean-checkout reviewer; acceptance and hosted CI remain pending.
 
 # Handoff
 
@@ -75,4 +76,4 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 
 # Next Action
 
-- After the clean candidate commit, Coordinator moves this task to `review` and delegates a fresh independent Review Agent. The reviewer checks the committed diff and clean checkout; then applicable real hosted CI is required. Investigate the local Docker mirror HTTP 403 only if it persists outside this host or hosted CI fails.
+- Fresh independent Review Agent: review candidate `a93569d` from a clean committed checkout, including contract/security/transaction/minimality/CI scope and Recorder integrity. On PASS, obtain applicable real hosted CI before `done`; on FAIL, retain `review` and delegate a fresh Fix Agent. The local Docker mirror HTTP 403 remains an unverified profile smoke limit.
