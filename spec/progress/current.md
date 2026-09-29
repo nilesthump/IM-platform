@@ -12,9 +12,11 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CI-001
 
-Current Task State: review
+Current Task State: done
 
 ## Current Contract Work
+
+- `LOOP1-CI-001` **done** after independent Review 2 PASS for `856e4d0` and hosted full-matrix GitHub Actions [36545406958](https://github.com/nilesthump/IM-platform/actions/runs/36545406958) PASS at review closure `0c00ea1`. Classify, Go, Java, Web, Desktop, Mobile, shared, compatibility, deploy, and gate all succeeded. Review closure was safely cherry-picked here as `3235996`; prior FAIL evidence remains. Exact hosted acceptance: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-hosted-acceptance.md`; closure Recorder `R-20260929T090505Z-ed62b6fb-ed72-4213-8219-c00aaa435c7b` finished `FAIL` and integrity-valid after an optional log-capture GBK error, while its structured hosted query succeeded. Local 19 CI tests, frozen hashes, and post-transition CTRL-002 Development pass. S0 Gate remains FAIL pending clean main integration and post-merge evaluation; no S1 activation.
 
 - Fresh independent placeholder Review 2 **PASS locally** for `856e4d0`: clean detached clone passed strict CTRL-002 Acceptance and Recorder repository validation with zero status entries; 19 CI tests passed (five real symlink cases skipped on Windows, mock controls passed); actual diff from `686dbf2` selects the full 11-job matrix; frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md`; review Recorder `R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373`. Task stays `review`, S0 Gate FAIL pending hosted full-matrix PASS and Gate reevaluation.
 
@@ -263,7 +265,7 @@ Current Task State: review
 
 ## Known Failures, Risks, and Assumptions
 
-- Hosted full-matrix run `36532087481` failed the S0 placeholder boundary. Prior research-only hosted PASS and local Gate evidence did not exercise selected profile jobs. This fix has local development verification only; real CI and independent review remain required.
+- Hosted full-matrix run `36532087481` failed the S0 placeholder boundary. Its Gate FAIL remains historical evidence; independent Review 2 and hosted full-matrix run `36545406958` now accept the repair. A new clean-main Gate evaluation is still required.
 
 - Hosted CI runs `36515716353` and `36521060867` failed strict clean-checkout Acceptance; the latter identified 17 historical Recorder stdout blobs altered by checkout filters. Fix 4's portable attribute repair passed independent Review 5 in clean clones. A new hosted PASS is still required; no failed run counts as acceptance.
 
@@ -286,17 +288,19 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh independent Review Agent verifies the clean committed Fix 2 candidate, including real symlink controls on a capable host and CI-only full-matrix classification. Then Coordinator obtains a hosted full-matrix CI run. On PASS, reevaluate S0 Gate and create a new checkpoint before S1 activation.
+Coordinator integrates the reviewed, hosted-PASS CI closure into clean `main`, verifies post-merge S0 Gate conditions and remote CI, and creates a new checkpoint only on Gate PASS. Keep S1 inactive meanwhile.
 
 ## Last Known Good Commit
 
-`686dbf237554b2aa52207f5aa63704c080423de7` is the latest clean committed recovery point before this fix; its S0 Gate PASS is invalidated by hosted full-matrix run `36532087481`. No full-matrix accepted commit is known yet.
+`0c00ea19cc9f2018c3540c2dabf5741d2a2705cb` is the exact independently reviewed closure and hosted full-matrix accepted commit on the remote task branch, incorporated locally as `3235996`. Clean `main` integration and S0 Gate recovery point remain pending.
 
 ## Latest Checkpoint
 
 `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md` (historical local PASS checkpoint, superseded for current Gate status by hosted full-matrix FAIL).
 
 ## Uncommitted Changes / Ownership
+
+- Coordinator closure writer `/root/ci_placeholder_closure` owns only CI task queue move, this current-state update, task-linked hosted evidence, and its prompt/Recorder artifacts until committed. Review closure `3235996` is committed; no product or original `H:\IM-platform` file was edited here. Generated Python bytecode caches from local tests are owned by this closure run and will be removed before commit.
 
 - Fresh independent Reviewer `/root/ci_placeholder_review2` owns only this PASS evidence, Task Spec/current recovery update, prompt, and linked Recorder artifacts until committed. The separate detached Acceptance clone remains clean; no product files were edited by the reviewer.
 

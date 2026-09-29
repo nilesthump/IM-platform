@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CI-001
 title: Establish path-aware CI skeleton
-status: review
-owner: /root/ci_placeholder_review2
+status: done
+owner: /root
 stage: S0
 gate: S0
 ---
@@ -51,6 +51,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 - Run `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development; Acceptance only from a clean committed independent checkout.
 
 # Evidence
+
+- Coordinator closure **PASS**: independent Review 2 accepted candidate `856e4d0ea90b4c87df8d5130b45bdbb3d4b7e7e4` in a clean detached clone. Review closure `0c00ea19cc9f2018c3540c2dabf5741d2a2705cb` was incorporated on this branch as `3235996`. Hosted GitHub Actions [run 36545406958](https://github.com/nilesthump/IM-platform/actions/runs/36545406958) completed `success` at exact `0c00ea1`; classify, Go, Java, Web, Desktop, Mobile, shared, compatibility, deploy, and gate all succeeded. Exact durable hosted evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-hosted-acceptance.md`; closure Recorder `R-20260929T090505Z-ed62b6fb-ed72-4213-8219-c00aaa435c7b`. Local 19 CI tests and frozen hashes passed; five real-symlink Windows supplemental subcases were skipped, but deterministic controls passed and Linux hosted matrix passed. Task moves `review -> done`. S0 Gate stays FAIL pending clean main integration and post-merge Gate evaluation; S1 inactive.
 
 - Fresh independent placeholder Review 2 `/root/ci_placeholder_review2` **PASS locally** for clean committed `856e4d0ea90b4c87df8d5130b45bdbb3d4b7e7e4`: separate detached clone passed strict CTRL-002 Acceptance and Recorder repository validation with zero status entries; 19 CI tests passed (five actual symlink cases skipped for Windows privilege, equivalent mock controls passed); actual `686dbf2..856e4d0` diff selects all 11 jobs; frozen hashes match, no gate weakening or out-of-scope product changes. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md`; Reviewer Recorder `R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373`. Task remains `review`, S0 Gate FAIL until hosted full-matrix CI PASS and Coordinator reevaluation.
 
@@ -107,4 +109,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator pushes independently reviewed `856e4d0` to a remote task branch and inspects a fresh hosted full-matrix CI run. On hosted PASS, reevaluate S0 Gate and create a new checkpoint before S1 activation.
+- Integrate the reviewed, hosted-PASS task branch into clean `main`, run post-merge S0 Gate verification, and create a new checkpoint only if every Gate condition passes. S1 remains inactive until then.
