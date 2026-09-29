@@ -1,0 +1,67 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 3bf86ae..8c23783 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh independent placeholder Review 2 **PASS locally** for `856e4d0`: clean detached clone passed strict CTRL-002 Acceptance and Recorder repository validation with zero status entries; 19 CI tests passed (five real symlink cases skipped on Windows, mock controls passed); actual diff from `686dbf2` selects the full 11-job matrix; frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md`; review Recorder `R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373`. Task stays `review`, S0 Gate FAIL pending hosted full-matrix PASS and Gate reevaluation.
++
+ - Fresh Fix 2 incorporated the independent FAIL closure commit and repaired both findings: symlinks are rejected before allowed S0 names, and CI/workflow/test changes select the entire job matrix. Nineteen CI tests, CTRL-002 Development, and frozen hash verification pass locally; real symlink creation is unavailable on this Windows host, so an additional deterministic negative test covers both bypasses. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. This is Fix Agent development evidence. Task remains `review`, S0 Gate FAIL; fresh independent review and hosted full-matrix CI are required.
+ 
+ - Fresh independent review of S0 placeholder candidate `502342358d11fc6e77ff2b7e1f86ed5f07220ea8` **FAIL**: clean detached CTRL-002 Acceptance and 16 CI tests pass, but workflow/checker changes classify as deploy only and do not run the five repaired profile jobs or compatibility on a push; allowed-name root symlinks bypass the boundary check. Frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` had an exposed GBK output capture failure. Task remains `review`, S0 Gate FAIL. Next: fresh Fix/Review cycle, then actual hosted full-matrix CI. No S1 activation.
+@@ -296,6 +298,8 @@ Fresh independent Review Agent verifies the clean committed Fix 2 candidate, inc
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh independent Reviewer `/root/ci_placeholder_review2` owns only this PASS evidence, Task Spec/current recovery update, prompt, and linked Recorder artifacts until committed. The separate detached Acceptance clone remains clean; no product files were edited by the reviewer.
++
+ - Fresh Fix Agent `/root/ci_placeholder_fix2` owns only CI checker/classifier, `tests/ci` regressions, CI Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until the clean candidate commit. No architecture, contract, gate, or original `H:\IM-platform` files were changed.
+ 
+ - Fresh independent Reviewer `/root/ci_placeholder_review` owns only this FAIL evidence, Task Spec/current recovery updates, prompt, and Recorder artifacts until committed in its isolated review worktree. The separate clean Acceptance clone was removed; no product file was modified. Recorder output capture failed on a symlink probe and was disclosed.
+diff --git a/spec/tasks/review/LOOP1-CI-001.md b/spec/tasks/review/LOOP1-CI-001.md
+index 6d6ee7b..6e2f13d 100644
+--- a/spec/tasks/review/LOOP1-CI-001.md
++++ b/spec/tasks/review/LOOP1-CI-001.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-CI-001
+ title: Establish path-aware CI skeleton
+ status: review
+-owner: /root/ci_placeholder_fix2
++owner: /root/ci_placeholder_review2
+ stage: S0
+ gate: S0
+ ---
+@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Fresh independent placeholder Review 2 `/root/ci_placeholder_review2` **PASS locally** for clean committed `856e4d0ea90b4c87df8d5130b45bdbb3d4b7e7e4`: separate detached clone passed strict CTRL-002 Acceptance and Recorder repository validation with zero status entries; 19 CI tests passed (five actual symlink cases skipped for Windows privilege, equivalent mock controls passed); actual `686dbf2..856e4d0` diff selects all 11 jobs; frozen hashes match, no gate weakening or out-of-scope product changes. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md`; Reviewer Recorder `R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373`. Task remains `review`, S0 Gate FAIL until hosted full-matrix CI PASS and Coordinator reevaluation.
++
+ - Fresh Fix 2 incorporated independent FAIL closure `e250e62` as `00b8a4e` without conflict. `ci/check_s0_boundary.py` now rejects profile-root and nested symlinks before allowed-name checks; `ci/classify.py` selects every job for changes to `ci/**`, `.github/workflows/**`, or `tests/ci/**`. Focused regressions cover both bypasses. Nineteen CI tests pass, with five supplemental real-symlink subtests skipped because this Windows host lacks symlink creation privilege; a deterministic mock-backed negative test passes for both root and allowed-name cases. CTRL-002 Development and frozen hash verification pass. Exact development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. Task stays `review`, S0 Gate FAIL pending fresh independent review and hosted full-matrix CI.
+ 
+ - Fresh independent placeholder Review `/root/ci_placeholder_review` **FAIL** for committed `502342358d11fc6e77ff2b7e1f86ed5f07220ea8`: a clean detached clone passes CTRL-002 Acceptance and all 16 CI tests pass, but the changed workflow/checker paths select deploy only, so a branch push skips all five repaired profile jobs and compatibility; root allowed-name symlinks bypass `ci/check_s0_boundary.py`. Frozen hashes match. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` exposed a GBK instrumentation failure. Task stays `review`, S0 Gate FAIL; fresh Fix/Review and hosted full-matrix PASS remain required.
+@@ -105,4 +107,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Next Action
+ 
+-- A different fresh independent Review Agent verifies the clean Fix 2 candidate, including real symlink controls on a capable host and complete job selection for CI-only changes. Coordinator then obtains a full-matrix hosted CI PASS and reevaluates the S0 Gate and recovery checkpoint. S1 remains inactive.
++- Coordinator pushes independently reviewed `856e4d0` to a remote task branch and inspects a fresh hosted full-matrix CI run. On hosted PASS, reevaluate S0 Gate and create a new checkpoint before S1 activation.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/2026-09-29-ci001-placeholder-independent-review2.txt
+# ?? research/prompts/P-17a7a6d5-2e6e-4f88-abbf-94c877b77f81/metadata.json
+# ?? research/prompts/P-17a7a6d5-2e6e-4f88-abbf-94c877b77f81/prompt.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-4bce7fb4-7b9a-491e-b234-b21470c43903.stderr.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-4bce7fb4-7b9a-491e-b234-b21470c43903.stdout.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-899a35a3-3436-4bae-9278-b3ecb15223e9.stderr.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-899a35a3-3436-4bae-9278-b3ecb15223e9.stdout.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-c6bb48e5-e5cf-4d2a-9ba3-7f99b105d5b4.stderr.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-c6bb48e5-e5cf-4d2a-9ba3-7f99b105d5b4.stdout.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-e670a86a-f59a-4413-bfc1-634f6cf69eb2.stderr.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/blobs/C-e670a86a-f59a-4413-bfc1-634f6cf69eb2.stdout.txt
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/events.jsonl
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/initial_state.json
+# ?? research/runs/R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md
