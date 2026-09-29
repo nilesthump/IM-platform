@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh independent placeholder Review 2 **PASS locally** for `856e4d0`: clean detached clone passed strict CTRL-002 Acceptance and Recorder repository validation with zero status entries; 19 CI tests passed (five real symlink cases skipped on Windows, mock controls passed); actual diff from `686dbf2` selects the full 11-job matrix; frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md`; review Recorder `R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373`. Task stays `review`, S0 Gate FAIL pending hosted full-matrix PASS and Gate reevaluation.
+
 - Fresh Fix 2 incorporated the independent FAIL closure commit and repaired both findings: symlinks are rejected before allowed S0 names, and CI/workflow/test changes select the entire job matrix. Nineteen CI tests, CTRL-002 Development, and frozen hash verification pass locally; real symlink creation is unavailable on this Windows host, so an additional deterministic negative test covers both bypasses. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. This is Fix Agent development evidence. Task remains `review`, S0 Gate FAIL; fresh independent review and hosted full-matrix CI are required.
 
 - Fresh independent review of S0 placeholder candidate `502342358d11fc6e77ff2b7e1f86ed5f07220ea8` **FAIL**: clean detached CTRL-002 Acceptance and 16 CI tests pass, but workflow/checker changes classify as deploy only and do not run the five repaired profile jobs or compatibility on a push; allowed-name root symlinks bypass the boundary check. Frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` had an exposed GBK output capture failure. Task remains `review`, S0 Gate FAIL. Next: fresh Fix/Review cycle, then actual hosted full-matrix CI. No S1 activation.
@@ -295,6 +297,8 @@ Fresh independent Review Agent verifies the clean committed Fix 2 candidate, inc
 `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md` (historical local PASS checkpoint, superseded for current Gate status by hosted full-matrix FAIL).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh independent Reviewer `/root/ci_placeholder_review2` owns only this PASS evidence, Task Spec/current recovery update, prompt, and linked Recorder artifacts until committed. The separate detached Acceptance clone remains clean; no product files were edited by the reviewer.
 
 - Fresh Fix Agent `/root/ci_placeholder_fix2` owns only CI checker/classifier, `tests/ci` regressions, CI Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until the clean candidate commit. No architecture, contract, gate, or original `H:\IM-platform` files were changed.
 

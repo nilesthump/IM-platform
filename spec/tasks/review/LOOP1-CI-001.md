@@ -2,7 +2,7 @@
 task_id: LOOP1-CI-001
 title: Establish path-aware CI skeleton
 status: review
-owner: /root/ci_placeholder_fix2
+owner: /root/ci_placeholder_review2
 stage: S0
 gate: S0
 ---
@@ -51,6 +51,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 - Run `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development; Acceptance only from a clean committed independent checkout.
 
 # Evidence
+
+- Fresh independent placeholder Review 2 `/root/ci_placeholder_review2` **PASS locally** for clean committed `856e4d0ea90b4c87df8d5130b45bdbb3d4b7e7e4`: separate detached clone passed strict CTRL-002 Acceptance and Recorder repository validation with zero status entries; 19 CI tests passed (five actual symlink cases skipped for Windows privilege, equivalent mock controls passed); actual `686dbf2..856e4d0` diff selects all 11 jobs; frozen hashes match, no gate weakening or out-of-scope product changes. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md`; Reviewer Recorder `R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373`. Task remains `review`, S0 Gate FAIL until hosted full-matrix CI PASS and Coordinator reevaluation.
 
 - Fresh Fix 2 incorporated independent FAIL closure `e250e62` as `00b8a4e` without conflict. `ci/check_s0_boundary.py` now rejects profile-root and nested symlinks before allowed-name checks; `ci/classify.py` selects every job for changes to `ci/**`, `.github/workflows/**`, or `tests/ci/**`. Focused regressions cover both bypasses. Nineteen CI tests pass, with five supplemental real-symlink subtests skipped because this Windows host lacks symlink creation privilege; a deterministic mock-backed negative test passes for both root and allowed-name cases. CTRL-002 Development and frozen hash verification pass. Exact development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. Task stays `review`, S0 Gate FAIL pending fresh independent review and hosted full-matrix CI.
 
@@ -105,4 +107,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- A different fresh independent Review Agent verifies the clean Fix 2 candidate, including real symlink controls on a capable host and complete job selection for CI-only changes. Coordinator then obtains a full-matrix hosted CI PASS and reevaluates the S0 Gate and recovery checkpoint. S1 remains inactive.
+- Coordinator pushes independently reviewed `856e4d0` to a remote task branch and inspects a fresh hosted full-matrix CI run. On hosted PASS, reevaluate S0 Gate and create a new checkpoint before S1 activation.
