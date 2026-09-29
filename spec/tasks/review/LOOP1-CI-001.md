@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Fresh independent Review 5 `/root/ci001_review5` **PASS** for exact committed candidate `0621f2b76aedecfb4fcb7a657bd977cc79e8e8ac`. Two separate `--no-local` clones with `core.autocrlf=true` and `false`, neither with `info/attributes`, passed strict CTRL-002 Acceptance with zero status/diff entries. All 42 historical Recorder blob object IDs and raw checkout bytes matched, both historical runs and Fix 4's run validated, 12 CI tests and frozen hashes passed, and no contract/architecture/Acceptance/workflow/gate path changed. Exact independent evidence, commands, exits, elapsed times, clean state, branch/diff range, and an exposed non-acceptance Recorder invocation failure: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review5-0621f2b-pass.md`; review Recorder `R-20260929T045735Z-19594017-8996-43dd-98a8-670c028c15c4`. Actual hosted CI remains pending; task stays `review`, S0 Gate NOT YET PASSED.
+
 - Fresh Fix 4 added exactly two Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`. Two genuinely separate clones without machine-local `info/attributes`, with `core.autocrlf=true` and `false`, both pass strict CTRL-002 Acceptance with zero status entries. All 42 historical blob object IDs and raw checkout bytes match; both original Recorder runs validate. Twelve CI tests pass. This remains Fix Agent development evidence pending fresh independent review and hosted CI. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Fix 4 Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Task `review`, S0 Gate NOT YET PASSED.
 
 - Coordinator prospectively authorized the two exact historical Recorder `blobs/.gitattributes` paths above after hosted diagnostic run `36521060867` identified 17 checkout-modified stdout blobs. The repair must preserve every historical blob Git object ID and Recorder validation result, and pass a fresh clone with no machine-local `info/attributes` overrides. No broader `research/**` write permission is granted.
@@ -93,4 +95,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- A different fresh Review Agent verifies Fix 4's clean portable checkout, unchanged historical blob bytes, scope, and strict Acceptance. Then obtain a passing actual GitHub workflow before closure. S0 Gate remains pending.
+- Coordinator obtains a passing actual GitHub Actions workflow run for the independently reviewed portable checkout candidate, then closes this task and evaluates S0 Gate. Task remains `review` until that evidence exists.

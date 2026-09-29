@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh independent CI Review 5 **PASS** for committed candidate `0621f2b76aedecfb4fcb7a657bd977cc79e8e8ac`: two independent clones without `info/attributes` and with `core.autocrlf=true` and `false` passed strict CTRL-002 Acceptance with zero status/diff; all 42 historical blob bytes and object IDs, 12 CI tests, frozen hashes, Recorder validity, and no-weakening scope passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review5-0621f2b-pass.md`; Recorder `R-20260929T045735Z-19594017-8996-43dd-98a8-670c028c15c4`. Next exact action: Coordinator obtains a new real GitHub Actions run and only closes this task after hosted PASS. Task stays `review`; S0 Gate NOT YET PASSED. Last accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only review evidence/probe, task/current recovery edits, and linked Recorder artifacts until committed.
+
 - Fresh Fix 4 repaired the hosted checkout failure with two exact Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`; no historical blob bytes changed. Independent clones with `core.autocrlf=true` and `false`, no `info/attributes`, both passed strict CTRL-002 Acceptance with zero status entries; all 42 blob files matched their Git objects byte-for-byte, both historical runs validated, and 12 CI tests passed. Fix Agent development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Next exact action: fresh independent Review Agent of the clean final candidate, then a new hosted CI run. Task stays `review`; S0 Gate NOT YET PASSED. Last accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Fix Agent changes are contained in the clean committed candidate.
 
 - User approved pushing independently reviewed `0e6ce82`; the fast-forward push to `origin/task/LOOP1-CI-001` succeeded without changing remote `main`. Hosted run [36521060867](https://github.com/nilesthump/IM-platform/actions/runs/36521060867) **FAIL**: diagnostic reported 17 modified historical Recorder stdout blobs in two runs immediately after checkout. `research/.gitattributes` LF checkout and machine-local `H:/IM-platform/.git/info/attributes` overrides explain local/hosted difference; no evidence blobs were edited. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`; Coordinator Recorder `R-20260929T041815Z-f8cae6b3-1867-4628-9ef6-6dec868928c5`. Next exact action: fresh Fix Agent repairs portable checkout integrity under task authority; independent Review Agent verifies clean clone, then another hosted run. Task remains `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns task evidence/current/spec and linked Recorder changes until committed.
@@ -249,7 +251,7 @@ Current Task State: review
 
 ## Known Failures, Risks, and Assumptions
 
-- Hosted CI run `36515716353` failed clean-checkout Acceptance; existing logs omit porcelain status. Fix 3 only adds an observable diagnostic. It is incomplete until a fresh hosted run identifies the entries and a repair passes independent review and actual CI.
+- Hosted CI runs `36515716353` and `36521060867` failed strict clean-checkout Acceptance; the latter identified 17 historical Recorder stdout blobs altered by checkout filters. Fix 4's portable attribute repair passed independent Review 5 in clean clones. A new hosted PASS is still required; no failed run counts as acceptance.
 
 - Infra Review 1 found no product defect. Its Upgrade check is an S0 non-business transport probe, not proof of later auth.bind or application WebSocket semantics. The local Caddy CA is development-only.
 - Contract 003 Review 2 FAIL is permanent: SP-A-002 prior FAILED state and SP-A-006 paginated Query outcome are not asserted; `review2-negative-probe.py` accepts 2/2 invalid mutations. A fresh Fix/Review cycle is required. SP-A-012's S0 static-vector acceptance meaning is the smallest remaining interpretation question; static vectors are not backend-produced results.
@@ -270,7 +272,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh independent review of Fix 4's clean portable checkout candidate; then obtain a passing hosted GitHub Actions run and close `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
+Coordinator obtains a passing hosted GitHub Actions run for independent Review 5's accepted candidate and closes `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -281,6 +283,8 @@ Fresh independent review of Fix 4's clean portable checkout candidate; then obta
 `spec/progress/checkpoints/2026-09-29-loop1-infra-001-accepted.md` (independently accepted Infra skeleton, integrated and verified on clean local `main`).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh independent Reviewer `/root/ci001_review5` owns only this review's evidence/probe, Task Spec/current recovery edits, and linked prompt/Recorder artifacts until committed. Product CI, contracts, architecture, Acceptance, and gate files remain unchanged; both independent clones are clean. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
 
 - Fresh Fix Agent `/root/ci001_fix4` committed only two exact Coordinator-authorized historical Recorder transport rules, Task Spec/current recovery, task-linked development evidence, and its own prompt/run. No Fix 4 changes remain uncommitted; historical Recorder blob bytes and original `H:\IM-platform\contracts\http\schema-lint` were untouched.
 
