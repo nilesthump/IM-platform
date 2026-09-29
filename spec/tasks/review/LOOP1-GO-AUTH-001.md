@@ -69,6 +69,7 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 - Coordinator activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; Recorder run `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`. This is development/recovery evidence, not independent task acceptance. Implementation evidence pending.
 - Implementation development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; linked Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Local Go race/integration, HTTP/WSS verifiers, frozen hashes, CTRL-002 Development, CI tests, and Compose config passed. Full local Go profile smoke stopped before service startup on Docker registry mirror HTTP 403. Hosted CI and independent review remain pending.
 - Candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed and the implementation worktree was clean at handoff. Coordinator moved the task to `review` for an independent clean-checkout reviewer; acceptance and hosted CI remain pending.
+- Independent Review 1 FAIL for candidate `a93569d`: the Go suite does not execute the canonical HTTP/WSS fixtures, and a focused WSS probe received `pong` for a non-UUID `requestId` contrary to `contracts/websocket/envelope.schema.json`. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review1-fail.md`; Recorder `R-20260929T143107Z-279b7a3e-f218-418d-925a-5a7f42e4421e` finished FAIL and integrity-valid. Task remains `review`; hosted CI is still pending.
 
 # Handoff
 
@@ -76,4 +77,4 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 
 # Next Action
 
-- Fresh independent Review Agent: review candidate `a93569d` from a clean committed checkout, including contract/security/transaction/minimality/CI scope and Recorder integrity. On PASS, obtain applicable real hosted CI before `done`; on FAIL, retain `review` and delegate a fresh Fix Agent. The local Docker mirror HTTP 403 remains an unverified profile smoke limit.
+- Coordinator delegates a fresh Fix Agent to make the Go CI/integration suite execute canonical Auth/User and WSS positive/negative fixture outcomes, reject malformed WSS envelope IDs, and cover these behaviors with focused tests. Then delegate a new independent Review Agent. Retain `review` and require applicable hosted CI before `done`. Local Go Compose smoke remains unverified because of Docker image access.
