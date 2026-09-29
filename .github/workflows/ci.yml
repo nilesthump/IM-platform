@@ -213,14 +213,15 @@ jobs:
     needs: classify
     if: needs.classify.outputs.deploy == 'true'
     runs-on: ubuntu-latest
-    env:
-      IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config
     steps:
       - uses: actions/checkout@v4
       - name: Prepare disposable Go profile configuration
         shell: pwsh
+        env:
+          IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config
         run: |
           New-Item -ItemType Directory -Path $env:IM_GO_CONFIG_DIR -Force | Out-Null
+          Add-Content -Path $env:GITHUB_ENV -Value "IM_GO_CONFIG_DIR=$env:IM_GO_CONFIG_DIR"
           Copy-Item backend/go/config.example.json (Join-Path $env:IM_GO_CONFIG_DIR 'config.json')
           [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'pg_password'), 'local-development-only')
           $key = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(48))

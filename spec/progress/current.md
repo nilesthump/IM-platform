@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh Go Auth hosted-CI Fix Agent moved the invalid deploy job-level `runner.temp` reference into the configuration preparation step and propagated its value through `GITHUB_ENV`; added a regression that detects the prior invalid placement. Local CI tests, HTTP/WSS verifiers, frozen hashes, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-fix-development.md`; Recorder `R-20260929T164238Z-6215f0a2-b090-4e45-8137-32eb19fa60e7`. Task stays `review`; next is fresh independent review and a new hosted CI run. S1 Gate NOT YET PASSED.
+
 - User-approved push of Go Auth review closure `ab81dd54fd3b6f4593bdacd89a08f28997e8c70c` to the remote task branch succeeded and remote SHA matched despite a reported Windows `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed immediately with zero jobs. The new deploy job-level `${{ runner.temp }}` expression is not permitted by GitHub's official context table; this is the leading workflow-validation cause. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; fresh Fix/Review and a new hosted CI run are required. S1 Gate NOT YET PASSED.
 
 - Fresh independent Review 2 of `LOOP1-GO-AUTH-001` candidate `c645014` **PASS locally** in a clean detached checkout. Live migrated PostgreSQL/NATS Go race tests execute canonical Auth/WSS fixtures; independent negative controls prove HTTP fixture outcomes and WSS UUID rejection are test-enforced. HTTP/WSS verifiers, frozen hashes, strict CTRL-002 Acceptance, CI tests, Go vet, and Compose configuration checks passed. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review2-pass.md`; Recorder `R-20260929T161307Z-fd438d62-f0ab-4d98-a031-b47933469e3a` finished PASS and integrity-valid (29 events). Task remains `review`; applicable real hosted CI is the next acceptance action, and S1 Gate has not passed. Last independently accepted base remains S0 `main` `09cec96`. Reviewer owns only task-linked review evidence/recovery/Recorder artifacts until committed; original `H:\IM-platform` unknown files remain untouched.
@@ -307,7 +309,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Delegate a fresh Fix Agent for the invalid deploy job-level `runner.temp` expression and focused workflow-context regression, then a different fresh independent Review Agent. Obtain a new applicable real hosted CI PASS before moving Go Auth to `done`. S1 Gate remains NOT YET PASSED.
+Delegate a different fresh independent Review Agent for the committed workflow-context fix candidate, then obtain a new applicable real hosted CI PASS before moving Go Auth to `done`. S1 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -318,6 +320,8 @@ Delegate a fresh Fix Agent for the invalid deploy job-level `runner.temp` expres
 `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md` (S0 Gate PASS recovery point on verified remote-main merge).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh Fix Agent `/root/go_auth_ci_fix` owns only the workflow-context repair, CI regression, task/current recovery, task-linked development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` unknown files remain untouched.
 
 - Coordinator owns only this hosted CI FAIL evidence, Task Spec/current recovery update, linked prompt and Recorder run until the diagnostic closure commit. The reviewed Go Auth product candidate and original `H:\IM-platform` unknown files remain unchanged.
 - Review 2 closure was committed cleanly at `ab81dd5`; its prior reviewer ownership is closed.
