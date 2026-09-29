@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CI-001
 title: Establish path-aware CI skeleton
-status: review
+status: done
 owner: /root
 stage: S0
 gate: S0
@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Operational CI acceptance **PASS**: user-approved reviewed evidence commit `9d1abc1` ran on GitHub Actions [36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147). Clean checkout, strict CTRL-002 Acceptance, 12 path/gate tests, classifier, and selected-job gate passed. This push selected no profile jobs because only research transport/review paths changed; independent matrix tests cover classification. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-operational-ci-acceptance.md`. Independent Review 5 accepted `0621f2b`; task moves `review -> done`. ADR-0001 bootstrap acceptance expires. S0 Stage Gate still requires clean main integration/evaluation.
+
 - Fresh independent Review 5 `/root/ci001_review5` **PASS** for exact committed candidate `0621f2b76aedecfb4fcb7a657bd977cc79e8e8ac`. Two separate `--no-local` clones with `core.autocrlf=true` and `false`, neither with `info/attributes`, passed strict CTRL-002 Acceptance with zero status/diff entries. All 42 historical Recorder blob object IDs and raw checkout bytes matched, both historical runs and Fix 4's run validated, 12 CI tests and frozen hashes passed, and no contract/architecture/Acceptance/workflow/gate path changed. Exact independent evidence, commands, exits, elapsed times, clean state, branch/diff range, and an exposed non-acceptance Recorder invocation failure: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review5-0621f2b-pass.md`; review Recorder `R-20260929T045735Z-19594017-8996-43dd-98a8-670c028c15c4`. Actual hosted CI remains pending; task stays `review`, S0 Gate NOT YET PASSED.
 
 - Fresh Fix 4 added exactly two Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`. Two genuinely separate clones without machine-local `info/attributes`, with `core.autocrlf=true` and `false`, both pass strict CTRL-002 Acceptance with zero status entries. All 42 historical blob object IDs and raw checkout bytes match; both original Recorder runs validate. Twelve CI tests pass. This remains Fix Agent development evidence pending fresh independent review and hosted CI. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Fix 4 Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Task `review`, S0 Gate NOT YET PASSED.
@@ -95,4 +97,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Coordinator obtains a passing actual GitHub Actions workflow run for the independently reviewed portable checkout candidate, then closes this task and evaluates S0 Gate. Task remains `review` until that evidence exists.
+- Integrate the accepted CI task closure into clean local `main`, run post-integration verification, and evaluate the actual S0 Gate checklist. Record a stable checkpoint. Do not activate S1 before Gate PASS.

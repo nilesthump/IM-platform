@@ -12,9 +12,11 @@ Current Batch: LOOP1-S0
 
 Current Task: LOOP1-CI-001
 
-Current Task State: review
+Current Task State: done
 
 ## Current Contract Work
+
+- `LOOP1-CI-001` operational CI acceptance **PASS**: user-approved push of reviewed `9d1abc1` triggered [GitHub Actions run 36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147), completed success. Clean checkout, strict CTRL-002 Acceptance, 12 CI tests, classifier and selected-job gate passed; the research-only diff selected no profile jobs. Independent Review 5 accepted `0621f2b` in portable clean clones. Closure evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-operational-ci-acceptance.md`. Task moves `review -> done`; ADR-0001 bootstrap exception expires. Next exact action: integrate this closure to clean local `main`, perform post-integration verification and evaluate the S0 Gate checklist/checkpoint. S0 Gate remains NOT YET PASSED until that evaluation. Last accepted local main before integration `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns only closure evidence/task/current and linked Recorder artifacts until committed.
 
 - Fresh independent CI Review 5 **PASS** for committed candidate `0621f2b76aedecfb4fcb7a657bd977cc79e8e8ac`: two independent clones without `info/attributes` and with `core.autocrlf=true` and `false` passed strict CTRL-002 Acceptance with zero status/diff; all 42 historical blob bytes and object IDs, 12 CI tests, frozen hashes, Recorder validity, and no-weakening scope passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review5-0621f2b-pass.md`; Recorder `R-20260929T045735Z-19594017-8996-43dd-98a8-670c028c15c4`. Next exact action: Coordinator obtains a new real GitHub Actions run and only closes this task after hosted PASS. Task stays `review`; S0 Gate NOT YET PASSED. Last accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only review evidence/probe, task/current recovery edits, and linked Recorder artifacts until committed.
 
@@ -266,13 +268,13 @@ Current Task State: review
 - OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
 - The Coordinator prospectively authorized the exact durable-evidence path for this repair cycle; that authorization does not retroactively excuse the prior hard violation.
 - The independent reviews of `74134bd306cbf0a1546f500bc46c45a1217b2d58` and `85069032c137cce6e526e0e329b6e93178515274` remain permanent FAIL records; accepted commit `aef6497d6216d9a8251250d157935e7af418d86b` supersedes them for task acceptance.
-- ADR-0001 remains active until `LOOP1-CI-001` is operational and `done`.
-- S0 remains NOT YET PASSED; the remaining Contract tasks, DB, Infra, and CI remain incomplete.
+- ADR-0001's temporary bootstrap acceptance exception expired when operational `LOOP1-CI-001` entered `done` after real GitHub Actions PASS; subsequent applicable task acceptance requires real CI.
+- All LOOP1-S0 required tasks are now `done`. S0 Gate remains NOT YET PASSED pending clean local-main integration and full checklist evaluation.
 - The Auth/User/Friend inputs constrain semantics but intentionally do not select endpoint paths, wire fields, implementation classes, or database tables.
 
 ## Next Exact Action
 
-Coordinator obtains a passing hosted GitHub Actions run for independent Review 5's accepted candidate and closes `LOOP1-CI-001` only after operational CI acceptance. S0 Gate NOT YET PASSED.
+Integrate the independently reviewed and actual-CI-accepted `LOOP1-CI-001` closure into clean local `main`; verify the integrated checkout and evaluate the S0 Gate checklist, then create a stable recovery checkpoint. S1 remains inactive until S0 Gate PASS.
 
 ## Last Known Good Commit
 
