@@ -29,6 +29,8 @@ Create the path-aware diff classifier and Go, Java, client, shared-contract, dep
 - `spec/tasks/**/LOOP1-CI-001.md`
 - `spec/progress/current.md`
 - `spec/tasks/backlog/.gitkeep` (exact queue-presence marker only; Coordinator-authorized after clean-checkout Review 1 FAIL)
+- `research/runs/R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb/blobs/.gitattributes` (exact portable Git transport metadata only; Coordinator-authorized after hosted run 36521060867 exposed CRLF blob checkout dirt)
+- `research/runs/R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a/blobs/.gitattributes` (same exact transport repair; historical Recorder blob bytes must remain unchanged)
 
 The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOOP1-CI-001/**`, accepted checkpoint `spec/progress/checkpoints/*loop1-ci-001*.md`, and this task's `research/prompts/**` and `research/runs/**` artifacts for instrumentation, review, and handoff only. These paths do not authorize product-scope expansion.
 
@@ -49,6 +51,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 - Run `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development; Acceptance only from a clean committed independent checkout.
 
 # Evidence
+
+- Coordinator prospectively authorized the two exact historical Recorder `blobs/.gitattributes` paths above after hosted diagnostic run `36521060867` identified 17 checkout-modified stdout blobs. The repair must preserve every historical blob Git object ID and Recorder validation result, and pass a fresh clone with no machine-local `info/attributes` overrides. No broader `research/**` write permission is granted.
 
 - User-approved diagnostic branch push `0e6ce82` triggered actual GitHub Actions run `36521060867`, which **FAIL** with 17 modified historical Recorder stdout blobs immediately after checkout. Machine-local Git info attributes masked those bytes in local clean checkouts; repository `research/.gitattributes` applies LF checkout. The strict CTRL-002 Acceptance and gate rejected the dirty tree. Exact run/cause: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`. Fresh Fix/Review required; task `review`, S0 Gate NOT YET PASSED.
 
