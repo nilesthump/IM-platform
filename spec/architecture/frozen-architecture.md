@@ -1,17 +1,17 @@
 # 面向十万级在线连接的可扩展分布式即时通信平台
 
-**架构基线 v1.0 · Frozen Architecture · Loop 1 执行版**
+**架构基线 v1.1 · Frozen Architecture · Loop 1 执行版**
 
 **正式架构方案 · Loop 1 可执行基线 · AI Agent 工作手册**
 
 ## 决策状态
 
-本文件把当前对话中已冻结的架构决策固化为唯一执行基线。新 Agent 可据此启动，但不得绕过 spec/ 中的权威契约，也不得把未来目标写成当前能力。
+本文件把当前对话中已冻结的架构决策固化为唯一执行基线。新 Agent 可据此启动，但不得绕过 contracts/ 中的机器可验证公共契约，也不得把未来目标写成当前能力。
 
 | 文档属性 | 值 |
 | --- | --- |
-| 版本 | v1.0 |
-| 基线日期 | 2026-09-19 |
+| 版本 | v1.1 |
+| 基线日期 | 2026-09-30（原始基线 2026-09-19） |
 | 执行周期 | Loop 1: 三个月 / 12 周预算窗口 |
 | 推进机制 | 里程碑门禁驱动；Gate 提前通过即可立即进入下一阶段 |
 | 当前容量验收 | 单机 8C / 16GB / 3TB；5000 authenticated WSS users |
@@ -22,7 +22,7 @@
 
 ## 目录
 
-原 PDF 的章节及附录索引；各项可跳转至本 Markdown 的对应标题。
+现行章节及附录索引；原 PDF 页码仅用于历史来源定位，不限制现行规范的修订。v1.1 冲突消解依据 ADR-0003；历史格式迁移仍由 ADR-0002 记录。
 
 - [0. 执行摘要](#section-0) · 原 PDF 第 5 页
 - [1. 项目目标、成功定义与边界](#section-1) · 原 PDF 第 6 页
@@ -135,16 +135,16 @@ flowchart LR
   Core --> Plugin
   Core --> PG
   Core --> NATS
-  NATS --> PG
+  NATS --> Gateway
 ```
 
 > 图 0-1 总体逻辑架构：PostgreSQL 是事实来源，NATS 是实时通知总线；Gateway 只承担接入与 fan-out。
 
-> 原图同时绘有 NATS → PostgreSQL 连线；此处照录其方向。该线的具体运行含义未在原图标注，不据此改变正文对 PostgreSQL 事实来源与 NATS 实时通知总线的定义。
+> 实时路径为 Core 的 Outbox dispatcher → NATS → Gateway；PostgreSQL 写入由 Core 事务负责。历史 PDF 的 NATS → PostgreSQL 箭头只保留在历史来源中，不代表现行运行依赖。
 
 #### 四条总纲
 
-1. 公共契约是唯一权威，Go 与 Java/Spring 只是独立实现；
+1. contracts/ 是机器可验证公共契约的唯一来源；总体权威顺序见 §2.2，Go 与 Java/Spring 是独立实现；
 2. 消息可靠性来自 PostgreSQL + Outbox + Sync，不来自 NATS；
 3. Agent 可改代码但无权自行宣布正确，CI 是独立事实裁判；
 4. 未经架构决策流程，任何 Agent 不得修改 frozen architecture。
@@ -213,16 +213,16 @@ Loop 1 不把 Redis、Kafka、分库分表、自动数据库切主视为必选�
 <a id="section-2-1"></a>
 ### 2.1 Frozen Architecture 变更协议
 
-- 禁止：直接修改 frozen spec / contracts / DB invariants / plugin security boundary
+- 禁止：未经明确批准直接修改 frozen spec / contracts / DB invariants / plugin security boundary
 - 允许：创建 Architecture Change Proposal (ACP) 或 ADR 草案
-- 流程：提出动机 -> 影响分析 -> 兼容/迁移/回滚方案 -> 架构负责人批准 -> 更新契约 -> 全平台兼容 CI -> 实施
+- 流程：提出动机 -> 影响分析 -> 兼容/迁移/回滚方案 -> 架构负责人批准 -> 修订现行正文及基线 -> 按影响更新契约（仅在授权改变契约时）与执行约束 -> 独立 Review 与适用 CI -> 实施迁移并验证。不得以尚待迁移实现违反新规则为由永久豁免；规则交付和产品最终合规分别验收。
 
 Agent 遇到与 frozen architecture 冲突的任务时必须停止该冲突部分，在任务记录中标记 BLOCKED_BY_ARCHITECTURE，并提出最小决策问题。不得用“实现方便”作为静默改变协议、唯一约束、ACK 语义或安全边界的理由。
 
 <a id="section-2-2"></a>
 ### 2.2 权威顺序
 
-1. spec/architecture/decisions/ (已批准 ADR / frozen decision)
+1. 本 Frozen Architecture（由 spec/architecture/README.md 与 baseline.md 解析）及 spec/architecture/decisions/ 的已批准 ADR / frozen decision。ADR 记录动机、批准来源和迁移；批准的现行规则必须落实到正文。同等权威存在无法消解的实质冲突时停止冲突部分并提出最小决策问题。
 
 2. contracts/ (机器可验证的公共契约)
 
@@ -256,12 +256,12 @@ flowchart LR
   Core --> Plugin
   Core --> PG
   Core --> NATS
-  NATS --> PG
+  NATS --> Gateway
 ```
 
 > 图 3-1 逻辑组件图。
 
-> 原图同时绘有 NATS → PostgreSQL 连线；此处照录其方向。该线的具体运行含义未在原图标注，不据此改变正文对 PostgreSQL 事实来源与 NATS 实时通知总线的定义。
+> 实时路径为 Core 的 Outbox dispatcher → NATS → Gateway；PostgreSQL 写入由 Core 事务负责。历史 PDF 的 NATS → PostgreSQL 箭头只保留在历史来源中，不代表现行运行依赖。
 
 <a id="section-3-1"></a>
 ### 3.1 三个物理部署单元
@@ -270,7 +270,7 @@ flowchart LR
 | --- | --- | --- |
 | gateway | TLS 之后的 WSS 生命周期、auth.bind、session/cache 校验、connection registry、协议路由、local fan-out、heartbeat/限流 | 好友/群成员规则、消息持久化、插件业务逻辑 |
 | core | Auth、Session、User、Friendship、Conversation、Message、Sync、Outbox；模块化单体 | 不可信插件执行；大量 socket 连接状态 |
-| plugin-host | WASM runtime、事件分派、Query/Action 代理、资源限制、熔断、编译缓存 | 直接访问数据库/文件/任意网络；成为 IM 主链单点 |
+| plugin-host | WASM runtime、事件分派、经授权的 Query/Action Host bridge、资源限制、熔断、编译缓存 | 不可信 WASM 直接访问数据库/文件/任意网络；绕过 Core 业务授权；成为 IM 主链单点 |
 
 <a id="section-3-2"></a>
 ### 3.2 运行 profile
@@ -282,15 +282,15 @@ docker compose --profile java up
 # gateway-java + core-java + plugin-host adapter + same canonical schema/contracts
 ```
 
-profile 的目标是行为可替换，不是源码结构相同。Go 与 Java 可使用各自惯用的框架和组织方式，但必须共享：公共契约、数据库迁移语义、错误码、测试向量、插件 API、Release Manifest 格式。
+profile 的目标是行为可替换；服务内部源码结构可以不同，但 §3 职责、§10 服务源码归属和依赖方向共同约束两个后端。Go 与 Java 可使用各自惯用的框架和组织方式，但必须共享：公共契约、数据库迁移语义、错误码、测试向量、插件 API、Release Manifest 格式。
 
 <a id="section-3-3"></a>
 ### 3.3 Loop 1 单机部署
 
 | 层 | Loop 1 单机部署规则 |
 | --- | --- |
-| 入口 | TLS reverse proxy 暴露 HTTPS/WSS；所有测试流量经过真实入口 |
-| 服务 | 仅启动一个后端 profile；gateway/core/plugin-host 可为独立进程/容器 |
+| 入口 | TLS reverse proxy 暴露 HTTPS/WSS；部署 smoke、E2E、容量与发布验收流量经过真实入口。单元和隔离集成测试可直接访问被测组件，但不得替代入口验收 |
+| 服务 | 仅启动一个后端 profile；gateway/core/plugin-host 为可独立启动的部署角色。可复用一个构建制品按角色启动；不强制三个 module 或三个 binary，禁止把源码职责混为一个业务包 |
 | 数据 | PostgreSQL 单实例；所有 migration 有 forward/rollback 规则 |
 | 事件 | Core NATS，默认非事实来源；Outbox dispatcher 可重放 |
 | 存储 | 3TB 是机器容量约束，不代表测试必须填满；记录实际占用与增长 |
@@ -310,13 +310,13 @@ flowchart LR
   Artifact["PluginArtifact<br/>version / hashes<br/>immutable"]
   Outbox["OutboxEvent<br/>aggregate / payload<br/>published_at"]
   KV["PluginKV<br/>schema_version<br/>conversation scope"]
-  User -->|"1 : 0..3"| Session
+  User -->|"有效槽位 1 : 0..3"| Session
   User --> Friendship
   Friendship -->|"pair → direct"| Conversation
   User -->|"member"| Member
   Member -->|"1 : N"| Message
   Message -->|"N : 1"| Conversation
-  Message -->|"1 : 1+"| Outbox
+  Message -->|"1 : 1 logical message.created"| Outbox
   Instance -->|"N : 1"| Artifact
   Instance -->|"1 : N"| KV
 ```
@@ -328,7 +328,7 @@ flowchart LR
 
 每个用户拥有 WEB、DESKTOP、MOBILE 三个登录槽位。每种 client_type 同时最多一个有效 Session，但三种端可同时登录。同端新登录必须在事务中撤销旧 Session 并递增 session_epoch。PostgreSQL 是登录状态权威；Gateway 内存是在线连接与路由缓存。
 
-- UNIQUE(user_id, client_type)
+- 每个 (user_id, client_type) 最多一个有效槽位；当前 contracts/database 定义为每槽一行，替换时原子轮换 session_id 与 epoch。本图不定义历史 Session 总量或另行创建历史表。
 - Access Token: user_id, session_id, client_type, session_epoch, iat, exp
 - Refresh Token: 只存 hash，可独立撤销
 - WSS: 先建立 TLS/WebSocket，再发送 auth.bind；禁止 token 放 URL query
@@ -369,12 +369,16 @@ sequenceDiagram
   participant Bus as Outbox/NATS
   participant Receiver as 接收端
   Sender->>Gateway: message.send(request_id)
-  Gateway->>Core: 鉴权 + 成员校验
+  Gateway->>Core: 转发绑定身份与发送请求
+  Core->>Core: 校验成员权限与业务规则
   Core->>PG: BEGIN / seq / message / outbox
   PG-->>Core: COMMIT 成功
-  Core-->>Sender: ACK = durable commit
-  PG->>Bus: dispatcher 发布
-  Bus->>Receiver: message.created fan-out
+  Core-->>Gateway: ACK = durable commit
+  Gateway-->>Sender: 转发 ACK
+  Core->>PG: Outbox dispatcher 读取已提交事件
+  Core->>Bus: dispatcher 可重试发布
+  Bus->>Gateway: message.created
+  Gateway->>Receiver: local fan-out
 ```
 
 > 图 5-1 私聊消息时序图。ACK 的唯一成功语义是 message 与 outbox 已持久化提交。
@@ -432,6 +436,8 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
 <a id="section-6-2"></a>
 ### 6.2 Optimistic write 与状态机
 
+以下 SQLite 持久状态机适用于 Desktop/Mobile；Web 使用内存态收敛，不引入聊天历史数据库。
+
 1. 用户点击发送
 2. -> 生成不可变 request_id
 3. -> SQLite 事务 UPSERT，state=SENDING
@@ -476,7 +482,7 @@ user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频
 <a id="section-7-1"></a>
 ### 7.1 登录与 Token
 
-- POST /auth/login 包含 username/password、client_type、device_id、client_version、protocol_version。
+- 登录端点、字段名、版本与传输形状由 contracts/http/ 定义（当前为 POST /v1/auth/login）。本章 snake_case 领域名称不是另一套 wire schema。
 
 - Access Token 短期、Refresh Token 长期；具体时长是配置，不写死进协议。
 
@@ -496,7 +502,7 @@ user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频
 <a id="section-7-3"></a>
 ### 7.3 Session 缓存一致性
 
-Core 在 Session 创建/撤销事务中写 outbox；Gateway 经 NATS 更新内存映射 (user_id, client_type) ->session_id/epoch/connection_id。每条消息不查询 PostgreSQL。实时撤销事件是体验优化；数据库权威状态和 epoch 确保旧 token 最终无法重连。
+Core 在 Session 创建/撤销事务中写 outbox；Gateway 经 NATS 更新内存映射 (user_id, client_type) ->session_id/epoch/connection_id。每条消息不查询 PostgreSQL。实时撤销事件是体验优化；每次新绑定/重连必须验证数据库权威 Session ID 与 epoch，拒绝旧凭据；不得把实时撤销事件作为唯一有效性来源。Gateway 只拥有验证/连接能力；注册、登录、刷新、退出、Session 写事务及其 Outbox 属于 Core，不能通过共享完整 Auth 服务绕过边界。
 
 <a id="section-7-4"></a>
 ### 7.4 传输与日志安全
@@ -559,12 +565,18 @@ UNIQUE(plugin_id, version)。同一版本的 package/backend/renderer hash 变�
 
 ```mermaid
 flowchart LR
-  Uploaded["UPLOADED"] --> Validating["VALIDATING"] --> Verified["VERIFIED"] --> Installing["INSTALLING"] --> Enabled["ENABLED"]
+  subgraph Artifact["不可变制品"]
+    Uploaded["UPLOADED"] --> Validating["VALIDATING"] --> Verified["VERIFIED"]
+  end
+  Verified -.->|"安装前提，不是同一状态机"| Installing
+  subgraph Instance["Conversation 实例"]
+    Installing["INSTALLING"] --> Enabled["ENABLED"]
   Enabled --> Disabled["DISABLED"] --> Uninstalled["UNINSTALLED"] --> Retained["RETAINED"] --> Purged["PURGED"]
   Disabled -->|"re-enable"| Enabled
+  end
   Exception["异常旁路<br/>VALIDATION / INSTALL / RUNTIME / ROLLBACK_FAILED"]
   Upgrade["升级<br/>旧版保持 ENABLED → 快照/迁移/健康检查 → 原子切换；失败回滚"]
-  %% 异常旁路与升级为原图的独立说明框，无连线。
+  %% 异常及升级仍遵循正文和 canonical lifecycle contracts。
 ```
 
 > 图 9-1 插件制品与实例生命周期。Artifact 状态和 Conversation 下 Instance 状态必须分离。
@@ -589,7 +601,7 @@ Plugin Instance 维护 active_version、desired_version、previous_version。升
 | --- | --- | --- |
 | DISABLE | 停止接收新事件与产生 Action，隐藏入口，可重新 enable | 保留 |
 | UNINSTALL | Conversation 不再持有活动实例 | 默认 RETAINED |
-| PURGE | 显式不可逆清理操作；需要高权限和审计 | 删除前必须确认保留策略 |
+| PURGE | 显式不可逆清理操作；需要高权限和审计 | 删除前必须确认保留策略；不得删除仍被历史消息引用且必须保留的 renderer |
 
 <a id="section-9-4"></a>
 ### 9.4 官方兼容 fixtures
@@ -603,8 +615,8 @@ Loop 1 必须提供 Echo Plugin 和 Poll Plugin。Echo 验证 event -> WASM -> a
 /
 ├── spec/
 │ ├── architecture/
-│ │ ├── overview.md
-│ │ ├── service-boundaries.md
+│ │ ├── README.md + baseline.md # resolver 与完整性元数据
+│ │ ├── frozen-architecture.md # 唯一现行正文
 │ │ └── decisions/ # ADR + frozen decisions
 │ ├── domain/ # auth/user/friend/conversation/message/sync/plugin
 │ ├── invariants/ # 跨语言不可变量
@@ -622,8 +634,8 @@ Loop 1 必须提供 Echo Plugin 和 Poll Plugin。Echo 验证 event -> WASM -> a
 │ ├── plugin-api/
 │ └── fixtures/ # golden vectors / old clients / plugins
 ├── backend/
-│ ├── go/{gateway,core,plugin-host,tests}/
-│ └── java/{gateway,core,plugin-host,tests}/
+│ ├── go/{gateway,core,plugin-host,tests,shared}/
+│ └── java/{gateway,core,plugin-host,tests,shared}/
 ├── clients/
 │ ├── shared/{protocol-sdk,plugin-sdk,ui}/
 │ ├── web/
@@ -635,6 +647,16 @@ Loop 1 必须提供 Echo Plugin 和 Poll Plugin。Echo 验证 event -> WASM -> a
 ├── ci/
 └── tools/
 ```
+
+### 服务源码与依赖规则（Go / Java 共同适用）
+
+- **SRC-01**：`backend/<language>/gateway/**` 只实现 §3.1 Gateway；`core/**` 拥有 Auth/Session 写事务、User/Friend/Conversation/Message/Sync/Outbox；`plugin-host/**` 拥有受控插件执行与代理。业务源码 MUST 位于对应服务范围，不能放在语言根目录或未批准的 `internal/**` 业务目录。
+- **SRC-02**：语言根目录只白名单允许入口装配（Go `main.go`、Java `Main.java`）、模块/依赖/构建文件（Go `go.mod`/`go.sum`，Java `pom.xml` 或 Gradle 配置）、Dockerfile、README.md、config.example.json 及根入口测试（Go `main_test.go`、Java `MainTest.java`）。入口只能读取配置、选择角色、连接依赖、启动/关闭对应服务；不得实现路由业务、Auth 服务或 Session 写逻辑。根测试仅验证装配，服务测试与职责同迁或置于 `tests/**`；不能以测试文件名藏业务实现。新增根源码例外必须先明确批准、列入检查器白名单并限定用途。
+- **SRC-03**：`shared/**` 可承载配置读取、日志、连接建立、通用编解码、密码学/令牌原语和由 canonical contracts 约束的传输数据类型。共享包 MUST NOT 承载完整 Auth 服务、注册/登录/刷新/退出流程、Session 写事务、业务仓储、权限/成员决策、Outbox 业务编排，亦不得反向依赖任何服务包。Gateway 的只读权威 Session 校验归 Gateway；Core 保有写事务。共享不是绕过职责的后门。
+- **SRC-04**：服务可依赖共享支持与本服务内部包；任何服务 MUST NOT 直接 import/依赖另一服务内部实现。服务间通过现有授权的 HTTP/WSS/事件/受控 Host bridge 边界协作；不因源码整改新增 RPC、公共契约、module 或基础设施。根装配可依赖各服务的最小启动接口，测试可跨服务作黑盒组合验证，均不得成为运行期业务反向依赖。
+- **SRC-05**：Go 与 Java 可使用不同的服务内部包/模块/线程组织；共同职责、物理角色和上述源码边界不可被“行为等价”豁免。不强制三 module、三 binary 或多层架构。Reviewer 检查实际职责和 import 图，不只看文件名或目录存在。
+- **SRC-06**：S0 历史占位白名单为 Go `backend/go/main.go` 与 Java `backend/java/InfraPlaceholder.java` 的非业务启动/健康/transport echo 骨架；清单不允许其承载业务。按后端分别退出：该后端第一次业务实现开始即移除业务路径的占位豁免；另一后端仍按明确占位清单验证，不能永久跳过结构规则。新规则暴露的旧实现偏离必须在迁移任务消除，不能 grandfather。单次跨服务迁移需 Task Spec 明确列出迁移文件/职责、范围和退出条件。
+- **SRC-07**：Task `allowed_paths` 仅限定可修改范围，不是架构豁免。普通业务任务按服务职责收窄；结构/依赖检查和行为测试共同验收。规范冲突必须在实现前升级，禁止事后修改架构追认错误布局。
 
 <a id="section-10-1"></a>
 ### 10.1 spec/ 各目录的职责
@@ -663,7 +685,7 @@ Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户�
 
 | 必须相同 | 允许不同 |
 | --- | --- |
-| HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、插件权限、数据库结果 | 框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部接口 |
+| HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、插件权限、数据库结果；§3/§10 服务职责、源码归属和依赖方向 | 服务内部框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部接口 |
 | Release Manifest、健康检查、metrics 标签、日志关联字段 | 内部模块名称与代码风格 |
 
 <a id="section-11-3"></a>
@@ -686,13 +708,16 @@ Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户�
 
 ```mermaid
 flowchart LR
-  Context["读取上下文"] --> Repo["恢复仓库状态"] --> Plan["PLAN"] --> Implement["IMPLEMENT"] --> Test["TEST"] --> Review["REVIEW"] --> Handoff["HANDOFF"]
-  Review --> Failure["失败修复环<br/>仅在 task.allowed_paths 内修改"]
-  Failure --> Complete["完成记录<br/>current.md + checkpoint + tests"]
-  Complete --> Handoff
+  Context["读取上下文"] --> Repo["恢复真实任务状态"] --> Plan["PLAN"] --> Implement["新 Implementation Agent"] --> Test["本地验证 + 候选提交"] --> Review["新独立 Review Agent"]
+  Review -->|"FAIL"| Failure["新 Fix Agent；授权范围内修复"]
+  Failure --> Test
+  Review -->|"PASS"| CI["适用真实 CI；核对 head SHA 与必跑作业"]
+  CI -->|"FAIL"| Failure
+  CI -->|"PASS"| Complete["接受任务；更新队列/证据/current/checkpoint"]
+  Complete --> Handoff["HANDOFF / 下一依赖满足任务"]
 ```
 
-> 职责隔离可以由不同 Agent 或同一模型的不同上下文阶段实现；验收依据始终是 spec + contracts + diff + test result。
+> 实现/修复与接受候选的 Review 必须是真实不同的新上下文；同一上下文改角色名不是独立审查。单写者；普通失败进入修复与新的独立 Review 循环。验收依据是权威规范、契约、候选 diff、结构/依赖/最小性检查及真实测试结果。
 >
 > 图 12-1 Agent 工作流。开发自动化和 CI/CD 是两个独立系统。
 
@@ -703,14 +728,16 @@ flowchart LR
 task_id: LOOP1-MSG-003
 goal: implement WSS text message sending
 inputs:
+ - spec/architecture/README.md # resolve §3/§10/§11 + Minimality Contract
  - spec/domain/messaging.md
  - spec/invariants/messaging.md
- - contracts/websocket/message/
+ - contracts/websocket/
 allowed_paths:
- - backend/go/internal/message/**
- - backend/go/internal/outbox/**
+ - backend/go/core/message/**
+ - backend/go/core/outbox/**
  - backend/go/tests/**
 acceptance:
+ - applicable source ownership and dependency checks pass
  - contract tests pass
  - retry is idempotent
  - ACK only after durable commit
@@ -728,7 +755,7 @@ backlog -> ready -> active -> review -> done
 - 进入 ready: inputs 完整、依赖完成、验收可执行
 - 进入 active: 分配唯一 owner/agent、建立 task branch
 - 进入 review: 实现完成 + 本地最小验证 + handoff 完整
-- 进入 done: 独立 CI Gate PASS + review 接受 + progress 更新
+- 进入 done: 对精确候选的适用真实 CI PASS + 新独立 review 接受 + progress 更新；Task PASS 不等于整个 Stage Gate PASS。ADR-0001 临时 bootstrap 机制仅在 LOOP1-CI-001 operational 且 done 前有效，现已失效，不得恢复为绕过方式。
 
 <a id="section-12-3"></a>
 ### 12.3 Git 工作模式
@@ -745,8 +772,8 @@ backlog -> ready -> active -> review -> done
 | --- | --- | --- |
 | 1 | spec/handoff/agent-context.md | 理解项目边界、frozen decisions 与工作方式 |
 | 2 | spec/progress/current.md | 知道当前 Stage、Gate、最后已验证commit、blockers |
-| 3 | spec/tasks/active/.md；若无 active 则选 ready 首项 | 确认 goal、allowed_paths、acceptance、forbidden |
-| 4 | 任务引用的 domain/invariants/decisions/contracts | 能复述不可变量和输入输出 |
+| 3 | 按 current.md 的精确 Current Task ID 查找 backlog/ready/active/review/done，必须唯一且 status 匹配 | review 继续独立审查/修复；active 继续实现；ready 验依赖后激活；backlog 保持阻塞；仅当前 done 且无未完当前任务才按依赖选下一任务，禁止 active 为空就跳任务 |
+| 4 | resolver/hash、现行冻结正文适用 §3/§10/§11、批准 ADR、Minimality 及任务引用的 domain/invariants/acceptance/contracts | 能复述职责、源码/依赖边界、不可变量、输入输出与验收 |
 | 5 | git status、当前 diff、最近提交 | 识别用户/前 Agent 未完成改动，不覆盖 |
 | 6 | 最小基线验证 | 确认仓库状态可继续；失败则记录而非盲改 |
 | 7 | PLAN -> IMPLEMENT -> TEST -> REVIEW | 仅在授权路径与任务范围内工作 |
@@ -771,7 +798,7 @@ backlog -> ready -> active -> review -> done
 
 #### 崩溃恢复目标
 
-新的 Agent 不扫描整个仓库重新猜架构。它通过 agent-context -> current -> active task -> referenced specs/contracts -> git diff 在一个可控上下文中恢复工作。
+新的 Agent 不扫描整个仓库重新猜架构。它通过 agent-context -> current -> 精确 Current Task 的真实队列状态 -> referenced specs/contracts -> git status/diff/commits 在一个可控上下文中恢复工作。
 
 <a id="section-14"></a>
 ## 14. CI/CD 独立校验架构
@@ -779,7 +806,14 @@ backlog -> ready -> active -> review -> done
 ```mermaid
 flowchart LR
   Diff["Diff 分类"]
-  Diff --> GoPath["backend/go/**"] --> JavaPath["backend/java/**"] --> Shared["contracts/** / DB"]
+  Diff --> GoPath["backend/go/**"]
+  Diff --> JavaPath["backend/java/**"]
+  Diff --> Shared["contracts/** / DB / shared SDK"]
+  Diff --> Rules["architecture / Agent / task template / acceptance / checker"]
+  Rules --> Structure["规范 + 源码归属 + 依赖 + 触发负例"]
+  GoCI --> Structure
+  JavaCI --> Structure
+  Structure --> Gate
   GoPath --> GoCI["Go CI<br/>unit + integration<br/>contract"]
   JavaPath --> JavaCI["Java CI<br/>unit + integration<br/>contract"]
   Shared --> Matrix["全平台兼容矩阵<br/>Go + Java + clients<br/>plugin + migration"]
@@ -791,7 +825,7 @@ flowchart LR
 
 > Agent 负责提出变更；CI 独立验证事实。Agent 无权自行宣布 Gate 通过。
 >
-> 图 14-1 Path-aware CI DAG。公共契约变更是唯一需要无条件放大全平台验证的路径。
+> 图 14-1 Path-aware CI DAG。分类分支相互独立；公共契约/schema/shared SDK 变更按表触发兼容矩阵，规范与检查器变更必须触发适用架构检查。部署/发布节点表示相应阶段要求，不把未来发布能力冒充当前 skeleton。
 
 <a id="section-14-1"></a>
 ### 14.1 路径感知规则
@@ -803,7 +837,8 @@ flowchart LR
 | clients/web/** | Web unit/build/protocol/plugin UI tests |
 | clients/desktop/** 或 clients/mobile/** | 对应客户端 + SQLite migration + protocol tests |
 | contracts/**、数据库迁移、shared protocol/plugin SDK | Go + Java + Web + Desktop + Mobile + old client fixtures + plugin fixtures + migration compatibility |
-| deploy/**、ci/** | compose/manifest/security/smoke/rollback validation |
+| deploy/**、ci/**、.github/workflows/** | 按当前阶段执行 compose/manifest/security/smoke/rollback validation，并验证分类与 Gate |
+| spec/architecture/**、Agent 入口、handoff、活动任务/模板/batch、acceptance、架构检查器与测试 | baseline/resolver/ADR 一致性、活动引用、源码归属、Go/Java 适用阶段依赖检查、触发与正负控制；Markdown-only 不能全部跳过 |
 
 <a id="section-14-2"></a>
 ### 14.2 流水线层次
@@ -815,12 +850,12 @@ static/lint -> unit -> contract -> integration -> compatibility -> build
 <a id="section-14-3"></a>
 ### 14.3 兼容矩阵
 
-最低矩阵包含 Client Protocol v1、v2、HEAD；Go/Java profile；Echo/Poll 插件 fixture；SQLite old schema fixtures。服务端只维护一个当前实现版本与有限兼容窗口。latest/recommended/min_supported 必须在 Release Manifest 中显式声明，客户端版本号与 protocol_version 不绑定。
+完整兼容阶段的最低矩阵包含 Client Protocol v1、v2、HEAD；在相应协议与客户端版本尚未定义的早期阶段，只能明确报告现有契约向量/占位检查，不能虚构 v2 或声称已通过完整矩阵；后续阶段不得永久豁免。Go/Java profile；Echo/Poll 插件 fixture；SQLite old schema fixtures。服务端只维护一个当前实现版本与有限兼容窗口。latest/recommended/min_supported 必须在 Release Manifest 中显式声明，客户端版本号与 protocol_version 不绑定。
 
 <a id="section-14-4"></a>
 ### 14.4 CI 与 Agent 的信任边界
 
-Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从干净 checkout 重建后判定。任何需要跳过测试、重录 golden fixture、降低阈值或更改验收项的动作都视为架构/验收变更，必须单独审批。
+Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从干净 checkout 重建后判定。核对精确 head SHA、要求运行的作业及实际结果；必跑作业缺失、异常 skip、失败或取消均不满足 Gate。测试环境未启用导致的 skip 不是集成 PASS；旧提交的绿色不覆盖新增要求。历史 ADR-0001 的适用及失效条件见 §12.2。任何需要跳过测试、重录 golden fixture、降低阈值或更改验收项的动作都视为架构/验收变更，必须单独审批。
 
 <a id="section-15"></a>
 ## 15. Loop 1: 12 周预算、里程碑门禁驱动
@@ -948,7 +983,7 @@ verification evidence links
 <a id="section-18-1"></a>
 ### 18.1 关联标识
 
-所有链路使用 request_id、server_message_id、conversation_id、session_id（脱敏）、outbox_event_id、plugin_instance_id 关联。Trace 跨 Gateway/Core/DB/Outbox/NATS/Plugin Host 传播，但消息正文与 token 默认不采集。
+所有链路使用 request_id、server_message_id、conversation_id、session_id（脱敏）、outbox_event_id、plugin_instance_id 关联。Trace 跨 Gateway/Core/DB/Outbox/NATS/Plugin Host 传播，消息正文默认不采集；token 严禁进入日志或 trace，与 §7.4 一致。
 
 <a id="section-18-2"></a>
 ### 18.2 健康与就绪
@@ -964,7 +999,7 @@ verification evidence links
 
 - TLS 配置、依赖/SBOM、镜像/插件签名、secret 扫描、最小容器权限纳入 CI。
 
-- WSS 鉴权前只允许 auth.bind/ping；每条业务命令校验绑定 Session 与权限。
+- WSS 鉴权前只允许 auth.bind/ping/pong；每条业务命令校验绑定 Session 与权限。
 
 - 好友、群成员、消息、插件 Action 都有服务端授权；不可相信客户端 UI 隐藏。
 
@@ -980,7 +1015,7 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 <a id="section-19"></a>
 ## 19. 第一批 Agent 可执行任务
 
-任务必须逐个进入 ready。S0 Gate 未通过前，S1 任务不得 active；依此类推。下面清单按依赖顺序排列，不授权并行修改同一契约。
+任务必须逐个进入 ready。S0 Gate 未通过前，S1 任务不得 active；依此类推。下面清单是阶段规划，不是现行队列快照；按 Task Spec 的真实依赖选择，不以表格/文件名顺序代替依赖。不授权并行修改同一契约。
 
 | Task ID | 目标 | 阶段 | 交付物 | 验收 |
 | --- | --- | --- | --- | --- |
@@ -1051,7 +1086,7 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 - PLAN: 从 acceptance 倒推最小实现与测试
 - IMPLEMENT: 只改 allowed_paths；先写/更新测试向量
 - TEST: unit -> contract -> integration 的最小相关集合
-- REVIEW: 重新读取 spec/contracts，检查 diff 与不变量
+- REVIEW: 新独立 Reviewer 重新读取权威输入，检查行为、职责归属、依赖方向、最小性、diff 与不变量；实现者自检不能替代
 - HANDOFF: 更新 task + current.md；Gate 点生成 checkpoint
 
 <a id="section-21-3"></a>
@@ -1086,7 +1121,7 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 
 - 功能/交付物完成且与 Task Spec 一致。
 
-- 自动化测试在干净环境通过，兼容性未破坏。
+- 自动化测试在干净环境通过，兼容性未破坏；适用源码/依赖/规范检查通过，新独立 Review 与精确候选 hosted CI 有效。
 
 - 无未处理 blocker、未批准架构偏离或隐藏 skip。
 
@@ -1108,8 +1143,8 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 | Sync | user cursor 只管低频状态；消息按 conversation seq；contiguous_seq 不跨 gap |
 | Web | 无聊天 DB、无离线历史；页面生命周期之外不保证消息状态 |
 | Plugin | 版本制品不可变；权限最小化；WASM/renderer sandbox；后端与 renderer 同版本原子绑定 |
-| Architecture | 公共契约唯一权威；Agent 不得越权修改 frozen decisions |
-| CI | 只测被修改后端；shared contract/schema/SDK 变更触发全平台兼容测试 |
+| Architecture | §2.2 权威顺序；contracts/ 是机器可验证公共契约唯一来源；§3/§10 服务职责/源码归属/依赖共同约束 Go/Java；allowed_paths 不豁免架构 |
+| CI | 后端路径感知；shared contract/schema/SDK 变更触发兼容矩阵；规范/Agent/模板/检查器变更触发适用架构验证；必跑作业缺失/失败/异常 skip 不能 PASS |
 | Release | 不可变制品 + manifest；expand/migrate/switch/contract；发布前验证回滚 |
 
 #### 文档结束

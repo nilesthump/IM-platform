@@ -8,3 +8,5 @@ This file is a resolver, not an independent architecture specification.
 4. Apply approved decisions in [`decisions/`](./decisions/) through the documented architecture process.
 
 The manifest and this index contain discovery and migration metadata only. They do not summarize, replace, or silently reinterpret the canonical Markdown. The PDF is an immutable pre-migration snapshot, not an active second canonical source. The Markdown remains frozen under the same ACP/ADR approval rule.
+
+Current revision: v1.1 conflict resolution under ADR-0003. The manifest separates current revision semantics from ADR-0002 historical representation-only migration. Review/CI acceptance status is recorded in the current task and evidence; historical PDF bytes remain immutable.
