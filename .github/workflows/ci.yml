@@ -59,16 +59,53 @@ jobs:
     needs: classify
     if: needs.classify.outputs.go == 'true'
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: im_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d im_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      nats:
+        image: nats:2.10-alpine
+        ports:
+          - 4222:4222
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: ci-only-password
+      PGDATABASE: im_ci
+      DB_TEST_ENABLE: '1'
+      NATS_URL: nats://localhost:4222
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23'
-      - name: Go S0 compile and test
+          cache-dependency-path: backend/go/go.sum
+      - name: Install PostgreSQL client
         run: |
-          python3 ci/check_s0_boundary.py go
-          test -z "$(gofmt -l backend/go/main.go)"
-          go test backend/go/main.go
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Migrate canonical schema
+        run: python3 contracts/database/migrate.py up
+      - name: Go Auth build, integration and contract verification
+        run: |
+          test -z "$(gofmt -l backend/go/*.go)"
+          cd backend/go
+          go build -o "$RUNNER_TEMP/im-go" .
+          go test -count=1 ./...
+          cd ../..
+          python3 contracts/websocket/verify.py
+          pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1
 
   java:
     needs: classify
@@ -176,8 +213,18 @@ jobs:
     needs: classify
     if: needs.classify.outputs.deploy == 'true'
     runs-on: ubuntu-latest
+    env:
+      IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config
     steps:
       - uses: actions/checkout@v4
+      - name: Prepare disposable Go profile configuration
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path $env:IM_GO_CONFIG_DIR -Force | Out-Null
+          Copy-Item backend/go/config.example.json (Join-Path $env:IM_GO_CONFIG_DIR 'config.json')
+          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'pg_password'), 'local-development-only')
+          $key = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'jwt_key'), $key)
       - name: Validate both Compose profiles
         run: |
           docker compose -f deploy/compose.yaml --profile go config --quiet

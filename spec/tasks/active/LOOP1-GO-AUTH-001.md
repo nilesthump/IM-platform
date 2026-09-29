@@ -26,6 +26,7 @@ Implement Go registration/login, refresh, logout, Session slot and epoch handlin
 # Allowed Paths
 
 - `backend/go/**`
+- `deploy/compose.yaml` only for read-only Go Core/Gateway mounts of one operator-provided directory containing `config.json`, `pg_password`, and `jwt_key`; no credential file is committed and Java/TLS service behavior remains unchanged.
 - Go Auth/Session integration tests under `tests/go/**`
 - `ci/**`, `.github/workflows/ci.yml`, and `tests/ci/**` only to replace the S0 Go placeholder boundary with actual Go build/test/contract execution; preserve other jobs and Gate semantics.
 - `spec/tasks/**/LOOP1-GO-AUTH-001.md`
@@ -35,6 +36,8 @@ Implement Go registration/login, refresh, logout, Session slot and epoch handlin
 - `research/prompts/**` and `research/runs/**` only for Recorder artifacts linked to this task.
 
 The Coordinator prospectively authorized the exact task-linked evidence, checkpoint, and Recorder paths at S1 activation. No path here authorizes changes to architecture, public contracts, migrations, or other backends.
+
+The Human explicitly approved modifying `deploy/compose.yaml` for this configuration-file connection after the automatic approval review rejected the earlier Coordinator-only scope expansion. This exact-path authorization was received on 2026-09-29; it does not authorize any other deployment path or secret material in Git.
 
 # Acceptance
 
@@ -64,11 +67,12 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 
 - Entry checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md`; clean S0 `main` at `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
 - Coordinator activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; Recorder run `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`. This is development/recovery evidence, not independent task acceptance. Implementation evidence pending.
+- Implementation development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; linked Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Local Go race/integration, HTTP/WSS verifiers, frozen hashes, CTRL-002 Development, CI tests, and Compose config passed. Full local Go profile smoke stopped before service startup on Docker registry mirror HTTP 403. Hosted CI and independent review remain pending.
 
 # Handoff
 
-- New isolated branch `task/LOOP1-GO-AUTH-001` starts from the clean S0 checkpoint. No product implementation has been made at activation. The Coordinator owns only the S1 batch/task/progress activation records until committed.
+- The isolated branch `task/LOOP1-GO-AUTH-001` contains the Auth/Session implementation and development evidence. No architecture, contract, migration, Java, or client files changed. The Implementation Agent owns only task-allowed implementation, CI, config mount, Task Spec/current recovery, evidence, and linked Recorder artifacts until the clean candidate commit. Last independently accepted base remains `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
 
 # Next Action
 
-- Fresh Implementation Agent: run the mandatory startup sequence, register a prospective Recorder run, then implement the bounded Go Auth/Session slice. Hand off a clean committed candidate for a different independent Review Agent.
+- After the clean candidate commit, Coordinator moves this task to `review` and delegates a fresh independent Review Agent. The reviewer checks the committed diff and clean checkout; then applicable real hosted CI is required. Investigate the local Docker mirror HTTP 403 only if it persists outside this host or hosted CI fails.

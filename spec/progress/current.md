@@ -16,6 +16,8 @@ Current Task State: active
 
 ## Current Contract Work
 
+- Fresh Go Auth Implementation Agent has implemented and locally verified the bounded S1 Auth/Session slice on `task/LOOP1-GO-AUTH-001`: PostgreSQL registration/login/refresh/logout and three slots, WSS bind/revocation, durable revocation Outbox relay through NATS, config-file credentials, and Go CI adaptation. Go race/integration with disposable PostgreSQL/NATS, HTTP/WSS contracts, frozen hashes, CTRL-002 Development, 19 CI tests, and Compose config pass. Local full Compose Go smoke could not fetch `golang:1.25-alpine` because the configured Docker mirror returned HTTP 403 before service startup. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Human explicitly approved the exact `deploy/compose.yaml` config-file mount amendment; prior automatic approval rejection remains disclosed. This is not independent acceptance or S1 Gate PASS.
+
 - S1 was explicitly authorized by the Human after S0 completion. An isolated clean checkout of `main` `09cec968f64faf0db319aea8d9c21d4fffe8ec49` passed CTRL-002 Acceptance, canonical Frozen Architecture hash verification, HTTP, WSS, and Sync/Plugin contract verification. The 19 local CI tests passed when granted temporary-directory access (five Windows symlink subcases skipped); hosted S0 full matrix PASS remains the Gate entry authority. New `spec/batches/LOOP1-S1.md` and four architecture-listed S1 Task Specs define dependency order; `LOOP1-GO-AUTH-001` is first and active. No S1 product code has changed. Activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; partial-resume Recorder `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`.
 
 - Final S0 remote sync: `git ls-remote origin main` confirms `origin/main` at `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to the clean local `main` before this governance record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA: classify and selected-job gate passed; the documentation-only diff correctly skipped profile jobs. The earlier merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071`. All nine S0 tasks remain done and **S0 Gate PASS** stands. Final sync evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`. S1 remains inactive.
@@ -295,7 +297,7 @@ Current Task State: active
 
 ## Next Exact Action
 
-Delegate `LOOP1-GO-AUTH-001` to a fresh Implementation Agent from the committed S1 activation branch. Require clean committed independent review and real CI before task acceptance. S1 Gate remains NOT YET PASSED.
+After the Implementation Agent's clean candidate commit, move `LOOP1-GO-AUTH-001` from `active` to `review` and delegate a fresh independent Review Agent. Review the exact committed diff in a clean checkout, then obtain applicable real hosted CI before acceptance. S1 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
@@ -306,6 +308,8 @@ Delegate `LOOP1-GO-AUTH-001` to a fresh Implementation Agent from the committed 
 `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md` (S0 Gate PASS recovery point on verified remote-main merge).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh Implementation Agent `/root/go_auth_impl` owns only task-allowed Go Auth/Session source and tests, Go CI/boundary adaptation, the Human-approved exact Go Compose config mounts, Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. The local disposable PostgreSQL and NATS test containers and temporary test config are owned by this run and are not repository changes; they will be removed after verification. Original `H:/IM-platform` unknown untracked files remain untouched.
 
 - S1 Coordinator owns only the new batch and four task specifications, this recovery update, task-linked activation evidence and Recorder artifacts until the activation commit. The separate original `H:/IM-platform` checkout and its unknown untracked files remain untouched. No S1 product file has changed.
 - Historical S0 final governance sync ownership below was closed by its clean `main` commit.

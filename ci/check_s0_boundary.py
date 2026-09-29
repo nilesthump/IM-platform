@@ -5,7 +5,6 @@ from pathlib import Path
 
 
 ALLOWED = {
-    "go": ("backend/go", {"main.go", "Dockerfile"}),
     "java": ("backend/java", {"InfraPlaceholder.java", "Dockerfile"}),
     "web": ("clients/web", set()),
     "desktop": ("clients/desktop", set()),
