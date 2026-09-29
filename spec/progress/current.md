@@ -12,9 +12,11 @@ Current Batch: LOOP1-S1
 
 Current Task: LOOP1-GO-AUTH-001
 
-Current Task State: review
+Current Task State: done
 
 ## Current Contract Work
+
+- `LOOP1-GO-AUTH-001` is **done** at accepted task head `59d92f39234596a5b66841e8aa2ef7db0bf65e8a`: fresh independent product and workflow-fix reviews passed from separate clean checkouts; real hosted [CI run 36602521287](https://github.com/nilesthump/IM-platform/actions/runs/36602521287) completed success with all ten jobs, including Go, deploy transport smokes, compatibility, and gate. Exact acceptance evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-pass-acceptance.md`. Stable vertical-slice checkpoint: `spec/progress/checkpoints/2026-09-30-loop1-go-auth-001-accepted.md`. S1 Gate remains NOT YET PASSED; next dependency-satisfied task is Go Social.
 
 - Fresh independent hosted-CI workflow-fix Review PASS locally for `LOOP1-GO-AUTH-001` candidate `8eed78b` in a separate clean detached clone. Strict CTRL-002 Acceptance, CI tests, HTTP/WSS and frozen-hash verifiers passed; an independent negative control reintroduced old job-level `runner.temp` and the regression failed as intended, then was restored exactly. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-independent-review-pass.md`; Recorder `R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3`. Task remains `review`; new applicable hosted CI PASS is required before `done`. S1 Gate NOT YET PASSED. Reviewer owns only task-linked review evidence/recovery/Recorder artifacts until committed; original `H:\IM-platform` unknown files remain untouched.
 
@@ -311,21 +313,19 @@ Current Task State: review
 
 ## Next Exact Action
 
-Obtain a new applicable real hosted CI run for the independently reviewed Go Auth workflow-fix closure; record its exact result and move Go Auth to `done` only after PASS. S1 Gate remains NOT YET PASSED.
+Activate dependency-satisfied `LOOP1-GO-SOCIAL-001` and delegate its implementation to a fresh Agent. S1 Gate remains NOT YET PASSED.
 
 ## Last Known Good Commit
 
-`09cec968f64faf0db319aea8d9c21d4fffe8ec49` (clean local S0 Gate PASS `main` used as the S1 activation base; hosted merged-main full matrix PASS was at `485a071`, and later main CI PASS was recorded at `8dc64ad`).
+`59d92f39234596a5b66841e8aa2ef7db0bf65e8a` (accepted Go Auth task head on the clean remote task branch; S0 accepted `main` base is `09cec968f64faf0db319aea8d9c21d4fffe8ec49`).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md` (S0 Gate PASS recovery point on verified remote-main merge).
+`spec/progress/checkpoints/2026-09-30-loop1-go-auth-001-accepted.md` (Go Auth/Session accepted vertical slice; S1 Gate remains open).
 
 ## Uncommitted Changes / Ownership
 
-- Fresh independent Reviewer `/root/go_auth_ci_review` owns only task-linked PASS evidence, Task Spec/current recovery updates, and linked prompt/Recorder artifacts until the review closure commit. The separate detached Acceptance clone is clean at `8eed78b`; original `H:\IM-platform` unknown files remain untouched.
-
-- Fresh independent Reviewer `/root/go_auth_ci_review` owns only task-linked PASS evidence, Task Spec/current recovery updates, and linked prompt/Recorder artifacts until the review closure commit. The separate detached Acceptance clone is clean at `8eed78b`; original `H:\IM-platform` unknown files remain untouched.
+- Coordinator owns only Go Auth acceptance evidence, Task Spec queue transition, this recovery update, checkpoint, and linked Recorder artifacts until the documentation closure commit. The reviewed product and workflow-fix commits are clean; original `H:\IM-platform` unknown files remain untouched.
 
 - Fresh Fix Agent `/root/go_auth_ci_fix` owns only the workflow-context repair, CI regression, task/current recovery, task-linked development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` unknown files remain untouched.
 

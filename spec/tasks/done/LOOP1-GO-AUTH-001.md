@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-GO-AUTH-001
 title: Implement Go Auth and Session vertical slice
-status: review
-owner: Coordinator pending applicable hosted CI after independent workflow-fix review PASS
+status: done
+owner: Coordinator; independently reviewed and hosted CI accepted
 stage: S1
 gate: S1
 ---
@@ -75,12 +75,13 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
 - User-approved remote task-branch push of review closure `ab81dd5` succeeded and was verified at the exact remote SHA despite a reported `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed before any jobs started. The new deploy job-level `runner.temp` expression violates GitHub's documented context availability and is the leading cause; exact evidence and qualification are at `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; a fresh Fix/Review and new hosted run are required.
 - Fresh Fix Agent moved `runner.temp` to the permitted deploy preparation step environment and propagated the resolved directory to later steps using `GITHUB_ENV`. A deterministic CI regression rejects the prior invalid job-level expression. Local CI unit tests (21, four Windows symlink skips), HTTP/WSS verifiers, frozen hashes, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-fix-development.md`; Recorder `R-20260929T164238Z-6215f0a2-b090-4e45-8137-32eb19fa60e7`. Independent review and hosted CI remain required.
 - Fresh independent workflow-fix Review PASS locally at clean detached candidate `8eed78bb1d5763edec349358fb538d32549ad187`. Strict CTRL-002 Acceptance, 21 CI tests, HTTP/WSS verifiers, frozen hashes, scoped diff, and Fix Recorder integrity passed; an independent mutation reintroducing the invalid job-level expression made the regression fail and was restored exactly. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-independent-review-pass.md`; Review Recorder `R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3`. A new real hosted CI PASS is required before `done`.
+- The Human-approved task-branch push of clean review closure `59d92f39234596a5b66841e8aa2ef7db0bf65e8a` reached the exact remote SHA. Real hosted [Actions run 36602521287](https://github.com/nilesthump/IM-platform/actions/runs/36602521287) completed `success`: classify, go, deploy (both Go and Java transport smoke), shared, compatibility, java, web, desktop, mobile, and gate all completed `success`. Together with the two fresh independent local reviews, this satisfies Go Auth task acceptance. Durable closure: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-pass-acceptance.md`.
 
 # Handoff
 
-- Fresh independent reviewer accepts the workflow-context repair locally at `8eed78b` with a clean exact detached checkout and effective negative control. Review Recorder `R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3` is finished PASS and integrity-valid (six events); startup and some direct clean-checkout checks preceded or ran outside Recorder and are disclosed in review evidence. This remains local evidence pending hosted CI.
+- Fresh independent reviewer accepted the workflow-context repair locally at `8eed78b` with a clean exact detached checkout and effective negative control. Review Recorder `R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3` is finished PASS and integrity-valid (six events); startup and some direct clean-checkout checks preceded or ran outside Recorder and are disclosed in review evidence. Hosted CI subsequently passed at `59d92f3`.
 - The isolated branch `task/LOOP1-GO-AUTH-001` contains the Auth/Session implementation and development evidence. No architecture, contract, migration, Java, or client files changed. The Implementation Agent owns only task-allowed implementation, CI, config mount, Task Spec/current recovery, evidence, and linked Recorder artifacts until the clean candidate commit. Last independently accepted base remains `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
 
 # Next Action
 
-- Coordinator obtains a new real hosted CI run at the reviewed closure and records its exact result; move this task to `done` only after applicable hosted PASS. Local Go Compose smoke remains unverified because of Docker image access.
+- Select and activate dependency-satisfied `LOOP1-GO-SOCIAL-001` with a fresh Implementation Agent. Local Go Compose smoke was blocked by Docker image access; hosted deploy Go smoke passed. S1 Gate remains open until all four tasks and the end-to-end chain pass.
