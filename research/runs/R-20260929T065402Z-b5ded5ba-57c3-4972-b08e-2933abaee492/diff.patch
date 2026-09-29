@@ -1,0 +1,254 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 1b44afb..6f59809 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -66,7 +66,7 @@ jobs:
+           go-version: '1.23'
+       - name: Go S0 compile and test
+         run: |
+-          test "$(find backend/go -type f ! -name main.go ! -name Dockerfile | wc -l)" -eq 0 || { echo 'Go source grew; add package lint/unit/integration/contract commands'; exit 1; }
++          python3 ci/check_s0_boundary.py go
+           test -z "$(gofmt -l backend/go/main.go)"
+           go test backend/go/main.go
+ 
+@@ -82,7 +82,7 @@ jobs:
+           java-version: '21'
+       - name: Java S0 compile
+         run: |
+-          test "$(find backend/java -type f ! -name InfraPlaceholder.java ! -name Dockerfile | wc -l)" -eq 0 || { echo 'Java source grew; add lint/unit/integration/contract commands'; exit 1; }
++          python3 ci/check_s0_boundary.py java
+           javac -d "$RUNNER_TEMP" backend/java/InfraPlaceholder.java
+ 
+   web:
+@@ -92,7 +92,7 @@ jobs:
+     steps:
+       - uses: actions/checkout@v4
+       - name: Web S0 skeleton boundary
+-        run: test ! -d clients/web || { echo 'Web source exists; add its unit/build/protocol/plugin UI CI command'; exit 1; }
++        run: python3 ci/check_s0_boundary.py web
+ 
+   desktop:
+     needs: classify
+@@ -101,7 +101,7 @@ jobs:
+     steps:
+       - uses: actions/checkout@v4
+       - name: Desktop S0 skeleton boundary
+-        run: test ! -d clients/desktop || { echo 'Desktop source exists; add its SQLite/protocol CI command'; exit 1; }
++        run: python3 ci/check_s0_boundary.py desktop
+ 
+   mobile:
+     needs: classify
+@@ -110,7 +110,7 @@ jobs:
+     steps:
+       - uses: actions/checkout@v4
+       - name: Mobile S0 skeleton boundary
+-        run: test ! -d clients/mobile || { echo 'Mobile source exists; add its SQLite/protocol CI command'; exit 1; }
++        run: python3 ci/check_s0_boundary.py mobile
+ 
+   shared:
+     needs: classify
+@@ -168,9 +168,9 @@ jobs:
+           python3 -m unittest discover -s tests/database -v
+       - name: Future client and plugin fixture boundary
+         run: |
+-          test ! -d clients/web || { echo 'Client compatibility command required'; exit 1; }
+-          test ! -d clients/desktop || { echo 'Desktop compatibility command required'; exit 1; }
+-          test ! -d clients/mobile || { echo 'Mobile compatibility command required'; exit 1; }
++          python3 ci/check_s0_boundary.py web
++          python3 ci/check_s0_boundary.py desktop
++          python3 ci/check_s0_boundary.py mobile
+ 
+   deploy:
+     needs: classify
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 47b4b97..7a81c9d 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -6,16 +6,18 @@ Current Stage: S0
+ 
+ Current Gate: S0
+ 
+-Gate Status: PASS
++Gate Status: FAIL
+ 
+ Current Batch: LOOP1-S0
+ 
+ Current Task: LOOP1-CI-001
+ 
+-Current Task State: done
++Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Post-push full-matrix GitHub Actions [36532087481](https://github.com/nilesthump/IM-platform/actions/runs/36532087481) **FAIL** at `origin/main` `686dbf2`: tracked `.gitkeep` markers and placeholder client directories trigger all five S0 source boundary checks. The prior S0 Gate PASS checkpoint was based on a research-only hosted change that selected no profile jobs and is now superseded for Gate status. `LOOP1-CI-001` is reopened in `review`; Fix Agent changed CI boundary checks and added regression tests. Local 16 CI tests and CTRL-002 Development pass. See `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-placeholder-fix-development.md`. Next: fresh independent review, then a full-matrix hosted CI run and S0 Gate reevaluation. No self-acceptance; S1 inactive.
++
+ - S0 Stage Gate **PASS** on clean integrated local `main` `037c88ce86c2d81b518e26cd367676b4343f3360`: all nine required tasks are `done`; actual GitHub Actions [36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147) succeeded on the reviewed CI branch; CTRL-002 Acceptance, frozen hashes, S0 spec/HTTP/WSS/Sync/Plugin/CI verifiers, and both PostgreSQL/NATS/HTTPS/WSS TLS 1.3 profile smokes passed after integration. Exact Gate evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-gate-evaluation.md`; latest checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md`. ADR-0001 temporary bootstrap exception expired. The historical CTRL-001 empty-product verifier rejects the approved Infra skeleton and is disclosed as phase-specific. Remote `main` remains old and was not pushed under task-branch-only approvals. S1 remains inactive.
+ 
+ - `LOOP1-CI-001` operational CI acceptance **PASS**: user-approved push of reviewed `9d1abc1` triggered [GitHub Actions run 36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147), completed success. Clean checkout, strict CTRL-002 Acceptance, 12 CI tests, classifier and selected-job gate passed; the research-only diff selected no profile jobs. Independent Review 5 accepted `0621f2b` in portable clean clones. Closure evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-operational-ci-acceptance.md`. Task moves `review -> done`; ADR-0001 bootstrap exception expires. Next exact action: integrate this closure to clean local `main`, perform post-integration verification and evaluate the S0 Gate checklist/checkpoint. S0 Gate remains NOT YET PASSED until that evaluation. Last accepted local main before integration `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns only closure evidence/task/current and linked Recorder artifacts until committed.
+@@ -255,6 +257,8 @@ Current Task State: done
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
++- Hosted full-matrix run `36532087481` failed the S0 placeholder boundary. Prior research-only hosted PASS and local Gate evidence did not exercise selected profile jobs. This fix has local development verification only; real CI and independent review remain required.
++
+ - Hosted CI runs `36515716353` and `36521060867` failed strict clean-checkout Acceptance; the latter identified 17 historical Recorder stdout blobs altered by checkout filters. Fix 4's portable attribute repair passed independent Review 5 in clean clones. A new hosted PASS is still required; no failed run counts as acceptance.
+ 
+ - Infra Review 1 found no product defect. Its Upgrade check is an S0 non-business transport probe, not proof of later auth.bind or application WebSocket semantics. The local Caddy CA is development-only.
+@@ -276,18 +280,20 @@ Current Task State: done
+ 
+ ## Next Exact Action
+ 
+-Return control at S0 Gate PASS. S1 selection may begin only as a separate dependency-satisfied Stage action. Remote `main` remains at `7484901b3915535f60941a01116b730a845bd47d`; pushing it requires separate authorization.
++Fresh independent Review Agent verifies the clean committed S0 placeholder fix candidate, then Coordinator obtains a new full-matrix hosted CI run. If it passes, reevaluate the S0 Gate and create a new recovery checkpoint before any S1 activation.
+ 
+ ## Last Known Good Commit
+ 
+-`037c88ce86c2d81b518e26cd367676b4343f3360` (clean integrated local `main` after accepted CI closure and post-integration S0 verification; Gate evidence/checkpoint commit follows).
++`686dbf237554b2aa52207f5aa63704c080423de7` is the latest clean committed recovery point before this fix; its S0 Gate PASS is invalidated by hosted full-matrix run `36532087481`. No full-matrix accepted commit is known yet.
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md` (S0 Gate PASS recovery point on verified integrated local `main`).
++`spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md` (historical local PASS checkpoint, superseded for current Gate status by hosted full-matrix FAIL).
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/ci_placeholder_fix` owns only CI boundary checker/workflow, `tests/ci` regressions, CI Task Spec queue/recovery, this current-state update, task-linked development evidence and Recorder prompt/run until the clean candidate commit. No architecture, contract, gate selection, or original `H:\IM-platform` untracked files were touched.
++
+ - Coordinator owns only this S0 Gate evaluation, checkpoint, CI Task Spec/current recovery update, linked Recorder prompt/run, and generated bytecode cleanup until the Gate evidence commit. The two CI Python bytecode cache directories from local tests were removed after resolved-path containment checks. No product, architecture, public contract, migration, or original-checkout files were edited during Gate evaluation.
+ 
+ - Fresh independent Reviewer `/root/ci001_review5` owns only this review's evidence/probe, Task Spec/current recovery edits, and linked prompt/Recorder artifacts until committed. Product CI, contracts, architecture, Acceptance, and gate files remain unchanged; both independent clones are clean. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+diff --git a/spec/tasks/done/LOOP1-CI-001.md b/spec/tasks/done/LOOP1-CI-001.md
+deleted file mode 100644
+index 2518974..0000000
+--- a/spec/tasks/done/LOOP1-CI-001.md
++++ /dev/null
+@@ -1,102 +0,0 @@
+----
+-task_id: LOOP1-CI-001
+-title: Establish path-aware CI skeleton
+-status: done
+-owner: /root
+-stage: S0
+-gate: S0
+----
+-
+-# Goal
+-
+-Create the path-aware diff classifier and Go, Java, client, shared-contract, deploy, and compatibility job skeletons.
+-
+-# Inputs
+-
+-- Architecture Baseline v1.0 chapters 11, 12, 14, 15, 19 and appendix A, resolved through `spec/architecture/README.md` and its canonical Markdown manifest. Apply approved ADRs.
+-- Existing S0 repository, contract, database, and infrastructure skeletons.
+-
+-# Dependencies
+-
+-- LOOP1-INFRA-001 done.
+-
+-# Allowed Paths
+-
+-- `ci/**`
+-- `.github/workflows/**` (only after this task becomes `active`)
+-- CI verification tests under `tests/**`
+-- Minimal CI entry files at repository root if explicitly added to this Task Spec before activation
+-- `spec/tasks/**/LOOP1-CI-001.md`
+-- `spec/progress/current.md`
+-- `spec/tasks/backlog/.gitkeep` (exact queue-presence marker only; Coordinator-authorized after clean-checkout Review 1 FAIL)
+-- `research/runs/R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb/blobs/.gitattributes` (exact portable Git transport metadata only; Coordinator-authorized after hosted run 36521060867 exposed CRLF blob checkout dirt)
+-- `research/runs/R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a/blobs/.gitattributes` (same exact transport repair; historical Recorder blob bytes must remain unchanged)
+-
+-The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOOP1-CI-001/**`, accepted checkpoint `spec/progress/checkpoints/*loop1-ci-001*.md`, and this task's `research/prompts/**` and `research/runs/**` artifacts for instrumentation, review, and handoff only. These paths do not authorize product-scope expansion.
+-
+-# Acceptance
+-
+-- Diff classification maps Go, Java, each client, shared contracts/database/SDKs, and deploy/CI paths to the mandated jobs.
+-- Path matrix unit tests pass and shared changes fan out to the full compatibility matrix.
+-
+-# Forbidden
+-
+-- Let Agent self-reporting replace isolated CI Gate judgment.
+-- Add skips, lower acceptance, or re-record golden fixtures to make CI pass.
+-- Implement product behavior.
+-
+-# Verification
+-
+-- Run path classifier and job-matrix unit tests.
+-- Run `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development; Acceptance only from a clean committed independent checkout.
+-
+-# Evidence
+-
+-- S0 Stage Gate evaluation on integrated clean local `main` `037c88c` passed current recovery, frozen hashes, S0 spec/contract/CI verifiers, and both Go/Java PostgreSQL/NATS/TLS 1.3 smokes. The actual CI run and independent Review 5 remain the acceptance basis for this task. Gate evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-gate-evaluation.md`; stable checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md`. Remote `main` was not pushed; S1 remains inactive.
+-
+-- Operational CI acceptance **PASS**: user-approved reviewed evidence commit `9d1abc1` ran on GitHub Actions [36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147). Clean checkout, strict CTRL-002 Acceptance, 12 path/gate tests, classifier, and selected-job gate passed. This push selected no profile jobs because only research transport/review paths changed; independent matrix tests cover classification. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-operational-ci-acceptance.md`. Independent Review 5 accepted `0621f2b`; task moves `review -> done`. ADR-0001 bootstrap acceptance expires. S0 Stage Gate still requires clean main integration/evaluation.
+-
+-- Fresh independent Review 5 `/root/ci001_review5` **PASS** for exact committed candidate `0621f2b76aedecfb4fcb7a657bd977cc79e8e8ac`. Two separate `--no-local` clones with `core.autocrlf=true` and `false`, neither with `info/attributes`, passed strict CTRL-002 Acceptance with zero status/diff entries. All 42 historical Recorder blob object IDs and raw checkout bytes matched, both historical runs and Fix 4's run validated, 12 CI tests and frozen hashes passed, and no contract/architecture/Acceptance/workflow/gate path changed. Exact independent evidence, commands, exits, elapsed times, clean state, branch/diff range, and an exposed non-acceptance Recorder invocation failure: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review5-0621f2b-pass.md`; review Recorder `R-20260929T045735Z-19594017-8996-43dd-98a8-670c028c15c4`. Actual hosted CI remains pending; task stays `review`, S0 Gate NOT YET PASSED.
+-
+-- Fresh Fix 4 added exactly two Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`. Two genuinely separate clones without machine-local `info/attributes`, with `core.autocrlf=true` and `false`, both pass strict CTRL-002 Acceptance with zero status entries. All 42 historical blob object IDs and raw checkout bytes match; both original Recorder runs validate. Twelve CI tests pass. This remains Fix Agent development evidence pending fresh independent review and hosted CI. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Fix 4 Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Task `review`, S0 Gate NOT YET PASSED.
+-
+-- Coordinator prospectively authorized the two exact historical Recorder `blobs/.gitattributes` paths above after hosted diagnostic run `36521060867` identified 17 checkout-modified stdout blobs. The repair must preserve every historical blob Git object ID and Recorder validation result, and pass a fresh clone with no machine-local `info/attributes` overrides. No broader `research/**` write permission is granted.
+-
+-- User-approved diagnostic branch push `0e6ce82` triggered actual GitHub Actions run `36521060867`, which **FAIL** with 17 modified historical Recorder stdout blobs immediately after checkout. Machine-local Git info attributes masked those bytes in local clean checkouts; repository `research/.gitattributes` applies LF checkout. The strict CTRL-002 Acceptance and gate rejected the dirty tree. Exact run/cause: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`. Fresh Fix/Review required; task `review`, S0 Gate NOT YET PASSED.
+-
+-- Fresh independent Review 4 `/root/ci001_review4` **PASS** for exact clean detached diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: CTRL-002 Acceptance with zero status entries, 12 CI tests, frozen hashes, no-weakening/scope/minimality inspection, and Fix 3 Recorder validity passed. The only product change prints Git porcelain status before unchanged Acceptance, to identify the dirty path in a new hosted run. Exact commands, exits, elapsed times, clean-state method, branch/diff range, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; review Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. Hosted root cause is unknown; task remains `review`, S0 Gate NOT YET PASSED.
+-
+-- Fresh Fix 3 added a checkout-status diagnostic before unchanged CTRL-002 Acceptance in the `classify` job. The failed hosted run did not expose the offending porcelain entries, and a clean local PowerShell probe did not reproduce the suspected empty-output bug; the exact hosted cause is still unknown. Twelve path/gate tests and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. This is a diagnostic candidate, not a repair PASS. Task stays `review`; independent review and a new hosted run are required.
+-
+-- User approved and the reviewed `f07e353` branch was pushed to `origin/task/LOOP1-CI-001`. Actual GitHub Actions run `36515716353` **FAIL**: the classify job's CTRL-002 Acceptance check reported a dirty checkout; the gate rejected it. The offending status entries are not in the log yet. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`. Fresh Fix Agent diagnosis and a new independent review are required. Task stays `review`; S0 Gate NOT YET PASSED.
+-
+-- Independent Review 3 PASS is recorded, but actual GitHub Actions execution is blocked: automatic approval review rejected pushing the reviewed branch to the repository remote. No push occurred. Exact reason, target, unchanged remote state, and requested approval: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-external-ci-dispatch-blocker.md`. Task remains `review`; S0 Gate NOT YET PASSED.
+-
+-- Fresh independent Review 3 `/root/ci001_review3` **PASS** at clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: CTRL-002 Acceptance, all 12 CI tests, prior rename probe, new independent SDK-rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. The clean checkout stayed clean. Exact commands, exits, elapsed times, scope/minimality judgment, and independence are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; review Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Task remains `review` pending actual GitHub workflow run and Coordinator closure; S0 Gate NOT YET PASSED.
+-
+-- Fresh Fix 2 changes Git diff collection to `--no-renames`, exposing both the removed source and added destination of a rename. Regression tests cover moves from contract, database, and SDK trees to unclassified docs paths; all 12 path/gate tests and the former Review 2 negative probe pass. CTRL-002 Acceptance, 12 tests, and frozen hashes pass from a clean detached checkout of `4dc41b5`; exact commands and Recorder run are in `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`. This Fix-Agent run is not independent acceptance; the task remains `review` and S0 Gate is NOT YET PASSED.
+-- Fresh independent Review 2 `/root/ci001_review2` returned **FAIL** at clean detached candidate `f508750`: the backlog marker repairs CTRL-002 Acceptance, but a rename from `contracts/wire.json` to `docs/wire.json` is reported only by its destination, so the classifier schedules no compatibility jobs. Eleven CI tests, 24 gate status controls, frozen hashes, and Recorder integrity passed. Exact evidence/probe: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md` and `review2-negative-probe.py`; review Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task remains `review`; actual GitHub workflow execution and S0 Gate remain pending.
+-- Fresh Fix Agent `/root/ci001_fix1` added only the prospectively authorized zero-byte `spec/tasks/backlog/.gitkeep` marker at `ba0bbe7`. A new detached clean checkout passed CTRL-002 Acceptance, 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Exact commands, exits, elapsed times, clean-state method, and linked Recorder: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`. This remains development evidence; fresh independent re-review and an actual GitHub workflow run are pending. S0 Gate NOT YET PASSED.
+-
+-- Coordinator prospectively authorized only `spec/tasks/backlog/.gitkeep` after independent Review 1 clean-checkout FAIL. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-queue-marker-authorization.md`; a fresh Fix Agent must add the marker before fresh re-review.
+-
+-- Fresh independent Review 1 `/root/ci001_review1` returned **FAIL** at clean detached handoff `2c335cd` for product candidate `97db67e`. Eleven CI unit tests, frozen hashes, and implementation Recorder integrity passed, but clean-checkout CTRL-002 Acceptance exited 1 because `spec/tasks/backlog/` has no tracked marker after this task left the queue. The workflow's first job invokes this check, so the candidate cannot serve as an operational CI judge. Exact commands, exits, elapsed times, clean-state method, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review1-97db67e-fail.md`; review Recorder `R-20260928T202247Z-2951ca94-5b67-47a5-ba6d-c6f00f3f4a15`. Keep task in `review`; S0 Gate NOT YET PASSED.
+-
+-- Coordinator review transition from clean candidate `97db67e` passed CTRL-002 Development recovery; the correctly linked Recorder run and an unused disclosed instrumentation FAIL are at `spec/progress/evidence/LOOP1-CI-001/2026-09-29-review-transition.md`. Independent acceptance remains pending.
+-
+-- Fresh Implementation Agent `/root/ci001_impl` built the path-aware classifier, full shared fan-out, GitHub Actions job skeletons and a selected-job gate. Eleven classifier/gate unit tests pass, including a real Git deletion case; Go compile, both Compose configurations, HTTP/WSS/Sync/Plugin verifiers, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4`. This is local development evidence; the workflow has not yet run on GitHub and independent review/acceptance remains pending. No product behavior, contract, migration, or Frozen Architecture file changed.
+-
+-- Activation prompt `P-7892975a-f2c8-4bfd-85d4-b11926c0b759`, Recorder run `R-20260928T193552Z-5891a0f5-0fe0-4415-8492-4b997360cc3c`; CTRL-002 Development and frozen-hash verification passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-activation-development.md`. This is not independent acceptance.
+-
+-- Dependency `LOOP1-INFRA-001` is independently accepted and `done` on verified clean local `main` `10406be70bf66482836164400cd5b8be07709c58`; both profile smokes, frozen hashes, Recorder repository, and CTRL-002 Acceptance passed after integration. S0 Gate remains NOT YET PASSED.
+-
+-# Handoff
+-
+-- Implementation files are confined to `ci/**`, `.github/workflows/**`, and `tests/ci/**`. Client source is absent at S0; each client job rejects future source until its actual test command is added. The Go/Java jobs similarly reject unexpected future source. Shared changes select Go, Java, every client, old-client/plugin/migration compatibility, and shared contract checks. The selected-job gate rejects skipped, failed, or cancelled selected jobs. The development candidate will be committed clean for a fresh independent reviewer under ADR-0001.
+-- Last known good independently accepted main commit: `10406be70bf66482836164400cd5b8be07709c58`. Implementation Agent owns only task-allowed uncommitted candidate files until commit; no unrelated work was changed.
+-
+-- Coordinator activated this task on isolated branch `task/LOOP1-CI-001` from clean local `main` `10406be70bf66482836164400cd5b8be07709c58`. Fresh Implementation Agent will take product CI work. No product CI file has changed.
+-
+-# Next Action
+-
+-- Return control at S0 Gate PASS after final clean post-commit verification. Remote `main` synchronization requires separate authorization; S1 remains inactive in this batch.
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/check_s0_boundary.py
+# ?? research/prompts/2026-09-29-ci001-placeholder-fix.txt
+# ?? research/prompts/P-270a21d0-9ec6-4b42-bfcc-33a7acbf4b19/metadata.json
+# ?? research/prompts/P-270a21d0-9ec6-4b42-bfcc-33a7acbf4b19/prompt.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-207da5b0-67b6-443b-bcd8-3d1afb268c9f.stderr.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-207da5b0-67b6-443b-bcd8-3d1afb268c9f.stdout.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-5fd6f7d6-c4ac-42fd-9bb5-3aa47052bc2c.stderr.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-5fd6f7d6-c4ac-42fd-9bb5-3aa47052bc2c.stdout.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-7e647204-a147-453b-bf7c-4743ef01064d.stderr.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-7e647204-a147-453b-bf7c-4743ef01064d.stdout.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-875d68dd-9b2c-4349-b98a-a115f3d147cb.stderr.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-875d68dd-9b2c-4349-b98a-a115f3d147cb.stdout.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-a3706c24-1831-4504-bee3-ed3e06bc172a.stderr.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-a3706c24-1831-4504-bee3-ed3e06bc172a.stdout.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-bc64f146-ad7c-4faa-95cf-e73c0829ba97.stderr.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-bc64f146-ad7c-4faa-95cf-e73c0829ba97.stdout.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-c5c4d823-2579-4d37-9e88-a24126c2e1da.stderr.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/blobs/C-c5c4d823-2579-4d37-9e88-a24126c2e1da.stdout.txt
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/events.jsonl
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/initial_state.json
+# ?? research/runs/R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-placeholder-fix-development.md
+# ?? spec/tasks/review/LOOP1-CI-001.md
+# ?? tests/ci/test_s0_boundary.py

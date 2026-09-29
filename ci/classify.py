@@ -43,8 +43,10 @@ def classify(paths):
             selected.add("desktop")
         elif parts[:2] == ["clients", "mobile"]:
             selected.add("mobile")
-        elif (parts[0] in {"deploy", "ci"}
-              or parts[:2] in ([".github", "workflows"], ["tests", "ci"], ["tests", "infrastructure"])):
+        elif (parts[0] == "ci"
+              or parts[:2] in ([".github", "workflows"], ["tests", "ci"])):
+            selected.update(JOBS)
+        elif (parts[0] == "deploy" or parts[:2] == ["tests", "infrastructure"]):
             selected.add("deploy")
     return {job: job in selected for job in JOBS}
 

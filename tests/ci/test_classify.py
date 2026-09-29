@@ -45,8 +45,13 @@ class PathMatrixTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assert_jobs(path, classify_module.FULL_COMPATIBILITY)
 
-    def test_deploy_and_ci_only_run_deploy_validation(self):
-        for path in ("deploy/compose.yaml", "ci/classify.py", ".github/workflows/ci.yml", "tests/ci/test_classify.py", "tests/infrastructure/smoke.ps1"):
+    def test_ci_changes_run_all_jobs(self):
+        for path in ("ci/classify.py", "ci/check_s0_boundary.py", ".github/workflows/ci.yml", "tests/ci/test_classify.py"):
+            with self.subTest(path=path):
+                self.assert_jobs(path, classify_module.JOBS)
+
+    def test_deploy_changes_run_deploy_validation(self):
+        for path in ("deploy/compose.yaml", "tests/infrastructure/smoke.ps1"):
             with self.subTest(path=path):
                 self.assert_jobs(path, {"deploy"})
 
