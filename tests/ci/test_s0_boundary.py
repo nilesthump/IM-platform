@@ -2,6 +2,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -43,6 +44,47 @@ class S0BoundaryTests(unittest.TestCase):
             nested.mkdir(parents=True)
             (nested / "main.go").write_text("package main", encoding="utf-8")
             self.assertEqual(boundary.unexpected_files(root, "go"), ["src/main.go"])
+
+    def test_symlinks_cannot_hide_behind_allowed_names_or_profile_root(self):
+        for profile, (relative_dir, allowed) in boundary.ALLOWED.items():
+            with self.subTest(profile=profile), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                directory = root / relative_dir
+                directory.mkdir(parents=True)
+                target = root / "target"
+                target.write_text("source", encoding="utf-8")
+                name = next(iter(allowed), ".gitkeep")
+                try:
+                    (directory / name).symlink_to(target)
+                except (OSError, NotImplementedError) as error:
+                    self.skipTest(f"symlink creation unavailable: {error}")
+                self.assertEqual(boundary.unexpected_files(root, profile), [name])
+
+                (directory / name).unlink()
+                directory.rmdir()
+                directory.symlink_to(root, target_is_directory=True)
+                self.assertEqual(boundary.unexpected_files(root, profile), [directory.name])
+
+    def test_allowed_name_and_profile_root_symlink_checks_without_os_link_privilege(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            directory = root / "backend/go"
+            directory.mkdir(parents=True)
+            allowed = directory / "main.go"
+            allowed.write_text("source", encoding="utf-8")
+            original = Path.is_symlink
+
+            def marks_path(path):
+                return path == allowed or original(path)
+
+            with mock.patch.object(Path, "is_symlink", marks_path):
+                self.assertEqual(boundary.unexpected_files(root, "go"), ["main.go"])
+
+            def marks_directory(path):
+                return path == directory or original(path)
+
+            with mock.patch.object(Path, "is_symlink", marks_directory):
+                self.assertEqual(boundary.unexpected_files(root, "go"), ["go"])
 
     def test_all_affected_workflow_jobs_use_boundary_checker(self):
         workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")

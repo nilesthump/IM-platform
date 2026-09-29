@@ -16,6 +16,8 @@ ALLOWED = {
 def unexpected_files(root, profile):
     relative_dir, allowed = ALLOWED[profile]
     directory = root / relative_dir
+    if directory.is_symlink():
+        return [directory.name]
     if not directory.is_dir():
         return []
     unexpected = []
@@ -23,6 +25,9 @@ def unexpected_files(root, profile):
         if path.is_dir() and not path.is_symlink():
             continue
         relative = path.relative_to(directory).as_posix()
+        if path.is_symlink():
+            unexpected.append(relative)
+            continue
         if relative in allowed:
             continue
         if (path.name == ".gitkeep" and path.is_file() and not path.is_symlink()

@@ -2,7 +2,7 @@
 task_id: LOOP1-CI-001
 title: Establish path-aware CI skeleton
 status: review
-owner: /root/ci_placeholder_fix
+owner: /root/ci_placeholder_fix2
 stage: S0
 gate: S0
 ---
@@ -51,6 +51,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 - Run `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development; Acceptance only from a clean committed independent checkout.
 
 # Evidence
+
+- Fresh Fix 2 incorporated independent FAIL closure `e250e62` as `00b8a4e` without conflict. `ci/check_s0_boundary.py` now rejects profile-root and nested symlinks before allowed-name checks; `ci/classify.py` selects every job for changes to `ci/**`, `.github/workflows/**`, or `tests/ci/**`. Focused regressions cover both bypasses. Nineteen CI tests pass, with five supplemental real-symlink subtests skipped because this Windows host lacks symlink creation privilege; a deterministic mock-backed negative test passes for both root and allowed-name cases. CTRL-002 Development and frozen hash verification pass. Exact development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. Task stays `review`, S0 Gate FAIL pending fresh independent review and hosted full-matrix CI.
 
 - Fresh independent placeholder Review `/root/ci_placeholder_review` **FAIL** for committed `502342358d11fc6e77ff2b7e1f86ed5f07220ea8`: a clean detached clone passes CTRL-002 Acceptance and all 16 CI tests pass, but the changed workflow/checker paths select deploy only, so a branch push skips all five repaired profile jobs and compatibility; root allowed-name symlinks bypass `ci/check_s0_boundary.py`. Frozen hashes match. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` exposed a GBK instrumentation failure. Task stays `review`, S0 Gate FAIL; fresh Fix/Review and hosted full-matrix PASS remain required.
 
@@ -103,4 +105,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- Fresh Fix Agent repairs hosted full-matrix selection for CI boundary changes and rejects symlinks even at root allowed names and profile directory. A different fresh independent Review Agent verifies the clean candidate; Coordinator then obtains a full-matrix hosted CI PASS and reevaluates the S0 Gate and recovery checkpoint. S1 remains inactive.
+- A different fresh independent Review Agent verifies the clean Fix 2 candidate, including real symlink controls on a capable host and complete job selection for CI-only changes. Coordinator then obtains a full-matrix hosted CI PASS and reevaluates the S0 Gate and recovery checkpoint. S1 remains inactive.

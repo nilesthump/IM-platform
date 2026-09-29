@@ -1,0 +1,197 @@
+diff --git a/ci/check_s0_boundary.py b/ci/check_s0_boundary.py
+index e0c92f8..acf805a 100644
+--- a/ci/check_s0_boundary.py
++++ b/ci/check_s0_boundary.py
+@@ -16,6 +16,8 @@ ALLOWED = {
+ def unexpected_files(root, profile):
+     relative_dir, allowed = ALLOWED[profile]
+     directory = root / relative_dir
++    if directory.is_symlink():
++        return [directory.name]
+     if not directory.is_dir():
+         return []
+     unexpected = []
+@@ -23,6 +25,9 @@ def unexpected_files(root, profile):
+         if path.is_dir() and not path.is_symlink():
+             continue
+         relative = path.relative_to(directory).as_posix()
++        if path.is_symlink():
++            unexpected.append(relative)
++            continue
+         if relative in allowed:
+             continue
+         if (path.name == ".gitkeep" and path.is_file() and not path.is_symlink()
+diff --git a/ci/classify.py b/ci/classify.py
+index 944653f..ddc2ba1 100644
+--- a/ci/classify.py
++++ b/ci/classify.py
+@@ -43,8 +43,10 @@ def classify(paths):
+             selected.add("desktop")
+         elif parts[:2] == ["clients", "mobile"]:
+             selected.add("mobile")
+-        elif (parts[0] in {"deploy", "ci"}
+-              or parts[:2] in ([".github", "workflows"], ["tests", "ci"], ["tests", "infrastructure"])):
++        elif (parts[0] == "ci"
++              or parts[:2] in ([".github", "workflows"], ["tests", "ci"])):
++            selected.update(JOBS)
++        elif (parts[0] == "deploy" or parts[:2] == ["tests", "infrastructure"]):
+             selected.add("deploy")
+     return {job: job in selected for job in JOBS}
+ 
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 1755896..3bf86ae 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh Fix 2 incorporated the independent FAIL closure commit and repaired both findings: symlinks are rejected before allowed S0 names, and CI/workflow/test changes select the entire job matrix. Nineteen CI tests, CTRL-002 Development, and frozen hash verification pass locally; real symlink creation is unavailable on this Windows host, so an additional deterministic negative test covers both bypasses. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. This is Fix Agent development evidence. Task remains `review`, S0 Gate FAIL; fresh independent review and hosted full-matrix CI are required.
++
+ - Fresh independent review of S0 placeholder candidate `502342358d11fc6e77ff2b7e1f86ed5f07220ea8` **FAIL**: clean detached CTRL-002 Acceptance and 16 CI tests pass, but workflow/checker changes classify as deploy only and do not run the five repaired profile jobs or compatibility on a push; allowed-name root symlinks bypass the boundary check. Frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` had an exposed GBK output capture failure. Task remains `review`, S0 Gate FAIL. Next: fresh Fix/Review cycle, then actual hosted full-matrix CI. No S1 activation.
+ 
+ - Post-push full-matrix GitHub Actions [36532087481](https://github.com/nilesthump/IM-platform/actions/runs/36532087481) **FAIL** at `origin/main` `686dbf2`: tracked `.gitkeep` markers and placeholder client directories trigger all five S0 source boundary checks. The prior S0 Gate PASS checkpoint was based on a research-only hosted change that selected no profile jobs and is now superseded for Gate status. `LOOP1-CI-001` is reopened in `review`; Fix Agent changed CI boundary checks and added regression tests. Local 16 CI tests and CTRL-002 Development pass. See `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-placeholder-fix-development.md`. Next: fresh independent review, then a full-matrix hosted CI run and S0 Gate reevaluation. No self-acceptance; S1 inactive.
+@@ -282,7 +284,7 @@ Current Task State: review
+ 
+ ## Next Exact Action
+ 
+-Fresh Fix Agent repairs CI-change full-matrix selection and symlink boundary bypass; a different fresh independent Review Agent verifies the clean committed candidate, then Coordinator obtains a hosted full-matrix CI run. On PASS, reevaluate S0 Gate and create a new checkpoint before S1 activation.
++Fresh independent Review Agent verifies the clean committed Fix 2 candidate, including real symlink controls on a capable host and CI-only full-matrix classification. Then Coordinator obtains a hosted full-matrix CI run. On PASS, reevaluate S0 Gate and create a new checkpoint before S1 activation.
+ 
+ ## Last Known Good Commit
+ 
+@@ -294,6 +296,8 @@ Fresh Fix Agent repairs CI-change full-matrix selection and symlink boundary byp
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Fix Agent `/root/ci_placeholder_fix2` owns only CI checker/classifier, `tests/ci` regressions, CI Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until the clean candidate commit. No architecture, contract, gate, or original `H:\IM-platform` files were changed.
++
+ - Fresh independent Reviewer `/root/ci_placeholder_review` owns only this FAIL evidence, Task Spec/current recovery updates, prompt, and Recorder artifacts until committed in its isolated review worktree. The separate clean Acceptance clone was removed; no product file was modified. Recorder output capture failed on a symlink probe and was disclosed.
+ 
+ - Fresh Fix Agent `/root/ci_placeholder_fix` owns only CI boundary checker/workflow, `tests/ci` regressions, CI Task Spec queue/recovery, this current-state update, task-linked development evidence and Recorder prompt/run until the clean candidate commit. No architecture, contract, gate selection, or original `H:\IM-platform` untracked files were touched.
+diff --git a/spec/tasks/review/LOOP1-CI-001.md b/spec/tasks/review/LOOP1-CI-001.md
+index 409cf52..6d6ee7b 100644
+--- a/spec/tasks/review/LOOP1-CI-001.md
++++ b/spec/tasks/review/LOOP1-CI-001.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-CI-001
+ title: Establish path-aware CI skeleton
+ status: review
+-owner: /root/ci_placeholder_fix
++owner: /root/ci_placeholder_fix2
+ stage: S0
+ gate: S0
+ ---
+@@ -52,6 +52,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Fresh Fix 2 incorporated independent FAIL closure `e250e62` as `00b8a4e` without conflict. `ci/check_s0_boundary.py` now rejects profile-root and nested symlinks before allowed-name checks; `ci/classify.py` selects every job for changes to `ci/**`, `.github/workflows/**`, or `tests/ci/**`. Focused regressions cover both bypasses. Nineteen CI tests pass, with five supplemental real-symlink subtests skipped because this Windows host lacks symlink creation privilege; a deterministic mock-backed negative test passes for both root and allowed-name cases. CTRL-002 Development and frozen hash verification pass. Exact development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. Task stays `review`, S0 Gate FAIL pending fresh independent review and hosted full-matrix CI.
++
+ - Fresh independent placeholder Review `/root/ci_placeholder_review` **FAIL** for committed `502342358d11fc6e77ff2b7e1f86ed5f07220ea8`: a clean detached clone passes CTRL-002 Acceptance and all 16 CI tests pass, but the changed workflow/checker paths select deploy only, so a branch push skips all five repaired profile jobs and compatibility; root allowed-name symlinks bypass `ci/check_s0_boundary.py`. Frozen hashes match. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` exposed a GBK instrumentation failure. Task stays `review`, S0 Gate FAIL; fresh Fix/Review and hosted full-matrix PASS remain required.
+ 
+ - Post-push full-matrix hosted GitHub Actions [36532087481](https://github.com/nilesthump/IM-platform/actions/runs/36532087481) **FAIL** on `origin/main` `686dbf2`: the existing S0 boundary commands interpret tracked `.gitkeep` markers as new Go/Java source and the tracked client placeholder directories as implemented clients. The earlier research-only hosted PASS did not select these profile jobs. S0 Gate PASS at this commit is invalidated; this task reopens in `review`. The Fix Agent candidate changes only the CI boundary checks, plus regression tests, and is local development evidence pending fresh independent review and a new full-matrix hosted CI PASS. Exact local evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-placeholder-fix-development.md`; Recorder run `R-20260929T065402Z-b5ded5ba-57c3-4972-b08e-2933abaee492`.
+@@ -103,4 +105,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Next Action
+ 
+-- Fresh Fix Agent repairs hosted full-matrix selection for CI boundary changes and rejects symlinks even at root allowed names and profile directory. A different fresh independent Review Agent verifies the clean candidate; Coordinator then obtains a full-matrix hosted CI PASS and reevaluates the S0 Gate and recovery checkpoint. S1 remains inactive.
++- A different fresh independent Review Agent verifies the clean Fix 2 candidate, including real symlink controls on a capable host and complete job selection for CI-only changes. Coordinator then obtains a full-matrix hosted CI PASS and reevaluates the S0 Gate and recovery checkpoint. S1 remains inactive.
+diff --git a/tests/ci/test_classify.py b/tests/ci/test_classify.py
+index 00b63cc..81c196a 100644
+--- a/tests/ci/test_classify.py
++++ b/tests/ci/test_classify.py
+@@ -45,8 +45,13 @@ class PathMatrixTests(unittest.TestCase):
+             with self.subTest(path=path):
+                 self.assert_jobs(path, classify_module.FULL_COMPATIBILITY)
+ 
+-    def test_deploy_and_ci_only_run_deploy_validation(self):
+-        for path in ("deploy/compose.yaml", "ci/classify.py", ".github/workflows/ci.yml", "tests/ci/test_classify.py", "tests/infrastructure/smoke.ps1"):
++    def test_ci_changes_run_all_jobs(self):
++        for path in ("ci/classify.py", "ci/check_s0_boundary.py", ".github/workflows/ci.yml", "tests/ci/test_classify.py"):
++            with self.subTest(path=path):
++                self.assert_jobs(path, classify_module.JOBS)
++
++    def test_deploy_changes_run_deploy_validation(self):
++        for path in ("deploy/compose.yaml", "tests/infrastructure/smoke.ps1"):
+             with self.subTest(path=path):
+                 self.assert_jobs(path, {"deploy"})
+ 
+diff --git a/tests/ci/test_s0_boundary.py b/tests/ci/test_s0_boundary.py
+index 868bb95..c888270 100644
+--- a/tests/ci/test_s0_boundary.py
++++ b/tests/ci/test_s0_boundary.py
+@@ -2,6 +2,7 @@ import importlib.util
+ from pathlib import Path
+ import tempfile
+ import unittest
++from unittest import mock
+ 
+ 
+ ROOT = Path(__file__).resolve().parents[2]
+@@ -44,6 +45,47 @@ class S0BoundaryTests(unittest.TestCase):
+             (nested / "main.go").write_text("package main", encoding="utf-8")
+             self.assertEqual(boundary.unexpected_files(root, "go"), ["src/main.go"])
+ 
++    def test_symlinks_cannot_hide_behind_allowed_names_or_profile_root(self):
++        for profile, (relative_dir, allowed) in boundary.ALLOWED.items():
++            with self.subTest(profile=profile), tempfile.TemporaryDirectory() as temp:
++                root = Path(temp)
++                directory = root / relative_dir
++                directory.mkdir(parents=True)
++                target = root / "target"
++                target.write_text("source", encoding="utf-8")
++                name = next(iter(allowed), ".gitkeep")
++                try:
++                    (directory / name).symlink_to(target)
++                except (OSError, NotImplementedError) as error:
++                    self.skipTest(f"symlink creation unavailable: {error}")
++                self.assertEqual(boundary.unexpected_files(root, profile), [name])
++
++                (directory / name).unlink()
++                directory.rmdir()
++                directory.symlink_to(root, target_is_directory=True)
++                self.assertEqual(boundary.unexpected_files(root, profile), [directory.name])
++
++    def test_allowed_name_and_profile_root_symlink_checks_without_os_link_privilege(self):
++        with tempfile.TemporaryDirectory() as temp:
++            root = Path(temp)
++            directory = root / "backend/go"
++            directory.mkdir(parents=True)
++            allowed = directory / "main.go"
++            allowed.write_text("source", encoding="utf-8")
++            original = Path.is_symlink
++
++            def marks_path(path):
++                return path == allowed or original(path)
++
++            with mock.patch.object(Path, "is_symlink", marks_path):
++                self.assertEqual(boundary.unexpected_files(root, "go"), ["main.go"])
++
++            def marks_directory(path):
++                return path == directory or original(path)
++
++            with mock.patch.object(Path, "is_symlink", marks_directory):
++                self.assertEqual(boundary.unexpected_files(root, "go"), ["go"])
++
+     def test_all_affected_workflow_jobs_use_boundary_checker(self):
+         workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+         self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py go"), 1)
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/2026-09-29-ci001-placeholder-fix2.txt
+# ?? research/prompts/P-2b02d03a-b37e-4b1d-85cd-c549e4d91c0e/metadata.json
+# ?? research/prompts/P-2b02d03a-b37e-4b1d-85cd-c549e4d91c0e/prompt.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/.gitattributes
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-289740da-3560-469c-ae5f-4d1d9e6a7eb0.stderr.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-289740da-3560-469c-ae5f-4d1d9e6a7eb0.stdout.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-62be3a69-422f-4667-801a-6822658d39f5.stderr.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-62be3a69-422f-4667-801a-6822658d39f5.stdout.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-9985d51c-1aea-4612-b8d0-d62fffb8eef1.stderr.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-9985d51c-1aea-4612-b8d0-d62fffb8eef1.stdout.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-d29fdbc5-1eb2-45a3-876d-0cfd561d6417.stderr.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/blobs/C-d29fdbc5-1eb2-45a3-876d-0cfd561d6417.stdout.txt
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/events.jsonl
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/initial_state.json
+# ?? research/runs/R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md
