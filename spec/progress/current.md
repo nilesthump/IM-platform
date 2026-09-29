@@ -16,6 +16,8 @@ Current Task State: review
 
 ## Current Contract Work
 
+- Fresh independent review of S0 placeholder candidate `502342358d11fc6e77ff2b7e1f86ed5f07220ea8` **FAIL**: clean detached CTRL-002 Acceptance and 16 CI tests pass, but workflow/checker changes classify as deploy only and do not run the five repaired profile jobs or compatibility on a push; allowed-name root symlinks bypass the boundary check. Frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` had an exposed GBK output capture failure. Task remains `review`, S0 Gate FAIL. Next: fresh Fix/Review cycle, then actual hosted full-matrix CI. No S1 activation.
+
 - Post-push full-matrix GitHub Actions [36532087481](https://github.com/nilesthump/IM-platform/actions/runs/36532087481) **FAIL** at `origin/main` `686dbf2`: tracked `.gitkeep` markers and placeholder client directories trigger all five S0 source boundary checks. The prior S0 Gate PASS checkpoint was based on a research-only hosted change that selected no profile jobs and is now superseded for Gate status. `LOOP1-CI-001` is reopened in `review`; Fix Agent changed CI boundary checks and added regression tests. Local 16 CI tests and CTRL-002 Development pass. See `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-placeholder-fix-development.md`. Next: fresh independent review, then a full-matrix hosted CI run and S0 Gate reevaluation. No self-acceptance; S1 inactive.
 
 - S0 Stage Gate **PASS** on clean integrated local `main` `037c88ce86c2d81b518e26cd367676b4343f3360`: all nine required tasks are `done`; actual GitHub Actions [36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147) succeeded on the reviewed CI branch; CTRL-002 Acceptance, frozen hashes, S0 spec/HTTP/WSS/Sync/Plugin/CI verifiers, and both PostgreSQL/NATS/HTTPS/WSS TLS 1.3 profile smokes passed after integration. Exact Gate evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-gate-evaluation.md`; latest checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md`. ADR-0001 temporary bootstrap exception expired. The historical CTRL-001 empty-product verifier rejects the approved Infra skeleton and is disclosed as phase-specific. Remote `main` remains old and was not pushed under task-branch-only approvals. S1 remains inactive.
@@ -280,7 +282,7 @@ Current Task State: review
 
 ## Next Exact Action
 
-Fresh independent Review Agent verifies the clean committed S0 placeholder fix candidate, then Coordinator obtains a new full-matrix hosted CI run. If it passes, reevaluate the S0 Gate and create a new recovery checkpoint before any S1 activation.
+Fresh Fix Agent repairs CI-change full-matrix selection and symlink boundary bypass; a different fresh independent Review Agent verifies the clean committed candidate, then Coordinator obtains a hosted full-matrix CI run. On PASS, reevaluate S0 Gate and create a new checkpoint before S1 activation.
 
 ## Last Known Good Commit
 
@@ -291,6 +293,8 @@ Fresh independent Review Agent verifies the clean committed S0 placeholder fix c
 `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md` (historical local PASS checkpoint, superseded for current Gate status by hosted full-matrix FAIL).
 
 ## Uncommitted Changes / Ownership
+
+- Fresh independent Reviewer `/root/ci_placeholder_review` owns only this FAIL evidence, Task Spec/current recovery updates, prompt, and Recorder artifacts until committed in its isolated review worktree. The separate clean Acceptance clone was removed; no product file was modified. Recorder output capture failed on a symlink probe and was disclosed.
 
 - Fresh Fix Agent `/root/ci_placeholder_fix` owns only CI boundary checker/workflow, `tests/ci` regressions, CI Task Spec queue/recovery, this current-state update, task-linked development evidence and Recorder prompt/run until the clean candidate commit. No architecture, contract, gate selection, or original `H:\IM-platform` untracked files were touched.
 
