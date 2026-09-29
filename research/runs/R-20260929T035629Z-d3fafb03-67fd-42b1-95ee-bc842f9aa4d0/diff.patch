@@ -1,0 +1,50 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index f8d4314..dcbf3b0 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- Fresh independent CI Review 4 **PASS** for diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: clean detached CTRL-002 Acceptance, 12 CI tests, frozen hashes, scope and no-weakening review passed. The diagnostic reports the same Git porcelain entries used by Acceptance before its unchanged check. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. This accepts diagnostic suitability only. Next exact action: Coordinator obtains a new hosted run to identify the dirty entries, then delegates a fresh Fix/Review cycle if necessary. Task stays `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only review evidence, task/current edits, and linked Recorder artifacts until committed.
++
+ - Fresh Fix 3 added a diagnostic step in `.github/workflows/ci.yml` to print the exact checkout Git porcelain status before the unchanged CTRL-002 Acceptance check. The hosted failure's entries remain unknown; 12 local CI tests and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. Task stays `review`, Gate NOT YET PASSED. Next: fresh independent review, then a new hosted diagnostic run; repair the identified cause in another Fix/Review cycle.
+ 
+ - User approved pushing reviewed CI commit `f07e353` to `origin/task/LOOP1-CI-001`; push succeeded without changing remote `main`. Actual GitHub Actions run [36515716353](https://github.com/nilesthump/IM-platform/actions/runs/36515716353) **FAIL**: classify job's CTRL-002 Acceptance check found a dirty checkout and the gate rejected the failed job. Exact offending status entries are not logged. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`; Coordinator Recorder `R-20260929T030511Z-4f60e75a-68e1-4f64-8516-b71c024a15c2` finalized FAIL and validated. Next exact action: fresh Fix Agent diagnoses and repairs this CI checkout failure, then a different fresh Review Agent checks a clean candidate. Task stays `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns only the task evidence/current/spec and linked Recorder changes until committed.
+diff --git a/spec/tasks/review/LOOP1-CI-001.md b/spec/tasks/review/LOOP1-CI-001.md
+index 372b037..2dceef8 100644
+--- a/spec/tasks/review/LOOP1-CI-001.md
++++ b/spec/tasks/review/LOOP1-CI-001.md
+@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Evidence
+ 
++- Fresh independent Review 4 `/root/ci001_review4` **PASS** for exact clean detached diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: CTRL-002 Acceptance with zero status entries, 12 CI tests, frozen hashes, no-weakening/scope/minimality inspection, and Fix 3 Recorder validity passed. The only product change prints Git porcelain status before unchanged Acceptance, to identify the dirty path in a new hosted run. Exact commands, exits, elapsed times, clean-state method, branch/diff range, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; review Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. Hosted root cause is unknown; task remains `review`, S0 Gate NOT YET PASSED.
++
+ - Fresh Fix 3 added a checkout-status diagnostic before unchanged CTRL-002 Acceptance in the `classify` job. The failed hosted run did not expose the offending porcelain entries, and a clean local PowerShell probe did not reproduce the suspected empty-output bug; the exact hosted cause is still unknown. Twelve path/gate tests and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. This is a diagnostic candidate, not a repair PASS. Task stays `review`; independent review and a new hosted run are required.
+ 
+ - User approved and the reviewed `f07e353` branch was pushed to `origin/task/LOOP1-CI-001`. Actual GitHub Actions run `36515716353` **FAIL**: the classify job's CTRL-002 Acceptance check reported a dirty checkout; the gate rejected it. The offending status entries are not in the log yet. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`. Fresh Fix Agent diagnosis and a new independent review are required. Task stays `review`; S0 Gate NOT YET PASSED.
+@@ -83,4 +85,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
+ 
+ # Next Action
+ 
+-- A fresh independent Review Agent checks the task-scoped diagnostic candidate; after its review, the Coordinator obtains a new hosted run to reveal exact Git porcelain status. A fresh Fix/Review cycle then repairs the root cause before operational CI acceptance. S0 Gate remains pending.
++- Coordinator obtains a new hosted run on the independently reviewed diagnostic candidate to reveal exact Git porcelain status. A fresh Fix/Review cycle then repairs the root cause before operational CI acceptance if the run still fails. S0 Gate remains pending.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-47cca3f2-a8fd-4fb5-90fd-b0d6cd466951/metadata.json
+# ?? research/prompts/P-47cca3f2-a8fd-4fb5-90fd-b0d6cd466951/prompt.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-53316130-5dae-4a29-9d5c-b24accafb807.stderr.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-53316130-5dae-4a29-9d5c-b24accafb807.stdout.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-6f08851a-0905-44fa-9656-036f66e9f4c1.stderr.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-6f08851a-0905-44fa-9656-036f66e9f4c1.stdout.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-8fe14af6-df05-4687-8574-b8a4463a4fc2.stderr.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-8fe14af6-df05-4687-8574-b8a4463a4fc2.stdout.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-ca139106-f4e8-4b4b-8278-357dcab5af5a.stderr.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-ca139106-f4e8-4b4b-8278-357dcab5af5a.stdout.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-ca52e82a-a5c4-443d-99a5-d4bfe3f9da1d.stderr.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/blobs/C-ca52e82a-a5c4-443d-99a5-d4bfe3f9da1d.stdout.txt
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/events.jsonl
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/initial_state.json
+# ?? research/runs/R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0/metadata.json
+# ?? spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md

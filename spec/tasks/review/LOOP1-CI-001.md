@@ -50,6 +50,8 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Evidence
 
+- Fresh independent Review 4 `/root/ci001_review4` **PASS** for exact clean detached diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: CTRL-002 Acceptance with zero status entries, 12 CI tests, frozen hashes, no-weakening/scope/minimality inspection, and Fix 3 Recorder validity passed. The only product change prints Git porcelain status before unchanged Acceptance, to identify the dirty path in a new hosted run. Exact commands, exits, elapsed times, clean-state method, branch/diff range, and independence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; review Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. Hosted root cause is unknown; task remains `review`, S0 Gate NOT YET PASSED.
+
 - Fresh Fix 3 added a checkout-status diagnostic before unchanged CTRL-002 Acceptance in the `classify` job. The failed hosted run did not expose the offending porcelain entries, and a clean local PowerShell probe did not reproduce the suspected empty-output bug; the exact hosted cause is still unknown. Twelve path/gate tests and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. This is a diagnostic candidate, not a repair PASS. Task stays `review`; independent review and a new hosted run are required.
 
 - User approved and the reviewed `f07e353` branch was pushed to `origin/task/LOOP1-CI-001`. Actual GitHub Actions run `36515716353` **FAIL**: the classify job's CTRL-002 Acceptance check reported a dirty checkout; the gate rejected it. The offending status entries are not in the log yet. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`. Fresh Fix Agent diagnosis and a new independent review are required. Task stays `review`; S0 Gate NOT YET PASSED.
@@ -83,4 +85,4 @@ The Coordinator prospectively authorizes task-linked `spec/progress/evidence/LOO
 
 # Next Action
 
-- A fresh independent Review Agent checks the task-scoped diagnostic candidate; after its review, the Coordinator obtains a new hosted run to reveal exact Git porcelain status. A fresh Fix/Review cycle then repairs the root cause before operational CI acceptance. S0 Gate remains pending.
+- Coordinator obtains a new hosted run on the independently reviewed diagnostic candidate to reveal exact Git porcelain status. A fresh Fix/Review cycle then repairs the root cause before operational CI acceptance if the run still fails. S0 Gate remains pending.
