@@ -1,28 +1,28 @@
 # Current Execution State
 
 Current Loop: Loop 1
-Current Stage: S1 remediation 4/4 administrative finalization
+Current Stage: S1 remediation completed
 Current Gate: LOOP1-ARCH-REMEDIATION
-Gate Status: NOT YET PASSED (product candidate accepted; final administrative Review CAPABILITY_BLOCKED_SUBAGENTS; S1 product Gate OPEN)
+Gate Status: PASS (remediation only; S1 product Gate OPEN; final state-record confirmation external)
 Current Batch: LOOP1-ARCH-REMEDIATION
 Current Task: LOOP1-ARCH-REMEDIATION-004
-Current Task State: review
+Current Task State: done
 
 ## Immediately Relevant Completed Work
 
-Tasks001-003 done;004 product accepted, administrative candidate remainsreview: full architecture audit25 determinate repairs, execution inputs, effective checks and Go migration. Product candidate d0ae52f independently reviewed and hosted36744072690 SUCCESS. Original Auth old-check PASS retained. Administrative candidate itself awaits new independent Review and exact-head hosted CI; no follow-on business activated.
+Tasks001-004 done: fullFrozen25conflict repairs, execution constraints, effective CI and Go migration. NEW independent CLI Review exactf4fdd82f8f3179034fb74700c1b4e9aa43e4637e and hosted36749210695 SUCCESS (five required successes/eight inactive skips), plus product d0ae52f independent Review/hosted36744072690 SUCCESS. The final state-record commit requires NEW independent Review and exact-head hosted confirmation before final delivery, captured externally at H:/.codex/worktrees/architecture-remediation/final-acceptance-research/final-acceptance-summary.json. S1 product Gate OPEN; no downstream business activated. HistoricalAuth oldPASS retained.
 
 ## Current Blockers
 
-No unresolved substantive architecture choice within audit coverage. CAPABILITY_BLOCKED_SUBAGENTS: Root and fresh child NEW Review dispatch both failed with agent thread limit reached. Final administrative Review/hosted verification is pending; ordinary failures require fresh fix/review cycles. S1 product Gate OPEN.
+No known blocking architecture conflict within audit coverage. Built-in thread quota resolved by actual new independent CLI context. Final state-record Review/hosted must finish before delivery; exact status is external final-acceptance-summary.json. S1 product Gate OPEN.
 
 ## Verification
 
-- Command: `gh run view 36744072690 --repo nilesthump/IM-platform --json headSha,status,conclusion,jobs,url`
-  - Result: SUCCESS on exact d0ae52f; six required jobs succeeded, seven classified inactive skips.
-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-hosted-acceptance.md`
+- Command: `gh run view 36749210695 --repo nilesthump/IM-platform --json headSha,status,conclusion,jobs,url`
+  - Result: SUCCESS exactf4fdd82;five required successes/eight inactive skips; newindependentCLIReviewPASS.
+  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/administrative-independent-review.md`
 
-Exact product acceptance: d0ae52f5615320790ae7039cb48831873de6f486, hosted36744072690 six required jobs SUCCESS, seven correctly inactive jobs skipped. New independent Review executed realPG16/NATS fullunit/race/canonical/3rolesComposeTLS/directNATS and security negatives with zero integration skips; hosted Linux27CI and34architecture controls passed without skips. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-hosted-acceptance.md and revocation-independent-review.md. Administrative finalHEAD CI capture is pending at H:/.codex/worktrees/architecture-remediation/final-acceptance-research.
+Product exactd0ae52f/hosted36744072690 sixrequiredsuccess/seveninactive; realPG16NATS unit/race/canonical/rolesTLS/rawNATS/securitynegative0integration skips; source0,34architecture/27CI. Four localWindows symlink skips, hostedLinuxnone. Final state-record HEAD/newReview/CI captured at H:/.codex/worktrees/architecture-remediation/final-acceptance-research/final-acceptance-summary.json.
 
 ## Changed Files or Migrations
 
@@ -30,26 +30,24 @@ Core private Auth/Session write transactions/Outbox; Gateway readonly validation
 
 ## Known Failures, Risks, and Assumptions
 
-Hosted36738064831 failed revocation race, repaired with new fresh Fix/Review and successful36744072690; preserve all evidence. Four historical local Windows symlink subcases skipped; hosted Linux confirmed zero skips. Current and earlier explicit Recorder redaction/incomplete pretrace limitations are disclosed in closure evidence; Recorder is not acceptance authority. Final administrative Review/hosted pending, not substituted by product CI.
+Hosted36738064831 revocationrace/GateFAIL retained, repaired by freshFix/newReview/36744072690SUCCESS. Four localWindows symlink subcases skipped; actualhostedLinuxcoverage no skips. Recorderexplicitredaction/incompletepretrace and prior decoding limits disclosed; researchvalidity not acceptance. Final statusrecord acceptance must matchHEAD in externalsummary.
 
 ## Last Known Good Commit
 
-`d0ae52f5615320790ae7039cb48831873de6f486` (independent product Review and exact hosted36744072690).
+`f4fdd82f8f3179034fb74700c1b4e9aa43e4637e` independentReview and exacthosted36749210695SUCCESS. Final state-record accepted HEAD and result are external final-acceptance-summary.json; require an exact match to actual gitHEAD.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-architecture-remediation-product-accepted.md`
+`spec/progress/checkpoints/2026-10-01-architecture-remediation-completed.md`
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage4_closure owns this bounded administrative candidate and new task-linked trace, including explicitly transferred Root hosted archives/trace; releases after clean commit. Original unknown files and separate Social worktree untouched.
+Coordinator owns only final accepted queue/status records until ordinarycommit; no active product writer. Original unknown files and separateSocial worktree untouched. Final Review may write only external newreview evidence.
 
 ## Next Exact Action
 
-Restore genuine new independent Review capability, then NEW independent administrative Review of this clean candidate, then Coordinator ordinary dedicated task-branch push and exact finalHEAD hosted verification, captured at H:/.codex/worktrees/architecture-remediation/final-acceptance-research. Restore this worktree and checkpoint, verify accepted SHA/current queues; before any later business selection inspect Social worktree ownership at H:/.codex/worktrees/loop1-s1/IM-platform. Do not automatically resume Social or original Auth implementation.
+Coordinator obtains NEW independent final state-record Review and exactHEAD hosted confirmation in the external final acceptance path, then delivery. Later restorethisworktree/checkpoint, compareHEAD with final-acceptance-summary.json and verify004unique done. Inspect preservedSocial ownership before separately authorized business selection; no automatic originalAuth/Social/Message/Java/plugin implementation.
 
 ## Architecture Conflicts / ACP / ADR
 
-Canonical v1.1 SHA83d124b unchanged; PDF546915f unchanged. Conflict closure supplement links I01 actualGo0violations and D01 propagation/checks without rewriting stage001 ledger. No new semantics/approval question.
-
-Independent capability recovery: built-in collaboration dispatch hit the actual thread quota (CAPABILITY_BLOCKED_SUBAGENTS for that mechanism). Coordinator located codex-cli0.159.2 and will attempt a genuinely new read-only CLI context; this alternative is not yet run or accepted. Do not equate thread quota with proven absence of all real independent-agent capability. Task004 staysreview and batch pending until an actual new Review plus exact-head hosted verification.
+Canonical v1.1 SHA83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e; historicalPDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 unchanged. Ledger001 plusclosure supplement004 resolveC01-C25/I01/D01 without rewriting historical approval. No pending substantive decision or new product scope.

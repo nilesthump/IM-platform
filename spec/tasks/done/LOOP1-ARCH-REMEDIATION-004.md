@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
-status: review
-owner: Coordinator (product accepted; administrative finalization pending)
+status: done
+owner: Coordinator (accepted closure; no active product writer)
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -72,16 +72,16 @@ Before migration, bind exact commands/results from independently accepted stage0
 
 # Evidence
 
-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (product independently accepted; administrative candidate pending independent Review/CI).
+- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (product and administrative candidate independently accepted; final state-record confirmation external).
 
 # Handoff
 
 - Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
-- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+- No active product writer; Coordinator records accepted queue transitions. Original and Social worktrees remain untouched.
 
 # Next Action
 
-Restore genuine new independent Review capability (CAPABILITY_BLOCKED_SUBAGENTS: agent thread limit reached), then Coordinator delegates a NEW independent administrative Review, then normally pushes the exact reviewed closure HEAD and verifies its hosted required jobs. Final JSON and prospective Recorder capture are stored outside the checkout at `H:/.codex/worktrees/architecture-remediation/final-acceptance-research` to preserve a clean final HEAD without recursive evidence commits. This final administrative verification is pending, not counted as executed. No other business advancement.
+Coordinator verifies the final status-record HEAD by new independent Review and hosted CI; then resume only by the completed checkpoint and external final-acceptance-summary.json. Inspect preserved Social ownership before any separately authorized next business selection. No automatic original Auth, Social, Java or plugin implementation.
 
 # Activation
 
@@ -120,3 +120,7 @@ Fresh /root/stage4_revocation_review localPASS exact6339f8e from cleanisolatedch
 Task004 retains review: existing fresh independent product Review plus exact d0ae52f5615320790ae7039cb48831873de6f486 hosted36744072690 SUCCESS accepts the product candidate; final administrative candidate Review is CAPABILITY_BLOCKED_SUBAGENTS (actual agent thread limit reached). Six required jobs succeeded; seven inactive profiles skipped as classified. Product acceptance survives prior failure36738064831, which is preserved with repair evidence. Tasks001-003 done and004review; this administrative candidate itself has NOT yet been independently reviewed or hosted-tested. Batch finalization is conditional on that new verification; S1 product Gate OPEN. See final-hosted-acceptance.md, conflict-closure-supplement.md and 2026-10-01 checkpoint. Migration scope expires at final batch closure; ordinary future scopes stay narrow.
 
 Independent capability recovery: built-in collaboration dispatch hit the actual thread quota (CAPABILITY_BLOCKED_SUBAGENTS for that mechanism). Coordinator located codex-cli0.159.2 and will attempt a genuinely new read-only CLI context; this alternative is not yet run or accepted. Do not equate thread quota with proven absence of all real independent-agent capability. Task004 staysreview and batch pending until an actual new Review plus exact-head hosted verification.
+
+# Coordinator accepted closure (2026-10-01)
+
+All four tasks done after NEW independent CLI Review exactf4fdd82f8f3179034fb74700c1b4e9aa43e4637e and hosted36749210695 SUCCESS (five required successes/eight inactive skips), plus product d0ae52f independent Review/hosted36744072690 SUCCESS. The final state-record commit requires NEW independent Review and exact-head hosted confirmation before final delivery, captured externally at H:/.codex/worktrees/architecture-remediation/final-acceptance-research/final-acceptance-summary.json. S1 product Gate OPEN; no downstream business activated. Actual new CLI thread01a0f338-0b78-7e32-ab51-21c61d8b7265 and54-event independent trace establish real delegation despite built-in thread quota; report/process/commands and hostedJSON preserved in evidence004. Both one-time migration and finite administrative authorizations expire at this accepted closure. Prior handoffs remain dated history.
