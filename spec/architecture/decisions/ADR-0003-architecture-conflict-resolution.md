@@ -1,6 +1,6 @@
 # ADR-0003: Whole-document architecture conflict resolution and executable service boundaries
 
-Status: Human-approved bounded conflict resolution; stage-one canonical revision independently accepted; downstream remediation pending.
+Status: Human-approved bounded conflict resolution; canonical revision and downstream product remediation independently accepted; administrative finalization pending.
 Date: 2026-09-30
 Approval source: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md; visible Human four-stage instruction and registered prompt P-ddf5a00c-27a1-412c-ad9b-2305e1aad734 (delegation plus exact approval excerpt, not complete Human prompt).
 
@@ -27,3 +27,7 @@ Each bounded stage needs new independent Review and applicable CI. Final batch a
 ## Actual bounded acceptance point
 
 Fresh stage-one Review accepted a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. Hosted run 36714913796 accepted exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md and task001 done. This discovery update preserves decision/approval/history. Stages002-004 and product/batch/S1 acceptance remain outstanding.
+
+## Current completion discovery (2026-10-01)
+
+The preceding bounded acceptance paragraph records the stage-one historical point, not current pending work. Tasks001-003 are done; Task004 remainsreview with accepted product candidate d0ae52f5615320790ae7039cb48831873de6f486 / hosted36744072690 with fresh independent revocation Review. See evidence004/final-hosted-acceptance.md and conflict-closure-supplement.md. This administrative candidate requires new independent Review and exact-head hosted verification before final batch closure. Canonical v1.1 semantics/hash/approval, historical migrations and PDF remain unchanged; S1 product Gate OPEN.

@@ -2,7 +2,7 @@
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
 status: review
-owner: Fresh Fix completed candidate pending new independent Review
+owner: Coordinator (product accepted; administrative finalization pending)
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -42,6 +42,10 @@ Apply spec/governance/execution-boundaries.md and spec/governance/independent-re
 
 User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
 
+# Administrative closure authorization (2026-10-01)
+
+The original Human four-stage instruction explicitly authorizes synchronized Agent instructions, acceptance, baseline discovery, task/batch/recovery and checkpoint updates. This one-time administrative scope adds `AGENTS.md`, `spec/handoff/agent-context.md`, `spec/governance/execution-boundaries.md`, `spec/acceptance/s0-auth-user-friend.md`, `spec/acceptance/s0-messaging.md`, `spec/acceptance/s0-sync-plugin.md`, `spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md`, and `spec/architecture/baseline.md` only for current completion discovery. It expires at administrative closure; no normative architecture, contract, product, checker or workflow changes. Preserve historical bounded acceptance paragraphs with explicitly dated current supplements. Coordinator transferred sole writer ownership to fresh /root/stage4_closure; inherited uncommitted Root prompt/run and hosted36744072690 archives have known ownership.
+
 # Acceptance
 
 Publish actual before/after file/responsibility migration map, preserve Core Auth writes and narrow Gateway validation, minimize shared support and exported interfaces. Recursive formatting/build/vet/unit/race, live migrated PostgreSQL/NATS integration and canonical fixtures, register/login/three slots/replacement/epoch/refresh/logout/bind/revocation/close/rollback/security, each role startup/routes/events, Compose/TLS smoke, all structural checks. Explicit test enable conditions; skipped integration is unexecuted. Fresh final independent review and hosted CI exact head/jobs; close batch only after all criteria.
@@ -68,7 +72,7 @@ Before migration, bind exact commands/results from independently accepted stage0
 
 # Evidence
 
-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (pending independent acceptance).
+- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (product independently accepted; administrative candidate pending independent Review/CI).
 
 # Handoff
 
@@ -77,7 +81,7 @@ Before migration, bind exact commands/results from independently accepted stage0
 
 # Next Action
 
-- Coordinator delegates NEW independent Review of the clean reason-repair candidate, then normally pushes its reviewed dedicated task branch and verifies NEW exact-head hosted allrequiredjobs before004/batch closure/checkpoint. No other business advancement.
+Restore genuine new independent Review capability (CAPABILITY_BLOCKED_SUBAGENTS: agent thread limit reached), then Coordinator delegates a NEW independent administrative Review, then normally pushes the exact reviewed closure HEAD and verifies its hosted required jobs. Final JSON and prospective Recorder capture are stored outside the checkout at `H:/.codex/worktrees/architecture-remediation/final-acceptance-research` to preserve a clean final HEAD without recursive evidence commits. This final administrative verification is pending, not counted as executed. No other business advancement.
 
 # Activation
 
@@ -110,3 +114,9 @@ Fresh /root/stage4_revocation_fix deterministically reproduced Corecommittedrepl
 ## New independent revocation repair Review pending hosted
 
 Fresh /root/stage4_revocation_review localPASS exact6339f8e from cleanisolatedcheckout; newPG16NATS fullunitrace/canonical/fallback3times/expiryDBfailure/oldbind/no-messagePGlock negative and3rolesTLS withdirectrawNATS REPLACED+LOGOUT observation PASS,zero integrationskips.19recursivefmtbuildvet/source0/34architecture0skip/27CI4historicalWindows symlinksubcase skips; protectedhistory/hash/UTF8unique004review/recoveryAcceptance PASS. Evidence004/revocation-independent-review.md. Coordinator next ordinarydedicatedbranchpush exactReviewclosure thenNEWhosted requiredjobs;004/batch/S1 remainNOT PASSED. SoleReviewwriter releasesafterevidencecommit; no productfix orotherbusiness.
+
+# Product acceptance and administrative closure candidate (2026-10-01)
+
+Task004 retains review: existing fresh independent product Review plus exact d0ae52f5615320790ae7039cb48831873de6f486 hosted36744072690 SUCCESS accepts the product candidate; final administrative candidate Review is CAPABILITY_BLOCKED_SUBAGENTS (actual agent thread limit reached). Six required jobs succeeded; seven inactive profiles skipped as classified. Product acceptance survives prior failure36738064831, which is preserved with repair evidence. Tasks001-003 done and004review; this administrative candidate itself has NOT yet been independently reviewed or hosted-tested. Batch finalization is conditional on that new verification; S1 product Gate OPEN. See final-hosted-acceptance.md, conflict-closure-supplement.md and 2026-10-01 checkpoint. Migration scope expires at final batch closure; ordinary future scopes stay narrow.
+
+Independent capability recovery: built-in collaboration dispatch hit the actual thread quota (CAPABILITY_BLOCKED_SUBAGENTS for that mechanism). Coordinator located codex-cli0.159.2 and will attempt a genuinely new read-only CLI context; this alternative is not yet run or accepted. Do not equate thread quota with proven absence of all real independent-agent capability. Task004 staysreview and batch pending until an actual new Review plus exact-head hosted verification.

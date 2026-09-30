@@ -21,3 +21,7 @@
 - baseline_date: 2026-09-30
 
 The Markdown is the single current canonical source under the explicitly approved revision. Stage-one bounded acceptance: fresh Review of a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d and hosted run 36714913796 on exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md. This does not accept pending stages two through four, source compliance or remediation/S1 Gate. This revision tightens executable source ownership and governance semantics; it is NOT the historical representation-only migration. ADR-0002 and its original v1.0 migration facts are immutable history. The PDF remains the byte-for-byte immutable historical snapshot and is not a second current authority. No public wire, database, ACK/Sync, compatibility or security boundary is changed.
+
+## Current completion discovery (2026-10-01)
+
+The preceding stage-one paragraph is its bounded historical acceptance point. Subsequent task/product acceptance is now recorded in evidence004/final-hosted-acceptance.md (d0ae52f / hosted36744072690). Administrative finalization requires a new independent Review and exact-head hosted run. Version, hashes, approval and historical source metadata remain unchanged; S1 product Gate OPEN.
