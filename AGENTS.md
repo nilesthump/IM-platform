@@ -9,7 +9,7 @@ Before doing any work, every agent MUST read and inspect, in this order:
 1. `spec/handoff/agent-context.md`.
 2. `spec/progress/current.md`.
 3. Read the `Current Task` ID and resolve that exact ID across `spec/tasks/{review,active,ready,backlog,done}/`. It MUST exist in exactly one queue and its declared status MUST match that queue. Resume by actual state: `review` completes the independent review/fix cycle; `active` continues implementation; `ready` may activate only when dependencies and inputs are satisfied; `backlog` remains blocked on prerequisites; `done` permits selection of the next dependency-satisfied task. Never select work merely because `active/` is empty. Select another task only when the current task is complete and no unfinished current task exists.
-4. Every architecture document, approved ADR or frozen decision, domain document, invariant, acceptance criterion, and contract referenced by the current Task Spec. First resolve and hash-check the canonical Frozen Architecture Markdown through `spec/architecture/README.md` and `spec/architecture/baseline.md`. The retained PDF is historical provenance.
+4. Every architecture document, approved ADR or frozen decision, domain document, invariant, acceptance criterion, and contract referenced by the current Task Spec. First resolve and hash-check the canonical Frozen Architecture Markdown through `spec/architecture/README.md` and `spec/architecture/baseline.md`. The retained PDF is historical provenance. Every business task MUST also read canonical sections §3, §10 (SRC-01 through SRC-07) and §11 before implementation, including responsibilities, source ownership and dependency direction.
 5. `git status`.
 6. The current diff.
 7. Recent commits.
@@ -41,6 +41,12 @@ Without explicit approval, an agent MUST NOT change Frozen Architecture, public 
 - Do not broaden task scope to make implementation easier.
 - Keep task state in exactly one queue: `backlog -> ready -> active -> review -> done`.
 - A task may enter `done` only after accepted independent review and the applicable independent acceptance mechanism.
+
+## Applicable execution constraints
+
+Read [execution constraints](spec/governance/execution-boundaries.md) and [the independent Review checklist](spec/governance/independent-review.md). allowed_paths never overrides or exempts architecture. Ordinary business tasks narrow paths by responsibility; one-time cross-service migration lists affected files/responsibilities, scope and exit before edits. Applicable source/dependency checks supplement behavior. Reviewer inspects actual logic and imports plus minimality; Java inherits canonical boundaries, never Go layout. Escalate conflicts before implementation; do not legalize errors after implementation.
+
+LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers are independently bounded accepted at2afeac8/run36726926394 (evidence003/hosted-acceptance.md); execute ci/check_architecture.py --scope all --json and tests/architecture; Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN.
 
 ## Verification, handoff, and checkpoints
 

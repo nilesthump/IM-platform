@@ -38,6 +38,23 @@ class GateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             gate.check(needs)
 
+    def test_architecture_jobs_missing_invalid_skipped_failed_cancelled(self):
+        for job in ("architecture", "source_go", "source_java"):
+            for status in ("skipped", "failure", "cancelled"):
+                needs = self.needs()
+                needs["classify"]["outputs"][job] = "true"
+                needs[job]["result"] = status
+                with self.subTest(job=job, status=status), self.assertRaises(ValueError):
+                    gate.check(needs)
+            needs = self.needs()
+            del needs[job]
+            with self.subTest(job=job, missing=True), self.assertRaises(ValueError):
+                gate.check(needs)
+            needs = self.needs()
+            needs["classify"]["outputs"][job] = "bogus"
+            with self.subTest(job=job, invalid=True), self.assertRaises(ValueError):
+                gate.check(needs)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,814 @@
+diff --git a/backend/go/gateway/gateway.go b/backend/go/gateway/gateway.go
+index 4248879..8e14ba0 100644
+--- a/backend/go/gateway/gateway.go
++++ b/backend/go/gateway/gateway.go
+@@ -187,11 +187,13 @@ func (h *hub) watch(c *connection, cl shared.Claims) {
+ 		case <-ticker.C:
+ 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+ 			_, err := h.auth.authenticate(ctx, c.token)
+-			cancel()
+ 			if err != nil {
+-				h.revoke(cl.SessionID, "REVOKED")
++				reason := h.auth.revocationReason(ctx, cl, err)
++				cancel()
++				h.revoke(cl.SessionID, reason)
+ 				return
+ 			}
++			cancel()
+ 		}
+ 	}
+ }
+diff --git a/backend/go/gateway/session.go b/backend/go/gateway/session.go
+index 3017073..874efc9 100644
+--- a/backend/go/gateway/session.go
++++ b/backend/go/gateway/session.go
+@@ -49,3 +49,23 @@ func (s *validator) authenticate(ctx context.Context, token string) (shared.Clai
+ 	}
+ 	return c, nil
+ }
++
++// A safety-watch failure can precede (or replace) NATS delivery. Only a
++// committed revocation for this exact bound identity supplies a business reason;
++// expiry, database faults and missing/unrecognized facts remain conservative.
++func (s *validator) revocationReason(ctx context.Context, c shared.Claims, err error) string {
++	e, ok := err.(shared.Error)
++	if !ok || (e.Code != "AUTH_SESSION_REVOKED" && e.Code != "AUTH_SESSION_EPOCH_STALE") {
++		return "REVOKED"
++	}
++	var reason string
++	if s.db.QueryRow(ctx, `SELECT payload->>'reason' FROM user_sync_events WHERE user_id=$1 AND event_type='session.revoked' AND payload->>'sessionId'=$2 ORDER BY cursor_id DESC LIMIT 1`, c.UserID, c.SessionID).Scan(&reason) != nil {
++		return "REVOKED"
++	}
++	switch reason {
++	case "REPLACED", "LOGOUT":
++		return reason
++	default:
++		return "REVOKED"
++	}
++}
+diff --git a/backend/go/gateway/session_test.go b/backend/go/gateway/session_test.go
+new file mode 100644
+index 0000000..6cbf3cd
+--- /dev/null
++++ b/backend/go/gateway/session_test.go
+@@ -0,0 +1,77 @@
++package gateway
++
++import (
++	"context"
++	"errors"
++	"github.com/jackc/pgx/v5/pgxpool"
++	"im-platform/backend/go/shared"
++	"os"
++	"testing"
++)
++
++func TestRevocationReasonDoesNotInventBusinessCause(t *testing.T) {
++	// A nil pool makes any accidental lookup fail loudly. These failures must
++	// close conservatively without looking up an unrelated business event.
++	s := &validator{}
++	for _, err := range []error{errors.New("database unavailable"), shared.Fail(401, "AUTH_TOKEN_EXPIRED", "expired"), shared.Fail(401, "AUTH_TOKEN_INVALID", "invalid"), nil} {
++		if got := s.revocationReason(context.Background(), shared.Claims{}, err); got != "REVOKED" {
++			t.Fatalf("reason %q for %v", got, err)
++		}
++	}
++}
++
++func TestPostgresRevocationReasonUsesExactCommittedIdentity(t *testing.T) {
++	if os.Getenv("DB_TEST_ENABLE") != "1" {
++		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
++	}
++	ctx := context.Background()
++	db, err := pgxpool.New(ctx, "")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer db.Close()
++	s := &validator{db: db}
++	uid, _ := shared.UUID()
++	other, _ := shared.UUID()
++	sid, _ := shared.UUID()
++	nextSID, _ := shared.UUID()
++	for _, id := range []string{uid, other} {
++		if _, err = db.Exec(ctx, "INSERT INTO users(user_id,username,display_name,password_hash) VALUES($1,$2,'Reason control','test-only-non-login-hash')", id, "reason"+id); err != nil {
++			t.Fatal(err)
++		}
++	}
++	defer func() {
++		_, _ = db.Exec(ctx, "DELETE FROM user_sync_events WHERE user_id=$1 OR user_id=$2", uid, other)
++		_, _ = db.Exec(ctx, "DELETE FROM users WHERE user_id=$1 OR user_id=$2", uid, other)
++	}()
++	c := shared.Claims{UserID: uid, SessionID: sid}
++	revoked := shared.Fail(401, "AUTH_SESSION_REVOKED", "revoked")
++	add := func(user, session, reason string) {
++		t.Helper()
++		if _, err := db.Exec(ctx, "INSERT INTO user_sync_events(user_id,event_type,payload) VALUES($1,'session.revoked',jsonb_build_object('sessionId',$2::text,'reason',$3::text))", user, session, reason); err != nil {
++			t.Fatal(err)
++		}
++	}
++	add(other, sid, "LOGOUT")
++	add(uid, nextSID, "REPLACED")
++	if got := s.revocationReason(ctx, c, revoked); got != "REVOKED" {
++		t.Fatalf("unrelated identity accepted %q", got)
++	}
++	add(uid, sid, "UNKNOWN")
++	if got := s.revocationReason(ctx, c, revoked); got != "REVOKED" {
++		t.Fatalf("unknown reason accepted %q", got)
++	}
++	add(uid, sid, "REPLACED")
++	add(uid, nextSID, "LOGOUT")
++	if got := s.revocationReason(ctx, c, revoked); got != "REPLACED" {
++		t.Fatalf("latest slot event replaced bound event: %q", got)
++	}
++	cancelled, cancel := context.WithCancel(ctx)
++	cancel()
++	if got := s.revocationReason(cancelled, c, revoked); got != "REVOKED" {
++		t.Fatalf("query error fabricated %q", got)
++	}
++	if got := s.revocationReason(ctx, c, shared.Fail(401, "AUTH_TOKEN_EXPIRED", "expired")); got != "REVOKED" {
++		t.Fatalf("expiry fabricated %q", got)
++	}
++}
+diff --git a/backend/go/tests/revocation_fallback_test.go b/backend/go/tests/revocation_fallback_test.go
+new file mode 100644
+index 0000000..5167c31
+--- /dev/null
++++ b/backend/go/tests/revocation_fallback_test.go
+@@ -0,0 +1,200 @@
++package tests
++
++import (
++	"context"
++	"net/http/httptest"
++	"os"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/gorilla/websocket"
++	"github.com/jackc/pgx/v5/pgxpool"
++	"im-platform/backend/go/gateway"
++	"im-platform/backend/go/shared"
++)
++
++// No NATS connection/relay is provided to this Gateway. The safety watch must
++// deliver the committed Core reason even when the realtime notification is lost.
++func TestPostgresRevocationFallbackWithoutNATS(t *testing.T) {
++	if os.Getenv("DB_TEST_ENABLE") != "1" {
++		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
++	}
++	db, err := pgxpool.New(context.Background(), "")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer db.Close()
++	if err = db.Ping(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	key := []byte("test-only-signing-key-at-least-32-bytes")
++	s := newService(db, key)
++	h, err := gateway.NewHandler(db, key, nil, "http://localhost:1")
++	if err != nil {
++		t.Fatal(err)
++	}
++	server := httptest.NewServer(h)
++	defer server.Close()
++	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/v1/ws"
++	for _, reason := range []string{"REPLACED", "LOGOUT", "REPLACED_THEN_LOGOUT"} {
++		t.Run(reason, func(t *testing.T) {
++			random, _ := shared.RandomToken(8)
++			username := "fallback" + strings.ToLower(random[:10])
++			password[REDACTED] "fixture-password-not-a-real-secret"
++			registered := call(t, s.handler, "POST", "/v1/auth/register", map[string]any{"username": username, "password": password, "displayName": "Fallback"}, "", nil)
++			expect(t, registered, 201)
++			userID := readResult(t, registered)["user"].(map[string]any)["userId"].(string)
++			defer func() {
++				ctx := context.Background()
++				_, _ = db.Exec(ctx, "DELETE FROM outbox_events WHERE aggregate_type='session' AND aggregate_id IN (SELECT (payload->>'sessionId')::uuid FROM user_sync_events WHERE user_id=$1 AND event_type='session.revoked')", userID)
++				_, _ = db.Exec(ctx, "DELETE FROM user_sync_events WHERE user_id=$1", userID)
++				_, _ = db.Exec(ctx, "DELETE FROM sessions WHERE user_id=$1", userID)
++				_, _ = db.Exec(ctx, "DELETE FROM users WHERE user_id=$1", userID)
++			}()
++			login := func(device string) *httptest.ResponseRecorder {
++				return call(t, s.handler, "POST", "/v1/auth/login", map[string]any{"username": username, "password": password, "clientType": "WEB", "deviceId": device, "clientVersion": "1.0.0", "protocolVersion": "1"}, "", nil)
++			}
++			first := login("fallback-first")
++			expect(t, first, 200)
++			token := getToken(t, first)
++			sid := getSession(t, first)["sessionId"].(string)
++			conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer conn.Close()
++			_ = conn.WriteJSON(frame("auth.bind", "80000000-0000-4000-8000-000000000020", map[string]string{"accessToken": token}))
++			var ack map[string]any
++			if err = conn.ReadJSON(&ack); err != nil {
++				t.Fatal(err)
++			}
++			if ack["payload"].(map[string]any)["status"] != "bound" {
++				t.Fatalf("bind: %v", ack)
++			}
++			if strings.HasPrefix(reason, "REPLACED") {
++				replacement := login("fallback-replacement")
++				expect(t, replacement, 200)
++				if reason == "REPLACED_THEN_LOGOUT" {
++					expect(t, call(t, s.handler, "POST", "/v1/auth/logout", map[string]any{}, getToken(t, replacement), nil), 204)
++					reason = "REPLACED"
++				}
++			} else {
++				expect(t, call(t, s.handler, "POST", "/v1/auth/logout", map[string]any{}, token, nil), 204)
++			}
++			var committed string
++			if err = db.QueryRow(context.Background(), "SELECT payload->>'reason' FROM user_sync_events WHERE user_id=$1 AND event_type='session.revoked' AND payload->>'sessionId'=$2", userID, sid).Scan(&committed); err != nil || committed != reason {
++				t.Fatalf("Core committed reason %q: %v", committed, err)
++			}
++			_ = conn.SetReadDeadline(time.Now().Add(3 * time.Second))
++			var event map[string]any
++			if err = conn.ReadJSON(&event); err != nil {
++				t.Fatal(err)
++			}
++			payload := event["payload"].(map[string]any)
++			if event["type"] != "session.revoked" || payload["sessionId"] != sid || payload["reason"] != reason {
++				t.Fatalf("fallback reason: got %v want %s", event, reason)
++			}
++			if err = conn.ReadJSON(&event); err == nil {
++				t.Fatal("revoked socket remained open")
++			}
++			stale, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer stale.Close()
++			_ = stale.SetReadDeadline(time.Now().Add(3 * time.Second))
++			_ = stale.WriteJSON(frame("auth.bind", "80000000-0000-4000-8000-000000000021", map[string]string{"accessToken": token}))
++			if err = stale.ReadJSON(&ack); err != nil {
++				t.Fatal(err)
++			}
++			if ack["payload"].(map[string]any)["status"] != "rejected" {
++				t.Fatal("old credential rebound")
++			}
++		})
++	}
++}
++
++// Token expiry and Session authority failure must still notify and close, even
++// without a business revocation fact or realtime event.
++func TestPostgresFallbackExpiryAndDatabaseFailureClose(t *testing.T) {
++	if os.Getenv("DB_TEST_ENABLE") != "1" {
++		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
++	}
++	for _, cause := range []string{"expiry", "database"} {
++		t.Run(cause, func(t *testing.T) {
++			ctx := context.Background()
++			db, err := pgxpool.New(ctx, "")
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer db.Close()
++			if err = db.Ping(ctx); err != nil {
++				t.Fatal(err)
++			}
++			gatewayDB, err := pgxpool.New(ctx, "")
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer gatewayDB.Close()
++			key := []byte("test-only-signing-key-at-least-32-bytes")
++			s := newService(db, key)
++			random, _ := shared.RandomToken(8)
++			username := "failclose" + strings.ToLower(random[:10])
++			password[REDACTED] "fixture-password-not-a-real-secret"
++			registered := call(t, s.handler, "POST", "/v1/auth/register", map[string]any{"username": username, "password": password, "displayName": "Close control"}, "", nil)
++			expect(t, registered, 201)
++			uid := readResult(t, registered)["user"].(map[string]any)["userId"].(string)
++			defer func() {
++				_, _ = db.Exec(ctx, "DELETE FROM sessions WHERE user_id=$1", uid)
++				_, _ = db.Exec(ctx, "DELETE FROM users WHERE user_id=$1", uid)
++			}()
++			login := call(t, s.handler, "POST", "/v1/auth/login", map[string]any{"username": username, "password": password, "clientType": "WEB", "deviceId": "control", "clientVersion": "1.0.0", "protocolVersion": "1"}, "", nil)
++			expect(t, login, 200)
++			token := getToken(t, login)
++			if cause == "expiry" {
++				claims, err := s.codec.Parse(token)
++				if err != nil {
++					t.Fatal(err)
++				}
++				claims.ExpiresAt = time.Now().Unix() + 2
++				token, err = s.codec.Sign(claims)
++				if err != nil {
++					t.Fatal(err)
++				}
++			}
++			h, err := gateway.NewHandler(gatewayDB, key, nil, "http://localhost:1")
++			if err != nil {
++				t.Fatal(err)
++			}
++			server := httptest.NewServer(h)
++			defer server.Close()
++			conn, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+"/v1/ws", nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer conn.Close()
++			_ = conn.WriteJSON(frame("auth.bind", "80000000-0000-4000-8000-000000000022", map[string]string{"accessToken": token}))
++			var event map[string]any
++			if err = conn.ReadJSON(&event); err != nil {
++				t.Fatal(err)
++			}
++			if event["payload"].(map[string]any)["status"] != "bound" {
++				t.Fatal("bind failed")
++			}
++			if cause == "database" {
++				gatewayDB.Close()
++			}
++			_ = conn.SetReadDeadline(time.Now().Add(4 * time.Second))
++			if err = conn.ReadJSON(&event); err != nil {
++				t.Fatal(err)
++			}
++			if event["type"] != "session.revoked" || event["payload"].(map[string]any)["reason"] != "REVOKED" {
++				t.Fatalf("unsafe cause %s: %v", cause, event)
++			}
++			if err = conn.ReadJSON(&event); err == nil {
++				t.Fatal("unsafe socket remained open")
++			}
++		})
++	}
++}
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 7dcf111..60a7444 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -14,7 +14,7 @@ Current Task State: review
+ 
+ ## Current Blockers
+ 
+-Actual final hosted run36738064831 on92306df failed Go race revocation reason, with consequent Gate failure. All11 other jobs succeeded. Fresh Fix/new independent Review/new hosted candidate required. No unresolved substantive architecture choice; remediation andS1 NOT PASSED.
++Hosted36738064831/92306df failed Go race reason and Gate (11otherjobs success). Fresh bounded reason fix and new realPGNATS/fullrace/3rolesTLS regression PASS locally; NEW independent Review and NEW hosted exacthead required. No unresolved substantive architecture choice; remediation andS1 NOT PASSED.
+ 
+ ## Verification
+ 
+@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Coordinator owns only this hosted failure evidence/Recorder and current task recovery until clean commit, then releases to fresh Fix Agent. Original unknown and Social worktrees untouched.
++Fresh /root/stage4_revocation_fix owns only Gateway bounded fix/newtests/new004evidence/task/current/tasklinkedRecorder until clean candidate commit, then releases to NEW independent Review. Original unknown and Social worktrees untouched.
+ 
+ ## Next Exact Action
+ 
+-Delegate fresh Fix Agent to reproduce and repair fallback revocation reason versus CoreOutbox/NATS timing without changing contracts, architecture, per-messagePG rule or test expectations. Then NEW independent Review and exact-head hosted CI. Evidence004/hosted-failure-36738064831.md. Do not close004/batch or advance other business.
++Delegate NEW independent Review of the clean repaired candidate, inspecting exact-bound readonlySession reason and rerunning live deterministic fallback/security/roles tests; then NEW exact-head hosted allrequiredjobs. Evidence004/revocation-fix.md and preserved hosted-failure-36738064831.md. Do not close004/batch or advance other business.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+@@ -67,3 +67,7 @@ Root metadata FAIL: confirmed section-reference encoding corruption and stale pr
+ ## Final post-fix independent Review pending hosted
+ 
+ Fresh /root/stage4_final_review local PASS exactb84cd0f, cleanisolatedcheckout; newPG16NATS enabledfullunitrace/canonical/rollbacksecurity and actual3Go rolesComposeTLS/CoreOutboxNATS/revocationclose0integrationskips; source0/34architecture0skip/27CI4historicalWindows symlinksubcases requireLinuxconfirmation. Evidence004/final-independent-review.md. Coordinator next ordinary dedicatedbranchpush, exactheadhosted allrequiredjobs, then004/batchcheckpoint. No finalGatePASS yet.
++
++## Fresh hosted-revocation Fix awaiting new independent Review
++
++Deterministic noNATS replacement/logout both failedbeforefix, nowexactbound committedreason fallbackPASS. Core writes/Outbox unchanged;Gatewayonlyprivate readonlySession notificationhelper, same timeout, safeREVOKED onexpiry/DB/query/unknown/missing/wrongidentity. NewfullPG16NATS unit/race/canonical/rollback/500msmessageDBnegative andtargetedrace3times/19fmtbuildvet/34architecture0skip/27CI4historicalWindows symlinksubcase skips/real3roleComposeTLSOutboxNATS PASSlocally. No Task/batch/S1 acceptance; nextNEW independentReview/newhosted. SoleFix releasesaftercleancommit. Evidence004/revocation-fix.md.
+diff --git a/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-capture-audit.json b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-capture-audit.json
+new file mode 100644
+index 0000000..cca65ea
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-capture-audit.json
+@@ -0,0 +1,130 @@
++[
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-7f65035d-4d1f-4cf0-a0ce-6d070229fb1f.stdout.txt",
++    "stored_sha256": "e6dadfcaf6181e787dd8e1ef3de1db39b139452072eb1ad8067ac06aeeae3f2e",
++    "raw_sha256": "e6dadfcaf6181e787dd8e1ef3de1db39b139452072eb1ad8067ac06aeeae3f2e",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-7f65035d-4d1f-4cf0-a0ce-6d070229fb1f.stderr.txt",
++    "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-9edca0e0-427f-4166-aa78-3b0c64d7875f.stdout.txt",
++    "stored_sha256": "0183b06fece17dc19c5316ef082ba31d70bba655d7bdc922d5591cc60bd7fa8c",
++    "raw_sha256": "0183b06fece17dc19c5316ef082ba31d70bba655d7bdc922d5591cc60bd7fa8c",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-9edca0e0-427f-4166-aa78-3b0c64d7875f.stderr.txt",
++    "stored_sha256": "bb3feda84470620a585e0e7d1bc86220fc1f072d24eb4cb1f9ee0d6cad4da4f3",
++    "raw_sha256": "bb3feda84470620a585e0e7d1bc86220fc1f072d24eb4cb1f9ee0d6cad4da4f3",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-ebb77dd1-bfb2-4968-b1a4-d23e461f6cf6.stdout.txt",
++    "stored_sha256": "2acd5d8e483824b82c9bc7d58fb1aa8559449d6e5b853795dd8a601a1a9aeb0d",
++    "raw_sha256": "2acd5d8e483824b82c9bc7d58fb1aa8559449d6e5b853795dd8a601a1a9aeb0d",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-ebb77dd1-bfb2-4968-b1a4-d23e461f6cf6.stderr.txt",
++    "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-e8ed93dc-0fb1-4791-a7c1-f2faac1ad1d6.stdout.txt",
++    "stored_sha256": "bcd482c5ca969fa05128bb6ec12e217110a1d2fbbe2060b1a69ee4efbf44a5a3",
++    "raw_sha256": "89f7dc7007c156bbf71cd84d48cad27b00f3009f27ed610161ab7e195cd32d47",
++    "raw_match": false,
++    "redacted": true,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-e8ed93dc-0fb1-4791-a7c1-f2faac1ad1d6.stderr.txt",
++    "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_match": true,
++    "redacted": true,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b3a7719c-d782-4699-bc2a-bf0d40d34237.stdout.txt",
++    "stored_sha256": "ce2634c33be1fe29f6a973bec85f2f9c62789f150f125d4817a423de56234736",
++    "raw_sha256": "c8f9be4d2d36a9f561a7cd2d7e7f3b51fa1666c9e4a2414493ce5891d0b0523d",
++    "raw_match": false,
++    "redacted": true,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b3a7719c-d782-4699-bc2a-bf0d40d34237.stderr.txt",
++    "stored_sha256": "7b389d86ad3dc43bbce00496a7325308a8c4b01211c734aee0a2e1f02eb44fbf",
++    "raw_sha256": "7b389d86ad3dc43bbce00496a7325308a8c4b01211c734aee0a2e1f02eb44fbf",
++    "raw_match": true,
++    "redacted": true,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-bf0a2eff-8770-444f-8feb-bc98441c2605.stdout.txt",
++    "stored_sha256": "f8a40d7bdfac2609012320c09532c43d00490c5f82f7e8e60c3391266f5519d7",
++    "raw_sha256": "f8a40d7bdfac2609012320c09532c43d00490c5f82f7e8e60c3391266f5519d7",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-bf0a2eff-8770-444f-8feb-bc98441c2605.stderr.txt",
++    "stored_sha256": "2dacfcb52b0f565029ed4acf5c54ab449d9b120d5fab9e11e753b057d35adeda",
++    "raw_sha256": "2dacfcb52b0f565029ed4acf5c54ab449d9b120d5fab9e11e753b057d35adeda",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-29600763-f522-4195-8e31-35a08f9e0a14.stdout.txt",
++    "stored_sha256": "c6f5eb0faa08abfbb7504b1e123c252b8847bc7611aaedfdb6534914a5a6271d",
++    "raw_sha256": "c6f5eb0faa08abfbb7504b1e123c252b8847bc7611aaedfdb6534914a5a6271d",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-29600763-f522-4195-8e31-35a08f9e0a14.stderr.txt",
++    "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b781b224-bf1f-40d7-be8b-41568e66cb1c.stdout.txt",
++    "stored_sha256": "105f701d1f5e7a88abdb8898a35e909217cc99cc16f1591bb84ec94dd3291e71",
++    "raw_sha256": "105f701d1f5e7a88abdb8898a35e909217cc99cc16f1591bb84ec94dd3291e71",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  },
++  {
++    "path": "research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b781b224-bf1f-40d7-be8b-41568e66cb1c.stderr.txt",
++    "stored_sha256": "bc8f3e7070664bda822c5c240c6edd97847501da222f4fefbf0dd150edde725b",
++    "raw_sha256": "bc8f3e7070664bda822c5c240c6edd97847501da222f4fefbf0dd150edde725b",
++    "raw_match": true,
++    "redacted": false,
++    "replacement_count": 0
++  }
++]
+diff --git a/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-command-events.json b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-command-events.json
+new file mode 100644
+index 0000000..e729ecd
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-command-events.json
+@@ -0,0 +1,144 @@
++[
++  {
++    "argv": [
++      "docker",
++      "ps",
++      "--format",
++      "{{.Names}} {{.Ports}}"
++    ],
++    "command_id": "C-7f65035d-4d1f-4cf0-a0ce-6d070229fb1f",
++    "cwd": ".",
++    "secret_redaction_applied": false,
++    "duration_ms": 172.0,
++    "exit_code": 0,
++    "result": "PASS",
++    "stderr_blob": "blobs/C-7f65035d-4d1f-4cf0-a0ce-6d070229fb1f.stderr.txt",
++    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "stdout_blob": "blobs/C-7f65035d-4d1f-4cf0-a0ce-6d070229fb1f.stdout.txt",
++    "stdout_sha256": "e6dadfcaf6181e787dd8e1ef3de1db39b139452072eb1ad8067ac06aeeae3f2e"
++  },
++  {
++    "argv": [
++      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
++      "spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py",
++      ".",
++      "live"
++    ],
++    "command_id": "C-9edca0e0-427f-4166-aa78-3b0c64d7875f",
++    "cwd": ".",
++    "secret_redaction_applied": false,
++    "duration_ms": 7781.0,
++    "exit_code": 1,
++    "result": "FAIL",
++    "stderr_blob": "blobs/C-9edca0e0-427f-4166-aa78-3b0c64d7875f.stderr.txt",
++    "stderr_sha256": "bb3feda84470620a585e0e7d1bc86220fc1f072d24eb4cb1f9ee0d6cad4da4f3",
++    "stdout_blob": "blobs/C-9edca0e0-427f-4166-aa78-3b0c64d7875f.stdout.txt",
++    "stdout_sha256": "0183b06fece17dc19c5316ef082ba31d70bba655d7bdc922d5591cc60bd7fa8c"
++  },
++  {
++    "argv": [
++      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
++      "spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py",
++      ".",
++      "live"
++    ],
++    "command_id": "C-ebb77dd1-bfb2-4968-b1a4-d23e461f6cf6",
++    "cwd": ".",
++    "secret_redaction_applied": false,
++    "duration_ms": 28234.0,
++    "exit_code": 0,
++    "result": "PASS",
++    "stderr_blob": "blobs/C-ebb77dd1-bfb2-4968-b1a4-d23e461f6cf6.stderr.txt",
++    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "stdout_blob": "blobs/C-ebb77dd1-bfb2-4968-b1a4-d23e461f6cf6.stdout.txt",
++    "stdout_sha256": "2acd5d8e483824b82c9bc7d58fb1aa8559449d6e5b853795dd8a601a1a9aeb0d"
++  },
++  {
++    "argv": [
++      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
++      "spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py",
++      ".",
++      "live"
++    ],
++    "command_id": "C-e8ed93dc-0fb1-4791-a7c1-f2faac1ad1d6",
++    "cwd": ".",
++    "secret_redaction_applied": true,
++    "duration_ms": 91750.0,
++    "exit_code": 0,
++    "result": "PASS",
++    "stderr_blob": "blobs/C-e8ed93dc-0fb1-4791-a7c1-f2faac1ad1d6.stderr.txt",
++    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "stdout_blob": "blobs/C-e8ed93dc-0fb1-4791-a7c1-f2faac1ad1d6.stdout.txt",
++    "stdout_sha256": "89f7dc7007c156bbf71cd84d48cad27b00f3009f27ed610161ab7e195cd32d47"
++  },
++  {
++    "argv": [
++      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
++      "spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py",
++      ".",
++      "static"
++    ],
++    "command_id": "C-b3a7719c-d782-4699-bc2a-bf0d40d34237",
++    "cwd": ".",
++    "secret_redaction_applied": true,
++    "duration_ms": 9750.0,
++    "exit_code": 0,
++    "result": "PASS",
++    "stderr_blob": "blobs/C-b3a7719c-d782-4699-bc2a-bf0d40d34237.stderr.txt",
++    "stderr_sha256": "7b389d86ad3dc43bbce00496a7325308a8c4b01211c734aee0a2e1f02eb44fbf",
++    "stdout_blob": "blobs/C-b3a7719c-d782-4699-bc2a-bf0d40d34237.stdout.txt",
++    "stdout_sha256": "c8f9be4d2d36a9f561a7cd2d7e7f3b51fa1666c9e4a2414493ce5891d0b0523d"
++  },
++  {
++    "argv": [
++      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
++      "tests/go/live_role_smoke.py"
++    ],
++    "command_id": "C-bf0a2eff-8770-444f-8feb-bc98441c2605",
++    "cwd": ".",
++    "secret_redaction_applied": false,
++    "duration_ms": 28922.0,
++    "exit_code": 0,
++    "result": "PASS",
++    "stderr_blob": "blobs/C-bf0a2eff-8770-444f-8feb-bc98441c2605.stderr.txt",
++    "stderr_sha256": "2dacfcb52b0f565029ed4acf5c54ab449d9b120d5fab9e11e753b057d35adeda",
++    "stdout_blob": "blobs/C-bf0a2eff-8770-444f-8feb-bc98441c2605.stdout.txt",
++    "stdout_sha256": "f8a40d7bdfac2609012320c09532c43d00490c5f82f7e8e60c3391266f5519d7"
++  },
++  {
++    "argv": [
++      "pwsh",
++      "-NoProfile",
++      "-File",
++      "tools/verify-loop1-ctrl-002.ps1",
++      "-Mode",
++      "Development"
++    ],
++    "command_id": "C-29600763-f522-4195-8e31-35a08f9e0a14",
++    "cwd": ".",
++    "secret_redaction_applied": false,
++    "duration_ms": 5844.0,
++    "exit_code": 0,
++    "result": "PASS",
++    "stderr_blob": "blobs/C-29600763-f522-4195-8e31-35a08f9e0a14.stderr.txt",
++    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++    "stdout_blob": "blobs/C-29600763-f522-4195-8e31-35a08f9e0a14.stdout.txt",
++    "stdout_sha256": "c6f5eb0faa08abfbb7504b1e123c252b8847bc7611aaedfdb6534914a5a6271d"
++  },
++  {
++    "argv": [
++      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
++      "spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-clean-recovery.py"
++    ],
++    "command_id": "C-b781b224-bf1f-40d7-be8b-41568e66cb1c",
++    "cwd": ".",
++    "secret_redaction_applied": false,
++    "duration_ms": 12344.0,
++    "exit_code": 0,
++    "result": "PASS",
++    "stderr_blob": "blobs/C-b781b224-bf1f-40d7-be8b-41568e66cb1c.stderr.txt",
++    "stderr_sha256": "bc8f3e7070664bda822c5c240c6edd97847501da222f4fefbf0dd150edde725b",
++    "stdout_blob": "blobs/C-b781b224-bf1f-40d7-be8b-41568e66cb1c.stdout.txt",
++    "stdout_sha256": "105f701d1f5e7a88abdb8898a35e909217cc99cc16f1591bb84ec94dd3291e71"
++  }
++]
+diff --git a/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py
+new file mode 100644
+index 0000000..f0cd427
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py
+@@ -0,0 +1,51 @@
++import os,sys,subprocess,tempfile,time,secrets,json,importlib.util
++from pathlib import Path
++ROOT=Path(sys.argv[1]).resolve()
++PY=sys.executable
++def run(argv,env=None,cwd=ROOT,timeout=600):
++    print('RUN '+str(argv),flush=True)
++    subprocess.run(argv,cwd=cwd,env=env,check=True,timeout=timeout)
++def static():
++    run(['pwsh','-NoProfile','-File','tools/verify-frozen-architecture.ps1'])
++    run([PY,'ci/check_architecture.py','--scope','all','--json'])
++    run([PY,'-m','unittest','discover','-s','tests/ci','-v'])
++    files=[str(p) for p in (ROOT/'backend/go').rglob('*.go')]
++    dirty=subprocess.check_output(['gofmt','-l']+files,cwd=ROOT,text=True)
++    assert not dirty,dirty
++    print('PASS recursivefmt '+str(len(files)))
++    run(['go','-C','backend/go','build','./...'])
++    run(['go','-C','backend/go','vet','./...'])
++def live():
++    env=os.environ.copy();env['DOCKER_CONTEXT']='default'
++    env['POSTGRES_PASSWORD']=secrets.token_hex(24);env['PGPASSWORD']=env['POSTGRES_PASSWORD']
++    pg='im-arch4-fix-pg-'+str(os.getpid());nt='im-arch4-fix-nats-'+str(os.getpid())
++    created=[]
++    def dock(*argv):return subprocess.check_output(['docker']+list(argv),env=env,text=True).strip()
++    try:
++        dock('run','-d','--name',pg,'-e','POSTGRES_PASSWORD','-e','POSTGRES_DB=im_review','-p','127.0.0.1::5432','postgres:16-alpine');created.append(pg)
++        dock('run','-d','--name',nt,'-p','127.0.0.1::4222','nats:2.10-alpine');created.append(nt)
++        for i in range(60):
++            result=subprocess.run(['docker','exec',pg,'pg_isready','-U','postgres','-d','im_review'],env=env,capture_output=True)
++            if result.returncode==0:break
++            time.sleep(.5)
++        else:raise RuntimeError('review PG unavailable')
++        env.update(PGHOST='127.0.0.1',PGUSER='postgres',PGDATABASE='im_review',PGPORT='5432',DB_TEST_ENABLE='1')
++        run(['docker','run','--rm','--network','container:'+pg,'-e','PGHOST','-e','PGUSER','-e','PGDATABASE','-e','PGPORT','-e','PGPASSWORD','-v',str(ROOT)+':/repo','-w','/repo','im-db-review-runtime','python3','contracts/database/migrate.py','up'],env)
++        env['PGPORT']=dock('port',pg,'5432/tcp').split(':')[-1]
++        env['NATS_URL']='nats://127.0.0.1:'+dock('port',nt,'4222/tcp').split(':')[-1]
++        print('Fresh Fix disposable PostgreSQL16/NATS2.10; DB_TEST_ENABLE=1; canonical0001_initial, no skipped integration permitted',flush=True)
++        for race in [False,True]:
++            cmd=['go','-C','backend/go','test']+(['-race'] if race else [])+(['-count=1','-v','-run','TestPostgresRevocationFallbackWithoutNATS','./tests'] if os.environ.get('FIX_REPRO_ONLY') == '1' else ['-count=1','-v','./...'])
++            out=subprocess.run(cmd,cwd=ROOT,env=env,capture_output=True,text=True,encoding='utf-8',timeout=180)
++            print(out.stdout);print(out.stderr);assert out.returncode==0 and '--- SKIP' not in out.stdout
++        out=subprocess.run(['go','-C','backend/go','test','-race','-count=3','-v','-run','TestPostgresRevocationFallbackWithoutNATS|TestPostgresFallbackExpiryAndDatabaseFailureClose|TestPostgresRevocationReasonUsesExactCommittedIdentity','./...'],cwd=ROOT,env=env,capture_output=True,text=True,encoding='utf-8',timeout=180)
++        print(out.stdout);print(out.stderr);assert out.returncode==0 and '--- SKIP' not in out.stdout
++        run([PY,'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/message-cache-negative.py'],env)
++        run([PY,'contracts/websocket/verify.py'],env)
++        run(['pwsh','-NoProfile','-File','contracts/http/verify-auth-user-friend.ps1'],env)
++        print('PASS fresh Fix live unit/race/auth/session/fixtures/rollback/cache negative, zero integration skips')
++    finally:
++        for name in reversed(created):subprocess.run(['docker','rm','-f','-v',name],env=env,check=True)
++if __name__=='__main__':
++    mode=sys.argv[2]
++    {'static':static,'live':live}[mode]()
+diff --git a/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-prompt.txt b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-prompt.txt
+new file mode 100644
+index 0000000..edfbca7
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-prompt.txt
+@@ -0,0 +1 @@
++Fresh Fix Agent delegated by Coordinator: reproduce hosted36738064831 fallback reason race; preserve Core writes/Outbox, readonlyGateway, existing reason expectations, security and no-per-messagePG; deterministic delayed/no-NATS replacement/logout regression; full live PG16NATS and race/fixtures/roles/TLS/checks; commit clean for NEW independent Review, no push/selfacceptance. Startup reads/baseline attempted before trace: sandbox temporary-directory/Docker denied; retry escalated. Parent delegation detailed task remains visible; this is a concise delegation record, not verbatim Human prompt.
+diff --git a/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix.md b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix.md
+new file mode 100644
+index 0000000..d0efdb9
+--- /dev/null
++++ b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix.md
+@@ -0,0 +1,31 @@
++# Fresh hosted-revocation repair
++
++Base: 0fb1f6007a1bb2f8efd3ba3cf31c88d0cf6f9d0d; branch task/LOOP1-ARCH-REMEDIATION. Fresh /root/stage4_revocation_fix did not implement/review prior candidate. Sole writer;004 remains review, no Task/batch/S1 acceptance. Recorder R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e is prospective_resume: startup reads and the first sandbox baseline attempt are explicitly pretrace/incomplete. Registered concise delegation is not the full Human prompt.
++
++## Confirmed cause and smallest correction
++
++Hosted36738064831 exact92306df is preserved FAIL. In a new disposable PostgreSQL16/NATS2.10 environment, migrated via canonical0001_initial, the new blackbox test deliberately supplies no NATS connection to Gateway and starts no Core relay. Core real replacement and logout HTTP operations commit; exact user/session committed user_sync_events reasons are independently asserted. BEFORE repair both subtests fail deterministically after the existing one-second safety watch: receivedREVOKED instead ofREPLACED/LOGOUT. This establishes the generic watch's false cause, not a guessed timing change. Original tests/expectations remain unchanged.
++
++Canonical§3.1/7.2/7.3 andSRC03 allow Gateway necessary readonly Session validation/connection handling; canonical WSS reason enum isLOGOUT/REPLACED/REVOKED. Core already atomically persists Session, Outbox and user_sync session.revoked reason. Fix changes onlyGateway private session.go helper and watch invocation. On AUTH_SESSION_REVOKED/EPOCH_STALE the watch reads only committed session.revoked reason for bound userId+sessionId, validates the existing enum, within its SAME existing one-second timeout. It does not infer logout from slot status, read Core internals, own Sync/Outbox business, add a dispatcher/API/dependency/schema, extend timeout, or move fullAuth to shared. Expiry/invalid tokens/authority errors returnREVOKED without lookup; missing/wrong identity/unknown event or query error alsoREVOKED. Every failure still notifies and closes. Bound message path is unchanged; no per-message PostgreSQL.
++
++## Validation
++
++Fresh disposablePG16/NATS, DB_TEST_ENABLE=1, actual migration; all fullGo unit AND race suites PASS, zero integration skips. Registration/login/3slots/replacement/epoch/refresh/logout/canonicalHTTPWSS/security/rollback remain tested. New noNATS replacement/logout and oldbind rejection, replacement followed by newslot logout with oldbound reasonREPLACED, actualexpiry and GatewaypoolfailureREVOKED+close, exactidentity/unknown/no record/cancelledquery controls pass; targeted race -count=3 PASS. An isolated reintroduced per-messageDB mutant still fails the500ms exclusiveSessionlock control as expected; original product bytes preserved.
++
++Static:19 recursiveGo files gofmt/build/vetPASS; actual all-source0violations; frozen hash/verifier34architecture tests0skip;27CI testsPASS with4historicalWindows symlink privilege subcase skips explicitly retained. CurrentcanonicalMarkdown83d124b.../historicalPDF unchanged. Actual new3Go-roleCompose build/startup/HTTPforward/HTTPSWSS/TLS/CoreOutbox→NATS→Gateway replacement/logout and oldtoken rejection smokePASS,0skip; all task-created containers/volumes removed. No globalDocker config changes; unrelated runningcontainers untouched.
++
++Exact commands, exits, durations and rawstdout/stderr pointers are in revocation-fix-command-events.json and Recorder blobs. Initial unprivileged baseline hash step passed but34fixture tests could not create sandbox temp files, Dockerpipe denied; authorized elevated rerunPASS. One shell quoting-only readonly diagnostic failed and was corrected. Initial regression failure is expected negative evidence; no failed evidence deleted. Capture raw equality/redaction/decoder status is separately in revocation-fix-capture-audit.json; validator alone is not capture-integrity proof.
++
++## Recovery
++
++Fix candidate needs NEW independent Review from a context that did not fix it, then NEW exact-head hostedCI all requiredjobs. Prior reviews/CI are historical and cannot accept this repaired candidate. Unique004review, batch/S1 NOT PASSED; no later business advancement. Clean isolated candidate recovery Acceptance is performed after product candidate commit and reported below.
++
++Capture audit:2stdout redactions explicitly markedtrue,0U+FFFD replacements; other10initial captures rawmatch. No decoder corruption is observed. Redacted outputs intentionally differ from rawhash and are not falsely declaredbyteidentical. New run-local blobs/** -text prevents Git transport rewriting; staged comparison follows.
++
++Clean recovery: exactc1114b50289a69170576ab07eafcb7cd4ad1fee5 detached temporaryworktree started/endedstatus0; verify-loop1-ctrl-002.ps1 -Mode Acceptance exit0. This is Fix local structure verification, NOT independent Review or hosted acceptance. Temporaryworktree removed viaGit; no force/remove unknown files.
++
++## Current-discovery closure items for Coordinator AFTER final acceptance
++
++Readonly audit requested by Coordinator: AGENTS.md:49 says actualGo remainsfailed until004; spec/handoff/agent-context.md:31 still describes newstructureunaccepted/currentbusinesssuspension; spec/governance/execution-boundaries.md:11 says actualGo remainsfailed until004; s0-auth-user-friend.md:20/s0-messaging.md:20/s0-sync-plugin.md:25 current acceptance overlays sayActualGo/Gate remainfailed/complianceunprovenuntil004. These current execution-status clauses need bounded completion discovery after valid newReview/hosted; retain checker commands, immutable historicaloldGoFAIL, Java stage rules, Task-vs-S1 scope and no-grandfather semantics. The handoff nextbusiness selection must follow actual dependency/currenttask and must not imply automatic productStagePASS.
++
++ADR0003 currentStatus downstreampending can get truthful completion metadata; its stage-one Actualboundedacceptance paragraph saysStages002-004outstanding as atthatpoint: preserve historicalacceptance wording or append explicit currentcompletionpoint rather than rewriting evidence. Baseline.md stage-oneparagraph does not acceptremainingstages is a valid historical limitation; append currentcompletiondiscovery if needed, do not change canonicalhash/approval/history. Fix DID NOT edit these paths or claim completion. CurrentTask004 and current.md instead point freshFix→NEWReview→NEWhosted. FinalCoordinator can minimally update only authorized currentmetadata after acceptance. I01 auditledger implementationdeviation should receive its final traceable closure without rewriting initialfinding or historicalreviews.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+index 0d9da09..6ebcba7 100644
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
++++ b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-ARCH-REMEDIATION-004
+ title: Migrate Go responsibility packages and regress
+ status: review
+-owner: Coordinator delegating fresh Fix for hosted revocation race
++owner: Fresh Fix completed candidate pending new independent Review
+ stage: S1 remediation 4/4
+ gate: LOOP1-ARCH-REMEDIATION
+ ---
+@@ -77,7 +77,7 @@ Before migration, bind exact commands/results from independently accepted stage0
+ 
+ # Next Action
+ 
+-- Coordinator normally pushes the clean independently reviewed dedicated task branch; verify exact-head hosted all required jobs before task004/batch closure and checkpoint. No other business advancement.
++- Coordinator delegates NEW independent Review of the clean reason-repair candidate, then normally pushes its reviewed dedicated task branch and verifies NEW exact-head hosted allrequiredjobs before004/batch closure/checkpoint. No other business advancement.
+ 
+ # Activation
+ 
+@@ -102,3 +102,7 @@ Fresh /root/stage4_final_review local PASS exactb84cd0f from clean isolatedcheck
+ # Hosted acceptance repair loop
+ 
+ Exact closure92306df/run36738064831 completed failure:11success,Go race andGate fail. Revocation expectedREPLACED butreceivedREVOKED at auth_test.go:211. Evidence004/hosted-failure-36738064831.md. Next exact action is freshFix diagnosis and bounded repair, then new independentReview and new hostedcandidate; do not relax existing expectations, suppressGate or closebatch.
++
++# Fresh hosted-revocation repair handoff
++
++Fresh /root/stage4_revocation_fix deterministically reproduced Corecommittedreplacement/logout withoutNATSGateway notification, both oldfallbackREVOKEDFAIL; minimalprivateGatewayexactbound readonlyreason lookup fixescauses whileexpired/DB/query/missing/unknownfacts closeREVOKED. Core/shared/contracts/schema/timeout/messagepath unchanged. NewrealPG16NATS fullunitrace/canonical/securityrollback/500msmessageDBnegative, targetedrace3times,19recursivefmtbuildvet/allsource0/34architecture0skip/27CI4historicWindows subcase skips/actual3rolesComposeTLSOutboxNATS PASSlocally. Evidence004/revocation-fix.md and freshRecorder. Task004 remainsreview, requiresNEW independentReview thenNEW exactheadhosted; no selfacceptance/batch/S1PASS. Fixownsnewchangesuntilcleancommit, then releases.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-56905c06-b7fb-49de-83a2-768c16976239/metadata.json
+# ?? research/prompts/P-56905c06-b7fb-49de-83a2-768c16976239/prompt.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/.gitattributes
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-29600763-f522-4195-8e31-35a08f9e0a14.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-29600763-f522-4195-8e31-35a08f9e0a14.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-7f65035d-4d1f-4cf0-a0ce-6d070229fb1f.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-7f65035d-4d1f-4cf0-a0ce-6d070229fb1f.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-9edca0e0-427f-4166-aa78-3b0c64d7875f.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-9edca0e0-427f-4166-aa78-3b0c64d7875f.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b3a7719c-d782-4699-bc2a-bf0d40d34237.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b3a7719c-d782-4699-bc2a-bf0d40d34237.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b781b224-bf1f-40d7-be8b-41568e66cb1c.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-b781b224-bf1f-40d7-be8b-41568e66cb1c.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-bf0a2eff-8770-444f-8feb-bc98441c2605.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-bf0a2eff-8770-444f-8feb-bc98441c2605.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-e8ed93dc-0fb1-4791-a7c1-f2faac1ad1d6.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-e8ed93dc-0fb1-4791-a7c1-f2faac1ad1d6.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-ebb77dd1-bfb2-4968-b1a4-d23e461f6cf6.stderr.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/blobs/C-ebb77dd1-bfb2-4968-b1a4-d23e461f6cf6.stdout.txt
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/events.jsonl
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/initial_state.json
+# ?? research/runs/R-20260930T155211Z-e47604c3-20c5-4803-a3ef-6bca7f86478e/metadata.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-clean-recovery.py

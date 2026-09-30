@@ -1,0 +1,10 @@
+--- FAIL: TestCanonicalWSSPrebindFixturesAndMalformedRequestID (0.01s)
+    --- FAIL: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/malformed-requestId-ping (0.00s)
+        contract_fixture_test.go:392: malformed requestId accepted: map[payload:map[] protocolVersion:1.0 requestId:not-a-uuid type:pong]
+    --- FAIL: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/malformed-requestId-auth.bind (0.00s)
+        contract_fixture_test.go:392: malformed requestId accepted: map[payload:map[error:map[code:AUTH_TOKEN_INVALID message:Request rejected] status:rejected] protocolVersion:1.0 requestId:not-a-uuid type:auth.ack]
+FAIL
+FAIL	im-platform/backend/go	0.135s
+FAIL
+
+PASS: removing the UUID guard caused the live WSS regression to fail

@@ -1,0 +1,132 @@
+# S0 Messaging Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| MSG-A-001 | Given an authorized member send, the runner MUST withhold success ACK until a fault-injection probe confirms durable Message and Outbox commit; rollback before commit MUST produce no success ACK. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-A-002 | Given repeated sends with the same sender, Conversation, and client request identity, the runner MUST assert one logical Message, one Conversation sequence, and a stable successful outcome. | Architecture Baseline v1.0, chapters 4.4, 5.1, and 11.3. |
+| MSG-A-003 | Given the same client request identity in different Conversations, the runner MUST treat each Conversation-scoped request independently while preserving globally unique server Message identity. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-A-004 | Given a sender who is not a Conversation member, the negative fixture MUST assert rejection, no Message, no Outbox event, and no success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-A-005 | Given duplicate and out-of-order NATS delivery, the runner MUST assert idempotent consumer behavior, no duplicate logical Message, and eventual completeness through Sync. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-A-006 | Given a GROUP send, the runner MUST assert one logical Message and one Outbox event regardless of member count, with local online fan-out treated separately from persistence. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-A-007 | Correctness fixtures MUST assert zero lost committed Messages, zero duplicate logical Messages, zero wrong-Conversation deliveries, zero permanent sequence gaps, and zero ACK-before-commit cases. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-A-008 | Both backend profiles MUST consume identical fixtures and normalize to the same ACK, idempotency, authorization, ordering, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+
+# S0 Sync and Plugin Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| SP-A-001 | Given duplicate and out-of-order per-Conversation inputs with a gap, the runner MUST assert idempotent materialization and that contiguous sequence stops before the gap; after the missing input arrives it MUST advance across the now-complete prefix. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-A-002 | Given a locally FAILED item and a matching server Message, the runner MUST assert convergence to SENT without an additional local item; SENT MUST remain terminal under later timeout input. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-A-003 | Fault injection between local materialization and cursor advancement MUST roll back both effects; retry MUST converge by transactional upsert. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-A-004 | A user-cursor fixture containing a Message event MUST be rejected; low-frequency friend, Conversation, membership, and plugin state fixtures MUST advance only the user cursor. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-A-005 | Permission-negative fixtures MUST deny undeclared Event subscriptions, unauthorized Queries, unauthorized Actions, and unavailable UI capabilities, with no direct Core or database bypass. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-A-006 | Query fixtures MUST assert read-only, paginated, limited behavior; Action fixtures MUST assert execution-time re-authorization, idempotent outcomes, and audit evidence. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-A-007 | Artifact fixtures MUST reject a changed package, backend, or renderer hash for an existing plugin/version identity and MUST reject backend-renderer version splitting. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-A-008 | Renderer-negative fixtures MUST reject failures of hash, signature, manifest schema, API compatibility, permission, resource-size, CSP, or entry-point checks; runtime probes MUST verify the declared UI sandbox boundary. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-A-009 | WASM-negative fixtures MUST verify default denial of database, server-file, arbitrary-network, and other-plugin-memory access plus enforcement of resource limits and AUTO_DISABLED threshold behavior. | Architecture Baseline v1.0, chapter 8.3. |
+| SP-A-010 | Upgrade fixtures MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed; failure at each step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-A-011 | Lifecycle fixtures MUST assert that DISABLE preserves data, UNINSTALL defaults to RETAINED, and PURGE requires an explicit elevated, audited, retention-confirmed operation. | Architecture Baseline v1.0, chapter 9.3. |
+| SP-A-012 | Golden fixtures MUST include duplicate, out-of-order, gap, and permission-denial cases and MUST normalize to identical Sync and Plugin outcomes across both backend profiles. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+| SP-A-013 | Given repeated execution of the same Action, the runner MUST assert one idempotent observable outcome with no duplicate side effect and MUST retain audit evidence for every execution attempt. | Architecture Baseline v1.0, chapter 8.1. |
+
+---
+task_id: LOOPX-AREA-NNN
+title: Short task title
+status: backlog
+owner: unassigned
+stage: SX
+gate: SX
+---
+
+# Goal
+
+State one bounded outcome.
+
+# Inputs
+
+- List the exact architecture, approved ADR/frozen decision, domain, invariant, acceptance, and contract inputs.
+
+# Dependencies
+
+- List completed prerequisite task IDs or `none`.
+
+# Allowed Paths
+
+- `path/or/glob/**`
+
+# Acceptance
+
+- State independently verifiable outcomes.
+
+# Forbidden
+
+- State changes that are out of scope or require architecture approval.
+
+# Minimality
+
+- What is the smallest implementation satisfying this task?
+- Which new abstractions, dependencies, or infrastructure have a current justification?
+- Which future work stays outside this task?
+- For non-obvious complexity, cite the current requirement or evidence.
+
+# Verification
+
+- Record exact commands, expected results, and the minimum baseline verification.
+
+# Evidence
+
+- Record actual command results and durable evidence locations. Local PASS is not Gate PASS.
+
+# Handoff
+
+- Record completed work, changed files/migrations, known failures/risks/assumptions, uncommitted-change ownership, last known good commit, checkpoint, and architecture conflicts.
+
+# Next Action
+
+- State one exact next action.
+
+
+---
+batch_id: LOOP1-S1
+loop: Loop 1
+stage: S1
+execution: dependency-driven
+writer_concurrency: 1
+independent_review_required: true
+ci_acceptance_required: true
+---
+
+# LOOP1-S1 Execution Manifest
+
+S0 Gate PASS is the entry condition. Execute these architecture-listed tasks in dependency order:
+
+1. `LOOP1-GO-AUTH-001`
+2. `LOOP1-GO-SOCIAL-001`
+3. `LOOP1-GO-MSG-001`
+4. `LOOP1-E2E-001`
+
+Each task enters `ready` only after its listed dependencies and inputs are present, then `active` in a single writer context. A fresh independent reviewer and applicable real CI are required before `done`.
+
+The S1 Gate passes only when the Go Auth -> Friend -> Direct -> Message chain works through the real TLS entrypoint with durable ACK, Outbox and NATS; contract, integration and end-to-end checks pass; all four tasks are `done`; recovery state and a stable checkpoint are current. S2 stays inactive until then.
+
+{
+  "apiVersion": "1.0",
+  "maxQueryPageSize": 100,
+  "autoDisableAfterConsecutiveFailures": 3,
+  "capabilityForType": {"event.subscribe":"events","query":"queries","action":"actions","ui.host":"ui"},
+  "permissionForEvent": {"message.created":"event.message.created","member.joined":"event.member.joined","plugin.lifecycle":"event.plugin.lifecycle"},
+  "permissionForQuery": {"conversation":"query.conversation","members":"query.members","messages":"query.messages","friendship":"query.friendship"},
+  "permissionForAction": {"send_message":"action.send_message","plugin_state":"action.plugin_state","ui":"action.ui"},
+  "permissionForSlot": {"page":"ui.page","modal":"ui.modal","panel":"ui.panel","menu":"ui.menu","form":"ui.form","toolbar":"ui.toolbar","message_renderer":"ui.message_renderer"},
+  "rendererChecks": ["packageHash","signature","manifestValid","compatible","permissionsApproved","resourceSizeOk","cspValid","entryPointValid"],
+  "rendererSandboxes": ["iframe","isolated_webview"],
+  "wasmDeniedResources": ["database","server_file","arbitrary_network","other_plugin_memory"],
+  "wasmLimitedResources": ["cpu_time","memory","concurrency","storage","network"],
+  "upgradeStages": ["snapshot","migration","backend_health","renderer_health","atomic_switch"],
+  "purgeRequirements": ["explicit","elevated","audited","retention_confirmed"]
+}
+

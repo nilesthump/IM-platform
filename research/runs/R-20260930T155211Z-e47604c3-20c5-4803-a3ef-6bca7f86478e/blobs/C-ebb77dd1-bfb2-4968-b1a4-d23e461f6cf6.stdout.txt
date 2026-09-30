@@ -1,0 +1,39 @@
+RUN ['docker', 'run', '--rm', '--network', 'container:im-arch4-fix-pg-35960', '-e', 'PGHOST', '-e', 'PGUSER', '-e', 'PGDATABASE', '-e', 'PGPORT', '-e', 'PGPASSWORD', '-v', 'H:\\.codex\\worktrees\\architecture-remediation\\IM-platform:/repo', '-w', '/repo', 'im-db-review-runtime', 'python3', 'contracts/database/migrate.py', 'up']
+0001_initial: up complete
+Independent disposable PostgreSQL16/NATS2.10; DB_TEST_ENABLE=1; canonical0001_initial, no skipped integration permitted
+=== RUN   TestPostgresRevocationFallbackWithoutNATS
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/REPLACED
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/LOGOUT
+--- PASS: TestPostgresRevocationFallbackWithoutNATS (2.23s)
+    --- PASS: TestPostgresRevocationFallbackWithoutNATS/REPLACED (1.12s)
+    --- PASS: TestPostgresRevocationFallbackWithoutNATS/LOGOUT (1.10s)
+PASS
+ok  	im-platform/backend/go/tests	2.360s
+
+
+=== RUN   TestPostgresRevocationFallbackWithoutNATS
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/REPLACED
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/LOGOUT
+--- PASS: TestPostgresRevocationFallbackWithoutNATS (4.08s)
+    --- PASS: TestPostgresRevocationFallbackWithoutNATS/REPLACED (2.04s)
+    --- PASS: TestPostgresRevocationFallbackWithoutNATS/LOGOUT (2.02s)
+PASS
+ok  	im-platform/backend/go/tests	6.082s
+
+
+RUN ['C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe', 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/message-cache-negative.py']
+--- FAIL: TestPostgresAuthSessionAndWSS (0.77s)
+    auth_test.go:191: bound operation blocked by PostgreSQL: read tcp 127.0.0.1:49255->127.0.0.1:49253: i/o timeout
+FAIL
+FAIL	im-platform/backend/go/tests	0.901s
+FAIL
+
+
+PASS: isolated reintroduced message PostgreSQL lookup rejected by actual exclusive-lock behavior control; product bytes unchanged
+RUN ['C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe', 'contracts/websocket/verify.py']
+PASS WSS v1: 8 positive, 10 negative shared Go/Java scenarios; 18 schema and 26 behavior mutations rejected
+RUN ['pwsh', '-NoProfile', '-File', 'contracts/http/verify-auth-user-friend.ps1']
+PASS: Auth/User/Friend contracts verified paths=9 operations=9 error_codes=15 positive=6 negative=21 profiles=go,java schema_lint=OAI-OpenAPI-3.1-2026-08-03 mutation_regressions=15.
+im-arch4-fix-nats-35960
+im-arch4-fix-pg-35960
+PASS independent live unit/race/auth/session/fixtures/rollback/cache negative, zero integration skips

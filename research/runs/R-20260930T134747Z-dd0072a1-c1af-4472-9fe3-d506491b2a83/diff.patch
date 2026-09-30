@@ -1,0 +1,133 @@
+diff --git a/ci/check_architecture.py b/ci/check_architecture.py
+index 832555e..e044e89 100644
+--- a/ci/check_architecture.py
++++ b/ci/check_architecture.py
+@@ -189,12 +189,14 @@ def check_java(root):
+         jdbc = bool(re.search(r"\b(?:java|javax)\.sql\b", code))
+         if jdbc and unit["owner"] in {"root", "shared", "gateway", "plugin-host"}:
+             calls = re.findall(r"\.\s*(\w+)\s*\(", code)
+-            forbidden = {"prepareStatement", "prepareCall", "createStatement", "execute", "executeQuery", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
++            transactions = {"commit", "rollback", "setAutoCommit", "setSavepoint", "releaseSavepoint"}
++            forbidden = transactions | {"prepareStatement", "prepareCall", "createStatement", "execute", "executeQuery", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
+             if unit["owner"] == "gateway":
+-                forbidden = {"executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
+-                # execute() may write; allow it only with a literal proven SELECT.
+-                if "execute" in calls and not any(re.match(r"\s*SELECT\b", s, re.I) for s in unit["strings"]):
+-                    forbidden.add("execute")
++                # execute() is ambiguous even when another literal in the file is
++                # SELECT. Gateway read-only queries use executeQuery(); transaction
++                # control and mutations belong to Core. Connection setup/close and
++                # shared connection factories remain allowed.
++                forbidden = transactions | {"execute", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
+             for call in set(calls) & forbidden:
+                 errors.append(f"SRC-01/03 {path}: {unit['owner']} owns prohibited JDBC persistence call {call}")
+         # Includes explicit imports, static imports, wildcard packages, same-package
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index a012449..b7a88df 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -46,7 +46,7 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Fresh /root/stage3_impl owns only003 checker/evidence/Recorder until candidate commit then releases writer to Coordinator for new independent Reviewer. Original unknown and Social worktrees untouched.
++Fresh /root/stage3_jdbc_fix owns only003 JDBC checker/evidence/Recorder repair until clean candidate commit, then releases writer to Coordinator for a new independent Reviewer. Original unknown and Social worktrees untouched.
+ 
+ ## Next Exact Action
+ 
+@@ -59,3 +59,7 @@ ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-on
+ ## Stage003 candidate verification
+ 
+ Exact commands/results/durations/limitations in evidence003/implementation-evidence.md, Recorder R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b. New static checks supplement semantic independent Review; governance triggering and Gate negative controls pass; originalGo real source failure is expected, no product or batch PASS. Host actual candidate jobs pending.
++
++## Fresh JDBC Fix handoff
++
++Independent read-only Review FAIL on a27f655 repaired by fresh Fix context: Gateway ambiguous execute no SELECT-decoy exemption; non-Core JDBC transaction controls forbidden,legal read-only/connection support retained. Localarchitecture34 PASS/noskip,CI24 PASS/four historical Windows symlink skips; canonical/governance/Java/recoveryDevelopmentPASS,oldGo72FAIL unchanged. Durable evidence003/jdbc-fix-evidence.md and fresh Recorder R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83. New independentReview and hosted bounded acceptance pending;003review/004backlog/overallGate red.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md
+index 6cc4560..bae56c1 100644
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md
++++ b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md
+@@ -84,3 +84,7 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
+ # Implementation candidate handoff
+ 
+ Effective checks delivered, local30architecture/24CI tests PASS (four historical Windows symlink subcases skipped), authority/governance/currentJava PASS; actualGo source FAIL expected inventory in evidence003/expected-old-go-violations.md and raw JSON. Commands ci/check_architecture.py --scope governance/go/java/all; unittest tests/architecture and tests/ci. No product/canonical/contracts/history edits. Fresh independent Reviewer plus exact hosted jobs still required, no selfacceptance; overall Gate stays red. Last bounded acceptedheadc0373ab, checkpointstage2. Implementation writer /root/stage3_impl releases after candidate commit, Coordinator delegates new Reviewer. Stage004 remainsbacklog.
++
++# Fresh JDBC repair candidate
++
++Independent read-only Review FAIL on a27f655 recorded in evidence003/jdbc-fix-evidence.md. New /root/stage3_jdbc_fix repaired Gateway execute SELECT-decoy loophole and non-Core JDBC transaction calls; architecture34 PASS/no skip,CI24 PASS/four historical Windows symlink subcase skips,canonical/recovery Development PASS; oldGo72 violations unchangedFAIL. Task remainsreview and004backlog; new independentReview/exact-hosted required,overallGate red. No product/history changes. Fixer releases writer after clean ordinary commit.
+diff --git a/tests/architecture/test_source_boundaries.py b/tests/architecture/test_source_boundaries.py
+index f7e45ae..af7436f 100644
+--- a/tests/architecture/test_source_boundaries.py
++++ b/tests/architecture/test_source_boundaries.py
+@@ -144,6 +144,34 @@ class SourceTests(unittest.TestCase):
+         self.assert_contains(errors, "shared owns prohibited JDBC persistence call prepareStatement")
+         self.assert_contains(errors, "gateway owns prohibited JDBC persistence call executeUpdate")
+ 
++    def test_java_gateway_execute_cannot_borrow_unrelated_select_literal(self):
++        self.java_base()
++        for operation in ('stmt.execute(q)', 'db.prepareStatement(q).execute()',
++                          'stmt.execute("SELECT session_epoch FROM sessions")'):
++            with self.subTest(operation=operation):
++                self.put("backend/java/gateway/Dynamic.java", 'package im.gateway; import java.sql.Statement; import java.sql.Connection; public class Dynamic {public static void run(Connection db,Statement stmt,String q)throws Exception{String unused="SELECT session_epoch FROM sessions";'+operation+';}}')
++                self.assert_contains(self.java_errors(), "gateway owns prohibited JDBC persistence call execute")
++
++    def test_java_gateway_dynamic_update_with_select_decoy_rejected(self):
++        self.java_base()
++        self.put("backend/java/gateway/Dynamic.java", 'package im.gateway; import java.sql.Statement; public class Dynamic {public static void run(Statement stmt)throws Exception{String unrelated="SELECT session_epoch FROM sessions";String q="UPDATE "+"sessions SET status=1";stmt.execute(q);}}')
++        self.assert_contains(self.java_errors(), "gateway owns prohibited JDBC persistence call execute")
++
++    def test_java_noncore_jdbc_transaction_controls_rejected(self):
++        self.java_base()
++        for location in ("gateway", "shared"):
++            for operation in ("commit()", "rollback()", "setAutoCommit(false)",
++                              "setSavepoint()", "releaseSavepoint(null)"):
++                with self.subTest(location=location, operation=operation):
++                    self.put(f"backend/java/{location}/Transaction.java", f'package im.{location}; import java.sql.Connection; public class Transaction {{public static void run(Connection db)throws Exception{{db.{operation};}}}}')
++                    self.assert_contains(self.java_errors(), f"{location} owns prohibited JDBC persistence call {operation.split('(')[0]}")
++
++    def test_java_gateway_executequery_and_connection_lifecycle_valid(self):
++        self.java_base()
++        self.put("backend/java/gateway/SessionCheck.java", 'package im.gateway; import java.sql.Connection; public class SessionCheck {public static void validate(Connection db)throws Exception{try(var statement=db.prepareStatement("SELECT session_epoch FROM sessions")){statement.executeQuery();} db.close();}}')
++        self.put("backend/java/shared/Connect.java", 'package im.shared; import java.sql.Connection; import java.sql.DriverManager; public class Connect {public static Connection open(String url)throws Exception{Connection db=DriverManager.getConnection(url);db.setReadOnly(true);return db;}}')
++        self.assertEqual([], self.java_errors())
++
+     def test_shared_java_connection_factory_is_support_not_repository(self):
+         self.java_base()
+         self.put("backend/java/shared/Connect.java", 'package im.shared; import java.sql.Connection; import java.sql.DriverManager; public class Connect {public static Connection open(String url)throws Exception{return DriverManager.getConnection(url);}}')
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/__pycache__/check_architecture.cpython-312.pyc
+# ?? ci/__pycache__/check_gate.cpython-312.pyc
+# ?? ci/__pycache__/check_s0_boundary.cpython-312.pyc
+# ?? ci/__pycache__/classify.cpython-312.pyc
+# ?? research/prompts/P-8398fc18-6a08-4483-b0f8-14e9c5bda5d1/metadata.json
+# ?? research/prompts/P-8398fc18-6a08-4483-b0f8-14e9c5bda5d1/prompt.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/.gitattributes
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-20c3618f-aa57-4ca5-af3b-c8bdd95463a5.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-20c3618f-aa57-4ca5-af3b-c8bdd95463a5.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-4d74d0e3-9242-42ed-b32c-a2c05020f104.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-4d74d0e3-9242-42ed-b32c-a2c05020f104.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-9a5eca73-580d-42dd-a6f1-3a69cbc8f29f.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-9a5eca73-580d-42dd-a6f1-3a69cbc8f29f.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-9c7f03d1-f5e2-4f39-91e6-f12f15b140b2.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-9c7f03d1-f5e2-4f39-91e6-f12f15b140b2.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-cb8a04ca-a721-4e67-a5d9-ebc002891897.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-cb8a04ca-a721-4e67-a5d9-ebc002891897.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-d85d0659-42d7-4982-af3c-2c99bed4fab9.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-d85d0659-42d7-4982-af3c-2c99bed4fab9.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-df1497aa-cf28-43a5-8f26-7214ac354d48.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-df1497aa-cf28-43a5-8f26-7214ac354d48.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-e985f769-6d65-4c4a-8bec-8b6224c153a2.stderr.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/blobs/C-e985f769-6d65-4c4a-8bec-8b6224c153a2.stdout.txt
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/events.jsonl
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/initial_state.json
+# ?? research/runs/R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83/metadata.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/jdbc-fix-evidence.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/jdbc-fix-prompt.txt
+# ?? tests/architecture/__pycache__/test_frozen_architecture.cpython-312.pyc
+# ?? tests/architecture/__pycache__/test_source_boundaries.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_classify.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_gate.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_s0_boundary.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_workflow_context.cpython-312.pyc
+# ?? tools/__pycache__/verify_frozen_architecture.cpython-312.pyc

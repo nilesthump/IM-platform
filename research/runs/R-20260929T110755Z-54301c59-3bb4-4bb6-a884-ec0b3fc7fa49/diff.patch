@@ -1,0 +1,87 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 7370c64..89fb2c7 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -2,20 +2,22 @@
+ 
+ Current Loop: Loop 1
+ 
+-Current Stage: S0
++Current Stage: S1
+ 
+-Current Gate: S0
++Current Gate: S1
+ 
+-Gate Status: PASS
++Gate Status: NOT YET PASSED (S0 PASS retained)
+ 
+-Current Batch: LOOP1-S0
++Current Batch: LOOP1-S1
+ 
+-Current Task: LOOP1-CI-001
++Current Task: LOOP1-GO-AUTH-001
+ 
+-Current Task State: done
++Current Task State: active
+ 
+ ## Current Contract Work
+ 
++- S1 was explicitly authorized by the Human after S0 completion. An isolated clean checkout of `main` `09cec968f64faf0db319aea8d9c21d4fffe8ec49` passed CTRL-002 Acceptance, canonical Frozen Architecture hash verification, HTTP, WSS, and Sync/Plugin contract verification. The 19 local CI tests passed when granted temporary-directory access (five Windows symlink subcases skipped); hosted S0 full matrix PASS remains the Gate entry authority. New `spec/batches/LOOP1-S1.md` and four architecture-listed S1 Task Specs define dependency order; `LOOP1-GO-AUTH-001` is first and active. No S1 product code has changed. Activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; partial-resume Recorder `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`.
++
+ - Final S0 remote sync: `git ls-remote origin main` confirms `origin/main` at `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to the clean local `main` before this governance record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA: classify and selected-job gate passed; the documentation-only diff correctly skipped profile jobs. The earlier merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071`. All nine S0 tasks remain done and **S0 Gate PASS** stands. Final sync evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`. S1 remains inactive.
+ 
+ - Remote PR #1 is merged at 485a071bc80afb1b6f3c252779444e1be275c562; isolated local main safely fast-forwarded to exact origin/main. Hosted main Actions [36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) completed success with classify, Go, Java, Web, Desktop, Mobile, shared, compatibility, deploy and gate all successful. Post-merge local frozen hashes, recovery, S0 spec/HTTP/WSS/Sync/Plugin verifiers and 19 CI tests passed (five Windows real-symlink subcases skipped; hosted Linux matrix passed). All nine S0 tasks remain done. **S0 Gate PASS**; evidence: spec/progress/evidence/LOOP1-CI-001/2026-09-29-remote-main-s0-gate-reevaluation.md; latest checkpoint: spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md. S1 remains inactive.
+@@ -293,11 +295,11 @@ Current Task State: done
+ 
+ ## Next Exact Action
+ 
+-Return control at S0 Gate PASS. The next work is separate S1 Stage selection after its batch manifest and dependency-satisfied task are resolved and that Stage action is authorized; S1 is inactive.
++Commit S1 activation records, then delegate `LOOP1-GO-AUTH-001` to a fresh Implementation Agent. Require clean committed independent review and real CI before task acceptance. S1 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+-`8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67` (remote-synchronized S0 Gate checkpoint, hosted main CI PASS at this SHA; prior merged-main full matrix and post-integration checks PASS).
++`09cec968f64faf0db319aea8d9c21d4fffe8ec49` (clean local S0 Gate PASS `main` used as the S1 activation base; hosted merged-main full matrix PASS was at `485a071`, and later main CI PASS was recorded at `8dc64ad`).
+ 
+ ## Latest Checkpoint
+ 
+@@ -305,7 +307,8 @@ Return control at S0 Gate PASS. The next work is separate S1 Stage selection aft
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-- Final governance sync writer owns only this current-state update, CI Task Spec, task-linked final remote evidence, and linked Recorder prompt/run until the local commit. The original `H:/IM-platform` checkout is untouched. After commit, this isolated worktree is expected to be clean; the governance record commit is local and is not itself the hosted-CI SHA.
++- S1 Coordinator owns only the new batch and four task specifications, this recovery update, task-linked activation evidence and Recorder artifacts until the activation commit. The separate original `H:/IM-platform` checkout and its unknown untracked files remain untouched. No S1 product file has changed.
++- Historical S0 final governance sync ownership below was closed by its clean `main` commit.
+ 
+ - Coordinator post-PR integration agent owns only this current-state update, CI Task Spec, S0 Gate evidence/checkpoint, and linked Recorder prompt/run until local commit. Product, architecture, contracts, migration and original `H:/IM-platform` untracked files were untouched. After local commit, no uncommitted changes are expected.
+ 
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/__pycache__/check_gate.cpython-312.pyc
+# ?? ci/__pycache__/check_s0_boundary.cpython-312.pyc
+# ?? ci/__pycache__/classify.cpython-312.pyc
+# ?? research/prompts/P-69a05cbf-617e-4117-aaed-2fcc51c5b158/metadata.json
+# ?? research/prompts/P-69a05cbf-617e-4117-aaed-2fcc51c5b158/prompt.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-03d1aafa-a214-4071-9cfb-5135549cd1af.stderr.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-03d1aafa-a214-4071-9cfb-5135549cd1af.stdout.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-44db95f7-2fba-431a-b405-0bfa691c366f.stderr.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-44db95f7-2fba-431a-b405-0bfa691c366f.stdout.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-5ed67b0b-46a7-493e-92a8-d0bba958afc7.stderr.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-5ed67b0b-46a7-493e-92a8-d0bba958afc7.stdout.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-6ba28eaa-bba0-42f1-94fa-589675fa700f.stderr.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-6ba28eaa-bba0-42f1-94fa-589675fa700f.stdout.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-e78644d4-17fb-4385-886a-277fd11f6bdc.stderr.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/blobs/C-e78644d4-17fb-4385-886a-277fd11f6bdc.stdout.txt
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/events.jsonl
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/initial_state.json
+# ?? research/runs/R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49/metadata.json
+# ?? spec/batches/LOOP1-S1.md
+# ?? spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md
+# ?? spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-visible-prompt.txt
+# ?? spec/tasks/active/LOOP1-GO-AUTH-001.md
+# ?? spec/tasks/backlog/LOOP1-E2E-001.md
+# ?? spec/tasks/backlog/LOOP1-GO-MSG-001.md
+# ?? spec/tasks/backlog/LOOP1-GO-SOCIAL-001.md
+# ?? tests/ci/__pycache__/test_classify.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_gate.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_s0_boundary.cpython-312.pyc

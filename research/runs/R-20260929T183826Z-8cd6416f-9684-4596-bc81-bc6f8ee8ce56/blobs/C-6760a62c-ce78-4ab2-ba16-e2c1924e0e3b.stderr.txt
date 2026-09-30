@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "H:\.codex\worktrees\architecture-remediation\IM-platform\stage1-recovery-fix.py", line 8, in <module>
+    p=r/'spec/architecture/baseline.md';s=p.read_text();import re;s=re.sub(r'(?m)^- sha256: `[^`]+`', '- sha256: `'+hashlib.sha256((r/'spec/architecture/frozen-architecture.md').read_bytes()).hexdigest()+'`',s);w('spec/architecture/baseline.md',s)
+                                          ^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py", line 1028, in read_text
+    return f.read()
+           ^^^^^^^^
+UnicodeDecodeError: 'gbk' codec can't decode byte 0xaf in position 91: illegal multibyte sequence

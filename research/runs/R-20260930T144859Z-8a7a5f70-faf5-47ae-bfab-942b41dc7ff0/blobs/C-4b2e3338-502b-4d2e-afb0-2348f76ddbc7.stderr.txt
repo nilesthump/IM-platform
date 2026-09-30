@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+  File "H:\.codex\worktrees\stage4-independent-review\IM-platform\tests\go\live_role_smoke.py", line 26, in __init__
+    if not chunk:raise EOFError('WebSocket upgrade closed before headers')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: WebSocket upgrade closed before headers
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+AssertionError
+Traceback (most recent call last):
+  File "H:\.codex\worktrees\architecture-remediation\IM-platform\spec\progress\evidence\LOOP1-ARCH-REMEDIATION-004\independent-validation.py", line 60, in <module>
+    {'static':static,'live':live,'eof':eof}[mode]()
+  File "H:\.codex\worktrees\architecture-remediation\IM-platform\spec\progress\evidence\LOOP1-ARCH-REMEDIATION-004\independent-validation.py", line 56, in eof
+    run([PY,'-c',code,str(ROOT/'tests/go/live_role_smoke.py'),port],timeout=5)
+  File "H:\.codex\worktrees\architecture-remediation\IM-platform\spec\progress\evidence\LOOP1-ARCH-REMEDIATION-004\independent-validation.py", line 7, in run
+    subprocess.run(argv,cwd=cwd,env=env,check=True,timeout=timeout)
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe', '-c', "import importlib.util,sys,time; s=importlib.util.spec_from_file_location('smoke',sys.argv[1]);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);m.PORT=int(sys.argv[2]);t=time.monotonic()\ntry:m.WS();raise AssertionError('EOF accepted')\nexcept EOFError:assert time.monotonic()-t<2;print('PASS real TLS remote upgrade EOF exits under2s')", 'H:\\.codex\\worktrees\\stage4-independent-review\\IM-platform\\tests\\go\\live_role_smoke.py', '62420']' returned non-zero exit status 1.

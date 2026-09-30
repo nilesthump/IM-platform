@@ -1,0 +1,134 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 52f72c3..4913f0f 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -12,10 +12,12 @@ Current Batch: LOOP1-S1
+ 
+ Current Task: LOOP1-GO-AUTH-001
+ 
+-Current Task State: active
++Current Task State: review
+ 
+ ## Current Contract Work
+ 
++- `LOOP1-GO-AUTH-001` candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed with a clean worktree and strict CTRL-002 Acceptance recovery PASS. Local Go race/integration, PostgreSQL/NATS Outbox, HTTP/WSS contracts, frozen hashes, CI unit tests, and Compose config pass. Full Go Compose smoke did not start because the configured Docker mirror returned HTTP 403 for its Go builder image. The task is now in `review`; a fresh independent reviewer and real hosted CI are required before `done`. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; implementation Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab` validated with 30 events.
++
+ - Fresh Go Auth Implementation Agent has implemented and locally verified the bounded S1 Auth/Session slice on `task/LOOP1-GO-AUTH-001`: PostgreSQL registration/login/refresh/logout and three slots, WSS bind/revocation, durable revocation Outbox relay through NATS, config-file credentials, and Go CI adaptation. Go race/integration with disposable PostgreSQL/NATS, HTTP/WSS contracts, frozen hashes, CTRL-002 Development, 19 CI tests, and Compose config pass. Local full Compose Go smoke could not fetch `golang:1.25-alpine` because the configured Docker mirror returned HTTP 403 before service startup. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Human explicitly approved the exact `deploy/compose.yaml` config-file mount amendment; prior automatic approval rejection remains disclosed. This is not independent acceptance or S1 Gate PASS.
+ 
+ - S1 was explicitly authorized by the Human after S0 completion. An isolated clean checkout of `main` `09cec968f64faf0db319aea8d9c21d4fffe8ec49` passed CTRL-002 Acceptance, canonical Frozen Architecture hash verification, HTTP, WSS, and Sync/Plugin contract verification. The 19 local CI tests passed when granted temporary-directory access (five Windows symlink subcases skipped); hosted S0 full matrix PASS remains the Gate entry authority. New `spec/batches/LOOP1-S1.md` and four architecture-listed S1 Task Specs define dependency order; `LOOP1-GO-AUTH-001` is first and active. No S1 product code has changed. Activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; partial-resume Recorder `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`.
+@@ -297,7 +299,7 @@ Current Task State: active
+ 
+ ## Next Exact Action
+ 
+-After the Implementation Agent's clean candidate commit, move `LOOP1-GO-AUTH-001` from `active` to `review` and delegate a fresh independent Review Agent. Review the exact committed diff in a clean checkout, then obtain applicable real hosted CI before acceptance. S1 Gate remains NOT YET PASSED.
++Delegate `LOOP1-GO-AUTH-001` candidate `a93569d` to a fresh independent Review Agent in a clean checkout. Resolve any FAIL through fresh Fix/Review; on Review PASS, obtain applicable real hosted CI before task acceptance. S1 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -309,7 +311,8 @@ After the Implementation Agent's clean candidate commit, move `LOOP1-GO-AUTH-001
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-- Fresh Implementation Agent `/root/go_auth_impl` owns only task-allowed Go Auth/Session source and tests, Go CI/boundary adaptation, the Human-approved exact Go Compose config mounts, Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. The local disposable PostgreSQL and NATS test containers and temporary test config are owned by this run and are not repository changes; they will be removed after verification. Original `H:/IM-platform` unknown untracked files remain untouched.
++- Coordinator owns only the Go Auth `active` to `review` task/progress transition, linked handoff evidence and Recorder artifacts until this transition is committed. Implementation Agent handed off a clean committed product candidate at `a93569d`; original `H:/IM-platform` unknown untracked files remain untouched.
++- Implementation Agent `/root/go_auth_impl` owns no uncommitted changes and removed its disposable PostgreSQL/NATS containers and temporary config after verification.
+ 
+ - S1 Coordinator owns only the new batch and four task specifications, this recovery update, task-linked activation evidence and Recorder artifacts until the activation commit. The separate original `H:/IM-platform` checkout and its unknown untracked files remain untouched. No S1 product file has changed.
+ - Historical S0 final governance sync ownership below was closed by its clean `main` commit.
+diff --git a/spec/tasks/active/LOOP1-GO-AUTH-001.md b/spec/tasks/active/LOOP1-GO-AUTH-001.md
+deleted file mode 100644
+index f23e18e..0000000
+--- a/spec/tasks/active/LOOP1-GO-AUTH-001.md
++++ /dev/null
+@@ -1,78 +0,0 @@
+----
+-task_id: LOOP1-GO-AUTH-001
+-title: Implement Go Auth and Session vertical slice
+-status: active
+-owner: unassigned
+-stage: S1
+-gate: S1
+----
+-
+-# Goal
+-
+-Implement Go registration/login, refresh, logout, Session slot and epoch handling, and WSS `auth.bind` against the frozen HTTP/WSS contracts and canonical database migration.
+-
+-# Inputs
+-
+-- Frozen Architecture v1.0 chapters 2, 4, 7, 11, 19 and appendix B, resolved and hash-checked through `spec/architecture/README.md`.
+-- Approved ADRs in `spec/architecture/decisions/` and `spec/governance/minimality.md`.
+-- `spec/domain/auth-user-friend.md`, `spec/invariants/auth-user-friend.md`, `spec/acceptance/s0-auth-user-friend.md`.
+-- `contracts/http/`, `contracts/errors/`, `contracts/websocket/`, relevant fixtures under `contracts/fixtures/`, and `contracts/database/`.
+-
+-# Dependencies
+-
+-- S0 Gate PASS on merged `main`.
+-- `LOOP1-CI-001`, `LOOP1-INFRA-001`, `LOOP1-DB-001`, and all three Contract tasks `done`.
+-
+-# Allowed Paths
+-
+-- `backend/go/**`
+-- `deploy/compose.yaml` only for read-only Go Core/Gateway mounts of one operator-provided directory containing `config.json`, `pg_password`, and `jwt_key`; no credential file is committed and Java/TLS service behavior remains unchanged.
+-- Go Auth/Session integration tests under `tests/go/**`
+-- `ci/**`, `.github/workflows/ci.yml`, and `tests/ci/**` only to replace the S0 Go placeholder boundary with actual Go build/test/contract execution; preserve other jobs and Gate semantics.
+-- `spec/tasks/**/LOOP1-GO-AUTH-001.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-GO-AUTH-001/**`
+-- `spec/progress/checkpoints/*loop1-go-auth-001*.md`
+-- `research/prompts/**` and `research/runs/**` only for Recorder artifacts linked to this task.
+-
+-The Coordinator prospectively authorized the exact task-linked evidence, checkpoint, and Recorder paths at S1 activation. No path here authorizes changes to architecture, public contracts, migrations, or other backends.
+-
+-The Human explicitly approved modifying `deploy/compose.yaml` for this configuration-file connection after the automatic approval review rejected the earlier Coordinator-only scope expansion. This exact-path authorization was received on 2026-09-29; it does not authorize any other deployment path or secret material in Git.
+-
+-# Acceptance
+-
+-- Go HTTP behavior matches the canonical Auth/User contract and shared errors for registration, login, refresh, and logout.
+-- Three client-type slots can coexist; same-slot login atomically revokes the prior Session and advances epoch. Old tokens cannot bind or reconnect; successful logout revokes Session and Refresh Token and closes its WSS connection.
+-- WSS remains unauthenticated until valid `auth.bind`, rejects non-allowed pre-bind operations, and binds user, Session and client type. Same-slot replacement emits `session.revoked` before close.
+-- PostgreSQL is authoritative; secrets never enter URL query, logs, traces, or error responses. Production transport stays behind HTTPS/WSS/TLS.
+-- Deterministic Go contract/integration tests exercise positive and negative fixtures, transaction rollback, revocation, epoch, and refresh-token handling. Applicable real CI passes after independent review.
+-
+-# Forbidden
+-
+-- Change Frozen Architecture, public contracts, database migration, ACK/Sync/Plugin semantics, or security boundary.
+-- Implement social, messages, Java, clients, or future-stage mechanisms.
+-- Treat a local test PASS or self-review as acceptance.
+-
+-# Minimality
+-
+-Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skeleton, and canonical fixtures. Add dependencies or layers only for a present contract, transaction, security, or test need; record their justification in evidence.
+-
+-# Verification
+-
+-- Run the existing HTTP and WSS contract verifiers and Go Auth/Session integration suite, including failure and concurrency cases.
+-- Run frozen-architecture verification and `tools/verify-loop1-ctrl-002.ps1 -Mode Development` during development.
+-- Fresh independent review must use a clean committed checkout and applicable real CI. Do not use ADR-0001 bootstrap acceptance: it expired at S0.
+-
+-# Evidence
+-
+-- Entry checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md`; clean S0 `main` at `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
+-- Coordinator activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; Recorder run `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`. This is development/recovery evidence, not independent task acceptance. Implementation evidence pending.
+-- Implementation development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; linked Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Local Go race/integration, HTTP/WSS verifiers, frozen hashes, CTRL-002 Development, CI tests, and Compose config passed. Full local Go profile smoke stopped before service startup on Docker registry mirror HTTP 403. Hosted CI and independent review remain pending.
+-
+-# Handoff
+-
+-- The isolated branch `task/LOOP1-GO-AUTH-001` contains the Auth/Session implementation and development evidence. No architecture, contract, migration, Java, or client files changed. The Implementation Agent owns only task-allowed implementation, CI, config mount, Task Spec/current recovery, evidence, and linked Recorder artifacts until the clean candidate commit. Last independently accepted base remains `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
+-
+-# Next Action
+-
+-- After the clean candidate commit, Coordinator moves this task to `review` and delegates a fresh independent Review Agent. The reviewer checks the committed diff and clean checkout; then applicable real hosted CI is required. Investigate the local Docker mirror HTTP 403 only if it persists outside this host or hosted CI fails.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-0ded789d-7d33-4542-9a02-8581d5831dc6/metadata.json
+# ?? research/prompts/P-0ded789d-7d33-4542-9a02-8581d5831dc6/prompt.txt
+# ?? research/runs/R-20260929T135630Z-849cc4df-9db0-4467-b82b-8e90c5edfd18/blobs/C-33f9eadc-8fa9-4b78-9eb3-e681e51660b0.stderr.txt
+# ?? research/runs/R-20260929T135630Z-849cc4df-9db0-4467-b82b-8e90c5edfd18/blobs/C-33f9eadc-8fa9-4b78-9eb3-e681e51660b0.stdout.txt
+# ?? research/runs/R-20260929T135630Z-849cc4df-9db0-4467-b82b-8e90c5edfd18/blobs/C-dcfdfa06-a7aa-4591-835d-f57ace04e878.stderr.txt
+# ?? research/runs/R-20260929T135630Z-849cc4df-9db0-4467-b82b-8e90c5edfd18/blobs/C-dcfdfa06-a7aa-4591-835d-f57ace04e878.stdout.txt
+# ?? research/runs/R-20260929T135630Z-849cc4df-9db0-4467-b82b-8e90c5edfd18/events.jsonl
+# ?? research/runs/R-20260929T135630Z-849cc4df-9db0-4467-b82b-8e90c5edfd18/initial_state.json
+# ?? research/runs/R-20260929T135630Z-849cc4df-9db0-4467-b82b-8e90c5edfd18/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review-handoff.md
+# ?? spec/tasks/review/LOOP1-GO-AUTH-001.md

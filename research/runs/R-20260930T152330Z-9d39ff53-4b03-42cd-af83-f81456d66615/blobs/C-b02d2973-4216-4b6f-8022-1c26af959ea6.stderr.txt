@@ -1,0 +1,35 @@
+ Image im-arch4-live-16144-core-go Building 
+ Image im-arch4-live-16144-gateway-go Building 
+ Image im-arch4-live-16144-plugin-host-go Building 
+ Image im-arch4-live-16144-migrate Building 
+migrate.Dockerfile:1
+
+--------------------
+
+   1 | >>> FROM python:3.12-alpine
+
+   2 |     RUN apk add --no-cache postgresql-client
+
+   3 |     WORKDIR /work
+
+--------------------
+
+target migrate: failed to solve: python:3.12-alpine: failed to resolve source metadata for docker.io/library/python:3.12-alpine: unexpected status from HEAD request to https://docker.1panel.live/v2/library/python/manifests/3.12-alpine?ns=docker.io: 403 Forbidden
+
+
+
+View build details: docker-desktop://dashboard/build/default/default/3w6spnxt4u7tjhbpp5sk4t99x
+
+Traceback (most recent call last):
+  File "H:\.codex\worktrees\stage4-final-review\IM-platform\tests\go\live_role_smoke.py", line 94, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "H:\.codex\worktrees\stage4-final-review\IM-platform\tests\go\live_role_smoke.py", line 63, in main
+    compose('config','--quiet');compose('up','-d','--build')
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\worktrees\stage4-final-review\IM-platform\tests\go\live_role_smoke.py", line 56, in compose
+    def compose(*args):subprocess.run(command+list(args),env=env,check=True,timeout=300)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['docker', 'compose', '-f', 'H:\\.codex\\worktrees\\stage4-final-review\\IM-platform\\deploy\\compose.yaml', '-p', 'im-arch4-live-16144', '--profile', 'go', 'up', '-d', '--build']' returned non-zero exit status 1.

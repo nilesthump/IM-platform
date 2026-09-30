@@ -1,0 +1,501 @@
+[
+  {
+    "command_id": "C-7f9b2f66-b676-4c68-acaf-5c295c44f476",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "$env:PYTHONDONTWRITEBYTECODE='1'; Get-Content -LiteralPath 'spec/architecture/decisions/ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md','spec/architecture/decisions/ADR-0002-frozen-architecture-canonical-markdown-migration.md','spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md'; $canonical=Get-Content -LiteralPath 'spec/architecture/frozen-architecture.md'; $canonical[197..297]; $canonical[611..859]; $canonical[1039..1106]"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:53:17.767446Z",
+    "finished_at": "2026-09-30T16:53:18.506210Z",
+    "exit_code": 0,
+    "duration_ms": 734.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-7f9b2f66-b676-4c68-acaf-5c295c44f476.stdout.txt",
+    "stderr_blob": "blobs/C-7f9b2f66-b676-4c68-acaf-5c295c44f476.stderr.txt"
+  },
+  {
+    "command_id": "C-7294ecdd-e014-45aa-a08e-10a5421649fb",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content -LiteralPath 'spec/architecture/frozen-architecture.md' | Select-Object -Skip 197 -First 102; Get-Content -LiteralPath 'spec/architecture/frozen-architecture.md' | Select-Object -Skip 650 -First 211; Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/administrative-closure.md','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-hosted-acceptance.md'"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:54:42.784749Z",
+    "finished_at": "2026-09-30T16:54:43.530515Z",
+    "exit_code": 0,
+    "duration_ms": 735.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-7294ecdd-e014-45aa-a08e-10a5421649fb.stdout.txt",
+    "stderr_blob": "blobs/C-7294ecdd-e014-45aa-a08e-10a5421649fb.stderr.txt"
+  },
+  {
+    "command_id": "C-fb74cd10-3082-4976-9d66-0e828bf82fee",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "git status --porcelain=v1; git diff --exit-code; git diff --cached --exit-code; git log -8 --format='%H %s'; git rev-parse HEAD; git branch --show-current; git diff --stat d0ae52f5615320790ae7039cb48831873de6f486 f4fdd82f8f3179034fb74700c1b4e9aa43e4637e; Get-Content -LiteralPath 'tools/verify-frozen-architecture.ps1' -TotalCount 45; rg --files tools | Select-String 'recover'"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:55:17.514223Z",
+    "finished_at": "2026-09-30T16:55:18.654354Z",
+    "exit_code": 0,
+    "duration_ms": 1141.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-fb74cd10-3082-4976-9d66-0e828bf82fee.stdout.txt",
+    "stderr_blob": "blobs/C-fb74cd10-3082-4976-9d66-0e828bf82fee.stderr.txt"
+  },
+  {
+    "command_id": "C-28aa23ca-7cd7-4471-b4c1-c0fe1b5b10db",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:55:39.765147Z",
+    "finished_at": "2026-09-30T16:55:45.240644Z",
+    "exit_code": 0,
+    "duration_ms": 5484.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-28aa23ca-7cd7-4471-b4c1-c0fe1b5b10db.stdout.txt",
+    "stderr_blob": "blobs/C-28aa23ca-7cd7-4471-b4c1-c0fe1b5b10db.stderr.txt"
+  },
+  {
+    "command_id": "C-b2ba71b2-1d17-4f6b-954f-777df0878750",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "rg --files spec tools ci | Select-String 'verify|recovery'; Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/closure-controls.py','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-independent-review.md','spec/progress/checkpoints/2026-10-01-architecture-remediation-product-accepted.md'; git diff d0ae52f5615320790ae7039cb48831873de6f486...f4fdd82f8f3179034fb74700c1b4e9aa43e4637e -- AGENTS.md spec/acceptance spec/architecture spec/governance spec/handoff spec/batches spec/tasks spec/progress/current.md"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:55:51.181759Z",
+    "finished_at": "2026-09-30T16:55:52.006350Z",
+    "exit_code": 0,
+    "duration_ms": 828.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-b2ba71b2-1d17-4f6b-954f-777df0878750.stdout.txt",
+    "stderr_blob": "blobs/C-b2ba71b2-1d17-4f6b-954f-777df0878750.stderr.txt"
+  },
+  {
+    "command_id": "C-43f5802a-fc42-4462-a7a1-31c983c327cd",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content -LiteralPath 'tools/verify-loop1-ctrl-002.ps1' -TotalCount 80; Get-Content -LiteralPath 'ci/check_architecture.py' -TotalCount 95; rg -n 'TemporaryDirectory|write_|mkdir|subprocess|skipTest|symlink' tests/ci tests/architecture; Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/hosted-acceptance.md','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/conflict-closure-supplement.md'"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:56:11.518032Z",
+    "finished_at": "2026-09-30T16:56:12.305328Z",
+    "exit_code": 0,
+    "duration_ms": 781.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-43f5802a-fc42-4462-a7a1-31c983c327cd.stdout.txt",
+    "stderr_blob": "blobs/C-43f5802a-fc42-4462-a7a1-31c983c327cd.stderr.txt"
+  },
+  {
+    "command_id": "C-39f13616-87f8-464c-93e8-265edde4e8c8",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:56:30.501291Z",
+    "finished_at": "2026-09-30T16:56:36.421671Z",
+    "exit_code": 0,
+    "duration_ms": 5922.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-39f13616-87f8-464c-93e8-265edde4e8c8.stdout.txt",
+    "stderr_blob": "blobs/C-39f13616-87f8-464c-93e8-265edde4e8c8.stderr.txt"
+  },
+  {
+    "command_id": "C-e0fa0b55-dc56-446e-a3a9-b5ed692ee571",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:56:41.743772Z",
+    "finished_at": "2026-09-30T16:56:42.114516Z",
+    "exit_code": 0,
+    "duration_ms": 360.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-e0fa0b55-dc56-446e-a3a9-b5ed692ee571.stdout.txt",
+    "stderr_blob": "blobs/C-e0fa0b55-dc56-446e-a3a9-b5ed692ee571.stderr.txt"
+  },
+  {
+    "command_id": "C-b3ccf58a-5d76-4e9c-91f7-c1bca43a164d",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/ci",
+      "-v"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:56:47.012009Z",
+    "finished_at": "2026-09-30T16:56:49.451066Z",
+    "exit_code": 0,
+    "duration_ms": 2437.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-b3ccf58a-5d76-4e9c-91f7-c1bca43a164d.stdout.txt",
+    "stderr_blob": "blobs/C-b3ccf58a-5d76-4e9c-91f7-c1bca43a164d.stderr.txt"
+  },
+  {
+    "command_id": "C-74a7b3e6-a7fb-4108-9101-d5c3cd620e22",
+    "argv": [
+      "gh",
+      "run",
+      "view",
+      "36744072690",
+      "--repo",
+      "nilesthump/IM-platform",
+      "--json",
+      "headSha,status,conclusion,jobs,url"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:56:58.901507Z",
+    "finished_at": "2026-09-30T16:57:00.569952Z",
+    "exit_code": 0,
+    "duration_ms": 1656.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-74a7b3e6-a7fb-4108-9101-d5c3cd620e22.stdout.txt",
+    "stderr_blob": "blobs/C-74a7b3e6-a7fb-4108-9101-d5c3cd620e22.stderr.txt"
+  },
+  {
+    "command_id": "C-8a538b5e-b368-46d9-aaff-76ffce8518c2",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "$reviewProcId=$PID; $reviewAncestry=@(); for($i=0;$i -lt 9 -and $reviewProcId;$i++){ $p=Get-CimInstance Win32_Process -Filter \"ProcessId=$reviewProcId\"; if(-not $p){break}; $reviewAncestry += [pscustomobject]@{pid=$p.ProcessId; parent_pid=$p.ParentProcessId; name=$p.Name; created=$p.CreationDate.ToUniversalTime().ToString('o'); codex_exec=($p.Name -match 'codex' -and $p.CommandLine -match '\\bexec\\b'); resume_flag=($p.Name -match 'codex' -and $p.CommandLine -match '\\bresume\\b'); prompt_file_reference=($p.Name -match 'codex' -and $p.CommandLine -match 'cli-review-prompt')}; $reviewProcId=$p.ParentProcessId }; $reviewAncestry | ConvertTo-Json -Depth 4; git diff d0ae52f5615320790ae7039cb48831873de6f486 f4fdd82f8f3179034fb74700c1b4e9aa43e4637e -- spec/architecture spec/acceptance spec/batches spec/governance; Get-Content -LiteralPath 'ci/classify.py' -TotalCount 190"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:57:39.841953Z",
+    "finished_at": "2026-09-30T16:57:42.232053Z",
+    "exit_code": 0,
+    "duration_ms": 2391.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-8a538b5e-b368-46d9-aaff-76ffce8518c2.stdout.txt",
+    "stderr_blob": "blobs/C-8a538b5e-b368-46d9-aaff-76ffce8518c2.stderr.txt"
+  },
+  {
+    "command_id": "C-618e984f-f55b-4937-9917-aea9b3837ca9",
+    "argv": [
+      "gh",
+      "run",
+      "view",
+      "36744072690",
+      "--repo",
+      "nilesthump/IM-platform",
+      "--log"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:58:10.070535Z",
+    "finished_at": "2026-09-30T16:58:11.788727Z",
+    "exit_code": 0,
+    "duration_ms": 1688.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-618e984f-f55b-4937-9917-aea9b3837ca9.stdout.txt",
+    "stderr_blob": "blobs/C-618e984f-f55b-4937-9917-aea9b3837ca9.stderr.txt"
+  },
+  {
+    "command_id": "C-fe5ef2a4-b87b-4688-959c-1704598388c7",
+    "argv": [
+      "gh",
+      "run",
+      "view",
+      "36738064831",
+      "--repo",
+      "nilesthump/IM-platform",
+      "--json",
+      "headSha,status,conclusion,jobs,url"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:58:17.381987Z",
+    "finished_at": "2026-09-30T16:58:20.016798Z",
+    "exit_code": 0,
+    "duration_ms": 2625.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-fe5ef2a4-b87b-4688-959c-1704598388c7.stdout.txt",
+    "stderr_blob": "blobs/C-fe5ef2a4-b87b-4688-959c-1704598388c7.stderr.txt"
+  },
+  {
+    "command_id": "C-413f0d7c-f5f0-4233-8ecd-b3eafedab206",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/coordinator-hosted-capture-audit.json' -TotalCount 38; Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/administrative-capture-audit.json' -TotalCount 40; Get-Content -LiteralPath 'research/runs/R-20260930T161055Z-626c89e9-528c-4c81-a16b-1c848baffb1b/metadata.json'; Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-review-command-events.json' -TotalCount 55; Get-Content -LiteralPath '.github/workflows/ci.yml' -TotalCount 130; Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/closure-agent-prompt.txt'; Get-Content -LiteralPath 'AGENTS.md'"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T16:58:40.938286Z",
+    "finished_at": "2026-09-30T16:58:41.666071Z",
+    "exit_code": 0,
+    "duration_ms": 734.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-413f0d7c-f5f0-4233-8ecd-b3eafedab206.stdout.txt",
+    "stderr_blob": "blobs/C-413f0d7c-f5f0-4233-8ecd-b3eafedab206.stderr.txt"
+  },
+  {
+    "command_id": "C-01f8ceb6-c176-4504-b408-febeb2d9c2ee",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/worktrees/architecture-remediation/final-acceptance-research/reviewer/independent_checks.py"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:00:14.683282Z",
+    "finished_at": "2026-09-30T17:00:17.014896Z",
+    "exit_code": 1,
+    "duration_ms": 2328.0,
+    "result": "FAIL",
+    "stdout_blob": "blobs/C-01f8ceb6-c176-4504-b408-febeb2d9c2ee.stdout.txt",
+    "stderr_blob": "blobs/C-01f8ceb6-c176-4504-b408-febeb2d9c2ee.stderr.txt"
+  },
+  {
+    "command_id": "C-d9464fa4-e090-420b-9540-5b04b420a68c",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "rg -n 'DB_TEST_ENABLE|go test|BASE_SHA:|HEAD_SHA:|Ran 27 tests|Ran 34 tests' 'research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-25b98f9c-d413-46bf-99dc-dfadeb558142.stdout.txt'"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:00:30.181812Z",
+    "finished_at": "2026-09-30T17:00:31.001640Z",
+    "exit_code": 0,
+    "duration_ms": 812.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-d9464fa4-e090-420b-9540-5b04b420a68c.stdout.txt",
+    "stderr_blob": "blobs/C-d9464fa4-e090-420b-9540-5b04b420a68c.stderr.txt"
+  },
+  {
+    "command_id": "C-f91277aa-7a04-4d75-abad-736835c4115f",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/worktrees/architecture-remediation/final-acceptance-research/reviewer/independent_checks_v2.py"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:01:01.833298Z",
+    "finished_at": "2026-09-30T17:01:04.994229Z",
+    "exit_code": 0,
+    "duration_ms": 3156.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-f91277aa-7a04-4d75-abad-736835c4115f.stdout.txt",
+    "stderr_blob": "blobs/C-f91277aa-7a04-4d75-abad-736835c4115f.stderr.txt"
+  },
+  {
+    "command_id": "C-30527da0-d536-473b-b087-f7e008f0749c",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-c",
+      "import json,pathlib",
+      "root=pathlib.Path('.')",
+      "run=root/'research/runs/R-20260930T161055Z-626c89e9-528c-4c81-a16b-1c848baffb1b'",
+      "events=[json.loads(x) for x in (run/'events.jsonl').read_text(encoding='utf-8').splitlines()]",
+      "starts={e['data']['command_id']:e['data'] for e in events if e['event_type']=='command_started'}",
+      "for e in events:",
+      " if e['event_type']=='command_finished':",
+      "  d=e['data']; start=starts[d['command_id']]",
+      "  print(json.dumps({'command_id':d['command_id'],'argv':start['argv'],'exit':d['exit_code'],'duration_ms':d['duration_ms']},ensure_ascii=False))",
+      "  for stream in ('stdout','stderr'):",
+      "   txt=(run/d[stream+'_blob']).read_text(encoding='utf-8')",
+      "   lines=[x for x in txt.splitlines() if any(k in x for k in ['PASS','SKIP','FAIL','Ran 34','Ran 27','DB_TEST_ENABLE','NATS','REPLACED','LOGOUT','PostgreSQL','postgres:16'])]",
+      "   print('\\n'.join(lines[-14:]))",
+      "print((pathlib.Path('H:/.codex/worktrees/architecture-remediation/final-acceptance-research/reviewer')/'new-process-proof.json').read_text(encoding='utf-8'))",
+      ""
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:01:32.425707Z",
+    "finished_at": "2026-09-30T17:01:32.476515Z",
+    "exit_code": 0,
+    "duration_ms": 47.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-30527da0-d536-473b-b087-f7e008f0749c.stdout.txt",
+    "stderr_blob": "blobs/C-30527da0-d536-473b-b087-f7e008f0749c.stderr.txt"
+  },
+  {
+    "command_id": "C-cd483753-62ab-4aa3-8449-322a8abea89c",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "rg -n 'Skip|DB_TEST_ENABLE|NATS_URL' backend/go --glob '*.go'; Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-review-nats.py' -TotalCount 130; Get-Content -LiteralPath 'contracts/database/README.md','contracts/websocket/README.md'; Get-Content -LiteralPath 'spec/tasks/done/LOOP1-GO-AUTH-001.md' -TotalCount 80"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:01:38.644952Z",
+    "finished_at": "2026-09-30T17:01:39.525496Z",
+    "exit_code": 0,
+    "duration_ms": 875.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-cd483753-62ab-4aa3-8449-322a8abea89c.stdout.txt",
+    "stderr_blob": "blobs/C-cd483753-62ab-4aa3-8449-322a8abea89c.stderr.txt"
+  },
+  {
+    "command_id": "C-fd1ca3c0-689f-4233-b01b-9f6d607e463f",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--run-id",
+      "R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:02:00.443801Z",
+    "finished_at": "2026-09-30T17:02:00.521086Z",
+    "exit_code": 0,
+    "duration_ms": 79.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-fd1ca3c0-689f-4233-b01b-9f6d607e463f.stdout.txt",
+    "stderr_blob": "blobs/C-fd1ca3c0-689f-4233-b01b-9f6d607e463f.stderr.txt"
+  },
+  {
+    "command_id": "C-6dccd77f-6bf1-4684-bbd7-0cbc560f1bd3",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--run-id",
+      "R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:02:05.722294Z",
+    "finished_at": "2026-09-30T17:02:05.801278Z",
+    "exit_code": 0,
+    "duration_ms": 78.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-6dccd77f-6bf1-4684-bbd7-0cbc560f1bd3.stdout.txt",
+    "stderr_blob": "blobs/C-6dccd77f-6bf1-4684-bbd7-0cbc560f1bd3.stderr.txt"
+  },
+  {
+    "command_id": "C-5cf62cae-acb1-428a-8605-9d28b8c2aa60",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content -LiteralPath 'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/revocation-fix-live.py' -TotalCount 165; Get-Content -LiteralPath 'research/INSTRUMENTATION_EPOCH.json'; git diff --check d0ae52f5615320790ae7039cb48831873de6f486 f4fdd82f8f3179034fb74700c1b4e9aa43e4637e; git status --porcelain=v1 --untracked-files=all"
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:02:13.633850Z",
+    "finished_at": "2026-09-30T17:02:14.456695Z",
+    "exit_code": 0,
+    "duration_ms": 812.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-5cf62cae-acb1-428a-8605-9d28b8c2aa60.stdout.txt",
+    "stderr_blob": "blobs/C-5cf62cae-acb1-428a-8605-9d28b8c2aa60.stderr.txt"
+  },
+  {
+    "command_id": "C-1b58eff5-c685-4097-9592-e1a3b73615fd",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-c",
+      "import json,re,subprocess,pathlib,time,hashlib",
+      "out=pathlib.Path('H:/.codex/worktrees/architecture-remediation/final-acceptance-research/reviewer')",
+      "started=time.perf_counter()",
+      "cmd=['git','diff','--check','d0ae52f5615320790ae7039cb48831873de6f486','f4fdd82f8f3179034fb74700c1b4e9aa43e4637e']",
+      "p=subprocess.run(cmd,capture_output=True)",
+      "lines=p.stdout.decode('utf-8').splitlines()",
+      "paths=sorted({x.rsplit(':',2)[0] for x in lines if re.search(r':\\d+: (trailing whitespace|new blank line at EOF)',x)})",
+      "allowed=all(x.startswith('research/runs/') and ('/blobs/' in x or x.endswith('/diff.patch')) or x=='spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/hosted-ci-36744072690.json' for x in paths)",
+      "assert p.returncode==2 and allowed,(p.returncode,paths)",
+      "d={'argv':cmd,'exit_code':p.returncode,'duration_ms':round((time.perf_counter()-started)*1000,3),'affected_paths':paths,'diagnostic_count':sum(': trailing whitespace.' in x or ': new blank line at EOF.' in x for x in lines),'raw_stdout_sha256':hashlib.sha256(p.stdout).hexdigest(),'disposition':'Non-blocking captured-output whitespace/CRLF only; preserve immutable research/hosted evidence, no documented candidate acceptance check requires normalization.'}",
+      "(out/'whitespace-diagnostic.json').write_text(json.dumps(d,indent=2)+'\\n',encoding='utf-8')",
+      "print(json.dumps(d,indent=2))",
+      "r=pathlib.Path('research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5')",
+      "events=[json.loads(x) for x in (r/'events.jsonl').read_text(encoding='utf-8').splitlines()]",
+      "audit=[]",
+      "for e in events:",
+      " if e['event_type']=='command_finished':",
+      "  d=e['data']",
+      "  for stream in ('stdout','stderr'):",
+      "   b=(r/d[stream+'_blob']).read_bytes()",
+      "   audit.append({'command_id':d['command_id'],'stream':stream,'raw_hash_equal':hashlib.sha256(b).hexdigest()==d[stream+'_sha256'],'explicit_redaction':d['secret_redaction_applied'],'replacement_characters':b.decode('utf-8').count('\\ufffd')})",
+      "assert all(a['raw_hash_equal'] or a['explicit_redaction'] for a in audit)",
+      "assert all(a['replacement_characters']==0 for a in audit)",
+      "(out/'administrative-capture-proof.json').write_text(json.dumps(audit,indent=2)+'\\n',encoding='utf-8')",
+      "print('PASS administrative captures',len(audit),'unexplained_mismatches=0')",
+      "assert subprocess.check_output(['git','rev-parse','HEAD']).decode().strip()=='f4fdd82f8f3179034fb74700c1b4e9aa43e4637e'",
+      "assert not subprocess.check_output(['git','-c','core.excludesFile=.git/info/exclude','status','--porcelain=v1','--untracked-files=all']).strip()",
+      "print('PASS exact final candidate unchanged; clean tracked/index/untracked state')",
+      ""
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:02:56.248056Z",
+    "finished_at": "2026-09-30T17:02:56.344760Z",
+    "exit_code": 1,
+    "duration_ms": 94.0,
+    "result": "FAIL",
+    "stdout_blob": "blobs/C-1b58eff5-c685-4097-9592-e1a3b73615fd.stdout.txt",
+    "stderr_blob": "blobs/C-1b58eff5-c685-4097-9592-e1a3b73615fd.stderr.txt"
+  },
+  {
+    "command_id": "C-1cf0d642-d62b-4f55-a563-84e517135f90",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-c",
+      "import json,re,subprocess,pathlib,time,hashlib",
+      "out=pathlib.Path('H:/.codex/worktrees/architecture-remediation/final-acceptance-research/reviewer')",
+      "started=time.perf_counter()",
+      "cmd=['git','diff','--check','d0ae52f5615320790ae7039cb48831873de6f486','f4fdd82f8f3179034fb74700c1b4e9aa43e4637e']",
+      "p=subprocess.run(cmd,capture_output=True)",
+      "lines=p.stdout.decode('utf-8').splitlines()",
+      "paths=sorted({x.rsplit(':',2)[0] for x in lines if re.search(r':\\d+: (trailing whitespace|new blank line at EOF)',x)})",
+      "assert p.returncode==2",
+      "assert all(x.startswith('research/runs/') and ('/blobs/' in x or x.endswith('/diff.patch')) or x in ['spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/hosted-ci-36744072690.json','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/hosted-ci-36744072690-selected-log.txt'] for x in paths)",
+      "d={'argv':cmd,'exit_code':p.returncode,'duration_ms':round((time.perf_counter()-started)*1000,3),'affected_paths':paths,'diagnostic_count':sum(': trailing whitespace.' in x or ': new blank line at EOF.' in x for x in lines),'raw_stdout_sha256':hashlib.sha256(p.stdout).hexdigest(),'disposition':'Non-blocking captured-output whitespace/CRLF only; preserve immutable research/hosted evidence. No documented candidate acceptance check requires normalization.'}",
+      "(out/'whitespace-diagnostic.json').write_text(json.dumps(d,indent=2)+'\\n',encoding='utf-8')",
+      "print('Observed git diff --check exit',p.returncode,'diagnostics',d['diagnostic_count'],'all',len(paths),'paths are preserved raw evidence or selected excerpts')",
+      "r=pathlib.Path('research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5')",
+      "events=[json.loads(x) for x in (r/'events.jsonl').read_text(encoding='utf-8').splitlines()]",
+      "audit=[]",
+      "for e in events:",
+      " if e['event_type']=='command_finished':",
+      "  d=e['data']",
+      "  for stream in ('stdout','stderr'):",
+      "   b=(r/d[stream+'_blob']).read_bytes()",
+      "   audit.append({'command_id':d['command_id'],'stream':stream,'raw_hash_equal':hashlib.sha256(b).hexdigest()==d[stream+'_sha256'],'explicit_redaction':d['secret_redaction_applied'],'replacement_characters':b.decode('utf-8').count('\\ufffd')})",
+      "assert all(a['raw_hash_equal'] or a['explicit_redaction'] for a in audit)",
+      "assert all(a['replacement_characters']==0 for a in audit)",
+      "(out/'administrative-capture-proof.json').write_text(json.dumps(audit,indent=2)+'\\n',encoding='utf-8')",
+      "print('PASS administrative captures',len(audit),'unexplained_mismatches=0')",
+      "assert subprocess.check_output(['git','rev-parse','HEAD']).decode().strip()=='f4fdd82f8f3179034fb74700c1b4e9aa43e4637e'",
+      "assert not subprocess.check_output(['git','-c','core.excludesFile=.git/info/exclude','status','--porcelain=v1','--untracked-files=all']).strip()",
+      "print('PASS exact final candidate unchanged; clean tracked/index/untracked state')",
+      ""
+    ],
+    "cwd": ".",
+    "started_at": "2026-09-30T17:03:43.695313Z",
+    "finished_at": "2026-09-30T17:03:43.881941Z",
+    "exit_code": 0,
+    "duration_ms": 188.0,
+    "result": "PASS",
+    "stdout_blob": "blobs/C-1cf0d642-d62b-4f55-a563-84e517135f90.stdout.txt",
+    "stderr_blob": "blobs/C-1cf0d642-d62b-4f55-a563-84e517135f90.stderr.txt"
+  }
+]

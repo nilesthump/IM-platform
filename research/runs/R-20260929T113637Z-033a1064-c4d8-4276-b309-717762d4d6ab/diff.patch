@@ -1,0 +1,419 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 6f59809..e8cb99a 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -59,16 +59,53 @@ jobs:
+     needs: classify
+     if: needs.classify.outputs.go == 'true'
+     runs-on: ubuntu-latest
++    services:
++      postgres:
++        image: postgres:16
++        env:
++          POSTGRES_PASSWORD: ci-only-password
++          POSTGRES_DB: im_ci
++        ports:
++          - 5432:5432
++        options: >-
++          --health-cmd "pg_isready -U postgres -d im_ci"
++          --health-interval 10s
++          --health-timeout 5s
++          --health-retries 5
++      nats:
++        image: nats:2.10-alpine
++        ports:
++          - 4222:4222
++    env:
++      PGHOST: localhost
++      PGPORT: '5432'
++      PGUSER: postgres
++      PGPASSWORD: ci-only-password
++      PGDATABASE: im_ci
++      DB_TEST_ENABLE: '1'
++      NATS_URL: nats://localhost:4222
++      PYTHONDONTWRITEBYTECODE: '1'
+     steps:
+       - uses: actions/checkout@v4
+       - uses: actions/setup-go@v5
+         with:
+           go-version: '1.23'
+-      - name: Go S0 compile and test
++          cache-dependency-path: backend/go/go.sum
++      - name: Install PostgreSQL client
+         run: |
+-          python3 ci/check_s0_boundary.py go
+-          test -z "$(gofmt -l backend/go/main.go)"
+-          go test backend/go/main.go
++          sudo apt-get update -qq
++          sudo apt-get install -y postgresql-client
++      - name: Migrate canonical schema
++        run: python3 contracts/database/migrate.py up
++      - name: Go Auth build, integration and contract verification
++        run: |
++          test -z "$(gofmt -l backend/go/*.go)"
++          cd backend/go
++          go build -o "$RUNNER_TEMP/im-go" .
++          go test -count=1 ./...
++          cd ../..
++          python3 contracts/websocket/verify.py
++          pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1
+ 
+   java:
+     needs: classify
+@@ -176,8 +213,18 @@ jobs:
+     needs: classify
+     if: needs.classify.outputs.deploy == 'true'
+     runs-on: ubuntu-latest
++    env:
++      IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config
+     steps:
+       - uses: actions/checkout@v4
++      - name: Prepare disposable Go profile configuration
++        shell: pwsh
++        run: |
++          New-Item -ItemType Directory -Path $env:IM_GO_CONFIG_DIR -Force | Out-Null
++          Copy-Item backend/go/config.example.json (Join-Path $env:IM_GO_CONFIG_DIR 'config.json')
++          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'pg_password'), 'local-development-only')
++          $key = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
++          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'jwt_key'), $key)
+       - name: Validate both Compose profiles
+         run: |
+           docker compose -f deploy/compose.yaml --profile go config --quiet
+diff --git a/backend/go/Dockerfile b/backend/go/Dockerfile
+index 841e102..f2de55f 100644
+--- a/backend/go/Dockerfile
++++ b/backend/go/Dockerfile
+@@ -1,8 +1,10 @@
+ FROM golang:1.25-alpine AS build
+ WORKDIR /src
+-COPY main.go .
+-RUN CGO_ENABLED=0 go build -o /infra-placeholder main.go
++COPY go.mod go.sum ./
++RUN go mod download
++COPY . .
++RUN CGO_ENABLED=0 go build -o /im-go .
+ 
+ FROM alpine:3.21
+-COPY --from=build /infra-placeholder /infra-placeholder
+-ENTRYPOINT ["/infra-placeholder"]
++COPY --from=build /im-go /im-go
++ENTRYPOINT ["/im-go"]
+diff --git a/backend/go/main.go b/backend/go/main.go
+index 90fb931..5749b46 100644
+--- a/backend/go/main.go
++++ b/backend/go/main.go
+@@ -1,13 +1,21 @@
+ package main
+ 
+ import (
++	"context"
+ 	"crypto/sha1"
+ 	"encoding/base64"
++	"encoding/json"
+ 	"fmt"
+ 	"log"
+ 	"net/http"
++	"net/http/httputil"
++	"net/url"
+ 	"os"
+ 	"strings"
++	"time"
++
++	"github.com/jackc/pgx/v5/pgxpool"
++	"github.com/nats-io/nats.go"
+ )
+ 
+ func main() {
+@@ -18,25 +26,77 @@ func main() {
+ 	if role != "gateway" && role != "core" && role != "plugin-host" {
+ 		log.Fatal("unknown role")
+ 	}
+-	http.HandleFunc("/__infra/health", func(w http.ResponseWriter, r *http.Request) {
+-		if r.Method != http.MethodGet {
+-			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
++	mux := http.NewServeMux()
++	mux.HandleFunc("/__infra/health", func(w http.ResponseWriter, r *http.Request) {
++		if r.Method != "GET" {
++			http.Error(w, "method not allowed", 405)
+ 			return
+ 		}
+ 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+ 		fmt.Fprintf(w, "profile=go role=%s\n", role)
+ 	})
+-	http.HandleFunc("/__infra/ws", func(w http.ResponseWriter, r *http.Request) {
++	mux.HandleFunc("/__infra/ws", func(w http.ResponseWriter, r *http.Request) {
+ 		if role != "gateway" || !strings.EqualFold(r.Header.Get("Upgrade"), "websocket") || r.Header.Get("Sec-WebSocket-Key") == "" {
+ 			http.NotFound(w, r)
+ 			return
+ 		}
+-		key := r.Header.Get("Sec-WebSocket-Key")
+-		sum := sha1.Sum([]byte(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))
++		sum := sha1.Sum([]byte(r.Header.Get("Sec-WebSocket-Key") + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))
+ 		w.Header().Set("Upgrade", "websocket")
+ 		w.Header().Set("Connection", "Upgrade")
+ 		w.Header().Set("Sec-WebSocket-Accept", base64.StdEncoding.EncodeToString(sum[:]))
+-		w.WriteHeader(http.StatusSwitchingProtocols)
++		w.WriteHeader(101)
+ 	})
+-	log.Fatal(http.ListenAndServe(":8080", nil))
++	if role == "plugin-host" {
++		log.Fatal(http.ListenAndServe(":8080", mux))
++	}
++	configPath := os.Getenv("IM_CONFIG_FILE")
++	if configPath == "" {
++		configPath = "/run/im-config/config.json"
++	}
++	cfg, key, pgConfig, err := readConfig(configPath)
++	if err != nil {
++		log.Fatal("Go runtime configuration unavailable")
++	}
++	db, err := pgxpool.NewWithConfig(context.Background(), pgConfig)
++	if err != nil {
++		log.Fatal("database configuration failed")
++	}
++	defer db.Close()
++	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
++	err = db.Ping(ctx)
++	cancel()
++	if err != nil {
++		log.Fatal("database unavailable")
++	}
++	s := &authService{db: db, key: key, now: time.Now}
++	nc, err := nats.Connect(cfg.NATSURL, nats.MaxReconnects(-1))
++	if err != nil {
++		log.Fatal("NATS unavailable")
++	}
++	defer nc.Close()
++	if role == "core" {
++		go relaySessionRevocations(context.Background(), db, nc)
++		mux.Handle("/v1/", s.handler())
++	} else {
++		h := newHub(s)
++		_, err = nc.Subscribe("session.revoked", func(m *nats.Msg) {
++			var v struct {
++				SessionID string `json:"sessionId"`
++				Reason    string `json:"reason"`
++			}
++			if json.Unmarshal(m.Data, &v) == nil {
++				h.revoke(v.SessionID, v.Reason)
++			}
++		})
++		if err != nil {
++			log.Fatal("NATS subscription failed")
++		}
++		mux.HandleFunc("GET /v1/ws", h.serve)
++		u, err := url.Parse(cfg.CoreURL)
++		if err != nil {
++			log.Fatal("invalid core address")
++		}
++		mux.Handle("/v1/", httputil.NewSingleHostReverseProxy(u))
++	}
++	log.Fatal(http.ListenAndServe(":8080", mux))
+ }
+diff --git a/ci/check_s0_boundary.py b/ci/check_s0_boundary.py
+index acf805a..7e496ce 100644
+--- a/ci/check_s0_boundary.py
++++ b/ci/check_s0_boundary.py
+@@ -5,7 +5,6 @@ from pathlib import Path
+ 
+ 
+ ALLOWED = {
+-    "go": ("backend/go", {"main.go", "Dockerfile"}),
+     "java": ("backend/java", {"InfraPlaceholder.java", "Dockerfile"}),
+     "web": ("clients/web", set()),
+     "desktop": ("clients/desktop", set()),
+diff --git a/deploy/compose.yaml b/deploy/compose.yaml
+index cb0b6fb..5842c22 100644
+--- a/deploy/compose.yaml
++++ b/deploy/compose.yaml
+@@ -44,6 +44,13 @@ services:
+     build:
+       context: ../backend/go
+     command: ["gateway"]
++    volumes:
++      - type: bind
++        source: ${IM_GO_CONFIG_DIR:-../backend/go/local-config}
++        target: /run/im-config
++        read_only: true
++        bind:
++          create_host_path: false
+     depends_on:
+       migrate:
+         condition: service_completed_successfully
+@@ -55,6 +62,13 @@ services:
+     build:
+       context: ../backend/go
+     command: ["core"]
++    volumes:
++      - type: bind
++        source: ${IM_GO_CONFIG_DIR:-../backend/go/local-config}
++        target: /run/im-config
++        read_only: true
++        bind:
++          create_host_path: false
+     depends_on:
+       migrate:
+         condition: service_completed_successfully
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 0682410..52f72c3 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -16,6 +16,8 @@ Current Task State: active
+ 
+ ## Current Contract Work
+ 
++- Fresh Go Auth Implementation Agent has implemented and locally verified the bounded S1 Auth/Session slice on `task/LOOP1-GO-AUTH-001`: PostgreSQL registration/login/refresh/logout and three slots, WSS bind/revocation, durable revocation Outbox relay through NATS, config-file credentials, and Go CI adaptation. Go race/integration with disposable PostgreSQL/NATS, HTTP/WSS contracts, frozen hashes, CTRL-002 Development, 19 CI tests, and Compose config pass. Local full Compose Go smoke could not fetch `golang:1.25-alpine` because the configured Docker mirror returned HTTP 403 before service startup. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Human explicitly approved the exact `deploy/compose.yaml` config-file mount amendment; prior automatic approval rejection remains disclosed. This is not independent acceptance or S1 Gate PASS.
++
+ - S1 was explicitly authorized by the Human after S0 completion. An isolated clean checkout of `main` `09cec968f64faf0db319aea8d9c21d4fffe8ec49` passed CTRL-002 Acceptance, canonical Frozen Architecture hash verification, HTTP, WSS, and Sync/Plugin contract verification. The 19 local CI tests passed when granted temporary-directory access (five Windows symlink subcases skipped); hosted S0 full matrix PASS remains the Gate entry authority. New `spec/batches/LOOP1-S1.md` and four architecture-listed S1 Task Specs define dependency order; `LOOP1-GO-AUTH-001` is first and active. No S1 product code has changed. Activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; partial-resume Recorder `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`.
+ 
+ - Final S0 remote sync: `git ls-remote origin main` confirms `origin/main` at `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to the clean local `main` before this governance record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA: classify and selected-job gate passed; the documentation-only diff correctly skipped profile jobs. The earlier merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071`. All nine S0 tasks remain done and **S0 Gate PASS** stands. Final sync evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`. S1 remains inactive.
+@@ -295,7 +297,7 @@ Current Task State: active
+ 
+ ## Next Exact Action
+ 
+-Delegate `LOOP1-GO-AUTH-001` to a fresh Implementation Agent from the committed S1 activation branch. Require clean committed independent review and real CI before task acceptance. S1 Gate remains NOT YET PASSED.
++After the Implementation Agent's clean candidate commit, move `LOOP1-GO-AUTH-001` from `active` to `review` and delegate a fresh independent Review Agent. Review the exact committed diff in a clean checkout, then obtain applicable real hosted CI before acceptance. S1 Gate remains NOT YET PASSED.
+ 
+ ## Last Known Good Commit
+ 
+@@ -307,6 +309,8 @@ Delegate `LOOP1-GO-AUTH-001` to a fresh Implementation Agent from the committed
+ 
+ ## Uncommitted Changes / Ownership
+ 
++- Fresh Implementation Agent `/root/go_auth_impl` owns only task-allowed Go Auth/Session source and tests, Go CI/boundary adaptation, the Human-approved exact Go Compose config mounts, Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. The local disposable PostgreSQL and NATS test containers and temporary test config are owned by this run and are not repository changes; they will be removed after verification. Original `H:/IM-platform` unknown untracked files remain untouched.
++
+ - S1 Coordinator owns only the new batch and four task specifications, this recovery update, task-linked activation evidence and Recorder artifacts until the activation commit. The separate original `H:/IM-platform` checkout and its unknown untracked files remain untouched. No S1 product file has changed.
+ - Historical S0 final governance sync ownership below was closed by its clean `main` commit.
+ 
+diff --git a/spec/tasks/active/LOOP1-GO-AUTH-001.md b/spec/tasks/active/LOOP1-GO-AUTH-001.md
+index 9c5c02e..f23e18e 100644
+--- a/spec/tasks/active/LOOP1-GO-AUTH-001.md
++++ b/spec/tasks/active/LOOP1-GO-AUTH-001.md
+@@ -26,6 +26,7 @@ Implement Go registration/login, refresh, logout, Session slot and epoch handlin
+ # Allowed Paths
+ 
+ - `backend/go/**`
++- `deploy/compose.yaml` only for read-only Go Core/Gateway mounts of one operator-provided directory containing `config.json`, `pg_password`, and `jwt_key`; no credential file is committed and Java/TLS service behavior remains unchanged.
+ - Go Auth/Session integration tests under `tests/go/**`
+ - `ci/**`, `.github/workflows/ci.yml`, and `tests/ci/**` only to replace the S0 Go placeholder boundary with actual Go build/test/contract execution; preserve other jobs and Gate semantics.
+ - `spec/tasks/**/LOOP1-GO-AUTH-001.md`
+@@ -36,6 +37,8 @@ Implement Go registration/login, refresh, logout, Session slot and epoch handlin
+ 
+ The Coordinator prospectively authorized the exact task-linked evidence, checkpoint, and Recorder paths at S1 activation. No path here authorizes changes to architecture, public contracts, migrations, or other backends.
+ 
++The Human explicitly approved modifying `deploy/compose.yaml` for this configuration-file connection after the automatic approval review rejected the earlier Coordinator-only scope expansion. This exact-path authorization was received on 2026-09-29; it does not authorize any other deployment path or secret material in Git.
++
+ # Acceptance
+ 
+ - Go HTTP behavior matches the canonical Auth/User contract and shared errors for registration, login, refresh, and logout.
+@@ -64,11 +67,12 @@ Implement one direct Go path using the existing PostgreSQL schema, NATS/TLS skel
+ 
+ - Entry checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md`; clean S0 `main` at `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
+ - Coordinator activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; Recorder run `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`. This is development/recovery evidence, not independent task acceptance. Implementation evidence pending.
++- Implementation development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; linked Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Local Go race/integration, HTTP/WSS verifiers, frozen hashes, CTRL-002 Development, CI tests, and Compose config passed. Full local Go profile smoke stopped before service startup on Docker registry mirror HTTP 403. Hosted CI and independent review remain pending.
+ 
+ # Handoff
+ 
+-- New isolated branch `task/LOOP1-GO-AUTH-001` starts from the clean S0 checkpoint. No product implementation has been made at activation. The Coordinator owns only the S1 batch/task/progress activation records until committed.
++- The isolated branch `task/LOOP1-GO-AUTH-001` contains the Auth/Session implementation and development evidence. No architecture, contract, migration, Java, or client files changed. The Implementation Agent owns only task-allowed implementation, CI, config mount, Task Spec/current recovery, evidence, and linked Recorder artifacts until the clean candidate commit. Last independently accepted base remains `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
+ 
+ # Next Action
+ 
+-- Fresh Implementation Agent: run the mandatory startup sequence, register a prospective Recorder run, then implement the bounded Go Auth/Session slice. Hand off a clean committed candidate for a different independent Review Agent.
++- After the clean candidate commit, Coordinator moves this task to `review` and delegates a fresh independent Review Agent. The reviewer checks the committed diff and clean checkout; then applicable real hosted CI is required. Investigate the local Docker mirror HTTP 403 only if it persists outside this host or hosted CI fails.
+diff --git a/tests/ci/test_s0_boundary.py b/tests/ci/test_s0_boundary.py
+index c888270..e1ecf4f 100644
+--- a/tests/ci/test_s0_boundary.py
++++ b/tests/ci/test_s0_boundary.py
+@@ -40,10 +40,10 @@ class S0BoundaryTests(unittest.TestCase):
+     def test_allowed_entry_name_is_only_allowed_at_profile_root(self):
+         with tempfile.TemporaryDirectory() as temp:
+             root = Path(temp)
+-            nested = root / "backend/go/src"
++            nested = root / "backend/java/src"
+             nested.mkdir(parents=True)
+-            (nested / "main.go").write_text("package main", encoding="utf-8")
+-            self.assertEqual(boundary.unexpected_files(root, "go"), ["src/main.go"])
++            (nested / "InfraPlaceholder.java").write_text("class InfraPlaceholder {}", encoding="utf-8")
++            self.assertEqual(boundary.unexpected_files(root, "java"), ["src/InfraPlaceholder.java"])
+ 
+     def test_symlinks_cannot_hide_behind_allowed_names_or_profile_root(self):
+         for profile, (relative_dir, allowed) in boundary.ALLOWED.items():
+@@ -68,9 +68,9 @@ class S0BoundaryTests(unittest.TestCase):
+     def test_allowed_name_and_profile_root_symlink_checks_without_os_link_privilege(self):
+         with tempfile.TemporaryDirectory() as temp:
+             root = Path(temp)
+-            directory = root / "backend/go"
++            directory = root / "backend/java"
+             directory.mkdir(parents=True)
+-            allowed = directory / "main.go"
++            allowed = directory / "InfraPlaceholder.java"
+             allowed.write_text("source", encoding="utf-8")
+             original = Path.is_symlink
+ 
+@@ -78,17 +78,19 @@ class S0BoundaryTests(unittest.TestCase):
+                 return path == allowed or original(path)
+ 
+             with mock.patch.object(Path, "is_symlink", marks_path):
+-                self.assertEqual(boundary.unexpected_files(root, "go"), ["main.go"])
++                self.assertEqual(boundary.unexpected_files(root, "java"), ["InfraPlaceholder.java"])
+ 
+             def marks_directory(path):
+                 return path == directory or original(path)
+ 
+             with mock.patch.object(Path, "is_symlink", marks_directory):
+-                self.assertEqual(boundary.unexpected_files(root, "go"), ["go"])
++                self.assertEqual(boundary.unexpected_files(root, "java"), ["java"])
+ 
+     def test_all_affected_workflow_jobs_use_boundary_checker(self):
+         workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+-        self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py go"), 1)
++        self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py go"), 0)
++        self.assertIn("go test -count=1 ./...", workflow)
++        self.assertIn("contracts/http/verify-auth-user-friend.ps1", workflow)
+         self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py java"), 1)
+         for profile in ("web", "desktop", "mobile"):
+             self.assertEqual(workflow.count(f"python3 ci/check_s0_boundary.py {profile}"), 2)
+
+# Untracked paths observed; content intentionally not captured
+# ?? backend/go/auth.go
+# ?? backend/go/auth_test.go
+# ?? backend/go/config.example.json
+# ?? backend/go/config.go
+# ?? backend/go/gateway.go
+# ?? backend/go/go.mod
+# ?? backend/go/go.sum
+# ?? backend/go/outbox.go
+# ?? research/prompts/2026-09-29-go-auth-implementation-visible-prompt.txt
+# ?? research/prompts/P-4842e715-701e-4666-87f5-ce9a8068d23a/metadata.json
+# ?? research/prompts/P-4842e715-701e-4666-87f5-ce9a8068d23a/prompt.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-0c4543d1-d7ad-493a-986b-eaf2dbbd111c.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-0c4543d1-d7ad-493a-986b-eaf2dbbd111c.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-19e16621-851a-46b1-9ca4-ddae80745042.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-19e16621-851a-46b1-9ca4-ddae80745042.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-47290cab-e2c5-4fc7-ad6b-eadfdb30e323.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-47290cab-e2c5-4fc7-ad6b-eadfdb30e323.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-61b044fb-7965-4fe2-8ea2-7c6b624bf822.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-61b044fb-7965-4fe2-8ea2-7c6b624bf822.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-6487e013-1ea1-4e6d-8b94-a4dff3307575.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-6487e013-1ea1-4e6d-8b94-a4dff3307575.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-70068046-94f8-4b42-b13c-48129c86a517.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-70068046-94f8-4b42-b13c-48129c86a517.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-7d7c7b34-3b9f-478d-a33f-75966b60c94f.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-7d7c7b34-3b9f-478d-a33f-75966b60c94f.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-857302f4-9ee3-49ac-a016-4ae1eedbbb3d.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-857302f4-9ee3-49ac-a016-4ae1eedbbb3d.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-8b681713-174d-4e10-b91a-11cbefff4f37.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-8b681713-174d-4e10-b91a-11cbefff4f37.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-912262ef-1e2a-427a-86da-7d069e092e18.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-912262ef-1e2a-427a-86da-7d069e092e18.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-b87e14c6-8e29-4e34-865b-24780e6d784e.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-b87e14c6-8e29-4e34-865b-24780e6d784e.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-c9faa750-ea15-4b66-af2f-6fe236f98481.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-c9faa750-ea15-4b66-af2f-6fe236f98481.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-ea33e9ce-59bd-4874-a99f-028fa92aff33.stderr.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/blobs/C-ea33e9ce-59bd-4874-a99f-028fa92aff33.stdout.txt
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/events.jsonl
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/initial_state.json
+# ?? research/runs/R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md

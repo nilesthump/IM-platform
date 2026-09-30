@@ -1,0 +1,317 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index d79b724..ea5e1b3 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -46,7 +46,7 @@ Without explicit approval, an agent MUST NOT change Frozen Architecture, public
+ 
+ Read [execution constraints](spec/governance/execution-boundaries.md) and [the independent Review checklist](spec/governance/independent-review.md). allowed_paths never overrides or exempts architecture. Ordinary business tasks narrow paths by responsibility; one-time cross-service migration lists affected files/responsibilities, scope and exit before edits. Applicable source/dependency checks supplement behavior. Reviewer inspects actual logic and imports plus minimality; Java inherits canonical boundaries, never Go layout. Escalate conflicts before implementation; do not legalize errors after implementation.
+ 
+-LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers are independently bounded accepted at2afeac8/run36726926394 (evidence003/hosted-acceptance.md); execute ci/check_architecture.py --scope all --json and tests/architecture; actual Go remains failed until004; expected old Go failures permit only stage-four migration, not product or Gate PASS.
++LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers are independently bounded accepted at2afeac8/run36726926394 (evidence003/hosted-acceptance.md); execute ci/check_architecture.py --scope all --json and tests/architecture; Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN.
+ 
+ ## Verification, handoff, and checkpoints
+ 
+diff --git a/spec/acceptance/s0-auth-user-friend.md b/spec/acceptance/s0-auth-user-friend.md
+index 322e1d4..7f0258a 100644
+--- a/spec/acceptance/s0-auth-user-friend.md
++++ b/spec/acceptance/s0-auth-user-friend.md
+@@ -17,4 +17,4 @@ These checks are executable requirements for the future canonical contract runne
+ 
+ Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+ 
+-Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. ActualGo source and Gate remainfailed until004; no businessoutside migration activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
++Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/acceptance/s0-messaging.md b/spec/acceptance/s0-messaging.md
+index 6ac82ef..3aa8926 100644
+--- a/spec/acceptance/s0-messaging.md
++++ b/spec/acceptance/s0-messaging.md
+@@ -17,4 +17,4 @@ These checks are executable requirements for the future canonical contract runne
+ 
+ Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+ 
+-Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. ActualGo source and Gate remainfailed until004; no businessoutside migration activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
++Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/acceptance/s0-sync-plugin.md b/spec/acceptance/s0-sync-plugin.md
+index 6057e49..4666bd6 100644
+--- a/spec/acceptance/s0-sync-plugin.md
++++ b/spec/acceptance/s0-sync-plugin.md
+@@ -22,4 +22,4 @@ These checks are executable requirements for the future canonical contract runne
+ 
+ Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+ 
+-Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. ActualGo source and Gate remainfailed until004; no businessoutside migration activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
++Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/architecture/baseline.md b/spec/architecture/baseline.md
+index 6ebd431..53866fa 100644
+--- a/spec/architecture/baseline.md
++++ b/spec/architecture/baseline.md
+@@ -21,3 +21,7 @@
+ - baseline_date: 2026-09-30
+ 
+ The Markdown is the single current canonical source under the explicitly approved revision. Stage-one bounded acceptance: fresh Review of a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d and hosted run 36714913796 on exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md. This does not accept pending stages two through four, source compliance or remediation/S1 Gate. This revision tightens executable source ownership and governance semantics; it is NOT the historical representation-only migration. ADR-0002 and its original v1.0 migration facts are immutable history. The PDF remains the byte-for-byte immutable historical snapshot and is not a second current authority. No public wire, database, ACK/Sync, compatibility or security boundary is changed.
++
++## Current completion discovery (2026-10-01)
++
++The preceding stage-one paragraph is its bounded historical acceptance point. Subsequent task/product acceptance is now recorded in evidence004/final-hosted-acceptance.md (d0ae52f / hosted36744072690). Administrative finalization requires a new independent Review and exact-head hosted run. Version, hashes, approval and historical source metadata remain unchanged; S1 product Gate OPEN.
+diff --git a/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md b/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md
+index a746cf0..fd63d73 100644
+--- a/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md
++++ b/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md
+@@ -1,6 +1,6 @@
+ # ADR-0003: Whole-document architecture conflict resolution and executable service boundaries
+ 
+-Status: Human-approved bounded conflict resolution; stage-one canonical revision independently accepted; downstream remediation pending.
++Status: Human-approved bounded conflict resolution; canonical revision and downstream product remediation independently accepted; administrative finalization pending.
+ Date: 2026-09-30
+ Approval source: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md; visible Human four-stage instruction and registered prompt P-ddf5a00c-27a1-412c-ad9b-2305e1aad734 (delegation plus exact approval excerpt, not complete Human prompt).
+ 
+@@ -27,3 +27,7 @@ Each bounded stage needs new independent Review and applicable CI. Final batch a
+ ## Actual bounded acceptance point
+ 
+ Fresh stage-one Review accepted a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. Hosted run 36714913796 accepted exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md and task001 done. This discovery update preserves decision/approval/history. Stages002-004 and product/batch/S1 acceptance remain outstanding.
++
++## Current completion discovery (2026-10-01)
++
++The preceding bounded acceptance paragraph records the stage-one historical point, not current pending work. Tasks001-003 are done; Task004 remainsreview with accepted product candidate d0ae52f5615320790ae7039cb48831873de6f486 / hosted36744072690 with fresh independent revocation Review. See evidence004/final-hosted-acceptance.md and conflict-closure-supplement.md. This administrative candidate requires new independent Review and exact-head hosted verification before final batch closure. Canonical v1.1 semantics/hash/approval, historical migrations and PDF remain unchanged; S1 product Gate OPEN.
+diff --git a/spec/batches/LOOP1-ARCH-REMEDIATION.md b/spec/batches/LOOP1-ARCH-REMEDIATION.md
+index 48fa0cd..0209abd 100644
+--- a/spec/batches/LOOP1-ARCH-REMEDIATION.md
++++ b/spec/batches/LOOP1-ARCH-REMEDIATION.md
+@@ -24,3 +24,9 @@ Batch PASS requires all four tasks done, no unresolved current architecture deci
+ ## Execution and Review inputs
+ 
+ Read canonical §3/§10 SRC-01 through SRC-07/§11 and execution-boundaries.md; fresh reviewers use independent-review.md. Only current.md names unique Current Task. Historical Auth done persists; Social/Message/E2E stay suspended. Bind stage-three accepted exact checker commands into stage-four Verification before migration; its actual file/responsibility map precedes edits and its broad scope exits on batch completion. Stage001 bounded done at head3e6e89f/run36714913796 does not accept remaining stages.
++
++## Product acceptance / administrative finalization (2026-10-01)
++
++Tasks001-003 done;004 remainsreview due CAPABILITY_BLOCKED_SUBAGENTS final administrative Review (agent thread limit reached). Product remediation acceptance PASS is independently reviewed d0ae52f5615320790ae7039cb48831873de6f486 / hosted36744072690; current authority/source/behavior/live regression evidence is linked in evidence004/final-hosted-acceptance.md. No known current architecture blocker within audited coverage. Final batch administrative closure is pending a NEW independent Review and exact-head hosted acceptance of this documentation/evidence candidate; do not claim that pending run passed. Final capture location: H:/.codex/worktrees/architecture-remediation/final-acceptance-research. S1 product Gate remains OPEN, original Auth historical PASS retained, no Social/Message/Java/plugin activation.
++
++Independent capability recovery: built-in collaboration dispatch hit the actual thread quota (CAPABILITY_BLOCKED_SUBAGENTS for that mechanism). Coordinator located codex-cli0.159.2 and will attempt a genuinely new read-only CLI context; this alternative is not yet run or accepted. Do not equate thread quota with proven absence of all real independent-agent capability. Task004 staysreview and batch pending until an actual new Review plus exact-head hosted verification.
+diff --git a/spec/governance/execution-boundaries.md b/spec/governance/execution-boundaries.md
+index 56ebf18..01556bf 100644
+--- a/spec/governance/execution-boundaries.md
++++ b/spec/governance/execution-boundaries.md
+@@ -8,7 +8,7 @@ Acceptance combines canonical behavior/security/transaction fixtures with applic
+ 
+ ## Current transition and recovery
+ 
+-Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. These tools are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture, with evidence003/hosted-acceptance.md; actualGo remains failed until004. Stage004 binds accepted exact checker commands before migration and eliminates I01 old Go deviations. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
++Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. These tools are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture, with evidence003/hosted-acceptance.md; Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. Stage004 bound accepted exact checker commands before migration and eliminated I01 old Go deviations; see evidence004/conflict-closure-supplement.md. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
+ 
+ The stage004 language-wide scope is a single migration authorization ending at batch completion. Its actual file/responsibility map precedes edits. Social/Message/E2E activation waits for the entire remediation batch and final exact-head hosted acceptance. Original Auth remains historical done under old checks. Resolve the unique current task; no parallel unique Current Task or normal business resumption.
+ 
+diff --git a/spec/handoff/agent-context.md b/spec/handoff/agent-context.md
+index f2c23b1..a509c4c 100644
+--- a/spec/handoff/agent-context.md
++++ b/spec/handoff/agent-context.md
+@@ -28,4 +28,4 @@ Create a checkpoint for a stable Gate, important vertical slice, contract/schema
+ 
+ Before business implementation read canonical §3/§10 SRC-01 through SRC-07/§11 and spec/governance/execution-boundaries.md. allowed_paths is never an architecture exemption; narrow ordinary scopes, explicitly authorize temporary migration maps and exit. Review uses spec/governance/independent-review.md for behavior, actual ownership, imports and minimality. Java future tasks derive from canonical §20 and the current task template, not Go layout.
+ 
+-LOOP1-CI-001 is operational and done, so ADR-0001 is expired. Verify hosted candidate SHA and actual required job conclusions. Current four-stage remediation suspends Social/Message/E2E/Java/plugin business. Historical Auth done is retained under old checks; new structure remains unaccepted until stage four. The unique task in current.md controls resumption. Stage-three checkers are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture (evidence003/hosted-acceptance.md); stage-three expected Go failures cannot close the batch or S1 Gate.
++LOOP1-CI-001 is operational and done, so ADR-0001 is expired. Verify hosted candidate SHA and actual required job conclusions. Current four-stage remediation suspends Social/Message/E2E/Java/plugin business. Historical Auth done is retained under old checks; Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. The unique task in current.md controls resumption. Stage-three checkers are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture (evidence003/hosted-acceptance.md); stage-three expected Go failures alone cannot close the batch or S1 Gate. Final administrative resumption is specified by current.md.
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 309e500..1986db0 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -1,77 +1,55 @@
+ # Current Execution State
+ 
+ Current Loop: Loop 1
+-Current Stage: S1 remediation 4/4
++Current Stage: S1 remediation 4/4 administrative finalization
+ Current Gate: LOOP1-ARCH-REMEDIATION
+-Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
++Gate Status: NOT YET PASSED (product candidate accepted; final administrative Review CAPABILITY_BLOCKED_SUBAGENTS; S1 product Gate OPEN)
+ Current Batch: LOOP1-ARCH-REMEDIATION
+ Current Task: LOOP1-ARCH-REMEDIATION-004
+ Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
+-001 fullFrozenaudit25repairs/v1.1/newADR accepted,002executioninputsaccepted,003effectivecheckers boundedaccepted exact2afeac8/run36726926394:11success/source_go+gateactualFAILexpected.004actualGomigration implemented andallapplicablelocalchecksPASS; freshindependentReview/finalhostedpending. OriginalAuthdone oldchecksPASS retained; Socialseparateworktree preserved/businesssuspended.
++Tasks001-003 done;004 product accepted, administrative candidate remainsreview: full architecture audit25 determinate repairs, execution inputs, effective checks and Go migration. Product candidate d0ae52f independently reviewed and hosted36744072690 SUCCESS. Original Auth old-check PASS retained. Administrative candidate itself awaits new independent Review and exact-head hosted CI; no follow-on business activated.
+ 
+ ## Current Blockers
+ 
+-Hosted36738064831/92306df failed Go race reason and Gate (11otherjobs success). Fresh bounded reason fix and new realPGNATS/fullrace/3rolesTLS regression PASS locally; NEW independent Review and NEW hosted exacthead required. No unresolved substantive architecture choice; remediation andS1 NOT PASSED.
++No unresolved substantive architecture choice within audit coverage. CAPABILITY_BLOCKED_SUBAGENTS: Root and fresh child NEW Review dispatch both failed with agent thread limit reached. Final administrative Review/hosted verification is pending; ordinary failures require fresh fix/review cycles. S1 product Gate OPEN.
+ 
+ ## Verification
+ 
+-- Command: `go -C backend/go test -race -count=1 -v ./...`
+-  - Result: exit0 realPG16/NATS DB_TEST_ENABLE=1,zero integration skips; fullAuth/canonical/security/rollback/locks/revocationclose.
+-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/implementation-evidence.md`
+-- Command: `bundled Python tests/go/live_role_smoke.py`
+-  - Result: exit0 actual3Go roles/Composebuild/TLS/HTTPforward/WSS/OutboxNATSevents/oldtokenreject/logoutclose,zero skips; firstmirror403failedattemptpreserved,normalretryPASS.
+-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/implementation-evidence.md`
+-- Command: `bundled Python ci/check_architecture.py --scope all`
+-  - Result: exit0 actualtree0violations;34architecturetests0skip/27CItests4historicalWindowssymlinksubcase skips disclosed; build/vet/recursive17filegofmtandcanonicalverifiersPASS.
+-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/implementation-evidence.md`
++- Command: `gh run view 36744072690 --repo nilesthump/IM-platform --json headSha,status,conclusion,jobs,url`
++  - Result: SUCCESS on exact d0ae52f; six required jobs succeeded, seven classified inactive skips.
++  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-hosted-acceptance.md`
++
++Exact product acceptance: d0ae52f5615320790ae7039cb48831873de6f486, hosted36744072690 six required jobs SUCCESS, seven correctly inactive jobs skipped. New independent Review executed realPG16/NATS fullunit/race/canonical/3rolesComposeTLS/directNATS and security negatives with zero integration skips; hosted Linux27CI and34architecture controls passed without skips. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-hosted-acceptance.md and revocation-independent-review.md. Administrative finalHEAD CI capture is pending at H:/.codex/worktrees/architecture-remediation/final-acceptance-research.
+ 
+ ## Changed Files or Migrations
+ 
+-SingleGomodule/rolebinary retained.CoreprivateAuth/Sessionwrites/Outbox;GatewayreadonlySession/WSS/NATS/proxy;sharedcrypto/config/DTO/generichealth;rootassemblyonly. Testsfollowresponsibility,canonicalfixturesunchanged. RecursiveCI/race/live-roleTLSrequired andtests/gopathtriggerregression. No database/publiccontract/canonicalchange.
++Core private Auth/Session write transactions/Outbox; Gateway readonly validation/WSS/NATS/proxy and bounded committed revocation reason; shared primitives/config/DTO; root assembly. Single existing module/role binary retained. Contracts/schema/ACK/Sync unchanged. This candidate only closes execution discovery, queues, evidence and recovery.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actualGo/live/smokes/numericstructure no skips. PersonalDocker mirror403failurepreservedthen normalpull/retryactualPASS; defaultdaemonavailable. OriginalRecorderhistoricalrawdecode limitationretained; newtaskrunrawbytespreserved. Fullhostedcandidatepending; nooverallGatePASS.
++Hosted36738064831 failed revocation race, repaired with new fresh Fix/Review and successful36744072690; preserve all evidence. Four historical local Windows symlink subcases skipped; hosted Linux confirmed zero skips. Current and earlier explicit Recorder redaction/incomplete pretrace limitations are disclosed in closure evidence; Recorder is not acceptance authority. Final administrative Review/hosted pending, not substituted by product CI.
+ 
+ ## Last Known Good Commit
+ 
+-`2afeac8bda051a507a1ea662455d7195ac93ed31` (bounded checker independentReview/exacthosted003acceptance; oldGosource/Gatefailedexpected). HistoricalAuth59d92f3 acceptedunderoldchecks.
++`d0ae52f5615320790ae7039cb48831873de6f486` (independent product Review and exact hosted36744072690).
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage3-accepted.md`
++`spec/progress/checkpoints/2026-10-01-architecture-remediation-product-accepted.md`
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Fresh /root/stage4_revocation_fix owns only Gateway bounded fix/newtests/new004evidence/task/current/tasklinkedRecorder until clean candidate commit, then releases to NEW independent Review. Original unknown and Social worktrees untouched.
++Fresh /root/stage4_closure owns this bounded administrative candidate and new task-linked trace, including explicitly transferred Root hosted archives/trace; releases after clean commit. Original unknown files and separate Social worktree untouched.
+ 
+ ## Next Exact Action
+ 
+-Delegate NEW independent Review of the clean repaired candidate, inspecting exact-bound readonlySession reason and rerunning live deterministic fallback/security/roles tests; then NEW exact-head hosted allrequiredjobs. Evidence004/revocation-fix.md and preserved hosted-failure-36738064831.md. Do not close004/batch or advance other business.
++Restore genuine new independent Review capability, then NEW independent administrative Review of this clean candidate, then Coordinator ordinary dedicated task-branch push and exact finalHEAD hosted verification, captured at H:/.codex/worktrees/architecture-remediation/final-acceptance-research. Restore this worktree and checkpoint, verify accepted SHA/current queues; before any later business selection inspect Social worktree ownership at H:/.codex/worktrees/loop1-s1/IM-platform. Do not automatically resume Social or original Auth implementation.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-ADR0003acceptedv1.1canonicalSHA83d124b unchanged,historicalPDFunchanged. I01oldGoimplementedsource0violationspendingindependentacceptance; D01propagated/enforced. No publiccontract/securitydecisionexpanded.
+-
+-## Stage004 independent Review pending hosted closure
+-
+-Fresh /root/stage4_review localPASS exact87c0ee2 cleanisolatedcheckout; fullnewPG16NATS unit/race/canonical andreal3rolesTLS/CoreOutboxNATS plusGoJavaComposeTLSsmokes0integrationskips,17fmt/build/vet/source0,34architecture0skip/27CI4historicalWindowssymlinksubcases disclosed. Evidence004/independent-review.md and command/captureJSON. Unique004remainsreview; overallGate NOT PASSED. SoleReviewwriter owns onlynew004evidence/research andhandoff; releasesafterordinarycommit. NextCoordinator normal dedicatedtaskbranchpush exactReviewclosure, freshhosted allrequiredjobs, then004/batch closurecheckpoint; nootherbusinessadvancement.
+-
+-## Post-Review metadata correction
+-
+-Root metadata FAIL: confirmed section-reference encoding corruption and stale predecessor activation/owner. Fresh Fix restores approved section references and current recovery without product/history changes; new independent post-fix Review and exact-head hosted acceptance pending. Prior local product Review is preserved, not promoted to final acceptance. Evidence004/metadata-fix.md.
+-
+-## Final post-fix independent Review pending hosted
+-
+-Fresh /root/stage4_final_review local PASS exactb84cd0f, cleanisolatedcheckout; newPG16NATS enabledfullunitrace/canonical/rollbacksecurity and actual3Go rolesComposeTLS/CoreOutboxNATS/revocationclose0integrationskips; source0/34architecture0skip/27CI4historicalWindows symlinksubcases requireLinuxconfirmation. Evidence004/final-independent-review.md. Coordinator next ordinary dedicatedbranchpush, exactheadhosted allrequiredjobs, then004/batchcheckpoint. No finalGatePASS yet.
+-
+-## Fresh hosted-revocation Fix awaiting new independent Review
+-
+-Deterministic noNATS replacement/logout both failedbeforefix, nowexactbound committedreason fallbackPASS. Core writes/Outbox unchanged;Gatewayonlyprivate readonlySession notificationhelper, same timeout, safeREVOKED onexpiry/DB/query/unknown/missing/wrongidentity. NewfullPG16NATS unit/race/canonical/rollback/500msmessageDBnegative andtargetedrace3times/19fmtbuildvet/34architecture0skip/27CI4historicalWindows symlinksubcase skips/real3roleComposeTLSOutboxNATS PASSlocally. No Task/batch/S1 acceptance; nextNEW independentReview/newhosted. SoleFix releasesaftercleancommit. Evidence004/revocation-fix.md.
+-
+-## New independent revocation repair Review pending hosted
++Canonical v1.1 SHA83d124b unchanged; PDF546915f unchanged. Conflict closure supplement links I01 actualGo0violations and D01 propagation/checks without rewriting stage001 ledger. No new semantics/approval question.
+ 
+-Fresh /root/stage4_revocation_review localPASS exact6339f8e from cleanisolatedcheckout; newPG16NATS fullunitrace/canonical/fallback3times/expiryDBfailure/oldbind/no-messagePGlock negative and3rolesTLS withdirectrawNATS REPLACED+LOGOUT observation PASS,zero integrationskips.19recursivefmtbuildvet/source0/34architecture0skip/27CI4historicalWindows symlinksubcase skips; protectedhistory/hash/UTF8unique004review/recoveryAcceptance PASS. Evidence004/revocation-independent-review.md. Coordinator next ordinarydedicatedbranchpush exactReviewclosure thenNEWhosted requiredjobs;004/batch/S1 remainNOT PASSED. SoleReviewwriter releasesafterevidencecommit; no productfix orotherbusiness.
++Independent capability recovery: built-in collaboration dispatch hit the actual thread quota (CAPABILITY_BLOCKED_SUBAGENTS for that mechanism). Coordinator located codex-cli0.159.2 and will attempt a genuinely new read-only CLI context; this alternative is not yet run or accepted. Do not equate thread quota with proven absence of all real independent-agent capability. Task004 staysreview and batch pending until an actual new Review plus exact-head hosted verification.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+index e88aa7a..80e4bd9 100644
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
++++ b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-ARCH-REMEDIATION-004
+ title: Migrate Go responsibility packages and regress
+ status: review
+-owner: Fresh Fix completed candidate pending new independent Review
++owner: Coordinator (product accepted; administrative finalization pending)
+ stage: S1 remediation 4/4
+ gate: LOOP1-ARCH-REMEDIATION
+ ---
+@@ -42,6 +42,10 @@ Apply spec/governance/execution-boundaries.md and spec/governance/independent-re
+ 
+ User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+ 
++# Administrative closure authorization (2026-10-01)
++
++The original Human four-stage instruction explicitly authorizes synchronized Agent instructions, acceptance, baseline discovery, task/batch/recovery and checkpoint updates. This one-time administrative scope adds `AGENTS.md`, `spec/handoff/agent-context.md`, `spec/governance/execution-boundaries.md`, `spec/acceptance/s0-auth-user-friend.md`, `spec/acceptance/s0-messaging.md`, `spec/acceptance/s0-sync-plugin.md`, `spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md`, and `spec/architecture/baseline.md` only for current completion discovery. It expires at administrative closure; no normative architecture, contract, product, checker or workflow changes. Preserve historical bounded acceptance paragraphs with explicitly dated current supplements. Coordinator transferred sole writer ownership to fresh /root/stage4_closure; inherited uncommitted Root prompt/run and hosted36744072690 archives have known ownership.
++
+ # Acceptance
+ 
+ Publish actual before/after file/responsibility migration map, preserve Core Auth writes and narrow Gateway validation, minimize shared support and exported interfaces. Recursive formatting/build/vet/unit/race, live migrated PostgreSQL/NATS integration and canonical fixtures, register/login/three slots/replacement/epoch/refresh/logout/bind/revocation/close/rollback/security, each role startup/routes/events, Compose/TLS smoke, all structural checks. Explicit test enable conditions; skipped integration is unexecuted. Fresh final independent review and hosted CI exact head/jobs; close batch only after all criteria.
+@@ -68,7 +72,7 @@ Before migration, bind exact commands/results from independently accepted stage0
+ 
+ # Evidence
+ 
+-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (pending independent acceptance).
++- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (product independently accepted; administrative candidate pending independent Review/CI).
+ 
+ # Handoff
+ 
+@@ -77,7 +81,7 @@ Before migration, bind exact commands/results from independently accepted stage0
+ 
+ # Next Action
+ 
+-- Coordinator delegates NEW independent Review of the clean reason-repair candidate, then normally pushes its reviewed dedicated task branch and verifies NEW exact-head hosted allrequiredjobs before004/batch closure/checkpoint. No other business advancement.
++Restore genuine new independent Review capability (CAPABILITY_BLOCKED_SUBAGENTS: agent thread limit reached), then Coordinator delegates a NEW independent administrative Review, then normally pushes the exact reviewed closure HEAD and verifies its hosted required jobs. Final JSON and prospective Recorder capture are stored outside the checkout at `H:/.codex/worktrees/architecture-remediation/final-acceptance-research` to preserve a clean final HEAD without recursive evidence commits. This final administrative verification is pending, not counted as executed. No other business advancement.
+ 
+ # Activation
+ 
+@@ -110,3 +114,9 @@ Fresh /root/stage4_revocation_fix deterministically reproduced Corecommittedrepl
+ ## New independent revocation repair Review pending hosted
+ 
+ Fresh /root/stage4_revocation_review localPASS exact6339f8e from cleanisolatedcheckout; newPG16NATS fullunitrace/canonical/fallback3times/expiryDBfailure/oldbind/no-messagePGlock negative and3rolesTLS withdirectrawNATS REPLACED+LOGOUT observation PASS,zero integrationskips.19recursivefmtbuildvet/source0/34architecture0skip/27CI4historicalWindows symlinksubcase skips; protectedhistory/hash/UTF8unique004review/recoveryAcceptance PASS. Evidence004/revocation-independent-review.md. Coordinator next ordinarydedicatedbranchpush exactReviewclosure thenNEWhosted requiredjobs;004/batch/S1 remainNOT PASSED. SoleReviewwriter releasesafterevidencecommit; no productfix orotherbusiness.
++
++# Product acceptance and administrative closure candidate (2026-10-01)
++
++Task004 retains review: existing fresh independent product Review plus exact d0ae52f5615320790ae7039cb48831873de6f486 hosted36744072690 SUCCESS accepts the product candidate; final administrative candidate Review is CAPABILITY_BLOCKED_SUBAGENTS (actual agent thread limit reached). Six required jobs succeeded; seven inactive profiles skipped as classified. Product acceptance survives prior failure36738064831, which is preserved with repair evidence. Tasks001-003 done and004review; this administrative candidate itself has NOT yet been independently reviewed or hosted-tested. Batch finalization is conditional on that new verification; S1 product Gate OPEN. See final-hosted-acceptance.md, conflict-closure-supplement.md and 2026-10-01 checkpoint. Migration scope expires at final batch closure; ordinary future scopes stay narrow.
++
++Independent capability recovery: built-in collaboration dispatch hit the actual thread quota (CAPABILITY_BLOCKED_SUBAGENTS for that mechanism). Coordinator located codex-cli0.159.2 and will attempt a genuinely new read-only CLI context; this alternative is not yet run or accepted. Do not equate thread quota with proven absence of all real independent-agent capability. Task004 staysreview and batch pending until an actual new Review plus exact-head hosted verification.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-2c42a886-5f8e-470c-8594-9dcf952ef5c1/metadata.json
+# ?? research/prompts/P-2c42a886-5f8e-470c-8594-9dcf952ef5c1/prompt.txt
+# ?? research/prompts/P-f4943d91-b029-42d6-9775-9cbe8a57cab6/metadata.json
+# ?? research/prompts/P-f4943d91-b029-42d6-9775-9cbe8a57cab6/prompt.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/.gitattributes
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-08a40ac4-ab55-41a3-a720-e93e0600e8fa.stderr.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-08a40ac4-ab55-41a3-a720-e93e0600e8fa.stdout.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-25b98f9c-d413-46bf-99dc-dfadeb558142.stderr.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-25b98f9c-d413-46bf-99dc-dfadeb558142.stdout.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-62d39b49-f6df-4573-afd0-199c177c912c.stderr.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-62d39b49-f6df-4573-afd0-199c177c912c.stdout.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-c71b847f-b3b3-4d68-bc77-1ab99ac8f11c.stderr.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-c71b847f-b3b3-4d68-bc77-1ab99ac8f11c.stdout.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-f850fdfe-b895-481b-8493-9f757aaf1542.stderr.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-f850fdfe-b895-481b-8493-9f757aaf1542.stdout.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-fe79476b-40da-43f5-aef3-769256b14d03.stderr.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/blobs/C-fe79476b-40da-43f5-aef3-769256b14d03.stdout.txt
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/diff.patch
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/events.jsonl
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/final_state.json
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/initial_state.json
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/metadata.json
+# ?? research/runs/R-20260930T162449Z-04aa4b3d-8b51-4172-8c1d-3e6223fb0047/summary.json
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/.gitattributes
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-75dfe34c-8d55-4d84-8e10-8b6c287a456f.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-75dfe34c-8d55-4d84-8e10-8b6c287a456f.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-7cbb13cf-3fbb-4e4c-83a1-ea631e208d92.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-7cbb13cf-3fbb-4e4c-83a1-ea631e208d92.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-8f44b978-7315-4c34-afe5-cd8cf8dca8d2.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-8f44b978-7315-4c34-afe5-cd8cf8dca8d2.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-bd63d4cc-4be2-407d-b715-b89db2e2495f.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-bd63d4cc-4be2-407d-b715-b89db2e2495f.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-da0af28a-d198-432d-94df-baf264aa00e9.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-da0af28a-d198-432d-94df-baf264aa00e9.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-e90647ea-af73-47ef-ac53-08d3656825ed.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-e90647ea-af73-47ef-ac53-08d3656825ed.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-ef866f52-2ea5-47d9-bac7-b19817598c14.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-ef866f52-2ea5-47d9-bac7-b19817598c14.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-faadd9ed-c004-4426-8bb1-49d3ce500a5a.stderr.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/blobs/C-faadd9ed-c004-4426-8bb1-49d3ce500a5a.stdout.txt
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/events.jsonl
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/initial_state.json
+# ?? research/runs/R-20260930T163459Z-5ab7d957-f37e-4ab3-a0ba-01e497f99cd5/metadata.json
+# ?? spec/progress/checkpoints/2026-10-01-architecture-remediation-product-accepted.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/administrative-closure.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/closure-agent-prompt.txt
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/closure-controls.py
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/conflict-closure-supplement.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/coordinator-hosted-capture-audit.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-hosted-acceptance.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/hosted-ci-36744072690-selected-log.txt
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/hosted-ci-36744072690.json

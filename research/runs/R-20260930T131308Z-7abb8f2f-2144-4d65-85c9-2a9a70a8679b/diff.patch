@@ -1,0 +1,466 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 36b2150..51d92b9 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -22,6 +22,9 @@ jobs:
+       migration: ${{ steps.paths.outputs.migration }}
+       compatibility: ${{ steps.paths.outputs.compatibility }}
+       deploy: ${{ steps.paths.outputs.deploy }}
++      architecture: ${{ steps.paths.outputs.architecture }}
++      source_go: ${{ steps.paths.outputs.source_go }}
++      source_java: ${{ steps.paths.outputs.source_java }}
+     steps:
+       - uses: actions/checkout@v4
+         with:
+@@ -55,6 +58,54 @@ jobs:
+           fi
+           python3 ci/classify.py --base "$base" --head "$HEAD_SHA" --github-output "$GITHUB_OUTPUT"
+ 
++  architecture:
++    needs: classify
++    if: needs.classify.outputs.architecture == 'true'
++    runs-on: ubuntu-latest
++    env:
++      PYTHONDONTWRITEBYTECODE: '1'
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-go@v5
++        with:
++          go-version: '1.23'
++      - uses: actions/setup-java@v4
++        with:
++          distribution: temurin
++          java-version: '21'
++      - name: Canonical integrity and authority structure
++        shell: pwsh
++        run: ./tools/verify-frozen-architecture.ps1
++      - name: Current governance references and task scopes
++        run: python3 ci/check_architecture.py --scope governance
++      - name: Checker positive and negative controls
++        run: python3 -m unittest discover -s tests/architecture -v
++
++  source_go:
++    needs: classify
++    if: needs.classify.outputs.source_go == 'true'
++    runs-on: ubuntu-latest
++    env:
++      PYTHONDONTWRITEBYTECODE: '1'
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-go@v5
++        with:
++          go-version: '1.23'
++      - name: Real Go source ownership and AST dependency graph
++        run: python3 ci/check_architecture.py --scope go --json
++
++  source_java:
++    needs: classify
++    if: needs.classify.outputs.source_java == 'true'
++    runs-on: ubuntu-latest
++    env:
++      PYTHONDONTWRITEBYTECODE: '1'
++    steps:
++      - uses: actions/checkout@v4
++      - name: Java current source and explicit placeholder boundary
++        run: python3 ci/check_architecture.py --scope java --json
++
+   go:
+     needs: classify
+     if: needs.classify.outputs.go == 'true'
+@@ -242,7 +293,7 @@ jobs:
+ 
+   gate:
+     if: always()
+-    needs: [classify, go, java, web, desktop, mobile, shared, compatibility, deploy]
++    needs: [classify, architecture, source_go, source_java, go, java, web, desktop, mobile, shared, compatibility, deploy]
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v4
+diff --git a/ci/check_gate.py b/ci/check_gate.py
+index cd448fb..c399989 100644
+--- a/ci/check_gate.py
++++ b/ci/check_gate.py
+@@ -5,14 +5,19 @@ import os
+ import sys
+ 
+ 
+-JOBS = ("go", "java", "web", "desktop", "mobile", "shared", "compatibility", "deploy")
++JOBS = ("go", "java", "web", "desktop", "mobile", "shared", "compatibility", "deploy", "architecture", "source_go", "source_java")
+ 
+ 
+ def check(needs):
++    missing = (set(JOBS) | {"classify"}) - needs.keys()
++    if missing:
++        raise ValueError(f"required job entries missing: {sorted(missing)}")
+     if needs["classify"]["result"] != "success":
+         raise ValueError("classification and repository recovery did not pass")
+     outputs = needs["classify"]["outputs"]
+     for job in JOBS:
++        if outputs.get(job) not in {"true", "false"}:
++            raise ValueError(f"missing/invalid selection for {job}")
+         selected = outputs[job] == "true"
+         result = needs[job]["result"]
+         if selected and result != "success":
+@@ -20,6 +25,8 @@ def check(needs):
+         if not selected and result != "skipped":
+             raise ValueError(f"unselected {job} job unexpectedly ended {result}")
+     for subcheck in ("old_client", "plugin", "migration"):
++        if outputs.get(subcheck) not in {"true", "false"}:
++            raise ValueError(f"missing/invalid selection for {subcheck}")
+         if outputs[subcheck] == "true" and outputs["compatibility"] != "true":
+             raise ValueError(f"{subcheck} selected without compatibility job")
+ 
+diff --git a/ci/classify.py b/ci/classify.py
+index ddc2ba1..c1db1ec 100644
+--- a/ci/classify.py
++++ b/ci/classify.py
+@@ -14,6 +14,7 @@ import sys
+ JOBS = (
+     "go", "java", "web", "desktop", "mobile", "shared",
+     "old_client", "plugin", "migration", "compatibility", "deploy",
++    "architecture", "source_go", "source_java",
+ )
+ FULL_COMPATIBILITY = frozenset(JOBS) - {"deploy"}
+ 
+@@ -25,6 +26,19 @@ def classify(paths):
+         if not path or path.startswith("/") or ".." in path.split("/"):
+             raise ValueError(f"not a repository-relative path: {raw!r}")
+         parts = path.split("/")
++        governance = (
++            path in {"AGENTS.md", "CLAUDE.md", "README.md"}
++            or parts[:2] in (["spec", "architecture"], ["spec", "handoff"],
++                             ["spec", "tasks"], ["spec", "batches"],
++                             ["spec", "acceptance"], ["spec", "governance"],
++                             ["tests", "architecture"], ["tools", "architecture"])
++            or path.startswith("tools/verify-frozen-architecture")
++            or path == "tools/verify_frozen_architecture.py"
++            or path.startswith("tools/verify-loop1-ctrl-")
++            or path.startswith("tools/verify-loop1-min-")
++        )
++        if governance:
++            selected.update({"architecture", "source_go", "source_java"})
+         shared = (
+             parts[0] in {"contracts", "database", "migrations", "sdk", "sdks", "shared"}
+             or parts[:2] in (["backend", "shared"], ["clients", "shared"])
+@@ -34,9 +48,9 @@ def classify(paths):
+         if shared:
+             selected.update(FULL_COMPATIBILITY)
+         elif parts[:2] == ["backend", "go"]:
+-            selected.add("go")
++            selected.update({"go", "architecture", "source_go"})
+         elif parts[:2] == ["backend", "java"]:
+-            selected.add("java")
++            selected.update({"java", "architecture", "source_java"})
+         elif parts[:2] == ["clients", "web"]:
+             selected.add("web")
+         elif parts[:2] == ["clients", "desktop"]:
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 6dc0eb6..a012449 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -6,7 +6,7 @@ Current Gate: LOOP1-ARCH-REMEDIATION
+ Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
+ Current Batch: LOOP1-ARCH-REMEDIATION
+ Current Task: LOOP1-ARCH-REMEDIATION-003
+-Current Task State: active
++Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
+@@ -14,7 +14,7 @@ Stage 001 bounded done after fresh independent Review at a09f4fb and hosted CI r
+ 
+ ## Current Blockers
+ 
+-No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 enforcement and stage004 I01 migration remain required. Overall remediation and S1 Gate not passed.
++No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 new checker candidate awaits independent Review/hosted bounded acceptance; stage004 I01 migration remains required. Overall remediation and S1 Gate not passed.
+ 
+ ## Verification
+ 
+@@ -46,12 +46,16 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Fresh /root/stage3_impl delegated task002 closure then003 implementation sole writer; linked Recorder. Original unknown and Social worktrees untouched.
++Fresh /root/stage3_impl owns only003 checker/evidence/Recorder until candidate commit then releases writer to Coordinator for new independent Reviewer. Original unknown and Social worktrees untouched.
+ 
+ ## Next Exact Action
+ 
+-Read active003 authority and start implementation Recorder; construct checker/isolated fixtures/trigger/Gate. Old Go violations expected, never waived. No migration before003 independent acceptance;004 backlog/business suspended.002 exact hosted evidence and old-scope profile skips disclosed in002/hosted-acceptance.md.
++Delegate new independent Reviewer on003 committed checker candidate, run applicable exact-head hosted CI with real source_go/Gate red expected inventory. Local30architecture/24CI tests PASS (4historical Windows symlink subcase skips); governance/Java PASS, oldGo actualFAIL. Evidence003/implementation-evidence.md and expected-old-go.json. No migration before003 bounded independent acceptance;004 backlog/business suspended.002 exact hosted evidence and old-scope profile skips disclosed in002/hosted-acceptance.md.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+ ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01 propagation implemented in stage002 candidate, local independent Review PASS; hosted acceptance completedc0373ab/run36719353192; stage003 enforcement pending; I01 Go migration pending stage004.
++
++## Stage003 candidate verification
++
++Exact commands/results/durations/limitations in evidence003/implementation-evidence.md, Recorder R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b. New static checks supplement semantic independent Review; governance triggering and Gate negative controls pass; originalGo real source failure is expected, no product or batch PASS. Host actual candidate jobs pending.
+diff --git a/spec/tasks/active/LOOP1-ARCH-REMEDIATION-003.md b/spec/tasks/active/LOOP1-ARCH-REMEDIATION-003.md
+deleted file mode 100644
+index 0b8e1c5..0000000
+--- a/spec/tasks/active/LOOP1-ARCH-REMEDIATION-003.md
++++ /dev/null
+@@ -1,82 +0,0 @@
+----
+-task_id: LOOP1-ARCH-REMEDIATION-003
+-title: Enforce architecture in CI and independent review
+-status: active
+-owner: fresh Implementation Agent /root/stage3_impl
+-stage: S1 remediation 3/4
+-gate: LOOP1-ARCH-REMEDIATION
+----
+-
+-# Goal
+-
+-Enforce architecture in CI and independent review within the explicitly authorized four-stage remediation.
+-
+-# Inputs
+-
+-- User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
+-- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+-- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+-
+-# Execution Constraints
+-
+-Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical 搂3/搂10 SRC-01 through SRC-07/搂11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+-
+-# Dependencies
+-
+-- LOOP1-ARCH-REMEDIATION-002 independently accepted bounded deliverable; no blocking architecture decision.
+-
+-# Allowed Paths
+-
+-- `ci/**`
+-- `.github/workflows/**`
+-- `tests/ci/**`
+-- `tests/architecture/**`
+-- `tools/** only architecture/constraint verification`
+-- `spec/acceptance/** only checker and review rules`
+-- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+-- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/**`
+-- `spec/progress/checkpoints/*architecture-remediation*.md`
+-- `research/prompts/** and research/runs/** only this task-linked artifacts`
+-
+-User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+-
+-# Acceptance
+-
+-Positive controls and negatives catch root business source, forbidden service imports, shared-to-service imports, invalid active Task paths, missed governance triggers, and original Go layout. Go import graph and stage-appropriate Java fixtures are exercised. Exact root whitelist, backend-specific placeholder exits, rename/delete handling, required job missing/skip/failure/cancellation fail Gate. Report expected old-Go failures without grandfathering. Independent reviewer validates checker effectiveness before stage 4.
+-
+-# Forbidden
+-
+-- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+-- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+-- No Go/Java product implementation edits.
+-- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+-
+-# Minimality
+-
+-Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+-
+-# Verification
+-
+-- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+-- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+-- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+-
+-# Evidence
+-
+-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/ (pending independent acceptance).
+-
+-# Handoff
+-
+-- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+-- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+-
+-# Next Action
+-
+-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+-
+-# Activation and bounded transition
+-
+-002 fresh independently reviewed product3b049046/closurec0373ab and exact hostedrun36719353192 accepted. Backlog->ready->active, all dependencies satisfied. Fresh /root/stage3_impl sole writer. Checker/regression/authority delivery may pass with actual old Go product-compliance FAIL and overall Gate red exposed. Temporary003 acceptance scope permits only004 migration next, exits upon004 actual tree compliance. No exemption, continue-on-error, product or Gate PASS.
+diff --git a/spec/tasks/done/LOOP1-ARCH-REMEDIATION-002.md b/spec/tasks/done/LOOP1-ARCH-REMEDIATION-002.md
+index 2bd9dda..52f7b92 100644
+--- a/spec/tasks/done/LOOP1-ARCH-REMEDIATION-002.md
++++ b/spec/tasks/done/LOOP1-ARCH-REMEDIATION-002.md
+@@ -14,7 +14,7 @@ Synchronize execution constraints within the explicitly authorized four-stage re
+ # Inputs
+ 
+ - User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
++- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+ - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+ - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+ 
+diff --git a/tests/ci/test_classify.py b/tests/ci/test_classify.py
+index 81c196a..61ce1b5 100644
+--- a/tests/ci/test_classify.py
++++ b/tests/ci/test_classify.py
+@@ -18,14 +18,14 @@ class PathMatrixTests(unittest.TestCase):
+ 
+     def test_profile_and_client_changes_are_local(self):
+         for path, job in (
+-            ("backend/go/main.go", "go"),
+-            ("backend/java/App.java", "java"),
++            ("backend/go/main.go", {"go", "architecture", "source_go"}),
++            ("backend/java/App.java", {"java", "architecture", "source_java"}),
+             ("clients/web/src/App.tsx", "web"),
+             ("clients/desktop/db/schema.sql", "desktop"),
+             ("clients/mobile/app.kt", "mobile"),
+         ):
+             with self.subTest(path=path):
+-                self.assert_jobs(path, {job})
++                self.assert_jobs(path, job if isinstance(job, set) else {job})
+ 
+     def test_shared_changes_fan_out_to_full_compatibility(self):
+         for path in (
+@@ -57,7 +57,7 @@ class PathMatrixTests(unittest.TestCase):
+ 
+     def test_union_and_deleted_paths(self):
+         result = classify_module.classify(["backend/go/old.go", "clients/web/new.ts"])
+-        self.assertEqual({key for key, value in result.items() if value}, {"go", "web"})
++        self.assertEqual({key for key, value in result.items() if value}, {"go", "web", "architecture", "source_go"})
+ 
+     def test_git_diff_includes_deleted_shared_file(self):
+         with tempfile.TemporaryDirectory() as temp:
+@@ -114,7 +114,49 @@ class PathMatrixTests(unittest.TestCase):
+                 self.assertEqual(selected, classify_module.FULL_COMPATIBILITY)
+ 
+     def test_unrelated_files_do_not_schedule_product_jobs(self):
+-        self.assert_jobs("README.md", set())
++        self.assert_jobs("docs/unrelated.md", set())
++
++    def test_governance_changes_cannot_skip_architecture(self):
++        for path in ("README.md", "AGENTS.md", "CLAUDE.md", "spec/architecture/baseline.md",
++                     "spec/architecture/decisions/ADR-9999.md", "spec/handoff/agent-context.md",
++                     "spec/tasks/TASK_TEMPLATE.md", "spec/tasks/active/TEST.md",
++                     "spec/batches/BATCH.md", "spec/acceptance/s1.md", "spec/governance/minimality.md",
++                     "tools/architecture/go_source_graph.go", "tools/verify-frozen-architecture.ps1",
++                     "tools/verify_frozen_architecture.py",
++                     "tools/verify-loop1-min-001.ps1",
++                     "tests/architecture/test_source.py"):
++            with self.subTest(path=path):
++                self.assert_jobs(path, {"architecture", "source_go", "source_java"})
++
++    def test_governance_deleted_and_renamed_paths_still_trigger(self):
++        with tempfile.TemporaryDirectory() as temp:
++            root = pathlib.Path(temp)
++            subprocess.run(["git", "init", "-q", str(root)], check=True)
++            subprocess.run(["git", "-C", str(root), "config", "user.name", "CI test"], check=True)
++            subprocess.run(["git", "-C", str(root), "config", "user.email", "ci@example.invalid"], check=True)
++            for name in ("AGENTS.md", "spec/tasks/TASK_TEMPLATE.md", "tools/verify_frozen_architecture.py"):
++                target = root / name
++                target.parent.mkdir(parents=True, exist_ok=True)
++                target.write_text("execution rule\n", encoding="utf-8")
++            subprocess.run(["git", "-C", str(root), "add", "."], check=True)
++            subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
++            base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
++            (root / "AGENTS.md").unlink()
++            (root / "spec/tasks/TASK_TEMPLATE.md").rename(root / "MOVED.md")
++            (root / "tools/verify_frozen_architecture.py").rename(root / "MOVED_VERIFY.py")
++            subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
++            subprocess.run(["git", "-C", str(root), "commit", "-qm", "move and delete"], check=True)
++            head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
++            previous = pathlib.Path.cwd()
++            try:
++                import os
++                os.chdir(root)
++                paths = classify_module.diff_paths(base, head)
++            finally:
++                os.chdir(previous)
++            self.assertCountEqual(paths, ["AGENTS.md", "spec/tasks/TASK_TEMPLATE.md", "MOVED.md", "tools/verify_frozen_architecture.py", "MOVED_VERIFY.py"])
++            result = classify_module.classify(paths)
++            self.assertEqual({k for k, v in result.items() if v}, {"architecture", "source_go", "source_java"})
+ 
+     def test_rejects_paths_outside_repo(self):
+         for path in ("../outside", "/absolute", "a/../b"):
+diff --git a/tests/ci/test_gate.py b/tests/ci/test_gate.py
+index 3c9e359..9f3f8f8 100644
+--- a/tests/ci/test_gate.py
++++ b/tests/ci/test_gate.py
+@@ -38,6 +38,23 @@ class GateTests(unittest.TestCase):
+         with self.assertRaises(ValueError):
+             gate.check(needs)
+ 
++    def test_architecture_jobs_missing_invalid_skipped_failed_cancelled(self):
++        for job in ("architecture", "source_go", "source_java"):
++            for status in ("skipped", "failure", "cancelled"):
++                needs = self.needs()
++                needs["classify"]["outputs"][job] = "true"
++                needs[job]["result"] = status
++                with self.subTest(job=job, status=status), self.assertRaises(ValueError):
++                    gate.check(needs)
++            needs = self.needs()
++            del needs[job]
++            with self.subTest(job=job, missing=True), self.assertRaises(ValueError):
++                gate.check(needs)
++            needs = self.needs()
++            needs["classify"]["outputs"][job] = "bogus"
++            with self.subTest(job=job, invalid=True), self.assertRaises(ValueError):
++                gate.check(needs)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/architecture-checks.md
+# ?? ci/check_architecture.py
+# ?? research/prompts/P-188c3431-b82a-47b8-b6e9-939b426f3071/metadata.json
+# ?? research/prompts/P-188c3431-b82a-47b8-b6e9-939b426f3071/prompt.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/.gitattributes
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-0bf15d60-5a38-409c-93d1-79780b4e048f.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-0bf15d60-5a38-409c-93d1-79780b4e048f.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-252fcf04-5813-4ec4-8095-ee41b48b34ee.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-252fcf04-5813-4ec4-8095-ee41b48b34ee.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-2ed12dde-1252-49bf-b2b7-e9161a1087e5.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-2ed12dde-1252-49bf-b2b7-e9161a1087e5.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-31956bc5-6669-4ad6-97ae-6d5836421931.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-31956bc5-6669-4ad6-97ae-6d5836421931.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-404472f3-abda-437b-9629-9657247ea74d.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-404472f3-abda-437b-9629-9657247ea74d.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-458e1b10-7929-4ff0-8895-6314a060c0a7.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-458e1b10-7929-4ff0-8895-6314a060c0a7.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-4bcdb02e-f9c4-4426-8dba-db1a95e35676.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-4bcdb02e-f9c4-4426-8dba-db1a95e35676.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-65dcbcd4-65b6-4f3a-92fb-52f14ba12941.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-65dcbcd4-65b6-4f3a-92fb-52f14ba12941.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-6c552ba8-0785-4d70-8f20-ea360c9cf489.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-6c552ba8-0785-4d70-8f20-ea360c9cf489.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-6debf5f1-827a-405a-90a1-4978a2c67af5.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-6debf5f1-827a-405a-90a1-4978a2c67af5.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-73fc0fcb-58ce-4cb2-a729-506fa8e83c2b.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-73fc0fcb-58ce-4cb2-a729-506fa8e83c2b.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-8099b575-cf8d-4d92-bcc7-f2d9f2cfc20c.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-8099b575-cf8d-4d92-bcc7-f2d9f2cfc20c.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-99af9518-11ab-4329-95d1-c8a733dfdfbb.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-99af9518-11ab-4329-95d1-c8a733dfdfbb.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-9eb971eb-b344-46cc-9bed-f50ff0f29614.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-9eb971eb-b344-46cc-9bed-f50ff0f29614.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-ba7b4076-f501-4c80-94de-0568df8fdfbd.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-ba7b4076-f501-4c80-94de-0568df8fdfbd.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-d10b4082-c310-4ea4-8fa1-f69deef04c0c.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-d10b4082-c310-4ea4-8fa1-f69deef04c0c.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-da01fcca-33d7-4b0c-8db4-e33c572bfbfd.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-da01fcca-33d7-4b0c-8db4-e33c572bfbfd.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-e0af39f8-882b-4622-8206-1e3fbc8b26d3.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-e0af39f8-882b-4622-8206-1e3fbc8b26d3.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-e5fc0aa8-534d-42f1-90a9-dbd0c5b8e7a0.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-e5fc0aa8-534d-42f1-90a9-dbd0c5b8e7a0.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-ec0bb293-43d5-4d4f-bf72-9624f33cb0cf.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-ec0bb293-43d5-4d4f-bf72-9624f33cb0cf.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-edd53738-a8d2-4781-9b73-c6c769ec46e0.stderr.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/blobs/C-edd53738-a8d2-4781-9b73-c6c769ec46e0.stdout.txt
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/events.jsonl
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/initial_state.json
+# ?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/metadata.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/expected-old-go-violations.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/expected-old-go.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/implementation-evidence.md
+# ?? spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md
+# ?? tests/architecture/test_source_boundaries.py
+# ?? tools/architecture/go_source_graph.go

@@ -1,0 +1,108 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index b18396e..efc2949 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -10,7 +10,7 @@ Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
+-User-authorized four-stage remediation takes precedence over further business work. Full canonical architecture audit and minimal normative repairs are locally verified and pending independent review on task/LOOP1-ARCH-REMEDIATION, isolated worktree H:/.codex/worktrees/architecture-remediation/IM-platform. Stages 2-4 remain backlog. No product code changed in stage 1.
++User-authorized four-stage remediation takes precedence over further business work. Full canonical architecture audit and minimal normative repairs have fresh independent local Review PASS at a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d; applicable fresh hosted CI acceptance remains pending on task/LOOP1-ARCH-REMEDIATION, isolated worktree H:/.codex/worktrees/architecture-remediation/IM-platform. Stages 2-4 remain backlog. No product code changed in stage 1.
+ 
+ ## Recovery relationship
+ 
+@@ -33,15 +33,15 @@ LOOP1-GO-AUTH-001 remains historical done; accepted exact remote head 59d92f3923
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Fresh stage-one Fix Agent /root/stage1_transport_fix is sole writer for the bounded transport repair; after clean handoff it releases write ownership to Coordinator. Prior /root/stage1_impl was interrupted by usage limit; its partial transport run is retained as partial. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
++Fresh independent Review Agent /root/stage1_review owns only new review evidence/Recorder and recovery handoff until clean commit, then releases sole write ownership to Coordinator. Fix transport repair was cleanly committed. Prior /root/stage1_impl was interrupted by usage limit; its partial transport run is retained as partial. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
+ 
+ ## Next Exact Action
+ 
+-Read spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/transport-repair.md (including raw-output encoding limitation), delegate a new independent Review Agent for the clean committed stage-one candidate, then applicable real hosted CI. Do not start stage two or claim batch/S1 Gate PASS.
++Read spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md and transport-repair.md, inspect clean review closure, normally push reviewed task branch and collect applicable fresh exact-head hosted CI with durable evidence. Do not start stage two or claim batch/S1 Gate PASS.
+ 
+ ## Current Blockers
+ 
+-No unresolved substantive architecture choice found in the audited scope. Independent Review and applicable hosted CI are pending. Stage-three product structural checks do not yet exist; original Go layout remains a known stage-four implementation deviation.
++No unresolved substantive architecture choice found in the audited scope. Fresh independent local Review PASS; applicable hosted CI pending. Stage-three product structural checks do not yet exist; original Go layout remains a known stage-four implementation deviation.
+ 
+ ## Verification
+ 
+@@ -56,3 +56,7 @@ Canonical architecture, baseline/resolver, new ADR-0003, integrity verifier/test
+ ## Architecture Conflicts / ACP / ADR
+ 
+ ADR-0003 implements bounded Human-approved conflict resolution; v1.1 normative tightening is distinct from ADR-0002's historical representation-only migration. Full conflict/coverage ledger is in current task evidence. ADR-0001 bootstrap acceptance remains expired.
++
++## Independent Review evidence
++
++Fresh /root/stage1_review local PASS at clean detached a09f4fb: integrity/negative controls, Recovery Acceptance, HTTP/WSS/Sync-Plugin and 50 persisted blob transportation checks PASS. Four CI real symlink subcases skipped on Windows; original one raw stderr encoding mismatch disclosed. No live product/source compliance claimed. Full exact evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md; Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2. Task/batch/S1 acceptance pending real applicable CI.
+diff --git a/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/conflict-ledger.md b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/conflict-ledger.md
+index 2a0107f..5acf490 100644
+--- a/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/conflict-ledger.md
++++ b/spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/conflict-ledger.md
+@@ -364,3 +364,7 @@ All C findings below are repaired in the current body/manifest/checker candidate
+ - Verification: new Agent recovery review and effective checker tests.
+ - Status / independent review: REGISTERED; ordered downstream stage pending; independent Review PENDING.
+ 
++
++## Fresh independent Review 2026-09-30
++
++Reviewer /root/stage1_review independently read full body/diff and authority inputs, accepted C01-C25 locally at a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. This append records current review without rewriting the candidate findings or their original pending facts. Each C finding: independent local Review PASS; hosted CI acceptance PENDING. I01/D01: downstream stages pending, not waived. Exact commands/negative controls/limitations: independent-review-pass.md; new Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md
+index 177a8e8..c33e01a 100644
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md
++++ b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md
+@@ -41,6 +41,8 @@ Audit and repair the whole Frozen Architecture within the explicitly authorized
+ 
+ User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+ 
++- Exact new independent Review run `research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/.gitattributes`: `blobs/** -text` only for new evidence transport fidelity; Coordinator approved under Human necessary execution-constraint authorization.
++
+ # Acceptance
+ 
+ Audit all 22 chapters, both appendices, tables, examples, nine diagrams and references against existing authority; classify real conflicts versus implementation deviations. Repair every determinate conflict in current prose, record coverage/ledger and approval source. Preserve historical PDF/ADR/evidence bytes; distinguish old representation-only migration from current normative tightening. Verify actual hashes and semantic structure with negative controls. Fresh independent review and applicable hosted CI; no product edits.
+@@ -88,3 +90,9 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
+ - Usage-interrupted implementation transport run preserved as partial; new fresh Fix context uses related R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8.
+ - 22 original blobs restored through exact run-local -text policy and ordinary corrective commit; all 38 persisted original bytes verified against working/index/committed SHA. One pre-existing raw subprocess vs UTF-8 persisted stderr hash mismatch is disclosed, not repaired by editing history.
+ - Exact failures, reruns and preservation method: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/transport-repair.md and verify-transport.py. Authority integrity rerun exit 0, four tests PASS. No product modification or self-acceptance. Independent Review/hosted CI remain pending; last known good historical Auth head unchanged.
++
++# Independent Review handoff
++
++- Fresh independent /root/stage1_review accepted candidate a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d locally from clean managed detached checkout. Full body/authority/diff audit and C01-C25 review PASS; four architecture tests, five additional chapter negatives, Recovery Acceptance, HTTP/WSS/Sync-Plugin and transport fidelity checks PASS. CI tests 21 completed, four Windows real symlink subcases skipped; hosted Linux results pending. Original raw stderr encoding mismatch disclosed, history unchanged.
++- Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md; Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2. No product/live integration or new source checker acceptance claimed. I01/D01 remain downstream pending.
++- Task remains review until applicable fresh hosted exact-head CI. Coordinator next normal task-branch push and durable CI acceptance; last known good historical Auth unchanged. Reviewer owns only new review artifacts/recovery until clean handoff, then releases sole writer to Coordinator.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-9aa0ee17-1d71-483f-b8bf-49431d4b87b2/metadata.json
+# ?? research/prompts/P-9aa0ee17-1d71-483f-b8bf-49431d4b87b2/prompt.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/.gitattributes
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-0366d814-a877-4340-94a2-cbd75ddce419.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-0366d814-a877-4340-94a2-cbd75ddce419.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-185f87e8-fd05-4218-94be-9dcd43973677.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-185f87e8-fd05-4218-94be-9dcd43973677.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-25124f23-c099-4c0b-b4ee-5f0f9b62e062.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-25124f23-c099-4c0b-b4ee-5f0f9b62e062.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-4a884375-bf59-438e-ac50-8505137e4ad8.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-4a884375-bf59-438e-ac50-8505137e4ad8.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-4b0bf433-6504-4b1b-8a71-24f58f17da77.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-4b0bf433-6504-4b1b-8a71-24f58f17da77.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-7b850db8-af08-494f-9472-463ca7139891.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-7b850db8-af08-494f-9472-463ca7139891.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-8b836d26-f497-441c-9889-ed892b1ece69.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-8b836d26-f497-441c-9889-ed892b1ece69.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-b0ff50e3-bb95-4353-835c-7d3b39f51ae3.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-b0ff50e3-bb95-4353-835c-7d3b39f51ae3.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-d1215e1a-485e-4cb8-9c77-849186d0a239.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-d1215e1a-485e-4cb8-9c77-849186d0a239.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-d2df7c4f-7d54-44b9-a174-38be9479588f.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-d2df7c4f-7d54-44b9-a174-38be9479588f.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-ff8bae15-3a1b-427b-804e-9c51663b4a4c.stderr.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/blobs/C-ff8bae15-3a1b-427b-804e-9c51663b4a4c.stdout.txt
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/events.jsonl
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/initial_state.json
+# ?? research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/metadata.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-controls.py
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-prompt.txt

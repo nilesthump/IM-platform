@@ -1,13 +1,17 @@
 package main
 
 import (
-	"crypto/sha1"
-	"encoding/base64"
-	"fmt"
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/nats-io/nats.go"
+	"im-platform/backend/go/core"
+	"im-platform/backend/go/gateway"
+	pluginhost "im-platform/backend/go/plugin-host"
+	"im-platform/backend/go/shared"
 	"log"
 	"net/http"
 	"os"
-	"strings"
+	"time"
 )
 
 func main() {
@@ -18,25 +22,44 @@ func main() {
 	if role != "gateway" && role != "core" && role != "plugin-host" {
 		log.Fatal("unknown role")
 	}
-	http.HandleFunc("/__infra/health", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-			return
+	if role == "plugin-host" {
+		log.Fatal(http.ListenAndServe(":8080", pluginhost.NewHandler()))
+	}
+	path := os.Getenv("IM_CONFIG_FILE")
+	if path == "" {
+		path = "/run/im-config/config.json"
+	}
+	cfg, key, pg, err := shared.ReadConfig(path)
+	if err != nil {
+		log.Fatal("Go runtime configuration unavailable")
+	}
+	db, err := pgxpool.NewWithConfig(context.Background(), pg)
+	if err != nil {
+		log.Fatal("database configuration failed")
+	}
+	defer db.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	err = db.Ping(ctx)
+	cancel()
+	if err != nil {
+		log.Fatal("database unavailable")
+	}
+	nc, err := nats.Connect(cfg.NATSURL, nats.MaxReconnects(-1))
+	if err != nil {
+		log.Fatal("NATS unavailable")
+	}
+	defer nc.Close()
+	var h http.Handler
+	if role == "core" {
+		ctx, stop := context.WithCancel(context.Background())
+		defer stop()
+		go core.RelaySessionRevocations(ctx, db, nc)
+		h = core.NewHandler(db, key)
+	} else {
+		h, err = gateway.NewHandler(db, key, nc, cfg.CoreURL)
+		if err != nil {
+			log.Fatal("gateway configuration failed")
 		}
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprintf(w, "profile=go role=%s\n", role)
-	})
-	http.HandleFunc("/__infra/ws", func(w http.ResponseWriter, r *http.Request) {
-		if role != "gateway" || !strings.EqualFold(r.Header.Get("Upgrade"), "websocket") || r.Header.Get("Sec-WebSocket-Key") == "" {
-			http.NotFound(w, r)
-			return
-		}
-		key := r.Header.Get("Sec-WebSocket-Key")
-		sum := sha1.Sum([]byte(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))
-		w.Header().Set("Upgrade", "websocket")
-		w.Header().Set("Connection", "Upgrade")
-		w.Header().Set("Sec-WebSocket-Accept", base64.StdEncoding.EncodeToString(sum[:]))
-		w.WriteHeader(http.StatusSwitchingProtocols)
-	})
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	}
+	log.Fatal(http.ListenAndServe(":8080", h))
 }

@@ -1,0 +1,104 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 95be448..69024bb 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Fresh /root/stage4_review solewriter owns only new004independentReview evidence/Recorder and presenthandoff; release after ordinaryReviewclosurecommit. Candidate87c0ee2 unchanged in separatecleanexecutioncheckout. Root/Impl readonly; unknownoriginal/Socialtreesuntouched.
++Fresh /root/stage4_metadata_fix is the sole writer for current task004 recovery metadata and new Fix evidence/Recorder only. Products and prior evidence remain unchanged. Writing releases after the ordinary corrective commit; the Coordinator delegates a new independent Review. Original/Social worktrees untouched.
+ 
+ ## Next Exact Action
+ 
+-Coordinator receives clean independentReviewclosure, normallypushes dedicatedtaskbranch and checks fresh exactheadhosted allrequiredjobs; onlyafterPASS close004/batch/checkpoint. LocalReview accepted87c0ee2; unique004review, product/batch/S1 NOT PASSED pendingCI. No Social/Message/Java business.
++Complete bounded metadata correction, commit clean, then new independent Review of that exact corrected head. Preserve prior product Review PASS of 87c0ee2; it does not accept this correction. After new Review PASS, normally push the dedicated task branch and verify fresh exact-head hosted all required jobs before closing004/batch/checkpoint. Unique004 remains review; batch/S1 NOT PASSED. No Social/Message/Java business.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+@@ -59,3 +59,7 @@ ADR0003acceptedv1.1canonicalSHA83d124b unchanged,historicalPDFunchanged. I01oldG
+ ## Stage004 independent Review pending hosted closure
+ 
+ Fresh /root/stage4_review localPASS exact87c0ee2 cleanisolatedcheckout; fullnewPG16NATS unit/race/canonical andreal3rolesTLS/CoreOutboxNATS plusGoJavaComposeTLSsmokes0integrationskips,17fmt/build/vet/source0,34architecture0skip/27CI4historicalWindowssymlinksubcases disclosed. Evidence004/independent-review.md and command/captureJSON. Unique004remainsreview; overallGate NOT PASSED. SoleReviewwriter owns onlynew004evidence/research andhandoff; releasesafterordinarycommit. NextCoordinator normal dedicatedtaskbranchpush exactReviewclosure, freshhosted allrequiredjobs, then004/batch closurecheckpoint; nootherbusinessadvancement.
++
++## Post-Review metadata correction
++
++Root metadata FAIL: confirmed section-reference encoding corruption and stale predecessor activation/owner. Fresh Fix restores approved section references and current recovery without product/history changes; new independent post-fix Review and exact-head hosted acceptance pending. Prior local product Review is preserved, not promoted to final acceptance. Evidence004/metadata-fix.md.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+index 7a2bdfa..27fb697 100644
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
++++ b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-ARCH-REMEDIATION-004
+ title: Migrate Go responsibility packages and regress
+ status: review
+-owner: Coordinator pending fresh independent Review and final hosted acceptance
++owner: /root/stage4_metadata_fix sole writer; fresh post-fix independent Review and hosted acceptance pending
+ stage: S1 remediation 4/4
+ gate: LOOP1-ARCH-REMEDIATION
+ ---
+@@ -14,13 +14,13 @@ Migrate Go responsibility packages and regress within the explicitly authorized
+ # Inputs
+ 
+ - User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
++- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+ - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+ - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+ 
+ # Execution Constraints
+ 
+-Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical 搂3/搂10 SRC-01 through SRC-07/搂11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
++Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+ 
+ # Dependencies
+ 
+@@ -77,7 +77,7 @@ Before migration, bind exact commands/results from independently accepted stage0
+ 
+ # Next Action
+ 
+-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
++- Complete this bounded metadata Fix, commit a clean candidate, release writing to the Coordinator, then delegate a new independent Review of the corrected candidate; only after that PASS push normally and verify fresh exact-head hosted required jobs.
+ 
+ # Activation
+ 
+@@ -90,3 +90,7 @@ Actual migrationmap/evidence004/migration-map.md BEFORE products; privateCoreAut
+ # Independent Review local acceptance
+ 
+ Fresh /root/stage4_review accepted exact87c0ee2 from clean isolatedcheckout after fullrealPGNATS/unit/race/canonical/3rolesTLS/GoJavaCompose/negative controls, source0violations; evidence004/independent-review.md. Four historicalWindows symlinksubcase skips explicitly requireLinuxconfirmation; integration0skip. Task remainsreview pendingfresh exact-headhosted allrequiredjobs. Coordinator resumesnormal dedicatedbranchpush/CI/checkpoint only; no batch/S1PASS yet.
++
++# Corrective metadata recovery point
++
++Root identified candidate recovery metadata FAIL after product Review: section signs in Inputs/Execution Constraints were decoded as U+6402, and Next Action still described completed predecessor activation. This fresh Fix restores exact UTF-8 references from 6cdd981, updates current ownership and recovery only, and preserves prior local product Review PASS of 87c0ee2. New independent post-fix Review and final hosted acceptance remain pending; task004 stays review, batch/S1 NOT PASSED. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/metadata-fix.md.
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/__pycache__/check_gate.cpython-312.pyc
+# ?? ci/__pycache__/check_s0_boundary.cpython-312.pyc
+# ?? ci/__pycache__/classify.cpython-312.pyc
+# ?? research/prompts/P-b478114b-f722-48af-97c5-d6b1d6077bdc/metadata.json
+# ?? research/prompts/P-b478114b-f722-48af-97c5-d6b1d6077bdc/prompt.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/.gitattributes
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-1101b8dd-0e88-4d0d-8521-3b51df4b43fa.stderr.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-1101b8dd-0e88-4d0d-8521-3b51df4b43fa.stdout.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-460e034c-9de3-445d-8895-366fd8921f4a.stderr.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-460e034c-9de3-445d-8895-366fd8921f4a.stdout.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-4d95083f-997d-49a2-a39e-18b31c501697.stderr.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-4d95083f-997d-49a2-a39e-18b31c501697.stdout.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-833e1a6b-0886-4c03-835c-4e8dec4d13a0.stderr.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-833e1a6b-0886-4c03-835c-4e8dec4d13a0.stdout.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-957a4d50-4379-4054-a1ff-92118edd11dc.stderr.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-957a4d50-4379-4054-a1ff-92118edd11dc.stdout.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-c78fd91d-1764-4db0-8761-80375e8e0e77.stderr.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/blobs/C-c78fd91d-1764-4db0-8761-80375e8e0e77.stdout.txt
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/events.jsonl
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/initial_state.json
+# ?? research/runs/R-20260930T151119Z-4ec8a9af-7a99-4f82-bc02-b3daeac138d3/metadata.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/metadata-audit.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/metadata-fix-prompt.txt
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/verify-metadata-fix.py
+# ?? tests/ci/__pycache__/test_classify.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_gate.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_go_regression.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_s0_boundary.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_workflow_context.cpython-312.pyc
+# ?? tests/go/__pycache__/live_role_smoke.cpython-312.pyc

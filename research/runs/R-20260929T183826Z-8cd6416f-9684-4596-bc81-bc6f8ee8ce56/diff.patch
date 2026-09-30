@@ -1,0 +1,1158 @@
+diff --git a/spec/architecture/README.md b/spec/architecture/README.md
+index 271917e..d306907 100644
+--- a/spec/architecture/README.md
++++ b/spec/architecture/README.md
+@@ -8,3 +8,5 @@ This file is a resolver, not an independent architecture specification.
+ 4. Apply approved decisions in [`decisions/`](./decisions/) through the documented architecture process.
+ 
+ The manifest and this index contain discovery and migration metadata only. They do not summarize, replace, or silently reinterpret the canonical Markdown. The PDF is an immutable pre-migration snapshot, not an active second canonical source. The Markdown remains frozen under the same ACP/ADR approval rule.
++
++Current revision: v1.1 conflict resolution under ADR-0003. The manifest separates current revision semantics from ADR-0002 historical representation-only migration. Review/CI acceptance status is recorded in the current task and evidence; historical PDF bytes remain immutable.
+diff --git a/spec/architecture/baseline.md b/spec/architecture/baseline.md
+index 9387e57..f208ee3 100644
+--- a/spec/architecture/baseline.md
++++ b/spec/architecture/baseline.md
+@@ -1,17 +1,23 @@
+ # Frozen Architecture Baseline Manifest
+ 
+ - baseline_title: 面向十万级在线连接的可扩展分布式即时通信平台
+-- version: v1.0
+-- status: Frozen and architect-approved
++- version: `v1.1`
++- status: Human-approved conflict resolution; candidate independent acceptance pending
+ - canonical_format: `markdown`
+ - repository_path: `spec/architecture/frozen-architecture.md`
+-- sha256: `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`
++- sha256: `83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e`
+ - previous_canonical_format: `pdf`
+ - previous_repository_path: `scalable-distributed-im-architecture.pdf`
+ - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
+-- migration_type: `representation_only`
+-- semantic_change: `false`
+-- migration_task_id: `LOOP1-ARCHDOC-001`
+-- baseline_date: 2026-09-19
++- historical_migration_type: `representation_only`
++- historical_semantic_change: `false`
++- historical_migration_task_id: `LOOP1-ARCHDOC-001`
++- historical_markdown_sha256: `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`
++- revision_type: `conflict_resolution`
++- semantic_change: `true`
++- revision_task_id: `LOOP1-ARCH-REMEDIATION-001`
++- revision_adr: `spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md`
++- approval_source: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md`
++- baseline_date: 2026-09-30
+ 
+-The Markdown artifact is the single active canonical Frozen Architecture after the accepted migration is merged to `main` and post-merge verification passes. It remains frozen and may change only through the approved architecture change process. The PDF is retained byte-for-byte as the immutable pre-migration historical snapshot; its SHA-256 is provenance, not the Markdown hash. Historical evidence remains unchanged. Implementation, contracts, indexes, and ordinary task specifications do not supersede the active canonical artifact.
++The Markdown is the single current candidate canonical source under the explicitly approved revision. Independent review and applicable CI acceptance remain required before task closure. This revision tightens executable source ownership and governance semantics; it is NOT the historical representation-only migration. ADR-0002 and its original v1.0 migration facts are immutable history. The PDF remains the byte-for-byte immutable historical snapshot and is not a second current authority. No public wire, database, ACK/Sync, compatibility or security boundary is changed.
+diff --git a/spec/architecture/frozen-architecture.md b/spec/architecture/frozen-architecture.md
+index 1f5f909..f28a43e 100644
+--- a/spec/architecture/frozen-architecture.md
++++ b/spec/architecture/frozen-architecture.md
+@@ -1,17 +1,17 @@
+ # 面向十万级在线连接的可扩展分布式即时通信平台
+ 
+-**架构基线 v1.0 · Frozen Architecture · Loop 1 执行版**
++**架构基线 v1.1 · Frozen Architecture · Loop 1 执行版**
+ 
+ **正式架构方案 · Loop 1 可执行基线 · AI Agent 工作手册**
+ 
+ ## 决策状态
+ 
+-本文件把当前对话中已冻结的架构决策固化为唯一执行基线。新 Agent 可据此启动，但不得绕过 spec/ 中的权威契约，也不得把未来目标写成当前能力。
++本文件把当前对话中已冻结的架构决策固化为唯一执行基线。新 Agent 可据此启动，但不得绕过 contracts/ 中的机器可验证公共契约，也不得把未来目标写成当前能力。
+ 
+ | 文档属性 | 值 |
+ | --- | --- |
+-| 版本 | v1.0 |
+-| 基线日期 | 2026-09-19 |
++| 版本 | v1.1 |
++| 基线日期 | 2026-09-30（原始基线 2026-09-19） |
+ | 执行周期 | Loop 1: 三个月 / 12 周预算窗口 |
+ | 推进机制 | 里程碑门禁驱动；Gate 提前通过即可立即进入下一阶段 |
+ | 当前容量验收 | 单机 8C / 16GB / 3TB；5000 authenticated WSS users |
+@@ -22,7 +22,7 @@
+ 
+ ## 目录
+ 
+-原 PDF 的章节及附录索引；各项可跳转至本 Markdown 的对应标题。
++现行章节及附录索引；原 PDF 页码仅用于历史来源定位，不限制现行规范的修订。v1.1 冲突消解依据 ADR-0003；历史格式迁移仍由 ADR-0002 记录。
+ 
+ - [0. 执行摘要](#section-0) · 原 PDF 第 5 页
+ - [1. 项目目标、成功定义与边界](#section-1) · 原 PDF 第 6 页
+@@ -135,16 +135,16 @@ flowchart LR
+   Core --> Plugin
+   Core --> PG
+   Core --> NATS
+-  NATS --> PG
++  NATS --> Gateway
+ ```
+ 
+ > 图 0-1 总体逻辑架构：PostgreSQL 是事实来源，NATS 是实时通知总线；Gateway 只承担接入与 fan-out。
+ 
+-> 原图同时绘有 NATS → PostgreSQL 连线；此处照录其方向。该线的具体运行含义未在原图标注，不据此改变正文对 PostgreSQL 事实来源与 NATS 实时通知总线的定义。
++> 实时路径为 Core 的 Outbox dispatcher → NATS → Gateway；PostgreSQL 写入由 Core 事务负责。历史 PDF 的 NATS → PostgreSQL 箭头只保留在历史来源中，不代表现行运行依赖。
+ 
+ #### 四条总纲
+ 
+-1. 公共契约是唯一权威，Go 与 Java/Spring 只是独立实现；
++1. contracts/ 是机器可验证公共契约的唯一来源；总体权威顺序见 §2.2，Go 与 Java/Spring 是独立实现；
+ 2. 消息可靠性来自 PostgreSQL + Outbox + Sync，不来自 NATS；
+ 3. Agent 可改代码但无权自行宣布正确，CI 是独立事实裁判；
+ 4. 未经架构决策流程，任何 Agent 不得修改 frozen architecture。
+@@ -213,16 +213,16 @@ Loop 1 不把 Redis、Kafka、分库分表、自动数据库切主视为必选
+ <a id="section-2-1"></a>
+ ### 2.1 Frozen Architecture 变更协议
+ 
+-- 禁止：直接修改 frozen spec / contracts / DB invariants / plugin security boundary
++- 禁止：未经明确批准直接修改 frozen spec / contracts / DB invariants / plugin security boundary
+ - 允许：创建 Architecture Change Proposal (ACP) 或 ADR 草案
+-- 流程：提出动机 -> 影响分析 -> 兼容/迁移/回滚方案 -> 架构负责人批准 -> 更新契约 -> 全平台兼容 CI -> 实施
++- 流程：提出动机 -> 影响分析 -> 兼容/迁移/回滚方案 -> 架构负责人批准 -> 修订现行正文及基线 -> 按影响更新契约（仅在授权改变契约时）与执行约束 -> 独立 Review 与适用 CI -> 实施迁移并验证。不得以尚待迁移实现违反新规则为由永久豁免；规则交付和产品最终合规分别验收。
+ 
+ Agent 遇到与 frozen architecture 冲突的任务时必须停止该冲突部分，在任务记录中标记 BLOCKED_BY_ARCHITECTURE，并提出最小决策问题。不得用“实现方便”作为静默改变协议、唯一约束、ACK 语义或安全边界的理由。
+ 
+ <a id="section-2-2"></a>
+ ### 2.2 权威顺序
+ 
+-1. spec/architecture/decisions/ (已批准 ADR / frozen decision)
++1. 本 Frozen Architecture（由 spec/architecture/README.md 与 baseline.md 解析）及 spec/architecture/decisions/ 的已批准 ADR / frozen decision。ADR 记录动机、批准来源和迁移；批准的现行规则必须落实到正文。同等权威存在无法消解的实质冲突时停止冲突部分并提出最小决策问题。
+ 
+ 2. contracts/ (机器可验证的公共契约)
+ 
+@@ -256,12 +256,12 @@ flowchart LR
+   Core --> Plugin
+   Core --> PG
+   Core --> NATS
+-  NATS --> PG
++  NATS --> Gateway
+ ```
+ 
+ > 图 3-1 逻辑组件图。
+ 
+-> 原图同时绘有 NATS → PostgreSQL 连线；此处照录其方向。该线的具体运行含义未在原图标注，不据此改变正文对 PostgreSQL 事实来源与 NATS 实时通知总线的定义。
++> 实时路径为 Core 的 Outbox dispatcher → NATS → Gateway；PostgreSQL 写入由 Core 事务负责。历史 PDF 的 NATS → PostgreSQL 箭头只保留在历史来源中，不代表现行运行依赖。
+ 
+ <a id="section-3-1"></a>
+ ### 3.1 三个物理部署单元
+@@ -270,7 +270,7 @@ flowchart LR
+ | --- | --- | --- |
+ | gateway | TLS 之后的 WSS 生命周期、auth.bind、session/cache 校验、connection registry、协议路由、local fan-out、heartbeat/限流 | 好友/群成员规则、消息持久化、插件业务逻辑 |
+ | core | Auth、Session、User、Friendship、Conversation、Message、Sync、Outbox；模块化单体 | 不可信插件执行；大量 socket 连接状态 |
+-| plugin-host | WASM runtime、事件分派、Query/Action 代理、资源限制、熔断、编译缓存 | 直接访问数据库/文件/任意网络；成为 IM 主链单点 |
++| plugin-host | WASM runtime、事件分派、经授权的 Query/Action Host bridge、资源限制、熔断、编译缓存 | 不可信 WASM 直接访问数据库/文件/任意网络；绕过 Core 业务授权；成为 IM 主链单点 |
+ 
+ <a id="section-3-2"></a>
+ ### 3.2 运行 profile
+@@ -282,15 +282,15 @@ docker compose --profile java up
+ # gateway-java + core-java + plugin-host adapter + same canonical schema/contracts
+ ```
+ 
+-profile 的目标是行为可替换，不是源码结构相同。Go 与 Java 可使用各自惯用的框架和组织方式，但必须共享：公共契约、数据库迁移语义、错误码、测试向量、插件 API、Release Manifest 格式。
++profile 的目标是行为可替换；服务内部源码结构可以不同，但 §3 职责、§10 服务源码归属和依赖方向共同约束两个后端。Go 与 Java 可使用各自惯用的框架和组织方式，但必须共享：公共契约、数据库迁移语义、错误码、测试向量、插件 API、Release Manifest 格式。
+ 
+ <a id="section-3-3"></a>
+ ### 3.3 Loop 1 单机部署
+ 
+ | 层 | Loop 1 单机部署规则 |
+ | --- | --- |
+-| 入口 | TLS reverse proxy 暴露 HTTPS/WSS；所有测试流量经过真实入口 |
+-| 服务 | 仅启动一个后端 profile；gateway/core/plugin-host 可为独立进程/容器 |
++| 入口 | TLS reverse proxy 暴露 HTTPS/WSS；部署 smoke、E2E、容量与发布验收流量经过真实入口。单元和隔离集成测试可直接访问被测组件，但不得替代入口验收 |
++| 服务 | 仅启动一个后端 profile；gateway/core/plugin-host 为可独立启动的部署角色。可复用一个构建制品按角色启动；不强制三个 module 或三个 binary，禁止把源码职责混为一个业务包 |
+ | 数据 | PostgreSQL 单实例；所有 migration 有 forward/rollback 规则 |
+ | 事件 | Core NATS，默认非事实来源；Outbox dispatcher 可重放 |
+ | 存储 | 3TB 是机器容量约束，不代表测试必须填满；记录实际占用与增长 |
+@@ -310,13 +310,13 @@ flowchart LR
+   Artifact["PluginArtifact<br/>version / hashes<br/>immutable"]
+   Outbox["OutboxEvent<br/>aggregate / payload<br/>published_at"]
+   KV["PluginKV<br/>schema_version<br/>conversation scope"]
+-  User -->|"1 : 0..3"| Session
++  User -->|"有效槽位 1 : 0..3"| Session
+   User --> Friendship
+   Friendship -->|"pair → direct"| Conversation
+   User -->|"member"| Member
+   Member -->|"1 : N"| Message
+   Message -->|"N : 1"| Conversation
+-  Message -->|"1 : 1+"| Outbox
++  Message -->|"1 : 1 logical message.created"| Outbox
+   Instance -->|"N : 1"| Artifact
+   Instance -->|"1 : N"| KV
+ ```
+@@ -328,7 +328,7 @@ flowchart LR
+ 
+ 每个用户拥有 WEB、DESKTOP、MOBILE 三个登录槽位。每种 client_type 同时最多一个有效 Session，但三种端可同时登录。同端新登录必须在事务中撤销旧 Session 并递增 session_epoch。PostgreSQL 是登录状态权威；Gateway 内存是在线连接与路由缓存。
+ 
+-- UNIQUE(user_id, client_type)
++- 每个 (user_id, client_type) 最多一个有效槽位；当前 contracts/database 定义为每槽一行，替换时原子轮换 session_id 与 epoch。本图不定义历史 Session 总量或另行创建历史表。
+ - Access Token: user_id, session_id, client_type, session_epoch, iat, exp
+ - Refresh Token: 只存 hash，可独立撤销
+ - WSS: 先建立 TLS/WebSocket，再发送 auth.bind；禁止 token 放 URL query
+@@ -369,12 +369,16 @@ sequenceDiagram
+   participant Bus as Outbox/NATS
+   participant Receiver as 接收端
+   Sender->>Gateway: message.send(request_id)
+-  Gateway->>Core: 鉴权 + 成员校验
++  Gateway->>Core: 转发绑定身份与发送请求
++  Core->>Core: 校验成员权限与业务规则
+   Core->>PG: BEGIN / seq / message / outbox
+   PG-->>Core: COMMIT 成功
+-  Core-->>Sender: ACK = durable commit
+-  PG->>Bus: dispatcher 发布
+-  Bus->>Receiver: message.created fan-out
++  Core-->>Gateway: ACK = durable commit
++  Gateway-->>Sender: 转发 ACK
++  Core->>PG: Outbox dispatcher 读取已提交事件
++  Core->>Bus: dispatcher 可重试发布
++  Bus->>Gateway: message.created
++  Gateway->>Receiver: local fan-out
+ ```
+ 
+ > 图 5-1 私聊消息时序图。ACK 的唯一成功语义是 message 与 outbox 已持久化提交。
+@@ -432,6 +436,8 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
+ <a id="section-6-2"></a>
+ ### 6.2 Optimistic write 与状态机
+ 
++以下 SQLite 持久状态机适用于 Desktop/Mobile；Web 使用内存态收敛，不引入聊天历史数据库。
++
+ 1. 用户点击发送
+ 2. -> 生成不可变 request_id
+ 3. -> SQLite 事务 UPSERT，state=SENDING
+@@ -476,7 +482,7 @@ user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频
+ <a id="section-7-1"></a>
+ ### 7.1 登录与 Token
+ 
+-- POST /auth/login 包含 username/password、client_type、device_id、client_version、protocol_version。
++- 登录端点、字段名、版本与传输形状由 contracts/http/ 定义（当前为 POST /v1/auth/login）。本章 snake_case 领域名称不是另一套 wire schema。
+ 
+ - Access Token 短期、Refresh Token 长期；具体时长是配置，不写死进协议。
+ 
+@@ -496,7 +502,7 @@ user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频
+ <a id="section-7-3"></a>
+ ### 7.3 Session 缓存一致性
+ 
+-Core 在 Session 创建/撤销事务中写 outbox；Gateway 经 NATS 更新内存映射 (user_id, client_type) ->session_id/epoch/connection_id。每条消息不查询 PostgreSQL。实时撤销事件是体验优化；数据库权威状态和 epoch 确保旧 token 最终无法重连。
++Core 在 Session 创建/撤销事务中写 outbox；Gateway 经 NATS 更新内存映射 (user_id, client_type) ->session_id/epoch/connection_id。每条消息不查询 PostgreSQL。实时撤销事件是体验优化；每次新绑定/重连必须验证数据库权威 Session ID 与 epoch，拒绝旧凭据；不得把实时撤销事件作为唯一有效性来源。Gateway 只拥有验证/连接能力；注册、登录、刷新、退出、Session 写事务及其 Outbox 属于 Core，不能通过共享完整 Auth 服务绕过边界。
+ 
+ <a id="section-7-4"></a>
+ ### 7.4 传输与日志安全
+@@ -559,12 +565,18 @@ UNIQUE(plugin_id, version)。同一版本的 package/backend/renderer hash 变
+ 
+ ```mermaid
+ flowchart LR
+-  Uploaded["UPLOADED"] --> Validating["VALIDATING"] --> Verified["VERIFIED"] --> Installing["INSTALLING"] --> Enabled["ENABLED"]
++  subgraph Artifact["不可变制品"]
++    Uploaded["UPLOADED"] --> Validating["VALIDATING"] --> Verified["VERIFIED"]
++  end
++  Verified -.->|"安装前提，不是同一状态机"| Installing
++  subgraph Instance["Conversation 实例"]
++    Installing["INSTALLING"] --> Enabled["ENABLED"]
+   Enabled --> Disabled["DISABLED"] --> Uninstalled["UNINSTALLED"] --> Retained["RETAINED"] --> Purged["PURGED"]
+   Disabled -->|"re-enable"| Enabled
++  end
+   Exception["异常旁路<br/>VALIDATION / INSTALL / RUNTIME / ROLLBACK_FAILED"]
+   Upgrade["升级<br/>旧版保持 ENABLED → 快照/迁移/健康检查 → 原子切换；失败回滚"]
+-  %% 异常旁路与升级为原图的独立说明框，无连线。
++  %% 异常及升级仍遵循正文和 canonical lifecycle contracts。
+ ```
+ 
+ > 图 9-1 插件制品与实例生命周期。Artifact 状态和 Conversation 下 Instance 状态必须分离。
+@@ -589,7 +601,7 @@ Plugin Instance 维护 active_version、desired_version、previous_version。升
+ | --- | --- | --- |
+ | DISABLE | 停止接收新事件与产生 Action，隐藏入口，可重新 enable | 保留 |
+ | UNINSTALL | Conversation 不再持有活动实例 | 默认 RETAINED |
+-| PURGE | 显式不可逆清理操作；需要高权限和审计 | 删除前必须确认保留策略 |
++| PURGE | 显式不可逆清理操作；需要高权限和审计 | 删除前必须确认保留策略；不得删除仍被历史消息引用且必须保留的 renderer |
+ 
+ <a id="section-9-4"></a>
+ ### 9.4 官方兼容 fixtures
+@@ -603,8 +615,8 @@ Loop 1 必须提供 Echo Plugin 和 Poll Plugin。Echo 验证 event -> WASM -> a
+ /
+ ├── spec/
+ │ ├── architecture/
+-│ │ ├── overview.md
+-│ │ ├── service-boundaries.md
++│ │ ├── README.md + baseline.md # resolver 与完整性元数据
++│ │ ├── frozen-architecture.md # 唯一现行正文
+ │ │ └── decisions/ # ADR + frozen decisions
+ │ ├── domain/ # auth/user/friend/conversation/message/sync/plugin
+ │ ├── invariants/ # 跨语言不可变量
+@@ -622,8 +634,8 @@ Loop 1 必须提供 Echo Plugin 和 Poll Plugin。Echo 验证 event -> WASM -> a
+ │ ├── plugin-api/
+ │ └── fixtures/ # golden vectors / old clients / plugins
+ ├── backend/
+-│ ├── go/{gateway,core,plugin-host,tests}/
+-│ └── java/{gateway,core,plugin-host,tests}/
++│ ├── go/{gateway,core,plugin-host,tests,shared}/
++│ └── java/{gateway,core,plugin-host,tests,shared}/
+ ├── clients/
+ │ ├── shared/{protocol-sdk,plugin-sdk,ui}/
+ │ ├── web/
+@@ -636,6 +648,16 @@ Loop 1 必须提供 Echo Plugin 和 Poll Plugin。Echo 验证 event -> WASM -> a
+ └── tools/
+ ```
+ 
++### 服务源码与依赖规则（Go / Java 共同适用）
++
++- **SRC-01**：`backend/<language>/gateway/**` 只实现 §3.1 Gateway；`core/**` 拥有 Auth/Session 写事务、User/Friend/Conversation/Message/Sync/Outbox；`plugin-host/**` 拥有受控插件执行与代理。业务源码 MUST 位于对应服务范围，不能放在语言根目录或未批准的 `internal/**` 业务目录。
++- **SRC-02**：语言根目录只白名单允许入口装配（Go `main.go`、Java `Main.java`）、模块/依赖/构建文件（Go `go.mod`/`go.sum`，Java `pom.xml` 或 Gradle 配置）、Dockerfile、README.md、config.example.json 及根入口测试（Go `main_test.go`、Java `MainTest.java`）。入口只能读取配置、选择角色、连接依赖、启动/关闭对应服务；不得实现路由业务、Auth 服务或 Session 写逻辑。根测试仅验证装配，服务测试与职责同迁或置于 `tests/**`；不能以测试文件名藏业务实现。新增根源码例外必须先明确批准、列入检查器白名单并限定用途。
++- **SRC-03**：`shared/**` 可承载配置读取、日志、连接建立、通用编解码、密码学/令牌原语和由 canonical contracts 约束的传输数据类型。共享包 MUST NOT 承载完整 Auth 服务、注册/登录/刷新/退出流程、Session 写事务、业务仓储、权限/成员决策、Outbox 业务编排，亦不得反向依赖任何服务包。Gateway 的只读权威 Session 校验归 Gateway；Core 保有写事务。共享不是绕过职责的后门。
++- **SRC-04**：服务可依赖共享支持与本服务内部包；任何服务 MUST NOT 直接 import/依赖另一服务内部实现。服务间通过现有授权的 HTTP/WSS/事件/受控 Host bridge 边界协作；不因源码整改新增 RPC、公共契约、module 或基础设施。根装配可依赖各服务的最小启动接口，测试可跨服务作黑盒组合验证，均不得成为运行期业务反向依赖。
++- **SRC-05**：Go 与 Java 可使用不同的服务内部包/模块/线程组织；共同职责、物理角色和上述源码边界不可被“行为等价”豁免。不强制三 module、三 binary 或多层架构。Reviewer 检查实际职责和 import 图，不只看文件名或目录存在。
++- **SRC-06**：S0 历史占位白名单为 Go `backend/go/main.go` 与 Java `backend/java/InfraPlaceholder.java` 的非业务启动/健康/transport echo 骨架；清单不允许其承载业务。按后端分别退出：该后端第一次业务实现开始即移除业务路径的占位豁免；另一后端仍按明确占位清单验证，不能永久跳过结构规则。新规则暴露的旧实现偏离必须在迁移任务消除，不能 grandfather。单次跨服务迁移需 Task Spec 明确列出迁移文件/职责、范围和退出条件。
++- **SRC-07**：Task `allowed_paths` 仅限定可修改范围，不是架构豁免。普通业务任务按服务职责收窄；结构/依赖检查和行为测试共同验收。规范冲突必须在实现前升级，禁止事后修改架构追认错误布局。
++
+ <a id="section-10-1"></a>
+ ### 10.1 spec/ 各目录的职责
+ 
+@@ -663,7 +685,7 @@ Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户
+ 
+ | 必须相同 | 允许不同 |
+ | --- | --- |
+-| HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、插件权限、数据库结果 | 框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部接口 |
++| HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、插件权限、数据库结果；§3/§10 服务职责、源码归属和依赖方向 | 服务内部框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部接口 |
+ | Release Manifest、健康检查、metrics 标签、日志关联字段 | 内部模块名称与代码风格 |
+ 
+ <a id="section-11-3"></a>
+@@ -686,13 +708,16 @@ Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户
+ 
+ ```mermaid
+ flowchart LR
+-  Context["读取上下文"] --> Repo["恢复仓库状态"] --> Plan["PLAN"] --> Implement["IMPLEMENT"] --> Test["TEST"] --> Review["REVIEW"] --> Handoff["HANDOFF"]
+-  Review --> Failure["失败修复环<br/>仅在 task.allowed_paths 内修改"]
+-  Failure --> Complete["完成记录<br/>current.md + checkpoint + tests"]
+-  Complete --> Handoff
++  Context["读取上下文"] --> Repo["恢复真实任务状态"] --> Plan["PLAN"] --> Implement["新 Implementation Agent"] --> Test["本地验证 + 候选提交"] --> Review["新独立 Review Agent"]
++  Review -->|"FAIL"| Failure["新 Fix Agent；授权范围内修复"]
++  Failure --> Test
++  Review -->|"PASS"| CI["适用真实 CI；核对 head SHA 与必跑作业"]
++  CI -->|"FAIL"| Failure
++  CI -->|"PASS"| Complete["接受任务；更新队列/证据/current/checkpoint"]
++  Complete --> Handoff["HANDOFF / 下一依赖满足任务"]
+ ```
+ 
+-> 职责隔离可以由不同 Agent 或同一模型的不同上下文阶段实现；验收依据始终是 spec + contracts + diff + test result。
++> 实现/修复与接受候选的 Review 必须是真实不同的新上下文；同一上下文改角色名不是独立审查。单写者；普通失败进入修复与新的独立 Review 循环。验收依据是权威规范、契约、候选 diff、结构/依赖/最小性检查及真实测试结果。
+ >
+ > 图 12-1 Agent 工作流。开发自动化和 CI/CD 是两个独立系统。
+ 
+@@ -703,14 +728,16 @@ flowchart LR
+ task_id: LOOP1-MSG-003
+ goal: implement WSS text message sending
+ inputs:
++ - spec/architecture/README.md # resolve §3/§10/§11 + Minimality Contract
+  - spec/domain/messaging.md
+  - spec/invariants/messaging.md
+- - contracts/websocket/message/
++ - contracts/websocket/
+ allowed_paths:
+- - backend/go/internal/message/**
+- - backend/go/internal/outbox/**
++ - backend/go/core/message/**
++ - backend/go/core/outbox/**
+  - backend/go/tests/**
+ acceptance:
++ - applicable source ownership and dependency checks pass
+  - contract tests pass
+  - retry is idempotent
+  - ACK only after durable commit
+@@ -728,7 +755,7 @@ backlog -> ready -> active -> review -> done
+ - 进入 ready: inputs 完整、依赖完成、验收可执行
+ - 进入 active: 分配唯一 owner/agent、建立 task branch
+ - 进入 review: 实现完成 + 本地最小验证 + handoff 完整
+-- 进入 done: 独立 CI Gate PASS + review 接受 + progress 更新
++- 进入 done: 对精确候选的适用真实 CI PASS + 新独立 review 接受 + progress 更新；Task PASS 不等于整个 Stage Gate PASS。ADR-0001 临时 bootstrap 机制仅在 LOOP1-CI-001 operational 且 done 前有效，现已失效，不得恢复为绕过方式。
+ 
+ <a id="section-12-3"></a>
+ ### 12.3 Git 工作模式
+@@ -745,8 +772,8 @@ backlog -> ready -> active -> review -> done
+ | --- | --- | --- |
+ | 1 | spec/handoff/agent-context.md | 理解项目边界、frozen decisions 与工作方式 |
+ | 2 | spec/progress/current.md | 知道当前 Stage、Gate、最后已验证commit、blockers |
+-| 3 | spec/tasks/active/.md；若无 active 则选 ready 首项 | 确认 goal、allowed_paths、acceptance、forbidden |
+-| 4 | 任务引用的 domain/invariants/decisions/contracts | 能复述不可变量和输入输出 |
++| 3 | 按 current.md 的精确 Current Task ID 查找 backlog/ready/active/review/done，必须唯一且 status 匹配 | review 继续独立审查/修复；active 继续实现；ready 验依赖后激活；backlog 保持阻塞；仅当前 done 且无未完当前任务才按依赖选下一任务，禁止 active 为空就跳任务 |
++| 4 | resolver/hash、现行冻结正文适用 §3/§10/§11、批准 ADR、Minimality 及任务引用的 domain/invariants/acceptance/contracts | 能复述职责、源码/依赖边界、不可变量、输入输出与验收 |
+ | 5 | git status、当前 diff、最近提交 | 识别用户/前 Agent 未完成改动，不覆盖 |
+ | 6 | 最小基线验证 | 确认仓库状态可继续；失败则记录而非盲改 |
+ | 7 | PLAN -> IMPLEMENT -> TEST -> REVIEW | 仅在授权路径与任务范围内工作 |
+@@ -771,7 +798,7 @@ backlog -> ready -> active -> review -> done
+ 
+ #### 崩溃恢复目标
+ 
+-新的 Agent 不扫描整个仓库重新猜架构。它通过 agent-context -> current -> active task -> referenced specs/contracts -> git diff 在一个可控上下文中恢复工作。
++新的 Agent 不扫描整个仓库重新猜架构。它通过 agent-context -> current -> 精确 Current Task 的真实队列状态 -> referenced specs/contracts -> git status/diff/commits 在一个可控上下文中恢复工作。
+ 
+ <a id="section-14"></a>
+ ## 14. CI/CD 独立校验架构
+@@ -779,7 +806,14 @@ backlog -> ready -> active -> review -> done
+ ```mermaid
+ flowchart LR
+   Diff["Diff 分类"]
+-  Diff --> GoPath["backend/go/**"] --> JavaPath["backend/java/**"] --> Shared["contracts/** / DB"]
++  Diff --> GoPath["backend/go/**"]
++  Diff --> JavaPath["backend/java/**"]
++  Diff --> Shared["contracts/** / DB / shared SDK"]
++  Diff --> Rules["architecture / Agent / task template / acceptance / checker"]
++  Rules --> Structure["规范 + 源码归属 + 依赖 + 触发负例"]
++  GoCI --> Structure
++  JavaCI --> Structure
++  Structure --> Gate
+   GoPath --> GoCI["Go CI<br/>unit + integration<br/>contract"]
+   JavaPath --> JavaCI["Java CI<br/>unit + integration<br/>contract"]
+   Shared --> Matrix["全平台兼容矩阵<br/>Go + Java + clients<br/>plugin + migration"]
+@@ -791,7 +825,7 @@ flowchart LR
+ 
+ > Agent 负责提出变更；CI 独立验证事实。Agent 无权自行宣布 Gate 通过。
+ >
+-> 图 14-1 Path-aware CI DAG。公共契约变更是唯一需要无条件放大全平台验证的路径。
++> 图 14-1 Path-aware CI DAG。分类分支相互独立；公共契约/schema/shared SDK 变更按表触发兼容矩阵，规范与检查器变更必须触发适用架构检查。部署/发布节点表示相应阶段要求，不把未来发布能力冒充当前 skeleton。
+ 
+ <a id="section-14-1"></a>
+ ### 14.1 路径感知规则
+@@ -803,7 +837,8 @@ flowchart LR
+ | clients/web/** | Web unit/build/protocol/plugin UI tests |
+ | clients/desktop/** 或 clients/mobile/** | 对应客户端 + SQLite migration + protocol tests |
+ | contracts/**、数据库迁移、shared protocol/plugin SDK | Go + Java + Web + Desktop + Mobile + old client fixtures + plugin fixtures + migration compatibility |
+-| deploy/**、ci/** | compose/manifest/security/smoke/rollback validation |
++| deploy/**、ci/**、.github/workflows/** | 按当前阶段执行 compose/manifest/security/smoke/rollback validation，并验证分类与 Gate |
++| spec/architecture/**、Agent 入口、handoff、活动任务/模板/batch、acceptance、架构检查器与测试 | baseline/resolver/ADR 一致性、活动引用、源码归属、Go/Java 适用阶段依赖检查、触发与正负控制；Markdown-only 不能全部跳过 |
+ 
+ <a id="section-14-2"></a>
+ ### 14.2 流水线层次
+@@ -815,12 +850,12 @@ static/lint -> unit -> contract -> integration -> compatibility -> build
+ <a id="section-14-3"></a>
+ ### 14.3 兼容矩阵
+ 
+-最低矩阵包含 Client Protocol v1、v2、HEAD；Go/Java profile；Echo/Poll 插件 fixture；SQLite old schema fixtures。服务端只维护一个当前实现版本与有限兼容窗口。latest/recommended/min_supported 必须在 Release Manifest 中显式声明，客户端版本号与 protocol_version 不绑定。
++完整兼容阶段的最低矩阵包含 Client Protocol v1、v2、HEAD；在相应协议与客户端版本尚未定义的早期阶段，只能明确报告现有契约向量/占位检查，不能虚构 v2 或声称已通过完整矩阵；后续阶段不得永久豁免。Go/Java profile；Echo/Poll 插件 fixture；SQLite old schema fixtures。服务端只维护一个当前实现版本与有限兼容窗口。latest/recommended/min_supported 必须在 Release Manifest 中显式声明，客户端版本号与 protocol_version 不绑定。
+ 
+ <a id="section-14-4"></a>
+ ### 14.4 CI 与 Agent 的信任边界
+ 
+-Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从干净 checkout 重建后判定。任何需要跳过测试、重录 golden fixture、降低阈值或更改验收项的动作都视为架构/验收变更，必须单独审批。
++Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从干净 checkout 重建后判定。核对精确 head SHA、要求运行的作业及实际结果；必跑作业缺失、异常 skip、失败或取消均不满足 Gate。测试环境未启用导致的 skip 不是集成 PASS；旧提交的绿色不覆盖新增要求。历史 ADR-0001 的适用及失效条件见 §12.2。任何需要跳过测试、重录 golden fixture、降低阈值或更改验收项的动作都视为架构/验收变更，必须单独审批。
+ 
+ <a id="section-15"></a>
+ ## 15. Loop 1: 12 周预算、里程碑门禁驱动
+@@ -948,7 +983,7 @@ verification evidence links
+ <a id="section-18-1"></a>
+ ### 18.1 关联标识
+ 
+-所有链路使用 request_id、server_message_id、conversation_id、session_id（脱敏）、outbox_event_id、plugin_instance_id 关联。Trace 跨 Gateway/Core/DB/Outbox/NATS/Plugin Host 传播，但消息正文与 token 默认不采集。
++所有链路使用 request_id、server_message_id、conversation_id、session_id（脱敏）、outbox_event_id、plugin_instance_id 关联。Trace 跨 Gateway/Core/DB/Outbox/NATS/Plugin Host 传播，消息正文默认不采集；token 严禁进入日志或 trace，与 §7.4 一致。
+ 
+ <a id="section-18-2"></a>
+ ### 18.2 健康与就绪
+@@ -964,7 +999,7 @@ verification evidence links
+ 
+ - TLS 配置、依赖/SBOM、镜像/插件签名、secret 扫描、最小容器权限纳入 CI。
+ 
+-- WSS 鉴权前只允许 auth.bind/ping；每条业务命令校验绑定 Session 与权限。
++- WSS 鉴权前只允许 auth.bind/ping/pong；每条业务命令校验绑定 Session 与权限。
+ 
+ - 好友、群成员、消息、插件 Action 都有服务端授权；不可相信客户端 UI 隐藏。
+ 
+@@ -980,7 +1015,7 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
+ <a id="section-19"></a>
+ ## 19. 第一批 Agent 可执行任务
+ 
+-任务必须逐个进入 ready。S0 Gate 未通过前，S1 任务不得 active；依此类推。下面清单按依赖顺序排列，不授权并行修改同一契约。
++任务必须逐个进入 ready。S0 Gate 未通过前，S1 任务不得 active；依此类推。下面清单是阶段规划，不是现行队列快照；按 Task Spec 的真实依赖选择，不以表格/文件名顺序代替依赖。不授权并行修改同一契约。
+ 
+ | Task ID | 目标 | 阶段 | 交付物 | 验收 |
+ | --- | --- | --- | --- | --- |
+@@ -1051,7 +1086,7 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
+ - PLAN: 从 acceptance 倒推最小实现与测试
+ - IMPLEMENT: 只改 allowed_paths；先写/更新测试向量
+ - TEST: unit -> contract -> integration 的最小相关集合
+-- REVIEW: 重新读取 spec/contracts，检查 diff 与不变量
++- REVIEW: 新独立 Reviewer 重新读取权威输入，检查行为、职责归属、依赖方向、最小性、diff 与不变量；实现者自检不能替代
+ - HANDOFF: 更新 task + current.md；Gate 点生成 checkpoint
+ 
+ <a id="section-21-3"></a>
+@@ -1086,7 +1121,7 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
+ 
+ - 功能/交付物完成且与 Task Spec 一致。
+ 
+-- 自动化测试在干净环境通过，兼容性未破坏。
++- 自动化测试在干净环境通过，兼容性未破坏；适用源码/依赖/规范检查通过，新独立 Review 与精确候选 hosted CI 有效。
+ 
+ - 无未处理 blocker、未批准架构偏离或隐藏 skip。
+ 
+@@ -1108,8 +1143,8 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
+ | Sync | user cursor 只管低频状态；消息按 conversation seq；contiguous_seq 不跨 gap |
+ | Web | 无聊天 DB、无离线历史；页面生命周期之外不保证消息状态 |
+ | Plugin | 版本制品不可变；权限最小化；WASM/renderer sandbox；后端与 renderer 同版本原子绑定 |
+-| Architecture | 公共契约唯一权威；Agent 不得越权修改 frozen decisions |
+-| CI | 只测被修改后端；shared contract/schema/SDK 变更触发全平台兼容测试 |
++| Architecture | §2.2 权威顺序；contracts/ 是机器可验证公共契约唯一来源；§3/§10 服务职责/源码归属/依赖共同约束 Go/Java；allowed_paths 不豁免架构 |
++| CI | 后端路径感知；shared contract/schema/SDK 变更触发兼容矩阵；规范/Agent/模板/检查器变更触发适用架构验证；必跑作业缺失/失败/异常 skip 不能 PASS |
+ | Release | 不可变制品 + manifest；expand/migrate/switch/contract；发布前验证回滚 |
+ 
+ #### 文档结束
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 970041d..66a1746 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -1,414 +1,57 @@
+ # Current Execution State
+ 
+ Current Loop: Loop 1
+-
+-Current Stage: S1
+-
+-Current Gate: S1
+-
+-Gate Status: NOT YET PASSED (S0 PASS retained)
+-
+-Current Batch: LOOP1-S1
+-
+-Current Task: LOOP1-GO-AUTH-001
+-
+-Current Task State: done
+-
+-## Current Contract Work
+-
+-- `LOOP1-GO-AUTH-001` is **done** at accepted task head `59d92f39234596a5b66841e8aa2ef7db0bf65e8a`: fresh independent product and workflow-fix reviews passed from separate clean checkouts; real hosted [CI run 36602521287](https://github.com/nilesthump/IM-platform/actions/runs/36602521287) completed success with all ten jobs, including Go, deploy transport smokes, compatibility, and gate. Exact acceptance evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-pass-acceptance.md`. Stable vertical-slice checkpoint: `spec/progress/checkpoints/2026-09-30-loop1-go-auth-001-accepted.md`. S1 Gate remains NOT YET PASSED; next dependency-satisfied task is Go Social.
+-
+-- Fresh independent hosted-CI workflow-fix Review PASS locally for `LOOP1-GO-AUTH-001` candidate `8eed78b` in a separate clean detached clone. Strict CTRL-002 Acceptance, CI tests, HTTP/WSS and frozen-hash verifiers passed; an independent negative control reintroduced old job-level `runner.temp` and the regression failed as intended, then was restored exactly. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-independent-review-pass.md`; Recorder `R-20260929T165256Z-44fbe90d-37de-44dc-9d92-f9150c8968c3`. Task remains `review`; new applicable hosted CI PASS is required before `done`. S1 Gate NOT YET PASSED. Reviewer owns only task-linked review evidence/recovery/Recorder artifacts until committed; original `H:\IM-platform` unknown files remain untouched.
+-
+-- Fresh Go Auth hosted-CI Fix Agent moved the invalid deploy job-level `runner.temp` reference into the configuration preparation step and propagated its value through `GITHUB_ENV`; added a regression that detects the prior invalid placement. Local CI tests, HTTP/WSS verifiers, frozen hashes, and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-context-fix-development.md`; Recorder `R-20260929T164238Z-6215f0a2-b090-4e45-8137-32eb19fa60e7`. Task stays `review`; next is fresh independent review and a new hosted CI run. S1 Gate NOT YET PASSED.
+-
+-- User-approved push of Go Auth review closure `ab81dd54fd3b6f4593bdacd89a08f28997e8c70c` to the remote task branch succeeded and remote SHA matched despite a reported Windows `git-remote-https.exe` error dialog. Hosted Actions run `36598098200` failed immediately with zero jobs. The new deploy job-level `${{ runner.temp }}` expression is not permitted by GitHub's official context table; this is the leading workflow-validation cause. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-36598098200-fail.md`. Task remains `review`; fresh Fix/Review and a new hosted CI run are required. S1 Gate NOT YET PASSED.
+-
+-- Fresh independent Review 2 of `LOOP1-GO-AUTH-001` candidate `c645014` **PASS locally** in a clean detached checkout. Live migrated PostgreSQL/NATS Go race tests execute canonical Auth/WSS fixtures; independent negative controls prove HTTP fixture outcomes and WSS UUID rejection are test-enforced. HTTP/WSS verifiers, frozen hashes, strict CTRL-002 Acceptance, CI tests, Go vet, and Compose configuration checks passed. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review2-pass.md`; Recorder `R-20260929T161307Z-fd438d62-f0ab-4d98-a031-b47933469e3a` finished PASS and integrity-valid (29 events). Task remains `review`; applicable real hosted CI is the next acceptance action, and S1 Gate has not passed. Last independently accepted base remains S0 `main` `09cec96`. Reviewer owns only task-linked review evidence/recovery/Recorder artifacts until committed; original `H:\IM-platform` unknown files remain untouched.
+-
+-- Fresh Fix 1 for `LOOP1-GO-AUTH-001` addresses independent Review 1: the Go suite now consumes canonical Auth/User positive and negative fixtures plus current Auth/Session WSS golden outcomes, normalizes dynamic IDs/credentials, and rejects malformed UUID WSS request IDs including ping. Fixture execution exposed and repaired HTTP/WSS error-outcome mismatches. Live disposable PostgreSQL/NATS `go test -race -count=1 ./...`, HTTP/WSS contract verifiers, frozen hashes, CTRL-002 Development, Go vet, and 19 CI tests pass locally. Four Windows symlink subcases remain skipped; local full Compose Go smoke remains unverified after the prior Docker mirror 403. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-fix1-development.md`; Recorder `R-20260929T151415Z-c0d03dff-1c6a-4238-86b0-96a4f38d19e5`. Task stays `review`; next is a new independent clean-checkout Review Agent and applicable hosted CI. Last independently accepted base remains S0 `main` `09cec96`; this Fix Agent owns only task-allowed changes until clean candidate commit.
+-
+-- Independent Review 1 of `LOOP1-GO-AUTH-001` candidate `a93569d` **FAIL** in a separate clean detached checkout: the Go suite/CI does not execute canonical HTTP/WSS positive and negative fixtures, and a focused negative probe showed `gateway.go` emits `pong` for a non-UUID WSS `requestId`. Go unit/race, HTTP/WSS artifact verifiers, frozen hashes, and 19 CI tests passed locally; the live DB/NATS Go test was skipped in this reviewer environment, and full Compose remains unverified. Evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-independent-review1-fail.md`; reviewer Recorder `R-20260929T143107Z-279b7a3e-f218-418d-925a-5a7f42e4421e` finished FAIL and integrity-valid, with pre-run startup activity explicitly disclosed in evidence. Task stays `review`; next exact action is a fresh Fix Agent, a new independent review, and real hosted CI before `done`. Last independently accepted base remains S0 `main` `09cec96`; reviewer owns only the task-linked review evidence/recovery/Recorder artifacts until committed. Latest stable checkpoint remains the S0 remote-main Gate PASS checkpoint.
+-
+-- `LOOP1-GO-AUTH-001` candidate `a93569d2153e8766c298e11d12ef1549565312b7` is committed with a clean worktree and strict CTRL-002 Acceptance recovery PASS. Local Go race/integration, PostgreSQL/NATS Outbox, HTTP/WSS contracts, frozen hashes, CI unit tests, and Compose config pass. Full Go Compose smoke did not start because the configured Docker mirror returned HTTP 403 for its Go builder image. The task is now in `review`; a fresh independent reviewer and real hosted CI are required before `done`. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; implementation Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab` validated with 30 events.
+-
+-- Fresh Go Auth Implementation Agent has implemented and locally verified the bounded S1 Auth/Session slice on `task/LOOP1-GO-AUTH-001`: PostgreSQL registration/login/refresh/logout and three slots, WSS bind/revocation, durable revocation Outbox relay through NATS, config-file credentials, and Go CI adaptation. Go race/integration with disposable PostgreSQL/NATS, HTTP/WSS contracts, frozen hashes, CTRL-002 Development, 19 CI tests, and Compose config pass. Local full Compose Go smoke could not fetch `golang:1.25-alpine` because the configured Docker mirror returned HTTP 403 before service startup. Development evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-go-auth-implementation-development.md`; Recorder `R-20260929T113637Z-033a1064-c4d8-4276-b309-717762d4d6ab`. Human explicitly approved the exact `deploy/compose.yaml` config-file mount amendment; prior automatic approval rejection remains disclosed. This is not independent acceptance or S1 Gate PASS.
+-
+-- S1 was explicitly authorized by the Human after S0 completion. An isolated clean checkout of `main` `09cec968f64faf0db319aea8d9c21d4fffe8ec49` passed CTRL-002 Acceptance, canonical Frozen Architecture hash verification, HTTP, WSS, and Sync/Plugin contract verification. The 19 local CI tests passed when granted temporary-directory access (five Windows symlink subcases skipped); hosted S0 full matrix PASS remains the Gate entry authority. New `spec/batches/LOOP1-S1.md` and four architecture-listed S1 Task Specs define dependency order; `LOOP1-GO-AUTH-001` is first and active. No S1 product code has changed. Activation evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-29-s1-activation-development.md`; partial-resume Recorder `R-20260929T110755Z-54301c59-3bb4-4bb6-a884-ec0b3fc7fa49`.
+-
+-- Final S0 remote sync: `git ls-remote origin main` confirms `origin/main` at `8dc64ad5293fb038c7ff26a92aaa3a29b8e0de67`, equal to the clean local `main` before this governance record. Hosted main Actions [36554068269](https://github.com/nilesthump/IM-platform/actions/runs/36554068269) completed success at that exact SHA: classify and selected-job gate passed; the documentation-only diff correctly skipped profile jobs. The earlier merged-main [full matrix 36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) passed all ten jobs at `485a071`. All nine S0 tasks remain done and **S0 Gate PASS** stands. Final sync evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-final-remote-main-sync.md`. S1 remains inactive.
+-
+-- Remote PR #1 is merged at 485a071bc80afb1b6f3c252779444e1be275c562; isolated local main safely fast-forwarded to exact origin/main. Hosted main Actions [36550304940](https://github.com/nilesthump/IM-platform/actions/runs/36550304940) completed success with classify, Go, Java, Web, Desktop, Mobile, shared, compatibility, deploy and gate all successful. Post-merge local frozen hashes, recovery, S0 spec/HTTP/WSS/Sync/Plugin verifiers and 19 CI tests passed (five Windows real-symlink subcases skipped; hosted Linux matrix passed). All nine S0 tasks remain done. **S0 Gate PASS**; evidence: spec/progress/evidence/LOOP1-CI-001/2026-09-29-remote-main-s0-gate-reevaluation.md; latest checkpoint: spec/progress/checkpoints/2026-09-29-loop1-ci-001-remote-main-s0-gate-pass.md. S1 remains inactive.
+-
+-
+-- `LOOP1-CI-001` **done** after independent Review 2 PASS for `856e4d0` and hosted full-matrix GitHub Actions [36545406958](https://github.com/nilesthump/IM-platform/actions/runs/36545406958) PASS at review closure `0c00ea1`. Classify, Go, Java, Web, Desktop, Mobile, shared, compatibility, deploy, and gate all succeeded. Review closure was safely cherry-picked here as `3235996`; prior FAIL evidence remains. Exact hosted acceptance: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-hosted-acceptance.md`; closure Recorder `R-20260929T090505Z-ed62b6fb-ed72-4213-8219-c00aaa435c7b` finished `FAIL` and integrity-valid after an optional log-capture GBK error, while its structured hosted query succeeded. Local 19 CI tests, frozen hashes, and post-transition CTRL-002 Development pass. At that historical point S0 Gate remained FAIL pending clean main integration and post-merge evaluation; no S1 activation.
+-
+-- Fresh independent placeholder Review 2 **PASS locally** for `856e4d0`: clean detached clone passed strict CTRL-002 Acceptance and Recorder repository validation with zero status entries; 19 CI tests passed (five real symlink cases skipped on Windows, mock controls passed); actual diff from `686dbf2` selects the full 11-job matrix; frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review2-856e4d0-pass.md`; review Recorder `R-20260929T082617Z-34ed37ce-5d8a-4b03-8f39-35d495bf7373`. Task stays `review`, S0 Gate FAIL pending hosted full-matrix PASS and Gate reevaluation.
+-
+-- Fresh Fix 2 incorporated the independent FAIL closure commit and repaired both findings: symlinks are rejected before allowed S0 names, and CI/workflow/test changes select the entire job matrix. Nineteen CI tests, CTRL-002 Development, and frozen hash verification pass locally; real symlink creation is unavailable on this Windows host, so an additional deterministic negative test covers both bypasses. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-placeholder-fix2-development.md`; Recorder `R-20260929T075614Z-e89fde53-720e-4829-9d9a-05691009c1ad`. This is Fix Agent development evidence. Task remains `review`, S0 Gate FAIL; fresh independent review and hosted full-matrix CI are required.
+-
+-- Fresh independent review of S0 placeholder candidate `502342358d11fc6e77ff2b7e1f86ed5f07220ea8` **FAIL**: clean detached CTRL-002 Acceptance and 16 CI tests pass, but workflow/checker changes classify as deploy only and do not run the five repaired profile jobs or compatibility on a push; allowed-name root symlinks bypass the boundary check. Frozen hashes match. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-placeholder-review-fail.md`; reviewer Recorder `R-20260929T072807Z-af85971f-4b19-44a4-a4b6-ebec51b430bf` had an exposed GBK output capture failure. Task remains `review`, S0 Gate FAIL. Next: fresh Fix/Review cycle, then actual hosted full-matrix CI. No S1 activation.
+-
+-- Post-push full-matrix GitHub Actions [36532087481](https://github.com/nilesthump/IM-platform/actions/runs/36532087481) **FAIL** at `origin/main` `686dbf2`: tracked `.gitkeep` markers and placeholder client directories trigger all five S0 source boundary checks. The prior S0 Gate PASS checkpoint was based on a research-only hosted change that selected no profile jobs and is now superseded for Gate status. `LOOP1-CI-001` is reopened in `review`; Fix Agent changed CI boundary checks and added regression tests. Local 16 CI tests and CTRL-002 Development pass. See `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-placeholder-fix-development.md`. Next: fresh independent review, then a full-matrix hosted CI run and S0 Gate reevaluation. No self-acceptance; S1 inactive.
+-
+-- S0 Stage Gate **PASS** on clean integrated local `main` `037c88ce86c2d81b518e26cd367676b4343f3360`: all nine required tasks are `done`; actual GitHub Actions [36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147) succeeded on the reviewed CI branch; CTRL-002 Acceptance, frozen hashes, S0 spec/HTTP/WSS/Sync/Plugin/CI verifiers, and both PostgreSQL/NATS/HTTPS/WSS TLS 1.3 profile smokes passed after integration. Exact Gate evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-s0-gate-evaluation.md`; latest checkpoint: `spec/progress/checkpoints/2026-09-29-loop1-ci-001-s0-gate-pass.md`. ADR-0001 temporary bootstrap exception expired. The historical CTRL-001 empty-product verifier rejects the approved Infra skeleton and is disclosed as phase-specific. Remote `main` remains old and was not pushed under task-branch-only approvals. S1 remains inactive.
+-
+-- `LOOP1-CI-001` operational CI acceptance **PASS**: user-approved push of reviewed `9d1abc1` triggered [GitHub Actions run 36525934147](https://github.com/nilesthump/IM-platform/actions/runs/36525934147), completed success. Clean checkout, strict CTRL-002 Acceptance, 12 CI tests, classifier and selected-job gate passed; the research-only diff selected no profile jobs. Independent Review 5 accepted `0621f2b` in portable clean clones. Closure evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-operational-ci-acceptance.md`. Task moves `review -> done`; ADR-0001 bootstrap exception expires. Next exact action: integrate this closure to clean local `main`, perform post-integration verification and evaluate the S0 Gate checklist/checkpoint. S0 Gate remains NOT YET PASSED until that evaluation. Last accepted local main before integration `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns only closure evidence/task/current and linked Recorder artifacts until committed.
+-
+-- Fresh independent CI Review 5 **PASS** for committed candidate `0621f2b76aedecfb4fcb7a657bd977cc79e8e8ac`: two independent clones without `info/attributes` and with `core.autocrlf=true` and `false` passed strict CTRL-002 Acceptance with zero status/diff; all 42 historical blob bytes and object IDs, 12 CI tests, frozen hashes, Recorder validity, and no-weakening scope passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review5-0621f2b-pass.md`; Recorder `R-20260929T045735Z-19594017-8996-43dd-98a8-670c028c15c4`. Next exact action: Coordinator obtains a new real GitHub Actions run and only closes this task after hosted PASS. Task stays `review`; S0 Gate NOT YET PASSED. Last accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only review evidence/probe, task/current recovery edits, and linked Recorder artifacts until committed.
+-
+-- Fresh Fix 4 repaired the hosted checkout failure with two exact Coordinator-authorized historical Recorder `blobs/.gitattributes` transport files at `21c10e3`; no historical blob bytes changed. Independent clones with `core.autocrlf=true` and `false`, no `info/attributes`, both passed strict CTRL-002 Acceptance with zero status entries; all 42 blob files matched their Git objects byte-for-byte, both historical runs validated, and 12 CI tests passed. Fix Agent development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix4-portable-recorder-checkout-development.md`; Recorder `R-20260929T043656Z-cdc8ce0f-06f4-460c-989b-c2f3603ee365`. Next exact action: fresh independent Review Agent of the clean final candidate, then a new hosted CI run. Task stays `review`; S0 Gate NOT YET PASSED. Last accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Fix Agent changes are contained in the clean committed candidate.
+-
+-- User approved pushing independently reviewed `0e6ce82`; the fast-forward push to `origin/task/LOOP1-CI-001` succeeded without changing remote `main`. Hosted run [36521060867](https://github.com/nilesthump/IM-platform/actions/runs/36521060867) **FAIL**: diagnostic reported 17 modified historical Recorder stdout blobs in two runs immediately after checkout. `research/.gitattributes` LF checkout and machine-local `H:/IM-platform/.git/info/attributes` overrides explain local/hosted difference; no evidence blobs were edited. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36521060867-fail.md`; Coordinator Recorder `R-20260929T041815Z-f8cae6b3-1867-4628-9ef6-6dec868928c5`. Next exact action: fresh Fix Agent repairs portable checkout integrity under task authority; independent Review Agent verifies clean clone, then another hosted run. Task remains `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns task evidence/current/spec and linked Recorder changes until committed.
+-
+-- Fresh independent CI Review 4 **PASS** for diagnostic candidate `6f1293cfdf4efbb527f3c7e19d08a1f31f569a37`: clean detached CTRL-002 Acceptance, 12 CI tests, frozen hashes, scope and no-weakening review passed. The diagnostic reports the same Git porcelain entries used by Acceptance before its unchanged check. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review4-6f1293c-pass.md`; Recorder `R-20260929T035629Z-d3fafb03-67fd-42b1-95ee-bc842f9aa4d0`. This accepts diagnostic suitability only. Next exact action: Coordinator obtains a new hosted run to identify the dirty entries, then delegates a fresh Fix/Review cycle if necessary. Task stays `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only review evidence, task/current edits, and linked Recorder artifacts until committed.
+-
+-- Fresh Fix 3 added a diagnostic step in `.github/workflows/ci.yml` to print the exact checkout Git porcelain status before the unchanged CTRL-002 Acceptance check. The hosted failure's entries remain unknown; 12 local CI tests and CTRL-002 Development pass. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`; Recorder `R-20260929T032745Z-2c2aaba9-5225-46c0-9bab-6a6e44e31d22`. Task stays `review`, Gate NOT YET PASSED. Next: fresh independent review, then a new hosted diagnostic run; repair the identified cause in another Fix/Review cycle.
+-
+-- User approved pushing reviewed CI commit `f07e353` to `origin/task/LOOP1-CI-001`; push succeeded without changing remote `main`. Actual GitHub Actions run [36515716353](https://github.com/nilesthump/IM-platform/actions/runs/36515716353) **FAIL**: classify job's CTRL-002 Acceptance check found a dirty checkout and the gate rejected the failed job. Exact offending status entries are not logged. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`; Coordinator Recorder `R-20260929T030511Z-4f60e75a-68e1-4f64-8516-b71c024a15c2` finalized FAIL and validated. Next exact action: fresh Fix Agent diagnoses and repairs this CI checkout failure, then a different fresh Review Agent checks a clean candidate. Task stays `review`; S0 Gate NOT YET PASSED. Last independently accepted local `main`: `10406be70bf66482836164400cd5b8be07709c58`. Coordinator owns only the task evidence/current/spec and linked Recorder changes until committed.
+-
+-- Fresh independent CI Review 3 **PASS** for clean detached candidate `57de113614a754afc69f39a7971d02197a984df2`: five-queue CTRL-002 Acceptance, 12 CI tests, prior rename regression, independent SDK rename/path/gate controls, frozen hashes, and Recorder repository integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review3-57de113-pass.md`; Recorder `R-20260928T212920Z-2d064d71-4eae-4ae2-bdfc-58ccd5965034`. Actual GitHub workflow execution and Coordinator acceptance closure remain pending; task stays `review`, S0 Gate NOT YET PASSED.
+-
+-- Fresh Fix 2 for `LOOP1-CI-001` exposes both source and destination of renames using Git `--no-renames`; contract, database, and SDK move-away regressions and the former Review 2 probe pass. Clean detached commit `4dc41b5` passed CTRL-002 Acceptance, 12 path/gate tests, and frozen hashes. Fix-Agent development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix2-development.md`; Recorder `R-20260928T211249Z-a84b0c58-8b90-4854-af03-3b1eb3aba958`. Task stays `review`; fresh independent review, actual GitHub workflow execution, and S0 Gate remain pending.
+-- Fresh independent CI Review 2 **FAIL** at clean detached candidate `f508750`: backlog queue marker and CTRL-002 Acceptance pass, but a shared contract renamed to an unclassified path schedules no compatibility jobs because Git reports only the destination. Eleven CI tests, independent gate controls, frozen hashes, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review2-f508750-fail.md`; Recorder `R-20260928T205355Z-d9e2feba-fa5d-431a-ab08-dd4d405a67af`. Task stays `review`; S0 Gate NOT YET PASSED.
+-- Fresh Fix Agent `/root/ci001_fix1` committed the exact authorized backlog marker at `ba0bbe7`. A new clean detached checkout passed CTRL-002 Acceptance (all five queues present), 11 CI path/gate tests, frozen hashes, and Recorder repository validation. Development evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix1-development.md`; linked Recorder `R-20260928T204018Z-fa44f3d6-9105-4273-b08b-e5f61aa5088b`. Task stays in `review`; fresh independent re-review and actual GitHub workflow execution remain pending. S0 Gate NOT YET PASSED.
+-
+-- Fresh independent CI Review 1 **FAIL** for product candidate `97db67e` at clean detached handoff `2c335cd`: `spec/tasks/backlog/` is absent in the committed tree after the CI task left that queue, so CTRL-002 Acceptance fails in the workflow's first job. Eleven CI path/gate tests, frozen hashes, and Recorder integrity passed. Exact evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-independent-review1-97db67e-fail.md`; review Recorder `R-20260928T202247Z-2951ca94-5b67-47a5-ba6d-c6f00f3f4a15`. Task remains `review`; S0 Gate NOT YET PASSED. Next: Coordinator authorize exact backlog marker path, fresh Fix Agent commit it, then new independent review and actual GitHub workflow execution. Last known good independently accepted main: `10406be70bf66482836164400cd5b8be07709c58`. Reviewer owns only FAIL evidence, task/current recovery edits, and linked Recorder artifacts until committed; detached review checkout is clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+-
+-- `LOOP1-CI-001` implementation candidate adds `ci/classify.py`, `ci/check_gate.py`, GitHub Actions job skeletons, and 11 path/gate tests. Shared contract/database/SDK paths fan out to all profiles and clients plus old-client/plugin/migration compatibility. The selected-job gate rejects selected jobs that fail, cancel, or skip. Local development checks pass; independent review and actual GitHub CI execution are pending. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-implementation-development.md`; Recorder `R-20260928T194702Z-28ed6ab3-9f1c-4240-9d1f-6e217d7265d4`. S0 Gate NOT YET PASSED.
+-
+-- `LOOP1-CI-001` activated on isolated branch from verified clean local `main` `10406be`; Infra dependency is independently accepted and `done`. Scope: path-aware CI classification, job skeletons, and path matrix tests. No CI product file changed at activation. S0 Gate NOT YET PASSED.
+-
+-- Fresh independent Reviewer `/root/infra001_review1` passed Infra 001 candidate `3cf1cf0cdfd30847949a75061c4477e4964e2603` from a clean detached handoff checkout `c9a3345`: Go and Java profile smokes each passed PostgreSQL migration, Core NATS, HTTPS health, and WSS Upgrade through Caddy TLS 1.3. Frozen hashes, implementation Recorder integrity, profile isolation/port-exposure probe, and detached CTRL-002 Acceptance passed. Evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-independent-review1-3cf1cf0-pass.md`; review Recorder `R-20260928T191238Z-e884d0f9-ede5-48ab-ac0c-347a67c71435`. Task is `done` after Coordinator closure; S0 Gate NOT YET PASSED.
+-- Fresh `LOOP1-INFRA-001` Implementation Agent completed a task-scoped Compose skeleton with separate Go/Java profiles, PostgreSQL, Core NATS, canonical migration, and Caddy TLS proxy. Both disposable profile smokes passed real HTTPS and WSS Upgrade through TLS 1.3, plus migration and NATS checks; frozen architecture and CTRL-002 Development passed. Development evidence: `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-implementation-development.md`; Recorder run `R-20260928T184630Z-a4f1554d-496f-4b5a-8d30-a4bc46edfb7b`. Task is `review`; independent clean-checkout acceptance is pending. S0 Gate NOT YET PASSED.
+-- `LOOP1-INFRA-001` is `active` on isolated branch `task/LOOP1-INFRA-001` from accepted local `main` `3e4d0f3cb3030731345288f677d2048d72651fd5`. DB dependency is independently accepted and `done`; infrastructure product work awaits a fresh Implementation Agent. Frozen architecture and CTRL-002 Development passed after correcting the DB integration handoff's abbreviated Last Known Good Commit. Docker Compose v5.1.4 is available. Activation Recorder `R-20260928T181929Z-4868929c-ccfb-45e1-8edc-860dbc5fe2b9` validated PASS; details at `spec/progress/evidence/LOOP1-INFRA-001/2026-09-29-activation-development.md`. S0 Gate NOT YET PASSED.
+-- `LOOP1-DB-001` accepted closure is integrated on clean local `main` at `016f429`. Post-integration PostgreSQL 16 tests passed 3/3, frozen architecture and CTRL-002 Acceptance passed, and committed Recorder repository artifacts validated. Integration Recorder `R-20260928T180300Z-e2553a57-4a18-4214-a83f-0c04f4859b5a` validated PASS; exact evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-main-integration.md`. The disposable DB test container was stopped. S0 Gate NOT YET PASSED.
+-- `LOOP1-DB-001` is `done` after fresh independent Review 1 PASS at clean product candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d`. Actual PostgreSQL 16 tests passed 3/3; independent negative probes, frozen hashes, scope, Recorder integrity, and clean detached CTRL-002 Acceptance passed. Coordinator closure Recorder `R-20260928T174948Z-79f0e8fe-b6ff-4c79-adf0-5e0b873c9a7e` validated PASS; `done` queue CTRL-002 Development exited 0. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md` and `2026-09-29-acceptance-closure.md`; checkpoint `spec/progress/checkpoints/2026-09-29-loop1-db-001-accepted.md`. S0 Gate NOT YET PASSED.
+-- Fresh independent Reviewer `/root/db001_review1` passed clean implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` under ADR-0001. Three PostgreSQL 16 tests, independent constraint/down/atomicity probes, frozen hashes, implementation Recorder integrity, and detached CTRL-002 Acceptance at review handoff `a9c491d` passed. Disposable PostgreSQL container was removed. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-independent-review1-7a677cc-pass.md`; review Recorder `R-20260928T173049Z-550c5234-bc12-4f2b-9e57-d9d49f3d19ff`. Task stays `review` for Coordinator closure; S0 Gate NOT YET PASSED.
+-- DB review-state Recorder run `R-20260928T171255Z-1eb5541f-d2e0-41c8-a583-5b721eb3ff78` finished and validated (8 events). A disposable PostgreSQL 16 run passed all 3 database tests; CTRL-002 Development recovered the task in `review`. Exact local evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. Fresh clean-checkout independent Acceptance remains pending; S0 Gate NOT YET PASSED.
+-- DB implementation candidate `7a677cca7151a2bd06ec9ed78f15ea20ba1e2c6d` is in `review`. A disposable PostgreSQL 16 container and locally built Python-plus-psql test image are running without a host port; a local development run passed all 3 database tests, including actual forward/uniqueness/rollback. Fresh independent clean-checkout execution remains pending. Evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-29-review-transition.md`. S0 Gate NOT YET PASSED.
+-- `LOOP1-DB-001` implementation candidate adds the canonical PostgreSQL schema, standalone migration runner, uniqueness and forward/rollback integration tests. A linked fix requires GROUP create request identity and tests its rejection/uniqueness. Initial static development tests and CTRL-002 Development passed; the prior PostgreSQL environment limitation was resolved after Docker started. Development evidence: `spec/progress/evidence/LOOP1-DB-001/2026-09-28-implementation-development.md`; Recorder runs `R-20260928T162338Z-5ba36fd3-29c6-48ab-b6b8-3e3aab4fae98` and `R-20260928T163630Z-74cf42e7-07d2-4e40-a86a-cecc67013be1`. Task is in review; S0 Gate NOT YET PASSED.
+-- DB activation Recorder run `R-20260928T155726Z-e6831664-d89d-46e2-b0e6-21753ebb56fe` finished and validated (8 events). CTRL-002 Development initially failed on a missing architecture resolver reference in the DB Task Spec, then passed after the reference was added; both outcomes are preserved at `spec/progress/evidence/LOOP1-DB-001/2026-09-28-activation-development.md`. Task remains `active`; S0 Gate NOT YET PASSED.
+-- `LOOP1-DB-001` is active in isolated branch `task/LOOP1-DB-001` from clean local `main` at `f25807e`; all three Contract dependencies are independently accepted and done. Scope: canonical PostgreSQL schema, application-independent migration runner, uniqueness and forward/rollback tests. S0 Gate NOT YET PASSED.
+-- Clean local `main` fast-forwarded to Contract 003 accepted closure `7faadd75b4e195e6b8e8ba8e08f635a18036d497`. Post-integration Contract 003, WSS, frozen architecture, CTRL-002 Acceptance, and Recorder repository checks passed; `main` stayed clean. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-main-integration.md`; prospective Recorder run `R-20260928T151354Z-d20e8aaa-1145-4e22-bec1-b0a4279824e6` finished and validated. S0 Gate NOT YET PASSED.
+-- `LOOP1-CONTRACT-003` is `done` after fresh independent Review 3 PASS at exact clean candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623`. ADR-0001 Acceptance, 79 cases/16 controls, all 16 independent negative probes across three review cycles, frozen hashes, allowed-path scope, and Recorder integrity passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md` and `2026-09-28-acceptance-closure.md`; checkpoint: `spec/progress/checkpoints/2026-09-28-loop1-contract-003-accepted.md`. S0 Gate NOT YET PASSED.
+-- Fresh independent Review Agent `/root/contract003_review3` accepted clean Fix 2 candidate `15b2477ca44c106e8e69b22b46eacfb7ca301623` under ADR-0001. Schema/fixture verifier passed 79 cases/16 controls; Review 1, Review 2, and seven fresh invalid mutations all rejected; frozen hashes, scope, Fix 2 Recorder, and clean detached CTRL-002 Acceptance passed. SP-A-012's S0 static profile artifacts are expected contract vectors, with backend runtime parity reserved for S3. Task is `done` after Coordinator closure; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review3-15b2477-pass.md`; Recorder run `R-20260928T141143Z-0bf14a8e-dc44-4222-8830-64a84237e98e`.
+-- Fresh Fix Agent `/root/contract003_fix2` repaired Review 2's two concrete findings in the isolated Contract 003 checkout. The FAILED local item and SENT convergence are observed at each step with one local item; Query v1 has bounded `query.page` responses and linked read-only pagination fixtures. Verifier passes 79 cases/16 controls; Review 1 and Review 2 probes reject all 7 and 2 invalid mutations; CTRL-002 Development passes. Independent acceptance is pending, and SP-A-012 S0 static-vector interpretation remains unresolved. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix2-development.md`; Recorder run `R-20260928T132300Z-2ceed8fb-fea6-4ab2-9320-73547e743d4c`. Task remains `review`; S0 Gate NOT YET PASSED.
+-- Fresh independent Review Agent `/root/contract003_review2` rejected clean Fix 1 candidate `56c14b1`: seven prior probes, baseline verifier, frozen hashes, Fix Recorder integrity and detached CTRL-002 Acceptance passed, but two new mutations were accepted. The SP-A-002 case does not observe a prior FAILED item; the SP-A-006 Query contract/fixture does not model a page response. Static Go/Java vector interpretation for SP-A-012 remains unresolved. Task stays `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review2-56c14b1-fail.md`; Recorder run `R-20260928T124947Z-fcdac40d-4b7d-406d-ba60-f61ae57ed4a8`.
+-- Fresh Fix Agent `/root/contract003_fix1` repaired the Contract 003 fixture oracle after independent Review 1 FAIL. Staged rollback/retry and gap checkpoints, full Message identity checks, per-attempt Action audit, and ordered upgrade trace now reject all seven committed reviewer mutations. The task verifier passes 79 cases and 11 controls; CTRL-002 Development passes. Distinct Go/Java static normalized contract-vector files now receive separate comparison, but neither is a backend execution result; fresh independent review must decide whether these satisfy SP-A-012 at S0 contract freeze. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-fix1-development.md`; Recorder run `R-20260928T114841Z-4641b577-7645-4011-be22-1baaa30290e5`.
+-- Fresh independent Review Agent `/root/contract003_review1` rejected clean Contract 003 candidate `9a14f63`: baseline schema/fixture verification and clean detached CTRL-002 Acceptance passed, but six of seven independent negative mutations retained the expected output and profile parity is tautological. Findings cover atomic rollback/materialization, conflicting duplicates, per-attempt Action authorization, upgrade stages, and distinct Go/Java outcomes. Task remains `review`; S0 Gate NOT YET PASSED. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-independent-review1-9a14f63-fail.md`; review Recorder run `R-20260928T112306Z-787dfce3-503e-46a6-9ba8-07bc78565d12`.
+-- Contract 003 moved to `review` after clean implementation candidate `9a14f63`. Coordinator Recorder run `R-20260928T110320Z-c950949e-ba78-488e-bd28-2b0a2258efcd` finished and validated with 6 events; CTRL-002 Development passed after the move. Exact handoff: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-review-transition.md`. Fresh independent acceptance remains pending; S0 Gate NOT YET PASSED.
+-- Fresh Implementation Agent `/root/contract003_impl` completed clean Contract 003 candidate `9a14f6370bf0fb36e9bd51f8b8c91b252e3060ff`: canonical Sync v1 and Plugin API v1 schemas, permission/limit/lifecycle policy, and 79 shared Go/Java golden cases covering SP-A-001..013. The final recorded schema/fixture verifier passed with exit 0; CTRL-002 Development passed with exit 0. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-003/2026-09-28-implementation-development.md`; prospective Recorder run `R-20260928T103052Z-d740d63c-ff5a-442e-9080-fbc0d54e86ae`. The task is now in `review` for a fresh independent agent; S0 Gate NOT YET PASSED.
+-- Contract 003 activation Recorder run `R-20260928T100002Z-a86d5739-b9d3-46d6-87f4-c34921fbb4df` finished and validated PASS (8 events). `tools/verify-loop1-ctrl-002.ps1 -Mode Development` passed with exit 0 in 1057.2144 ms; this is recovery evidence, not acceptance. The exact activation commands and initial failed recovery attempt are recorded in the run.
+-- `LOOP1-CONTRACT-003` was selected by dependency satisfaction after clean local-main Contract 002 closure `eb9ebea` passed WSS, CTRL-002 Acceptance, and Recorder repository validation. Its exact Task Spec is now active in branch `task/LOOP1-CONTRACT-003`. Scope: machine-verifiable Sync and Plugin API v1 contracts and duplicate/out-of-order/gap/permission fixtures. S0 Gate NOT YET PASSED.
+-- `LOOP1-CONTRACT-002` is independently accepted and locally integrated. Fresh portability Review PASS covers clean checkouts with both `core.autocrlf` settings. Local `main` at `fb789509bb9d28dc224b0b1a623a65478f7b7ebc` needed one refresh of its previously converted clean fixture from the exact committed blob. It then passed WSS, frozen architecture, and clean CTRL-002 Acceptance. Integration Recorder run `R-20260928T093047Z-78a476e3-1352-4f6b-844b-e06cf8a75bfb`; closure evidence `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-acceptance-closure.md`. Task is `done`; S0 Gate NOT YET PASSED.
+-- Fresh independent Review Agent `/root/contract002_portability_review` accepted clean candidate `57a02590b0464755c6ff2bf5187e0bb69f9ce08c`: both `core.autocrlf` clean checkouts preserved golden bytes and passed WSS; five prior probes, canonical hashes, clean detached CTRL-002 Acceptance, scope/minimality, and Fix Recorder bytes passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-independent-review-pass.md`; Review run `R-20260928T090226Z-78bea0f2-b253-430b-a1c6-549720487779`. Task remains `review` for Coordinator integration; S0 Gate NOT YET PASSED.
+-- Fresh Fix Agent `/root/contract002_portability_fix` repaired the post-main checkout failure with fixture-local `golden.json -text` at `59bc411`. Disposable clean worktrees with `core.autocrlf=true` and `false` both retained the original golden blob bytes and passed WSS verification. Five prior independent mutation probe sets, the WSS baseline, frozen architecture hash verifier, and CTRL-002 Development passed. The golden fixture and WSS schema/semantics are unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-portability-fix-development.md`; Recorder run `R-20260928T083213Z-9aaad4eb-0bfa-4998-9604-000a450420e6`. The task remains `review` for fresh independent review; S0 Gate remains NOT YET PASSED.
+-- `LOOP1-CONTRACT-002` is independently accepted under ADR-0001 at exact reviewed candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b`, with PASS report committed at `c2eba3acec6ece2ec347b536d352ddf8909081f3`. The separate clean detached CTRL-002 Acceptance, WSS verifier, five prior probe sets, ten new controls, architecture hashes, scope audit, and Review Recorder validation passed. Coordinator closure evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-acceptance-closure.md`.
+-- Local `main` fast-forwarded to closure `4d27d56975d355144f24c945e0de030184758fa2`, but clean post-merge WSS verification failed because `core.autocrlf=true` changed `golden.json` working-file bytes. Task 002 is reopened in `review`; the earlier candidate PASS and closure remain historical evidence, while `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-post-main-merge-fail.md` records the integration failure. `origin/main` remains at `7484901b3915535f60941a01116b730a845bd47d`; no new remote push occurred. S0 Gate remains NOT YET PASSED.
+-- Clean `main` at `7484901` was pushed to `origin/main` on 2026-09-28 and used as the base for isolated branch `task/LOOP1-CONTRACT-002`.
+-- `LOOP1-ARCHDOC-001` is `done`; its accepted canonical Markdown hash, historical PDF hash, architecture verifier, CTRL-002 Acceptance recovery, and Recorder repository validation passed before this activation. S0 Gate remains NOT YET PASSED.
+-- `LOOP1-CONTRACT-002` dependencies are `done`. The Coordinator activated the task in a clean managed worktree and prospectively authorized its task-linked evidence and Recorder paths in the Task Spec.
+-- Activation Recorder run `R-20260928T005917Z-da1e7bcf-0952-4664-b76d-b699a2b59840` uses `prospective_resume`; its recorded CTRL-002 Development check passed after correcting two task recovery fields. This is not acceptance evidence.
+-- Fresh Implementation Agent `/root/contract002_impl` completed a strict WSS v1 envelope schema and deterministic shared Go/Java golden vectors in isolated branch `task/LOOP1-CONTRACT-002`. The generator/verifier passes 8 positive, 10 negative, and 11 malformed-wire mutation controls. Fresh independent Review Agent `/root/contract002_review1` rejected candidate `55670c2` after finding four missing behavioral assertions in the fixture verifier: wrong-Conversation fan-out, omitted revocation event, omitted negative auth rejection, and `message.created` before COMMIT were accepted by in-memory mutations. The baseline verifier and clean detached CTRL-002 Acceptance passed but do not cover these violations. The task remains in `review` for fresh Fix then fresh Review; S0 Gate remains NOT YET PASSED. Review evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review-55670c2-fail.md`; review Recorder run `R-20260928T015007Z-9b76e656-7d6d-4f91-91dc-080318cb92a5`. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-implementation-development.md`; implementation Recorder run `R-20260928T011345Z-3c7689c2-2116-4c18-97dc-efd0e2f946d1`. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+-- Fresh Fix Agent `/root/contract002_fix1` repaired the four prior WSS fixture verifier gaps and committed nine in-memory mutation controls; its development evidence is `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-fix-development.md` and Recorder run `R-20260928T021000Z-97be66ca-3d6f-4b95-855d-3dd6f033714f`.
+-- Fresh independent Review Agent `/root/contract002_review2` rejected clean candidate `102b0ef`: in-memory probes accepted omission of successful auth.ack, valid bind left unauthenticated, and stale-epoch rejection left authenticated. The four earlier failures and five other controls reject correctly. WSS baseline, frozen hashes, and clean detached CTRL-002 Acceptance passed, but auth.bind state/epoch acceptance remains incomplete. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`; Recorder run `R-20260928T022529Z-0d3417e3-6f8e-43df-aae6-2c75a1fe6c3c`. Task remains in review; S0 Gate remains NOT YET PASSED. The original checkout's untracked `contracts/http/schema-lint/` remains under the paused Agent's sole ownership and was not touched.
+-- Fresh Fix Agent `/root/contract002_fix2` repaired the three auth.bind assertions without changing canonical schema or fixture bytes. WSS verifier PASS with 12 behavior controls, committed independent probe rejected 12/12 invalid mutations, and CTRL-002 Development PASS. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-auth-bind-fix-development.md`; Recorder run `R-20260928T024701Z-63b628c9-0944-46da-b52b-c2f97020a7ee`. This is not acceptance. The next action is independent review of the clean fix commit; task remains in `review` and S0 Gate remains NOT YET PASSED.
+-- Fresh independent Review Agent `/root/contract002_review3` rejected clean candidate `1da1b40`: committed 12-case probe rejected 12/12, but broader independent fixture mutation audit found 21/24 invalid output/state/timeline outcomes accepted by `check_scenario`. Clean detached CTRL-002 Acceptance, WSS baseline, architecture hashes, and Fix Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review3-1da1b40-fail.md`; Recorder run `R-20260928T031404Z-1b954968-1e74-47a2-925b-65c3188f4559`. Task remains in `review`; S0 Gate remains NOT YET PASSED. Original `H:\IM-platform` untracked HTTP schema-lint directory was untouched.
+-- Fresh Fix Agent `/root/contract002_fix3` added independent named-case outcome and transaction assertions plus direct frame/request relationships. Development WSS baseline, prior 12-case probe, broad 24-case probe, and CTRL-002 Development passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-systemic-fixture-fix-development.md`; Recorder run `R-20260928T033910Z-c8f7568a-2fe1-4c9a-aec5-e50bf28cb4b2`. Canonical schema and fixture bytes remain unchanged. Task stays in `review` pending a different fresh independent Reviewer; S0 Gate remains NOT YET PASSED.
+-- Fresh independent Review Agent `/root/contract002_review4` rejected clean candidate `cb24c4c`: despite baseline, prior 12/24 mutation probes, frozen hash verification, and clean detached CTRL-002 Acceptance passing, a new precondition probe found 0/9 invalid `given` mutations rejected. Committed ACKs remained accepted for unauthenticated/nonmember/rolled-back premises. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review4-cb24c4c-fail.md`; Recorder run `R-20260928T040555Z-46762043-e185-4e47-b77a-8402f787f573`. Task remains in `review`; S0 Gate remains NOT YET PASSED.
+-- Fresh Fix Agent `/root/contract002_fix4` added independent exact `given` assertions for all 18 scenarios and 12 permanent premise mutations. Baseline WSS verifier passed with 11 schema/24 behavior controls; all three committed independent probes rejected 12/12, 24/24, and 9/9 invalid mutations. CTRL-002 Development and scope/diff checks passed; this is development evidence only. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-precondition-fix-development.md`; Recorder run `R-20260928T042440Z-2abf26e1-ad46-4d62-b224-42f747519427`. Task remains in `review`; S0 Gate remains NOT YET PASSED.
+-
+-- Fresh independent Review Agent `/root/contract002_review5` rejected clean candidate `d89d4f5`: the verifier accepts an out-of-order seq-1 event reassigned to another Conversation while still claiming contiguous sequence 2. Baseline and prior 12/24/9 probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 4 Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review5-d89d4f5-fail.md`; Recorder run `R-20260928T044144Z-c2f35c2f-7072-4b31-bd49-5b84dd1c4654`. Task remains `review`; S0 Gate NOT YET PASSED.
+-
+-- Fresh Fix Agent `/root/contract002_fix5` asserted that out-of-order seq 2/1 events belong to one Conversation and added a permanent cross-Conversation mutation. WSS verification passed with 11 schema/25 behavior controls, prior 12/24/9 probes and Review 5's focused probe all rejected invalid mutations, CTRL-002 Development and scope/diff checks passed. Canonical schema/fixtures unchanged. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-cross-conversation-fix-development.md`; Recorder run `R-20260928T050925Z-2cc0954c-0cd6-43fa-8b41-b014d633a5bb`. Task remains `review` for fresh independent review; S0 Gate NOT YET PASSED.
+-
+-- Fresh independent Review Agent `/root/contract002_review6` rejected clean candidate `dfc31e5`: the verifier accepts two different Messages/sequences under one sender/Conversation/request identity; a separate in-memory schema type mutation also passed lint. Baseline, prior probes, frozen hashes, clean detached CTRL-002 Acceptance, and Fix 5 Recorder byte audit passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review6-dfc31e5-fail.md`; Recorder run `R-20260928T053447Z-5aa0c014-0381-4fba-9457-7acb7cf3da9a`. Task stays `review`; S0 Gate NOT YET PASSED.
+-
+-- Fresh Fix Agent `/root/contract002_fix6` repaired the duplicate request-identity and malformed schema keyword acceptance gaps, adding eight permanent mutation controls. WSS baseline, prior 12/24/9/1 probes, Review 6's two cases, CTRL-002 Development, and canonical-file scope checks passed. Canonical schema and golden fixtures are unchanged. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-request-identity-schema-fix-development.md`; Recorder run `R-20260928T060018Z-0daae2f5-d6ee-4d1a-a688-39bb16513878`. Task stays `review` for a different fresh independent Reviewer; S0 Gate NOT YET PASSED.
+-
+-- Fresh independent Review Agent `/root/contract002_review7` accepted exact clean candidate `5d5afddfc5c5099029daf6ecd6c653cd9fecff4b` under ADR-0001. The WSS baseline, all five prior probes, 10 focused new controls, clean detached CTRL-002 Acceptance, canonical hashes, protected-path scope, Fix 6 Recorder raw bytes, and Review 7 Recorder validation passed. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-review7-5d5afdd-pass.md`; Recorder run `R-20260928T062353Z-39bc4b6e-2cc6-4610-940b-1e93949d211b`. Task remains `review` for Coordinator acceptance closure and integration; S0 Gate NOT YET PASSED.
+-
+-## Authorized Frozen Architecture Representation Migration
+-
+-- Human Architect explicitly authorized `LOOP1-ARCHDOC-001`, a governance-only canonical-source migration from the immutable PDF to Markdown. The source PDF SHA-256 before candidate work is `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`.
+-- Isolated branch `task/LOOP1-ARCHDOC-001` starts at clean local `main` commit `abcdb5beaf3bc46fed53f1208ab843a8c5e79f8a`; original `H:\IM-platform` and its other-Agent-owned untracked directory remain untouched.
+-- Prospective Recorder prompt `P-f0a652e5-89aa-4cad-84f2-578b28973d40`, run `R-20260924T065732Z-5b072546-5f38-480d-9ae7-2786a0b77c43`, group `full_governance`.
+-- The 2026-09-27 continuation is linked to prompt `P-a61d816d-9e7f-4e01-8a8c-1a1e80fdd87b`, run `R-20260927T122147Z-09acf128-7271-40df-bfa5-a1741633c9cc`, capture mode `prospective_resume`; the pre-run same-turn Git transport audit is not represented as fully prospective. All 36 initial-run output blobs now match staged bytes after a run-local `-text -eol` transport rule and re-indexing; the prior automatic approval attempt failed because the approval system hit a usage limit, and the same approval path later succeeded.
+-- Fresh independent review rejected the first canonical Markdown candidate at `bc42205de19777ca033d14707b48d450a298a021`: it preserved text inside 28 fenced page dumps rather than native Markdown. The FAIL closure `5f117a41bf2f906fcb0f490e0f87352ad19aadb7` and evidence remain permanent.
+-- Fresh isolated Fix Agent `/root/archdoc_fix1` repaired the source into 86 clickable TOC entries and anchors, 25 native tables, lists and nine in-place Mermaid diagrams. New Markdown SHA-256 `e31fe163be90667b5562c1873ba427795e449e4ae22458390d2b7920de00894b`; PDF SHA-256 remains `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. Both NATS → PostgreSQL arrows are retained with ambiguity noted.
+-- Fix prompt `P-9548431c-8181-4f5a-9598-1142c6215300`, run `R-20260927T144417Z-6e078f22-5d64-49fc-ab84-ad381cc6b575`; recorded semantic extraction audit, architecture verifier, CTRL-001 and CTRL-002 Development PASS. Evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-27-native-fix-semantic-checklist.md` and `2026-09-27-native-fix-development.md`. The Fix run finished and validated PASS with 14 events; a run-local Git attribute preserved all 19 staged Recorder files byte-for-byte. This is development evidence; fresh independent review remains pending.
+-- PDF section 2.1 requires Architect approval for frozen authority changes. ADR-0002 records the current Human authorization solely for representation/hash-target migration. Candidate and local verification are not independent acceptance; Markdown authority becomes effective only after independent PASS, merge to `main`, and post-merge PASS.
+-- The second fresh reviewer identified a missing seventh `Gate PASS` label in candidate `4770214`'s Figure 15-1; its authored FAIL report is retained verbatim, while its interrupted Recorder run remains unfinished. Fresh Fix Agent `/root/archdoc_fix2` repaired that diagram, its real Markdown hash, and a focused deterministic regression on isolated branch `fix/LOOP1-ARCHDOC-001-gate-label`. Task remains `review` pending a different fresh independent reviewer. Development evidence: `spec/progress/evidence/LOOP1-ARCHDOC-001/2026-09-28-gate-label-fix-development.md`.
+-- Fresh independent Review 3 accepted exact candidate `c7db4597c30610dd76c4505bbcbaa65a3ec46779` from a separate clean checkout. Its semantic/diagram review, CTRL-002 Acceptance, hash/scope verifier and Recorder all passed; evidence commit `0f9286629bfa72a82137fe94bf39472f188f0f6e`. The candidate acceptance closure was subsequently committed and merged at `566ee352f818f6beb2ca7d991c25eecc07f752e7`.
+-- Candidate acceptance closure `566ee352f818f6beb2ca7d991c25eecc07f752e7` was verified clean and fast-forwarded to clean local `main`. The post-merge architecture verifier, immutable PDF and Product scope diff, and CTRL-001 baseline passed. Markdown is effective canonical authority from that commit at `2026-09-27T19:41:30Z` UTC; the PDF remains immutable historical provenance. Task closure and stable checkpoint are being committed on `main`; S0 Gate remains NOT YET PASSED.
+-
+-## Authorized Control-Plane Insertion
+-
+-- `LOOP1-MIN-001` is independently accepted and `done`: content Review PASS at `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7`, corrected integration Review PASS at clean candidate `fa0099cf2b6cc887d02328b6d433eb4f66147320`, and local-main post-merge verifiers PASS. The accepted integration Review closure is `09cac596ca527fa80b187c63e5beb8308e946762`; durable evidence is under `spec/progress/evidence/LOOP1-MIN-001/` and the stable checkpoint below.
+-- Earlier integration candidate `b1a6e13dd044a80e42055c5e02278785df9c0a13` remains independently rejected with permanent findings. The Human later approved the exact Coordinator Recorder paths, then a fresh Fix and a different fresh independent Reviewer closed those findings; this did not retroactively change the FAIL result.
+-- `LOOP1-CONTRACT-001` is independently accepted and in `done` at closure `2a3812e0b4a23157ecd6fe341f0011ca96390229`. Its original worktree and untracked `contracts/http/schema-lint/` remain under their original ownership, untouched by this integration.
+-- The Human requested that final local `main` include additions from `task/LOOP1-MIN-001`. Local `main` safely fast-forwarded from `e5482b135a2ab7451c24c29c7517e1a8f19ce420` to independent PASS closure `09cac596ca527fa80b187c63e5beb8308e946762`, containing both the MIN lineage and accepted Contract closure; clean post-merge verification passed. No remote push occurred.
++Current Stage: S1 remediation 1/4
++Current Gate: LOOP1-ARCH-REMEDIATION
++Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate remains open)
++Current Batch: LOOP1-ARCH-REMEDIATION
++Current Task: LOOP1-ARCH-REMEDIATION-001
++Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
+-- Human Architect authorized a temporary Research Recorder control-plane insertion on 2026-09-21. `LOOP1-CONTRACT-001` is now `done` under ADR-0001: independent content review passed candidate `d46ce5a`, and later Human-authorized run-local Git transport preserved all Recorder output hashes in a clean committed checkout. S0 Gate remains NOT YET PASSED.
+-- The Minimality candidate `c18ec53e65e297f2e8b7eba4c3e2a9ba686a84b7` passed fresh independent content review after two documented FAIL/Fix cycles; later integration PASS and clean local-main post-merge checks completed the separate merge acceptance requirement.
+-- `LOOP1-RESEARCH-001` is independently accepted at Recorder candidate `ab3b507241cf51822af79cbcb63dfdf40e273359`; schema `1.0.0` Instrumentation Epoch begins at `2026-09-21T07:34:40.0170021Z`. Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
+-- `LOOP1-CTRL-001` and `LOOP1-CTRL-002` are `done`.
+-- `LOOP1-SPEC-001` is `done`; fresh independent Review Agent `/root/spec001_review4` accepted reviewed commit `aef6497d6216d9a8251250d157935e7af418d86b` from a clean detached isolated checkout under ADR-0001.
+-- The independent review passed the 9-file/84-rule materialization verifier, CTRL-002 Acceptance mode, and baseline diff check; all eight disposable negative controls were rejected.
+-- Durable acceptance evidence: `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
+-- Accepted checkpoint: `spec/progress/checkpoints/2026-09-20-loop1-spec-001-accepted.md`.
+-- Fresh independent Review Agent `/root/contract001_review` reviewed `LOOP1-CONTRACT-001` commit `1c2637cb253dc6eece0393c229fe77cd5934160e` from a clean detached isolated checkout and returned FAIL. Durable evidence is `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-independent-review-1c2637c-fail.md`.
+-- Fix Agent `/root/contract001_fix` repaired all review findings at candidate commit `12c566f71da9b038764ecb7a5303b116e77ca32f`; development verification passed from that clean committed checkout, but this is not acceptance.
+-- Fresh independent Review Agent `/root/contract001_resume_review` resumed under Recorder run `R-20260921T080248Z-b5e568c3-afdd-4f81-8ef7-5c3d236e16f4` and returned FAIL on candidate `12c566f71da9b038764ecb7a5303b116e77ca32f`. A disposable negative control removed OpenAPI 3.1-required `info.title`, but the committed verifier still returned PASS.
+-- Durable FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`.
+-- Fresh Fix Agent `/root/contract001_schema_fix` added deterministic repository-contained OpenAPI 3.1 structural schema lint and a missing-`info.title` regression at candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc`. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-fix-5d1d165-development.md`; Recorder run `R-20260921T083334Z-f24d9caf-e49d-4678-a2d8-f05c6481190b`.
+-- Fresh independent Review Agent `/root/contract001_schema_rereview` reviewed closure `9290139b918e76a0f0310b646ec7a9c6433c91a1` under Recorder run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905` and returned FAIL. Durable evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-5d1d165-fail.md`.
+-- The Human authorized Task-linked Recorder prompt/run paths on 2026-09-23. The Coordinator validated both preserved Review runs and recorded the exact authorization at `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-recorder-path-authorization.md`.
+-- Fresh Fix Agent `/root/contract001_complete_oas_lint_fix` committed candidate `272bb28`, replacing the narrow bespoke schema with an offline validator generated from the pinned official OAI OpenAPI 3.1 structural schema and adding nine structural negative regressions. Development evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-fix-272bb28-development.md`; Recorder run `R-20260923T034702Z-a877284a-a16d-4848-9d8f-164c2833b74a`.
+-- Fresh independent Review Agent `/root/contract001_official_oas_review` completed substantive Review PASS at clean detached closure `d46ce5a9e6ee7a7a080e0a574189b090135abdb5`, but acceptance closure was initially stopped when staging revealed 35 of 142 unredacted Recorder output blobs changed SHA-256 under Git normalization. The automatic approval reviewer rejected a post-validation attribute change and prohibited an alternate bypass. Provisional evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-d46ce5a-pass.md`. The later Human-authorized transport correction and committed acceptance are recorded below.
+-- The Human later explicitly approved the exact run-local transport attribute. Its preserved Recorder package was committed at `4b4cb4a15f17025cb92531d24e39f84816d973fa`. Clean committed detached validation returned PASS for both Review and linked closure runs (149 and 12 events), with 142/142 and 6/6 output blobs matching SHA-256. Independent acceptance evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-acceptance-closure.md`. Accepted checkpoint: `spec/progress/checkpoints/2026-09-23-loop1-contract-001-accepted.md`.
+-- The accepted Contract closure defines 9 canonical Auth/User/Friend HTTP operations, 15 shared error codes with operation/status bindings and complete negative coverage, fixture version `1.1`, 6 positive and 21 negative dual-profile scenarios, and a deterministic verifier with 15 committed mutation regressions.
+-
+-## Current Blockers
+-
+-- Hosted CI run `36515716353` failed CTRL-002 Acceptance with nonempty Git status, but its log omitted the entries. The exact cause awaits the diagnostic workflow run. The prior external-access block was resolved by explicit Human approval of the reviewed `f07e353` push. Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-github-run-36515716353-fail.md`.
+-
+-- No current `LOOP1-MIN-001` blocker. The prior integration FAIL remains permanent evidence; the later Human authorization did not retroactively turn that review into PASS.
+-- No current `LOOP1-CONTRACT-001` blocker. Its prior Recorder Git-transport rejection and subsequent explicit Human authorization remain documented; the accepted closure preserves original run event/output bytes.
+-- Private-repository branch protection remains unavailable on the current GitHub plan; this is a known non-blocking external limitation.
+-
+-## Verification
++User-authorized four-stage remediation takes precedence over further business work. Full canonical architecture audit and minimal normative repairs are locally verified and pending independent review on task/LOOP1-ARCH-REMEDIATION, isolated worktree H:/.codex/worktrees/architecture-remediation/IM-platform. Stages 2-4 remain backlog. No product code changed in stage 1.
+ 
+-- Command: `C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest discover -s tests/ci -v`
+-  - Result: Fix 3 development PASS, 12/12 tests, exit 0. CTRL-002 Development also exited 0; neither is independent acceptance.
+-  - Evidence: `spec/progress/evidence/LOOP1-CI-001/2026-09-29-fix3-diagnostic-development.md`
++## Recovery relationship
+ 
+-- Infra independent Review 1: `pwsh -NoProfile -File tests/infrastructure/smoke.ps1 -Profile go` and `-Profile java` each exited 0 from a clean detached checkout (30,202 ms and 17,467 ms); `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`, implementation Recorder validation, profile isolation probe, and `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` each exited 0. Exact commands and results are in the linked review evidence.
+-- Fix 2 Recorder-wrapped checks: `python contracts/websocket/verify.py` PASS, exit `0`, 93 ms (8 positive, 10 negative, 11 schema and 12 behavior controls); committed rereview mutation probe PASS, exit `0`, 94 ms (12/12 rejected); `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development` PASS, exit `0`, 1641 ms. Exact command IDs and limitations are in the Fix evidence. Development mode is not independent acceptance.
+-- Independent Contract 002 rereview at clean candidate `102b0ef`: WSS verifier and frozen hashes PASS, clean detached CTRL-002 Acceptance PASS; task FAIL because three auth.bind state/output negative controls were accepted. Exact commands, exits, elapsed times, and Recorder validation are in `spec/progress/evidence/LOOP1-CONTRACT-002/2026-09-28-independent-rereview-102b0ef-fail.md`.
+-
+-- Fresh independent integration Review PASS on clean detached `fa0099c` under ADR-0001: Minimality exit `0` in `881.321 ms`, CTRL-002 Acceptance exit `0` in `969.1123 ms`, Contract exit `0` in `6156.5435 ms`, task-owned Recorder validation and protected-path checks PASS. Review Run `R-20260924T021010Z-23d39be1-65fb-4e9c-9851-084b7972aa29` finished PASS with 26 events and passed committed validation; evidence `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-independent-integration-review-fa0099c-pass.md`.
+-- Clean local-main post-merge checks after fast-forward to `09cac596`: Minimality exit `0` in `861.5677 ms`; CTRL-002 Acceptance exit `0` in `916.7036 ms`; Contract exit `0` in `6102.8251 ms`; Recorder repository validation exit `0` in `665.4624 ms`; Contract/MIN ancestry checks exit `0`. Coordinator Run `R-20260924T063710Z-8018f93d-e54c-4772-a738-1027e0c783ac` finished PASS and validated with 27 events, with pre-Run limitations explicitly marked. Exact command IDs and evidence: `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-post-main-merge.md`.
+-- Earlier MIN integration factual Fix: Recorder-wrapped Minimality verifier PASS (exit `0`, 907.53 ms after final edits); CTRL-002 Development PASS (exit `0`, 991.7274 ms); accepted Contract verifier PASS (exit `0`, 6108.3547 ms); tracked-source `git diff --check` PASS (exit `0`, 34.69 ms). Run `R-20260924T015550Z-a800f61f-4e6a-4d26-9eb0-1802f7594bb2` finished `PASS` with 18 events and passed `validate-run` and repository validation after finish. Exact command IDs and stdout/stderr hashes are in `spec/progress/evidence/LOOP1-MIN-001/2026-09-24-integration-fix-development.md` and the immutable run. These development/instrumentation checks were later superseded for acceptance by the fresh independent PASS above.
+-- Fresh independent content review on clean detached `d46ce5a`: contract verifier exit `0` in `6710.3654 ms`; CTRL-002 default Acceptance exit `0` in `953.4633 ms`; fifteen in-memory structural negatives rejected; official OAI source and LF regenerated validator hashes matched; 20 committed Fix-run output blobs matched. Review Recorder run finished `PASS` and validated with 149 events. After explicit Human authorization, local, staged, and clean committed output-blob SHA audits passed; both Review and closure runs validated from clean detached `4b4cb4a`. Details and exact command IDs are in durable evidence.
+-- Fresh Fix Agent Recorder-wrapped command: `pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`.
+-  - Result: Development PASS, exit `0`, elapsed `6174.1193 ms`; 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, OAI OpenAPI 3.1 structural lint, and 15 total mutation regressions including nine structural negatives.
+-- Fresh Fix Agent Recorder-wrapped command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`.
+-  - Result: Development PASS, exit `0`, elapsed `995.6156 ms`; explicitly non-acceptance evidence. Rebuilding the offline validator with pinned Ajv produced the identical SHA-256; canonical OpenAPI/errors/fixtures diff and committed repair diff checks passed.
+-- Fresh Fix Recorder run `R-20260923T034702Z-a877284a-a16d-4848-9d8f-164c2833b74a` finished as development `PASS`; `validate-run` PASS, 25 events. This is Recorder integrity, not Contract acceptance.
+-- Recorder-wrapped Coordinator verification: CTRL-002 Development PASS; preserved Review runs validate with 103 and 71 events; `git diff --check` PASS. These verify only the governance handoff and Recorder integrity, not Contract acceptance.
+-- Fresh independent Review Agent command through Recorder: `pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`
+-  - Result: PASS on clean detached closure `9290139b918e76a0f0310b646ec7a9c6433c91a1`, exit `0`, elapsed `5915.9704 ms`; 9 operations, 15 error codes, 6 positive and 21 negative fixtures, both profiles, schema lint, and 7 committed regressions.
+-- Fresh independent command through Recorder: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+-  - Result: PASS, exit `0`, elapsed `959.8039 ms`; detached checkout clean and current task recovered as `review`.
+-- Fresh independent disposable negative control: remove required `info.title` and run the contract verifier.
+-  - Result: expected rejection, exit `1`, elapsed `638.5647 ms`.
+-- Fresh independent in-memory structural negative controls: add unknown top-level and `Info` members and replace a Response Object with scalar `42`.
+-  - Result: Review FAIL, exit `1`, elapsed `623.0664 ms`; the alleged OpenAPI 3.1 structural lint accepted all three invalid shapes.
+-- Canonical immutability and scope checks.
+-  - Result: PASS; canonical OpenAPI/errors/fixtures are unchanged by the fix, and the Fix commit changes only the new structural schema and verifier. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-23-independent-review-5d1d165-fail.md`.
+-- Fresh independent Recorder run `R-20260921T085657Z-61a82ea3-f63b-4315-87b2-d090f3f48905`
+-  - Result: finished as `FAIL` and `validate-run` PASS with 71 events. One empty prompt-registration artifact from a PowerShell stdin limitation is preserved and explicitly excluded from the run; the exact prompt is `P-3031f02c-67f1-49c7-b890-295c85627dba`.
+-
+-- Fresh Fix Agent command through Recorder: `& .\contracts\http\verify-auth-user-friend.ps1`
+-  - Result: Development PASS on committed candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc`, exit `0`, elapsed `5858.7081 ms`; OpenAPI 3.1 schema lint and 7 mutation regressions included.
+-- Fresh Fix Agent focused negative control: remove required `info.title` in memory and run the repository structural schema lint.
+-  - Result: Development PASS, exit `0`, elapsed `602.8583 ms`; invalid document rejected.
+-- Fresh Fix Agent command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
+-  - Result: Development PASS, exit `0`, elapsed `907.3632 ms`; explicitly non-acceptance evidence.
+-- Fresh Fix Agent repair/diff checks.
+-  - Result: PASS, exit `0`, elapsed `680.9781 ms`; repair scope is the structural schema plus verifier, and the canonical OpenAPI/errors/fixtures are unchanged. Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-fix-5d1d165-development.md`.
+-
+-- Fresh independent Recorder review command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
+-  - Result: Acceptance PASS, exit `0`; 22 tests in `21.520s`.
+-- Fresh independent commands: default `validate-repository`, CTRL-002 Acceptance, diff/scope/generated-artifact checks, and disposable negative controls for all four permanent blocker classes.
+-  - Result: Acceptance PASS; structured and quoted synthetic secrets produced zero durable secret hits, CI extra-secret evidence was rejected without event append, clean committed copy validated, and prompt hash/cross-link tampering was rejected.
+-  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-ab3b507-pass.md`.
+-- Fresh Fix Agent command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
+-  - Result: Development PASS, exit `0`; 22 tests in `15.305s`, including exact committed-artifact, CRLF manifest portability, prompt hash/cross-link, structured/quoted secret, and CI extra-secret negative regressions.
+-- Fresh Fix Agent command: `& .\tools\research\recorder.ps1 validate-repository`
+-  - Result: Development PASS, exit `0`; the committed bootstrap run and Prompt Registry validate without exemption.
+-- Fresh Fix Agent commands: prompt Git-blob/metadata SHA comparison, CTRL-002 Development mode, diff/scope and `*.pyc` checks.
+-  - Result: Development PASS; prompt SHA values both `a7c3cb691d25fb8fd456c4f544653fc48e881c271ee3e32486f369a9cd08da8f`, governance recovery passes, no product-scope or generated Python artifacts exist.
+-  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-fix-1d850cf-development.md`.
+-- Independent command: `& '<bundled-python-3.12>' -m unittest discover -s tests/research -v`
+-  - Result: PASS, exit `0`; 17 tests in `12.078s`, but the suite did not detect the committed-artifact and structured-secret failures below.
+-- Independent command: `& .\tools\research\recorder.ps1 validate-repository`
+-  - Result: FAIL, exit `2`; committed bootstrap run manifest hash mismatch.
+-- Independent command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+-  - Result: PASS, exit `0`, after removing only reviewer-generated `__pycache__` and re-confirming a clean isolated checkout.
+-- Independent command: `git diff --check 1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc..HEAD -- . ':(exclude)research/runs/**/diff.patch'`
+-  - Result: PASS, exit `0`.
+-- Independent negative controls: structured `password`/`api_key`/`token` events, quoted JSON prompt, and secret-bearing CI extra fields.
+-  - Result: FAIL; all synthetic secret-like values were retained in durable artifacts. The committed prompt file SHA-256 also differs from its metadata.
+-  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-independent-review-96fc13d-fail.md`.
+-- Command: `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- <python3> -m unittest discover -s tests/research -v`
+-  - Result: Development PASS, exit `0`; 17 tests. An earlier FAIL and subsequent repair remain preserved in the append-only bootstrap stream. This is not acceptance.
+-  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`
+-- Command: `& .\tools\research\recorder.ps1 run-command --run-id R-LOOP1-RESEARCH-001-BOOTSTRAP-PARTIAL -- pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+-  - Result: Development PASS, exit `0`; recovery resolved `LOOP1-RESEARCH-001` and checked all queues. This is not acceptance.
+-  - Evidence: `spec/progress/evidence/LOOP1-RESEARCH-001/2026-09-21-development.md`
+-- Command: `& .\contracts\http\verify-auth-user-friend.ps1`
+-  - Result: Fix Agent development PASS on clean committed candidate `12c566f71da9b038764ecb7a5303b116e77ca32f`, exit `0`, elapsed `5280.2464 ms`; 9 paths, 9 operations, 15 error codes, 6 positive and 21 negative scenarios, both profiles, and 6 mutation regressions.
+-- Command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Development`
+-  - Result: Fix Agent development PASS on the clean committed candidate, exit `0`, elapsed `402.055 ms`; explicitly non-acceptance evidence.
+-- Command: `git diff --check e5482b135a2ab7451c24c29c7517e1a8f19ce420..HEAD`
+-  - Result: Fix Agent development PASS, exit `0`, elapsed `40.6779 ms`.
+-  - Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-fix-12c566f-pass.md`
+-- Independent FAIL evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-20-independent-review-1c2637c-fail.md`.
+-- Resumed independent command: `& .\contracts\http\verify-auth-user-friend.ps1`
+-  - Result: PASS on the unmodified candidate, exit `0`, elapsed `6918.3063 ms`.
+-- Resumed independent command: `& .\tools\verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+-  - Result: PASS, exit `0`, elapsed `959.8942 ms`.
+-- Resumed independent negative control: remove OpenAPI 3.1-required `info.title` in a disposable detached candidate checkout, then run `& .\contracts\http\verify-auth-user-friend.ps1`.
+-  - Result: unexpected PASS, exit `0`, elapsed `5981.2862 ms`; schema-lint acceptance FAIL.
+-  - Evidence: `spec/progress/evidence/LOOP1-CONTRACT-001/2026-09-21-independent-review-12c566f-fail.md`.
+-- Accepted `LOOP1-SPEC-001` verification history remains in `spec/progress/evidence/LOOP1-SPEC-001/2026-09-20-independent-review-aef6497-pass.md`.
+-
+-## Changed Files or Migrations
+-
+-- Fix 3 diagnostic candidate changes only `.github/workflows/ci.yml`, the CI Task Spec/current recovery state, task-linked evidence, and Recorder artifacts. It changes no migration, contract, or product behavior.
+-
+-- Infra review adds only task-linked PASS evidence, prompt/Recorder artifacts, and task/current recovery updates. It changes no product file or migration.
+-- Contract 003 Review 2 adds only a task-linked independent negative probe, FAIL evidence, prompt/Recorder run, and Task Spec/current recovery updates; no product contract, schema, migration, runtime or Frozen Architecture file changed.
+-- Contract 003 Fix 1 changes `contracts/plugin-api/verify.py` and README, `contracts/fixtures/sync-plugin/generate.py` and `golden.json`, and adds separate `profile-outcomes/go.json` and `java.json`; task-linked evidence/Recorder and recovery files are updated. No schema, migration, runtime, HTTP/WSS, or Frozen Architecture file changes.
+-- The accepted earlier Research task added the Recorder control plane under `research/**`, `tools/research/**`, and `tests/research/**`. The current integration combines accepted Contract and Minimality lineages and adds task-owned integration Recorder/evidence and recovery-state changes; it adds no IM product implementation.
+-- `contracts/http/auth-user-friend.openapi.json` is the canonical OpenAPI 3.1 Auth/User/Friend contract with separate credential-bound WEB/native refresh operations and operation/status-specific error codes; `contracts/http/verify-auth-user-friend.ps1` cross-validates it with fixtures and runs mutation regressions.
+-- The obsolete `contracts/http/auth-user-friend.openapi.structure.schema.json` was removed. The task verifier now uses `contracts/http/openapi-3.1-2026-08-03.schema.json`, an offline standalone validator, and nine structural negative regressions. OAI's structural schema does not validate all embedded Schema Object content or every prose rule.
+-- `contracts/errors/http-errors.schema.json` defines the shared HTTP error envelope and stable codes.
+-- `contracts/fixtures/auth-user-friend/` defines constrained fixture schema `1.1` plus exact canonical/Go/Java positive and negative golden scenarios.
+-- No database migrations, product implementation, WSS/Sync/Plugin contract, or frozen architecture changes were introduced by `LOOP1-CONTRACT-001`.
+-- `LOOP1-SPEC-001` added three domain inputs, three invariant inputs, three executable S0 contract-check inputs, and their deterministic verifier; the accepted closure adds durable review evidence and a stable checkpoint.
+-- The earlier `LOOP1-SPEC-001` closure introduced no database migrations, machine-verifiable public contract files, product implementation, container images, or fixture versions.
+-- `.github/workflows/` remains absent. Frozen Architecture PDF bytes remain unchanged.
+-- The repair retains durable independent-FAIL and Fix-Agent development evidence; the accepted closure adds the stable Recorder checkpoint.
+-- Recorder repair adds LF-canonical manifest/prompt handling, key-aware recursive redaction, strict CI evidence allowlisting, prompt registry validation, and focused regressions only; it changes no product or contract path.
+-- Independent closure adds only the Research Instrumentation Epoch, durable PASS evidence, accepted checkpoint, Research Task transition to `done`, and recovery-state updates.
++LOOP1-GO-AUTH-001 remains historical done; accepted exact remote head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a and hosted run 36602521287 all ten jobs success. Local inherited 8cd90a7 adds acceptance closure only. Old PASS is valid under old checks and does not cover new requirements. Separate Social candidate/worktree is preserved and is not inherited or advanced. After remediation, Coordinator must reconcile that separate work explicitly before resuming dependency-satisfied business tasks; never blindly select Social because active is empty.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-- Hosted full-matrix run `36532087481` failed the S0 placeholder boundary. Its Gate FAIL remains historical evidence; independent Review 2 and hosted full-matrix run `36545406958` now accept the repair. A new clean-main Gate evaluation is still required.
+-
+-- Hosted CI runs `36515716353` and `36521060867` failed strict clean-checkout Acceptance; the latter identified 17 historical Recorder stdout blobs altered by checkout filters. Fix 4's portable attribute repair passed independent Review 5 in clean clones. A new hosted PASS is still required; no failed run counts as acceptance.
+-
+-- Infra Review 1 found no product defect. Its Upgrade check is an S0 non-business transport probe, not proof of later auth.bind or application WebSocket semantics. The local Caddy CA is development-only.
+-- Contract 003 Review 2 FAIL is permanent: SP-A-002 prior FAILED state and SP-A-006 paginated Query outcome are not asserted; `review2-negative-probe.py` accepts 2/2 invalid mutations. A fresh Fix/Review cycle is required. SP-A-012's S0 static-vector acceptance meaning is the smallest remaining interpretation question; static vectors are not backend-produced results.
+-- Contract 003 Review 1 FAIL remains permanent. Fix 1's static Go/Java outcome vectors are contract baselines initially populated from canonical expectations, not independent backend outputs. The fresh reviewer must decide the S0 interpretation of SP-A-012; development PASS does not close the task.
+-- Recorder candidate `96fc13d5e953a8a926a9295dd82847789ed222fc` remains permanently rejected; its FAIL evidence is retained. Accepted candidate `ab3b507241cf51822af79cbcb63dfdf40e273359` supersedes it for Recorder use.
+-- All activity before the Instrumentation Epoch is bootstrap, retrospective backfill, or pilot evidence and must not be represented as complete prospective trace data.
+-- `1c2637cb253dc6eece0393c229fe77cd5934160e` failed independent review. Its findings, including the hard self-expanded-write-boundary violation, remain permanent evidence.
+-- Candidate `12c566f71da9b038764ecb7a5303b116e77ca32f` is independently rejected because its verifier does not enforce OpenAPI 3.1 structural schema validity. Semantic verification PASS does not override the explicit schema-lint acceptance failure; the task remains `review` and S0 remains NOT YET PASSED.
+-- Fix-Agent development evidence for candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` claimed the missing-`info.title` finding was repaired; the later independent result below supersedes that development conclusion for acceptance.
+-- Candidate `5d1d16561d7671ce54d6456741a51c21f5d3dadc` is independently rejected: its narrow bespoke schema catches missing `info.title` but accepts unknown top-level/`Info` members and a scalar Response Object, so the schema-lint acceptance remains incomplete.
+-- Candidate `272bb28` passed fresh independent review under the ADR-0001 mechanism. The OAI schema intentionally leaves Schema Object contents and some prose requirements outside structural lint; the existing task-specific semantic verifier remains in force.
+-- OpenAPI wire choices use HTTPS `/v1`, JWT bearer access tokens with frozen claims, a required Secure HttpOnly WEB refresh cookie, required native refresh-token/client/device bodies intended for OS secure storage, and idempotent `PUT` friend creation; these are task-authorized wire choices, not changes to frozen semantics.
+-- The Coordinator prospectively authorized the exact durable-evidence path for this repair cycle; that authorization does not retroactively excuse the prior hard violation.
+-- The independent reviews of `74134bd306cbf0a1546f500bc46c45a1217b2d58` and `85069032c137cce6e526e0e329b6e93178515274` remain permanent FAIL records; accepted commit `aef6497d6216d9a8251250d157935e7af418d86b` supersedes them for task acceptance.
+-- ADR-0001's temporary bootstrap acceptance exception expired when operational `LOOP1-CI-001` entered `done` after real GitHub Actions PASS; subsequent applicable task acceptance requires real CI.
+-- All LOOP1-S0 required tasks are `done`; the merged remote-main full matrix and post-integration checklist now pass.
+-- The Auth/User/Friend inputs constrain semantics but intentionally do not select endpoint paths, wire fields, implementation classes, or database tables.
+-
+-## Next Exact Action
+-
+-Activate dependency-satisfied `LOOP1-GO-SOCIAL-001` and delegate its implementation to a fresh Agent. S1 Gate remains NOT YET PASSED.
++- Original frozen architecture verifier PASS with PowerShell 7; Windows PowerShell 5 cannot parse the existing UTF-8 script, so use pwsh.
++- Independent remediation review/CI pending. Complete command history and findings belong in spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/ and linked Recorder, not this file.
++- Recorder R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56 uses prospective_resume with incomplete pre-Recorder trace. Registered visible delegation/approval excerpt is not full Human prompt.
+ 
+ ## Last Known Good Commit
+ 
+-`59d92f39234596a5b66841e8aa2ef7db0bf65e8a` (accepted Go Auth task head on the clean remote task branch; S0 accepted `main` base is `09cec968f64faf0db319aea8d9c21d4fffe8ec49`).
++`59d92f39234596a5b66841e8aa2ef7db0bf65e8a` (historical Auth acceptance); inherited closure 8cd90a7. Neither is acceptance of this remediation.
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-09-30-loop1-go-auth-001-accepted.md` (Go Auth/Session accepted vertical slice; S1 Gate remains open).
++`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage1-candidate.md` (candidate authority transition, not accepted; points to historical Auth checkpoint).
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-- Coordinator owns only Go Auth acceptance evidence, Task Spec queue transition, this recovery update, checkpoint, and linked Recorder artifacts until the documentation closure commit. The reviewed product and workflow-fix commits are clean; original `H:\IM-platform` unknown files remain untouched.
+-
+-- Fresh Fix Agent `/root/go_auth_ci_fix` owns only the workflow-context repair, CI regression, task/current recovery, task-linked development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` unknown files remain untouched.
+-
+-- Coordinator owns only this hosted CI FAIL evidence, Task Spec/current recovery update, linked prompt and Recorder run until the diagnostic closure commit. The reviewed Go Auth product candidate and original `H:\IM-platform` unknown files remain unchanged.
+-- Review 2 closure was committed cleanly at `ab81dd5`; its prior reviewer ownership is closed.
+-
+-- Fix Agent `/root/go_auth_fix1` owns only the Go Auth runtime/test repair, this task/current recovery update, task-linked development evidence, prompt, and Recorder run until a clean candidate commit. No architecture, contracts, migration, Java, client, or original `H:\IM-platform` unknown untracked file was changed.
+-
+-- Coordinator owns only the Go Auth `active` to `review` task/progress transition, linked handoff evidence and Recorder artifacts until this transition is committed. Implementation Agent handed off a clean committed product candidate at `a93569d`; original `H:/IM-platform` unknown untracked files remain untouched.
+-- Implementation Agent `/root/go_auth_impl` owns no uncommitted changes and removed its disposable PostgreSQL/NATS containers and temporary config after verification.
+-
+-- S1 Coordinator owns only the new batch and four task specifications, this recovery update, task-linked activation evidence and Recorder artifacts until the activation commit. The separate original `H:/IM-platform` checkout and its unknown untracked files remain untouched. No S1 product file has changed.
+-- Historical S0 final governance sync ownership below was closed by its clean `main` commit.
+-
+-- Coordinator post-PR integration agent owns only this current-state update, CI Task Spec, S0 Gate evidence/checkpoint, and linked Recorder prompt/run until local commit. Product, architecture, contracts, migration and original `H:/IM-platform` untracked files were untouched. After local commit, no uncommitted changes are expected.
+-
+-- Coordinator closure writer `/root/ci_placeholder_closure` owned only CI task queue move, the then-current recovery update, task-linked hosted evidence, and its prompt/Recorder artifacts until its commit. Review closure `3235996` is committed; no product or original `H:\IM-platform` file was edited here. Generated Python bytecode caches from local tests are owned by this closure run and will be removed before commit.
+-
+-- Fresh independent Reviewer `/root/ci_placeholder_review2` owns only this PASS evidence, Task Spec/current recovery update, prompt, and linked Recorder artifacts until committed. The separate detached Acceptance clone remains clean; no product files were edited by the reviewer.
+-
+-- Fresh Fix Agent `/root/ci_placeholder_fix2` owns only CI checker/classifier, `tests/ci` regressions, CI Task Spec/current recovery, task-linked development evidence, prompt, and Recorder run until the clean candidate commit. No architecture, contract, gate, or original `H:\IM-platform` files were changed.
++Fresh stage-one Implementation Agent /root/stage1_impl is sole writer for authorized stage-one paths and linked control/evidence/Recorder artifacts. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
+ 
+-- Fresh independent Reviewer `/root/ci_placeholder_review` owns only this FAIL evidence, Task Spec/current recovery updates, prompt, and Recorder artifacts until committed in its isolated review worktree. The separate clean Acceptance clone was removed; no product file was modified. Recorder output capture failed on a symlink probe and was disclosed.
+-
+-- Fresh Fix Agent `/root/ci_placeholder_fix` owns only CI boundary checker/workflow, `tests/ci` regressions, CI Task Spec queue/recovery, this current-state update, task-linked development evidence and Recorder prompt/run until the clean candidate commit. No architecture, contract, gate selection, or original `H:\IM-platform` untracked files were touched.
+-
+-- Coordinator owns only this S0 Gate evaluation, checkpoint, CI Task Spec/current recovery update, linked Recorder prompt/run, and generated bytecode cleanup until the Gate evidence commit. The two CI Python bytecode cache directories from local tests were removed after resolved-path containment checks. No product, architecture, public contract, migration, or original-checkout files were edited during Gate evaluation.
+-
+-- Fresh independent Reviewer `/root/ci001_review5` owns only this review's evidence/probe, Task Spec/current recovery edits, and linked prompt/Recorder artifacts until committed. Product CI, contracts, architecture, Acceptance, and gate files remain unchanged; both independent clones are clean. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+-
+-- Fresh Fix Agent `/root/ci001_fix4` committed only two exact Coordinator-authorized historical Recorder transport rules, Task Spec/current recovery, task-linked development evidence, and its own prompt/run. No Fix 4 changes remain uncommitted; historical Recorder blob bytes and original `H:\IM-platform\contracts\http\schema-lint` were untouched.
+-
+-- Fresh Fix Agent `/root/ci001_fix3` owns only the CI workflow diagnostic, task/current recovery, linked evidence, and Recorder prompt/run until candidate commit. No unrelated or original `H:\IM-platform\contracts\http\schema-lint` work was touched.
+-
+-- Fresh independent Reviewer `/root/ci001_review3` owns only Review 3 PASS evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. CI product files and the separate detached Acceptance checkout remain clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
++## Next Exact Action
+ 
+-- Fresh Fix Agent `/root/ci001_fix2` owns only task-allowed classifier/test changes, task/current recovery, task-linked development evidence, prompt, and Recorder artifacts until the candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+-- Fresh independent Reviewer `/root/ci001_review2` owns only task-linked FAIL evidence/probe, task/current recovery edits, prompt, and Recorder artifacts until committed. The separate detached Acceptance checkout remains clean at `f508750`; original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
+-- Fresh Fix Agent `/root/ci001_fix1` includes only task-linked development evidence, task/current recovery edits, prompt, and Recorder artifacts in the final candidate commit; no fix-owned uncommitted changes remain at handoff. The separate detached verification checkout is clean. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under another Agent's ownership.
++Delegate a new independent Review Agent for the committed stage-one candidate, then applicable real hosted CI. Do not start stage two or claim batch/S1 Gate PASS.
+ 
+-- Fresh Implementation Agent `/root/ci001_impl` owns only task-allowed CI classifier/workflow/tests, CI Task Spec/current recovery, task-linked development evidence, prompt and Recorder artifacts until candidate commit. Generated `ci/__pycache__` was verified and removed. Original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
+-- Fresh independent Reviewer `/root/infra001_review1` owns only task-linked PASS evidence, Task Spec/current recovery, prompt and Recorder artifacts until committed. Product files and the separate detached Acceptance checkout remain clean; original `H:\IM-platform\contracts\http\schema-lint` was untouched.
+-- Fresh Implementation Agent `/root/infra001_impl` owns only task-allowed Compose/TLS, Go/Java non-business placeholders, infrastructure smoke, task/current recovery, development evidence, and linked Recorder artifacts until committed as a clean candidate. The original `H:\IM-platform\contracts\http\schema-lint` belongs to the paused Agent and was untouched.
+-- Coordinator `/root` owns only Infra queue activation, task/current recovery update, and task-linked activation Recorder evidence until committed. No product infrastructure path is changed; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
+-- Coordinator `/root` owns only DB local-main integration evidence, the linked Recorder prompt/run, and recovery update until committed. Local `main` is clean at the accepted DB closure; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's ownership and untouched.
+-- Coordinator `/root` owns only DB `done` queue transition, accepted checkpoint/evidence, current recovery update, and linked Recorder closure artifacts until committed. All DB migration/runner/test files are clean at the independently reviewed candidate; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+-- Fresh independent Reviewer `/root/db001_review1` owns only task-linked PASS evidence and probe, Task Spec/current recovery, and linked prompt/Recorder artifacts until committed. The separate detached Acceptance checkout is clean at `a9c491d`; no product schema, runner, test, or original `H:\IM-platform\contracts\http\schema-lint` file was touched.
+-- Coordinator `/root` owns only the DB review queue transition, current/task recovery update, disposable test environment, and task-linked Recorder handoff artifacts until committed. The implementation candidate is clean; the original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+-- Fresh DB Implementation Agent `/root/db001_impl` owns only task-allowed database schema/runner/tests, Task Spec/current recovery, development evidence, and task-linked prompt/Recorder run until its candidate commit. The original `H:\IM-platform\contracts\http\schema-lint` remains untouched under the paused Agent's ownership.
+-- Coordinator `/root` owns only DB task queue activation, Task Spec/current recovery updates, and task-linked Recorder activation artifacts until committed. No DB schema or migration file has changed. The original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+-- Coordinator `/root` owns only Contract 003 local-main integration evidence, current/checkpoint/task recovery update, and linked Recorder integration artifacts until committed. Accepted Contract 003 product files and local `main` are clean; original `H:\IM-platform\contracts\http\schema-lint` remains under the paused Agent's sole ownership and untouched.
+-- Fresh independent Reviewer `/root/contract003_review3` owns only task-linked PASS evidence, an independent negative probe, Task Spec/current recovery updates, prompt and Recorder run until committed. It changed no product contract or runtime file. The separate detached Acceptance checkout remains clean at `15b2477`; original `H:\IM-platform\contracts\http\schema-lint` was untouched.
+-- Fresh Fix Agent `/root/contract003_fix2` owns only task-allowed contract, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until a clean candidate commit. Original `H:\IM-platform\contracts\http\schema-lint` was untouched.
+-- Fresh independent Reviewer `/root/contract003_review2` owns only task-linked FAIL evidence/probe, Task Spec/current recovery update, prompt and Recorder artifacts until review closure commit. No product contract file changed. The separate detached Acceptance checkout is clean at `56c14b1`; original `H:\IM-platform` HTTP schema-lint was untouched.
+-- Fresh Fix Agent `/root/contract003_fix1` owns only task-allowed verifier, fixture, README, task/current recovery, development evidence, and linked Recorder prompt/run until the clean candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory belongs to another agent and was untouched.
+-- Fresh independent Reviewer `/root/contract003_review1` owns only task-linked FAIL evidence/probe, task/current recovery updates, prompt and Recorder run until review closure is committed. It changed no product contract file. The separate detached Acceptance checkout remains clean at candidate `9a14f63`. The original `H:\IM-platform` untracked HTTP schema-lint directory was not accessed.
+-- Coordinator `/root` owns only the Contract 003 review queue transition, current/task recovery update, and linked Recorder handoff artifacts until the transition commit. The fresh Implementation Agent committed its clean candidate and owns no uncommitted changes. The original `H:\IM-platform` untracked HTTP schema-lint directory remains solely owned by the paused Agent and untouched.
+-- Coordinator `/root` completed Contract 003 queue activation in the clean activation commit; Implementation Agent ownership of the candidate is recorded above.
+-- Coordinator `/root` owns only Contract 002 closure evidence, queue/progress transition, checkpoint, and task-linked Recorder artifacts until committed. Local `main` is clean; the original checkout's unrelated untracked HTTP schema-lint directory remains under its paused Agent's ownership and untouched.
+-- Fresh independent Reviewer `/root/contract002_portability_review` owns only task-linked PASS evidence, byte-integrity audit, task/current recovery updates, and linked Recorder artifacts until the review closure commit. No product file was edited. The separate detached Acceptance checkout remains clean.
++## Current Blockers
+ 
+-- Fresh Fix Agent `/root/contract002_portability_fix` owns only the fixture-local transport rule, committed checkout regression, Task Spec/current recovery updates, task-linked development evidence, and Recorder prompt/run until the clean review-candidate commit. The original `H:\IM-platform` untracked HTTP schema-lint directory remains untouched.
+-- Coordinator owns only the Contract 002 post-main-merge FAIL evidence, correction from `done` back to `review`, current recovery update, and linked Recorder artifacts until committed. No product contract file is uncommitted. Clean local `main` contains the failed integration at `4d27d56`; repair will move forward after fresh Fix/Review.
+-- Coordinator owns only the Contract 002 `done` transition, acceptance evidence, checkpoint, current recovery update, and linked Recorder artifacts until committed; no product contract file is uncommitted. Original `H:\IM-platform` untracked `contracts/http/schema-lint/` remains owned by the paused Agent and untouched.
+-- Fresh Fix Agent `/root/min001_integration_fix` and fresh independent Reviewer `/root/min001_integration_review2` each handed off clean committed isolated worktrees; neither owns pending product changes.
+-- Coordinator's final MIN task/progress/evidence/checkpoint closure and its task-owned Recorder artifacts are committed on the isolated integration branch, with no pending uncommitted integration work. Local `main` was advanced by safe fast-forward in a separate clean worktree, not by changing the original task checkout.
+-- The original paused Agent retains sole ownership of untracked `contracts/http/schema-lint/` in `H:\IM-platform`; this merge did not read, modify, copy, stage, or depend on it.
+-- Both Fix Agents and the third independent Reviewer handed off clean committed isolated worktrees. The Coordinator owns only the task `done` transition, post-merge evidence, checkpoint, current recovery update, and post-merge Recorder artifacts on local `main` until committed. The interrupted second-review worktree remains untouched.
+-- Fresh independent Reviewer `/root/contract002_review2` committed the task-authorized FAIL evidence, probe, Recorder run, and recovery updates on the isolated Contract 002 branch; no pending reviewer changes remain. Product files remain at reviewed candidate `102b0ef`. The original checkout's untracked HTTP schema-lint directory belongs to the paused Agent and was not accessed.
+-- Fresh Fix Agent `/root/contract002_fix2` owns the WSS verifier fix and its task-linked evidence, Recorder prompt/run, Task Spec, and current-state update until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
+-- Fresh independent Reviewer `/root/contract002_review3` owns only the broad negative-control probe, FAIL report, task/current recovery update, and task-linked Recorder artifacts until its review closure commit; no product file was changed. The clean detached Acceptance checkout remains at candidate `1da1b40` and clean. The original checkout's untracked HTTP schema-lint directory was not accessed.
+-- Fresh Fix Agent `/root/contract002_fix3` owns the WSS verifier repair, task/current recovery updates, and task-linked evidence/Recorder artifacts until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
+-- Fresh independent Reviewer `/root/contract002_review4` owns only task-linked FAIL evidence, its negative-control probe, Recorder artifacts, and recovery updates until its review closure commit. It changed no product contract file. Its detached Acceptance checkout remains clean at `cb24c4c`. The original checkout's untracked HTTP schema-lint directory was not accessed.
+-- Fresh Fix Agent `/root/contract002_fix4` owns the WSS premise-verifier repair, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. The original checkout's untracked HTTP schema-lint directory was not accessed.
++No unresolved substantive architecture choice found in the audited scope. Independent Review and applicable hosted CI are pending. Stage-three product structural checks do not yet exist; original Go layout remains a known stage-four implementation deviation.
+ 
+-- Fresh independent Reviewer `/root/contract002_review5` owns only the focused probe, FAIL evidence, task/current recovery updates, and task-linked Recorder artifacts until its review closure commit; no product contract file was changed. Detached Acceptance checkout remained clean at `d89d4f5`. Original untracked HTTP schema-lint directory was untouched.
++## Verification
+ 
+-- Fresh Fix Agent `/root/contract002_fix5` owns only the WSS verifier fix, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. Original untracked HTTP schema-lint directory was untouched.
++- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1 -BaseCommit 8cd90a7`
++  - Result: PASS locally, including 4 integrity test methods and semantic/hash negative controls; not independent acceptance.
++  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/development.md`
+ 
+-- Fresh Fix Agent `/root/contract002_fix6` owns only the WSS verifier fix, task/current recovery updates, and task-linked development evidence/Recorder artifacts until the clean review-candidate commit. Original untracked HTTP schema-lint directory was untouched.
++## Changed Files or Migrations
+ 
+-- Fresh independent Reviewer `/root/contract002_review7` owns only independent PASS evidence, two focused review probes, task/current recovery updates, and task-linked Recorder artifacts until the review closure commit. No product contract file was changed; the detached Acceptance checkout remains clean. Original untracked HTTP schema-lint directory was untouched.
++Canonical architecture, baseline/resolver, new ADR-0003, integrity verifier/tests, serial batch/four tasks, this recovery and linked evidence/Recorder only. No database migration, public contract or product implementation changed.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-- ADR-0002 records Human-approved representation-only canonical-source migration; no Product Architecture semantic change is authorized. ADR-0001 remains the temporary independent-acceptance mechanism until `LOOP1-CI-001` is operational and `done`.
++ADR-0003 implements bounded Human-approved conflict resolution; v1.1 normative tightening is distinct from ADR-0002's historical representation-only migration. Full conflict/coverage ledger is in current task evidence. ADR-0001 bootstrap acceptance remains expired.
+diff --git a/tools/verify-frozen-architecture.ps1 b/tools/verify-frozen-architecture.ps1
+index 7a122b1..2e7d962 100644
+--- a/tools/verify-frozen-architecture.ps1
++++ b/tools/verify-frozen-architecture.ps1
+@@ -1,131 +1,31 @@
+ [CmdletBinding()]
+ param([string]$BaseCommit = '')
+-
+ $ErrorActionPreference = 'Stop'
+-$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+-$manifestPath = Join-Path $root 'spec/architecture/baseline.md'
+-$manifest = Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath
+-$errors = [System.Collections.Generic.List[string]]::new()
+-
+-function Field([string]$name) {
+-    $m = [regex]::Match($manifest, '(?m)^- ' + [regex]::Escape($name) + ':\s*`([^`]+)`\s*$')
+-    if (-not $m.Success) { $errors.Add("Missing manifest field: $name"); return '' }
+-    return $m.Groups[1].Value.Trim()
+-}
+-function Sha([string]$relative, [string]$expected, [string]$label) {
+-    $path = Join-Path $root $relative
+-    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { $errors.Add("Missing $label`: $relative"); return }
+-    $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLowerInvariant()
+-    if ($actual -ne $expected.ToLowerInvariant()) { $errors.Add("$label SHA-256 mismatch: $relative actual=$actual expected=$expected") }
+-}
+-
+-$format = Field 'canonical_format'
+-$canonical = Field 'repository_path'
+-$hash = Field 'sha256'
+-$previousFormat = Field 'previous_canonical_format'
+-$previous = Field 'previous_repository_path'
+-$previousHash = Field 'previous_sha256'
+-$migration = Field 'migration_type'
+-$semantic = Field 'semantic_change'
+-$taskId = Field 'migration_task_id'
+-if ($format -ne 'markdown' -or $canonical -ne 'spec/architecture/frozen-architecture.md') { $errors.Add('Active canonical source must be the one Frozen Architecture Markdown.') }
+-if ($previousFormat -ne 'pdf' -or $previous -ne 'scalable-distributed-im-architecture.pdf') { $errors.Add('Historical PDF identity mismatch.') }
+-if ($canonical -eq $previous) { $errors.Add('Active and previous canonical paths cannot be equal.') }
+-if ($hash -notmatch '^[0-9a-fA-F]{64}$' -or $previousHash -notmatch '^[0-9a-fA-F]{64}$') { $errors.Add('Both SHA-256 fields must be 64 hexadecimal characters.') }
+-if ($hash -eq $previousHash) { $errors.Add('Markdown and PDF hashes must be separate actual values.') }
+-if ($migration -ne 'representation_only' -or $semantic -ne 'false' -or $taskId -ne 'LOOP1-ARCHDOC-001') { $errors.Add('Representation-only migration metadata mismatch.') }
+-Sha $canonical $hash 'Canonical Markdown'
+-Sha $previous $previousHash 'Historical PDF'
+-function Get-StructuralErrors([string]$doc) {
+-    $issues = [System.Collections.Generic.List[string]]::new()
+-    $fence = [string]::new([char]96, 3)
+-    if ($doc -match '(?m)^## 原 PDF 第 \d+ 页\s*$' -or ([regex]::Matches($doc, '(?m)^' + [regex]::Escape($fence) + 'text\s*$')).Count -ge 20) {
+-        $issues.Add('Canonical document is a page-fenced PDF text layout.')
+-    }
+-    foreach ($chapter in 0..21) {
+-        if ($doc -notmatch "(?m)^## $chapter\. \S") { $issues.Add("Missing native Markdown chapter $chapter.") }
+-    }
+-    foreach ($appendix in @('A','B')) {
+-        if ($doc -notmatch "(?m)^## 附录 $appendix\. \S") { $issues.Add("Missing native Markdown appendix $appendix.") }
+-    }
+-    $links = [regex]::Matches($doc, '(?m)^\s*- \[[^\]]+\]\(#([a-z0-9-]+)\)')
+-    $anchors = [regex]::Matches($doc, '(?m)^<a id="([a-z0-9-]+)"></a>$')
+-    $linkIds = @($links | ForEach-Object { $_.Groups[1].Value })
+-    $anchorIds = @($anchors | ForEach-Object { $_.Groups[1].Value })
+-    if ($linkIds.Count -lt 80 -or $linkIds.Count -ne $anchorIds.Count) { $issues.Add('Clickable table of contents is incomplete.') }
+-    if (@($linkIds | Sort-Object -Unique).Count -ne $linkIds.Count -or @($anchorIds | Sort-Object -Unique).Count -ne $anchorIds.Count) {
+-        $issues.Add('Table-of-contents anchors are not unique.')
+-    }
+-    foreach ($id in $linkIds) {
+-        if ($id -notin $anchorIds) { $issues.Add("TOC target missing: $id") }
+-    }
+-    $mermaid = [regex]::Matches($doc, '(?ms)^' + [regex]::Escape($fence) + 'mermaid\r?\n(.*?)^' + [regex]::Escape($fence) + '\s*$')
+-    if ($mermaid.Count -ne 9) { $issues.Add("Expected nine readable Mermaid figures; found $($mermaid.Count).") }
+-    $stageFigure = [regex]::Match($doc, '(?ms)^## 15\..*?^' + [regex]::Escape($fence) + 'mermaid\r?\n(.*?)^' + [regex]::Escape($fence))
+-    if (-not $stageFigure.Success) { $issues.Add('Missing Loop 1 stage figure 15-1.') }
+-    else {
+-        $stageGraph = $stageFigure.Groups[1].Value
+-        if (([regex]::Matches($stageGraph, 'Gate PASS')).Count -ne 7 -or ([regex]::Matches($stageGraph, '-->')).Count -ne 6) {
+-            $issues.Add('Figure 15-1 must retain seven stage Gate PASS labels and six progression arrows.')
+-        }
+-        foreach ($stage in 0..6) {
+-            if ($stageGraph -notmatch ('S' + $stage + '\["[^"\r\n]*<br/>Gate PASS"\]')) {
+-                $issues.Add("Figure 15-1 is missing the Gate PASS label for S$stage.")
+-            }
+-        }
+-    }
+-    foreach ($figure in @('0-1','3-1','4-1','5-1','6-1','9-1','12-1','14-1','15-1')) {
+-        if ($doc -notmatch [regex]::Escape("图 $figure")) { $issues.Add("Missing figure caption $figure.") }
+-    }
+-    if (([regex]::Matches($doc, '(?m)^\s*NATS --> PG\s*$')).Count -ne 2) {
+-        $issues.Add('Repeated deployment figures must retain the original NATS to PostgreSQL arrow.')
+-    }
+-    if (([regex]::Matches($doc, '(?m)^\| [^|]+ \|')).Count -lt 100) {
+-        $issues.Add('Native Markdown architecture tables are incomplete.')
+-    }
+-    return $issues
+-}
+-$architecture = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'spec/architecture/frozen-architecture.md')
+-foreach ($issue in @(Get-StructuralErrors $architecture)) { $errors.Add($issue) }
+-# In-memory controls reject the prior layout, a lost index entry, and missing figures.
+-$fence = [string]::new([char]96, 3)
+-$oldLayoutMutant = ((1..28 | ForEach-Object { '## 原 PDF 第 ' + $_ + ' 页' + [Environment]::NewLine + $fence + 'text' + [Environment]::NewLine + 'PDF text' + [Environment]::NewLine + $fence }) -join [Environment]::NewLine)
+-if (@(Get-StructuralErrors $oldLayoutMutant | Where-Object { $_ -match 'page-fenced' }).Count -eq 0) {
+-    $errors.Add('Structural negative control accepted the old page-fenced layout.')
+-}
+-$missingTocMutant = $architecture -replace '(?m)^\s*- \[0\. 执行摘要\]\(#section-0\).*\r?\n', ''
+-if (@(Get-StructuralErrors $missingTocMutant).Count -eq 0) {
+-    $errors.Add('Structural negative control accepted a missing clickable TOC entry.')
+-}
+-$fence = [string]::new([char]96, 3)
+-$missingDiagramMutant = $architecture.Replace($fence + 'mermaid', $fence + 'text')
+-if (@(Get-StructuralErrors $missingDiagramMutant).Count -eq 0) {
+-    $errors.Add('Structural negative control accepted missing Mermaid diagrams.')
+-}
+-$missingFinalGateMutant = $architecture.Replace('W11-12<br/>Gate PASS', 'W11-12')
+-if (@(Get-StructuralErrors $missingFinalGateMutant | Where-Object { $_ -match 'Figure 15-1' }).Count -eq 0) {
+-    $errors.Add('Structural negative control accepted missing S6 Gate PASS in Figure 15-1.')
+-}
+-
+-$candidates = @(Get-ChildItem -LiteralPath (Join-Path $root 'spec/architecture') -File -Filter '*.md' | Where-Object { $_.Name -notin @('README.md','baseline.md') })
+-if ($candidates.Count -ne 1 -or $candidates[0].Name -ne 'frozen-architecture.md') { $errors.Add('Canonical Markdown path is not unique.') }
+-$index = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'spec/architecture/README.md')
+-$agents = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'AGENTS.md')
+-$handoff = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'spec/handoff/agent-context.md')
+-$adr = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'spec/architecture/decisions/ADR-0002-frozen-architecture-canonical-markdown-migration.md')
+-if ($index -notmatch 'canonical Markdown' -or $agents -notmatch 'canonical Frozen Architecture Markdown' -or $handoff -notmatch 'canonical Frozen Architecture Markdown') { $errors.Add('Governance must route future Agent recovery to Markdown.') }
+-if ($adr -notmatch 'Architect-approved' -or $adr -notmatch 'representation-only') { $errors.Add('Approved representation-only ADR is missing.') }
+-if ($index -notmatch 'historical PDF' -or $manifest -notmatch 'historical snapshot') { $errors.Add('PDF historical status is not explicit.') }
+-if ($BaseCommit) {
+-    & git -C $root cat-file -e "$BaseCommit^{commit}" 2>$null
+-    if ($LASTEXITCODE -ne 0) { $errors.Add("Base commit does not exist: $BaseCommit") }
+-    else {
+-        $changed = @(& git -C $root diff --name-only $BaseCommit HEAD -- contracts backend clients plugins)
+-        $changed += @(& git -C $root diff --name-only -- contracts backend clients plugins)
+-        $changed += @(& git -C $root diff --cached --name-only -- contracts backend clients plugins)
+-        if (@($changed | Where-Object { $_ }).Count -gt 0) { $errors.Add("Product contracts/implementation changed: $($changed -join ', ')") }
+-    }
+-}
+-if ($errors.Count) { $errors | ForEach-Object { Write-Error $_ }; exit 1 }
+-Write-Output "PASS: canonical Markdown=$canonical sha256=$hash; historical PDF=$previous sha256=$previousHash; semantic_change=false"
+-exit 0
++$python = $null
++$prefix = @()
++foreach ($name in @('python3', 'python')) {
++    $candidate = Get-Command $name -ErrorAction SilentlyContinue
++    if ($candidate) {
++        $version = & $candidate.Source --version 2>&1
++        if ($version -match '^Python 3\.') { $python = $candidate.Source; break }
++    }
++}
++if (-not $python) {
++    $launcher = Get-Command py -ErrorAction SilentlyContinue
++    if ($launcher) {
++        $version = & $launcher.Source -3 --version 2>&1
++        if ($version -match '^Python 3\.') { $python = $launcher.Source; $prefix = @('-3') }
++    }
++}
++if (-not $python) {
++    $bundled = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
++    if (Test-Path -LiteralPath $bundled -PathType Leaf) { $python = $bundled }
++}
++if (-not $python) { throw 'Frozen architecture verification requires Python 3.' }
++$arguments = @((Join-Path $PSScriptRoot 'verify_frozen_architecture.py'))
++if ($BaseCommit) { $arguments += @('--base-commit', $BaseCommit) }
++& $python @prefix @arguments
++if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
++# Negative controls are part of this integrity entry point, not optional CI coverage.
++& $python @prefix -B -m unittest discover -s (Join-Path $PSScriptRoot '../tests/architecture') -v
++exit $LASTEXITCODE
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-ddf5a00c-27a1-412c-ad9b-2305e1aad734/metadata.json
+# ?? research/prompts/P-ddf5a00c-27a1-412c-ad9b-2305e1aad734/prompt.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-1c7e427a-1625-4108-ae15-610ae030067c.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-1c7e427a-1625-4108-ae15-610ae030067c.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-291f2b0a-cf07-4f4c-ab0a-3ae5d7d2ffff.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-291f2b0a-cf07-4f4c-ab0a-3ae5d7d2ffff.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-3e0d003f-8661-4322-811e-7a14054a219e.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-3e0d003f-8661-4322-811e-7a14054a219e.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-451d10b1-8647-48be-91b6-c1532c78c738.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-451d10b1-8647-48be-91b6-c1532c78c738.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-5d26e23a-6c65-43a5-b05f-a0301573e244.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-5d26e23a-6c65-43a5-b05f-a0301573e244.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-6760a62c-ce78-4ab2-ba16-e2c1924e0e3b.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-6760a62c-ce78-4ab2-ba16-e2c1924e0e3b.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-6c9a7245-6f4a-4e87-baa2-e82bf1a49a27.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-6c9a7245-6f4a-4e87-baa2-e82bf1a49a27.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-7030ee29-8de2-4488-8239-fe6761c90f05.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-7030ee29-8de2-4488-8239-fe6761c90f05.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-7a0b41fb-8391-40c0-a84d-e07667e796f0.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-7a0b41fb-8391-40c0-a84d-e07667e796f0.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-80ce0336-c409-47cf-90c4-12001405d1b1.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-80ce0336-c409-47cf-90c4-12001405d1b1.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-812f631f-c6ef-45c8-82d7-a525147533ca.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-812f631f-c6ef-45c8-82d7-a525147533ca.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-8e091358-89b1-4f42-872f-cfa492bde6f9.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-8e091358-89b1-4f42-872f-cfa492bde6f9.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-9bd1a90d-70ff-4f95-bae2-a52782a00ae7.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-9bd1a90d-70ff-4f95-bae2-a52782a00ae7.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-c073edc6-43cc-429e-b2a4-65715d530a1a.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-c073edc6-43cc-429e-b2a4-65715d530a1a.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-d14d3e42-514c-4b1b-a3a0-f6dc8f25af06.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-d14d3e42-514c-4b1b-a3a0-f6dc8f25af06.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-d2440ed3-e8a6-49c8-8c62-04c1faaa4e25.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-d2440ed3-e8a6-49c8-8c62-04c1faaa4e25.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-ee77dc2f-0dde-4283-88a0-2e0cbf962744.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-ee77dc2f-0dde-4283-88a0-2e0cbf962744.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-f21f2a7e-c9ae-42f4-9dc0-082c8c6fd1dd.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-f21f2a7e-c9ae-42f4-9dc0-082c8c6fd1dd.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-f56dbed5-f9e8-4bba-9886-6df606a1dfa3.stderr.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/blobs/C-f56dbed5-f9e8-4bba-9886-6df606a1dfa3.stdout.txt
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/events.jsonl
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/initial_state.json
+# ?? research/runs/R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56/metadata.json
+# ?? spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md
+# ?? spec/batches/LOOP1-ARCH-REMEDIATION.md
+# ?? spec/progress/checkpoints/2026-09-30-architecture-remediation-stage1-candidate.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/conflict-ledger.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/development.md
+# ?? spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-002.md
+# ?? spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-003.md
+# ?? spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md
+# ?? spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md
+# ?? tests/architecture/test_frozen_architecture.py
+# ?? tools/verify_frozen_architecture.py

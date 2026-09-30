@@ -1,0 +1,10 @@
+--- FAIL: TestCanonicalAuthHTTPFixtures (7.81s)
+    --- FAIL: TestCanonicalAuthHTTPFixtures/token-in-query-rejected (0.00s)
+        contract_fixture_test.go:304: body.error.message: got "Authentication material is not permitted in query parameters.", want fixture "Authentication material is forbidden in query parameters."
+    --- FAIL: TestCanonicalAuthHTTPFixtures/invalid-client-type (0.00s)
+        contract_fixture_test.go:304: body.error.message: got "Login fields are invalid.", want fixture "clientType is invalid."
+    --- FAIL: TestCanonicalAuthHTTPFixtures/refresh-client-type-mismatch (0.00s)
+        contract_fixture_test.go:304: body.error.message: got "Refresh token has been revoked.", want fixture "Refresh credential does not belong to the declared client type."
+FAIL
+FAIL	im-platform/backend/go	13.256s
+FAIL

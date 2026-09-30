@@ -1,0 +1,805 @@
+# Auth, User, and Friend Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-001`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| AUF-D-001 | A user MUST have exactly three login slots: WEB, DESKTOP, and MOBILE; at most one Session for a given user and client type may be valid at a time. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-002 | Sessions for different client types MAY be valid concurrently for the same user. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-003 | A new login for the same user and client type MUST revoke the previous Session and advance the session epoch in one transaction. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-004 | PostgreSQL MUST remain authoritative for login state; Gateway memory is only an online-connection and routing cache. | Architecture Baseline v1.0, chapters 2 (F-03), 4.1, and 7.3. |
+| AUF-D-005 | A friendship MUST be represented by one normalized unordered user pair, so `(A,B)` and `(B,A)` denote the same friendship. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-D-006 | Adding a friend in Loop 1 MUST immediately establish the bidirectional friendship and create or reuse the pair's single DIRECT Conversation in the same transaction. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-D-007 | Loop 1 MUST NOT introduce a friend-request approval flow. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-D-008 | A successful explicit logout MUST revoke the Session and Refresh Token and close its WSS connection; it MUST NOT be specified as deletion of local client history. | Architecture Baseline v1.0, chapter 7.1. |
+| AUF-D-009 | Production authentication transport MUST use HTTPS/WSS/TLS; tokens MUST NOT be accepted from a URL query or written to logs or traces, and error responses MUST NOT reveal token material. | Architecture Baseline v1.0, chapter 7.4. |
+# Messaging Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-002`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| MSG-D-001 | A client request identity MUST be unique within a Conversation and is the identity reused by retry and local convergence. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-D-002 | The server idempotency identity MUST include sender, Conversation, and client request identity; the server message identity MUST be globally unique. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-003 | Conversation sequence numbers MUST be unique and monotonically increasing within each Conversation. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-004 | Message send MUST authorize the sender as a Conversation member before persistence. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-D-005 | Sequence allocation, Message persistence, and the matching Outbox event MUST commit atomically; a successful ACK MUST mean that durable commit has completed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message, Outbox). |
+| MSG-D-006 | Outbox delivery and NATS delivery MAY repeat or be briefly missed; consumers MUST be idempotent and Sync MUST provide eventual completeness. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-D-007 | Gateway MUST fan out only to locally active connections and MUST NOT own friendship, membership, persistence, or plugin business rules. | Architecture Baseline v1.0, chapters 2 (F-05) and 5.2. |
+| MSG-D-008 | A GROUP send MUST create one logical Message and one Outbox event; it MUST NOT create one persistent message record per member. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-D-009 | Loop 1 MUST NOT treat NATS JetStream as the message source of truth. | Architecture Baseline v1.0, chapters 2 (F-03) and 5.2. |
+# Sync and Plugin Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-003`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| SP-D-001 | Web MUST remain memory-only and MUST NOT claim offline history; Desktop and Mobile MUST use per-account local materialized views and render local state before background Sync. | Architecture Baseline v1.0, chapters 2 (F-07) and 6.1, and appendix B (Web). |
+| SP-D-002 | A local optimistic send MUST create one client request identity, persist SENDING before transmission, converge to SENT after ACK, and reuse the same request identity when retrying FAILED. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-D-003 | SENT MUST be terminal and MUST NOT regress to FAILED; FAILED means only that the current attempt lacks success confirmation. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-D-004 | User Sync cursor MUST cover only low-frequency user-level state; message state MUST use per-Conversation sequence and contiguous sequence tracking. | Architecture Baseline v1.0, chapters 2 (F-06) and 6.4, and appendix B (Sync). |
+| SP-D-005 | Sync MUST advance a per-Conversation contiguous sequence only across a gap-free prefix; duplicate and out-of-order input MUST converge without skipping a gap. | Architecture Baseline v1.0, chapter 6.4 and appendix B (Sync). |
+| SP-D-006 | All local send, ACK, realtime, and Sync write paths MUST converge through transactional upsert; data and cursor advancement MUST commit together. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-D-007 | Plugin API v1 MUST expose Events, Queries, Actions, and UI Host surfaces, each constrained by declared capability and permission. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-D-008 | Queries MUST be read-only, paginated, and limited; each Action MUST be re-authorized, idempotent, and audited; plugins MUST NOT call Core internals or databases directly. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-D-009 | A custom renderer MUST pass package hash, signature, manifest-schema, API-compatibility, permission, resource-size, CSP, and entry-point checks before loading, and MUST run in the stated UI sandbox. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-D-010 | A plugin artifact identified by plugin and version MUST be immutable; backend and renderer MUST remain version-bound, and history MUST retain the renderer needed by referenced messages plus fallback text. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-D-011 | WASM execution MUST default-deny database, server-file, arbitrary-network, and other-plugin-memory access and MUST enforce CPU/time, memory, concurrency, storage, and network limits. | Architecture Baseline v1.0, chapter 8.3 and appendix B (Plugin). |
+| SP-D-012 | Plugin artifact lifecycle and Conversation-scoped instance lifecycle MUST remain distinct; upgrade MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed, and MUST roll back on failure. | Architecture Baseline v1.0, chapters 9.1 and 9.2. |
+| SP-D-013 | DISABLE MUST preserve data, UNINSTALL MUST default to RETAINED, and PURGE MUST require an explicit irreversible operation with elevated permission, audit, and a confirmed retention policy. | Architecture Baseline v1.0, chapter 9.3. |
+# Auth, User, and Friend Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| AUF-I-001 | A contract MUST make it impossible to represent more than one valid Session for the same user and client type. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-I-002 | Same-slot relogin MUST invalidate the old epoch before the new Session is accepted; an old token MUST NOT reconnect successfully. | Architecture Baseline v1.0, chapters 4.1, 7.2, and 7.3, and appendix B (Session). |
+| AUF-I-003 | WSS MUST remain UNAUTHENTICATED until auth.bind succeeds and MUST permit only auth.bind plus ping/pong in that state. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-004 | Authenticated WSS state MUST bind user, Session, and client type, and a same-slot revocation MUST produce session.revoked before connection close. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-005 | Friendship identity MUST be order-independent, and one normalized pair MUST map to one friendship and one DIRECT Conversation. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-I-006 | Friendship creation, DIRECT Conversation creation or reuse, both memberships, Sync events, and Outbox effects MUST form one atomic outcome. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-I-007 | Authentication secrets MUST NOT be exposed through query parameters, logs, traces, or error responses. | Architecture Baseline v1.0, chapter 7.4. |
+# Messaging Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| MSG-I-001 | Repeating a send with the same server idempotency identity MUST converge on the same logical Message and MUST NOT allocate another Conversation sequence. | Architecture Baseline v1.0, chapters 4.4 and 5.1. |
+| MSG-I-002 | A successful message ACK MUST NOT be observable before the Message and matching Outbox event are durably committed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-I-003 | Every committed logical Message MUST have exactly one logical Outbox event, even when publication delivery is retried. | Architecture Baseline v1.0, chapters 4 (Figure 4-1), 5.1, and 5.2. |
+| MSG-I-004 | No recipient MUST receive a Message for the wrong Conversation, and no permanent sequence gap may remain after Sync convergence. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-I-005 | Duplicate NATS delivery MUST NOT create a duplicate logical Message or duplicate client materialization. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-I-006 | A send by a non-member MUST be rejected before persistence and before a success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-I-007 | GROUP fan-out MUST remain an online delivery concern and MUST NOT alter the single-Message, single-Outbox persistence outcome. | Architecture Baseline v1.0, chapter 5.3. |
+# Sync and Plugin Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| SP-I-001 | Duplicate or out-of-order Sync input MUST be idempotent, and contiguous sequence MUST NOT advance across a missing sequence. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-I-002 | When Sync observes a server Message matching a locally FAILED send identity, it MUST converge that local item to SENT rather than create another item. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-I-003 | Local materialized data and its corresponding cursor or contiguous-sequence advance MUST commit atomically. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-I-004 | User-level cursor input MUST NOT contain Message events. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-I-005 | Plugin capability or permission denial MUST prevent the Event subscription, Query, Action, or UI behavior without granting an alternate direct access path. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-I-006 | Query operations MUST NOT mutate state; each Action MUST be re-authorized at execution, MUST be idempotent, and MUST be auditable. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-I-007 | A changed package, backend, or renderer hash under an existing plugin version MUST be rejected. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-I-008 | WASM and custom-renderer execution MUST remain sandboxed with least privilege and MUST NOT directly reach host-sensitive resources. | Architecture Baseline v1.0, chapters 8.2 and 8.3, and appendix B (Plugin). |
+| SP-I-009 | Upgrade MUST NOT split backend and renderer versions and MUST leave the previous version serviceable until atomic switch; any failed step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-I-010 | DISABLE and UNINSTALL MUST NOT purge retained data; PURGE MUST NOT occur implicitly. | Architecture Baseline v1.0, chapter 9.3. |
+---
+task_id: LOOP1-ARCH-REMEDIATION-003
+title: Enforce architecture in CI and independent review
+status: backlog
+owner: unassigned
+stage: S1 remediation 3/4
+gate: LOOP1-ARCH-REMEDIATION
+---
+
+# Goal
+
+Enforce architecture in CI and independent review within the explicitly authorized four-stage remediation.
+
+# Inputs
+
+- User four-stage instruction; approval-and-recovery evidence for stage 1.
+- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+
+# Dependencies
+
+- LOOP1-ARCH-REMEDIATION-002 independently accepted bounded deliverable; no blocking architecture decision.
+
+# Allowed Paths
+
+- `ci/**`
+- `.github/workflows/**`
+- `tests/ci/**`
+- `tests/architecture/**`
+- `tools/** only architecture/constraint verification`
+- `spec/acceptance/** only checker and review rules`
+- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/**`
+- `spec/progress/checkpoints/*architecture-remediation*.md`
+- `research/prompts/** and research/runs/** only this task-linked artifacts`
+
+User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+
+# Acceptance
+
+Positive controls and negatives catch root business source, forbidden service imports, shared-to-service imports, invalid active Task paths, missed governance triggers, and original Go layout. Go import graph and stage-appropriate Java fixtures are exercised. Exact root whitelist, backend-specific placeholder exits, rename/delete handling, required job missing/skip/failure/cancellation fail Gate. Report expected old-Go failures without grandfathering. Independent reviewer validates checker effectiveness before stage 4.
+
+# Forbidden
+
+- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+- No Go/Java product implementation edits.
+- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+
+# Minimality
+
+Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+
+# Verification
+
+- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+
+# Evidence
+
+- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/ (pending independent acceptance).
+
+# Handoff
+
+- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+
+# Next Action
+
+- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+---
+task_id: LOOP1-ARCH-REMEDIATION-004
+title: Migrate Go responsibility packages and regress
+status: backlog
+owner: unassigned
+stage: S1 remediation 4/4
+gate: LOOP1-ARCH-REMEDIATION
+---
+
+# Goal
+
+Migrate Go responsibility packages and regress within the explicitly authorized four-stage remediation.
+
+# Inputs
+
+- User four-stage instruction; approval-and-recovery evidence for stage 1.
+- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+
+# Dependencies
+
+- LOOP1-ARCH-REMEDIATION-003 independently accepted bounded deliverable; no blocking architecture decision.
+
+# Allowed Paths
+
+- `backend/go/**`
+- `tests/go/**`
+- `tests/ci/** only migration regression`
+- `deploy/** only existing role/build/config adaptation`
+- `ci/** and .github/workflows/** only recursive Go verification and regression activation`
+- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/**`
+- `spec/progress/checkpoints/*architecture-remediation*.md`
+- `research/prompts/** and research/runs/** only this task-linked artifacts`
+
+User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+
+# Acceptance
+
+Publish actual before/after file/responsibility migration map, preserve Core Auth writes and narrow Gateway validation, minimize shared support and exported interfaces. Recursive formatting/build/vet/unit/race, live migrated PostgreSQL/NATS integration and canonical fixtures, register/login/three slots/replacement/epoch/refresh/logout/bind/revocation/close/rollback/security, each role startup/routes/events, Compose/TLS smoke, all structural checks. Explicit test enable conditions; skipped integration is unexecuted. Fresh final independent review and hosted CI exact head/jobs; close batch only after all criteria.
+
+# Forbidden
+
+- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+- No copied/modified canonical fixture expectations, mass export of internals, deleted tests, or moving full Auth into shared.
+- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+
+# Minimality
+
+Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+
+# Verification
+
+- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+
+# Evidence
+
+- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (pending independent acceptance).
+
+# Handoff
+
+- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+
+# Next Action
+
+- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+# Whole-document audit coverage and conflict ledger
+
+Scope: actual canonical frozen-architecture.md v1.0 at inherited 8cd90a7, all chapters 0-21, every subsection, both appendices, tables, code/tree examples, all nine Mermaid diagrams/captions, MUST/MUST NOT/SHOULD/MAY language and references. The full file was read in successive non-overlapping slices, not only searched for directory examples. Original document SHA ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91. Current version/hash are in the baseline manifest.
+
+Compared against both approved historical ADRs, baseline/resolver, Minimality Contract, all current domain/invariant/acceptance documents, canonical HTTP/WSS/database/Sync/plugin schema and policy/readmes, actual Agent/handoff/current/task template/Auth done task and S1 batch, plus existing architecture verifier. Canonical machine rules and fixture verifiers are rerun; no contract or fixture bytes changed.
+
+## Coverage (including areas with no determinate defect)
+
+| Area | Inspection and outcome |
+| --- | --- |
+| status/front matter/TOC | Current vs original date/version and PDF provenance, normative keywords, authority link; C03/C25. Retain chapter and appendix anchors. |
+| §0 summary, diagram, scope table | C03/C04; 100k future vs current 5k consistent, no capacity rewrite. |
+| §1.1-1.3 goals/non-goals | Correctness vs capacity, 12-week budget, Loop2/N+1/Redis/Kafka scope consistent; no speculative change. |
+| §2 F-01..F-10 and 2.1/2.2 | C03 and bounded approval/current-body process. No contract/security authority reversal. |
+| §3 figure and 3.1-3.3 | C04/C08/C09/C10; independent roles do not force module/binary duplication. |
+| §4 figure and 4.1-4.4 | C06/C07. Friend/direct atomicity and normalized pair, group idempotency, three distinct message identities consistent with canonical schema. Client conversation/request and server sender/conversation/request keys serve different roles; NOT treated as a conflict or changed. |
+| §5 figure and 5.1-5.3 | C05; commit/Outbox sequence, duplicate publication, Sync recovery, one logical group message consistent. No ACK/reliability redesign. |
+| §6 figure and 6.1-6.4 | C11. FAILED/SENT terminality, same-transaction cursor, account SQLite, user-vs-conversation cursor and realtime crossing consistent; no cursor change. |
+| §7.1-7.4 | C12/C13; cookie/native token storage, logout/local-history distinction, TLS unchanged. |
+| §8.1-8.3 package example/API table | C08 context; exact host bridge/default-deny/capability permissions and immutable renderer hashes consistent with policy. Package-tree indent cosmetic only, not false normative conflict. |
+| §9 figure and 9.1-9.4 | C14/C15; install/upgrade snapshot/old service/backend-renderer atomicity/Echo/Poll unchanged. |
+| §10 tree and 10.1 | C01/C02; source and support exceptions require actual explicit rules. Control-plane directory responsibilities retained. |
+| §11.1-11.4 | C01; contract uniqueness/equivalence/golden vectors/migration component and expand-contract consistent. Go reference does not authorize Java inheriting illegal Go layout. |
+| §12 figure and 12.1-12.3 | C01/C16/C17; allowed_paths not exemption, current task branch/serial migration bounded. |
+| §13.1-13.3 | C18; handoff/checkpoint facts retained, current history moved out of recovery presentation but historical Git and evidence unchanged. |
+| §14 figure and 14.1-14.4 | C19/C20/C21; compatibility scope retained, independent CI and fresh Review both required. |
+| §15 diagram/table/execution policy | Seven stage progression gates and milestone-not-calendar consistent; stage delivery is distinct from overall batch/product Gate. No scope acceleration. |
+| §16.1-16.4 | 8C/16GB/3TB, five authenticated stages, real TLS, per-profile reports and zero correctness redlines consistent. Soak/SLO concrete values delegated to future acceptance, not invented here and not current Auth acceptance criteria. |
+| §17.1-17.5 | Immutable promotion, version windows, migration/rollback/forward-fix and incident criteria consistent. No release or destructive action authorized by audit. |
+| §18.1-18.4 | C22/C23. Readiness/degraded/liveness and alert levels are future full-platform rules, not claim of present implementation. |
+| §19 table | C24; task plan not actual status. Old done historical tasks not rewritten. |
+| §20/20.1 | Dependencies and Java parity scope consistent; C24 interpretation. Java Sync after S2 does not require premature Go/Java business now. |
+| §21.1-21.3 | Fresh independent Review clarified; existing stop conditions and empty-repo bootstrap remain conditional examples. |
+| appendix A | Existing stage goals retained; applicable architecture/dependency/final head CI evidence added to general checklist. |
+| appendix B | C03/C20 summarized consistently; other invariant summaries unchanged. |
+
+No unresolved equal-authority substantive architecture choice was found in this audit scope. This is an implementation audit conclusion pending independent Review, not self-acceptance. Future implementation or review can identify additional issues. No claim that every possible defect is mechanically proved absent.
+
+## Findings
+
+All C findings below are repaired in the current body/manifest/checker candidate; independent Review is PENDING for each. I01 remains an explicit implementation deviation for stage 4, and D01 remains ordered downstream work for stages 2/3; neither is hidden or accepted as a permanent exception. Exact locations use stable actual sections/rule identifiers rather than line numbers that move during revision.
+
+### C01
+
+- Locations / conflicting rules: §3.1, §10 tree, §11.2 versus §12.1 root internal/message,outbox.
+- Category: Internal conflict / example ambiguity.
+- Impact: Go/Java ownership; future task generation.
+- Authority: F-05 and §3.1 service responsibilities; explicit Human source-boundary instruction.
+- Resolution: §10 SRC-01..07, §11 constrained internal variation, Core task paths; root assembly/tests/build and shared support enumerate limits.
+- Normative semantic change: yes: executable ownership tightened.
+- Downstream: Agent/spec tasks (stage 2), source/import checker (3), Go migration (4).
+- Verification: §10/§12 structural mutation; independent source-boundary review.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C02
+
+- Locations / conflicting rules: §10 overview.md/service-boundaries.md versus ADR-0002 resolver/canonical source.
+- Category: Approved ADR not reflected.
+- Impact: all Agents discover competing authority.
+- Authority: ADR-0002 and current architecture README/baseline.
+- Resolution: tree names actual resolver, baseline and sole frozen Markdown.
+- Normative semantic change: no product change.
+- Downstream: stage 2 references.
+- Verification: unique canonical artifact check.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C03
+
+- Locations / conflicting rules: §2.2 omits current frozen body; §0/appendix B unqualified sole contracts authority.
+- Category: Cross-document authority ambiguity.
+- Impact: all Agent and contract interpretation.
+- Authority: AGENTS authority order, ADR-0002, §11.1.
+- Resolution: rank body plus approved ADR first; contracts sole machine-verifiable public source, no reverse-authoring.
+- Normative semantic change: governance clarification.
+- Downstream: Agent/handoff/review (2).
+- Verification: resolver and independent prose review.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C04
+
+- Locations / conflicting rules: §0/§3 diagrams NATS->PG versus F-03, §5.1/.2.
+- Category: Internal diagram conflict; historical representation artifact.
+- Impact: runtime/deployment interpretation; verifier.
+- Authority: Core transactional persistence and Outbox/NATS/Gateway existing rules.
+- Resolution: replace arrow with NATS->Gateway, retain PDF unchanged and explain historical arrow.
+- Normative semantic change: no product semantics change.
+- Downstream: integrity verifier (1).
+- Verification: both chapter-bound directed edge negatives.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C05
+
+- Locations / conflicting rules: §5 figure Gateway membership, Core->Sender ACK, Bus->Receiver versus F-05/§5.1/.2.
+- Category: Internal diagram conflict.
+- Impact: Gateway/Core security responsibility and ACK delivery.
+- Authority: contracts/websocket README; MSG-D-004/007, MSG-I-002/006.
+- Resolution: Core authorizes; commit precedes Core->Gateway->Sender; dispatcher and Gateway fanout explicit.
+- Normative semantic change: no product semantics change.
+- Downstream: source migration/review (4).
+- Verification: membership, early ACK, direct ACK and fanout negative controls.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C06
+
+- Locations / conflicting rules: §4 figure 1:1+ Message/Outbox versus §5.3, MSG-I-003, DB logical-event uniqueness.
+- Category: Internal diagram conflict.
+- Impact: message reliability / future implementations.
+- Authority: one logical message.created Outbox per Message; retries are deliveries.
+- Resolution: diagram states one logical message.created, not one publication attempt.
+- Normative semantic change: no product semantics change.
+- Downstream: none beyond reviewer.
+- Verification: cardinality mutation.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C07
+
+- Locations / conflicting rules: §4 User 0..3 diagram/UNIQUE shorthand versus §4.1 valid slots and contracts/database slot rows.
+- Category: Example ambiguity.
+- Impact: Session validation and DB interpretation.
+- Authority: contracts/database README/0001 schema; AUF-D-001..004.
+- Resolution: label active slots, describe current one row per slot and rotation; do not create history design.
+- Normative semantic change: no DB change.
+- Downstream: none.
+- Verification: slot negative control and contract verification.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C08
+
+- Locations / conflicting rules: §3.1 plugin-host blanket DB/file/network ban versus §8 controlled Host bridge and plugin_kv.
+- Category: Subject ambiguity.
+- Impact: plugin host versus untrusted WASM security.
+- Authority: F-08, §8.1/.3, plugin policy/default-deny resources.
+- Resolution: ban untrusted WASM direct access and Core authorization bypass, describe controlled bridge without granting new capability.
+- Normative semantic change: no security boundary change.
+- Downstream: future plugin task inputs (2).
+- Verification: independent review against policy-v1.json.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C09
+
+- Locations / conflicting rules: §3.2/§3.3 internal variation and optional processes versus three physical deployment units.
+- Category: Normative gap.
+- Impact: Go/Java deployment and build choices.
+- Authority: §3.1, existing separate roles, Human prohibition of mandatory three modules/binaries.
+- Resolution: independently startable roles may reuse one artifact; service boundary retained.
+- Normative semantic change: clarification, no required new infrastructure.
+- Downstream: stage 2 tasks, stage 4 role smoke.
+- Verification: independent review; role smoke stage4.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C10
+
+- Locations / conflicting rules: §3.3 all test traffic through TLS versus unit/isolated integration §14.
+- Category: Scope ambiguity.
+- Impact: testing and false acceptance.
+- Authority: §16 and S1 E2E actual entry; §14 test layers.
+- Resolution: scope real entry to deployment/E2E/load/release, isolated tests cannot substitute.
+- Normative semantic change: no acceptance weakening.
+- Downstream: acceptance/checklists (2/3).
+- Verification: review stage-specific verification.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C11
+
+- Locations / conflicting rules: §6.2 unconditional SQLite sequence versus §6.1 Web memory only.
+- Category: Example applicability ambiguity.
+- Impact: client parity.
+- Authority: F-07; SP-D-001..006.
+- Resolution: limit persistent sequence to Desktop/Mobile; Web memory convergence.
+- Normative semantic change: no client semantics change.
+- Downstream: future client tasks (2).
+- Verification: independent whole-section review.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C12
+
+- Locations / conflicting rules: §7.1 /auth/login and snake_case example versus canonical /v1/auth/login/camelCase wire.
+- Category: Cross-document example ambiguity.
+- Impact: HTTP client/SDK implementation.
+- Authority: contracts/http/auth-user-friend.openapi.json and §11.1.
+- Resolution: point to canonical path/fields; classify snake_case as domain names.
+- Normative semantic change: no wire change.
+- Downstream: none.
+- Verification: HTTP verifier; independent canonical comparison.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C13
+
+- Locations / conflicting rules: §7.3 eventually cannot reconnect versus AUF-I-002 and WSS authoritative bind.
+- Category: Temporal ambiguity.
+- Impact: stale-token auth and Gateway/Core coupling.
+- Authority: §4.1/.7.2 and canonical WSS authority check.
+- Resolution: require each new bind/reconnect authoritative ID+epoch; Gateway validates, Core owns all Auth writes/outbox.
+- Normative semantic change: no auth behavior change; ownership clarified.
+- Downstream: stage 2 rules, phase4 interface migration.
+- Verification: WSS contract verifier; live integration later.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C14
+
+- Locations / conflicting rules: §9 single Artifact->Instance lifecycle chain versus caption/§9.1/.2 and SP-I-009.
+- Category: Internal diagram conflict.
+- Impact: plugin lifecycle state modelling.
+- Authority: artifact immutable identity and separate Conversation instance.
+- Resolution: separate subgraphs with prerequisite edge, preserve lifecycle requirements.
+- Normative semantic change: no lifecycle contract change.
+- Downstream: future plugin task source (2).
+- Verification: separate state-machine negative control.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C15
+
+- Locations / conflicting rules: §9 purge deletion versus §8.2 historical renderer retention.
+- Category: Scope ambiguity.
+- Impact: historical plugin rendering.
+- Authority: SP-D-010, SP-I-010, canonical purge requirements.
+- Resolution: purge cannot remove renderer still required by history.
+- Normative semantic change: no new retention policy.
+- Downstream: future plugin acceptance (2).
+- Verification: independent policy and history review.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C16
+
+- Locations / conflicting rules: §12 diagram review/failure->complete->handoff versus independent governance.
+- Category: Internal workflow conflict.
+- Impact: review independence/recovery.
+- Authority: AGENTS batch protocol; Human fresh contexts.
+- Resolution: fresh Implementation/Fix/Review, FAIL returns Test+new Review, PASS proceeds applicable CI.
+- Normative semantic change: yes: executable independence clarified.
+- Downstream: Agent/review checklists (2), CI (3).
+- Verification: review/CI failure shortcut mutations.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C17
+
+- Locations / conflicting rules: §12 done unconditional CI wording omits ADR-0001 bounded bootstrap and expiration.
+- Category: Approved ADR not reflected.
+- Impact: historical acceptance interpretation.
+- Authority: ADR-0001; CI task done.
+- Resolution: state exact temporary condition and current expiration; no reuse.
+- Normative semantic change: no current waiver.
+- Downstream: stage2 governance.
+- Verification: expiration check and independent ADR review.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C18
+
+- Locations / conflicting rules: §13 active empty -> ready first and active-task recovery versus exact current task governance.
+- Category: Cross-document conflict.
+- Impact: task skipping and lost review.
+- Authority: AGENTS mandatory startup; Human exact current.
+- Resolution: unique exact ID across queues, resume real state, dependency-driven next selection.
+- Normative semantic change: yes: enforce existing recovery.
+- Downstream: current fixed now; entry/template sync2.
+- Verification: recovery shortcut mutation and CTRL-002.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C19
+
+- Locations / conflicting rules: §14 serial classifier diagram and only public contract expansion versus table shared SDK/DB.
+- Category: Internal graph/caption conflict.
+- Impact: CI missing or overtriggered jobs.
+- Authority: §14.1 existing path matrix.
+- Resolution: independent Go/Java/shared classification, shared trigger semantics retained.
+- Normative semantic change: no compatibility requirement change.
+- Downstream: classifier/workflow stage3.
+- Verification: independent branch graph check.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C20
+
+- Locations / conflicting rules: §14 lacks architecture/Agent/template/checker triggers and required-job outcomes.
+- Category: Normative gap.
+- Impact: Markdown skips and false CI Gate.
+- Authority: F-10; Human CI requirements.
+- Resolution: governance branch to structural Gate; explicit missing/skip/fail/cancel and head SHA checks.
+- Normative semantic change: yes: executable enforcement tightened.
+- Downstream: phase3 checks and negatives.
+- Verification: disconnected trigger/Gate negative controls; real workflow tests phase3.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C21
+
+- Locations / conflicting rules: §14.3 v1/v2/HEAD immediate matrix versus current v1 skeleton/stage5.
+- Category: Stage scope ambiguity.
+- Impact: premature fake versions/false parity.
+- Authority: §15 stage gates; existing canonical v1 only.
+- Resolution: future complete matrix remains required; early exact fixture/placeholders cannot claim complete acceptance.
+- Normative semantic change: no compatibility change.
+- Downstream: phase2 task/acceptance, phase3 stage-aware checks.
+- Verification: independent stage review.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C22
+
+- Locations / conflicting rules: §18.1 token default not collected versus §7.4 absolute prohibition.
+- Category: Internal normative conflict.
+- Impact: secret exposure.
+- Authority: AUF-I-007, §7.4, canonical HTTP/WSS.
+- Resolution: token prohibited in logs/trace, message body default unchanged.
+- Normative semantic change: no security change.
+- Downstream: review checklist (2).
+- Verification: token-prohibition mutation.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C23
+
+- Locations / conflicting rules: §18.3 pre-auth auth.bind/ping versus §7.2 ping/pong.
+- Category: Internal omission.
+- Impact: WSS implementer interpretation.
+- Authority: AUF-I-003, canonical WSS.
+- Resolution: include pong.
+- Normative semantic change: no wire change.
+- Downstream: none.
+- Verification: WSS verifier.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C24
+
+- Locations / conflicting rules: §19 list ordering / §20 task text versus actual dependency/queue state.
+- Category: Example ambiguity.
+- Impact: resumption and stage progression.
+- Authority: AGENTS dependency satisfaction; §12 ready conditions.
+- Resolution: list is planning not current queues; do not choose by filename/table order.
+- Normative semantic change: no business scope change.
+- Downstream: phase2 batch/task references.
+- Verification: CTRL-002 and independent dependency review.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### C25
+
+- Locations / conflicting rules: baseline migration_type=representation_only and verifier historical arrow/figure counts versus authorized current semantic tightening.
+- Category: Historical representation binding conflict.
+- Impact: all revisions and integrity CI.
+- Authority: ADR-0002 unchanged historical scope; Human new revision approval.
+- Resolution: separate historical metadata/hashes and current semantic_change=true; actual hash plus graph/flow structure and negative controls.
+- Normative semantic change: yes current revision, old migration unchanged.
+- Downstream: phase3 invoke and trigger integrity checker.
+- Verification: actual hash/PDF/semantic mutation tests; full structure negative suite.
+- Status / independent review: REPAIRED IN CANDIDATE; independent Review PENDING.
+
+### I01
+
+- Locations / conflicting rules: backend/go root auth.go/gateway.go/outbox.go versus clear §3 responsibilities.
+- Category: Implementation deviation ONLY.
+- Impact: Go package and Gateway full auth coupling.
+- Authority: §3 F-05; SRC rules clarify already required responsibility.
+- Resolution: do not legalize existing code; defer actual migration to ordered stage4 after effective checks.
+- Normative semantic change: no architecture accommodation.
+- Downstream: phase3 expose original violations; phase4 migration.
+- Verification: future Go source/import negative fixture and final live regression.
+- Status / independent review: REGISTERED; ordered downstream stage pending; independent Review PENDING.
+
+### D01
+
+- Locations / conflicting rules: AGENTS/handoff/template/backlog tasks/LOOP1-S1 and CI do not yet cite current SRC rules.
+- Category: Downstream synchronization work.
+- Impact: new Agents/Java source tasks/review.
+- Authority: stage1 current body and explicit four-stage sequence.
+- Resolution: register for stage2 then stage3; no product compliance claim.
+- Normative semantic change: downstream only.
+- Downstream: phase2 named paths; phase3 tests.
+- Verification: new Agent recovery review and effective checker tests.
+- Status / independent review: REGISTERED; ordered downstream stage pending; independent Review PENDING.
+
+
+## Fresh independent Review 2026-09-30
+
+Reviewer /root/stage1_review independently read full body/diff and authority inputs, accepted C01-C25 locally at a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. This append records current review without rewriting the candidate findings or their original pending facts. Each C finding: independent local Review PASS; hosted CI acceptance PENDING. I01/D01: downstream stages pending, not waived. Exact commands/negative controls/limitations: independent-review-pass.md; new Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2.
+[CmdletBinding()]
+param(
+    [ValidateSet('Acceptance', 'Development')]
+    [string]$Mode = 'Acceptance'
+)
+
+$ErrorActionPreference = 'Stop'
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$failures = [System.Collections.Generic.List[string]]::new()
+$queueNames = @('backlog', 'ready', 'active', 'review', 'done')
+
+function Add-Failure([string]$message) {
+    $failures.Add($message)
+}
+
+function Require-File([string]$relativePath) {
+    if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $relativePath) -PathType Leaf)) {
+        Add-Failure "Missing required file: $relativePath"
+        return $false
+    }
+    return $true
+}
+
+function Get-Section([string]$content, [string]$heading) {
+    $pattern = "(?ms)^# $([regex]::Escape($heading))\s*\r?\n(.*?)(?=^# |\z)"
+    $match = [regex]::Match($content, $pattern)
+    if (-not $match.Success) { return '' }
+    return $match.Groups[1].Value
+}
+
+function Get-CurrentSection([string]$content, [string]$heading) {
+    $pattern = "(?ms)^## $([regex]::Escape($heading))\s*\r?\n(.*?)(?=^## |\z)"
+    $match = [regex]::Match($content, $pattern)
+    if (-not $match.Success) { return '' }
+    return $match.Groups[1].Value
+}
+
+function Invoke-Git([string[]]$arguments, [string]$purpose) {
+    $output = @(& git -C $repoRoot -c core.excludesFile=.git/info/exclude @arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        Add-Failure "Unable to inspect git $purpose (exit $LASTEXITCODE): $($output -join ' ')"
+    }
+    return $output
+}
+
+$coreFiles = @(
+    'AGENTS.md',
+    'spec/handoff/agent-context.md',
+    'spec/progress/current.md',
+    'spec/tasks/TASK_TEMPLATE.md',
+    'spec/architecture/README.md'
+)
+$coreFiles | ForEach-Object { [void](Require-File $_) }
+foreach ($queue in $queueNames) {
+    if (-not (Test-Path -LiteralPath (Join-Path $repoRoot "spec/tasks/$queue") -PathType Container)) {
+        Add-Failure "Missing task queue: spec/tasks/$queue"
+    }
+}
+
+$agents = if (Test-Path -LiteralPath (Join-Path $repoRoot 'AGENTS.md')) { Get-Content -Raw (Join-Path $repoRoot 'AGENTS.md') } else { '' }
+$orderedRules = @(
+    'spec/handoff/agent-context.md',
+    'spec/progress/current.md',
+    'Current Task',
+    'spec/tasks/{review,active,ready,backlog,done}/',
+    'Every architecture document',
+    'git status',
+    'current diff',
+    'Recent commits',
+    'baseline verification'
+)
+$lastRuleIndex = -1
+foreach ($rule in $orderedRules) {
+    $ruleIndex = $agents.IndexOf($rule)
+    if ($ruleIndex -lt 0) {
+        Add-Failure "AGENTS.md is missing recovery rule: $rule"
+    } elseif ($ruleIndex -le $lastRuleIndex) {
+        Add-Failure "AGENTS.md recovery rule is out of order: $rule"
+    } else {
+        $lastRuleIndex = $ruleIndex
+    }
+}
+foreach ($requiredRule in @('review', 'active', 'ready', 'backlog', 'done', 'Never select work merely because `active/` is empty', 'spec/architecture/README.md', 'Development-mode output and self-review are never acceptance evidence')) {
+    if (-not $agents.Contains($requiredRule)) { Add-Failure "AGENTS.md is missing required governance: $requiredRule" }
+}
+
+$currentPath = Join-Path $repoRoot 'spec/progress/current.md'
+$current = if (Test-Path -LiteralPath $currentPath) { Get-Content -Raw $currentPath } else { '' }
+$currentFieldPatterns = @{
+    'Current Loop' = '(?m)^Current Loop:\s*\S.+$'
+    'Current Stage' = '(?m)^Current Stage:\s*\S.+$'
+    'Current Gate' = '(?m)^Current Gate:\s*\S.+$'
+    'Gate Status' = '(?m)^Gate Status:\s*\S.+$'
+    'Current Batch' = '(?m)^Current Batch:\s*\S.+$'
+}
+if ($current -notmatch '(?m)^# Current Execution State\s*$') {
+    Add-Failure 'current.md is missing the Current Execution State heading.'
+}
+foreach ($field in $currentFieldPatterns.Keys) {
+    if ($current -notmatch $currentFieldPatterns[$field]) { Add-Failure "current.md is missing non-empty field: $field" }
+}
+$taskIdMatch = [regex]::Match($current, '(?m)^Current Task:\s*`?([A-Z][A-Z0-9-]+)`?\s*$')
+$taskStateMatch = [regex]::Match($current, '(?m)^Current Task State:\s*`?(backlog|ready|active|review|done)`?\s*$')
+$currentGateMatch = [regex]::Match($current, '(?m)^Current Gate:\s*`?([^`\r\n]+)`?\s*$')
+$gateStatusMatch = [regex]::Match($current, '(?m)^Gate Status:\s*`?([^`\r\n]+)`?\s*$')
+if (-not $taskIdMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task ID.' }
+if (-not $taskStateMatch.Success) { Add-Failure 'current.md does not contain a parseable Current Task State.' }
+
+$requiredCurrentSections = @(
+    'Immediately Relevant Completed Work',
+    'Current Blockers',
+    'Verification',
+    'Changed Files or Migrations',
+    'Known Failures, Risks, and Assumptions',
+    'Next Exact Action',
+    'Last Known Good Commit',
+    'Latest Checkpoint',
+    'Uncommitted Changes / Ownership',
+    'Architecture Conflicts / ACP / ADR'
+)
+foreach ($heading in $requiredCurrentSections) {
+    if ([string]::IsNullOrWhiteSpace((Get-CurrentSection $current $heading))) {
+        Add-Failure "current.md is missing a non-empty ## $heading section."
+    }
+}
+
+$currentVerification = Get-CurrentSection $current 'Verification'
+if ($currentVerification -notmatch '(?m)^- Command:\s*`[^`]+`\s*$') { Add-Failure 'current.md Verification is missing an exact command.' }
+if ($currentVerification -notmatch '(?m)^\s+- Result:\s*\S.+$') { Add-Failure 'current.md Verification is missing a non-empty result.' }
+$currentEvidenceMatches = [regex]::Matches($currentVerification, '(?m)^\s+- Evidence:\s*`([^`]+)`\s*$')
+if ($currentEvidenceMatches.Count -eq 0) {
+    Add-Failure 'current.md Verification is missing a durable evidence path.'
+} else {
+    foreach ($evidenceMatch in $currentEvidenceMatches) {
+        $evidencePath = $evidenceMatch.Groups[1].Value
+        if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $evidencePath) -PathType Leaf)) {
+            Add-Failure "current.md Verification evidence does not exist: $evidencePath"
+        }
+    }
+}
+
+$lastKnownGoodSection = Get-CurrentSection $current 'Last Known Good Commit'
+$lastKnownGoodMatch = [regex]::Match($lastKnownGoodSection, '`([0-9a-fA-F]{40})`')
+if (-not $lastKnownGoodMatch.Success) {
+    Add-Failure 'current.md Last Known Good Commit is missing a full commit SHA.'
+} else {
+    [void](Invoke-Git @('cat-file', '-e', "$($lastKnownGoodMatch.Groups[1].Value)^{commit}") 'Last Known Good Commit')
+}
+
+$checkpointSection = Get-CurrentSection $current 'Latest Checkpoint'
+$checkpointMatch = [regex]::Match($checkpointSection, '`(spec/progress/checkpoints/[^`]+\.md)`')
+if (-not $checkpointMatch.Success) {
+    Add-Failure 'current.md Latest Checkpoint is missing a repository checkpoint path.'
+} elseif (-not (Test-Path -LiteralPath (Join-Path $repoRoot $checkpointMatch.Groups[1].Value) -PathType Leaf)) {
+    Add-Failure "current.md Latest Checkpoint does not exist: $($checkpointMatch.Groups[1].Value)"
+}
+
+$taskFiles = @()
+foreach ($queue in $queueNames) {
+    $queuePath = Join-Path $repoRoot "spec/tasks/$queue"
+contracts\websocket\verify.py
+contracts\websocket\sync-v1.schema.json
+contracts\websocket\README.md
+contracts\websocket\envelope.schema.json
+contracts\errors\http-errors.schema.json
+contracts\database\README.md
+contracts\database\migrate.py
+contracts\plugin-api\verify.py
+contracts\plugin-api\v1.schema.json
+contracts\plugin-api\README.md
+contracts\plugin-api\policy-v1.json
+contracts\http\build-openapi-3.1-validator.js
+contracts\http\auth-user-friend.openapi.validator.js
+contracts\http\auth-user-friend.openapi.json
+contracts\http\check-openapi-3.1.js
+contracts\http\openapi-3.1-2026-08-03.schema.json
+contracts\http\openapi-3.1-lint.md
+contracts\http\verify-auth-user-friend.ps1
+contracts\database\migrations\0001_initial.up.sql
+contracts\database\migrations\0001_initial.down.sql
+contracts\fixtures\websocket\golden.json
+contracts\fixtures\auth-user-friend\negative.json
+contracts\fixtures\auth-user-friend\fixture.schema.json
+contracts\fixtures\auth-user-friend\positive.json
+contracts\fixtures\sync-plugin\profile-outcomes\java.json
+contracts\fixtures\sync-plugin\profile-outcomes\go.json
+contracts\fixtures\sync-plugin\golden.json
+contracts\fixtures\sync-plugin\generate.py
+CLAUDE.md
+README.md
+contracts/database/README.md
+contracts/plugin-api/README.md
+contracts/websocket/README.md
+deploy/README.md
+research/README.md
+spec/architecture/README.md
+spec/progress/evidence/README.md

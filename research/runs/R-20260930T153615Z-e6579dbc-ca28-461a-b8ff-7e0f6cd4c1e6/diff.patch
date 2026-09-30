@@ -1,0 +1,75 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 6ac6f10..7dcf111 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -14,7 +14,7 @@ Current Task State: review
+ 
+ ## Current Blockers
+ 
+-No known unresolved substantive architecture choice within auditedscope. NewindependentReview andfinalexactheadhostedrequired before004/batchclosure; S1productGate separate/open.
++Actual final hosted run36738064831 on92306df failed Go race revocation reason, with consequent Gate failure. All11 other jobs succeeded. Fresh Fix/new independent Review/new hosted candidate required. No unresolved substantive architecture choice; remediation andS1 NOT PASSED.
+ 
+ ## Verification
+ 
+@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Fresh /root/stage4_final_review solely owns new final Review evidence/Recorder and present handoff until ordinary commit. Release writing to Coordinator after clean closure; product/history unchanged. Original/Social trees untouched.
++Coordinator owns only this hosted failure evidence/Recorder and current task recovery until clean commit, then releases to fresh Fix Agent. Original unknown and Social worktrees untouched.
+ 
+ ## Next Exact Action
+ 
+-Coordinator normally pushes the clean final independently reviewed closure to dedicated task branch and verifies exact-head hosted all required jobs; only then close004/remediation batch and stable checkpoint. Unique004 review; remediation/S1 NOT PASSED, no business advancement.
++Delegate fresh Fix Agent to reproduce and repair fallback revocation reason versus CoreOutbox/NATS timing without changing contracts, architecture, per-messagePG rule or test expectations. Then NEW independent Review and exact-head hosted CI. Evidence004/hosted-failure-36738064831.md. Do not close004/batch or advance other business.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+index 4ccfa55..0d9da09 100644
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
++++ b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-ARCH-REMEDIATION-004
+ title: Migrate Go responsibility packages and regress
+ status: review
+-owner: Coordinator after /root/stage4_final_review release; fresh post-fix independent Review local PASS, exact-head hosted acceptance pending
++owner: Coordinator delegating fresh Fix for hosted revocation race
+ stage: S1 remediation 4/4
+ gate: LOOP1-ARCH-REMEDIATION
+ ---
+@@ -98,3 +98,7 @@ Root identified candidate recovery metadata FAIL after product Review: section s
+ # Final post-fix independent Review
+ 
+ Fresh /root/stage4_final_review local PASS exactb84cd0f from clean isolatedcheckout; new realPG16NATS/fullunitrace/canonical/3Go rolesComposeTLS/negativecontrols passed, zerointegration skips. Evidence004/final-independent-review.md. Four historicalWindows symlink subcases need hostedLinux confirmation. Unique004 stays review, remediation/S1 NOT PASSED pending fresh exact-head allrequiredjobs hosted. Coordinator owns next ordinarypush/CI/closure; Review releases onlynew evidence and handoff after commit.
++
++# Hosted acceptance repair loop
++
++Exact closure92306df/run36738064831 completed failure:11success,Go race andGate fail. Revocation expectedREPLACED butreceivedREVOKED at auth_test.go:211. Evidence004/hosted-failure-36738064831.md. Next exact action is freshFix diagnosis and bounded repair, then new independentReview and new hostedcandidate; do not relax existing expectations, suppressGate or closebatch.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-611b25ec-fc60-4b7d-bbbd-c91adfc66967/metadata.json
+# ?? research/prompts/P-611b25ec-fc60-4b7d-bbbd-c91adfc66967/prompt.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/.gitattributes
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-27cf4a3a-6fe5-4355-8cb9-7c734812f36c.stderr.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-27cf4a3a-6fe5-4355-8cb9-7c734812f36c.stdout.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-5be09e61-954b-4b91-8536-62015a42979c.stderr.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-5be09e61-954b-4b91-8536-62015a42979c.stdout.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-61851bbc-b847-40c9-900c-1b70da2c8d36.stderr.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-61851bbc-b847-40c9-900c-1b70da2c8d36.stdout.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-739c92fb-913b-4394-9541-7693bc1246c1.stderr.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-739c92fb-913b-4394-9541-7693bc1246c1.stdout.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-a27093df-f5a4-48d1-bc53-e283551af1dc.stderr.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-a27093df-f5a4-48d1-bc53-e283551af1dc.stdout.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-aa3f8be4-96ef-43f8-9ef8-384923b00856.stderr.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-aa3f8be4-96ef-43f8-9ef8-384923b00856.stdout.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-c52a82b6-be52-4ca6-999b-6cc6b8bf1d8c.stderr.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/blobs/C-c52a82b6-be52-4ca6-999b-6cc6b8bf1d8c.stdout.txt
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/events.jsonl
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/initial_state.json
+# ?? research/runs/R-20260930T153615Z-e6579dbc-ca28-461a-b8ff-7e0f6cd4c1e6/metadata.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/coordinator-final-controls.py
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/coordinator-final-resume-prompt.txt
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/coordinator-hosted-failure-capture-audit.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/hosted-ci-36738064831.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/hosted-failure-36738064831.md

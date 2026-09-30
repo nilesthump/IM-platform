@@ -1,0 +1,205 @@
+backend/go\config.go:16:type runtimeConfig struct {
+backend/go\config.go:27:func readConfig(path string) (runtimeConfig, []byte, *pgxpool.Config, error) {
+backend/go\contract_fixture_test.go:22:type fixtureDocument struct {
+backend/go\contract_fixture_test.go:25:type fixtureScenario struct {
+backend/go\contract_fixture_test.go:30:type fixtureStep struct {
+backend/go\contract_fixture_test.go:40:type fixtureRequest struct {
+backend/go\contract_fixture_test.go:48:func readFixture(t *testing.T, path string) map[string]fixtureScenario {
+backend/go\contract_fixture_test.go:68:func fixture(t *testing.T, all map[string]fixtureScenario, id string) fixtureScenario {
+backend/go\contract_fixture_test.go:77:type fixtureNormalizer struct {
+backend/go\contract_fixture_test.go:83:func newFixtureNormalizer(username string) *fixtureNormalizer {
+backend/go\contract_fixture_test.go:86:func (n *fixtureNormalizer) check(t *testing.T, expected, actual any, path string) {
+backend/go\contract_fixture_test.go:148:func fixtureBody(v map[string]any, username string) map[string]any {
+backend/go\contract_fixture_test.go:162:func runFixtureHTTP(t *testing.T, h http.Handler, st fixtureStep, n *fixtureNormalizer, token string, cookie *http.Cookie, bodyOverride map[string]any) *httptest.ResponseRecorder {
+backend/go\contract_fixture_test.go:201:func TestCanonicalAuthHTTPFixtures(t *testing.T) {
+backend/go\contract_fixture_test.go:224:			_, _ = db.Exec(ctx, "DELETE FROM outbox_events WHERE aggregate_type='session' AND aggregate_id IN (SELECT (payload->>'sessionId')::uuid FROM user_sync_events WHERE user_id=$1 AND event_type='session.revoked')", userID)
+backend/go\contract_fixture_test.go:225:			_, _ = db.Exec(ctx, "DELETE FROM user_sync_events WHERE user_id=$1", userID)
+backend/go\contract_fixture_test.go:226:			_, _ = db.Exec(ctx, "DELETE FROM sessions WHERE user_id=$1", userID)
+backend/go\contract_fixture_test.go:227:			_, _ = db.Exec(ctx, "DELETE FROM users WHERE user_id=$1", userID)
+backend/go\contract_fixture_test.go:322:func openFixtureSocket(t *testing.T, wsURL string) *websocket.Conn {
+backend/go\contract_fixture_test.go:331:func assertWSSStep(t *testing.T, c *websocket.Conn, st fixtureStep, n *fixtureNormalizer, token string) {
+backend/go\contract_fixture_test.go:356:func TestCanonicalWSSPrebindFixturesAndMalformedRequestID(t *testing.T) {
+backend/go\contract_fixture_test.go:398:func TestCanonicalWSSAuthSessionFixtures(t *testing.T) {
+backend/go\contract_fixture_test.go:423:		_, _ = db.Exec(ctx, "DELETE FROM outbox_events WHERE aggregate_type='session' AND aggregate_id IN (SELECT (payload->>'sessionId')::uuid FROM user_sync_events WHERE user_id=$1 AND event_type='session.revoked')", userID)
+backend/go\contract_fixture_test.go:424:		_, _ = db.Exec(ctx, "DELETE FROM user_sync_events WHERE user_id=$1", userID)
+backend/go\contract_fixture_test.go:425:		_, _ = db.Exec(ctx, "DELETE FROM sessions WHERE user_id=$1", userID)
+backend/go\contract_fixture_test.go:426:		_, _ = db.Exec(ctx, "DELETE FROM users WHERE user_id=$1", userID)
+backend/go\auth_test.go:21:func TestTokenTamperAndExpiry(t *testing.T) {
+backend/go\auth_test.go:40:func TestConfigReadsExternalCredentialFiles(t *testing.T) {
+backend/go\auth_test.go:70:func call(t *testing.T, h http.Handler, method, path string, body any, token string, cookie *http.Cookie) *httptest.ResponseRecorder {
+backend/go\auth_test.go:91:func readResult(t *testing.T, w *httptest.ResponseRecorder) map[string]any {
+backend/go\auth_test.go:99:func getToken(t *testing.T, w *httptest.ResponseRecorder) string {
+backend/go\auth_test.go:103:func getSession(t *testing.T, w *httptest.ResponseRecorder) map[string]any {
+backend/go\auth_test.go:107:func expect(t *testing.T, w *httptest.ResponseRecorder, status int) {
+backend/go\auth_test.go:114:func TestPostgresAuthSessionAndWSS(t *testing.T) {
+backend/go\auth_test.go:164:		_, _ = db.Exec(ctx, "DELETE FROM outbox_events WHERE aggregate_type='session' AND aggregate_id IN (SELECT (payload->>'sessionId')::uuid FROM user_sync_events WHERE user_id=$1 AND event_type='session.revoked')", userID)
+backend/go\auth_test.go:165:		_, _ = db.Exec(ctx, "DELETE FROM user_sync_events WHERE user_id=$1", userID)
+backend/go\auth_test.go:166:		_, _ = db.Exec(ctx, "DELETE FROM sessions WHERE user_id=$1", userID)
+backend/go\auth_test.go:167:		_, _ = db.Exec(ctx, "DELETE FROM users WHERE user_id=$1", userID)
+backend/go\auth_test.go:300:	_, err = tx.Exec(ctx, "UPDATE sessions SET status='REVOKED' WHERE user_id=$1 AND client_type='DESKTOP'", userID)
+backend/go\auth.go:29:type authService struct {
+backend/go\auth.go:36:type clientInput struct {
+backend/go\auth.go:43:type loginInput struct {
+backend/go\auth.go:49:type registerInput struct {
+backend/go\auth.go:55:type refreshInput struct {
+backend/go\auth.go:60:type claims struct {
+backend/go\auth.go:69:type apiError struct {
+backend/go\auth.go:75:func (e apiError) Error() string { return e.code }
+backend/go\auth.go:77:func fail(status int, code, message string) error { return apiError{status, code, message} }
+backend/go\auth.go:79:func randomToken(n int) (string, error) {
+backend/go\auth.go:87:func uuid() (string, error) {
+backend/go\auth.go:98:func hashToken(token string) string {
+backend/go\auth.go:104:func passwordMaterial(password string) []byte {
+backend/go\auth.go:109:func (s *authService) sign(c claims) (string, error) {
+backend/go\auth.go:121:func (s *authService) parse(token string) (claims, error) {
+backend/go\auth.go:143:func (s *authService) authenticate(ctx context.Context, token string) (claims, error) {
+backend/go\auth.go:178:func validClient(t string) bool { return t == "WEB" || t == "DESKTOP" || t == "MOBILE" }
+backend/go\auth.go:179:func (v clientInput) valid() bool {
+backend/go\auth.go:183:func decode(r *http.Request, dst any) error {
+backend/go\auth.go:196:func requestID(_ *http.Request) string {
+backend/go\auth.go:200:func writeJSON(w http.ResponseWriter, status int, v any) {
+backend/go\auth.go:205:func writeError(w http.ResponseWriter, r *http.Request, err error) {
+backend/go\auth.go:214:func (s *authService) handler() http.Handler {
+backend/go\auth.go:216:	m.HandleFunc("POST /v1/auth/register", s.register)
+backend/go\auth.go:217:	m.HandleFunc("POST /v1/auth/login", s.login)
+backend/go\auth.go:218:	m.HandleFunc("POST /v1/auth/refresh/web", s.refreshWeb)
+backend/go\auth.go:219:	m.HandleFunc("POST /v1/auth/refresh/native", s.refreshNative)
+backend/go\auth.go:220:	m.HandleFunc("POST /v1/auth/logout", s.logout)
+backend/go\auth.go:221:	m.HandleFunc("GET /v1/users/me", s.me)
+backend/go\auth.go:222:	m.HandleFunc("GET /v1/users/search", s.search)
+backend/go\auth.go:235:func (s *authService) register(w http.ResponseWriter, r *http.Request) {
+backend/go\auth.go:256:	_, err = s.db.Exec(r.Context(), `INSERT INTO users(user_id,username,display_name,password_hash) VALUES($1,$2,$3,$4)`, id, name, v.DisplayName, string(password))
+backend/go\auth.go:269:func (s *authService) login(w http.ResponseWriter, r *http.Request) {
+backend/go\auth.go:309:func (s *authService) newSession(ctx context.Context, userID string, v clientInput) (sid string, epoch int64, replaced bool, refresh string, err error) {
+backend/go\auth.go:317:	err = tx.QueryRow(ctx, `SELECT user_id FROM users WHERE user_id=$1 FOR UPDATE`, userID).Scan(&locked)
+backend/go\auth.go:340:	_, err = tx.Exec(ctx, `INSERT INTO sessions(user_id,client_type,session_id,session_epoch,refresh_token_hash,status,device_id,expires_at) VALUES($1,$2,$3,$4,$5,'ACTIVE',$6,$7)
+backend/go\auth.go:341:	ON CONFLICT(user_id,client_type) DO UPDATE SET session_id=EXCLUDED.session_id,session_epoch=EXCLUDED.session_epoch,refresh_token_hash=EXCLUDED.refresh_token_hash,status='ACTIVE',device_id=EXCLUDED.device_id,expires_at=EXCLUDED.expires_at,updated_at=now()`, userID, v.ClientType, sid, epoch, hashToken(refresh), v.DeviceID, s.now().Add(refreshTTL*time.Second))
+backend/go\auth.go:361:func writeRevocation(ctx context.Context, tx pgx.Tx, userID, sid, reason string) error {
+backend/go\auth.go:371:	_, err = tx.Exec(ctx, `INSERT INTO outbox_events(event_id,aggregate_type,aggregate_id,event_type,payload) VALUES($1,'session',$2,'session.revoked',$3)`, id, sid, b)
+backend/go\auth.go:375:	_, err = tx.Exec(ctx, `INSERT INTO user_sync_events(user_id,event_type,payload) VALUES($1,'session.revoked',$2)`, userID, b)
+backend/go\auth.go:379:func (s *authService) authResponse(w http.ResponseWriter, r *http.Request, userID, sid, typ string, epoch int64, replaced bool, refresh string) {
+backend/go\auth.go:398:func (s *authService) refreshWeb(w http.ResponseWriter, r *http.Request) {
+backend/go\auth.go:420:func (s *authService) refreshNative(w http.ResponseWriter, r *http.Request) {
+backend/go\auth.go:441:func (s *authService) refresh(w http.ResponseWriter, r *http.Request, v clientInput, presented string) {
+backend/go\auth.go:452:	err = tx.QueryRow(ctx, `SELECT user_id,session_id,refresh_token_hash,status,session_epoch,expires_at,device_id,client_type FROM sessions WHERE refresh_token_hash=$1 FOR UPDATE`, hashToken(presented)).Scan(&userID, &sid, &stored, &status, &epoch, &expiry, &device, &clientType)
+backend/go\auth.go:478:	_, err = tx.Exec(ctx, `UPDATE sessions SET refresh_token_hash=$1,expires_at=$2,updated_at=now() WHERE user_id=$3 AND client_type=$4`, hashToken(newRefresh), s.now().Add(refreshTTL*time.Second), userID, v.ClientType)
+backend/go\auth.go:489:func bearer(r *http.Request) (string, error) {
+backend/go\auth.go:497:func (s *authService) logout(w http.ResponseWriter, r *http.Request) {
+backend/go\auth.go:516:	err = tx.QueryRow(r.Context(), `SELECT session_id,status,session_epoch FROM sessions WHERE user_id=$1 AND client_type=$2 FOR UPDATE`, c.UserID, c.ClientType).Scan(&sid, &status, &epoch)
+backend/go\auth.go:525:	_, err = tx.Exec(r.Context(), `UPDATE sessions SET status='REVOKED',refresh_token_hash=NULL,updated_at=now() WHERE user_id=$1 AND client_type=$2`, c.UserID, c.ClientType)
+backend/go\auth.go:542:func (s *authService) me(w http.ResponseWriter, r *http.Request) {
+backend/go\auth.go:562:func (s *authService) search(w http.ResponseWriter, r *http.Request) {
+backend/go\main.go:21:func main() {
+backend/go\main.go:30:	mux.HandleFunc("/__infra/health", func(w http.ResponseWriter, r *http.Request) {
+backend/go\main.go:38:	mux.HandleFunc("/__infra/ws", func(w http.ResponseWriter, r *http.Request) {
+backend/go\main.go:94:		mux.HandleFunc("GET /v1/ws", h.serve)
+backend/go\gateway.go:14:type hub struct {
+backend/go\gateway.go:19:type connection struct {
+backend/go\gateway.go:26:type envelope struct {
+backend/go\gateway.go:35:func validUUID(id string) bool { return requestIDPattern.MatchString(id) }
+backend/go\gateway.go:37:func newHub(auth *authService) *hub {
+backend/go\gateway.go:40:func (c *connection) send(v any) error { c.mu.Lock(); defer c.mu.Unlock(); return c.ws.WriteJSON(v) }
+backend/go\gateway.go:41:func (c *connection) close() {
+backend/go\gateway.go:44:func (h *hub) add(sid string, c *connection) {
+backend/go\gateway.go:52:func (h *hub) remove(sid string, c *connection) {
+backend/go\gateway.go:60:func frame(typ, id string, payload any) any {
+backend/go\gateway.go:63:func (h *hub) revoke(sid, reason string) {
+backend/go\gateway.go:78:func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
+backend/go\gateway.go:171:func (s *authService) mustSign(c claims) string { t, _ := s.sign(c); return t }
+backend/go\gateway.go:172:func (h *hub) reject(c *connection, id, code, message string) {
+backend/go\gateway.go:176:func (h *hub) watch(c *connection, cl claims) {
+backend/go\outbox.go:13:func relaySessionRevocations(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
+backend/go\outbox.go:26:func relaySessionBatch(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
+backend/go\outbox.go:34:	rows, err := tx.Query(ctx, `SELECT event_id,payload FROM outbox_events WHERE event_type='session.revoked' AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED`)
+backend/go\outbox.go:67:		if _, err = tx.Exec(ctx, `UPDATE outbox_events SET published_at=now(),attempts=attempts+1 WHERE event_id=$1`, e.id); err != nil {
+
+ M spec/tasks/active/LOOP1-ARCH-REMEDIATION-003.md
+ M spec/tasks/done/LOOP1-ARCH-REMEDIATION-002.md
+?? research/prompts/P-188c3431-b82a-47b8-b6e9-939b426f3071/
+?? research/runs/R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b/
+e31acaa accept(governance): close stage two and activate architecture enforcement
+c0373ab review(governance): independently accept stage-two candidate locally
+3b04904 fix(governance): synchronize canonical execution boundaries for stage two
+Name      Source
+----      ------
+go.exe    H:\go\bin\go.exe
+javac.exe H:\jdk-25.0.2\bin\javac.exe
+jdeps.exe H:\jdk-25.0.2\bin\jdeps.exe
+
+> 图 3-1 逻辑组件图。
+
+> 实时路径为 Core 的 Outbox dispatcher → NATS → Gateway；PostgreSQL 写入由 Core 事务负责。历史 PDF 的 NATS → PostgreSQL 箭头只保留在历史来源中，不代表现行运行依赖。
+
+<a id="section-3-1"></a>
+### 3.1 三个物理部署单元
+
+| 部署单元 | 职责 | 明确不负责 |
+| --- | --- | --- |
+| gateway | TLS 之后的 WSS 生命周期、auth.bind、session/cache 校验、connection registry、协议路由、local fan-out、heartbeat/限流 | 好友/群成员规则、消息持久化、插件业务逻辑 |
+| core | Auth、Session、User、Friendship、Conversation、Message、Sync、Outbox；模块化单体 | 不可信插件执行；大量 socket 连接状态 |
+| plugin-host | WASM runtime、事件分派、经授权的 Query/Action Host bridge、资源限制、熔断、编译缓存 | 不可信 WASM 直接访问数据库/文件/任意网络；绕过 Core 业务授权；成为 IM 主链单点 |
+
+<a id="section-3-2"></a>
+### 3.2 运行 profile
+
+<a id="section-14"></a>
+## 14. CI/CD 独立校验架构
+
+```mermaid
+flowchart LR
+  Diff["Diff 分类"]
+  Diff --> GoPath["backend/go/**"]
+  Diff --> JavaPath["backend/java/**"]
+  Diff --> Shared["contracts/** / DB / shared SDK"]
+  Diff --> Rules["architecture / Agent / task template / acceptance / checker"]
+  Rules --> Structure["规范 + 源码归属 + 依赖 + 触发负例"]
+  GoCI --> Structure
+  JavaCI --> Structure
+  Structure --> Gate
+  GoPath --> GoCI["Go CI<br/>unit + integration<br/>contract"]
+  JavaPath --> JavaCI["Java CI<br/>unit + integration<br/>contract"]
+  Shared --> Matrix["全平台兼容矩阵<br/>Go + Java + clients<br/>plugin + migration"]
+  Matrix --> Artifacts["可重复制品<br/>镜像 / 客户端"]
+  Matrix --> Smoke["Staging Smoke"]
+  Artifacts --> Smoke
+  Smoke --> Gate["Release Gate<br/>manifest + rollback"]
+```
+
+> Agent 负责提出变更；CI 独立验证事实。Agent 无权自行宣布 Gate 通过。
+>
+> 图 14-1 Path-aware CI DAG。分类分支相互独立；公共契约/schema/shared SDK 变更按表触发兼容矩阵，规范与检查器变更必须触发适用架构检查。部署/发布节点表示相应阶段要求，不把未来发布能力冒充当前 skeleton。
+
+<a id="section-14-1"></a>
+### 14.1 路径感知规则
+
+| 变更路径 | 必跑作业 |
+| --- | --- |
+| backend/go/** | Go lint/unit/integration/contract；不默认跑 Java |
+| backend/java/** | Java lint/unit/integration/contract；不默认跑 Go |
+| clients/web/** | Web unit/build/protocol/plugin UI tests |
+| clients/desktop/** 或 clients/mobile/** | 对应客户端 + SQLite migration + protocol tests |
+| contracts/**、数据库迁移、shared protocol/plugin SDK | Go + Java + Web + Desktop + Mobile + old client fixtures + plugin fixtures + migration compatibility |
+| deploy/**、ci/**、.github/workflows/** | 按当前阶段执行 compose/manifest/security/smoke/rollback validation，并验证分类与 Gate |
+| spec/architecture/**、Agent 入口、handoff、活动任务/模板/batch、acceptance、架构检查器与测试 | baseline/resolver/ADR 一致性、活动引用、源码归属、Go/Java 适用阶段依赖检查、触发与正负控制；Markdown-only 不能全部跳过 |
+
+<a id="section-14-2"></a>
+### 14.2 流水线层次
+
+static/lint -> unit -> contract -> integration -> compatibility -> build
+-> immutable artifacts -> SBOM/signature -> staging deploy -> smoke/E2E
+-> release gate -> canary/controlled rollout -> observe -> complete or rollback
+
+<a id="section-14-3"></a>
+### 14.3 兼容矩阵
+
+完整兼容阶段的最低矩阵包含 Client Protocol v1、v2、HEAD；在相应协议与客户端版本尚未定义的早期阶段，只能明确报告现有契约向量/占位检查，不能虚构 v2 或声称已通过完整矩阵；后续阶段不得永久豁免。Go/Java profile；Echo/Poll 插件 fixture；SQLite old schema fixtures。服务端只维护一个当前实现版本与有限兼容窗口。latest/recommended/min_supported 必须在 Release Manifest 中显式声明，客户端版本号与 protocol_version 不绑定。
+
+<a id="section-14-4"></a>
+### 14.4 CI 与 Agent 的信任边界
+
+Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从干净 checkout 重建后判定。核对精确 head SHA、要求运行的作业及实际结果；必跑作业缺失、异常 skip、失败或取消均不满足 Gate。测试环境未启用导致的 skip 不是集成 PASS；旧提交的绿色不覆盖新增要求。历史 ADR-0001 的适用及失效条件见 §12.2。任何需要跳过测试、重录 golden fixture、降低阈值或更改验收项的动作都视为架构/验收变更，必须单独审批。
+
+<a id="section-15"></a>
+## 15. Loop 1: 12 周预算、里程碑门禁驱动
+
+

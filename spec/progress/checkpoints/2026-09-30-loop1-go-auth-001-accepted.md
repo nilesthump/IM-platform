@@ -1,0 +1,7 @@
+# LOOP1-GO-AUTH-001 accepted vertical-slice checkpoint
+
+- Accepted task head: `59d92f39234596a5b66841e8aa2ef7db0bf65e8a` on `task/LOOP1-GO-AUTH-001`; clean local checkout and exact remote branch match before this documentation closure. S0 accepted `main` base: `09cec968f64faf0db319aea8d9c21d4fffe8ec49`.
+- `LOOP1-GO-AUTH-001`: **done** after fresh independent clean-checkout reviews and real hosted [Loop 1 CI 36602521287](https://github.com/nilesthump/IM-platform/actions/runs/36602521287) PASS at the accepted head. All ten CI jobs, including Go, deploy transport smokes, compatibility, and gate, completed success. Exact evidence: `spec/progress/evidence/LOOP1-GO-AUTH-001/2026-09-30-hosted-ci-pass-acceptance.md`.
+- Frozen Architecture v1.0 hashes unchanged. Public baselines remain Auth/User/Friend HTTP v1, WSS v1, Sync v1, Plugin API v1; database migration baseline remains `0001_initial` on PostgreSQL 16. Go Auth/Session uses these existing contracts and migration. No architecture or public contract transition occurred.
+- S1 Gate remains **NOT YET PASSED**. `LOOP1-GO-SOCIAL-001`, `LOOP1-GO-MSG-001`, and `LOOP1-E2E-001` remain to be independently accepted. Next dependency-satisfied task is Go Social.
+- Earlier local full Go Compose smoke was blocked by the configured Docker image mirror HTTP 403; hosted deployment Go smoke passed. Original `H:\IM-platform` checkout with unknown preexisting untracked paths remains untouched. This checkpoint is a stable recovery point for the accepted Auth/Session vertical slice.

@@ -29,3 +29,7 @@ Dependency order, not filename order, controls execution:
 ## Completion
 
 The batch completes only when every required task is `done`, the actual S0 Gate Checklist passes, no blocker remains, `spec/progress/current.md` is current, a Last Known Good Commit and stable checkpoint exist, the Frozen Architecture resolves from the repository index and verified manifest, and real CI is operational. Task filenames or local self-reported PASS results do not establish Stage PASS. S1 must not activate during this batch.
+
+## Current historical status
+
+Original bootstrap condition above is retained as history. LOOP1-CI-001 is operational and done, so ADR-0001 is expired and cannot substitute current hosted acceptance. Preserve historical S0 PASS; current remediation/later applicable tasks use exact-head hosted CI and fresh Review. S1 business waits for remediation batch PASS.

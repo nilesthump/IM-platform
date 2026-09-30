@@ -1,0 +1,407 @@
+FILE spec\domain\auth-user-friend.md
+# Auth, User, and Friend Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-001`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| AUF-D-001 | A user MUST have exactly three login slots: WEB, DESKTOP, and MOBILE; at most one Session for a given user and client type may be valid at a time. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-002 | Sessions for different client types MAY be valid concurrently for the same user. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-003 | A new login for the same user and client type MUST revoke the previous Session and advance the session epoch in one transaction. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-004 | PostgreSQL MUST remain authoritative for login state; Gateway memory is only an online-connection and routing cache. | Architecture Baseline v1.0, chapters 2 (F-03), 4.1, and 7.3. |
+| AUF-D-005 | A friendship MUST be represented by one normalized unordered user pair, so `(A,B)` and `(B,A)` denote the same friendship. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-D-006 | Adding a friend in Loop 1 MUST immediately establish the bidirectional friendship and create or reuse the pair's single DIRECT Conversation in the same transaction. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-D-007 | Loop 1 MUST NOT introduce a friend-request approval flow. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-D-008 | A successful explicit logout MUST revoke the Session and Refresh Token and close its WSS connection; it MUST NOT be specified as deletion of local client history. | Architecture Baseline v1.0, chapter 7.1. |
+| AUF-D-009 | Production authentication transport MUST use HTTPS/WSS/TLS; tokens MUST NOT be accepted from a URL query or written to logs or traces, and error responses MUST NOT reveal token material. | Architecture Baseline v1.0, chapter 7.4. |
+
+FILE spec\domain\messaging.md
+# Messaging Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-002`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| MSG-D-001 | A client request identity MUST be unique within a Conversation and is the identity reused by retry and local convergence. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-D-002 | The server idempotency identity MUST include sender, Conversation, and client request identity; the server message identity MUST be globally unique. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-003 | Conversation sequence numbers MUST be unique and monotonically increasing within each Conversation. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-004 | Message send MUST authorize the sender as a Conversation member before persistence. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-D-005 | Sequence allocation, Message persistence, and the matching Outbox event MUST commit atomically; a successful ACK MUST mean that durable commit has completed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message, Outbox). |
+| MSG-D-006 | Outbox delivery and NATS delivery MAY repeat or be briefly missed; consumers MUST be idempotent and Sync MUST provide eventual completeness. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-D-007 | Gateway MUST fan out only to locally active connections and MUST NOT own friendship, membership, persistence, or plugin business rules. | Architecture Baseline v1.0, chapters 2 (F-05) and 5.2. |
+| MSG-D-008 | A GROUP send MUST create one logical Message and one Outbox event; it MUST NOT create one persistent message record per member. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-D-009 | Loop 1 MUST NOT treat NATS JetStream as the message source of truth. | Architecture Baseline v1.0, chapters 2 (F-03) and 5.2. |
+
+FILE spec\domain\sync-plugin.md
+# Sync and Plugin Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-003`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| SP-D-001 | Web MUST remain memory-only and MUST NOT claim offline history; Desktop and Mobile MUST use per-account local materialized views and render local state before background Sync. | Architecture Baseline v1.0, chapters 2 (F-07) and 6.1, and appendix B (Web). |
+| SP-D-002 | A local optimistic send MUST create one client request identity, persist SENDING before transmission, converge to SENT after ACK, and reuse the same request identity when retrying FAILED. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-D-003 | SENT MUST be terminal and MUST NOT regress to FAILED; FAILED means only that the current attempt lacks success confirmation. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-D-004 | User Sync cursor MUST cover only low-frequency user-level state; message state MUST use per-Conversation sequence and contiguous sequence tracking. | Architecture Baseline v1.0, chapters 2 (F-06) and 6.4, and appendix B (Sync). |
+| SP-D-005 | Sync MUST advance a per-Conversation contiguous sequence only across a gap-free prefix; duplicate and out-of-order input MUST converge without skipping a gap. | Architecture Baseline v1.0, chapter 6.4 and appendix B (Sync). |
+| SP-D-006 | All local send, ACK, realtime, and Sync write paths MUST converge through transactional upsert; data and cursor advancement MUST commit together. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-D-007 | Plugin API v1 MUST expose Events, Queries, Actions, and UI Host surfaces, each constrained by declared capability and permission. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-D-008 | Queries MUST be read-only, paginated, and limited; each Action MUST be re-authorized, idempotent, and audited; plugins MUST NOT call Core internals or databases directly. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-D-009 | A custom renderer MUST pass package hash, signature, manifest-schema, API-compatibility, permission, resource-size, CSP, and entry-point checks before loading, and MUST run in the stated UI sandbox. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-D-010 | A plugin artifact identified by plugin and version MUST be immutable; backend and renderer MUST remain version-bound, and history MUST retain the renderer needed by referenced messages plus fallback text. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-D-011 | WASM execution MUST default-deny database, server-file, arbitrary-network, and other-plugin-memory access and MUST enforce CPU/time, memory, concurrency, storage, and network limits. | Architecture Baseline v1.0, chapter 8.3 and appendix B (Plugin). |
+| SP-D-012 | Plugin artifact lifecycle and Conversation-scoped instance lifecycle MUST remain distinct; upgrade MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed, and MUST roll back on failure. | Architecture Baseline v1.0, chapters 9.1 and 9.2. |
+| SP-D-013 | DISABLE MUST preserve data, UNINSTALL MUST default to RETAINED, and PURGE MUST require an explicit irreversible operation with elevated permission, audit, and a confirmed retention policy. | Architecture Baseline v1.0, chapter 9.3. |
+
+FILE spec\invariants\auth-user-friend.md
+# Auth, User, and Friend Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| AUF-I-001 | A contract MUST make it impossible to represent more than one valid Session for the same user and client type. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-I-002 | Same-slot relogin MUST invalidate the old epoch before the new Session is accepted; an old token MUST NOT reconnect successfully. | Architecture Baseline v1.0, chapters 4.1, 7.2, and 7.3, and appendix B (Session). |
+| AUF-I-003 | WSS MUST remain UNAUTHENTICATED until auth.bind succeeds and MUST permit only auth.bind plus ping/pong in that state. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-004 | Authenticated WSS state MUST bind user, Session, and client type, and a same-slot revocation MUST produce session.revoked before connection close. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-005 | Friendship identity MUST be order-independent, and one normalized pair MUST map to one friendship and one DIRECT Conversation. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-I-006 | Friendship creation, DIRECT Conversation creation or reuse, both memberships, Sync events, and Outbox effects MUST form one atomic outcome. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-I-007 | Authentication secrets MUST NOT be exposed through query parameters, logs, traces, or error responses. | Architecture Baseline v1.0, chapter 7.4. |
+
+FILE spec\invariants\messaging.md
+# Messaging Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| MSG-I-001 | Repeating a send with the same server idempotency identity MUST converge on the same logical Message and MUST NOT allocate another Conversation sequence. | Architecture Baseline v1.0, chapters 4.4 and 5.1. |
+| MSG-I-002 | A successful message ACK MUST NOT be observable before the Message and matching Outbox event are durably committed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-I-003 | Every committed logical Message MUST have exactly one logical Outbox event, even when publication delivery is retried. | Architecture Baseline v1.0, chapters 4 (Figure 4-1), 5.1, and 5.2. |
+| MSG-I-004 | No recipient MUST receive a Message for the wrong Conversation, and no permanent sequence gap may remain after Sync convergence. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-I-005 | Duplicate NATS delivery MUST NOT create a duplicate logical Message or duplicate client materialization. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-I-006 | A send by a non-member MUST be rejected before persistence and before a success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-I-007 | GROUP fan-out MUST remain an online delivery concern and MUST NOT alter the single-Message, single-Outbox persistence outcome. | Architecture Baseline v1.0, chapter 5.3. |
+
+FILE spec\invariants\sync-plugin.md
+# Sync and Plugin Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| SP-I-001 | Duplicate or out-of-order Sync input MUST be idempotent, and contiguous sequence MUST NOT advance across a missing sequence. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-I-002 | When Sync observes a server Message matching a locally FAILED send identity, it MUST converge that local item to SENT rather than create another item. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-I-003 | Local materialized data and its corresponding cursor or contiguous-sequence advance MUST commit atomically. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-I-004 | User-level cursor input MUST NOT contain Message events. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-I-005 | Plugin capability or permission denial MUST prevent the Event subscription, Query, Action, or UI behavior without granting an alternate direct access path. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-I-006 | Query operations MUST NOT mutate state; each Action MUST be re-authorized at execution, MUST be idempotent, and MUST be auditable. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-I-007 | A changed package, backend, or renderer hash under an existing plugin version MUST be rejected. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-I-008 | WASM and custom-renderer execution MUST remain sandboxed with least privilege and MUST NOT directly reach host-sensitive resources. | Architecture Baseline v1.0, chapters 8.2 and 8.3, and appendix B (Plugin). |
+| SP-I-009 | Upgrade MUST NOT split backend and renderer versions and MUST leave the previous version serviceable until atomic switch; any failed step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-I-010 | DISABLE and UNINSTALL MUST NOT purge retained data; PURGE MUST NOT occur implicitly. | Architecture Baseline v1.0, chapter 9.3. |
+
+FILE spec\acceptance\s0-auth-user-friend.md
+# S0 Auth, User, and Friend Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not endpoint paths, wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| AUF-A-001 | Given one valid Session in a login slot, when the same user logs in again for that client type, the fixture runner MUST assert that the old epoch can no longer authenticate and the new Session can; the same test MUST assert that other client types remain valid. | Architecture Baseline v1.0, chapters 4.1, 7.2, and 7.3, and appendix B (Session). |
+| AUF-A-002 | Given an unauthenticated WSS connection, the negative fixture runner MUST reject every operation other than auth.bind and ping/pong; after valid binding it MUST assert the authenticated state is bound to user, Session, and client type. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-A-003 | Given an active same-slot connection, when a replacement login commits, the fixture runner MUST observe session.revoked followed by closure and MUST reject reconnect with the old token. | Architecture Baseline v1.0, chapters 7.2 and 7.3. |
+| AUF-A-004 | Given users A and B, adding A-to-B and then B-to-A MUST converge to one normalized friendship and one DIRECT Conversation; fixtures MUST reject a second distinct relationship for the same unordered pair. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-A-005 | The friend-add contract fixture MUST demonstrate immediate bidirectional success and MUST NOT expose a pending approval state. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-A-006 | Logout fixtures MUST assert Session and Refresh Token revocation plus WSS closure, while making no assertion that local client history is deleted. | Architecture Baseline v1.0, chapter 7.1. |
+| AUF-A-007 | Security fixtures MUST reject tokens in URL query input and MUST assert that responses and captured structured logs contain no token or password material. | Architecture Baseline v1.0, chapter 7.4. |
+| AUF-A-008 | Both backend profiles MUST run the same positive and negative fixtures and normalize to the same observable auth, friendship, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+
+FILE spec\acceptance\s0-messaging.md
+# S0 Messaging Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| MSG-A-001 | Given an authorized member send, the runner MUST withhold success ACK until a fault-injection probe confirms durable Message and Outbox commit; rollback before commit MUST produce no success ACK. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-A-002 | Given repeated sends with the same sender, Conversation, and client request identity, the runner MUST assert one logical Message, one Conversation sequence, and a stable successful outcome. | Architecture Baseline v1.0, chapters 4.4, 5.1, and 11.3. |
+| MSG-A-003 | Given the same client request identity in different Conversations, the runner MUST treat each Conversation-scoped request independently while preserving globally unique server Message identity. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-A-004 | Given a sender who is not a Conversation member, the negative fixture MUST assert rejection, no Message, no Outbox event, and no success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-A-005 | Given duplicate and out-of-order NATS delivery, the runner MUST assert idempotent consumer behavior, no duplicate logical Message, and eventual completeness through Sync. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-A-006 | Given a GROUP send, the runner MUST assert one logical Message and one Outbox event regardless of member count, with local online fan-out treated separately from persistence. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-A-007 | Correctness fixtures MUST assert zero lost committed Messages, zero duplicate logical Messages, zero wrong-Conversation deliveries, zero permanent sequence gaps, and zero ACK-before-commit cases. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-A-008 | Both backend profiles MUST consume identical fixtures and normalize to the same ACK, idempotency, authorization, ordering, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+
+FILE spec\acceptance\s0-sync-plugin.md
+# S0 Sync and Plugin Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| SP-A-001 | Given duplicate and out-of-order per-Conversation inputs with a gap, the runner MUST assert idempotent materialization and that contiguous sequence stops before the gap; after the missing input arrives it MUST advance across the now-complete prefix. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-A-002 | Given a locally FAILED item and a matching server Message, the runner MUST assert convergence to SENT without an additional local item; SENT MUST remain terminal under later timeout input. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-A-003 | Fault injection between local materialization and cursor advancement MUST roll back both effects; retry MUST converge by transactional upsert. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-A-004 | A user-cursor fixture containing a Message event MUST be rejected; low-frequency friend, Conversation, membership, and plugin state fixtures MUST advance only the user cursor. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-A-005 | Permission-negative fixtures MUST deny undeclared Event subscriptions, unauthorized Queries, unauthorized Actions, and unavailable UI capabilities, with no direct Core or database bypass. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-A-006 | Query fixtures MUST assert read-only, paginated, limited behavior; Action fixtures MUST assert execution-time re-authorization, idempotent outcomes, and audit evidence. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-A-007 | Artifact fixtures MUST reject a changed package, backend, or renderer hash for an existing plugin/version identity and MUST reject backend-renderer version splitting. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-A-008 | Renderer-negative fixtures MUST reject failures of hash, signature, manifest schema, API compatibility, permission, resource-size, CSP, or entry-point checks; runtime probes MUST verify the declared UI sandbox boundary. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-A-009 | WASM-negative fixtures MUST verify default denial of database, server-file, arbitrary-network, and other-plugin-memory access plus enforcement of resource limits and AUTO_DISABLED threshold behavior. | Architecture Baseline v1.0, chapter 8.3. |
+| SP-A-010 | Upgrade fixtures MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed; failure at each step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-A-011 | Lifecycle fixtures MUST assert that DISABLE preserves data, UNINSTALL defaults to RETAINED, and PURGE requires an explicit elevated, audited, retention-confirmed operation. | Architecture Baseline v1.0, chapter 9.3. |
+| SP-A-012 | Golden fixtures MUST include duplicate, out-of-order, gap, and permission-denial cases and MUST normalize to identical Sync and Plugin outcomes across both backend profiles. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+| SP-A-013 | Given repeated execution of the same Action, the runner MUST assert one idempotent observable outcome with no duplicate side effect and MUST retain audit evidence for every execution attempt. | Architecture Baseline v1.0, chapter 8.1. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+
+FILE contracts\database\README.md
+# Canonical PostgreSQL schema
+
+`migrations/0001_initial.up.sql` is the shared schema for Go and Java profiles.
+Run the migration before application startup, using a normal PostgreSQL `psql`
+client and libpq connection settings (`PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE`,
+and secure credential handling outside the command line):
+
+```text
+python3 contracts/database/migrate.py status
+python3 contracts/database/migrate.py up
+python3 contracts/database/migrate.py down --allow-data-loss
+```
+
+The runner applies each SQL file and its checksum ledger entry in one transaction
+under a PostgreSQL advisory transaction lock. Applied SQL is immutable. The down
+migration drops all product tables and requires explicit data-loss acknowledgement;
+release rollback still requires a backup and compatibility assessment.
+
+`sessions` is one row per `(user_id, client_type)` slot. A replacement login must
+rotate `session_id`, increment `session_epoch`, and revoke the old session in one
+transaction. The server must validate both session ID and epoch against PostgreSQL.
+The database constraints reject duplicate normalized friendship and DIRECT pairs,
+request IDs and sequence numbers within a Conversation, and duplicate logical
+`message.created` outbox events. Message authorization, sequence allocation,
+matching Outbox insertion, friend/direct/membership/sync transaction assembly, and
+post-commit ACK remain application transaction obligations. A unique constraint
+alone cannot prove those multi-row operations occurred atomically.
+
+With a disposable PostgreSQL database configured through libpq variables, run
+`python3 -m unittest discover -s tests/database -v`. The integration test uses
+an isolated temporary schema and exercises forward, uniqueness, and rollback.
+
+FILE contracts\websocket\README.md
+# Canonical WSS v1 contract
+
+`envelope.schema.json` is the machine-verifiable wire authority. Every JSON frame has `protocolVersion`, `type`, `requestId`, and `payload`; unknown fields are rejected. A successful `message.ack` has `status: committed`, `messageId`, `seq`, and `createdAt`. The echoed `requestId` identifies the client logical send within its Conversation. `message.created` carries that same request identity for local convergence. Server-generated events use a unique event `requestId` except `message.created`, which carries the originating send request identity.
+
+TLS and WebSocket upgrade produce an unauthenticated connection. Before successful `auth.bind`, only `auth.bind`, `ping`, and `pong` are legal. The access token appears only in `auth.bind.payload`, never in the URL, logs, errors, or fan-out. The server checks signature, expiry, session ID, client type, and session epoch against authoritative session state before binding. A revoked or replaced session emits `session.revoked` and closes the connection; later sends cannot succeed. The `auth.ack` echoes the bind request identity.
+
+For `message.send`, the sender identity comes solely from the bound session. Core authorizes Conversation membership before persistence. `(senderId, conversationId, requestId)` is the server idempotency identity. A repeated send with that identity and identical content returns the original committed `messageId`, `seq`, and `createdAt`; it creates no second Message, sequence, or logical Outbox event. Reuse of the identity with different content is rejected. The same request ID in another Conversation is independent. Sequence numbers increase within each Conversation, while message IDs are globally unique.
+
+`message.ack` with `status: committed` is legal only after the Message, sequence allocation, and matching Outbox event commit atomically in PostgreSQL. A rollback or unknown commit outcome must not yield a successful ACK. A rejected send has no persisted Message or Outbox event. NATS delivery and local `message.created` fan-out can repeat; clients converge by Conversation and request/message identity, and Sync supplies eventual completeness. GROUP send persists one logical Message and one logical Outbox event regardless of member count. WSS v1's send content is `TEXT`; Plugin content requires its separate versioned contract. `message.created` is routed only to locally active, authorized Conversation members; Gateway does not decide business membership.
+
+`contracts/fixtures/websocket/` holds the deterministic shared Go/Java vectors. Run `python contracts/websocket/verify.py` to regenerate and compare them, validate the wire schema, run state assertions, and exercise negative mutations. `python contracts/websocket/verify.py --write` updates generated fixtures intentionally.
+
+FILE contracts\plugin-api\README.md
+# Canonical Sync and Plugin API v1 contracts
+
+`../websocket/sync-v1.schema.json` defines the four Sync v1 wire objects: user request/page and Conversation request/page. `v1.schema.json` defines Plugin API v1 manifests, Event subscriptions, Queries, Actions, UI Host calls, and immutable artifact descriptors. `policy-v1.json` fixes the capability and permission map, Query page limit, renderer preflight and sandbox choices, WASM denials and limit classes, upgrade stages, and purge requirements. These files under `contracts/` are the public machine-verifiable authority. The verifier and golden vectors live beside them; implementations must conform to the contracts.
+
+The user cursor is opaque and advances only with friend, Conversation, membership, or plugin state. Message pages use a per-Conversation sequence. A client materializes data and advances the corresponding cursor or contiguous sequence in one transaction. A failed transaction changes neither. Duplicate and out-of-order Messages upsert by `(conversationId, requestId)`, `messageId`, and `(conversationId, seq)`; a conflicting identity is rejected. `contiguous_seq` advances only across a complete prefix. A locally FAILED item with the same Conversation and request identity becomes SENT, and SENT never regresses to FAILED. Web remains memory-only; Desktop and Mobile render account-scoped local materialized state before background Sync.
+
+Each Plugin API surface requires both its declared capability and current permission. A Query request is limited to 100 items; an allowed Query returns a `query.page` with at most the requested number of host-projected items, a matching request page token, a continuation token when `hasMore` is true, and `sideEffects: 0`. A follow-up request presents the prior continuation token. An unauthorized or invalid Query returns no page. Actions are re-authorized at execution, use `(pluginId, conversationId, requestId)` as the idempotency identity, and leave an audit record for every attempt. The Host bridge is the only route to Core data or actions; no direct Core or database access is granted.
+
+A renderer loads only after package hash, signature, manifest schema, API compatibility, permission, resource size, CSP, and entry-point checks succeed. It executes in a sandbox iframe or isolated WebView and reaches UI Host only through the mediated bridge. The verifier's renderer runtime cases reject direct host-sensitive resource access. A `(pluginId, version)` artifact is immutable: package, backend, and renderer hashes cannot change under that identity. Backend and renderer versions must match. Messages referring to Plugin content must retain the referenced renderer version and fallback TEXT. WSS v1's existing `message.send` remains TEXT-only; this contract does not change it.
+
+WASM denies database, server-file, arbitrary-network, and other-plugin-memory access by default. CPU/time, memory, concurrency, storage, and network limits are enforced; three consecutive timeout, panic, or limit violations trigger AUTO_DISABLED. Plugin artifact lifecycle and Conversation instance lifecycle remain distinct. During upgrade the old version serves until snapshot, migration, backend and renderer health checks, and atomic switch succeed. Any failed stage restores the snapshot and leaves the old version serving. DISABLE preserves data; UNINSTALL defaults to RETAINED; PURGE requires an explicit, elevated, audited, retention-confirmed operation.
+
+Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; observable Sync checkpoints record rollback, materialized user state, the gap before repair, and retry. The local send trace records FAILED before matching Sync, SENT after Sync with one item, and terminal SENT after a later failure signal. Query fixtures observe linked result pages, item counts, and zero side effects. Action fixtures record every authorization/audit result, and upgrade fixtures record each attempted stage while the old version serves.
+
+`contracts/fixtures/sync-plugin/profile-outcomes/go.json` and `java.json` are separately stored normalized **contract vectors** for the two planned backend profiles. The verifier checks each artifact's complete case set against the canonical expected outcome and rejects a divergent value in either profile. These static vectors were initially populated from the canonical fixture expectations; they are not outputs from Go or Java backend execution, because neither backend exists at this stage. Backend conformance must replace or validate these observations when those implementations arrive. The verifier also runs malformed-wire, wrong-outcome, seven scenario mutation, and profile-divergence controls.
+
+FILE contracts\database\migrations\0001_initial.up.sql
+CREATE TABLE users (
+    user_id uuid PRIMARY KEY,
+    username text NOT NULL UNIQUE,
+    display_name text NOT NULL,
+    password_hash text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CHECK (length(username) > 0),
+    CHECK (length(password_hash) > 0)
+);
+
+-- The slot row is replaced atomically on login: session_id rotates and epoch rises.
+CREATE TABLE sessions (
+    user_id uuid NOT NULL REFERENCES users(user_id),
+    client_type text NOT NULL CHECK (client_type IN ('WEB', 'DESKTOP', 'MOBILE')),
+    session_id uuid NOT NULL UNIQUE,
+    session_epoch bigint NOT NULL CHECK (session_epoch > 0),
+    refresh_token_hash text,
+    status text NOT NULL CHECK (status IN ('ACTIVE', 'REVOKED')),
+    device_id text NOT NULL,
+    expires_at timestamptz NOT NULL,
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, client_type),
+    CHECK (status <> 'ACTIVE' OR refresh_token_hash IS NOT NULL)
+);
+
+CREATE TABLE conversations (
+    conversation_id uuid PRIMARY KEY,
+    kind text NOT NULL CHECK (kind IN ('DIRECT', 'GROUP')),
+    direct_user_low_id uuid REFERENCES users(user_id),
+    direct_user_high_id uuid REFERENCES users(user_id),
+    next_seq bigint NOT NULL DEFAULT 1 CHECK (next_seq > 0),
+    created_by uuid NOT NULL REFERENCES users(user_id),
+    group_create_request_id uuid,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CHECK ((kind = 'DIRECT' AND direct_user_low_id IS NOT NULL AND direct_user_high_id IS NOT NULL
+            AND direct_user_low_id < direct_user_high_id AND group_create_request_id IS NULL)
+        OR (kind = 'GROUP' AND direct_user_low_id IS NULL AND direct_user_high_id IS NULL
+            AND group_create_request_id IS NOT NULL)),
+    UNIQUE (conversation_id, direct_user_low_id, direct_user_high_id),
+    UNIQUE (direct_user_low_id, direct_user_high_id),
+    UNIQUE (created_by, group_create_request_id)
+);
+
+CREATE TABLE friendships (
+    user_low_id uuid NOT NULL REFERENCES users(user_id),
+    user_high_id uuid NOT NULL REFERENCES users(user_id),
+    direct_conversation_id uuid NOT NULL UNIQUE,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_low_id, user_high_id),
+    CHECK (user_low_id < user_high_id),
+    FOREIGN KEY (direct_conversation_id, user_low_id, user_high_id)
+        REFERENCES conversations(conversation_id, direct_user_low_id, direct_user_high_id)
+);
+
+CREATE TABLE conversation_members (
+    conversation_id uuid NOT NULL REFERENCES conversations(conversation_id),
+    user_id uuid NOT NULL REFERENCES users(user_id),
+    role text NOT NULL CHECK (role IN ('OWNER', 'MEMBER')),
+    joined_at timestamptz NOT NULL DEFAULT now(),
+    left_at timestamptz,
+    PRIMARY KEY (conversation_id, user_id)
+);
+
+CREATE TABLE plugin_artifacts (
+    plugin_id text NOT NULL,
+    version text NOT NULL,
+    package_hash text NOT NULL,
+    backend_hash text NOT NULL,
+    renderer_hash text NOT NULL,
+    manifest jsonb NOT NULL,
+    status text NOT NULL CHECK (status IN ('UPLOADED', 'VALIDATING', 'VERIFIED', 'REJECTED')),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (plugin_id, version),
+    CHECK (length(plugin_id) > 0 AND length(version) > 0),
+    CHECK (length(package_hash) > 0 AND length(backend_hash) > 0 AND length(renderer_hash) > 0)
+);
+
+CREATE FUNCTION reject_plugin_artifact_mutation() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    IF (OLD.plugin_id, OLD.version, OLD.package_hash, OLD.backend_hash, OLD.renderer_hash, OLD.manifest)
+       IS DISTINCT FROM
+       (NEW.plugin_id, NEW.version, NEW.package_hash, NEW.backend_hash, NEW.renderer_hash, NEW.manifest) THEN
+        RAISE EXCEPTION 'plugin artifact identity and bytes are immutable';
+    END IF;
+    RETURN NEW;
+END $$;
+CREATE TRIGGER plugin_artifact_immutable BEFORE UPDATE ON plugin_artifacts
+    FOR EACH ROW EXECUTE FUNCTION reject_plugin_artifact_mutation();
+
+CREATE FUNCTION reject_plugin_artifact_delete() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION 'plugin artifact versions cannot be deleted';
+END $$;
+CREATE TRIGGER plugin_artifact_no_delete BEFORE DELETE ON plugin_artifacts
+    FOR EACH ROW EXECUTE FUNCTION reject_plugin_artifact_delete();
+
+CREATE TABLE plugin_instances (
+    conversation_id uuid NOT NULL REFERENCES conversations(conversation_id),
+    plugin_id text NOT NULL,
+    active_version text,
+    desired_version text,
+    previous_version text,
+    status text NOT NULL CHECK (status IN ('INSTALLING', 'ENABLED', 'DISABLED', 'INSTALL_FAILED', 'AUTO_DISABLED', 'UNINSTALLED', 'RETAINED', 'PURGED')),
+    grants jsonb NOT NULL DEFAULT '{}'::jsonb,
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (conversation_id, plugin_id),
+    FOREIGN KEY (plugin_id, active_version) REFERENCES plugin_artifacts(plugin_id, version),
+    FOREIGN KEY (plugin_id, desired_version) REFERENCES plugin_artifacts(plugin_id, version),
+    FOREIGN KEY (plugin_id, previous_version) REFERENCES plugin_artifacts(plugin_id, version)
+);
+
+CREATE TABLE plugin_kv (
+    conversation_id uuid NOT NULL,
+    plugin_id text NOT NULL,
+    key text NOT NULL,
+    value jsonb NOT NULL,
+    schema_version integer NOT NULL CHECK (schema_version > 0),
+    PRIMARY KEY (conversation_id, plugin_id, key),
+    FOREIGN KEY (conversation_id, plugin_id) REFERENCES plugin_instances(conversation_id, plugin_id)
+);
+
+CREATE TABLE messages (
+    server_message_id uuid PRIMARY KEY,
+    conversation_id uuid NOT NULL REFERENCES conversations(conversation_id),
+    sender_id uuid NOT NULL REFERENCES users(user_id),
+    request_id uuid NOT NULL,
+    seq bigint NOT NULL CHECK (seq > 0),
+    kind text NOT NULL CHECK (kind IN ('TEXT', 'PLUGIN')),
+    text_body text,
+    plugin_id text,
+    plugin_version text,
+    fallback_text text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (conversation_id, request_id),
+    UNIQUE (sender_id, conversation_id, request_id),
+    UNIQUE (conversation_id, seq),
+    UNIQUE (server_message_id, conversation_id),
+    FOREIGN KEY (plugin_id, plugin_version) REFERENCES plugin_artifacts(plugin_id, version),
+    CHECK ((kind = 'TEXT' AND text_body IS NOT NULL AND plugin_id IS NULL AND plugin_version IS NULL)
+        OR (kind = 'PLUGIN' AND plugin_id IS NOT NULL AND plugin_version IS NOT NULL AND fallback_text IS NOT NULL))
+);
+
+CREATE TABLE outbox_events (
+    event_id uuid PRIMARY KEY,
+    aggregate_type text NOT NULL,
+    aggregate_id uuid NOT NULL,
+    event_type text NOT NULL,
+    conversation_id uuid REFERENCES conversations(conversation_id),
+    message_id uuid,
+    payload jsonb NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    published_at timestamptz,
+    attempts integer NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+    FOREIGN KEY (message_id, conversation_id) REFERENCES messages(server_message_id, conversation_id),
+    CHECK ((event_type = 'message.created' AND message_id IS NOT NULL AND conversation_id IS NOT NULL)
+        OR (event_type <> 'message.created' AND message_id IS NULL))
+);
+CREATE UNIQUE INDEX outbox_one_message_created ON outbox_events(message_id) WHERE event_type = 'message.created';
+CREATE INDEX outbox_unpublished ON outbox_events(created_at, event_id) WHERE published_at IS NULL;
+
+CREATE TABLE user_sync_events (
+    user_id uuid NOT NULL REFERENCES users(user_id),
+    cursor_id bigint GENERATED ALWAYS AS IDENTITY,
+    event_type text NOT NULL CHECK (event_type IN ('friend.changed', 'conversation.changed', 'membership.changed', 'plugin.changed', 'session.revoked')),
+    payload jsonb NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, cursor_id)
+);
+
