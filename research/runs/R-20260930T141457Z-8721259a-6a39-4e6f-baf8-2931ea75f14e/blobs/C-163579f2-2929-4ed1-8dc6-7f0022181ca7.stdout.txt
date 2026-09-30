@@ -1,0 +1,61 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 2.28kB 0.0s done
+#1 DONE 0.0s
+
+#2 [core-go internal] load build definition from Dockerfile
+#2 transferring dockerfile: 247B done
+#2 DONE 0.0s
+
+#3 [migrate internal] load build definition from migrate.Dockerfile
+#3 transferring dockerfile: 229B done
+#3 DONE 0.0s
+
+#4 [core-go internal] load metadata for docker.io/library/alpine:3.21
+#4 DONE 5.7s
+
+#5 [core-go internal] load metadata for docker.io/library/golang:1.25-alpine
+#5 ...
+
+#6 [migrate internal] load metadata for docker.io/library/python:3.12-alpine
+#6 DONE 7.6s
+
+#7 [migrate internal] load .dockerignore
+#7 transferring context: 2B done
+#7 DONE 0.0s
+
+#8 [migrate internal] load build context
+#8 transferring context: 401B done
+#8 DONE 0.0s
+
+#9 [migrate 1/4] FROM docker.io/library/python:3.12-alpine@sha256:4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111
+#9 resolve docker.io/library/python:3.12-alpine@sha256:4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111 0.0s done
+#9 DONE 0.0s
+
+#10 [migrate 3/4] WORKDIR /work
+#10 CACHED
+
+#11 [migrate 2/4] RUN apk add --no-cache postgresql-client
+#11 CACHED
+
+#12 [migrate 4/4] COPY contracts/database /work/contracts/database
+#12 CACHED
+
+#13 [migrate] exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:7464d7ffa6f8e098276bc310fd47040a60cca3e14261e425d1924b672ba809d9 0.0s done
+#13 exporting config sha256:60c46e483eabdbff1d2d5aa362bf60134bfdedfad98c7864abcfc70f8ce7e467 0.0s done
+#13 exporting attestation manifest sha256:3acba9c178c34616bc447037d38b357fcc82bd1c49b91287a35a8d84b0401c6d 0.0s done
+#13 exporting manifest list sha256:267c9353901b33e4d3a4b9c592a0a4eac170d8a60c876877a40216fb84de557c
+#13 exporting manifest list sha256:267c9353901b33e4d3a4b9c592a0a4eac170d8a60c876877a40216fb84de557c 0.0s done
+#13 naming to docker.io/library/im-arch4-live-25720-migrate:latest done
+#13 unpacking to docker.io/library/im-arch4-live-25720-migrate:latest 0.0s done
+#13 DONE 0.1s
+
+#14 [migrate] resolving provenance for metadata file
+#14 DONE 0.0s
+
+#5 [core-go internal] load metadata for docker.io/library/golang:1.25-alpine
+#5 ERROR: unexpected status from HEAD request to https://docker.1panel.live/v2/library/golang/manifests/1.25-alpine?ns=docker.io: 403 Forbidden
+------
+ > [gateway-go internal] load metadata for docker.io/library/golang:1.25-alpine:
+------

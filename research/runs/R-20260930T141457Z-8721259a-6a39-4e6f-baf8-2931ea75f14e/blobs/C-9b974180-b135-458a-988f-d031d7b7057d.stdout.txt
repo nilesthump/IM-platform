@@ -1,0 +1,140 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 2.28kB 0.0s done
+#1 DONE 0.0s
+
+#2 [plugin-host-go internal] load build definition from Dockerfile
+#2 transferring dockerfile: 247B done
+#2 DONE 0.0s
+
+#3 [migrate internal] load build definition from migrate.Dockerfile
+#3 transferring dockerfile: 229B done
+#3 DONE 0.0s
+
+#4 [core-go internal] load metadata for docker.io/library/alpine:3.21
+#4 DONE 5.0s
+
+#5 [core-go internal] load metadata for docker.io/library/golang:1.25-alpine
+#5 ...
+
+#6 [migrate internal] load metadata for docker.io/library/python:3.12-alpine
+#6 DONE 9.6s
+
+#7 [migrate internal] load .dockerignore
+#7 transferring context: 2B done
+#7 DONE 0.0s
+
+#8 [migrate internal] load build context
+#8 transferring context: 14.52kB done
+#8 DONE 0.0s
+
+#9 [migrate 1/4] FROM docker.io/library/python:3.12-alpine@sha256:4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111
+#9 resolve docker.io/library/python:3.12-alpine@sha256:4c47124a8391cb7a9f571164147d154777cf012a4ece5f86097130d7a4478111 0.0s done
+#9 DONE 0.0s
+
+#10 [migrate 2/4] RUN apk add --no-cache postgresql-client
+#10 CACHED
+
+#11 [migrate 3/4] WORKDIR /work
+#11 CACHED
+
+#12 [migrate 4/4] COPY contracts/database /work/contracts/database
+#12 CACHED
+
+#13 [migrate] exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:21e00aa9ab5879e64aae1b08b747f8aded4a6fa577d55efa12155d53fef39177 0.0s done
+#13 exporting config sha256:ebfe07b5e453a5322aead929657d9e7878d28042447a5fa848d08f8e21f84fbe 0.0s done
+#13 exporting attestation manifest sha256:6bbdbe461d07232a62678708a2e38403326c3eb16abbb17e4ddcdf6ca2368c1d 0.0s done
+#13 exporting manifest list sha256:2fb52da2794eb27b805835ab6c68e9e866cacd22c2245ac22ace4e6c07a868f7
+#13 exporting manifest list sha256:2fb52da2794eb27b805835ab6c68e9e866cacd22c2245ac22ace4e6c07a868f7 done
+#13 naming to docker.io/library/im-arch4-live-37316-migrate:latest done
+#13 unpacking to docker.io/library/im-arch4-live-37316-migrate:latest done
+#13 DONE 0.1s
+
+#14 [migrate] resolving provenance for metadata file
+#14 DONE 0.0s
+
+#5 [core-go internal] load metadata for docker.io/library/golang:1.25-alpine
+#5 DONE 13.3s
+
+#15 [core-go internal] load .dockerignore
+#15 transferring context: 2B done
+#15 DONE 0.0s
+
+#16 [core-go stage-1 1/2] FROM docker.io/library/alpine:3.21@sha256:ce64758a109eb420d874a118f87920e625e12d3634e03b4a5573fd9f6e5d3507
+#16 resolve docker.io/library/alpine:3.21@sha256:ce64758a109eb420d874a118f87920e625e12d3634e03b4a5573fd9f6e5d3507 0.0s done
+#16 CACHED
+
+#17 [core-go build 1/6] FROM docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59
+#17 resolve docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59 0.0s done
+#17 DONE 0.0s
+
+#18 [core-go build 2/6] WORKDIR /src
+#18 CACHED
+
+#19 [plugin-host-go internal] load build context
+#19 transferring context: 76.98kB done
+#19 DONE 0.0s
+
+#20 [core-go build 3/6] COPY go.mod go.sum ./
+#20 DONE 0.0s
+
+#21 [plugin-host-go build 4/6] RUN go mod download
+#21 DONE 68.2s
+
+#21 [plugin-host-go build 4/6] RUN go mod download
+#21 DONE 68.2s
+
+#22 [core-go build 5/6] COPY . .
+#22 DONE 0.1s
+
+#23 [gateway-go build 6/6] RUN CGO_ENABLED=0 go build -o /im-go .
+#23 DONE 15.1s
+
+#23 [plugin-host-go build 6/6] RUN CGO_ENABLED=0 go build -o /im-go .
+#23 DONE 15.1s
+
+#24 [plugin-host-go stage-1 2/2] COPY --from=build /im-go /im-go
+#24 DONE 0.1s
+
+#25 [gateway-go] exporting to image
+#25 exporting layers
+#25 exporting layers 0.6s done
+#25 exporting manifest sha256:4448e09aacdc1f9d877ae207b5d503b490ea1c25f17ab4fae2678ea7f722bb66 0.0s done
+#25 exporting config sha256:2ead40876261387e74b2af9ba20e45281dda00a8e97dc9367e873bc3a57b2d56 0.0s done
+#25 exporting attestation manifest sha256:d98434067b67d55bcb41ac777c0b033ce2196725cc5e8d884b2e205a5242e096
+#25 exporting attestation manifest sha256:d98434067b67d55bcb41ac777c0b033ce2196725cc5e8d884b2e205a5242e096 0.1s done
+#25 exporting manifest list sha256:2ace6b33ca2978d8f498dac8709abec55ec79beb489feaab53dea957f9d7ba05 0.0s done
+#25 naming to docker.io/library/im-arch4-live-37316-gateway-go:latest done
+#25 unpacking to docker.io/library/im-arch4-live-37316-gateway-go:latest 0.1s done
+#25 DONE 0.9s
+
+#26 [plugin-host-go] exporting to image
+#26 exporting layers 0.6s done
+#26 exporting manifest sha256:faa3490133af918d943aa9e7a6b980b84e12da322a804f85a9a19870d9cae289 0.0s done
+#26 exporting config sha256:3c5c56f4806c5eda612916e0aa0909c86a673ea5d074767d81623d4144db3b5b 0.0s done
+#26 exporting attestation manifest sha256:4f7bfc9251edf3397adc9756e3e11920628ef991b92757bc75233b850ab75040 0.1s done
+#26 exporting manifest list sha256:6ebfd801a7ab173013432ef25ec55312744926d3921e906feb040aee0ef65b66 0.0s done
+#26 naming to docker.io/library/im-arch4-live-37316-plugin-host-go:latest done
+#26 unpacking to docker.io/library/im-arch4-live-37316-plugin-host-go:latest 0.2s done
+#26 DONE 0.9s
+
+#27 [core-go] exporting to image
+#27 exporting layers 0.6s done
+#27 exporting manifest sha256:9f159cb2291a40aa35a7024091489bbff94d1105bf07cc1aa9cc5da12edd4f5d 0.0s done
+#27 exporting config sha256:7d430df73b73b38cf5a81b7df47f03fc1e24a3d466f0315bc6c97752c15747ee 0.0s done
+#27 exporting attestation manifest sha256:bcbfa9e72bfb37f9a4db8e7404a71bcdeb997510c72ef25826ac490498da2691 0.1s done
+#27 exporting manifest list sha256:cee9475723fe57f022d965bdd77c5f1c0d05c1eb063df2f7dab982c309e750c5 0.0s done
+#27 naming to docker.io/library/im-arch4-live-37316-core-go:latest 0.0s done
+#27 unpacking to docker.io/library/im-arch4-live-37316-core-go:latest 0.2s done
+#27 DONE 0.9s
+
+#28 [core-go] resolving provenance for metadata file
+#28 DONE 0.1s
+
+#29 [plugin-host-go] resolving provenance for metadata file
+#29 DONE 0.0s
+
+#30 [gateway-go] resolving provenance for metadata file
+#30 DONE 0.1s
+PASS: actual3 Go roles/HTTP forwarding/TLS/WSS3slots/replacementepoch/oldtokenreject/CoreOutboxNATSGatewayrevocation/logoutclose; no skips

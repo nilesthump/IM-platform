@@ -1,11 +1,8 @@
-package main
+package core
 
 import (
 	"context"
-	"crypto/hmac"
-	"crypto/rand"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -19,6 +16,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
+	"im-platform/backend/go/shared"
 )
 
 const accessTTL = 900
@@ -27,10 +25,9 @@ const refreshTTL = 2592000
 var usernamePattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]*$`)
 
 type authService struct {
-	db     *pgxpool.Pool
-	key    []byte
-	now    func() time.Time
-	revoke func(string, string)
+	db    *pgxpool.Pool
+	codec *shared.Codec
+	now   func() time.Time
 }
 
 type clientInput struct {
@@ -57,91 +54,13 @@ type refreshInput struct {
 	RefreshToken string `json:"refreshToken,omitempty"`
 }
 
-type claims struct {
-	UserID       string `json:"user_id"`
-	SessionID    string `json:"session_id"`
-	ClientType   string `json:"client_type"`
-	SessionEpoch int64  `json:"session_epoch"`
-	IssuedAt     int64  `json:"iat"`
-	ExpiresAt    int64  `json:"exp"`
-}
-
-type apiError struct {
-	status  int
-	code    string
-	message string
-}
-
-func (e apiError) Error() string { return e.code }
-
-func fail(status int, code, message string) error { return apiError{status, code, message} }
-
-func randomToken(n int) (string, error) {
-	b := make([]byte, n)
-	if _, err := rand.Read(b); err != nil {
-		return "", err
-	}
-	return base64.RawURLEncoding.EncodeToString(b), nil
-}
-
-func uuid() (string, error) {
-	b := make([]byte, 16)
-	if _, err := rand.Read(b); err != nil {
-		return "", err
-	}
-	b[6] = b[6]&0x0f | 0x40
-	b[8] = b[8]&0x3f | 0x80
-	h := hex.EncodeToString(b)
-	return h[:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:], nil
-}
-
-func hashToken(token string) string {
-	h := sha256.Sum256([]byte(token))
-	return hex.EncodeToString(h[:])
-}
-
-// Prehash keeps bcrypt's 72-byte input limit from truncating valid passwords.
 func passwordMaterial(password string) []byte {
 	h := sha256.Sum256([]byte("im-password-v1:" + password))
 	return []byte(hex.EncodeToString(h[:]))
 }
 
-func (s *authService) sign(c claims) (string, error) {
-	head := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"HS256","typ":"JWT"}`))
-	payload, err := json.Marshal(c)
-	if err != nil {
-		return "", err
-	}
-	data := head + "." + base64.RawURLEncoding.EncodeToString(payload)
-	mac := hmac.New(sha256.New, s.key)
-	mac.Write([]byte(data))
-	return data + "." + base64.RawURLEncoding.EncodeToString(mac.Sum(nil)), nil
-}
-
-func (s *authService) parse(token string) (claims, error) {
-	var c claims
-	parts := strings.Split(token, ".")
-	if len(parts) != 3 || parts[0] != base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"HS256","typ":"JWT"}`)) {
-		return c, fail(401, "AUTH_TOKEN_INVALID", "Access token is invalid.")
-	}
-	mac := hmac.New(sha256.New, s.key)
-	mac.Write([]byte(parts[0] + "." + parts[1]))
-	sig, err := base64.RawURLEncoding.DecodeString(parts[2])
-	if err != nil || !hmac.Equal(sig, mac.Sum(nil)) {
-		return c, fail(401, "AUTH_TOKEN_INVALID", "Access token is invalid.")
-	}
-	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
-	if err != nil || json.Unmarshal(payload, &c) != nil || c.UserID == "" || c.SessionID == "" || c.SessionEpoch < 1 || !validClient(c.ClientType) || c.IssuedAt < 1 || c.ExpiresAt <= c.IssuedAt {
-		return c, fail(401, "AUTH_TOKEN_INVALID", "Access token is invalid.")
-	}
-	if s.now().Unix() >= c.ExpiresAt {
-		return c, fail(401, "AUTH_TOKEN_EXPIRED", "Access token has expired.")
-	}
-	return c, nil
-}
-
 func (s *authService) authenticate(ctx context.Context, token string) (claims, error) {
-	c, err := s.parse(token)
+	c, err := s.codec.Parse(token)
 	if err != nil {
 		return c, err
 	}
@@ -203,12 +122,12 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	_ = json.NewEncoder(w).Encode(v)
 }
 func writeError(w http.ResponseWriter, r *http.Request, err error) {
-	e := apiError{500, "INTERNAL_ERROR", "Internal server error."}
+	e := apiError{Status: 500, Code: "INTERNAL_ERROR", Message: "Internal server error."}
 	var a apiError
 	if errors.As(err, &a) {
 		e = a
 	}
-	writeJSON(w, e.status, map[string]any{"error": map[string]string{"code": e.code, "message": e.message}, "requestId": requestID(r)})
+	writeJSON(w, e.Status, map[string]any{"error": map[string]string{"code": e.Code, "message": e.Message}, "requestId": requestID(r)})
 }
 
 func (s *authService) handler() http.Handler {
@@ -352,9 +271,7 @@ func (s *authService) newSession(ctx context.Context, userID string, v clientInp
 	if err != nil {
 		return
 	}
-	if replaced && s.revoke != nil {
-		s.revoke(oldID, "REPLACED")
-	}
+
 	return
 }
 
@@ -378,7 +295,7 @@ func writeRevocation(ctx context.Context, tx pgx.Tx, userID, sid, reason string)
 
 func (s *authService) authResponse(w http.ResponseWriter, r *http.Request, userID, sid, typ string, epoch int64, replaced bool, refresh string) {
 	now := s.now().Unix()
-	access, err := s.sign(claims{userID, sid, typ, epoch, now, now + accessTTL})
+	access, err := s.codec.Sign(claims{UserID: userID, SessionID: sid, ClientType: typ, SessionEpoch: epoch, IssuedAt: now, ExpiresAt: now + accessTTL})
 	if err != nil {
 		writeError(w, r, err)
 		return
@@ -533,9 +450,7 @@ func (s *authService) logout(w http.ResponseWriter, r *http.Request) {
 		writeError(w, r, err)
 		return
 	}
-	if s.revoke != nil {
-		s.revoke(sid, "LOGOUT")
-	}
+
 	w.WriteHeader(204)
 }
 
@@ -587,3 +502,11 @@ func (s *authService) search(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, 200, map[string]any{"users": []any{map[string]string{"userId": id, "username": canonical, "displayName": display}}})
 }
+
+type claims = shared.Claims
+type apiError = shared.Error
+
+func fail(status int, code, message string) error { return shared.Fail(status, code, message) }
+func uuid() (string, error)                       { return shared.UUID() }
+func randomToken(n int) (string, error)           { return shared.RandomToken(n) }
+func hashToken(t string) string                   { return shared.HashToken(t) }

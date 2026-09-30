@@ -150,10 +150,13 @@ jobs:
         run: python3 contracts/database/migrate.py up
       - name: Go Auth build, integration and contract verification
         run: |
-          test -z "$(gofmt -l backend/go/*.go)"
+          test -z "$(find backend/go -name '*.go' -type f -print0 | xargs -0 gofmt -l)"
           cd backend/go
+          go build ./...
           go build -o "$RUNNER_TEMP/im-go" .
+          go vet ./...
           go test -count=1 ./...
+          go test -race -count=1 ./...
           cd ../..
           python3 contracts/websocket/verify.py
           pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1
@@ -287,6 +290,8 @@ jobs:
       - name: Go transport smoke
         shell: pwsh
         run: ./tests/infrastructure/smoke.ps1 -Profile go
+      - name: Go Auth actual roles and TLS event smoke
+        run: python3 tests/go/live_role_smoke.py
       - name: Java transport smoke
         shell: pwsh
         run: ./tests/infrastructure/smoke.ps1 -Profile java

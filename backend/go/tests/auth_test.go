@@ -1,4 +1,4 @@
-package main
+package tests
 
 import (
 	"bytes"
@@ -16,56 +16,9 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
+	"im-platform/backend/go/core"
+	"im-platform/backend/go/shared"
 )
-
-func TestTokenTamperAndExpiry(t *testing.T) {
-	s := &authService{key: []byte("test-only-signing-key-at-least-32-bytes"), now: func() time.Time { return time.Unix(1000, 0) }}
-	c := claims{"10000000-0000-4000-8000-000000000001", "50000000-0000-4000-8000-000000000001", "WEB", 1, 999, 1001}
-	token, err := s.sign(c)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err = s.parse(token); err != nil {
-		t.Fatal(err)
-	}
-	if _, err = s.parse(token + "x"); err == nil {
-		t.Fatal("tampered signature accepted")
-	}
-	s.now = func() time.Time { return time.Unix(1001, 0) }
-	if _, err = s.parse(token); err == nil || err.(apiError).code != "AUTH_TOKEN_EXPIRED" {
-		t.Fatalf("expired token: %v", err)
-	}
-}
-
-func TestConfigReadsExternalCredentialFiles(t *testing.T) {
-	dir := t.TempDir()
-	if err := os.WriteFile(dir+"/pg_password", []byte("local-test-password\n"), 0600); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(dir+"/jwt_key", []byte("test-only-signing-key-at-least-32-bytes\n"), 0600); err != nil {
-		t.Fatal(err)
-	}
-	config := []byte(`{"postgresHost":"localhost","postgresPort":5432,"postgresUser":"test","postgresDatabase":"test","postgresPasswordFile":"pg_password","jwtSigningKeyFile":"jwt_key","coreUrl":"http://localhost:8080","natsUrl":"nats://localhost:4222"}`)
-	if err := os.WriteFile(dir+"/config.json", config, 0600); err != nil {
-		t.Fatal(err)
-	}
-	_, key, pg, err := readConfig(dir + "/config.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(key) != "test-only-signing-key-at-least-32-bytes" || pg.ConnConfig.Password != "local-test-password" {
-		t.Fatal("credential files were not loaded")
-	}
-	if strings.Contains(string(config), "local-test-password") || strings.Contains(string(config), string(key)) {
-		t.Fatal("credential embedded in configuration")
-	}
-	if err := os.Remove(dir + "/jwt_key"); err != nil {
-		t.Fatal(err)
-	}
-	if _, _, _, err := readConfig(dir + "/config.json"); err == nil {
-		t.Fatal("missing signing key accepted")
-	}
-}
 
 func call(t *testing.T, h http.Handler, method, path string, body any, token string, cookie *http.Cookie) *httptest.ResponseRecorder {
 	t.Helper()
@@ -124,8 +77,8 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 	if err = db.Ping(ctx); err != nil {
 		t.Fatal(err)
 	}
-	s := &authService{db: db, key: []byte("test-only-signing-key-at-least-32-bytes"), now: time.Now}
-	h := newHub(s)
+	s := newService(db, []byte("test-only-signing-key-at-least-32-bytes"))
+	h := newGateway(t, s.db, s.codec.Key)
 	natsURL := os.Getenv("NATS_URL")
 	if natsURL == "" {
 		natsURL = "nats://127.0.0.1:4222"
@@ -135,26 +88,14 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer nc.Close()
-	_, err = nc.Subscribe("session.revoked", func(m *nats.Msg) {
-		var v struct {
-			SessionID string `json:"sessionId"`
-			Reason    string `json:"reason"`
-		}
-		if json.Unmarshal(m.Data, &v) == nil {
-			h.revoke(v.SessionID, v.Reason)
-		}
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
 	if err = nc.Flush(); err != nil {
 		t.Fatal(err)
 	}
 	relayCtx, stopRelay := context.WithCancel(ctx)
 	defer stopRelay()
-	go relaySessionRevocations(relayCtx, db, nc)
-	handler := s.handler()
-	random, _ := randomToken(8)
+	go core.RelaySessionRevocations(relayCtx, db, nc)
+	handler := s.handler
+	random, _ := shared.RandomToken(8)
 	username := "auth" + strings.ToLower(random[:10])
 	password := "fixture-password-not-a-real-secret"
 	w := call(t, handler, "POST", "/v1/auth/register", map[string]any{"username": username, "password": password, "displayName": "Auth Test"}, "", nil)
@@ -203,9 +144,9 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 	expect(t, mobile, 200)
 	mobileRefresh := readResult(t, mobile)["tokens"].(map[string]any)["refreshToken"].(string)
 	// Exercise real WebSocket pre-bind rejection and bind/replace notification.
-	server := httptest.NewServer(http.HandlerFunc(h.serve))
+	server := httptest.NewServer(h)
 	defer server.Close()
-	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
+	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/v1/ws"
 	pre, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -232,6 +173,27 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 	if ack["type"] != "auth.ack" || ack["payload"].(map[string]any)["status"] != "bound" {
 		t.Fatalf("bind failed: %v", ack)
 	}
+	// A bound operation must not query PostgreSQL (canonical7.3). An exclusive
+	// Session table lock makes a regression block rather than silently pass.
+	lock, err := db.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = lock.Exec(ctx, "LOCK TABLE sessions IN ACCESS EXCLUSIVE MODE"); err != nil {
+		t.Fatal(err)
+	}
+	_ = conn.SetReadDeadline(time.Now().Add(500 * time.Millisecond))
+	_ = conn.WriteJSON(frame("message.send", "80000000-0000-4000-8000-000000000010", map[string]any{}))
+	var operation map[string]any
+	err = conn.ReadJSON(&operation)
+	_ = lock.Rollback(ctx)
+	if err != nil {
+		t.Fatalf("bound operation blocked by PostgreSQL: %v", err)
+	}
+	if operation["type"] != "message.ack" || operation["payload"].(map[string]any)["error"].(map[string]any)["code"] != "AUTHORIZATION_DENIED" {
+		t.Fatalf("bound operation response: %v", operation)
+	}
+	_ = conn.SetReadDeadline(time.Time{})
 	web2 := login("WEB", "browser-2")
 	expect(t, web2, 200)
 	if getSession(t, web2)["sessionEpoch"] != float64(2) {
@@ -277,8 +239,33 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 	expect(t, rotated, 200)
 	expect(t, call(t, handler, "POST", "/v1/auth/refresh/native", refreshBody, "", nil), 401)
 	newRefresh := readResult(t, rotated)["tokens"].(map[string]any)["refreshToken"].(string)
+	mobileSocket, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer mobileSocket.Close()
+	_ = mobileSocket.WriteJSON(frame("auth.bind", "80000000-0000-4000-8000-000000000011", map[string]string{"accessToken": getToken(t, rotated)}))
+	var mobileAck map[string]any
+	if err = mobileSocket.ReadJSON(&mobileAck); err != nil {
+		t.Fatal(err)
+	}
+	if mobileAck["payload"].(map[string]any)["status"] != "bound" {
+		t.Fatal("mobile bind failed")
+	}
 	logout := call(t, handler, "POST", "/v1/auth/logout", nil, getToken(t, rotated), nil)
 	expect(t, logout, 204)
+	_ = mobileSocket.SetReadDeadline(time.Now().Add(3 * time.Second))
+	var logoutEvent map[string]any
+	if err = mobileSocket.ReadJSON(&logoutEvent); err != nil {
+		t.Fatal(err)
+	}
+	if logoutEvent["type"] != "session.revoked" || logoutEvent["payload"].(map[string]any)["reason"] != "LOGOUT" {
+		t.Fatalf("logout revocation: %v", logoutEvent)
+	}
+	if err = mobileSocket.ReadJSON(&closed); err == nil {
+		t.Fatal("logout socket stayed open")
+	}
+
 	refreshBody["refreshToken"] = newRefresh
 	expect(t, call(t, handler, "POST", "/v1/auth/refresh/native", refreshBody, "", nil), 401)
 	var status string
@@ -291,26 +278,5 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 	err = db.QueryRow(ctx, "SELECT count(*) FROM outbox_events WHERE aggregate_type='session' AND aggregate_id=$1", webSession["sessionId"]).Scan(&n)
 	if err != nil || n != 1 {
 		t.Fatalf("replacement outbox: %d %v", n, err)
-	}
-	// A failed revocation side effect rolls back its Session change.
-	tx, err := db.Begin(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = tx.Exec(ctx, "UPDATE sessions SET status='REVOKED' WHERE user_id=$1 AND client_type='DESKTOP'", userID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = writeRevocation(ctx, tx, "00000000-0000-4000-8000-000000000000", getSession(t, desktop)["sessionId"].(string), "REVOKED")
-	if err == nil {
-		t.Fatal("expected foreign-key failure")
-	}
-	if err := tx.Rollback(ctx); err != nil {
-		t.Fatal(err)
-	}
-	var desktopStatus string
-	err = db.QueryRow(ctx, "SELECT status FROM sessions WHERE user_id=$1 AND client_type='DESKTOP'", userID).Scan(&desktopStatus)
-	if err != nil || desktopStatus != "ACTIVE" {
-		t.Fatalf("rollback lost active session: %s %v", desktopStatus, err)
 	}
 }

@@ -6,39 +6,39 @@ Current Gate: LOOP1-ARCH-REMEDIATION
 Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
 Current Batch: LOOP1-ARCH-REMEDIATION
 Current Task: LOOP1-ARCH-REMEDIATION-004
-Current Task State: active
+Current Task State: review
 
 ## Immediately Relevant Completed Work
 
-Stage 001 bounded done after fresh independent Review at a09f4fb and hosted CI run 36714913796 completed success on exact Review closure `3e6e89fa2b378f1fcb4c944466fef2e3bc905379`, all ten jobs success. Full audit/25 repairs and v1.1 semantic/hash checks accepted. Historical Auth done at 59d92f3/local closure8cd90a7 retains old PASS; this does not prove new product compliance. Separate Social worktree preserved and not advanced.
+001 fullFrozenaudit25repairs/v1.1/newADR accepted,002executioninputsaccepted,003effectivecheckers boundedaccepted exact2afeac8/run36726926394:11success/source_go+gateactualFAILexpected.004actualGomigration implemented andallapplicablelocalchecksPASS; freshindependentReview/finalhostedpending. OriginalAuthdone oldchecksPASS retained; Socialseparateworktree preserved/businesssuspended.
 
 ## Current Blockers
 
-No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 bounded independent Review/hosted acceptance completed; stage004 I01 migration remains required. Overall remediation and S1 Gate not passed.
+No known unresolved substantive architecture choice within auditedscope. NewindependentReview andfinalexactheadhostedrequired before004/batchclosure; S1productGate separate/open.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
-  - Result: exit0, four integrity/semantic negative tests PASS; no canonical/PDF hash change.
-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md`
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: exit0 during edits; task002 unique, queues5/tasks20; Development is not acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md`
-- Command: `bundled Python spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/recovery-controls.py`
-  - Result: exit0; three disposable memory recovery negative controls and actual delta scope PASS. No source/import/trigger checker effectiveness claim.
-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md`
+- Command: `go -C backend/go test -race -count=1 -v ./...`
+  - Result: exit0 realPG16/NATS DB_TEST_ENABLE=1,zero integration skips; fullAuth/canonical/security/rollback/locks/revocationclose.
+  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/implementation-evidence.md`
+- Command: `bundled Python tests/go/live_role_smoke.py`
+  - Result: exit0 actual3Go roles/Composebuild/TLS/HTTPforward/WSS/OutboxNATSevents/oldtokenreject/logoutclose,zero skips; firstmirror403failedattemptpreserved,normalretryPASS.
+  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/implementation-evidence.md`
+- Command: `bundled Python ci/check_architecture.py --scope all`
+  - Result: exit0 actualtree0violations;34architecturetests0skip/27CItests4historicalWindowssymlinksubcase skips disclosed; build/vet/recursive17filegofmtandcanonicalverifiersPASS.
+  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/implementation-evidence.md`
 
 ## Changed Files or Migrations
 
-Stage002 synchronized entry/handoff/template, existing backlog tasks/batches/acceptance, README, subordinate execution/review guides and current baseline/ADR0003 accepted discovery metadata under Coordinator narrow scope. D01 stage-two propagation locally independently reviewed at 3b04904666530687705dfcb189b34337f3e3ae41; hosted acceptance exactc0373ab/run36719353192 completed; classify/gate success, eight profiles old-scope skipped, stage003 checks pending. No product, contract, database migration, canonical body or historical evidence/PDF change.
+SingleGomodule/rolebinary retained.CoreprivateAuth/Sessionwrites/Outbox;GatewayreadonlySession/WSS/NATS/proxy;sharedcrypto/config/DTO/generichealth;rootassemblyonly. Testsfollowresponsibility,canonicalfixturesunchanged. RecursiveCI/race/live-roleTLSrequired andtests/gopathtriggerregression. No database/publiccontract/canonicalchange.
 
 ## Known Failures, Risks, and Assumptions
 
-Historical stage001: four local Windows symlink subcase skips disclosed; its hosted Linux test job succeeded. Original Recorder one raw/UTF-8 replacement limitation and partial interrupted transport run preserved; independent new Review trace verified. Recorder PASS is not acceptance. New Go structural rules still pending stage003; old layout must be repaired in stage004, not grandfathered.
+LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actualGo/live/smokes/numericstructure no skips. PersonalDocker mirror403failurepreservedthen normalpull/retryactualPASS; defaultdaemonavailable. OriginalRecorderhistoricalrawdecode limitationretained; newtaskrunrawbytespreserved. Fullhostedcandidatepending; nooverallGatePASS.
 
 ## Last Known Good Commit
 
-`2afeac8bda051a507a1ea662455d7195ac93ed31` (bounded stage-three Review closure and exact hosted checker acceptance; realGo/Gate failed expected); historical Auth accepted59d92f3.
+`2afeac8bda051a507a1ea662455d7195ac93ed31` (bounded checker independentReview/exacthosted003acceptance; oldGosource/Gatefailedexpected). HistoricalAuth59d92f3 acceptedunderoldchecks.
 
 ## Latest Checkpoint
 
@@ -46,17 +46,12 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage4_impl solewriter owns003closuremetadata/Recorder and004authorizedmigration. Root/otheragentsreadonly. Unknownoriginal/Socialworktreesuntouched.
+/root/stage4_impl owns only004authorizedcandidate/Recorder until cleancommit andthen releaseswriter. Root/othersreadonly. OriginalunknownandSocialworktreesuntouched.
 
 ## Next Exact Action
 
-Fresh /root/stage4_impl solewriter reads004authority, publishes actualfile/responsibility migrationmap before edits, then Go migration/live regression.003boundedaccepted exact2afeac8/run36726926394;11jobssuccess,source_go/gateFAILexpected; no Go/batch/S1PASS. Businessoutside004suspended.
+FreshindependentReview of committed004candidate incleancheckout: actualserviceownership/minimality/originalbehavior/liveenableconditions/newpositive-negativeCI/003closuremetadata. OnFAILnewFix/newReview; onPASSordinarydedicatedtaskpush andactualfinalheadhostedallrequiredjobs. Do notclaim004/batchdone orresumeotherbusinessbeforeallapplicableacceptance.
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01 propagation implemented in stage002 candidate, local independent Review PASS; hosted acceptance completedc0373ab/run36719353192; stage003 enforcement pending; I01 Go migration pending stage004.
-
-
-## Stage003 actual accepted checks
-
-New finalReviewer exact94b2f36 cleancheckout accepted34architecture/no skip,24CI/four historical Windows symlinksubcases disclosed. Hosted exact2afeac8/run36726926394 all13jobs ran:11success,source_go/gateFAILrealoldGo72. Durable003/final-independent-review.md and hosted-acceptance.md. SourceGo mustpass004; no waiver.
+ADR0003acceptedv1.1canonicalSHA83d124b unchanged,historicalPDFunchanged. I01oldGoimplementedsource0violationspendingindependentacceptance; D01propagated/enforced. No publiccontract/securitydecisionexpanded.

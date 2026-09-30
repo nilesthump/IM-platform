@@ -1,4 +1,4 @@
-package main
+package shared
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 
 // Runtime settings are read from an operator-provided file. The file names the
 // credential files; it never contains the PostgreSQL password or JWT key.
-type runtimeConfig struct {
+type RuntimeConfig struct {
 	PostgresHost         string `json:"postgresHost"`
 	PostgresPort         uint16 `json:"postgresPort"`
 	PostgresUser         string `json:"postgresUser"`
@@ -24,8 +24,8 @@ type runtimeConfig struct {
 	NATSURL              string `json:"natsUrl"`
 }
 
-func readConfig(path string) (runtimeConfig, []byte, *pgxpool.Config, error) {
-	var cfg runtimeConfig
+func ReadConfig(path string) (RuntimeConfig, []byte, *pgxpool.Config, error) {
+	var cfg RuntimeConfig
 	if path == "" {
 		return cfg, nil, nil, errors.New("IM_CONFIG_FILE is required")
 	}

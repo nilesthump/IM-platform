@@ -47,6 +47,8 @@ def classify(paths):
         )
         if shared:
             selected.update(FULL_COMPATIBILITY)
+        elif parts[:2] == ["tests", "go"]:
+            selected.update({"go", "deploy", "architecture", "source_go"})
         elif parts[:2] == ["backend", "go"]:
             selected.update({"go", "architecture", "source_go"})
         elif parts[:2] == ["backend", "java"]:

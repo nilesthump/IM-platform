@@ -1,4 +1,4 @@
-package main
+package tests
 
 import (
 	"context"
@@ -15,6 +15,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"im-platform/backend/go/shared"
 )
 
 // These tests consume the versioned contract fixtures as input, rather than
@@ -202,8 +203,8 @@ func TestCanonicalAuthHTTPFixtures(t *testing.T) {
 	if os.Getenv("DB_TEST_ENABLE") != "1" {
 		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
 	}
-	positive := readFixture(t, "../../contracts/fixtures/auth-user-friend/positive.json")
-	negative := readFixture(t, "../../contracts/fixtures/auth-user-friend/negative.json")
+	positive := readFixture(t, "../../../contracts/fixtures/auth-user-friend/positive.json")
+	negative := readFixture(t, "../../../contracts/fixtures/auth-user-friend/negative.json")
 	ctx := context.Background()
 	db, err := pgxpool.New(ctx, "")
 	if err != nil {
@@ -213,9 +214,9 @@ func TestCanonicalAuthHTTPFixtures(t *testing.T) {
 	if err := db.Ping(ctx); err != nil {
 		t.Fatal(err)
 	}
-	s := &authService{db: db, key: []byte("test-only-signing-key-at-least-32-bytes"), now: time.Now}
-	h := s.handler()
-	random, _ := randomToken(8)
+	s := newService(db, []byte("test-only-signing-key-at-least-32-bytes"))
+	h := s.handler
+	random, _ := shared.RandomToken(8)
 	username := "fixture" + strings.ToLower(random[:10])
 	n := newFixtureNormalizer(username)
 	defer func() {
@@ -290,16 +291,16 @@ func TestCanonicalAuthHTTPFixtures(t *testing.T) {
 			case "refresh-client-type-mismatch":
 				override = map[string]any{"refreshToken": readResult(t, desktop)["tokens"].(map[string]any)["refreshToken"]}
 			case "authorization-binding-mismatch":
-				c, _ := s.parse(getToken(t, webRefreshed))
-				c.SessionID, _ = uuid()
-				token, _ = s.sign(c)
+				c, _ := s.codec.Parse(getToken(t, webRefreshed))
+				c.SessionID, _ = shared.UUID()
+				token, _ = s.codec.Sign(c)
 			case "invalid-access-token":
 				token = getToken(t, webRefreshed) + "x"
 			case "expired-access-token":
-				c, _ := s.parse(getToken(t, webRefreshed))
+				c, _ := s.codec.Parse(getToken(t, webRefreshed))
 				c.IssuedAt = time.Now().Add(-2 * time.Hour).Unix()
 				c.ExpiresAt = time.Now().Add(-time.Hour).Unix()
-				token, _ = s.sign(c)
+				token, _ = s.codec.Sign(c)
 			case "stale-session-epoch-rejected":
 				token = oldWebToken
 			case "revoked-refresh-token-rejected":
@@ -354,10 +355,10 @@ func assertWSSStep(t *testing.T, c *websocket.Conn, st fixtureStep, n *fixtureNo
 }
 
 func TestCanonicalWSSPrebindFixturesAndMalformedRequestID(t *testing.T) {
-	all := readFixture(t, "../../contracts/fixtures/websocket/golden.json")
-	server := httptest.NewServer(http.HandlerFunc(newHub(&authService{key: []byte("test-only-signing-key-at-least-32-bytes"), now: time.Now}).serve))
+	all := readFixture(t, "../../../contracts/fixtures/websocket/golden.json")
+	server := httptest.NewServer(newGateway(t, nil, []byte("test-only-signing-key-at-least-32-bytes")))
 	defer server.Close()
-	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
+	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/v1/ws"
 	n := newFixtureNormalizer("alice")
 	for _, id := range []string{"ping-before-bind", "unauthenticated-send", "invalid-signature-bind", "expired-token-bind"} {
 		t.Run(id, func(t *testing.T) {
@@ -368,8 +369,8 @@ func TestCanonicalWSSPrebindFixturesAndMalformedRequestID(t *testing.T) {
 				token = "not-a-valid-JWT"
 			}
 			if id == "expired-token-bind" {
-				s := &authService{key: []byte("test-only-signing-key-at-least-32-bytes"), now: time.Now}
-				c, _ := s.sign(claims{"10000000-0000-4000-8000-000000000001", "50000000-0000-4000-8000-000000000001", "WEB", 1, time.Now().Add(-2 * time.Hour).Unix(), time.Now().Add(-time.Hour).Unix()})
+				s := newService(nil, []byte("test-only-signing-key-at-least-32-bytes"))
+				c, _ := s.codec.Sign(shared.Claims{UserID: "10000000-0000-4000-8000-000000000001", SessionID: "50000000-0000-4000-8000-000000000001", ClientType: "WEB", SessionEpoch: 1, IssuedAt: time.Now().Add(-2 * time.Hour).Unix(), ExpiresAt: time.Now().Add(-time.Hour).Unix()})
 				token = c
 			}
 			assertWSSStep(t, c, fixture(t, all, id).Steps[0], n, token)
@@ -399,7 +400,7 @@ func TestCanonicalWSSAuthSessionFixtures(t *testing.T) {
 	if os.Getenv("DB_TEST_ENABLE") != "1" {
 		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
 	}
-	all := readFixture(t, "../../contracts/fixtures/websocket/golden.json")
+	all := readFixture(t, "../../../contracts/fixtures/websocket/golden.json")
 	ctx := context.Background()
 	db, err := pgxpool.New(ctx, "")
 	if err != nil {
@@ -409,14 +410,14 @@ func TestCanonicalWSSAuthSessionFixtures(t *testing.T) {
 	if err := db.Ping(ctx); err != nil {
 		t.Fatal(err)
 	}
-	s := &authService{db: db, key: []byte("test-only-signing-key-at-least-32-bytes"), now: time.Now}
-	hub := newHub(s)
-	server := httptest.NewServer(http.HandlerFunc(hub.serve))
+	s := newService(db, []byte("test-only-signing-key-at-least-32-bytes"))
+	hub := newGateway(t, s.db, s.codec.Key)
+	server := httptest.NewServer(hub)
 	defer server.Close()
-	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
-	random, _ := randomToken(8)
+	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/v1/ws"
+	random, _ := shared.RandomToken(8)
 	username := "wssfixture" + strings.ToLower(random[:10])
-	registration := call(t, s.handler(), "POST", "/v1/auth/register", map[string]any{"username": username, "password": "fixture-password-not-a-real-secret", "displayName": "Alice"}, "", nil)
+	registration := call(t, s.handler, "POST", "/v1/auth/register", map[string]any{"username": username, "password": "fixture-password-not-a-real-secret", "displayName": "Alice"}, "", nil)
 	expect(t, registration, 201)
 	userID := readResult(t, registration)["user"].(map[string]any)["userId"].(string)
 	defer func() {
@@ -426,7 +427,7 @@ func TestCanonicalWSSAuthSessionFixtures(t *testing.T) {
 		_, _ = db.Exec(ctx, "DELETE FROM users WHERE user_id=$1", userID)
 	}()
 	loginBody := map[string]any{"username": username, "password": "fixture-password-not-a-real-secret", "clientType": "WEB", "deviceId": "browser-1", "clientVersion": "1.0.0", "protocolVersion": "1"}
-	first := call(t, s.handler(), "POST", "/v1/auth/login", loginBody, "", nil)
+	first := call(t, s.handler, "POST", "/v1/auth/login", loginBody, "", nil)
 	expect(t, first, 200)
 	firstToken := getToken(t, first)
 	firstSession := getSession(t, first)["sessionId"].(string)
@@ -435,17 +436,17 @@ func TestCanonicalWSSAuthSessionFixtures(t *testing.T) {
 	defer bound.Close()
 	assertWSSStep(t, bound, fixture(t, all, "bind-valid-session").Steps[0], n, firstToken)
 
-	second := call(t, s.handler(), "POST", "/v1/auth/login", loginBody, "", nil)
+	second := call(t, s.handler, "POST", "/v1/auth/login", loginBody, "", nil)
 	expect(t, second, 200)
 	stale := openFixtureSocket(t, wsURL)
 	defer stale.Close()
 	assertWSSStep(t, stale, fixture(t, all, "stale-epoch-bind").Steps[0], n, firstToken)
-	wrongClaims, err := s.parse(getToken(t, second))
+	wrongClaims, err := s.codec.Parse(getToken(t, second))
 	if err != nil {
 		t.Fatal(err)
 	}
 	wrongClaims.ClientType = "DESKTOP"
-	wrongToken, err := s.sign(wrongClaims)
+	wrongToken, err := s.codec.Sign(wrongClaims)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -454,7 +455,7 @@ func TestCanonicalWSSAuthSessionFixtures(t *testing.T) {
 	assertWSSStep(t, wrong, fixture(t, all, "wrong-client-type-bind").Steps[0], n, wrongToken)
 
 	// The golden revoked-socket case models a committed same-slot replacement event.
-	hub.revoke(firstSession, "REPLACED")
+	publishEvent(t, firstSession, "REPLACED")
 	revoked := fixture(t, all, "revoked-socket")
 	_ = bound.SetReadDeadline(time.Now().Add(3 * time.Second))
 	var event map[string]any

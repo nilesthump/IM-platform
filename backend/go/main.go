@@ -2,20 +2,16 @@ package main
 
 import (
 	"context"
-	"crypto/sha1"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"os"
-	"strings"
-	"time"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
+	"im-platform/backend/go/core"
+	"im-platform/backend/go/gateway"
+	pluginhost "im-platform/backend/go/plugin-host"
+	"im-platform/backend/go/shared"
+	"log"
+	"net/http"
+	"os"
+	"time"
 )
 
 func main() {
@@ -26,38 +22,18 @@ func main() {
 	if role != "gateway" && role != "core" && role != "plugin-host" {
 		log.Fatal("unknown role")
 	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("/__infra/health", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			http.Error(w, "method not allowed", 405)
-			return
-		}
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprintf(w, "profile=go role=%s\n", role)
-	})
-	mux.HandleFunc("/__infra/ws", func(w http.ResponseWriter, r *http.Request) {
-		if role != "gateway" || !strings.EqualFold(r.Header.Get("Upgrade"), "websocket") || r.Header.Get("Sec-WebSocket-Key") == "" {
-			http.NotFound(w, r)
-			return
-		}
-		sum := sha1.Sum([]byte(r.Header.Get("Sec-WebSocket-Key") + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))
-		w.Header().Set("Upgrade", "websocket")
-		w.Header().Set("Connection", "Upgrade")
-		w.Header().Set("Sec-WebSocket-Accept", base64.StdEncoding.EncodeToString(sum[:]))
-		w.WriteHeader(101)
-	})
 	if role == "plugin-host" {
-		log.Fatal(http.ListenAndServe(":8080", mux))
+		log.Fatal(http.ListenAndServe(":8080", pluginhost.NewHandler()))
 	}
-	configPath := os.Getenv("IM_CONFIG_FILE")
-	if configPath == "" {
-		configPath = "/run/im-config/config.json"
+	path := os.Getenv("IM_CONFIG_FILE")
+	if path == "" {
+		path = "/run/im-config/config.json"
 	}
-	cfg, key, pgConfig, err := readConfig(configPath)
+	cfg, key, pg, err := shared.ReadConfig(path)
 	if err != nil {
 		log.Fatal("Go runtime configuration unavailable")
 	}
-	db, err := pgxpool.NewWithConfig(context.Background(), pgConfig)
+	db, err := pgxpool.NewWithConfig(context.Background(), pg)
 	if err != nil {
 		log.Fatal("database configuration failed")
 	}
@@ -68,35 +44,22 @@ func main() {
 	if err != nil {
 		log.Fatal("database unavailable")
 	}
-	s := &authService{db: db, key: key, now: time.Now}
 	nc, err := nats.Connect(cfg.NATSURL, nats.MaxReconnects(-1))
 	if err != nil {
 		log.Fatal("NATS unavailable")
 	}
 	defer nc.Close()
+	var h http.Handler
 	if role == "core" {
-		go relaySessionRevocations(context.Background(), db, nc)
-		mux.Handle("/v1/", s.handler())
+		ctx, stop := context.WithCancel(context.Background())
+		defer stop()
+		go core.RelaySessionRevocations(ctx, db, nc)
+		h = core.NewHandler(db, key)
 	} else {
-		h := newHub(s)
-		_, err = nc.Subscribe("session.revoked", func(m *nats.Msg) {
-			var v struct {
-				SessionID string `json:"sessionId"`
-				Reason    string `json:"reason"`
-			}
-			if json.Unmarshal(m.Data, &v) == nil {
-				h.revoke(v.SessionID, v.Reason)
-			}
-		})
+		h, err = gateway.NewHandler(db, key, nc, cfg.CoreURL)
 		if err != nil {
-			log.Fatal("NATS subscription failed")
+			log.Fatal("gateway configuration failed")
 		}
-		mux.HandleFunc("GET /v1/ws", h.serve)
-		u, err := url.Parse(cfg.CoreURL)
-		if err != nil {
-			log.Fatal("invalid core address")
-		}
-		mux.Handle("/v1/", httputil.NewSingleHostReverseProxy(u))
 	}
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", h))
 }

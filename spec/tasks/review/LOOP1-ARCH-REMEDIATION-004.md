@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
-status: active
-owner: /root/stage4_impl sole writer
+status: review
+owner: Coordinator pending fresh independent Review and final hosted acceptance
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -14,13 +14,13 @@ Migrate Go responsibility packages and regress within the explicitly authorized 
 # Inputs
 
 - User four-stage instruction; approval-and-recovery evidence for stage 1.
-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
 - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
 - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
 
 # Execution Constraints
 
-Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical 搂3/搂10 SRC-01 through SRC-07/搂11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
 
 # Dependencies
 
@@ -82,3 +82,7 @@ Before migration, bind exact commands/results from independently accepted stage0
 # Activation
 
 003 bounded accepted exact2afeac8/run36726926394 after new independentReview. Backlog->ready->active; only004 migration authorized, overallGate remainsred. Accepted executable checks: bundledPython ci/check_architecture.py --scope all --json; bundledPython -m unittest discover -s tests/architecture -v; bundledPython -m unittest discover -s tests/ci -v; pwsh tools/verify-frozen-architecture.ps1. Publish actual migration table before product edits.
+
+# Implementation candidate handoff
+
+Actual migrationmap/evidence004/migration-map.md BEFORE products; privateCoreAuth/transactions/Outbox, readonlyGatewaynofullAuth,no permessageDB, minimalshared/rootassembly. All17recursiveformattedGo/build/vet/fullDB_TEST_ENABLE=1unit/race/canonical/livePGNATS/3rolesHTTPforwardandTLSbusiness/revocationclose/GoJavaComposeTLSsmokesPASS;34architecture0skip/27CI4historicWindows symlinksubcase skips. ExpectedoldGo72now actualsource0violations. No contracts/canonical/historicalProduct changes. Recorder004R-20260930T141457Z-8721259a-6a39-4e6f-baf8-2931ea75f14e andimplementation-evidence.md exactcommands. PendingnewindependentReview/finalexactheadhosted; no selfacceptance/batchorS1PASS.

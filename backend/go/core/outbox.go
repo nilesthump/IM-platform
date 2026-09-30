@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 // Session revocations are stored in the same transaction as the Session change.
 // Publishing can repeat after a crash; the gateway handles duplicate events.
-func relaySessionRevocations(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
+func RelaySessionRevocations(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 	for {
