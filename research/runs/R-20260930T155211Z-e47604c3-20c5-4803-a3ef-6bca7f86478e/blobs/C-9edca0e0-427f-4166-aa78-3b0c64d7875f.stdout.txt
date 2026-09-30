@@ -1,0 +1,18 @@
+RUN ['docker', 'run', '--rm', '--network', 'container:im-arch4-fix-pg-42540', '-e', 'PGHOST', '-e', 'PGUSER', '-e', 'PGDATABASE', '-e', 'PGPORT', '-e', 'PGPASSWORD', '-v', 'H:\\.codex\\worktrees\\architecture-remediation\\IM-platform:/repo', '-w', '/repo', 'im-db-review-runtime', 'python3', 'contracts/database/migrate.py', 'up']
+0001_initial: up complete
+Independent disposable PostgreSQL16/NATS2.10; DB_TEST_ENABLE=1; canonical0001_initial, no skipped integration permitted
+im-arch4-fix-nats-42540
+im-arch4-fix-pg-42540
+=== RUN   TestPostgresRevocationFallbackWithoutNATS
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/REPLACED
+    revocation_fallback_test.go:91: fallback reason: got map[payload:map[reason:REVOKED sessionId:264daf20-2984-40f6-bc06-4be77a868963] protocolVersion:1.0 requestId:fd26d14c-6795-492c-bb92-17a12e6b64e1 type:session.revoked] want REPLACED
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/LOGOUT
+    revocation_fallback_test.go:91: fallback reason: got map[payload:map[reason:REVOKED sessionId:86d06534-759a-47c1-8d65-5e403a40e3ef] protocolVersion:1.0 requestId:d880f4a6-cafc-4fc5-97e0-0ad6ae1182de type:session.revoked] want LOGOUT
+--- FAIL: TestPostgresRevocationFallbackWithoutNATS (2.23s)
+    --- FAIL: TestPostgresRevocationFallbackWithoutNATS/REPLACED (1.11s)
+    --- FAIL: TestPostgresRevocationFallbackWithoutNATS/LOGOUT (1.10s)
+FAIL
+FAIL	im-platform/backend/go/tests	2.364s
+FAIL
+
+
