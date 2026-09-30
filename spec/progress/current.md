@@ -71,3 +71,7 @@ Fresh /root/stage4_final_review local PASS exactb84cd0f, cleanisolatedcheckout; 
 ## Fresh hosted-revocation Fix awaiting new independent Review
 
 Deterministic noNATS replacement/logout both failedbeforefix, nowexactbound committedreason fallbackPASS. Core writes/Outbox unchanged;Gatewayonlyprivate readonlySession notificationhelper, same timeout, safeREVOKED onexpiry/DB/query/unknown/missing/wrongidentity. NewfullPG16NATS unit/race/canonical/rollback/500msmessageDBnegative andtargetedrace3times/19fmtbuildvet/34architecture0skip/27CI4historicalWindows symlinksubcase skips/real3roleComposeTLSOutboxNATS PASSlocally. No Task/batch/S1 acceptance; nextNEW independentReview/newhosted. SoleFix releasesaftercleancommit. Evidence004/revocation-fix.md.
+
+## New independent revocation repair Review pending hosted
+
+Fresh /root/stage4_revocation_review localPASS exact6339f8e from cleanisolatedcheckout; newPG16NATS fullunitrace/canonical/fallback3times/expiryDBfailure/oldbind/no-messagePGlock negative and3rolesTLS withdirectrawNATS REPLACED+LOGOUT observation PASS,zero integrationskips.19recursivefmtbuildvet/source0/34architecture0skip/27CI4historicalWindows symlinksubcase skips; protectedhistory/hash/UTF8unique004review/recoveryAcceptance PASS. Evidence004/revocation-independent-review.md. Coordinator next ordinarydedicatedbranchpush exactReviewclosure thenNEWhosted requiredjobs;004/batch/S1 remainNOT PASSED. SoleReviewwriter releasesafterevidencecommit; no productfix orotherbusiness.
