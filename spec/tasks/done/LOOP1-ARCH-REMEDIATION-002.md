@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-002
 title: Synchronize execution constraints
-status: review
-owner: Coordinator pending exact-head hosted CI
+status: done
+owner: Coordinator bounded acceptance complete
 stage: S1 remediation 2/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -14,7 +14,7 @@ Synchronize execution constraints within the explicitly authorized four-stage re
 # Inputs
 
 - User four-stage instruction; approval-and-recovery evidence for stage 1.
-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
 - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
 - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
 
@@ -95,3 +95,7 @@ Predecessor 001 bounded independent Review and exact-head hosted matrix accepted
 # Independent Review handoff
 
 Fresh /root/stage2_review independently accepted exact candidate 3b04904666530687705dfcb189b34337f3e3ae41 against base5ca5089 from clean managed checkout. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/independent-review.md; Recorder R-20260930T125435Z-95638b32-0cfc-4de8-ade7-34ef5f27c798. Frozen four tests, recovery Acceptance, three memory negative controls/scope and implementation Recorder32events/28rawblobs PASS. No implementation edited. First reviewer command omitted explicit repo and failed on dirty original; retained and corrected clean rerun PASS. No product/live/hosted acceptance claimed. Task remains review; Coordinator must obtain exact review-closure-head applicable hosted CI before done/checkpoint/003 activation. Last known good remains3e6e89f. Reviewer owns only linked new evidence/recovery until closure commit, then releases write ownership.
+
+# Bounded acceptance closure
+
+Fresh independent Review PASS plus exact review-closure headc0373ab hostedrun36719353192 accepted under old applicable classifier scope. Evidence hosted-acceptance.md and raw JSON; profile skips disclosed, stage003/004 and overall Gate pending. Next exact action activate003, no business continuation.

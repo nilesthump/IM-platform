@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-003
 title: Enforce architecture in CI and independent review
-status: backlog
-owner: unassigned
+status: active
+owner: fresh Implementation Agent /root/stage3_impl
 stage: S1 remediation 3/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -14,13 +14,13 @@ Enforce architecture in CI and independent review within the explicitly authoriz
 # Inputs
 
 - User four-stage instruction; approval-and-recovery evidence for stage 1.
-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
 - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
 - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
 
 # Execution Constraints
 
-Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical 搂3/搂10 SRC-01 through SRC-07/搂11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
 
 # Dependencies
 
@@ -76,3 +76,7 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
 # Next Action
 
 - Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+
+# Activation and bounded transition
+
+002 fresh independently reviewed product3b049046/closurec0373ab and exact hostedrun36719353192 accepted. Backlog->ready->active, all dependencies satisfied. Fresh /root/stage3_impl sole writer. Checker/regression/authority delivery may pass with actual old Go product-compliance FAIL and overall Gate red exposed. Temporary003 acceptance scope permits only004 migration next, exits upon004 actual tree compliance. No exemption, continue-on-error, product or Gate PASS.
