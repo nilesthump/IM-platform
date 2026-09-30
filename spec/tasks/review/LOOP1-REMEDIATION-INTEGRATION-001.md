@@ -40,19 +40,23 @@ No main push/force push/remote or old-worktree deletion/admin bypass/rule change
 
 # Verification
 
+Discoverable entry points: `tools/verify-loop1-ctrl-002.ps1` and `tools/verify-frozen-architecture.ps1`. Execute the recovery verifier as a standalone process and capture its actual exit code, full output and elapsed time; preceding or following successful commands cannot establish its result.
+
 `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development` during preparation and Acceptance from clean committed checkout; bundled Python3 -B `ci/check_architecture.py --scope all --json`; full diff classification plus actual hosted job/checkout/step/log checks. Independent Review may cite accepted live product tests by proven tree identity but cannot substitute five-job administrative CI for full PR CI. Re-run affected regressions on actual merge as applicable.
 
 # Evidence
+
+Bounded recovery repair: `spec/progress/evidence/LOOP1-REMEDIATION-INTEGRATION-001/fix-recovery-development.md`. Actual PR CI 36761927418 failed candidate 1ccb8c1 with seven control-record parser requirements; earlier composite Development output did not establish recovery PASS. Fresh Fix reproduces and repairs the exact parser failures without editing verifiers. Local checks are development evidence only; a new fresh independent Review and exact candidate hosted CI remain required. Coordinator subsequently observed delivered 0e92cde full PR CI 36761878401 SUCCESS, all 13 jobs; this inherited result does not accept the repaired candidate.
 
 `spec/progress/evidence/LOOP1-REMEDIATION-INTEGRATION-001/delivery-verification.md` and delivered summaries/hashes. Startup Recorder finished/validated 17 events; not product acceptance. Full integration Review/PR/merge/main acceptance pending.
 
 # Handoff
 
-Root owns only listed new control records and task-linked research artifacts. Original checkout unknown files and historical Social/main/Auth worktrees preserved. No active product writer observed. Integration candidate is prepared; tests/review/merge not yet accepted.
+Fresh Fix Agent /root/integration_records_fix owns only current.md, this review Task Spec and new fix-recovery evidence until its clean repair commit, then releases repository writer ownership. Its trace is external H:/.codex/worktrees/architecture-remediation/integration-records-fix-20261001/research; startup before Recorder is explicitly incomplete. Root/Reviewer do not write during repair. Original checkout unknown files and historical Social/main/Auth worktrees preserved. No active product writer observed. Integration candidate is prepared; tests/review/merge not yet accepted.
 
 # Next Action
 
-Commit finite recovery/evidence inputs; fresh independent Integration Reviewer reviews complete origin/main-to-candidate; create/reuse PR, verify all selected jobs, repair via fresh Fix/new Review if needed, then normal protected merge and safe main synchronization. Do not activate Social before merged-result verification.
+Fresh independent Integration Reviewer reviews the clean bounded repair and complete origin/main-to-candidate; create/reuse PR, verify all selected jobs, repair via fresh Fix/new Review if needed, then normal protected merge and safe main synchronization. Do not activate Social before merged-result verification.
 
 # Last Known Good Commit
 

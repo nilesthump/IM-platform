@@ -8,13 +8,25 @@ Current Batch: LOOP1-S1
 Current Task: LOOP1-REMEDIATION-INTEGRATION-001
 Current Task State: review
 
-## Completed Work
+## Immediately Relevant Completed Work
 
 Recovered exact clean delivered0e92cde, four unique remediation tasks done, final independent Review and real exact hosted36751729344 success. Product/test/dependency/build/deploy/CI trees identical to accepted d0ae52f. Copied bounded final acceptance reports/hash metadata into task evidence for shared recovery. Existing 1028-path main integration selects all CI categories; full Review and PR CI pending.
 
+## Current Blockers
+
+Candidate 1ccb8c1 failed actual PR CI run 36761927418: recovery classifier reported seven malformed or missing control-record requirements. This bounded Fix repairs those requirements. Fresh independent Review and exact new candidate PR CI, merge/main CI and local main sync remain required; integration Gate and S1 product Gate stay OPEN.
+
 ## Verification
 
-Frozen verifier PASS (34 controls); exact hosted0e92cde five administrative successes/eight inactive skips confirmed. Tree identity direct Git comparison passed. Root Recorder17-event validation PASS; not product acceptance. Details and limitations in task evidence/delivery-verification.md. No integration/main/Social PASS claimed.
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: Baseline on clean 1ccb8c1 exited 1 with the same seven recovery issues as actual PR CI. After bounded repair the standalone Development verifier exited 0 with PASS; source/governance checker --scope all exited 0, zero violations. Exact durations and full recovery output are recorded in evidence; this is local development evidence, never independent acceptance. Earlier composite Development output did not establish a recovery PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-REMEDIATION-INTEGRATION-001/fix-recovery-development.md`
+
+Inherited delivered 0e92cde full PR CI run 36761878401 succeeded with all 13 jobs, according to Coordinator inspection; the new candidate still requires exact-head independent Review and actual PR CI. Delivered remediation and Recorder provenance are preserved in delivery-verification.md; Recorder PASS is not product acceptance.
+
+## Changed Files or Migrations
+
+This repair changes only spec/progress/current.md, spec/tasks/review/LOOP1-REMEDIATION-INTEGRATION-001.md and new fix-recovery evidence. No migrations, public contracts, architecture, product, test, verifier or workflow changes. Prior 1ccb8c1 added finite integration control records and copied delivered acceptance evidence.
 
 ## Known Failures, Risks, and Assumptions
 
@@ -22,7 +34,7 @@ Original checkout five unknown untracked paths preserved. Social/main checkout m
 
 ## Next Exact Action
 
-Commit finite control candidate, delegate fresh independent full integration Review, create/reuse authorized remediation PR and verify real full-diff CI before ordinary merge. Then verify merge/main CI, fast-forward clean actual main worktree, checkpoint and bind/activate Social on the new accepted layout.
+Delegate fresh independent full integration Review of the clean bounded repair candidate, create/reuse authorized remediation PR and verify real full-diff CI before ordinary merge. Then verify merge/main CI, fast-forward clean actual main worktree, checkpoint and bind/activate Social on the new accepted layout.
 
 ## Last Known Good Commit
 
@@ -34,7 +46,7 @@ Commit finite control candidate, delegate fresh independent full integration Rev
 
 ## Uncommitted Changes / Ownership
 
-/root owns this integration Task/current/new evidence and exact P-INTEGRATION-20261001-ROOT/R-INTEGRATION-20261001-ROOT research paths until commit; no product files changed. Original/Auth/Social/main historical working trees remain untouched. Stage004 migration permission expired.
+Fresh Fix Agent /root/integration_records_fix owns only current.md, the integration review Task Spec and new fix-recovery evidence until its clean commit, then releases repository writer ownership. Its Recorder writes only external integration-records-fix-20261001/research. Coordinator and Reviewer remain read-only during this repair; no product files changed. Original/Auth/Social/main historical working trees remain untouched. Stage004 migration permission expired.
 
 ## Architecture Conflicts / ACP / ADR
 
