@@ -37,6 +37,7 @@ Audit and repair the whole Frozen Architecture within the explicitly authorized 
 - `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/**`
 - `spec/progress/checkpoints/*architecture-remediation*.md`
 - `research/prompts/** and research/runs/** only this task-linked artifacts`
+- Exact run-local `research/runs/{R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56,R-20260929T185051Z-4ba6947e-5726-4f55-ba96-a1b9bed48769,R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8}/.gitattributes`: `blobs/** -text` only, preserving raw evidence bytes; Human-authorized necessary execution constraint, Coordinator approved transport repair. No historical run policy change.
 
 User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
 
@@ -81,3 +82,9 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
 - `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/development.md` records exact verifier results/failures/skips; linked Recorder contains argv/exit/time/output hashes. New integrity, old HTTP/WSS/Sync-Plugin, recovery Development, and 21 CI regressions pass locally; four CI symlink subcases skipped due Windows privilege.
 - No Go/Java product, public contract, historical evidence/ADR or PDF edited. New candidate checkpoint records transition only, not acceptance. Last known good remains historical Auth head `59d92f39234596a5b66841e8aa2ef7db0bf65e8a`; inherited base `8cd90a7`.
 - Implementation Agent owns only stage-one candidate artifacts until clean commit, then releases write ownership. No independent acceptance or hosted remediation CI yet.
+
+# Transport fix handoff
+
+- Usage-interrupted implementation transport run preserved as partial; new fresh Fix context uses related R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8.
+- 22 original blobs restored through exact run-local -text policy and ordinary corrective commit; all 38 persisted original bytes verified against working/index/committed SHA. One pre-existing raw subprocess vs UTF-8 persisted stderr hash mismatch is disclosed, not repaired by editing history.
+- Exact failures, reruns and preservation method: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/transport-repair.md and verify-transport.py. Authority integrity rerun exit 0, four tests PASS. No product modification or self-acceptance. Independent Review/hosted CI remain pending; last known good historical Auth head unchanged.

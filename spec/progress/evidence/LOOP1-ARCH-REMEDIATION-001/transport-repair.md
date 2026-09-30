@@ -1,0 +1,19 @@
+# Stage-one transport repair (local evidence, not acceptance)
+
+Fresh Fix context: /root/stage1_transport_fix. Related fresh run R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8, prompt P-813797a3-e695-43f5-b029-59f2d111bbfc. Startup reads and minimal verification precede this run: prospective_resume, incomplete pre-Recorder trace. Sole writer; no product/contract/architecture text changes. Base 17f45d0b917159a3380b02a0d0c59ec7c4276597, branch task/LOOP1-ARCH-REMEDIATION.
+
+Original stage1_impl was interrupted by usage limit after candidate commit. Its later transport run R-20260929T185051Z-4ba6947e-5726-4f55-ba96-a1b9bed48769 remains partial, byte-preserved, not relabelled as this Agent's prospective work or complete trace. Exact interrupted prompt moved from known root temporary file into interrupted-transport-prompt.txt, bytes unchanged. Finished original events/metadata/summary untouched.
+
+## Transport FAIL and bounded repair
+
+Original run has 38 persisted stdout/stderr blobs. 22 differ from base commit only because Git changed CRLF to LF; working original bytes remain available. Added exact task-linked run-local .gitattributes `blobs/** -text` for original, partial transport, and new Fix runs; ordinary corrective commits, no amend/history rewrite. Task write permission records Coordinator approval within Human necessary execution-constraint authorization. verify-transport.py proves all 22 differences equal raw.replace(CRLF, LF) and compares all 38 original persisted hashes across working tree, index, new commit and clean committed export. This restores evidence transportation, not a changed test result.
+
+One original stderr has an independent encoding limitation: blobs/C-3e0d003f-8661-4322-811e-7a14054a219e.stderr.txt. Event stderr_sha256 (raw subprocess bytes) = 5acd8d8026f3fdb50f35b54c77376e4f3794c69d716a13755be080692d26cb74, secret_redaction_applied=false; persisted original UTF-8 blob SHA = 62b9875b8941f1e4ef1c891d9982191906e7658f8e2817178feb24286bc5bdfe, 60 replacement characters. Recorder decodes with UTF-8 errors=replace before persisting text but hashes original subprocess bytes; raw bytes are unavailable. 37/38 persisted blobs match their event raw hash. Existing validate-run validates event chain/manifest but not blob hashes. Thus transportation consistency is not raw-output identity; do not assert all raw hashes match. No historical blob/event edited to conceal this. Future Recorder hardening must address persisted-vs-raw hashes separately, outside this stage-one bounded transport fix.
+
+## Verification
+
+- Initial unrecorded read-only sandbox `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1 -BaseCommit 8cd90a7`: body PASS, temporary-directory negative-control setup ERROR (no writable temp). Permission escalation rerun through Fix Recorder: exit 0, 4 tests PASS, elapsed in command_finished.
+- Initial new verify-transport assertion expected raw identity for every persisted blob: exit 1, exposed the one original encoding mismatch above. Corrected validation distinguishes transportation SHA from raw subprocess SHA and allows only the exact pre-existing disclosed encoding case; subsequent original-byte comparison exit 0, 38 blobs, 22 normalization-only differences.
+- Candidate `verify-transport.py --candidate`: exact argv/exit/elapsed/full 38-row SHA matrix and committed-export validate-run are in Fix Recorder events/blobs. Export uses git archive HEAD only, without worktree/untracked inputs; existing original validate-run runs with explicit exported research root.
+
+Review, hosted CI, task acceptance and batch/S1 Gate remain pending. Last accepted product head is historical Auth 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Next: fresh independent stage-one Review, then applicable real hosted CI. No stage two execution or push by Fix Agent.

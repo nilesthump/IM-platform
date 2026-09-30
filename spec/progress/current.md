@@ -20,6 +20,7 @@ LOOP1-GO-AUTH-001 remains historical done; accepted exact remote head 59d92f3923
 
 - Original frozen architecture verifier PASS with PowerShell 7; Windows PowerShell 5 cannot parse the existing UTF-8 script, so use pwsh.
 - Independent remediation review/CI pending. Complete command history and findings belong in spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/ and linked Recorder, not this file.
+- Transport repair: exact task-linked run-local blob -text rules preserve original bytes. Original run has one disclosed UTF-8 replacement/raw-hash mismatch; no finished record was rewritten. New Fix run is R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8; prior transport run remains partial after usage interruption. Evidence: transport-repair.md.
 - Recorder R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56 uses prospective_resume with incomplete pre-Recorder trace. Registered visible delegation/approval excerpt is not full Human prompt.
 
 ## Last Known Good Commit
@@ -32,11 +33,11 @@ LOOP1-GO-AUTH-001 remains historical done; accepted exact remote head 59d92f3923
 
 ## Uncommitted Changes / Ownership
 
-Fresh stage-one Implementation Agent /root/stage1_impl is sole writer for authorized stage-one paths and linked control/evidence/Recorder artifacts. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
+Fresh stage-one Fix Agent /root/stage1_transport_fix is sole writer for the bounded transport repair; after clean handoff it releases write ownership to Coordinator. Prior /root/stage1_impl was interrupted by usage limit; its partial transport run is retained as partial. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
 
 ## Next Exact Action
 
-Delegate a new independent Review Agent for the committed stage-one candidate, then applicable real hosted CI. Do not start stage two or claim batch/S1 Gate PASS.
+Read spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/transport-repair.md (including raw-output encoding limitation), delegate a new independent Review Agent for the clean committed stage-one candidate, then applicable real hosted CI. Do not start stage two or claim batch/S1 Gate PASS.
 
 ## Current Blockers
 
