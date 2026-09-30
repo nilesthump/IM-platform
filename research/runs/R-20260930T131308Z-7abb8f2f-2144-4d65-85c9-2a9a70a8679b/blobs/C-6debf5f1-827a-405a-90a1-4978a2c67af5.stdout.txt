@@ -1,0 +1,433 @@
+---
+task_id: LOOP1-ARCH-REMEDIATION-003
+title: Enforce architecture in CI and independent review
+status: active
+owner: fresh Implementation Agent /root/stage3_impl
+stage: S1 remediation 3/4
+gate: LOOP1-ARCH-REMEDIATION
+---
+
+# Goal
+
+Enforce architecture in CI and independent review within the explicitly authorized four-stage remediation.
+
+# Inputs
+
+- User four-stage instruction; approval-and-recovery evidence for stage 1.
+- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
+- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+
+# Execution Constraints
+
+Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical 搂3/搂10 SRC-01 through SRC-07/搂11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+
+# Dependencies
+
+- LOOP1-ARCH-REMEDIATION-002 independently accepted bounded deliverable; no blocking architecture decision.
+
+# Allowed Paths
+
+- `ci/**`
+- `.github/workflows/**`
+- `tests/ci/**`
+- `tests/architecture/**`
+- `tools/** only architecture/constraint verification`
+- `spec/acceptance/** only checker and review rules`
+- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/**`
+- `spec/progress/checkpoints/*architecture-remediation*.md`
+- `research/prompts/** and research/runs/** only this task-linked artifacts`
+
+User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+
+# Acceptance
+
+Positive controls and negatives catch root business source, forbidden service imports, shared-to-service imports, invalid active Task paths, missed governance triggers, and original Go layout. Go import graph and stage-appropriate Java fixtures are exercised. Exact root whitelist, backend-specific placeholder exits, rename/delete handling, required job missing/skip/failure/cancellation fail Gate. Report expected old-Go failures without grandfathering. Independent reviewer validates checker effectiveness before stage 4.
+
+# Forbidden
+
+- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+- No Go/Java product implementation edits.
+- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+
+# Minimality
+
+Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+
+# Verification
+
+- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+
+# Evidence
+
+- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/ (pending independent acceptance).
+
+# Handoff
+
+- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+
+# Next Action
+
+- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+
+# Activation and bounded transition
+
+002 fresh independently reviewed product3b049046/closurec0373ab and exact hostedrun36719353192 accepted. Backlog->ready->active, all dependencies satisfied. Fresh /root/stage3_impl sole writer. Checker/regression/authority delivery may pass with actual old Go product-compliance FAIL and overall Gate red exposed. Temporary003 acceptance scope permits only004 migration next, exits upon004 actual tree compliance. No exemption, continue-on-error, product or Gate PASS.
+"""Reject product source added before its CI commands exist at S0."""
+
+import argparse
+from pathlib import Path
+
+
+ALLOWED = {
+    "java": ("backend/java", {"InfraPlaceholder.java", "Dockerfile"}),
+    "web": ("clients/web", set()),
+    "desktop": ("clients/desktop", set()),
+    "mobile": ("clients/mobile", set()),
+}
+
+
+def unexpected_files(root, profile):
+    relative_dir, allowed = ALLOWED[profile]
+    directory = root / relative_dir
+    if directory.is_symlink():
+        return [directory.name]
+    if not directory.is_dir():
+        return []
+    unexpected = []
+    for path in directory.rglob("*"):
+        if path.is_dir() and not path.is_symlink():
+            continue
+        relative = path.relative_to(directory).as_posix()
+        if path.is_symlink():
+            unexpected.append(relative)
+            continue
+        if relative in allowed:
+            continue
+        if (path.name == ".gitkeep" and path.is_file() and not path.is_symlink()
+                and path.read_bytes() in (b"", b"\n", b"\r\n")):
+            continue
+        unexpected.append(relative)
+    return sorted(unexpected)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("profile", choices=ALLOWED)
+    args = parser.parse_args()
+    root = Path(__file__).resolve().parents[1]
+    unexpected = unexpected_files(root, args.profile)
+    if unexpected:
+        parser.exit(1, f"{args.profile} source grew; add its CI commands: {', '.join(unexpected)}\n")
+
+
+if __name__ == "__main__":
+    main()
+import importlib.util
+import pathlib
+import subprocess
+import tempfile
+import unittest
+
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+spec = importlib.util.spec_from_file_location("classify", ROOT / "ci/classify.py")
+classify_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(classify_module)
+
+
+class PathMatrixTests(unittest.TestCase):
+    def assert_jobs(self, path, expected):
+        actual = classify_module.classify([path])
+        self.assertEqual({job for job, enabled in actual.items() if enabled}, set(expected), path)
+
+    def test_profile_and_client_changes_are_local(self):
+        for path, job in (
+            ("backend/go/main.go", "go"),
+            ("backend/java/App.java", "java"),
+            ("clients/web/src/App.tsx", "web"),
+            ("clients/desktop/db/schema.sql", "desktop"),
+            ("clients/mobile/app.kt", "mobile"),
+        ):
+            with self.subTest(path=path):
+                self.assert_jobs(path, {job})
+
+    def test_shared_changes_fan_out_to_full_compatibility(self):
+        for path in (
+            "contracts/http/api.json",
+            "contracts/database/migrations/0001.sql",
+            "contracts/plugin-api/v1.schema.json",
+            "database/changes.sql",
+            "migrations/0002.sql",
+            "sdk/protocol/types.go",
+            "sdks/plugin/api.ts",
+            "shared/protocol/wire.json",
+            "backend/shared/protocol.go",
+            "backend/java/migrations/0002.sql",
+            "clients/shared/sdk.ts",
+            "tests/database/test_migrations.py",
+        ):
+            with self.subTest(path=path):
+                self.assert_jobs(path, classify_module.FULL_COMPATIBILITY)
+
+    def test_ci_changes_run_all_jobs(self):
+        for path in ("ci/classify.py", "ci/check_s0_boundary.py", ".github/workflows/ci.yml", "tests/ci/test_classify.py"):
+            with self.subTest(path=path):
+                self.assert_jobs(path, classify_module.JOBS)
+
+    def test_deploy_changes_run_deploy_validation(self):
+        for path in ("deploy/compose.yaml", "tests/infrastructure/smoke.ps1"):
+            with self.subTest(path=path):
+                self.assert_jobs(path, {"deploy"})
+
+    def test_union_and_deleted_paths(self):
+        result = classify_module.classify(["backend/go/old.go", "clients/web/new.ts"])
+        self.assertEqual({key for key, value in result.items() if value}, {"go", "web"})
+
+    def test_git_diff_includes_deleted_shared_file(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = pathlib.Path(temp)
+            subprocess.run(["git", "init", "-q", str(root)], check=True)
+            subprocess.run(["git", "-C", str(root), "config", "user.name", "CI test"], check=True)
+            subprocess.run(["git", "-C", str(root), "config", "user.email", "ci@example.invalid"], check=True)
+            contract = root / "contracts" / "wire.json"
+            contract.parent.mkdir()
+            contract.write_text("{}", encoding="utf-8")
+            subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
+            base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+            contract.unlink()
+            subprocess.run(["git", "-C", str(root), "add", "-u"], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-qm", "delete"], check=True)
+            head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+            previous = pathlib.Path.cwd()
+            try:
+                import os
+                os.chdir(root)
+                self.assertEqual(classify_module.diff_paths(base, head), ["contracts/wire.json"])
+            finally:
+                os.chdir(previous)
+
+    def test_git_diff_includes_both_sides_of_shared_renames(self):
+        for source in ("contracts/wire.json", "database/schema.sql", "sdk/types.json"):
+            with self.subTest(source=source), tempfile.TemporaryDirectory() as temp:
+                root = pathlib.Path(temp)
+                subprocess.run(["git", "init", "-q", str(root)], check=True)
+                subprocess.run(["git", "-C", str(root), "config", "user.name", "CI test"], check=True)
+                subprocess.run(["git", "-C", str(root), "config", "user.email", "ci@example.invalid"], check=True)
+                old = root / source
+                old.parent.mkdir(parents=True)
+                old.write_text("unique fixture content\n", encoding="utf-8")
+                subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+                subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
+                base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+                new = root / "docs" / old.name
+                new.parent.mkdir()
+                old.rename(new)
+                subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
+                subprocess.run(["git", "-C", str(root), "commit", "-qm", "rename"], check=True)
+                head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+                previous = pathlib.Path.cwd()
+                try:
+                    import os
+                    os.chdir(root)
+                    paths = classify_module.diff_paths(base, head)
+                finally:
+                    os.chdir(previous)
+                self.assertCountEqual(paths, [source, f"docs/{old.name}"])
+                selected = {job for job, enabled in classify_module.classify(paths).items() if enabled}
+                self.assertEqual(selected, classify_module.FULL_COMPATIBILITY)
+
+    def test_unrelated_files_do_not_schedule_product_jobs(self):
+        self.assert_jobs("README.md", set())
+
+    def test_rejects_paths_outside_repo(self):
+        for path in ("../outside", "/absolute", "a/../b"):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                classify_module.classify([path])
+
+    def test_github_outputs_are_lowercase_booleans(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = pathlib.Path(temp) / "output"
+            classify_module.main(["--paths", "contracts/errors/x.json", "--github-output", str(output)])
+            values = dict(line.split("=", 1) for line in output.read_text().splitlines())
+            self.assertEqual(values["go"], "true")
+            self.assertEqual(values["compatibility"], "true")
+            self.assertEqual(values["deploy"], "false")
+
+
+if __name__ == "__main__":
+    unittest.main()
+import importlib.util
+import pathlib
+import unittest
+
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+spec = importlib.util.spec_from_file_location("gate", ROOT / "ci/check_gate.py")
+gate = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(gate)
+
+
+class GateTests(unittest.TestCase):
+    def needs(self):
+        outputs = {name: "false" for name in (*gate.JOBS, "old_client", "plugin", "migration")}
+        result = {name: {"result": "skipped"} for name in gate.JOBS}
+        result["classify"] = {"result": "success", "outputs": outputs}
+        return result
+
+    def test_selected_job_must_succeed(self):
+        needs = self.needs()
+        needs["classify"]["outputs"]["go"] = "true"
+        for status in ("skipped", "failure", "cancelled"):
+            needs["go"]["result"] = status
+            with self.subTest(status=status), self.assertRaises(ValueError):
+                gate.check(needs)
+        needs["go"]["result"] = "success"
+        gate.check(needs)
+
+    def test_classifier_failure_fails_gate(self):
+        needs = self.needs()
+        needs["classify"]["result"] = "failure"
+        with self.assertRaises(ValueError):
+            gate.check(needs)
+
+    def test_shared_subchecks_require_compatibility(self):
+        needs = self.needs()
+        needs["classify"]["outputs"]["migration"] = "true"
+        with self.assertRaises(ValueError):
+            gate.check(needs)
+
+
+if __name__ == "__main__":
+    unittest.main()
+import pathlib
+import re
+import unittest
+
+
+WORKFLOW = pathlib.Path(__file__).resolve().parents[2] / ".github/workflows/ci.yml"
+RUNNER_CONTEXT = re.compile(r"\$\{\{\s*runner\.")
+
+
+def invalid_job_env_lines(workflow):
+    """Find runner expressions where GitHub does not make runner available."""
+    in_job_env = False
+    for number, line in enumerate(workflow.splitlines(), 1):
+        indent = len(line) - len(line.lstrip(" "))
+        if indent == 4 and line.strip() == "env:":
+            in_job_env = True
+            continue
+        if indent <= 4 and line.strip() and not line.lstrip().startswith("#"):
+            in_job_env = False
+        if in_job_env and RUNNER_CONTEXT.search(line):
+            yield number
+
+
+class WorkflowContextTests(unittest.TestCase):
+    def test_runner_context_is_absent_from_job_env(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        self.assertEqual([], list(invalid_job_env_lines(workflow)))
+        self.assertIn("        env:\n          IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config", workflow)
+        self.assertIn('Add-Content -Path $env:GITHUB_ENV -Value "IM_GO_CONFIG_DIR=$env:IM_GO_CONFIG_DIR"', workflow)
+
+    def test_rejects_runner_context_at_deploy_job_env(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        invalid = workflow.replace(
+            "  deploy:\n    needs: classify",
+            "  deploy:\n    env:\n      IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config\n    needs: classify",
+            1,
+        )
+        self.assertNotEqual(workflow, invalid)
+        self.assertTrue(list(invalid_job_env_lines(invalid)))
+
+
+if __name__ == "__main__":
+    unittest.main()
+module im-platform/backend/go
+
+go 1.23.0
+
+require (
+	github.com/gorilla/websocket v1.5.3
+	github.com/jackc/pgx/v5 v5.7.6
+	github.com/nats-io/nats.go v1.43.0
+	golang.org/x/crypto v0.39.0
+)
+
+require (
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/nats-io/nkeys v0.4.11 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
+	golang.org/x/sync v0.15.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
+)
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Base64;
+
+public final class InfraPlaceholder {
+    public static void main(String[] args) throws Exception {
+        if (args.length != 1 || !(args[0].equals("gateway") || args[0].equals("core") || args[0].equals("plugin-host"))) {
+            throw new IllegalArgumentException("expected gateway, core, or plugin-host role");
+        }
+        String role = args[0];
+        try (ServerSocket server = new ServerSocket(8080)) {
+            while (true) {
+                try (Socket socket = server.accept()) {
+                    socket.setSoTimeout(5000);
+                    handle(socket, role);
+                } catch (Exception error) {
+                    System.err.println("placeholder request failed: " + error.getClass().getSimpleName());
+                }
+            }
+        }
+    }
+
+    private static void handle(Socket socket, String role) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+        String request = reader.readLine();
+        if (request == null) return;
+        String path = request.split(" ")[1];
+        String key = null;
+        boolean upgrade = false;
+        String line;
+        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+            int colon = line.indexOf(':');
+            if (colon < 0) continue;
+            String name = line.substring(0, colon).trim();
+            String value = line.substring(colon + 1).trim();
+            if (name.equalsIgnoreCase("Sec-WebSocket-Key")) key = value;
+            if (name.equalsIgnoreCase("Upgrade") && value.equalsIgnoreCase("websocket")) upgrade = true;
+        }
+        OutputStream out = socket.getOutputStream();
+        if (role.equals("gateway") && path.equals("/__infra/ws") && upgrade && key != null) {
+            byte[] digest = MessageDigest.getInstance("SHA-1").digest((key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes(StandardCharsets.US_ASCII));
+            String accept = Base64.getEncoder().encodeToString(digest);
+            out.write(("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " + accept + "\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+        } else if (path.equals("/__infra/health")) {
+            byte[] body = ("profile=java role=" + role + "\n").getBytes(StandardCharsets.UTF_8);
+            out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: " + body.length + "\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+            out.write(body);
+        } else {
+            out.write("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+        }
+        out.flush();
+    }
+}

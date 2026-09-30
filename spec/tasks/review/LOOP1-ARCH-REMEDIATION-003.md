@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-003
 title: Enforce architecture in CI and independent review
-status: active
-owner: fresh Implementation Agent /root/stage3_impl
+status: review
+owner: Coordinator pending new independent Review and bounded hosted acceptance
 stage: S1 remediation 3/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -75,8 +75,12 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
 
 # Next Action
 
-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+- Coordinator delegates new independent Review on the committed checker candidate and verifies exact-head hosted job outcomes under explicit stage003 bounded scope; real source_go/Gate remain red until004 migration. Do not activate004 before bounded checker acceptance.
 
 # Activation and bounded transition
 
 002 fresh independently reviewed product3b049046/closurec0373ab and exact hostedrun36719353192 accepted. Backlog->ready->active, all dependencies satisfied. Fresh /root/stage3_impl sole writer. Checker/regression/authority delivery may pass with actual old Go product-compliance FAIL and overall Gate red exposed. Temporary003 acceptance scope permits only004 migration next, exits upon004 actual tree compliance. No exemption, continue-on-error, product or Gate PASS.
+
+# Implementation candidate handoff
+
+Effective checks delivered, local30architecture/24CI tests PASS (four historical Windows symlink subcases skipped), authority/governance/currentJava PASS; actualGo source FAIL expected inventory in evidence003/expected-old-go-violations.md and raw JSON. Commands ci/check_architecture.py --scope governance/go/java/all; unittest tests/architecture and tests/ci. No product/canonical/contracts/history edits. Fresh independent Reviewer plus exact hosted jobs still required, no selfacceptance; overall Gate stays red. Last bounded acceptedheadc0373ab, checkpointstage2. Implementation writer /root/stage3_impl releases after candidate commit, Coordinator delegates new Reviewer. Stage004 remainsbacklog.

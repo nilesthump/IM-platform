@@ -6,7 +6,7 @@ Current Gate: LOOP1-ARCH-REMEDIATION
 Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
 Current Batch: LOOP1-ARCH-REMEDIATION
 Current Task: LOOP1-ARCH-REMEDIATION-003
-Current Task State: active
+Current Task State: review
 
 ## Immediately Relevant Completed Work
 
@@ -14,7 +14,7 @@ Stage 001 bounded done after fresh independent Review at a09f4fb and hosted CI r
 
 ## Current Blockers
 
-No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 enforcement and stage004 I01 migration remain required. Overall remediation and S1 Gate not passed.
+No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 new checker candidate awaits independent Review/hosted bounded acceptance; stage004 I01 migration remains required. Overall remediation and S1 Gate not passed.
 
 ## Verification
 
@@ -46,12 +46,16 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage3_impl delegated task002 closure then003 implementation sole writer; linked Recorder. Original unknown and Social worktrees untouched.
+Fresh /root/stage3_impl owns only003 checker/evidence/Recorder until candidate commit then releases writer to Coordinator for new independent Reviewer. Original unknown and Social worktrees untouched.
 
 ## Next Exact Action
 
-Read active003 authority and start implementation Recorder; construct checker/isolated fixtures/trigger/Gate. Old Go violations expected, never waived. No migration before003 independent acceptance;004 backlog/business suspended.002 exact hosted evidence and old-scope profile skips disclosed in002/hosted-acceptance.md.
+Delegate new independent Reviewer on003 committed checker candidate, run applicable exact-head hosted CI with real source_go/Gate red expected inventory. Local30architecture/24CI tests PASS (4historical Windows symlink subcase skips); governance/Java PASS, oldGo actualFAIL. Evidence003/implementation-evidence.md and expected-old-go.json. No migration before003 bounded independent acceptance;004 backlog/business suspended.002 exact hosted evidence and old-scope profile skips disclosed in002/hosted-acceptance.md.
 
 ## Architecture Conflicts / ACP / ADR
 
 ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01 propagation implemented in stage002 candidate, local independent Review PASS; hosted acceptance completedc0373ab/run36719353192; stage003 enforcement pending; I01 Go migration pending stage004.
+
+## Stage003 candidate verification
+
+Exact commands/results/durations/limitations in evidence003/implementation-evidence.md, Recorder R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b. New static checks supplement semantic independent Review; governance triggering and Gate negative controls pass; originalGo real source failure is expected, no product or batch PASS. Host actual candidate jobs pending.

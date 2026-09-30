@@ -22,6 +22,9 @@ jobs:
       migration: ${{ steps.paths.outputs.migration }}
       compatibility: ${{ steps.paths.outputs.compatibility }}
       deploy: ${{ steps.paths.outputs.deploy }}
+      architecture: ${{ steps.paths.outputs.architecture }}
+      source_go: ${{ steps.paths.outputs.source_go }}
+      source_java: ${{ steps.paths.outputs.source_java }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,6 +57,54 @@ jobs:
             base=$(git hash-object -t tree /dev/null)
           fi
           python3 ci/classify.py --base "$base" --head "$HEAD_SHA" --github-output "$GITHUB_OUTPUT"
+
+  architecture:
+    needs: classify
+    if: needs.classify.outputs.architecture == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Canonical integrity and authority structure
+        shell: pwsh
+        run: ./tools/verify-frozen-architecture.ps1
+      - name: Current governance references and task scopes
+        run: python3 ci/check_architecture.py --scope governance
+      - name: Checker positive and negative controls
+        run: python3 -m unittest discover -s tests/architecture -v
+
+  source_go:
+    needs: classify
+    if: needs.classify.outputs.source_go == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Real Go source ownership and AST dependency graph
+        run: python3 ci/check_architecture.py --scope go --json
+
+  source_java:
+    needs: classify
+    if: needs.classify.outputs.source_java == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Java current source and explicit placeholder boundary
+        run: python3 ci/check_architecture.py --scope java --json
 
   go:
     needs: classify
@@ -242,7 +293,7 @@ jobs:
 
   gate:
     if: always()
-    needs: [classify, go, java, web, desktop, mobile, shared, compatibility, deploy]
+    needs: [classify, architecture, source_go, source_java, go, java, web, desktop, mobile, shared, compatibility, deploy]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

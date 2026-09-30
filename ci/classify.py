@@ -14,6 +14,7 @@ import sys
 JOBS = (
     "go", "java", "web", "desktop", "mobile", "shared",
     "old_client", "plugin", "migration", "compatibility", "deploy",
+    "architecture", "source_go", "source_java",
 )
 FULL_COMPATIBILITY = frozenset(JOBS) - {"deploy"}
 
@@ -25,6 +26,19 @@ def classify(paths):
         if not path or path.startswith("/") or ".." in path.split("/"):
             raise ValueError(f"not a repository-relative path: {raw!r}")
         parts = path.split("/")
+        governance = (
+            path in {"AGENTS.md", "CLAUDE.md", "README.md"}
+            or parts[:2] in (["spec", "architecture"], ["spec", "handoff"],
+                             ["spec", "tasks"], ["spec", "batches"],
+                             ["spec", "acceptance"], ["spec", "governance"],
+                             ["tests", "architecture"], ["tools", "architecture"])
+            or path.startswith("tools/verify-frozen-architecture")
+            or path == "tools/verify_frozen_architecture.py"
+            or path.startswith("tools/verify-loop1-ctrl-")
+            or path.startswith("tools/verify-loop1-min-")
+        )
+        if governance:
+            selected.update({"architecture", "source_go", "source_java"})
         shared = (
             parts[0] in {"contracts", "database", "migrations", "sdk", "sdks", "shared"}
             or parts[:2] in (["backend", "shared"], ["clients", "shared"])
@@ -34,9 +48,9 @@ def classify(paths):
         if shared:
             selected.update(FULL_COMPATIBILITY)
         elif parts[:2] == ["backend", "go"]:
-            selected.add("go")
+            selected.update({"go", "architecture", "source_go"})
         elif parts[:2] == ["backend", "java"]:
-            selected.add("java")
+            selected.update({"java", "architecture", "source_java"})
         elif parts[:2] == ["clients", "web"]:
             selected.add("web")
         elif parts[:2] == ["clients", "desktop"]:
