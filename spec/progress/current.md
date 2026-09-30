@@ -1,12 +1,12 @@
 # Current Execution State
 
 Current Loop: Loop 1
-Current Stage: S1 remediation 3/4
+Current Stage: S1 remediation 4/4
 Current Gate: LOOP1-ARCH-REMEDIATION
 Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
 Current Batch: LOOP1-ARCH-REMEDIATION
-Current Task: LOOP1-ARCH-REMEDIATION-003
-Current Task State: review
+Current Task: LOOP1-ARCH-REMEDIATION-004
+Current Task State: active
 
 ## Immediately Relevant Completed Work
 
@@ -14,7 +14,7 @@ Stage 001 bounded done after fresh independent Review at a09f4fb and hosted CI r
 
 ## Current Blockers
 
-No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 new checker candidate awaits independent Review/hosted bounded acceptance; stage004 I01 migration remains required. Overall remediation and S1 Gate not passed.
+No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 bounded independent Review/hosted acceptance completed; stage004 I01 migration remains required. Overall remediation and S1 Gate not passed.
 
 ## Verification
 
@@ -38,32 +38,25 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
 
 ## Last Known Good Commit
 
-`c0373abf07d1af7f8a89423f9b8324db636d503c` (bounded stage-two Review closure and applicable exact hosted CI); historical Auth accepted59d92f3.
+`2afeac8bda051a507a1ea662455d7195ac93ed31` (bounded stage-three Review closure and exact hosted checker acceptance; realGo/Gate failed expected); historical Auth accepted59d92f3.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage2-accepted.md`
+`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage3-accepted.md`
 
 ## Uncommitted Changes / Ownership
 
-New /root/stage3_final_review owns only fresh Review evidence/Recorder and present handoff; releases after clean Review closure. Candidate product/checker unchanged; original unknown and Social worktrees untouched.
+Fresh /root/stage4_impl solewriter owns003closuremetadata/Recorder and004authorizedmigration. Root/otheragentsreadonly. Unknownoriginal/Socialworktreesuntouched.
 
 ## Next Exact Action
 
-Delegate new independent Reviewer on003 committed checker candidate, run applicable exact-head hosted CI with real source_go/Gate red expected inventory. Local30architecture/24CI tests PASS (4historical Windows symlink subcase skips); governance/Java PASS, oldGo actualFAIL. Evidence003/implementation-evidence.md and expected-old-go.json. No migration before003 bounded independent acceptance;004 backlog/business suspended.002 exact hosted evidence and old-scope profile skips disclosed in002/hosted-acceptance.md.
+Fresh /root/stage4_impl solewriter reads004authority, publishes actualfile/responsibility migrationmap before edits, then Go migration/live regression.003boundedaccepted exact2afeac8/run36726926394;11jobssuccess,source_go/gateFAILexpected; no Go/batch/S1PASS. Businessoutside004suspended.
 
 ## Architecture Conflicts / ACP / ADR
 
 ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01 propagation implemented in stage002 candidate, local independent Review PASS; hosted acceptance completedc0373ab/run36719353192; stage003 enforcement pending; I01 Go migration pending stage004.
 
-## Stage003 candidate verification
 
-Exact commands/results/durations/limitations in evidence003/implementation-evidence.md, Recorder R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b. New static checks supplement semantic independent Review; governance triggering and Gate negative controls pass; originalGo real source failure is expected, no product or batch PASS. Host actual candidate jobs pending.
+## Stage003 actual accepted checks
 
-## Fresh JDBC Fix handoff
-
-Independent read-only Review FAIL on a27f655 repaired by fresh Fix context: Gateway ambiguous execute no SELECT-decoy exemption; non-Core JDBC transaction controls forbidden,legal read-only/connection support retained. Localarchitecture34 PASS/noskip,CI24 PASS/four historical Windows symlink skips; canonical/governance/Java/recoveryDevelopmentPASS,oldGo72FAIL unchanged. Durable evidence003/jdbc-fix-evidence.md and fresh Recorder R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83. New independentReview and hosted bounded acceptance pending;003review/004backlog/overallGate red.
-
-## New final independent Review
-
-Exact94b2f366dd1bee6652ec433b213c90f6c84fb4c9 bounded localcheckerPASS by new /root/stage3_final_review; clean detachedcheckout,34architecture/no skip,24CI/four historical Windows symlink subcase skips,independent six-class controlsPASS,canonical/RecoveryAcceptancePASS. ActualGo72FAIL expected,Java/governancePASS. Evidence003/final-independent-review.md; Recorder R-20260930T135729Z-4a5e6887-279d-42ab-8289-0b6fc6f53e29. Coordinator next validates actual exact Review-closure hosted jobs;003review/004backlog/batch and S1 NOT PASSED.
+New finalReviewer exact94b2f36 cleancheckout accepted34architecture/no skip,24CI/four historical Windows symlinksubcases disclosed. Hosted exact2afeac8/run36726926394 all13jobs ran:11success,source_go/gateFAILrealoldGo72. Durable003/final-independent-review.md and hosted-acceptance.md. SourceGo mustpass004; no waiver.

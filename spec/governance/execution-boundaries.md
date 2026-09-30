@@ -8,7 +8,7 @@ Acceptance combines canonical behavior/security/transaction fixtures with applic
 
 ## Current transition and recovery
 
-Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. Those tools are currently pending, not proven available commands. Stage004 binds accepted exact checker commands before migration and eliminates I01 old Go deviations. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
+Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. These tools are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture, with evidence003/hosted-acceptance.md; actualGo remains failed until004. Stage004 binds accepted exact checker commands before migration and eliminates I01 old Go deviations. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
 
 The stage004 language-wide scope is a single migration authorization ending at batch completion. Its actual file/responsibility map precedes edits. Social/Message/E2E activation waits for the entire remediation batch and final exact-head hosted acceptance. Original Auth remains historical done under old checks. Resolve the unique current task; no parallel unique Current Task or normal business resumption.
 

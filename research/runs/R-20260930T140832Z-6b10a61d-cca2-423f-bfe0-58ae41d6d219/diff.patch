@@ -1,0 +1,346 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 7bd8481..d79b724 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -46,7 +46,7 @@ Without explicit approval, an agent MUST NOT change Frozen Architecture, public
+ 
+ Read [execution constraints](spec/governance/execution-boundaries.md) and [the independent Review checklist](spec/governance/independent-review.md). allowed_paths never overrides or exempts architecture. Ordinary business tasks narrow paths by responsibility; one-time cross-service migration lists affected files/responsibilities, scope and exit before edits. Applicable source/dependency checks supplement behavior. Reviewer inspects actual logic and imports plus minimality; Java inherits canonical boundaries, never Go layout. Escalate conflicts before implementation; do not legalize errors after implementation.
+ 
+-LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers remain pending until independently accepted; expected old Go failures permit only stage-four migration, not product or Gate PASS.
++LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers are independently bounded accepted at2afeac8/run36726926394 (evidence003/hosted-acceptance.md); execute ci/check_architecture.py --scope all --json and tests/architecture; actual Go remains failed until004; expected old Go failures permit only stage-four migration, not product or Gate PASS.
+ 
+ ## Verification, handoff, and checkpoints
+ 
+diff --git a/spec/acceptance/s0-auth-user-friend.md b/spec/acceptance/s0-auth-user-friend.md
+index 1685361..322e1d4 100644
+--- a/spec/acceptance/s0-auth-user-friend.md
++++ b/spec/acceptance/s0-auth-user-friend.md
+@@ -17,4 +17,4 @@ These checks are executable requirements for the future canonical contract runne
+ 
+ Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+ 
+-Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
++Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. ActualGo source and Gate remainfailed until004; no businessoutside migration activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/acceptance/s0-messaging.md b/spec/acceptance/s0-messaging.md
+index 4aa082d..6ac82ef 100644
+--- a/spec/acceptance/s0-messaging.md
++++ b/spec/acceptance/s0-messaging.md
+@@ -17,4 +17,4 @@ These checks are executable requirements for the future canonical contract runne
+ 
+ Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+ 
+-Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
++Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. ActualGo source and Gate remainfailed until004; no businessoutside migration activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/acceptance/s0-sync-plugin.md b/spec/acceptance/s0-sync-plugin.md
+index e23c317..6057e49 100644
+--- a/spec/acceptance/s0-sync-plugin.md
++++ b/spec/acceptance/s0-sync-plugin.md
+@@ -22,4 +22,4 @@ These checks are executable requirements for the future canonical contract runne
+ 
+ Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+ 
+-Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
++Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. ActualGo source and Gate remainfailed until004; no businessoutside migration activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/governance/execution-boundaries.md b/spec/governance/execution-boundaries.md
+index 2689f3a..56ebf18 100644
+--- a/spec/governance/execution-boundaries.md
++++ b/spec/governance/execution-boundaries.md
+@@ -8,7 +8,7 @@ Acceptance combines canonical behavior/security/transaction fixtures with applic
+ 
+ ## Current transition and recovery
+ 
+-Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. Those tools are currently pending, not proven available commands. Stage004 binds accepted exact checker commands before migration and eliminates I01 old Go deviations. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
++Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. These tools are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture, with evidence003/hosted-acceptance.md; actualGo remains failed until004. Stage004 binds accepted exact checker commands before migration and eliminates I01 old Go deviations. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
+ 
+ The stage004 language-wide scope is a single migration authorization ending at batch completion. Its actual file/responsibility map precedes edits. Social/Message/E2E activation waits for the entire remediation batch and final exact-head hosted acceptance. Original Auth remains historical done under old checks. Resolve the unique current task; no parallel unique Current Task or normal business resumption.
+ 
+diff --git a/spec/handoff/agent-context.md b/spec/handoff/agent-context.md
+index 44ce689..f2c23b1 100644
+--- a/spec/handoff/agent-context.md
++++ b/spec/handoff/agent-context.md
+@@ -28,4 +28,4 @@ Create a checkpoint for a stable Gate, important vertical slice, contract/schema
+ 
+ Before business implementation read canonical §3/§10 SRC-01 through SRC-07/§11 and spec/governance/execution-boundaries.md. allowed_paths is never an architecture exemption; narrow ordinary scopes, explicitly authorize temporary migration maps and exit. Review uses spec/governance/independent-review.md for behavior, actual ownership, imports and minimality. Java future tasks derive from canonical §20 and the current task template, not Go layout.
+ 
+-LOOP1-CI-001 is operational and done, so ADR-0001 is expired. Verify hosted candidate SHA and actual required job conclusions. Current four-stage remediation suspends Social/Message/E2E/Java/plugin business. Historical Auth done is retained under old checks; new structure remains unaccepted until stage four. The unique task in current.md controls resumption. Stage-three checkers are pending, not available proven checks; stage-three expected Go failures cannot close the batch or S1 Gate.
++LOOP1-CI-001 is operational and done, so ADR-0001 is expired. Verify hosted candidate SHA and actual required job conclusions. Current four-stage remediation suspends Social/Message/E2E/Java/plugin business. Historical Auth done is retained under old checks; new structure remains unaccepted until stage four. The unique task in current.md controls resumption. Stage-three checkers are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture (evidence003/hosted-acceptance.md); stage-three expected Go failures cannot close the batch or S1 Gate.
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index b75d52c..4d88a86 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -1,12 +1,12 @@
+ # Current Execution State
+ 
+ Current Loop: Loop 1
+-Current Stage: S1 remediation 3/4
++Current Stage: S1 remediation 4/4
+ Current Gate: LOOP1-ARCH-REMEDIATION
+ Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
+ Current Batch: LOOP1-ARCH-REMEDIATION
+-Current Task: LOOP1-ARCH-REMEDIATION-003
+-Current Task State: review
++Current Task: LOOP1-ARCH-REMEDIATION-004
++Current Task State: active
+ 
+ ## Immediately Relevant Completed Work
+ 
+@@ -14,7 +14,7 @@ Stage 001 bounded done after fresh independent Review at a09f4fb and hosted CI r
+ 
+ ## Current Blockers
+ 
+-No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 new checker candidate awaits independent Review/hosted bounded acceptance; stage004 I01 migration remains required. Overall remediation and S1 Gate not passed.
++No blocking substantive architecture choice within audited scope. Stage002 bounded accepted; stage003 bounded independent Review/hosted acceptance completed; stage004 I01 migration remains required. Overall remediation and S1 Gate not passed.
+ 
+ ## Verification
+ 
+@@ -38,32 +38,25 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
+ 
+ ## Last Known Good Commit
+ 
+-`c0373abf07d1af7f8a89423f9b8324db636d503c` (bounded stage-two Review closure and applicable exact hosted CI); historical Auth accepted59d92f3.
++`2afeac8bda051a507a1ea662455d7195ac93ed31` (bounded stage-three Review closure and exact hosted checker acceptance; realGo/Gate failed expected); historical Auth accepted59d92f3.
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage2-accepted.md`
++`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage3-accepted.md`
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-New /root/stage3_final_review owns only fresh Review evidence/Recorder and present handoff; releases after clean Review closure. Candidate product/checker unchanged; original unknown and Social worktrees untouched.
++Fresh /root/stage4_impl solewriter owns003closuremetadata/Recorder and004authorizedmigration. Root/otheragentsreadonly. Unknownoriginal/Socialworktreesuntouched.
+ 
+ ## Next Exact Action
+ 
+-Delegate new independent Reviewer on003 committed checker candidate, run applicable exact-head hosted CI with real source_go/Gate red expected inventory. Local30architecture/24CI tests PASS (4historical Windows symlink subcase skips); governance/Java PASS, oldGo actualFAIL. Evidence003/implementation-evidence.md and expected-old-go.json. No migration before003 bounded independent acceptance;004 backlog/business suspended.002 exact hosted evidence and old-scope profile skips disclosed in002/hosted-acceptance.md.
++Fresh /root/stage4_impl solewriter reads004authority, publishes actualfile/responsibility migrationmap before edits, then Go migration/live regression.003boundedaccepted exact2afeac8/run36726926394;11jobssuccess,source_go/gateFAILexpected; no Go/batch/S1PASS. Businessoutside004suspended.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+ ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01 propagation implemented in stage002 candidate, local independent Review PASS; hosted acceptance completedc0373ab/run36719353192; stage003 enforcement pending; I01 Go migration pending stage004.
+ 
+-## Stage003 candidate verification
+ 
+-Exact commands/results/durations/limitations in evidence003/implementation-evidence.md, Recorder R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b. New static checks supplement semantic independent Review; governance triggering and Gate negative controls pass; originalGo real source failure is expected, no product or batch PASS. Host actual candidate jobs pending.
++## Stage003 actual accepted checks
+ 
+-## Fresh JDBC Fix handoff
+-
+-Independent read-only Review FAIL on a27f655 repaired by fresh Fix context: Gateway ambiguous execute no SELECT-decoy exemption; non-Core JDBC transaction controls forbidden,legal read-only/connection support retained. Localarchitecture34 PASS/noskip,CI24 PASS/four historical Windows symlink skips; canonical/governance/Java/recoveryDevelopmentPASS,oldGo72FAIL unchanged. Durable evidence003/jdbc-fix-evidence.md and fresh Recorder R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83. New independentReview and hosted bounded acceptance pending;003review/004backlog/overallGate red.
+-
+-## New final independent Review
+-
+-Exact94b2f366dd1bee6652ec433b213c90f6c84fb4c9 bounded localcheckerPASS by new /root/stage3_final_review; clean detachedcheckout,34architecture/no skip,24CI/four historical Windows symlink subcase skips,independent six-class controlsPASS,canonical/RecoveryAcceptancePASS. ActualGo72FAIL expected,Java/governancePASS. Evidence003/final-independent-review.md; Recorder R-20260930T135729Z-4a5e6887-279d-42ab-8289-0b6fc6f53e29. Coordinator next validates actual exact Review-closure hosted jobs;003review/004backlog/batch and S1 NOT PASSED.
++New finalReviewer exact94b2f36 cleancheckout accepted34architecture/no skip,24CI/four historical Windows symlinksubcases disclosed. Hosted exact2afeac8/run36726926394 all13jobs ran:11success,source_go/gateFAILrealoldGo72. Durable003/final-independent-review.md and hosted-acceptance.md. SourceGo mustpass004; no waiver.
+diff --git a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md b/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md
+deleted file mode 100644
+index 84abd70..0000000
+--- a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md
++++ /dev/null
+@@ -1,80 +0,0 @@
+----
+-task_id: LOOP1-ARCH-REMEDIATION-004
+-title: Migrate Go responsibility packages and regress
+-status: backlog
+-owner: unassigned
+-stage: S1 remediation 4/4
+-gate: LOOP1-ARCH-REMEDIATION
+----
+-
+-# Goal
+-
+-Migrate Go responsibility packages and regress within the explicitly authorized four-stage remediation.
+-
+-# Inputs
+-
+-- User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+-- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+-- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+-
+-# Execution Constraints
+-
+-Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+-
+-# Dependencies
+-
+-- LOOP1-ARCH-REMEDIATION-003 independently accepted bounded deliverable; no blocking architecture decision.
+-
+-# Allowed Paths
+-
+-- `backend/go/**`
+-- `tests/go/**`
+-- `tests/ci/** only migration regression`
+-- `deploy/** only existing role/build/config adaptation`
+-- `ci/** and .github/workflows/** only recursive Go verification and regression activation`
+-- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+-- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/**`
+-- `spec/progress/checkpoints/*architecture-remediation*.md`
+-- `research/prompts/** and research/runs/** only this task-linked artifacts`
+-
+-User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+-
+-# Acceptance
+-
+-Publish actual before/after file/responsibility migration map, preserve Core Auth writes and narrow Gateway validation, minimize shared support and exported interfaces. Recursive formatting/build/vet/unit/race, live migrated PostgreSQL/NATS integration and canonical fixtures, register/login/three slots/replacement/epoch/refresh/logout/bind/revocation/close/rollback/security, each role startup/routes/events, Compose/TLS smoke, all structural checks. Explicit test enable conditions; skipped integration is unexecuted. Fresh final independent review and hosted CI exact head/jobs; close batch only after all criteria.
+-
+-# Forbidden
+-
+-- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+-- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+-- No copied/modified canonical fixture expectations, mass export of internals, deleted tests, or moving full Auth into shared.
+-- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+-
+-# Minimality
+-
+-Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+-
+-# Verification
+-
+-Before migration, bind exact commands/results from independently accepted stage003 evidence; publish the actual file/responsibility migration table before edits. Pending checker tools cannot be counted as executable PASS. The broad migration scope is a one-time authorization ending at batch completion; preserve behavioral fixtures and minimize exported APIs.
+-
+-
+-- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+-- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+-- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+-
+-# Evidence
+-
+-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/ (pending independent acceptance).
+-
+-# Handoff
+-
+-- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+-- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+-
+-# Next Action
+-
+-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md
+deleted file mode 100644
+index 2230a7d..0000000
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-003.md
++++ /dev/null
+@@ -1,94 +0,0 @@
+----
+-task_id: LOOP1-ARCH-REMEDIATION-003
+-title: Enforce architecture in CI and independent review
+-status: review
+-owner: Coordinator pending new independent Review and bounded hosted acceptance
+-stage: S1 remediation 3/4
+-gate: LOOP1-ARCH-REMEDIATION
+----
+-
+-# Goal
+-
+-Enforce architecture in CI and independent review within the explicitly authorized four-stage remediation.
+-
+-# Inputs
+-
+-- User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+-- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+-- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+-
+-# Execution Constraints
+-
+-Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+-
+-# Dependencies
+-
+-- LOOP1-ARCH-REMEDIATION-002 independently accepted bounded deliverable; no blocking architecture decision.
+-
+-# Allowed Paths
+-
+-- `ci/**`
+-- `.github/workflows/**`
+-- `tests/ci/**`
+-- `tests/architecture/**`
+-- `tools/** only architecture/constraint verification`
+-- `spec/acceptance/** only checker and review rules`
+-- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+-- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/**`
+-- `spec/progress/checkpoints/*architecture-remediation*.md`
+-- `research/prompts/** and research/runs/** only this task-linked artifacts`
+-
+-User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+-
+-# Acceptance
+-
+-Positive controls and negatives catch root business source, forbidden service imports, shared-to-service imports, invalid active Task paths, missed governance triggers, and original Go layout. Go import graph and stage-appropriate Java fixtures are exercised. Exact root whitelist, backend-specific placeholder exits, rename/delete handling, required job missing/skip/failure/cancellation fail Gate. Report expected old-Go failures without grandfathering. Independent reviewer validates checker effectiveness before stage 4.
+-
+-# Forbidden
+-
+-- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+-- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+-- No Go/Java product implementation edits.
+-- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+-
+-# Minimality
+-
+-Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+-
+-# Verification
+-
+-- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+-- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+-- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+-
+-# Evidence
+-
+-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/ (pending independent acceptance).
+-
+-# Handoff
+-
+-- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+-- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+-
+-# Next Action
+-
+-- Coordinator delegates new independent Review on the committed checker candidate and verifies exact-head hosted job outcomes under explicit stage003 bounded scope; real source_go/Gate remain red until004 migration. Do not activate004 before bounded checker acceptance.
+-
+-# Activation and bounded transition
+-
+-002 fresh independently reviewed product3b049046/closurec0373ab and exact hostedrun36719353192 accepted. Backlog->ready->active, all dependencies satisfied. Fresh /root/stage3_impl sole writer. Checker/regression/authority delivery may pass with actual old Go product-compliance FAIL and overall Gate red exposed. Temporary003 acceptance scope permits only004 migration next, exits upon004 actual tree compliance. No exemption, continue-on-error, product or Gate PASS.
+-
+-# Implementation candidate handoff
+-
+-Effective checks delivered, local30architecture/24CI tests PASS (four historical Windows symlink subcases skipped), authority/governance/currentJava PASS; actualGo source FAIL expected inventory in evidence003/expected-old-go-violations.md and raw JSON. Commands ci/check_architecture.py --scope governance/go/java/all; unittest tests/architecture and tests/ci. No product/canonical/contracts/history edits. Fresh independent Reviewer plus exact hosted jobs still required, no selfacceptance; overall Gate stays red. Last bounded acceptedheadc0373ab, checkpointstage2. Implementation writer /root/stage3_impl releases after candidate commit, Coordinator delegates new Reviewer. Stage004 remainsbacklog.
+-
+-# Fresh JDBC repair candidate
+-
+-Independent read-only Review FAIL on a27f655 recorded in evidence003/jdbc-fix-evidence.md. New /root/stage3_jdbc_fix repaired Gateway execute SELECT-decoy loophole and non-Core JDBC transaction calls; architecture34 PASS/no skip,CI24 PASS/four historical Windows symlink subcase skips,canonical/recovery Development PASS; oldGo72 violations unchangedFAIL. Task remainsreview and004backlog; new independentReview/exact-hosted required,overallGate red. No product/history changes. Fixer releases writer after clean ordinary commit.
+-
+-# Fresh final independent Review
+-
+-New /root/stage3_final_review independently reviewed exact94b2f366dd1bee6652ec433b213c90f6c84fb4c9 in clean detached checkout. Bounded localcheckerPASS,34architecture tests/no skip,24CI tests/four disclosed historical Windows symlink subcases skipped,independent six-class variantsPASS,canonical/cleanRecoveryAcceptancePASS. ActualGo72FAIL expected,Java/governancePASS; manualmaintransport/fullAuthcoupling remains004. Evidence003/final-independent-review.md. Hosted exact closure pending; task staysreview,004backlog,overallGate NOT PASSED. Reviewer releases after evidence commit.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-c99b477d-e876-4bb5-a495-00cf6dcac36c/metadata.json
+# ?? research/prompts/P-c99b477d-e876-4bb5-a495-00cf6dcac36c/prompt.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/.gitattributes
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-10a549ae-d500-4db5-8ad4-2a32500edbd5.stderr.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-10a549ae-d500-4db5-8ad4-2a32500edbd5.stdout.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-1657dc25-a01b-4e64-94b2-3fb4123e5bb0.stderr.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-1657dc25-a01b-4e64-94b2-3fb4123e5bb0.stdout.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-347244e9-3b89-4256-a9c8-a38f78ea5e92.stderr.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-347244e9-3b89-4256-a9c8-a38f78ea5e92.stdout.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-3493aa6d-83f8-433e-be61-b6df02857707.stderr.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-3493aa6d-83f8-433e-be61-b6df02857707.stdout.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-57936938-93d8-47dd-815a-aac860b88813.stderr.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-57936938-93d8-47dd-815a-aac860b88813.stdout.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-761c46e0-15dc-4d6b-89bf-ecf1338f7e02.stderr.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/blobs/C-761c46e0-15dc-4d6b-89bf-ecf1338f7e02.stdout.txt
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/events.jsonl
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/initial_state.json
+# ?? research/runs/R-20260930T140832Z-6b10a61d-cca2-423f-bfe0-58ae41d6d219/metadata.json
+# ?? spec/progress/checkpoints/2026-09-30-architecture-remediation-stage3-accepted.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/hosted-acceptance.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/hosted-ci-36726926394.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/stage4-closure-delegation.txt
+# ?? spec/tasks/active/LOOP1-ARCH-REMEDIATION-004.md
+# ?? spec/tasks/done/LOOP1-ARCH-REMEDIATION-003.md

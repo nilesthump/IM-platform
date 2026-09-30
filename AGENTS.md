@@ -46,7 +46,7 @@ Without explicit approval, an agent MUST NOT change Frozen Architecture, public 
 
 Read [execution constraints](spec/governance/execution-boundaries.md) and [the independent Review checklist](spec/governance/independent-review.md). allowed_paths never overrides or exempts architecture. Ordinary business tasks narrow paths by responsibility; one-time cross-service migration lists affected files/responsibilities, scope and exit before edits. Applicable source/dependency checks supplement behavior. Reviewer inspects actual logic and imports plus minimality; Java inherits canonical boundaries, never Go layout. Escalate conflicts before implementation; do not legalize errors after implementation.
 
-LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers remain pending until independently accepted; expected old Go failures permit only stage-four migration, not product or Gate PASS.
+LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers are independently bounded accepted at2afeac8/run36726926394 (evidence003/hosted-acceptance.md); execute ci/check_architecture.py --scope all --json and tests/architecture; actual Go remains failed until004; expected old Go failures permit only stage-four migration, not product or Gate PASS.
 
 ## Verification, handoff, and checkpoints
 

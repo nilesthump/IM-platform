@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
-status: backlog
-owner: unassigned
+status: active
+owner: /root/stage4_impl sole writer
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -78,3 +78,7 @@ Before migration, bind exact commands/results from independently accepted stage0
 # Next Action
 
 - Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+
+# Activation
+
+003 bounded accepted exact2afeac8/run36726926394 after new independentReview. Backlog->ready->active; only004 migration authorized, overallGate remainsred. Accepted executable checks: bundledPython ci/check_architecture.py --scope all --json; bundledPython -m unittest discover -s tests/architecture -v; bundledPython -m unittest discover -s tests/ci -v; pwsh tools/verify-frozen-architecture.ps1. Publish actual migration table before product edits.

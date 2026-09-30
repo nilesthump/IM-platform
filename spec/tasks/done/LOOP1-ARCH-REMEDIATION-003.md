@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-003
 title: Enforce architecture in CI and independent review
-status: review
-owner: Coordinator pending new independent Review and bounded hosted acceptance
+status: done
+owner: Coordinator; fresh independent Review and exact hosted bounded acceptance
 stage: S1 remediation 3/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -92,3 +92,7 @@ Independent read-only Review FAIL on a27f655 recorded in evidence003/jdbc-fix-ev
 # Fresh final independent Review
 
 New /root/stage3_final_review independently reviewed exact94b2f366dd1bee6652ec433b213c90f6c84fb4c9 in clean detached checkout. Bounded localcheckerPASS,34architecture tests/no skip,24CI tests/four disclosed historical Windows symlink subcases skipped,independent six-class variantsPASS,canonical/cleanRecoveryAcceptancePASS. ActualGo72FAIL expected,Java/governancePASS; manualmaintransport/fullAuthcoupling remains004. Evidence003/final-independent-review.md. Hosted exact closure pending; task staysreview,004backlog,overallGate NOT PASSED. Reviewer releases after evidence commit.
+
+# Bounded hosted closure
+
+Exact2afeac8/run36726926394 accepted bounded checker delivery:11 jobs success,source_go/gate actualFAIL; no product/Gate PASS. Evidence003/hosted-acceptance.md. Fresh004 Implementation owns next migration. One-time closure scope additionally includes AGENTS.md,spec/handoff/agent-context.md,spec/governance/execution-boundaries.md and3spec/acceptance/*.md only accepted-command/state references under Coordinator explicit authorization; final fresh004Review/hosted verifies this metadata.
