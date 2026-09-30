@@ -10,7 +10,7 @@ Current Task State: review
 
 ## Immediately Relevant Completed Work
 
-User-authorized four-stage remediation takes precedence over further business work. Full canonical architecture audit and minimal normative repairs are locally verified and pending independent review on task/LOOP1-ARCH-REMEDIATION, isolated worktree H:/.codex/worktrees/architecture-remediation/IM-platform. Stages 2-4 remain backlog. No product code changed in stage 1.
+User-authorized four-stage remediation takes precedence over further business work. Full canonical architecture audit and minimal normative repairs have fresh independent local Review PASS at a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d; applicable fresh hosted CI acceptance remains pending on task/LOOP1-ARCH-REMEDIATION, isolated worktree H:/.codex/worktrees/architecture-remediation/IM-platform. Stages 2-4 remain backlog. No product code changed in stage 1.
 
 ## Recovery relationship
 
@@ -33,15 +33,15 @@ LOOP1-GO-AUTH-001 remains historical done; accepted exact remote head 59d92f3923
 
 ## Uncommitted Changes / Ownership
 
-Fresh stage-one Fix Agent /root/stage1_transport_fix is sole writer for the bounded transport repair; after clean handoff it releases write ownership to Coordinator. Prior /root/stage1_impl was interrupted by usage limit; its partial transport run is retained as partial. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
+Fresh independent Review Agent /root/stage1_review owns only new review evidence/Recorder and recovery handoff until clean commit, then releases sole write ownership to Coordinator. Fix transport repair was cleanly committed. Prior /root/stage1_impl was interrupted by usage limit; its partial transport run is retained as partial. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
 
 ## Next Exact Action
 
-Read spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/transport-repair.md (including raw-output encoding limitation), delegate a new independent Review Agent for the clean committed stage-one candidate, then applicable real hosted CI. Do not start stage two or claim batch/S1 Gate PASS.
+Read spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md and transport-repair.md, inspect clean review closure, normally push reviewed task branch and collect applicable fresh exact-head hosted CI with durable evidence. Do not start stage two or claim batch/S1 Gate PASS.
 
 ## Current Blockers
 
-No unresolved substantive architecture choice found in the audited scope. Independent Review and applicable hosted CI are pending. Stage-three product structural checks do not yet exist; original Go layout remains a known stage-four implementation deviation.
+No unresolved substantive architecture choice found in the audited scope. Fresh independent local Review PASS; applicable hosted CI pending. Stage-three product structural checks do not yet exist; original Go layout remains a known stage-four implementation deviation.
 
 ## Verification
 
@@ -56,3 +56,7 @@ Canonical architecture, baseline/resolver, new ADR-0003, integrity verifier/test
 ## Architecture Conflicts / ACP / ADR
 
 ADR-0003 implements bounded Human-approved conflict resolution; v1.1 normative tightening is distinct from ADR-0002's historical representation-only migration. Full conflict/coverage ledger is in current task evidence. ADR-0001 bootstrap acceptance remains expired.
+
+## Independent Review evidence
+
+Fresh /root/stage1_review local PASS at clean detached a09f4fb: integrity/negative controls, Recovery Acceptance, HTTP/WSS/Sync-Plugin and 50 persisted blob transportation checks PASS. Four CI real symlink subcases skipped on Windows; original one raw stderr encoding mismatch disclosed. No live product/source compliance claimed. Full exact evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md; Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2. Task/batch/S1 acceptance pending real applicable CI.

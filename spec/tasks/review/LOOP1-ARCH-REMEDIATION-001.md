@@ -41,6 +41,8 @@ Audit and repair the whole Frozen Architecture within the explicitly authorized 
 
 User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
 
+- Exact new independent Review run `research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/.gitattributes`: `blobs/** -text` only for new evidence transport fidelity; Coordinator approved under Human necessary execution-constraint authorization.
+
 # Acceptance
 
 Audit all 22 chapters, both appendices, tables, examples, nine diagrams and references against existing authority; classify real conflicts versus implementation deviations. Repair every determinate conflict in current prose, record coverage/ledger and approval source. Preserve historical PDF/ADR/evidence bytes; distinguish old representation-only migration from current normative tightening. Verify actual hashes and semantic structure with negative controls. Fresh independent review and applicable hosted CI; no product edits.
@@ -88,3 +90,9 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
 - Usage-interrupted implementation transport run preserved as partial; new fresh Fix context uses related R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8.
 - 22 original blobs restored through exact run-local -text policy and ordinary corrective commit; all 38 persisted original bytes verified against working/index/committed SHA. One pre-existing raw subprocess vs UTF-8 persisted stderr hash mismatch is disclosed, not repaired by editing history.
 - Exact failures, reruns and preservation method: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/transport-repair.md and verify-transport.py. Authority integrity rerun exit 0, four tests PASS. No product modification or self-acceptance. Independent Review/hosted CI remain pending; last known good historical Auth head unchanged.
+
+# Independent Review handoff
+
+- Fresh independent /root/stage1_review accepted candidate a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d locally from clean managed detached checkout. Full body/authority/diff audit and C01-C25 review PASS; four architecture tests, five additional chapter negatives, Recovery Acceptance, HTTP/WSS/Sync-Plugin and transport fidelity checks PASS. CI tests 21 completed, four Windows real symlink subcases skipped; hosted Linux results pending. Original raw stderr encoding mismatch disclosed, history unchanged.
+- Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md; Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2. No product/live integration or new source checker acceptance claimed. I01/D01 remain downstream pending.
+- Task remains review until applicable fresh hosted exact-head CI. Coordinator next normal task-branch push and durable CI acceptance; last known good historical Auth unchanged. Reviewer owns only new review artifacts/recovery until clean handoff, then releases sole writer to Coordinator.

@@ -364,3 +364,7 @@ All C findings below are repaired in the current body/manifest/checker candidate
 - Verification: new Agent recovery review and effective checker tests.
 - Status / independent review: REGISTERED; ordered downstream stage pending; independent Review PENDING.
 
+
+## Fresh independent Review 2026-09-30
+
+Reviewer /root/stage1_review independently read full body/diff and authority inputs, accepted C01-C25 locally at a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. This append records current review without rewriting the candidate findings or their original pending facts. Each C finding: independent local Review PASS; hosted CI acceptance PENDING. I01/D01: downstream stages pending, not waived. Exact commands/negative controls/limitations: independent-review-pass.md; new Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2.
