@@ -2,7 +2,7 @@
 task_id: LOOP1-ARCH-REMEDIATION-002
 title: Synchronize execution constraints
 status: review
-owner: Coordinator pending fresh independent Review
+owner: Coordinator pending exact-head hosted CI
 stage: S1 remediation 2/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -91,3 +91,7 @@ Coordinator /root authorized stage-two discovery metadata synchronization on 202
 # Activation
 
 Predecessor 001 bounded independent Review and exact-head hosted matrix accepted at 3e6e89f/run36714913796. No known blocking architecture decision. Inputs inspected and v1.1 integrity independently verified. Coordinator transitions backlog->ready->active in dependency order; fresh Implementation Agent must implement stage two only. New run-local Recorder .gitattributes blobs/** -text is authorized within task-linked research/runs/** before capture, preserving evidence transport. No business implementation authorized.
+
+# Independent Review handoff
+
+Fresh /root/stage2_review independently accepted exact candidate 3b04904666530687705dfcb189b34337f3e3ae41 against base5ca5089 from clean managed checkout. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/independent-review.md; Recorder R-20260930T125435Z-95638b32-0cfc-4de8-ade7-34ef5f27c798. Frozen four tests, recovery Acceptance, three memory negative controls/scope and implementation Recorder32events/28rawblobs PASS. No implementation edited. First reviewer command omitted explicit repo and failed on dirty original; retained and corrected clean rerun PASS. No product/live/hosted acceptance claimed. Task remains review; Coordinator must obtain exact review-closure-head applicable hosted CI before done/checkpoint/003 activation. Last known good remains3e6e89f. Reviewer owns only linked new evidence/recovery until closure commit, then releases write ownership.
