@@ -2,7 +2,7 @@
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
 status: review
-owner: /root/stage4_metadata_fix sole writer; fresh post-fix independent Review and hosted acceptance pending
+owner: Coordinator after /root/stage4_final_review release; fresh post-fix independent Review local PASS, exact-head hosted acceptance pending
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -77,7 +77,7 @@ Before migration, bind exact commands/results from independently accepted stage0
 
 # Next Action
 
-- Complete this bounded metadata Fix, commit a clean candidate, release writing to the Coordinator, then delegate a new independent Review of the corrected candidate; only after that PASS push normally and verify fresh exact-head hosted required jobs.
+- Coordinator normally pushes the clean independently reviewed dedicated task branch; verify exact-head hosted all required jobs before task004/batch closure and checkpoint. No other business advancement.
 
 # Activation
 
@@ -94,3 +94,7 @@ Fresh /root/stage4_review accepted exact87c0ee2 from clean isolatedcheckout afte
 # Corrective metadata recovery point
 
 Root identified candidate recovery metadata FAIL after product Review: section signs in Inputs/Execution Constraints were decoded as U+6402, and Next Action still described completed predecessor activation. This fresh Fix restores exact UTF-8 references from 6cdd981, updates current ownership and recovery only, and preserves prior local product Review PASS of 87c0ee2. New independent post-fix Review and final hosted acceptance remain pending; task004 stays review, batch/S1 NOT PASSED. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/metadata-fix.md.
+
+# Final post-fix independent Review
+
+Fresh /root/stage4_final_review local PASS exactb84cd0f from clean isolatedcheckout; new realPG16NATS/fullunitrace/canonical/3Go rolesComposeTLS/negativecontrols passed, zerointegration skips. Evidence004/final-independent-review.md. Four historicalWindows symlink subcases need hostedLinux confirmation. Unique004 stays review, remediation/S1 NOT PASSED pending fresh exact-head allrequiredjobs hosted. Coordinator owns next ordinarypush/CI/closure; Review releases onlynew evidence and handoff after commit.

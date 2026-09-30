@@ -1,0 +1,95 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 69024bb..6ac6f10 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Fresh /root/stage4_metadata_fix is the sole writer for current task004 recovery metadata and new Fix evidence/Recorder only. Products and prior evidence remain unchanged. Writing releases after the ordinary corrective commit; the Coordinator delegates a new independent Review. Original/Social worktrees untouched.
++Fresh /root/stage4_final_review solely owns new final Review evidence/Recorder and present handoff until ordinary commit. Release writing to Coordinator after clean closure; product/history unchanged. Original/Social trees untouched.
+ 
+ ## Next Exact Action
+ 
+-Complete bounded metadata correction, commit clean, then new independent Review of that exact corrected head. Preserve prior product Review PASS of 87c0ee2; it does not accept this correction. After new Review PASS, normally push the dedicated task branch and verify fresh exact-head hosted all required jobs before closing004/batch/checkpoint. Unique004 remains review; batch/S1 NOT PASSED. No Social/Message/Java business.
++Coordinator normally pushes the clean final independently reviewed closure to dedicated task branch and verifies exact-head hosted all required jobs; only then close004/remediation batch and stable checkpoint. Unique004 review; remediation/S1 NOT PASSED, no business advancement.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+@@ -63,3 +63,7 @@ Fresh /root/stage4_review localPASS exact87c0ee2 cleanisolatedcheckout; fullnewP
+ ## Post-Review metadata correction
+ 
+ Root metadata FAIL: confirmed section-reference encoding corruption and stale predecessor activation/owner. Fresh Fix restores approved section references and current recovery without product/history changes; new independent post-fix Review and exact-head hosted acceptance pending. Prior local product Review is preserved, not promoted to final acceptance. Evidence004/metadata-fix.md.
++
++## Final post-fix independent Review pending hosted
++
++Fresh /root/stage4_final_review local PASS exactb84cd0f, cleanisolatedcheckout; newPG16NATS enabledfullunitrace/canonical/rollbacksecurity and actual3Go rolesComposeTLS/CoreOutboxNATS/revocationclose0integrationskips; source0/34architecture0skip/27CI4historicalWindows symlinksubcases requireLinuxconfirmation. Evidence004/final-independent-review.md. Coordinator next ordinary dedicatedbranchpush, exactheadhosted allrequiredjobs, then004/batchcheckpoint. No finalGatePASS yet.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+index 27fb697..4ccfa55 100644
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
++++ b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-004.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-ARCH-REMEDIATION-004
+ title: Migrate Go responsibility packages and regress
+ status: review
+-owner: /root/stage4_metadata_fix sole writer; fresh post-fix independent Review and hosted acceptance pending
++owner: Coordinator after /root/stage4_final_review release; fresh post-fix independent Review local PASS, exact-head hosted acceptance pending
+ stage: S1 remediation 4/4
+ gate: LOOP1-ARCH-REMEDIATION
+ ---
+@@ -77,7 +77,7 @@ Before migration, bind exact commands/results from independently accepted stage0
+ 
+ # Next Action
+ 
+-- Complete this bounded metadata Fix, commit a clean candidate, release writing to the Coordinator, then delegate a new independent Review of the corrected candidate; only after that PASS push normally and verify fresh exact-head hosted required jobs.
++- Coordinator normally pushes the clean independently reviewed dedicated task branch; verify exact-head hosted all required jobs before task004/batch closure and checkpoint. No other business advancement.
+ 
+ # Activation
+ 
+@@ -94,3 +94,7 @@ Fresh /root/stage4_review accepted exact87c0ee2 from clean isolatedcheckout afte
+ # Corrective metadata recovery point
+ 
+ Root identified candidate recovery metadata FAIL after product Review: section signs in Inputs/Execution Constraints were decoded as U+6402, and Next Action still described completed predecessor activation. This fresh Fix restores exact UTF-8 references from 6cdd981, updates current ownership and recovery only, and preserves prior local product Review PASS of 87c0ee2. New independent post-fix Review and final hosted acceptance remain pending; task004 stays review, batch/S1 NOT PASSED. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/metadata-fix.md.
++
++# Final post-fix independent Review
++
++Fresh /root/stage4_final_review local PASS exactb84cd0f from clean isolatedcheckout; new realPG16NATS/fullunitrace/canonical/3Go rolesComposeTLS/negativecontrols passed, zerointegration skips. Evidence004/final-independent-review.md. Four historicalWindows symlink subcases need hostedLinux confirmation. Unique004 stays review, remediation/S1 NOT PASSED pending fresh exact-head allrequiredjobs hosted. Coordinator owns next ordinarypush/CI/closure; Review releases onlynew evidence and handoff after commit.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-a50f01a7-f173-48ca-b5ae-158230d21e83/metadata.json
+# ?? research/prompts/P-a50f01a7-f173-48ca-b5ae-158230d21e83/prompt.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/.gitattributes
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-05cc3996-9ff2-4b45-b3b8-40e17d387907.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-05cc3996-9ff2-4b45-b3b8-40e17d387907.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-08184307-73af-40ec-9962-cb376f34d219.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-08184307-73af-40ec-9962-cb376f34d219.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-0f1e4e2e-215a-4e51-8064-5172ddc75d70.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-0f1e4e2e-215a-4e51-8064-5172ddc75d70.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-3b7fd12c-86ca-4c2e-bc56-bbada18c6799.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-3b7fd12c-86ca-4c2e-bc56-bbada18c6799.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-409c8ea6-5200-491f-b882-1394198afb29.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-409c8ea6-5200-491f-b882-1394198afb29.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-4b81c72b-6e2f-48ab-9d6d-69233c7ef7e6.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-4b81c72b-6e2f-48ab-9d6d-69233c7ef7e6.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-53bf3619-fa81-49ed-a0ec-f56e6797238b.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-53bf3619-fa81-49ed-a0ec-f56e6797238b.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-5db424fd-99c2-46e6-bd82-13c6f0c4af28.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-5db424fd-99c2-46e6-bd82-13c6f0c4af28.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-62e53277-ae04-4ce4-88f6-4f065808b8cb.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-62e53277-ae04-4ce4-88f6-4f065808b8cb.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-82836748-c44b-4b42-b1c0-42bfacf06d61.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-82836748-c44b-4b42-b1c0-42bfacf06d61.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-9e8fbacd-2c42-4a1a-9382-dd8594166e92.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-9e8fbacd-2c42-4a1a-9382-dd8594166e92.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-a7a69737-6de5-4782-bc8a-be7a6c536200.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-a7a69737-6de5-4782-bc8a-be7a6c536200.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-b02d2973-4216-4b6f-8022-1c26af959ea6.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-b02d2973-4216-4b6f-8022-1c26af959ea6.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-ef4859bd-418e-4672-8e58-25c6ca780c1e.stderr.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/blobs/C-ef4859bd-418e-4672-8e58-25c6ca780c1e.stdout.txt
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/events.jsonl
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/initial_state.json
+# ?? research/runs/R-20260930T152330Z-9d39ff53-4b03-42cd-af83-f81456d66615/metadata.json
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-independent-review.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-review-prompt.txt
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/final-review-protection.py

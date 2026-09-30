@@ -1,0 +1,101 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 2.24kB 0.0s done
+#1 DONE 0.0s
+
+#2 [migrate internal] load build definition from migrate.Dockerfile
+#2 transferring dockerfile: 229B done
+#2 DONE 0.0s
+
+#3 [core-go internal] load build definition from Dockerfile
+#3 transferring dockerfile: 247B 0.0s done
+#3 DONE 0.0s
+
+#4 [plugin-host-go internal] load metadata for docker.io/library/golang:1.25-alpine
+#4 DONE 0.1s
+
+#5 [core-go internal] load metadata for docker.io/library/alpine:3.21
+#5 DONE 6.9s
+
+#6 [gateway-go internal] load .dockerignore
+#6 transferring context: 2B done
+#6 DONE 0.0s
+
+#7 [plugin-host-go build 1/6] FROM docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59
+#7 resolve docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59 0.0s done
+#7 DONE 0.0s
+
+#8 [gateway-go stage-1 1/2] FROM docker.io/library/alpine:3.21@sha256:ce64758a109eb420d874a118f87920e625e12d3634e03b4a5573fd9f6e5d3507
+#8 resolve docker.io/library/alpine:3.21@sha256:ce64758a109eb420d874a118f87920e625e12d3634e03b4a5573fd9f6e5d3507 0.0s done
+#8 DONE 0.0s
+
+#9 [plugin-host-go internal] load build context
+#9 transferring context: 76.98kB 0.0s done
+#9 DONE 0.0s
+
+#10 [gateway-go build 2/6] WORKDIR /src
+#10 CACHED
+
+#11 [gateway-go build 5/6] COPY . .
+#11 CACHED
+
+#12 [gateway-go build 4/6] RUN go mod download
+#12 CACHED
+
+#13 [gateway-go build 6/6] RUN CGO_ENABLED=0 go build -o /im-go .
+#13 CACHED
+
+#14 [gateway-go build 3/6] COPY go.mod go.sum ./
+#14 CACHED
+
+#15 [gateway-go stage-1 2/2] COPY --from=build /im-go /im-go
+#15 CACHED
+
+#16 [plugin-host-go] exporting to image
+#16 exporting layers done
+#16 exporting manifest sha256:df722413516d36ce555796a5d153e2608010e3c92133842cc26e4aecf5993a21 0.0s done
+#16 exporting config sha256:7096808b403f9b4687a77b406a5a72d00ff765d878e4c23319cb809a1cd17d02
+#16 exporting config sha256:7096808b403f9b4687a77b406a5a72d00ff765d878e4c23319cb809a1cd17d02 0.0s done
+#16 exporting attestation manifest sha256:8d580998344cb8b229ec3235c667bb1cb09a6137520a9abc8c90faa29b41e9b8 0.0s done
+#16 exporting manifest list sha256:c8ed69d8eb616a097807db4c6515e735beafc0b49af601af8fa312953ee2d388
+#16 exporting manifest list sha256:c8ed69d8eb616a097807db4c6515e735beafc0b49af601af8fa312953ee2d388 0.0s done
+#16 naming to docker.io/library/im-arch4-live-16144-plugin-host-go:latest done
+#16 unpacking to docker.io/library/im-arch4-live-16144-plugin-host-go:latest done
+#16 DONE 0.2s
+
+#17 [core-go] exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:daf98954fc554784893df6dbc5ef74d1076f8eef9beb7de36e378df9b2c38211 0.0s done
+#17 exporting config sha256:b872968efccff4b88ae5d13a08cd244fb4a2be2b23cffefb769b320581398b8c 0.0s done
+#17 exporting attestation manifest sha256:b9fbb6c3ade3f1073d6e5e74140f6304a6bbb28258d8af59f2cca0db093f1a0b 0.0s done
+#17 exporting manifest list sha256:a8bf1c4a1959d2b6a2d5d988f11a9258aae61158946c1a604e258c71e674a6ef 0.0s done
+#17 naming to docker.io/library/im-arch4-live-16144-core-go:latest done
+#17 unpacking to docker.io/library/im-arch4-live-16144-core-go:latest done
+#17 DONE 0.2s
+
+#18 [gateway-go] exporting to image
+#18 exporting layers done
+#18 exporting manifest sha256:4e50bd2de0b98bb49a0312f5d618787c58352454ef265d0464252b0120be2658 0.0s done
+#18 exporting config sha256:778b2c1a909356cb6ab1018d325b73758e8b3beec346853215047eff00534380 0.0s done
+#18 exporting attestation manifest sha256:53a20421b66b23b0885c403a492566cb93df552c580d861222e65ba0f88b5a69 0.0s done
+#18 exporting manifest list sha256:7cf227c4431ee086f652acc3986675ca7cab07562aa47110a405991c377ed052 0.0s done
+#18 naming to docker.io/library/im-arch4-live-16144-gateway-go:latest done
+#18 unpacking to docker.io/library/im-arch4-live-16144-gateway-go:latest done
+#18 DONE 0.2s
+
+#19 [migrate internal] load metadata for docker.io/library/python:3.12-alpine
+#19 ...
+
+#20 [core-go] resolving provenance for metadata file
+#20 DONE 0.1s
+
+#21 [gateway-go] resolving provenance for metadata file
+#21 DONE 0.0s
+
+#22 [plugin-host-go] resolving provenance for metadata file
+#22 DONE 0.0s
+
+#19 [migrate internal] load metadata for docker.io/library/python:3.12-alpine
+#19 ERROR: unexpected status from HEAD request to https://docker.1panel.live/v2/library/python/manifests/3.12-alpine?ns=docker.io: 403 Forbidden
+------
+ > [migrate internal] load metadata for docker.io/library/python:3.12-alpine:
+------

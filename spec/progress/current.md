@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage4_metadata_fix is the sole writer for current task004 recovery metadata and new Fix evidence/Recorder only. Products and prior evidence remain unchanged. Writing releases after the ordinary corrective commit; the Coordinator delegates a new independent Review. Original/Social worktrees untouched.
+Fresh /root/stage4_final_review solely owns new final Review evidence/Recorder and present handoff until ordinary commit. Release writing to Coordinator after clean closure; product/history unchanged. Original/Social trees untouched.
 
 ## Next Exact Action
 
-Complete bounded metadata correction, commit clean, then new independent Review of that exact corrected head. Preserve prior product Review PASS of 87c0ee2; it does not accept this correction. After new Review PASS, normally push the dedicated task branch and verify fresh exact-head hosted all required jobs before closing004/batch/checkpoint. Unique004 remains review; batch/S1 NOT PASSED. No Social/Message/Java business.
+Coordinator normally pushes the clean final independently reviewed closure to dedicated task branch and verifies exact-head hosted all required jobs; only then close004/remediation batch and stable checkpoint. Unique004 review; remediation/S1 NOT PASSED, no business advancement.
 
 ## Architecture Conflicts / ACP / ADR
 
@@ -63,3 +63,7 @@ Fresh /root/stage4_review localPASS exact87c0ee2 cleanisolatedcheckout; fullnewP
 ## Post-Review metadata correction
 
 Root metadata FAIL: confirmed section-reference encoding corruption and stale predecessor activation/owner. Fresh Fix restores approved section references and current recovery without product/history changes; new independent post-fix Review and exact-head hosted acceptance pending. Prior local product Review is preserved, not promoted to final acceptance. Evidence004/metadata-fix.md.
+
+## Final post-fix independent Review pending hosted
+
+Fresh /root/stage4_final_review local PASS exactb84cd0f, cleanisolatedcheckout; newPG16NATS enabledfullunitrace/canonical/rollbacksecurity and actual3Go rolesComposeTLS/CoreOutboxNATS/revocationclose0integrationskips; source0/34architecture0skip/27CI4historicalWindows symlinksubcases requireLinuxconfirmation. Evidence004/final-independent-review.md. Coordinator next ordinary dedicatedbranchpush, exactheadhosted allrequiredjobs, then004/batchcheckpoint. No finalGatePASS yet.
