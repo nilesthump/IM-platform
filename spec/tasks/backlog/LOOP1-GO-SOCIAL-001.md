@@ -2,7 +2,7 @@
 task_id: LOOP1-GO-SOCIAL-001
 title: Implement Go search, friendship, and unique direct conversation
 status: backlog
-owner: unassigned
+owner: /root Coordinator (recovery; no product writer)
 stage: S1
 gate: S1
 ---
@@ -27,17 +27,17 @@ Read spec/governance/execution-boundaries.md and independent-review.md. allowed_
 
 # Allowed Paths
 
-- `backend/go/core/user/**`
-- `backend/go/core/friend/**`
-- `backend/go/core/conversation/**`
-- `backend/go/core/sync/**`
-- `backend/go/core/outbox/**`
-- Go social integration tests under `tests/go/**`
+- `backend/go/core/auth.go` (only existing handler friend route registration; preserve search/Auth)
+- `backend/go/core/social.go` (private normalized friendship/DIRECT/membership/Sync/Outbox transaction)
+- `backend/go/core/social_test.go` (transaction/concurrency/rollback unit integration, no hidden business)
+- `backend/go/tests/social_test.go` (public-handler canonical social outcomes using existing test helpers)
 - `spec/tasks/**/LOOP1-GO-SOCIAL-001.md`
 - `spec/progress/current.md`
 - `spec/progress/evidence/LOOP1-GO-SOCIAL-001/**`
 - `spec/progress/checkpoints/*loop1-go-social-001*.md`
-- `research/prompts/**` and `research/runs/**` only for this task's Recorder artifacts.
+- `research/prompts/**` and `research/runs/**` only this Task-linked Recorder artifacts.
+
+Human2026-10-01 prospectively authorizes exact layout binding. Core/auth.go already owns handler/Auth/search; Core/http.go merely assembles it and needs no duplicate router. Existing Core/outbox.go Session dispatcher remains unchanged; Social transaction writes use canonical existing tables, no new generic dispatcher/service in shared or Gateway. No language-wide migration scope remains.
 
 # Acceptance
 
@@ -58,18 +58,23 @@ Use the canonical uniqueness constraints and one direct transaction path; no ext
 
 # Verification
 
-- Run Go social contract/integration tests including concurrent reverse-order add and rollback, plus recovery and architecture checks.
-
-- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
+- Entry points `tools/verify-loop1-ctrl-002.ps1` and `tools/verify-frozen-architecture.ps1`: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development` during edits, Acceptance only clean committed candidate; `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`.
+- Bundled Python3 -B `ci/check_architecture.py --scope all --json`; `python -B -m unittest discover -s tests/ci -v`; checker controls via frozen verifier/tests/architecture.
+- With unique migrated disposable PostgreSQL16/NATS2.10 and DB_TEST_ENABLE=1/connection env, recursive gofmt/build/vet and `go -C backend/go test -count=1 ./...`, `go -C backend/go test -race -count=1 ./...`; actual live canonical social/auth, concurrent reversed pair, memberships/Sync/Outbox atomicity and rollback, auth/WSS/fallback regressions. No existing/production services or volumes modified. Unconstructible/skipped403 is not fixturePASS.
+- Current accepted base279c1dc/main36764254107 all13SUCCESS; source/frozen/recovery and old accepted product coverage documented in integration evidence. Fresh implementation and independent Review/hostedCI after executable inputs, never old-head substitution.
 
 # Evidence
 
-- Pending activation after Go Auth acceptance.
+Recovery/old-to-current file map: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-recovery-path-map.md`. Old implementation2a6eaa1/handoff5b35735 remains preserved, not independent accepted; current restoration contains no Social product yet.
 
 # Handoff
 
-- Unassigned. No files owned or changed for this task.
+S0PASS/Authdone/remediationPASS/integrationdone dependencies verified; new clean restoration branch task/LOOP1-GO-SOCIAL-001-v1.1 from actualaccepted merge279c1dc. Old Social clean5b35735 intentionally paused and no active writer observed. Do not merge old AGENTS/current/task/package-main structure. Current Task remains backlog because required acceptance input is not executable: friend-add-authorization-denied presupposes insufficient-scope authenticated principal, absent from current six-claim JWT/implicit-caller PUT ownership. Fresh independent context must assess; Coordinator does not invent model or waive fixture.
 
 # Next Action
 
-- Remain backlog until remediation batch PASS; then promote only when `LOOP1-GO-AUTH-001` is independently accepted and `done`.
+Independent acceptance-context reviewer reads canonical credential/ownership contracts and old candidate, verifies whether an existing approved input can produce required403. If none, record BLOCKED_BY_ARCHITECTURE and smallest Architect decision; no contract or acceptance changes under this request. Only after approved constructible inputs complete backlog->ready->active and delegate fresh mapped Implementation, fresh Review/real hostedCI. No Message/E2E/Java/client/plugin/S2 and no automatic Social PR merge.
+
+# Last Known Good Commit
+
+Actual main279c1dc4681683e2af3b3534a00e5222dde36be6. Old unaccepted Social2a6eaa167f90e32d69ee309fe373fd28e0ff3451/handoff5b35735ae6625b82c0de78d7bd64fdb9bd7e1123.

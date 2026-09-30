@@ -1,0 +1,54 @@
+classify	Verify clean repository recovery	2026-09-30T19:14:41.0993587Z PASS: generic repository recovery verified task=LOOP1-REMEDIATION-INTEGRATION-001 state=review mode=Acceptance queues=5 task_specs=21.
+classify	Test path matrix	2026-09-30T19:14:41.3354427Z test_recursive_live_go_verification_and_role_smoke_present (test_go_regression.GoRegressionTests.test_recursive_live_go_verification_and_role_smoke_present) ... ok
+classify	Test path matrix	2026-09-30T19:14:41.3355016Z test_role_smoke_change_and_deletion_select_actual_jobs (test_go_regression.GoRegressionTests.test_role_smoke_change_and_deletion_select_actual_jobs) ... ok
+classify	Test path matrix	2026-09-30T19:14:41.3523389Z Ran 27 tests in 0.137s
+classify	Classify full diff, including deletions	2026-09-30T19:14:41.4491571Z     "tests/go/live_role_smoke.py",
+source_go	Real Go source ownership and AST dependency graph	2026-09-30T19:15:05.9712244Z           "canonical fixture %s missing",
+compatibility	Run actions/checkout@v4	2026-09-30T19:15:44.1534545Z   DB_TEST_ENABLE: 1
+compatibility	Install PostgreSQL client	2026-09-30T19:15:45.3973872Z   DB_TEST_ENABLE: 1
+compatibility	Shared fixture compatibility and migration	2026-09-30T19:15:54.5482988Z   DB_TEST_ENABLE: 1
+compatibility	Shared fixture compatibility and migration	2026-09-30T19:15:54.6682332Z PASS: Sync/Plugin v1 schemas, 79 distinct Go/Java outcome artifacts (22 positive, 57 negative), SP-A-001..013, 16 mutation controls
+compatibility	Shared fixture compatibility and migration	2026-09-30T19:15:55.9914972Z Ran 3 tests in 1.242s
+compatibility	Future client and plugin fixture boundary	2026-09-30T19:15:56.0089734Z   DB_TEST_ENABLE: 1
+go	Run actions/checkout@v4	2026-09-30T19:15:10.4582222Z   DB_TEST_ENABLE: 1
+go	Run actions/setup-go@v5	2026-09-30T19:15:11.2998827Z   DB_TEST_ENABLE: 1
+go	Install PostgreSQL client	2026-09-30T19:15:19.5467014Z   DB_TEST_ENABLE: 1
+go	Migrate canonical schema	﻿2026-09-30T19:15:35.6006146Z ##[group]Run python3 contracts/database/migrate.py up
+go	Migrate canonical schema	2026-09-30T19:15:35.6006617Z ^[[36;1mpython3 contracts/database/migrate.py up^[[0m
+go	Migrate canonical schema	2026-09-30T19:15:35.6072838Z shell: /usr/bin/bash -e {0}
+go	Migrate canonical schema	2026-09-30T19:15:35.6073101Z env:
+go	Migrate canonical schema	2026-09-30T19:15:35.6073294Z   PGHOST: localhost
+go	Migrate canonical schema	2026-09-30T19:15:35.6073514Z   PGPORT: 5432
+go	Migrate canonical schema	2026-09-30T19:15:35.6073717Z   PGUSER: postgres
+go	Migrate canonical schema	2026-09-30T19:15:35.6074207Z   PGDATABASE: im_ci
+go	Migrate canonical schema	2026-09-30T19:15:35.6074414Z   DB_TEST_ENABLE: 1
+go	Migrate canonical schema	2026-09-30T19:15:35.6074640Z   NATS_URL: nats://localhost:4222
+go	Migrate canonical schema	2026-09-30T19:15:35.6075083Z   PYTHONDONTWRITEBYTECODE: 1
+go	Migrate canonical schema	2026-09-30T19:15:35.6075323Z ##[endgroup]
+go	Migrate canonical schema	2026-09-30T19:15:35.8313782Z 0001_initial: up complete
+go	Go Auth build, integration and contract verification	2026-09-30T19:15:35.8412764Z ^[[36;1mgo build ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T19:15:35.8413023Z ^[[36;1mgo build -o "$RUNNER_TEMP/im-go" .^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T19:15:35.8413305Z ^[[36;1mgo vet ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T19:15:35.8413521Z ^[[36;1mgo test -count=1 ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T19:15:35.8413778Z ^[[36;1mgo test -race -count=1 ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T19:15:35.8480015Z   DB_TEST_ENABLE: 1
+go	Go Auth build, integration and contract verification	2026-09-30T19:17:19.4034781Z PASS: Auth/User/Friend contracts verified paths=9 operations=9 error_codes=15 positive=6 negative=21 profiles=go,java schema_lint=OAI-OpenAPI-3.1-2026-08-03 mutation_regressions=15.
+architecture	Canonical integrity and authority structure	2026-09-30T19:15:05.4097895Z PASS: v1.1 current SHA/PDF provenance/ADR and section-bound semantic structure; historical migration semantic_change=false; current revision semantic_change=true
+architecture	Canonical integrity and authority structure	2026-09-30T19:15:15.8204107Z Ran 34 tests in 10.308s
+architecture	Current governance references and task scopes	2026-09-30T19:15:16.0471674Z PASS: scope=governance violations=0; static checks supplement independent Review
+architecture	Checker positive and negative controls	2026-09-30T19:15:18.2221593Z Ran 34 tests in 2.095s
+shared	HTTP, WSS, Sync and Plugin contracts	2026-09-30T19:15:04.5998868Z PASS: Auth/User/Friend contracts verified paths=9 operations=9 error_codes=15 positive=6 negative=21 profiles=go,java schema_lint=OAI-OpenAPI-3.1-2026-08-03 mutation_regressions=15.
+shared	HTTP, WSS, Sync and Plugin contracts	2026-09-30T19:15:04.7305460Z PASS: Sync/Plugin v1 schemas, 79 distinct Go/Java outcome artifacts (22 positive, 57 negative), SP-A-001..013, 16 mutation controls
+deploy	Frozen architecture integrity	2026-09-30T19:14:53.3846851Z PASS: v1.1 current SHA/PDF provenance/ADR and section-bound semantic structure; historical migration semantic_change=false; current revision semantic_change=true
+deploy	Frozen architecture integrity	2026-09-30T19:15:06.5353103Z Ran 34 tests in 13.080s
+deploy	Go transport smoke	2026-09-30T19:15:41.4660391Z PASS: go profile, PostgreSQL migration, Core NATS, HTTPS and WSS over Tls13
+deploy	Go Auth actual roles and TLS event smoke	﻿2026-09-30T19:15:42.1027469Z ##[group]Run python3 tests/go/live_role_smoke.py
+deploy	Go Auth actual roles and TLS event smoke	2026-09-30T19:15:42.1028218Z ^[[36;1mpython3 tests/go/live_role_smoke.py^[[0m
+deploy	Go Auth actual roles and TLS event smoke	2026-09-30T19:15:42.7024895Z #10 [core-go build 1/6] FROM docker.io/library/golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59
+deploy	Go Auth actual roles and TLS event smoke	2026-09-30T19:15:42.7034064Z #17 [core-go build 6/6] RUN CGO_ENABLED=0 go build -o /im-go .
+deploy	Go Auth actual roles and TLS event smoke	2026-09-30T19:15:42.7035017Z #18 [core-go build 2/6] WORKDIR /src
+deploy	Go Auth actual roles and TLS event smoke	2026-09-30T19:15:42.7035693Z #19 [core-go build 3/6] COPY go.mod go.sum ./
+deploy	Go Auth actual roles and TLS event smoke	2026-09-30T19:15:42.7036471Z #20 [core-go build 5/6] COPY . .
+deploy	Go Auth actual roles and TLS event smoke	2026-09-30T19:15:42.7037322Z #21 [core-go build 4/6] RUN go mod download
+deploy	Java transport smoke	2026-09-30T19:15:58.4916704Z PASS: java profile, PostgreSQL migration, Core NATS, HTTPS and WSS over Tls13
+gate	Require every selected job to pass	2026-09-30T19:17:30.1255872Z PASS: every selected CI job succeeded
