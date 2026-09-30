@@ -35,13 +35,18 @@ assert sum(r['normalization_only'] for r in rows)==22
 result={'base':BASE,'head':git('rev-parse','HEAD').decode().strip(),'blob_count':len(rows),'normalized_blob_count':22,'result':'PASS','rows':rows}
 print(json.dumps(result,indent=2))
 if '--candidate' in sys.argv:
-    # Export only committed bytes: no checkout filters, no untracked input, no product write.
+    # Clean temporary clone of exact committed HEAD, no untracked input or product write.
     with tempfile.TemporaryDirectory(prefix='im-recorder-committed-') as directory:
         exported=Path(directory)
-        zipfile.ZipFile(io.BytesIO(git('archive','--format=zip','HEAD'))).extractall(exported)
+        assert exported.resolve().parent == Path(tempfile.gettempdir()).resolve()
+        subprocess.run(['git','clone','--no-hardlinks','--no-checkout',str(root),str(exported)],check=True,capture_output=True)
+        subprocess.run(['git','-C',str(exported),'-c','core.autocrlf=false','checkout','--detach',result['head']],check=True,capture_output=True)
+        clean=subprocess.run(['git','-C',str(exported),'status','--porcelain'],check=True,capture_output=True).stdout
+        assert clean==b'',clean
+        print('PASS: clean detached temporary checkout of',result['head'])
         for row in rows: assert sha((exported/row['path']).read_bytes())==row['working_sha256']
-        print('PASS: committed archive bytes match all original persisted blob hashes (37 raw matches, 1 disclosed UTF-8 replacement mismatch)')
-        command=[sys.executable,str(exported/'tools/research/recorder.py'),'validate-run','--repo',str(root),'--research-root',str(exported/'research'),'--run-id',RUN]
+        print('PASS: clean committed checkout bytes match all original persisted blob hashes (37 raw matches, 1 disclosed UTF-8 replacement mismatch)')
+        command=[sys.executable,str(exported/'tools/research/recorder.py'),'validate-run','--repo',str(exported),'--research-root',str(exported/'research'),'--run-id',RUN]
         completed=subprocess.run(command,capture_output=True,text=True)
         print('clean committed extraction command:',json.dumps(command),'exit:',completed.returncode)
         print(completed.stdout,completed.stderr)
