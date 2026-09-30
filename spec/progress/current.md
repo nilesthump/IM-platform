@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage4_review solewriter owns only new004independentReview evidence/Recorder and presenthandoff; release after ordinaryReviewclosurecommit. Candidate87c0ee2 unchanged in separatecleanexecutioncheckout. Root/Impl readonly; unknownoriginal/Socialtreesuntouched.
+Fresh /root/stage4_metadata_fix is the sole writer for current task004 recovery metadata and new Fix evidence/Recorder only. Products and prior evidence remain unchanged. Writing releases after the ordinary corrective commit; the Coordinator delegates a new independent Review. Original/Social worktrees untouched.
 
 ## Next Exact Action
 
-Coordinator receives clean independentReviewclosure, normallypushes dedicatedtaskbranch and checks fresh exactheadhosted allrequiredjobs; onlyafterPASS close004/batch/checkpoint. LocalReview accepted87c0ee2; unique004review, product/batch/S1 NOT PASSED pendingCI. No Social/Message/Java business.
+Complete bounded metadata correction, commit clean, then new independent Review of that exact corrected head. Preserve prior product Review PASS of 87c0ee2; it does not accept this correction. After new Review PASS, normally push the dedicated task branch and verify fresh exact-head hosted all required jobs before closing004/batch/checkpoint. Unique004 remains review; batch/S1 NOT PASSED. No Social/Message/Java business.
 
 ## Architecture Conflicts / ACP / ADR
 
@@ -59,3 +59,7 @@ ADR0003acceptedv1.1canonicalSHA83d124b unchanged,historicalPDFunchanged. I01oldG
 ## Stage004 independent Review pending hosted closure
 
 Fresh /root/stage4_review localPASS exact87c0ee2 cleanisolatedcheckout; fullnewPG16NATS unit/race/canonical andreal3rolesTLS/CoreOutboxNATS plusGoJavaComposeTLSsmokes0integrationskips,17fmt/build/vet/source0,34architecture0skip/27CI4historicalWindowssymlinksubcases disclosed. Evidence004/independent-review.md and command/captureJSON. Unique004remainsreview; overallGate NOT PASSED. SoleReviewwriter owns onlynew004evidence/research andhandoff; releasesafterordinarycommit. NextCoordinator normal dedicatedtaskbranchpush exactReviewclosure, freshhosted allrequiredjobs, then004/batch closurecheckpoint; nootherbusinessadvancement.
+
+## Post-Review metadata correction
+
+Root metadata FAIL: confirmed section-reference encoding corruption and stale predecessor activation/owner. Fresh Fix restores approved section references and current recovery without product/history changes; new independent post-fix Review and exact-head hosted acceptance pending. Prior local product Review is preserved, not promoted to final acceptance. Evidence004/metadata-fix.md.

@@ -2,7 +2,7 @@
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
 status: review
-owner: Coordinator pending fresh independent Review and final hosted acceptance
+owner: /root/stage4_metadata_fix sole writer; fresh post-fix independent Review and hosted acceptance pending
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -14,13 +14,13 @@ Migrate Go responsibility packages and regress within the explicitly authorized 
 # Inputs
 
 - User four-stage instruction; approval-and-recovery evidence for stage 1.
-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable 搂3/搂10/搂11/搂12-14 and Minimality Contract.
+- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
 - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
 - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
 
 # Execution Constraints
 
-Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical 搂3/搂10 SRC-01 through SRC-07/搂11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
 
 # Dependencies
 
@@ -77,7 +77,7 @@ Before migration, bind exact commands/results from independently accepted stage0
 
 # Next Action
 
-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+- Complete this bounded metadata Fix, commit a clean candidate, release writing to the Coordinator, then delegate a new independent Review of the corrected candidate; only after that PASS push normally and verify fresh exact-head hosted required jobs.
 
 # Activation
 
@@ -90,3 +90,7 @@ Actual migrationmap/evidence004/migration-map.md BEFORE products; privateCoreAut
 # Independent Review local acceptance
 
 Fresh /root/stage4_review accepted exact87c0ee2 from clean isolatedcheckout after fullrealPGNATS/unit/race/canonical/3rolesTLS/GoJavaCompose/negative controls, source0violations; evidence004/independent-review.md. Four historicalWindows symlinksubcase skips explicitly requireLinuxconfirmation; integration0skip. Task remainsreview pendingfresh exact-headhosted allrequiredjobs. Coordinator resumesnormal dedicatedbranchpush/CI/checkpoint only; no batch/S1PASS yet.
+
+# Corrective metadata recovery point
+
+Root identified candidate recovery metadata FAIL after product Review: section signs in Inputs/Execution Constraints were decoded as U+6402, and Next Action still described completed predecessor activation. This fresh Fix restores exact UTF-8 references from 6cdd981, updates current ownership and recovery only, and preserves prior local product Review PASS of 87c0ee2. New independent post-fix Review and final hosted acceptance remain pending; task004 stays review, batch/S1 NOT PASSED. Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-004/metadata-fix.md.
