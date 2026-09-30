@@ -84,3 +84,7 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
 # Implementation candidate handoff
 
 Effective checks delivered, local30architecture/24CI tests PASS (four historical Windows symlink subcases skipped), authority/governance/currentJava PASS; actualGo source FAIL expected inventory in evidence003/expected-old-go-violations.md and raw JSON. Commands ci/check_architecture.py --scope governance/go/java/all; unittest tests/architecture and tests/ci. No product/canonical/contracts/history edits. Fresh independent Reviewer plus exact hosted jobs still required, no selfacceptance; overall Gate stays red. Last bounded acceptedheadc0373ab, checkpointstage2. Implementation writer /root/stage3_impl releases after candidate commit, Coordinator delegates new Reviewer. Stage004 remainsbacklog.
+
+# Fresh JDBC repair candidate
+
+Independent read-only Review FAIL on a27f655 recorded in evidence003/jdbc-fix-evidence.md. New /root/stage3_jdbc_fix repaired Gateway execute SELECT-decoy loophole and non-Core JDBC transaction calls; architecture34 PASS/no skip,CI24 PASS/four historical Windows symlink subcase skips,canonical/recovery Development PASS; oldGo72 violations unchangedFAIL. Task remainsreview and004backlog; new independentReview/exact-hosted required,overallGate red. No product/history changes. Fixer releases writer after clean ordinary commit.

@@ -189,12 +189,14 @@ def check_java(root):
         jdbc = bool(re.search(r"\b(?:java|javax)\.sql\b", code))
         if jdbc and unit["owner"] in {"root", "shared", "gateway", "plugin-host"}:
             calls = re.findall(r"\.\s*(\w+)\s*\(", code)
-            forbidden = {"prepareStatement", "prepareCall", "createStatement", "execute", "executeQuery", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
+            transactions = {"commit", "rollback", "setAutoCommit", "setSavepoint", "releaseSavepoint"}
+            forbidden = transactions | {"prepareStatement", "prepareCall", "createStatement", "execute", "executeQuery", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
             if unit["owner"] == "gateway":
-                forbidden = {"executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
-                # execute() may write; allow it only with a literal proven SELECT.
-                if "execute" in calls and not any(re.match(r"\s*SELECT\b", s, re.I) for s in unit["strings"]):
-                    forbidden.add("execute")
+                # execute() is ambiguous even when another literal in the file is
+                # SELECT. Gateway read-only queries use executeQuery(); transaction
+                # control and mutations belong to Core. Connection setup/close and
+                # shared connection factories remain allowed.
+                forbidden = transactions | {"execute", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
             for call in set(calls) & forbidden:
                 errors.append(f"SRC-01/03 {path}: {unit['owner']} owns prohibited JDBC persistence call {call}")
         # Includes explicit imports, static imports, wildcard packages, same-package

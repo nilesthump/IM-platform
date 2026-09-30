@@ -144,6 +144,34 @@ class SourceTests(unittest.TestCase):
         self.assert_contains(errors, "shared owns prohibited JDBC persistence call prepareStatement")
         self.assert_contains(errors, "gateway owns prohibited JDBC persistence call executeUpdate")
 
+    def test_java_gateway_execute_cannot_borrow_unrelated_select_literal(self):
+        self.java_base()
+        for operation in ('stmt.execute(q)', 'db.prepareStatement(q).execute()',
+                          'stmt.execute("SELECT session_epoch FROM sessions")'):
+            with self.subTest(operation=operation):
+                self.put("backend/java/gateway/Dynamic.java", 'package im.gateway; import java.sql.Statement; import java.sql.Connection; public class Dynamic {public static void run(Connection db,Statement stmt,String q)throws Exception{String unused="SELECT session_epoch FROM sessions";'+operation+';}}')
+                self.assert_contains(self.java_errors(), "gateway owns prohibited JDBC persistence call execute")
+
+    def test_java_gateway_dynamic_update_with_select_decoy_rejected(self):
+        self.java_base()
+        self.put("backend/java/gateway/Dynamic.java", 'package im.gateway; import java.sql.Statement; public class Dynamic {public static void run(Statement stmt)throws Exception{String unrelated="SELECT session_epoch FROM sessions";String q="UPDATE "+"sessions SET status=1";stmt.execute(q);}}')
+        self.assert_contains(self.java_errors(), "gateway owns prohibited JDBC persistence call execute")
+
+    def test_java_noncore_jdbc_transaction_controls_rejected(self):
+        self.java_base()
+        for location in ("gateway", "shared"):
+            for operation in ("commit()", "rollback()", "setAutoCommit(false)",
+                              "setSavepoint()", "releaseSavepoint(null)"):
+                with self.subTest(location=location, operation=operation):
+                    self.put(f"backend/java/{location}/Transaction.java", f'package im.{location}; import java.sql.Connection; public class Transaction {{public static void run(Connection db)throws Exception{{db.{operation};}}}}')
+                    self.assert_contains(self.java_errors(), f"{location} owns prohibited JDBC persistence call {operation.split('(')[0]}")
+
+    def test_java_gateway_executequery_and_connection_lifecycle_valid(self):
+        self.java_base()
+        self.put("backend/java/gateway/SessionCheck.java", 'package im.gateway; import java.sql.Connection; public class SessionCheck {public static void validate(Connection db)throws Exception{try(var statement=db.prepareStatement("SELECT session_epoch FROM sessions")){statement.executeQuery();} db.close();}}')
+        self.put("backend/java/shared/Connect.java", 'package im.shared; import java.sql.Connection; import java.sql.DriverManager; public class Connect {public static Connection open(String url)throws Exception{Connection db=DriverManager.getConnection(url);db.setReadOnly(true);return db;}}')
+        self.assertEqual([], self.java_errors())
+
     def test_shared_java_connection_factory_is_support_not_repository(self):
         self.java_base()
         self.put("backend/java/shared/Connect.java", 'package im.shared; import java.sql.Connection; import java.sql.DriverManager; public class Connect {public static Connection open(String url)throws Exception{return DriverManager.getConnection(url);}}')

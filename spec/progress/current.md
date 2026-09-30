@@ -46,7 +46,7 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage3_impl owns only003 checker/evidence/Recorder until candidate commit then releases writer to Coordinator for new independent Reviewer. Original unknown and Social worktrees untouched.
+Fresh /root/stage3_jdbc_fix owns only003 JDBC checker/evidence/Recorder repair until clean candidate commit, then releases writer to Coordinator for a new independent Reviewer. Original unknown and Social worktrees untouched.
 
 ## Next Exact Action
 
@@ -59,3 +59,7 @@ ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-on
 ## Stage003 candidate verification
 
 Exact commands/results/durations/limitations in evidence003/implementation-evidence.md, Recorder R-20260930T131308Z-7abb8f2f-2144-4d65-85c9-2a9a70a8679b. New static checks supplement semantic independent Review; governance triggering and Gate negative controls pass; originalGo real source failure is expected, no product or batch PASS. Host actual candidate jobs pending.
+
+## Fresh JDBC Fix handoff
+
+Independent read-only Review FAIL on a27f655 repaired by fresh Fix context: Gateway ambiguous execute no SELECT-decoy exemption; non-Core JDBC transaction controls forbidden,legal read-only/connection support retained. Localarchitecture34 PASS/noskip,CI24 PASS/four historical Windows symlink skips; canonical/governance/Java/recoveryDevelopmentPASS,oldGo72FAIL unchanged. Durable evidence003/jdbc-fix-evidence.md and fresh Recorder R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83. New independentReview and hosted bounded acceptance pending;003review/004backlog/overallGate red.
