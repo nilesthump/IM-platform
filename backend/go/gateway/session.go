@@ -49,3 +49,23 @@ func (s *validator) authenticate(ctx context.Context, token string) (shared.Clai
 	}
 	return c, nil
 }
+
+// A safety-watch failure can precede (or replace) NATS delivery. Only a
+// committed revocation for this exact bound identity supplies a business reason;
+// expiry, database faults and missing/unrecognized facts remain conservative.
+func (s *validator) revocationReason(ctx context.Context, c shared.Claims, err error) string {
+	e, ok := err.(shared.Error)
+	if !ok || (e.Code != "AUTH_SESSION_REVOKED" && e.Code != "AUTH_SESSION_EPOCH_STALE") {
+		return "REVOKED"
+	}
+	var reason string
+	if s.db.QueryRow(ctx, `SELECT payload->>'reason' FROM user_sync_events WHERE user_id=$1 AND event_type='session.revoked' AND payload->>'sessionId'=$2 ORDER BY cursor_id DESC LIMIT 1`, c.UserID, c.SessionID).Scan(&reason) != nil {
+		return "REVOKED"
+	}
+	switch reason {
+	case "REPLACED", "LOGOUT":
+		return reason
+	default:
+		return "REVOKED"
+	}
+}

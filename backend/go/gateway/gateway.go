@@ -187,11 +187,13 @@ func (h *hub) watch(c *connection, cl shared.Claims) {
 		case <-ticker.C:
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			_, err := h.auth.authenticate(ctx, c.token)
-			cancel()
 			if err != nil {
-				h.revoke(cl.SessionID, "REVOKED")
+				reason := h.auth.revocationReason(ctx, cl, err)
+				cancel()
+				h.revoke(cl.SessionID, reason)
 				return
 			}
+			cancel()
 		}
 	}
 }

@@ -2,7 +2,7 @@
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
 status: review
-owner: Coordinator delegating fresh Fix for hosted revocation race
+owner: Fresh Fix completed candidate pending new independent Review
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -77,7 +77,7 @@ Before migration, bind exact commands/results from independently accepted stage0
 
 # Next Action
 
-- Coordinator normally pushes the clean independently reviewed dedicated task branch; verify exact-head hosted all required jobs before task004/batch closure and checkpoint. No other business advancement.
+- Coordinator delegates NEW independent Review of the clean reason-repair candidate, then normally pushes its reviewed dedicated task branch and verifies NEW exact-head hosted allrequiredjobs before004/batch closure/checkpoint. No other business advancement.
 
 # Activation
 
@@ -102,3 +102,7 @@ Fresh /root/stage4_final_review local PASS exactb84cd0f from clean isolatedcheck
 # Hosted acceptance repair loop
 
 Exact closure92306df/run36738064831 completed failure:11success,Go race andGate fail. Revocation expectedREPLACED butreceivedREVOKED at auth_test.go:211. Evidence004/hosted-failure-36738064831.md. Next exact action is freshFix diagnosis and bounded repair, then new independentReview and new hostedcandidate; do not relax existing expectations, suppressGate or closebatch.
+
+# Fresh hosted-revocation repair handoff
+
+Fresh /root/stage4_revocation_fix deterministically reproduced Corecommittedreplacement/logout withoutNATSGateway notification, both oldfallbackREVOKEDFAIL; minimalprivateGatewayexactbound readonlyreason lookup fixescauses whileexpired/DB/query/missing/unknownfacts closeREVOKED. Core/shared/contracts/schema/timeout/messagepath unchanged. NewrealPG16NATS fullunitrace/canonical/securityrollback/500msmessageDBnegative, targetedrace3times,19recursivefmtbuildvet/allsource0/34architecture0skip/27CI4historicWindows subcase skips/actual3rolesComposeTLSOutboxNATS PASSlocally. Evidence004/revocation-fix.md and freshRecorder. Task004 remainsreview, requiresNEW independentReview thenNEW exactheadhosted; no selfacceptance/batch/S1PASS. Fixownsnewchangesuntilcleancommit, then releases.

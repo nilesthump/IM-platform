@@ -14,7 +14,7 @@ Current Task State: review
 
 ## Current Blockers
 
-Actual final hosted run36738064831 on92306df failed Go race revocation reason, with consequent Gate failure. All11 other jobs succeeded. Fresh Fix/new independent Review/new hosted candidate required. No unresolved substantive architecture choice; remediation andS1 NOT PASSED.
+Hosted36738064831/92306df failed Go race reason and Gate (11otherjobs success). Fresh bounded reason fix and new realPGNATS/fullrace/3rolesTLS regression PASS locally; NEW independent Review and NEW hosted exacthead required. No unresolved substantive architecture choice; remediation andS1 NOT PASSED.
 
 ## Verification
 
@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
 
 ## Uncommitted Changes / Ownership
 
-Coordinator owns only this hosted failure evidence/Recorder and current task recovery until clean commit, then releases to fresh Fix Agent. Original unknown and Social worktrees untouched.
+Fresh /root/stage4_revocation_fix owns only Gateway bounded fix/newtests/new004evidence/task/current/tasklinkedRecorder until clean candidate commit, then releases to NEW independent Review. Original unknown and Social worktrees untouched.
 
 ## Next Exact Action
 
-Delegate fresh Fix Agent to reproduce and repair fallback revocation reason versus CoreOutbox/NATS timing without changing contracts, architecture, per-messagePG rule or test expectations. Then NEW independent Review and exact-head hosted CI. Evidence004/hosted-failure-36738064831.md. Do not close004/batch or advance other business.
+Delegate NEW independent Review of the clean repaired candidate, inspecting exact-bound readonlySession reason and rerunning live deterministic fallback/security/roles tests; then NEW exact-head hosted allrequiredjobs. Evidence004/revocation-fix.md and preserved hosted-failure-36738064831.md. Do not close004/batch or advance other business.
 
 ## Architecture Conflicts / ACP / ADR
 
@@ -67,3 +67,7 @@ Root metadata FAIL: confirmed section-reference encoding corruption and stale pr
 ## Final post-fix independent Review pending hosted
 
 Fresh /root/stage4_final_review local PASS exactb84cd0f, cleanisolatedcheckout; newPG16NATS enabledfullunitrace/canonical/rollbacksecurity and actual3Go rolesComposeTLS/CoreOutboxNATS/revocationclose0integrationskips; source0/34architecture0skip/27CI4historicalWindows symlinksubcases requireLinuxconfirmation. Evidence004/final-independent-review.md. Coordinator next ordinary dedicatedbranchpush, exactheadhosted allrequiredjobs, then004/batchcheckpoint. No finalGatePASS yet.
+
+## Fresh hosted-revocation Fix awaiting new independent Review
+
+Deterministic noNATS replacement/logout both failedbeforefix, nowexactbound committedreason fallbackPASS. Core writes/Outbox unchanged;Gatewayonlyprivate readonlySession notificationhelper, same timeout, safeREVOKED onexpiry/DB/query/unknown/missing/wrongidentity. NewfullPG16NATS unit/race/canonical/rollback/500msmessageDBnegative andtargetedrace3times/19fmtbuildvet/34architecture0skip/27CI4historicalWindows symlinksubcase skips/real3roleComposeTLSOutboxNATS PASSlocally. No Task/batch/S1 acceptance; nextNEW independentReview/newhosted. SoleFix releasesaftercleancommit. Evidence004/revocation-fix.md.
