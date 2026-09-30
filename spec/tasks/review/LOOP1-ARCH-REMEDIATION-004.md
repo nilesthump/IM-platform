@@ -2,7 +2,7 @@
 task_id: LOOP1-ARCH-REMEDIATION-004
 title: Migrate Go responsibility packages and regress
 status: review
-owner: Coordinator after /root/stage4_final_review release; fresh post-fix independent Review local PASS, exact-head hosted acceptance pending
+owner: Coordinator delegating fresh Fix for hosted revocation race
 stage: S1 remediation 4/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -98,3 +98,7 @@ Root identified candidate recovery metadata FAIL after product Review: section s
 # Final post-fix independent Review
 
 Fresh /root/stage4_final_review local PASS exactb84cd0f from clean isolatedcheckout; new realPG16NATS/fullunitrace/canonical/3Go rolesComposeTLS/negativecontrols passed, zerointegration skips. Evidence004/final-independent-review.md. Four historicalWindows symlink subcases need hostedLinux confirmation. Unique004 stays review, remediation/S1 NOT PASSED pending fresh exact-head allrequiredjobs hosted. Coordinator owns next ordinarypush/CI/closure; Review releases onlynew evidence and handoff after commit.
+
+# Hosted acceptance repair loop
+
+Exact closure92306df/run36738064831 completed failure:11success,Go race andGate fail. Revocation expectedREPLACED butreceivedREVOKED at auth_test.go:211. Evidence004/hosted-failure-36738064831.md. Next exact action is freshFix diagnosis and bounded repair, then new independentReview and new hostedcandidate; do not relax existing expectations, suppressGate or closebatch.

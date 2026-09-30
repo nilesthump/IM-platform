@@ -14,7 +14,7 @@ Current Task State: review
 
 ## Current Blockers
 
-No known unresolved substantive architecture choice within auditedscope. NewindependentReview andfinalexactheadhostedrequired before004/batchclosure; S1productGate separate/open.
+Actual final hosted run36738064831 on92306df failed Go race revocation reason, with consequent Gate failure. All11 other jobs succeeded. Fresh Fix/new independent Review/new hosted candidate required. No unresolved substantive architecture choice; remediation andS1 NOT PASSED.
 
 ## Verification
 
@@ -46,11 +46,11 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage4_final_review solely owns new final Review evidence/Recorder and present handoff until ordinary commit. Release writing to Coordinator after clean closure; product/history unchanged. Original/Social trees untouched.
+Coordinator owns only this hosted failure evidence/Recorder and current task recovery until clean commit, then releases to fresh Fix Agent. Original unknown and Social worktrees untouched.
 
 ## Next Exact Action
 
-Coordinator normally pushes the clean final independently reviewed closure to dedicated task branch and verifies exact-head hosted all required jobs; only then close004/remediation batch and stable checkpoint. Unique004 review; remediation/S1 NOT PASSED, no business advancement.
+Delegate fresh Fix Agent to reproduce and repair fallback revocation reason versus CoreOutbox/NATS timing without changing contracts, architecture, per-messagePG rule or test expectations. Then NEW independent Review and exact-head hosted CI. Evidence004/hosted-failure-36738064831.md. Do not close004/batch or advance other business.
 
 ## Architecture Conflicts / ACP / ADR
 

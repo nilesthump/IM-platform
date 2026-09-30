@@ -1,0 +1,112 @@
+go	Go Auth build, integration and contract verification	﻿2026-09-30T15:38:11.5679691Z ##[group]Run test -z "$(find backend/go -name '*.go' -type f -print0 | xargs -0 gofmt -l)"
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5680641Z ^[[36;1mtest -z "$(find backend/go -name '*.go' -type f -print0 | xargs -0 gofmt -l)"^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5681145Z ^[[36;1mcd backend/go^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5681381Z ^[[36;1mgo build ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5681645Z ^[[36;1mgo build -o "$RUNNER_TEMP/im-go" .^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5681929Z ^[[36;1mgo vet ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5682154Z ^[[36;1mgo test -count=1 ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5682423Z ^[[36;1mgo test -race -count=1 ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5682683Z ^[[36;1mcd ../..^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5682927Z ^[[36;1mpython3 contracts/websocket/verify.py^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5683351Z ^[[36;1mpwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1^[[0m
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5746537Z shell: /usr/bin/bash -e {0}
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5746815Z env:
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5747020Z   PGHOST: localhost
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5747255Z   PGPORT: 5432
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5747468Z   PGUSER: postgres
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5747748Z   PGPASSWORD: ci-only-password
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5748010Z   PGDATABASE: im_ci
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5748222Z   DB_TEST_ENABLE: 1
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5748457Z   NATS_URL: nats://localhost:4222
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5748751Z   PYTHONDONTWRITEBYTECODE: 1
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:11.5749002Z ##[endgroup]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:15.5891809Z ?   	im-platform/backend/go	[no test files]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:15.8694856Z ?   	im-platform/backend/go/gateway	[no test files]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:15.8695607Z ?   	im-platform/backend/go/plugin-host	[no test files]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:15.8947163Z ok  	im-platform/backend/go/core	0.022s
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:15.8947853Z ok  	im-platform/backend/go/shared	0.004s
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:18.5403787Z ok  	im-platform/backend/go/tests	2.256s
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:36.8990308Z ?   	im-platform/backend/go	[no test files]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:37.4210092Z ?   	im-platform/backend/go/gateway	[no test files]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:37.4211211Z ?   	im-platform/backend/go/plugin-host	[no test files]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:38.4658450Z ok  	im-platform/backend/go/core	1.042s
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:38.4659092Z ok  	im-platform/backend/go/shared	1.011s
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:57.1125358Z --- FAIL: TestPostgresAuthSessionAndWSS (5.27s)
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:57.1127214Z     auth_test.go:211: revocation missing: map[payload:map[reason:REVOKED sessionId:36976a74-aa3a-49a1-a956-f5a02a7594e8] protocolVersion:1.0 requestId:9f89f1c9-5f52-4987-aba0-ad384ae68baa type:session.revoked]
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:57.1128259Z FAIL
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:57.1128523Z FAIL	im-platform/backend/go/tests	18.963s
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:57.1128837Z FAIL
+go	Go Auth build, integration and contract verification	2026-09-30T15:38:57.1960165Z ##[error]Process completed with exit code 1.
+gate	Require every selected job to pass	﻿2026-09-30T15:39:06.7202256Z ##[group]Run python3 ci/check_gate.py
+gate	Require every selected job to pass	2026-09-30T15:39:06.7202844Z ^[[36;1mpython3 ci/check_gate.py^[[0m
+gate	Require every selected job to pass	2026-09-30T15:39:06.7441257Z shell: /usr/bin/bash -e {0}
+gate	Require every selected job to pass	2026-09-30T15:39:06.7441711Z env:
+gate	Require every selected job to pass	2026-09-30T15:39:06.7444758Z   NEEDS_JSON: {
+gate	Require every selected job to pass	  "classify": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {
+gate	Require every selected job to pass	      "shared": "true",
+gate	Require every selected job to pass	      "old_client": "true",
+gate	Require every selected job to pass	      "plugin": "true",
+gate	Require every selected job to pass	      "compatibility": "true",
+gate	Require every selected job to pass	      "architecture": "true",
+gate	Require every selected job to pass	      "web": "true",
+gate	Require every selected job to pass	      "mobile": "true",
+gate	Require every selected job to pass	      "migration": "true",
+gate	Require every selected job to pass	      "deploy": "true",
+gate	Require every selected job to pass	      "source_go": "true",
+gate	Require every selected job to pass	      "source_java": "true",
+gate	Require every selected job to pass	      "go": "true",
+gate	Require every selected job to pass	      "java": "true",
+gate	Require every selected job to pass	      "desktop": "true"
+gate	Require every selected job to pass	    }
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "architecture": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "source_go": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "source_java": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "go": {
+gate	Require every selected job to pass	    "result": "failure",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "java": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "web": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "desktop": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "mobile": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "shared": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "compatibility": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "deploy": {
+gate	Require every selected job to pass	    "result": "success",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  }
+gate	Require every selected job to pass	}
+gate	Require every selected job to pass	2026-09-30T15:39:06.7448330Z   PYTHONDONTWRITEBYTECODE: 1
+gate	Require every selected job to pass	2026-09-30T15:39:06.7448662Z ##[endgroup]
+gate	Require every selected job to pass	2026-09-30T15:39:06.7769153Z FAIL: selected go job ended failure
+gate	Require every selected job to pass	2026-09-30T15:39:06.7821038Z ##[error]Process completed with exit code 1.
