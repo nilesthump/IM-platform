@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-002
 title: Synchronize execution constraints
-status: backlog
-owner: unassigned
+status: active
+owner: fresh Implementation Agent pending delegation
 stage: S1 remediation 2/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -76,3 +76,7 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
 # Next Action
 
 - Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+
+# Activation
+
+Predecessor 001 bounded independent Review and exact-head hosted matrix accepted at 3e6e89f/run36714913796. No known blocking architecture decision. Inputs inspected and v1.1 integrity independently verified. Coordinator transitions backlog->ready->active in dependency order; fresh Implementation Agent must implement stage two only. New run-local Recorder .gitattributes blobs/** -text is authorized within task-linked research/runs/** before capture, preserving evidence transport. No business implementation authorized.

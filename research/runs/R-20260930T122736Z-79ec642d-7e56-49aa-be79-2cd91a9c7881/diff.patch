@@ -1,0 +1,349 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index efc2949..21db591 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -1,62 +1,54 @@
+-# Current Execution State
+-
+-Current Loop: Loop 1
+-Current Stage: S1 remediation 1/4
+-Current Gate: LOOP1-ARCH-REMEDIATION
+-Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate remains open)
+-Current Batch: LOOP1-ARCH-REMEDIATION
+-Current Task: LOOP1-ARCH-REMEDIATION-001
+-Current Task State: review
+-
+-## Immediately Relevant Completed Work
+-
+-User-authorized four-stage remediation takes precedence over further business work. Full canonical architecture audit and minimal normative repairs have fresh independent local Review PASS at a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d; applicable fresh hosted CI acceptance remains pending on task/LOOP1-ARCH-REMEDIATION, isolated worktree H:/.codex/worktrees/architecture-remediation/IM-platform. Stages 2-4 remain backlog. No product code changed in stage 1.
+-
+-## Recovery relationship
+-
+-LOOP1-GO-AUTH-001 remains historical done; accepted exact remote head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a and hosted run 36602521287 all ten jobs success. Local inherited 8cd90a7 adds acceptance closure only. Old PASS is valid under old checks and does not cover new requirements. Separate Social candidate/worktree is preserved and is not inherited or advanced. After remediation, Coordinator must reconcile that separate work explicitly before resuming dependency-satisfied business tasks; never blindly select Social because active is empty.
+-
+-## Known Failures, Risks, and Assumptions
+-
+-- Original frozen architecture verifier PASS with PowerShell 7; Windows PowerShell 5 cannot parse the existing UTF-8 script, so use pwsh.
+-- Independent remediation review/CI pending. Complete command history and findings belong in spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/ and linked Recorder, not this file.
+-- Transport repair: exact task-linked run-local blob -text rules preserve original bytes. Original run has one disclosed UTF-8 replacement/raw-hash mismatch; no finished record was rewritten. New Fix run is R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8; prior transport run remains partial after usage interruption. Evidence: transport-repair.md.
+-- Recorder R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56 uses prospective_resume with incomplete pre-Recorder trace. Registered visible delegation/approval excerpt is not full Human prompt.
+-
+-## Last Known Good Commit
+-
+-`59d92f39234596a5b66841e8aa2ef7db0bf65e8a` (historical Auth acceptance); inherited closure 8cd90a7. Neither is acceptance of this remediation.
+-
+-## Latest Checkpoint
+-
+-`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage1-candidate.md` (candidate authority transition, not accepted; points to historical Auth checkpoint).
+-
+-## Uncommitted Changes / Ownership
+-
+-Fresh independent Review Agent /root/stage1_review owns only new review evidence/Recorder and recovery handoff until clean commit, then releases sole write ownership to Coordinator. Fix transport repair was cleanly committed. Prior /root/stage1_impl was interrupted by usage limit; its partial transport run is retained as partial. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
+-
+-## Next Exact Action
+-
+-Read spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md and transport-repair.md, inspect clean review closure, normally push reviewed task branch and collect applicable fresh exact-head hosted CI with durable evidence. Do not start stage two or claim batch/S1 Gate PASS.
+-
+-## Current Blockers
+-
+-No unresolved substantive architecture choice found in the audited scope. Fresh independent local Review PASS; applicable hosted CI pending. Stage-three product structural checks do not yet exist; original Go layout remains a known stage-four implementation deviation.
+-
+-## Verification
+-
+-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1 -BaseCommit 8cd90a7`
+-  - Result: PASS locally, including 4 integrity test methods and semantic/hash negative controls; not independent acceptance.
+-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/development.md`
+-
+-## Changed Files or Migrations
+-
+-Canonical architecture, baseline/resolver, new ADR-0003, integrity verifier/tests, serial batch/four tasks, this recovery and linked evidence/Recorder only. No database migration, public contract or product implementation changed.
+-
+-## Architecture Conflicts / ACP / ADR
+-
+-ADR-0003 implements bounded Human-approved conflict resolution; v1.1 normative tightening is distinct from ADR-0002's historical representation-only migration. Full conflict/coverage ledger is in current task evidence. ADR-0001 bootstrap acceptance remains expired.
+-
+-## Independent Review evidence
+-
+-Fresh /root/stage1_review local PASS at clean detached a09f4fb: integrity/negative controls, Recovery Acceptance, HTTP/WSS/Sync-Plugin and 50 persisted blob transportation checks PASS. Four CI real symlink subcases skipped on Windows; original one raw stderr encoding mismatch disclosed. No live product/source compliance claimed. Full exact evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md; Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2. Task/batch/S1 acceptance pending real applicable CI.
++# Current Execution State
++
++Current Loop: Loop 1
++Current Stage: S1 remediation 2/4
++Current Gate: LOOP1-ARCH-REMEDIATION
++Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
++Current Batch: LOOP1-ARCH-REMEDIATION
++Current Task: LOOP1-ARCH-REMEDIATION-002
++Current Task State: active
++
++## Immediately Relevant Completed Work
++
++Stage 001 bounded done after fresh independent Review at a09f4fb and hosted CI run 36714913796 completed success on exact Review closure `3e6e89fa2b378f1fcb4c944466fef2e3bc905379`, all ten jobs success. Full audit/25 repairs and v1.1 semantic/hash checks accepted. Historical Auth done at 59d92f3/local closure8cd90a7 retains old PASS; this does not prove new product compliance. Separate Social worktree preserved and not advanced.
++
++## Current Blockers
++
++No blocking substantive architecture choice within audited scope. Stage002 D01 synchronization, stage003 enforcement, stage004 I01 old Go migration remain required. Overall remediation and S1 Gate not passed.
++
++## Verification
++
++- Command: `gh run view 36714913796 --repo nilesthump/IM-platform --json headSha,status,conclusion,jobs,url`
++  - Result: exact-head hosted success, all ten jobs completed success; stage-one bounded acceptance only.
++  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md`
++- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
++  - Result: Coordinator first draft failed existing current.md section/schema requirements; corrected to exact required headings and LF transport, rerun PASS (task002 active, five queues, 20 tasks) before closure commit. Not acceptance.
++  - Evidence: linked Coordinator Recorder `R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881` and stage-one hosted evidence directory.
++
++## Changed Files or Migrations
++
++Stage-one current architecture/baseline/checker/control artifacts accepted; closure only adds hosted evidence, task001 done/task002 active, accepted checkpoint and linked Recorder. No product, contract, database migration, historical evidence or PDF change.
++
++## Known Failures, Risks, and Assumptions
++
++Four local Windows symlink subcase skips disclosed; hosted Linux test job succeeded. Original Recorder one raw/UTF-8 replacement limitation and partial interrupted transport run preserved; independent new Review trace verified. Recorder PASS is not acceptance. New Go structural rules still pending stage003; old layout must be repaired in stage004, not grandfathered.
++
++## Last Known Good Commit
++
++`3e6e89fa2b378f1fcb4c944466fef2e3bc905379` (bounded stage-one independent Review closure and exact-head hosted CI); historical Auth accepted59d92f3.
++
++## Latest Checkpoint
++
++`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage1-accepted.md`
++
++## Uncommitted Changes / Ownership
++
++Coordinator /root owns only task001 closure, current/task002 activation/checkpoint and linked Recorder until commit. Original H:/IM-platform unknown files and separate Social worktree untouched. After commit fresh stage002 Implementation Agent receives sole write ownership.
++
++## Next Exact Action
++
++Fresh Implementation Agent: recover task002 and v1.1 SRC/dependency/review inputs, synchronize permitted execution constraints only, verify and submit candidate for new independent Review. Stages003/004 remain backlog; do not resume business.
++
++## Architecture Conflicts / ACP / ADR
++
++ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01/I01 downstream changes pending.
+diff --git a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-002.md b/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-002.md
+deleted file mode 100644
+index e9c1a19..0000000
+--- a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-002.md
++++ /dev/null
+@@ -1,78 +0,0 @@
+----
+-task_id: LOOP1-ARCH-REMEDIATION-002
+-title: Synchronize execution constraints
+-status: backlog
+-owner: unassigned
+-stage: S1 remediation 2/4
+-gate: LOOP1-ARCH-REMEDIATION
+----
+-
+-# Goal
+-
+-Synchronize execution constraints within the explicitly authorized four-stage remediation.
+-
+-# Inputs
+-
+-- User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+-- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+-- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+-
+-# Dependencies
+-
+-- LOOP1-ARCH-REMEDIATION-001 independently accepted bounded deliverable; no blocking architecture decision.
+-
+-# Allowed Paths
+-
+-- `AGENTS.md`
+-- `CLAUDE.md only if present`
+-- `spec/handoff/agent-context.md`
+-- `spec/tasks/TASK_TEMPLATE.md`
+-- `spec/tasks/backlog/**`
+-- `spec/tasks/ready/**`
+-- `spec/batches/**`
+-- `spec/acceptance/** only execution constraints`
+-- `spec/governance/**`
+-- `README.md and tools/** documentation only`
+-- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+-- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/**`
+-- `spec/progress/checkpoints/*architecture-remediation*.md`
+-- `research/prompts/** and research/runs/** only this task-linked artifacts`
+-
+-User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+-
+-# Acceptance
+-
+-New Agent can recover the unique current remediation task, responsibilities, allowed scope and acceptance. Active templates/tasks reference service ownership; allowed_paths never exempts authority; Java task source inherits boundaries. Reviewer checks behavior, ownership, imports and minimality. Preserve done tasks and historical evidence.
+-
+-# Forbidden
+-
+-- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+-- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+-- No Go/Java product implementation edits.
+-- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+-
+-# Minimality
+-
+-Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+-
+-# Verification
+-
+-- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+-- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+-- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+-
+-# Evidence
+-
+-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/ (pending independent acceptance).
+-
+-# Handoff
+-
+-- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+-- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+-
+-# Next Action
+-
+-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+diff --git a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md b/spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md
+deleted file mode 100644
+index c33e01a..0000000
+--- a/spec/tasks/review/LOOP1-ARCH-REMEDIATION-001.md
++++ /dev/null
+@@ -1,98 +0,0 @@
+----
+-task_id: LOOP1-ARCH-REMEDIATION-001
+-title: Audit and repair the whole Frozen Architecture
+-status: review
+-owner: Coordinator awaiting fresh independent Review Agent
+-stage: S1 remediation 1/4
+-gate: LOOP1-ARCH-REMEDIATION
+----
+-
+-# Goal
+-
+-Audit and repair the whole Frozen Architecture within the explicitly authorized four-stage remediation.
+-
+-# Inputs
+-
+-- User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+-- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+-- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+-
+-# Dependencies
+-
+-- LOOP1-GO-AUTH-001 done; explicit Human authority and isolated clean inherited checkout.
+-
+-# Allowed Paths
+-
+-- `spec/architecture/frozen-architecture.md`
+-- `spec/architecture/baseline.md`
+-- `spec/architecture/README.md`
+-- `spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md`
+-- `tools/verify-frozen-architecture.ps1`
+-- `tools/verify_frozen_architecture.py`
+-- `tests/architecture/**`
+-- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+-- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/**`
+-- `spec/progress/checkpoints/*architecture-remediation*.md`
+-- `research/prompts/** and research/runs/** only this task-linked artifacts`
+-- Exact run-local `research/runs/{R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56,R-20260929T185051Z-4ba6947e-5726-4f55-ba96-a1b9bed48769,R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8}/.gitattributes`: `blobs/** -text` only, preserving raw evidence bytes; Human-authorized necessary execution constraint, Coordinator approved transport repair. No historical run policy change.
+-
+-User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+-
+-- Exact new independent Review run `research/runs/R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2/.gitattributes`: `blobs/** -text` only for new evidence transport fidelity; Coordinator approved under Human necessary execution-constraint authorization.
+-
+-# Acceptance
+-
+-Audit all 22 chapters, both appendices, tables, examples, nine diagrams and references against existing authority; classify real conflicts versus implementation deviations. Repair every determinate conflict in current prose, record coverage/ledger and approval source. Preserve historical PDF/ADR/evidence bytes; distinguish old representation-only migration from current normative tightening. Verify actual hashes and semantic structure with negative controls. Fresh independent review and applicable hosted CI; no product edits.
+-
+-# Forbidden
+-
+-- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+-- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+-- No Go/Java product implementation edits.
+-- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+-
+-# Minimality
+-
+-Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+-
+-# Verification
+-
+-- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+-- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+-- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+-
+-# Evidence
+-
+-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/ (pending independent acceptance).
+-
+-# Handoff
+-
+-- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+-- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+-
+-# Next Action
+-
+-- Run a new independent Review Agent against the committed candidate, then applicable real hosted CI. Stage two remains blocked until bounded stage-one acceptance.
+-
+-# Candidate handoff
+-
+-- Full 22-chapter/two-appendix coverage and 25 repaired determinate findings: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/conflict-ledger.md`; two explicitly pending downstream items. No known blocking equal-authority decision in audit scope; independent review pending.
+-- v1.1 actual canonical SHA: `83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e`; original PDF hash unchanged. ADR-0003 records explicit Human authorization and semantic tightening, separately from historical ADR-0002.
+-- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/development.md` records exact verifier results/failures/skips; linked Recorder contains argv/exit/time/output hashes. New integrity, old HTTP/WSS/Sync-Plugin, recovery Development, and 21 CI regressions pass locally; four CI symlink subcases skipped due Windows privilege.
+-- No Go/Java product, public contract, historical evidence/ADR or PDF edited. New candidate checkpoint records transition only, not acceptance. Last known good remains historical Auth head `59d92f39234596a5b66841e8aa2ef7db0bf65e8a`; inherited base `8cd90a7`.
+-- Implementation Agent owns only stage-one candidate artifacts until clean commit, then releases write ownership. No independent acceptance or hosted remediation CI yet.
+-
+-# Transport fix handoff
+-
+-- Usage-interrupted implementation transport run preserved as partial; new fresh Fix context uses related R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8.
+-- 22 original blobs restored through exact run-local -text policy and ordinary corrective commit; all 38 persisted original bytes verified against working/index/committed SHA. One pre-existing raw subprocess vs UTF-8 persisted stderr hash mismatch is disclosed, not repaired by editing history.
+-- Exact failures, reruns and preservation method: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/transport-repair.md and verify-transport.py. Authority integrity rerun exit 0, four tests PASS. No product modification or self-acceptance. Independent Review/hosted CI remain pending; last known good historical Auth head unchanged.
+-
+-# Independent Review handoff
+-
+-- Fresh independent /root/stage1_review accepted candidate a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d locally from clean managed detached checkout. Full body/authority/diff audit and C01-C25 review PASS; four architecture tests, five additional chapter negatives, Recovery Acceptance, HTTP/WSS/Sync-Plugin and transport fidelity checks PASS. CI tests 21 completed, four Windows real symlink subcases skipped; hosted Linux results pending. Original raw stderr encoding mismatch disclosed, history unchanged.
+-- Evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md; Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2. No product/live integration or new source checker acceptance claimed. I01/D01 remain downstream pending.
+-- Task remains review until applicable fresh hosted exact-head CI. Coordinator next normal task-branch push and durable CI acceptance; last known good historical Auth unchanged. Reviewer owns only new review artifacts/recovery until clean handoff, then releases sole writer to Coordinator.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-42e16c0a-4bd0-443a-8f0f-d6b72af41088/metadata.json
+# ?? research/prompts/P-42e16c0a-4bd0-443a-8f0f-d6b72af41088/prompt.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/.gitattributes
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-04504b93-0a54-49ea-bc58-cba0427996e9.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-04504b93-0a54-49ea-bc58-cba0427996e9.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-5c0c4859-84c4-4273-82b2-6efa6e959849.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-5c0c4859-84c4-4273-82b2-6efa6e959849.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-6d31fb4f-b19b-4b72-92e6-42a6be540f4e.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-6d31fb4f-b19b-4b72-92e6-42a6be540f4e.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-74102b9e-b551-4a2d-8d9e-6a968c547334.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-74102b9e-b551-4a2d-8d9e-6a968c547334.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-82144071-dfa6-4612-8ef2-5011cb4ac6fc.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-82144071-dfa6-4612-8ef2-5011cb4ac6fc.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-859ba18f-7f01-4110-8ef8-2a7d62d0c665.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-859ba18f-7f01-4110-8ef8-2a7d62d0c665.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-94a475a0-fc4b-4e50-9503-9198e51934b5.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-94a475a0-fc4b-4e50-9503-9198e51934b5.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-982c8272-b239-41f5-a6f5-1024cc729e4e.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-982c8272-b239-41f5-a6f5-1024cc729e4e.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-a90bdf48-8cc2-476b-9469-75fced4a1361.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-a90bdf48-8cc2-476b-9469-75fced4a1361.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-d0a63d78-10e2-44d0-b130-82e50f3c6c7d.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-d0a63d78-10e2-44d0-b130-82e50f3c6c7d.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-d1968ef7-25b2-494f-979d-18722a1954a8.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-d1968ef7-25b2-494f-979d-18722a1954a8.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-d902241b-8317-4d23-b2a2-532e8d945ffb.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-d902241b-8317-4d23-b2a2-532e8d945ffb.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-fdfaf165-c18d-4167-b40e-eacc7e5d839a.stderr.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/blobs/C-fdfaf165-c18d-4167-b40e-eacc7e5d839a.stdout.txt
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/events.jsonl
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/initial_state.json
+# ?? research/runs/R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881/metadata.json
+# ?? spec/progress/checkpoints/2026-09-30-architecture-remediation-stage1-accepted.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/coordinator-resume-prompt.txt
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-ci-36714913796.json
+# ?? spec/tasks/active/LOOP1-ARCH-REMEDIATION-002.md
+# ?? spec/tasks/done/LOOP1-ARCH-REMEDIATION-001.md

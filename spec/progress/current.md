@@ -1,62 +1,54 @@
 # Current Execution State
 
 Current Loop: Loop 1
-Current Stage: S1 remediation 1/4
+Current Stage: S1 remediation 2/4
 Current Gate: LOOP1-ARCH-REMEDIATION
-Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate remains open)
+Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
 Current Batch: LOOP1-ARCH-REMEDIATION
-Current Task: LOOP1-ARCH-REMEDIATION-001
-Current Task State: review
+Current Task: LOOP1-ARCH-REMEDIATION-002
+Current Task State: active
 
 ## Immediately Relevant Completed Work
 
-User-authorized four-stage remediation takes precedence over further business work. Full canonical architecture audit and minimal normative repairs have fresh independent local Review PASS at a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d; applicable fresh hosted CI acceptance remains pending on task/LOOP1-ARCH-REMEDIATION, isolated worktree H:/.codex/worktrees/architecture-remediation/IM-platform. Stages 2-4 remain backlog. No product code changed in stage 1.
-
-## Recovery relationship
-
-LOOP1-GO-AUTH-001 remains historical done; accepted exact remote head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a and hosted run 36602521287 all ten jobs success. Local inherited 8cd90a7 adds acceptance closure only. Old PASS is valid under old checks and does not cover new requirements. Separate Social candidate/worktree is preserved and is not inherited or advanced. After remediation, Coordinator must reconcile that separate work explicitly before resuming dependency-satisfied business tasks; never blindly select Social because active is empty.
-
-## Known Failures, Risks, and Assumptions
-
-- Original frozen architecture verifier PASS with PowerShell 7; Windows PowerShell 5 cannot parse the existing UTF-8 script, so use pwsh.
-- Independent remediation review/CI pending. Complete command history and findings belong in spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/ and linked Recorder, not this file.
-- Transport repair: exact task-linked run-local blob -text rules preserve original bytes. Original run has one disclosed UTF-8 replacement/raw-hash mismatch; no finished record was rewritten. New Fix run is R-20260930T120604Z-82f5344c-b7a0-4876-a454-f4b2bf344fa8; prior transport run remains partial after usage interruption. Evidence: transport-repair.md.
-- Recorder R-20260929T183826Z-8cd6416f-9684-4596-bc81-bc6f8ee8ce56 uses prospective_resume with incomplete pre-Recorder trace. Registered visible delegation/approval excerpt is not full Human prompt.
-
-## Last Known Good Commit
-
-`59d92f39234596a5b66841e8aa2ef7db0bf65e8a` (historical Auth acceptance); inherited closure 8cd90a7. Neither is acceptance of this remediation.
-
-## Latest Checkpoint
-
-`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage1-candidate.md` (candidate authority transition, not accepted; points to historical Auth checkpoint).
-
-## Uncommitted Changes / Ownership
-
-Fresh independent Review Agent /root/stage1_review owns only new review evidence/Recorder and recovery handoff until clean commit, then releases sole write ownership to Coordinator. Fix transport repair was cleanly committed. Prior /root/stage1_impl was interrupted by usage limit; its partial transport run is retained as partial. Original H:/IM-platform and separate Social worktree untouched. Historical current.md run history is preserved in Git at 8cd90a7; old evidence files remain unchanged.
-
-## Next Exact Action
-
-Read spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md and transport-repair.md, inspect clean review closure, normally push reviewed task branch and collect applicable fresh exact-head hosted CI with durable evidence. Do not start stage two or claim batch/S1 Gate PASS.
+Stage 001 bounded done after fresh independent Review at a09f4fb and hosted CI run 36714913796 completed success on exact Review closure `3e6e89fa2b378f1fcb4c944466fef2e3bc905379`, all ten jobs success. Full audit/25 repairs and v1.1 semantic/hash checks accepted. Historical Auth done at 59d92f3/local closure8cd90a7 retains old PASS; this does not prove new product compliance. Separate Social worktree preserved and not advanced.
 
 ## Current Blockers
 
-No unresolved substantive architecture choice found in the audited scope. Fresh independent local Review PASS; applicable hosted CI pending. Stage-three product structural checks do not yet exist; original Go layout remains a known stage-four implementation deviation.
+No blocking substantive architecture choice within audited scope. Stage002 D01 synchronization, stage003 enforcement, stage004 I01 old Go migration remain required. Overall remediation and S1 Gate not passed.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1 -BaseCommit 8cd90a7`
-  - Result: PASS locally, including 4 integrity test methods and semantic/hash negative controls; not independent acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/development.md`
+- Command: `gh run view 36714913796 --repo nilesthump/IM-platform --json headSha,status,conclusion,jobs,url`
+  - Result: exact-head hosted success, all ten jobs completed success; stage-one bounded acceptance only.
+  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md`
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: Coordinator first draft failed existing current.md section/schema requirements; corrected to exact required headings and LF transport, rerun PASS (task002 active, five queues, 20 tasks) before closure commit. Not acceptance.
+  - Evidence: linked Coordinator Recorder `R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881` and stage-one hosted evidence directory.
 
 ## Changed Files or Migrations
 
-Canonical architecture, baseline/resolver, new ADR-0003, integrity verifier/tests, serial batch/four tasks, this recovery and linked evidence/Recorder only. No database migration, public contract or product implementation changed.
+Stage-one current architecture/baseline/checker/control artifacts accepted; closure only adds hosted evidence, task001 done/task002 active, accepted checkpoint and linked Recorder. No product, contract, database migration, historical evidence or PDF change.
+
+## Known Failures, Risks, and Assumptions
+
+Four local Windows symlink subcase skips disclosed; hosted Linux test job succeeded. Original Recorder one raw/UTF-8 replacement limitation and partial interrupted transport run preserved; independent new Review trace verified. Recorder PASS is not acceptance. New Go structural rules still pending stage003; old layout must be repaired in stage004, not grandfathered.
+
+## Last Known Good Commit
+
+`3e6e89fa2b378f1fcb4c944466fef2e3bc905379` (bounded stage-one independent Review closure and exact-head hosted CI); historical Auth accepted59d92f3.
+
+## Latest Checkpoint
+
+`spec/progress/checkpoints/2026-09-30-architecture-remediation-stage1-accepted.md`
+
+## Uncommitted Changes / Ownership
+
+Coordinator /root owns only task001 closure, current/task002 activation/checkpoint and linked Recorder until commit. Original H:/IM-platform unknown files and separate Social worktree untouched. After commit fresh stage002 Implementation Agent receives sole write ownership.
+
+## Next Exact Action
+
+Fresh Implementation Agent: recover task002 and v1.1 SRC/dependency/review inputs, synchronize permitted execution constraints only, verify and submit candidate for new independent Review. Stages003/004 remain backlog; do not resume business.
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0003 implements bounded Human-approved conflict resolution; v1.1 normative tightening is distinct from ADR-0002's historical representation-only migration. Full conflict/coverage ledger is in current task evidence. ADR-0001 bootstrap acceptance remains expired.
-
-## Independent Review evidence
-
-Fresh /root/stage1_review local PASS at clean detached a09f4fb: integrity/negative controls, Recovery Acceptance, HTTP/WSS/Sync-Plugin and 50 persisted blob transportation checks PASS. Four CI real symlink subcases skipped on Windows; original one raw stderr encoding mismatch disclosed. No live product/source compliance claimed. Full exact evidence: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/independent-review-pass.md; Recorder R-20260930T121610Z-80a2186d-1aef-444e-914f-4b9b3341e5b2. Task/batch/S1 acceptance pending real applicable CI.
+ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01/I01 downstream changes pending.
