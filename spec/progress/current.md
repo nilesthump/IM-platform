@@ -46,12 +46,16 @@ LocalPASS isnotacceptance. FourhistoricWindowsCI symlinksubcases skipped; actual
 
 ## Uncommitted Changes / Ownership
 
-/root/stage4_impl owns only004authorizedcandidate/Recorder until cleancommit andthen releaseswriter. Root/othersreadonly. OriginalunknownandSocialworktreesuntouched.
+Fresh /root/stage4_review solewriter owns only new004independentReview evidence/Recorder and presenthandoff; release after ordinaryReviewclosurecommit. Candidate87c0ee2 unchanged in separatecleanexecutioncheckout. Root/Impl readonly; unknownoriginal/Socialtreesuntouched.
 
 ## Next Exact Action
 
-FreshindependentReview of committed004candidate incleancheckout: actualserviceownership/minimality/originalbehavior/liveenableconditions/newpositive-negativeCI/003closuremetadata. OnFAILnewFix/newReview; onPASSordinarydedicatedtaskpush andactualfinalheadhostedallrequiredjobs. Do notclaim004/batchdone orresumeotherbusinessbeforeallapplicableacceptance.
+Coordinator receives clean independentReviewclosure, normallypushes dedicatedtaskbranch and checks fresh exactheadhosted allrequiredjobs; onlyafterPASS close004/batch/checkpoint. LocalReview accepted87c0ee2; unique004review, product/batch/S1 NOT PASSED pendingCI. No Social/Message/Java business.
 
 ## Architecture Conflicts / ACP / ADR
 
 ADR0003acceptedv1.1canonicalSHA83d124b unchanged,historicalPDFunchanged. I01oldGoimplementedsource0violationspendingindependentacceptance; D01propagated/enforced. No publiccontract/securitydecisionexpanded.
+
+## Stage004 independent Review pending hosted closure
+
+Fresh /root/stage4_review localPASS exact87c0ee2 cleanisolatedcheckout; fullnewPG16NATS unit/race/canonical andreal3rolesTLS/CoreOutboxNATS plusGoJavaComposeTLSsmokes0integrationskips,17fmt/build/vet/source0,34architecture0skip/27CI4historicalWindowssymlinksubcases disclosed. Evidence004/independent-review.md and command/captureJSON. Unique004remainsreview; overallGate NOT PASSED. SoleReviewwriter owns onlynew004evidence/research andhandoff; releasesafterordinarycommit. NextCoordinator normal dedicatedtaskbranchpush exactReviewclosure, freshhosted allrequiredjobs, then004/batch closurecheckpoint; nootherbusinessadvancement.
