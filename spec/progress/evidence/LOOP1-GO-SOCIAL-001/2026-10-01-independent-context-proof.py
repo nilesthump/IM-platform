@@ -31,4 +31,3 @@ for f in ['backend/go/social.go','backend/go/social_test.go','spec/progress/evid
  for i,line in enumerate(text.splitlines(),1):
   if re.search(r'403|scope|authoriz|func \(s \*authService\)|func Test|package main',line,re.I):print(f'OLDREF {f}:{i}: {line.strip()}')
 print('FINAL_CLEAN',not git('status','--porcelain=v1'));print('CONTROL_PROOF_PASS; SOCIAL403_UNEXECUTED_UNRESOLVED')
-
