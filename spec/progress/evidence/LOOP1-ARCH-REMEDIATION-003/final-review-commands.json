@@ -1,0 +1,61 @@
+[
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Set-Location 'H:/.codex/worktrees/stage3-final-review/IM-platform'; git status --porcelain; git rev-parse HEAD; ./tools/verify-frozen-architecture.ps1; if (0) { exit 0 }; ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance"
+    ],
+    "exit_code": 0,
+    "duration_ms": 11954.0,
+    "stdout_blob": "blobs/C-ef131f38-27cf-4a35-8e04-ae326b8a7d97.stdout.txt",
+    "stderr_blob": "blobs/C-ef131f38-27cf-4a35-8e04-ae326b8a7d97.stderr.txt"
+  },
+  {
+    "command": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "spec/progress/evidence/LOOP1-ARCH-REMEDIATION-003/final-review-controls.py",
+      "H:/.codex/worktrees/stage3-final-review/IM-platform"
+    ],
+    "exit_code": 0,
+    "duration_ms": 1672.0,
+    "stdout_blob": "blobs/C-9359fd00-ee1e-49e0-9f3c-cf33b3224e20.stdout.txt",
+    "stderr_blob": "blobs/C-9359fd00-ee1e-49e0-9f3c-cf33b3224e20.stderr.txt"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Set-Location H:/.codex/worktrees/stage3-final-review/IM-platform; & C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe -m unittest discover -s tests/ci -v; exit $LASTEXITCODE"
+    ],
+    "exit_code": 0,
+    "duration_ms": 3343.0,
+    "stdout_blob": "blobs/C-6ae262c1-fc3b-41d2-b407-b73891b96c80.stdout.txt",
+    "stderr_blob": "blobs/C-6ae262c1-fc3b-41d2-b407-b73891b96c80.stderr.txt"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Set-Location H:/.codex/worktrees/stage3-final-review/IM-platform; ./tools/verify-frozen-architecture.ps1; exit $LASTEXITCODE"
+    ],
+    "exit_code": 0,
+    "duration_ms": 5250.0,
+    "stdout_blob": "blobs/C-c0a2f688-f621-4afe-9030-07ff5a76a157.stdout.txt",
+    "stderr_blob": "blobs/C-c0a2f688-f621-4afe-9030-07ff5a76a157.stderr.txt"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Set-Location H:/.codex/worktrees/stage3-final-review/IM-platform; ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance; exit $LASTEXITCODE"
+    ],
+    "exit_code": 0,
+    "duration_ms": 5750.0,
+    "stdout_blob": "blobs/C-d8ebdaef-4289-4913-8638-a3c36f84e3e8.stdout.txt",
+    "stderr_blob": "blobs/C-d8ebdaef-4289-4913-8638-a3c36f84e3e8.stderr.txt"
+  }
+]

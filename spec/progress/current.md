@@ -46,7 +46,7 @@ Historical stage001: four local Windows symlink subcase skips disclosed; its hos
 
 ## Uncommitted Changes / Ownership
 
-Fresh /root/stage3_jdbc_fix owns only003 JDBC checker/evidence/Recorder repair until clean candidate commit, then releases writer to Coordinator for a new independent Reviewer. Original unknown and Social worktrees untouched.
+New /root/stage3_final_review owns only fresh Review evidence/Recorder and present handoff; releases after clean Review closure. Candidate product/checker unchanged; original unknown and Social worktrees untouched.
 
 ## Next Exact Action
 
@@ -63,3 +63,7 @@ Exact commands/results/durations/limitations in evidence003/implementation-evide
 ## Fresh JDBC Fix handoff
 
 Independent read-only Review FAIL on a27f655 repaired by fresh Fix context: Gateway ambiguous execute no SELECT-decoy exemption; non-Core JDBC transaction controls forbidden,legal read-only/connection support retained. Localarchitecture34 PASS/noskip,CI24 PASS/four historical Windows symlink skips; canonical/governance/Java/recoveryDevelopmentPASS,oldGo72FAIL unchanged. Durable evidence003/jdbc-fix-evidence.md and fresh Recorder R-20260930T134747Z-dd0072a1-c1af-4472-9fe3-d506491b2a83. New independentReview and hosted bounded acceptance pending;003review/004backlog/overallGate red.
+
+## New final independent Review
+
+Exact94b2f366dd1bee6652ec433b213c90f6c84fb4c9 bounded localcheckerPASS by new /root/stage3_final_review; clean detachedcheckout,34architecture/no skip,24CI/four historical Windows symlink subcase skips,independent six-class controlsPASS,canonical/RecoveryAcceptancePASS. ActualGo72FAIL expected,Java/governancePASS. Evidence003/final-independent-review.md; Recorder R-20260930T135729Z-4a5e6887-279d-42ab-8289-0b6fc6f53e29. Coordinator next validates actual exact Review-closure hosted jobs;003review/004backlog/batch and S1 NOT PASSED.
