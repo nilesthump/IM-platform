@@ -18,6 +18,10 @@ Migrate Go responsibility packages and regress within the explicitly authorized 
 - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
 - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
 
+# Execution Constraints
+
+Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+
 # Dependencies
 
 - LOOP1-ARCH-REMEDIATION-003 independently accepted bounded deliverable; no blocking architecture decision.
@@ -54,6 +58,9 @@ Publish actual before/after file/responsibility migration map, preserve Core Aut
 Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
 
 # Verification
+
+Before migration, bind exact commands/results from independently accepted stage003 evidence; publish the actual file/responsibility migration table before edits. Pending checker tools cannot be counted as executable PASS. The broad migration scope is a one-time authorization ending at batch completion; preserve behavioral fixtures and minimize exported APIs.
+
 
 - Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
 - Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.

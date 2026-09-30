@@ -12,3 +12,9 @@ These checks are executable requirements for the future canonical contract runne
 | AUF-A-006 | Logout fixtures MUST assert Session and Refresh Token revocation plus WSS closure, while making no assertion that local client history is deleted. | Architecture Baseline v1.0, chapter 7.1. |
 | AUF-A-007 | Security fixtures MUST reject tokens in URL query input and MUST assert that responses and captured structured logs contain no token or password material. | Architecture Baseline v1.0, chapter 7.4. |
 | AUF-A-008 | Both backend profiles MUST run the same positive and negative fixtures and normalize to the same observable auth, friendship, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.

@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-ARCH-REMEDIATION-002
 title: Synchronize execution constraints
-status: active
-owner: fresh Implementation Agent pending delegation
+status: review
+owner: Coordinator pending fresh independent Review
 stage: S1 remediation 2/4
 gate: LOOP1-ARCH-REMEDIATION
 ---
@@ -33,6 +33,8 @@ Synchronize execution constraints within the explicitly authorized four-stage re
 - `spec/batches/**`
 - `spec/acceptance/** only execution constraints`
 - `spec/governance/**`
+- `spec/architecture/baseline.md` only acceptance discovery metadata
+- `spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md` only current Status and appended actual acceptance
 - `README.md and tools/** documentation only`
 - `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
 - `spec/batches/LOOP1-ARCH-REMEDIATION.md`
@@ -66,16 +68,25 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
 
 # Evidence
 
-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/ (pending independent acceptance).
+- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md and recovery-controls.py: completed D01 propagation, exact local command results/limits and remaining stage003 enforcement. Fresh independent Review/hosted acceptance pending.
+- Recorder R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365 is implementation evidence only.
 
 # Handoff
+
+- Completed canonical execution read/scope, actual behavior+ownership/import/minimality Review, expiry/head/jobs, Java future task creation, narrowed suspended business tasks, recovery and baseline acceptance discovery synchronization. No product/contracts/canonical body/history edits.
+- Local integrity four tests, recovery Development, isolated three recovery negatives/scope and minimality policy PASS. Historical minimality task scope invocation failed as in evidence; source/import/live regressions and hosted acceptance not executed in this stage.
+- Last bounded accepted head: 3e6e89fa2b378f1fcb4c944466fef2e3bc905379 (001 only). Latest accepted checkpoint unchanged. /root/stage2_impl owns current new changes until commit, then releases write ownership.
 
 - Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
 - Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
 
 # Next Action
 
-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+- Coordinator delegates a new independent Review Agent for this committed candidate; after accepted local Review obtain applicable exact-head hosted CI. Do not activate stage003 or resume business before bounded stage002 acceptance.
+
+# Coordinator Scope Clarification
+
+Coordinator /root authorized stage-two discovery metadata synchronization on 2026-09-30 under the Human scope: baseline.md status/acceptance discovery only; ADR-0003 current Status and appended actual acceptance only. No canonical body/hash/version/decision change or historical ADR/evidence change.
 
 # Activation
 

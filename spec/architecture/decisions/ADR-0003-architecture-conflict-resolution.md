@@ -1,6 +1,6 @@
 # ADR-0003: Whole-document architecture conflict resolution and executable service boundaries
 
-Status: Human-approved bounded conflict resolution; candidate implementation pending independent acceptance.
+Status: Human-approved bounded conflict resolution; stage-one canonical revision independently accepted; downstream remediation pending.
 Date: 2026-09-30
 Approval source: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md; visible Human four-stage instruction and registered prompt P-ddf5a00c-27a1-412c-ad9b-2305e1aad734 (delegation plus exact approval excerpt, not complete Human prompt).
 
@@ -23,3 +23,7 @@ semantic_change=true: source-boundary and governance ambiguity is tightened into
 Four sequential tasks repair authority, execution constraints, effective checkers/CI, then Go implementation. Stage-one verifier preserves hash checks and replaces historical arrow/figure/format counts with section-bound graph/structure checks and negative controls. Stage three supplies product ownership/import/trigger tests; until stage four repairs old Go violations those are expected failures, never a permanent exception or product PASS. Java remains stage-appropriate and its future business boundaries are tested with fixtures.
 
 Each bounded stage needs new independent Review and applicable CI. Final batch acceptance requires final candidate exact-head hosted CI, all applicable live regressions, no unresolved blocker and recovery checkpoint. Historical Auth acceptance remains valid for its old requirements. Rollback of this candidate is a new corrective commit/approved decision; do not rewrite historical source/evidence or discard Auth implementation. No data migration or public-wire migration is needed.
+
+## Actual bounded acceptance point
+
+Fresh stage-one Review accepted a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. Hosted run 36714913796 accepted exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md and task001 done. This discovery update preserves decision/approval/history. Stages002-004 and product/batch/S1 acceptance remain outstanding.

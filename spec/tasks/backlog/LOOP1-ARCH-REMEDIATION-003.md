@@ -18,6 +18,10 @@ Enforce architecture in CI and independent review within the explicitly authoriz
 - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
 - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
 
+# Execution Constraints
+
+Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
+
 # Dependencies
 
 - LOOP1-ARCH-REMEDIATION-002 independently accepted bounded deliverable; no blocking architecture decision.

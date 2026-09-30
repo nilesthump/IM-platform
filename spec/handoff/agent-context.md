@@ -23,3 +23,9 @@ After the independently accepted Research Recorder Instrumentation Epoch, regist
 ## Checkpoints
 
 Create a checkpoint for a stable Gate, important vertical slice, contract/schema version transition, release recovery point, or other important stable recovery state. A checkpoint records the commit (or `none` before the first commit), contract and migration versions when applicable, fixture/artifact versions when applicable, verified Gate state, and known limitations. `spec/progress/current.md` points to the latest checkpoint.
+
+## Current execution constraints
+
+Before business implementation read canonical §3/§10 SRC-01 through SRC-07/§11 and spec/governance/execution-boundaries.md. allowed_paths is never an architecture exemption; narrow ordinary scopes, explicitly authorize temporary migration maps and exit. Review uses spec/governance/independent-review.md for behavior, actual ownership, imports and minimality. Java future tasks derive from canonical §20 and the current task template, not Go layout.
+
+LOOP1-CI-001 is operational and done, so ADR-0001 is expired. Verify hosted candidate SHA and actual required job conclusions. Current four-stage remediation suspends Social/Message/E2E/Java/plugin business. Historical Auth done is retained under old checks; new structure remains unaccepted until stage four. The unique task in current.md controls resumption. Stage-three checkers are pending, not available proven checks; stage-three expected Go failures cannot close the batch or S1 Gate.

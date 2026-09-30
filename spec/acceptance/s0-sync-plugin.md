@@ -17,3 +17,9 @@ These checks are executable requirements for the future canonical contract runne
 | SP-A-011 | Lifecycle fixtures MUST assert that DISABLE preserves data, UNINSTALL defaults to RETAINED, and PURGE requires an explicit elevated, audited, retention-confirmed operation. | Architecture Baseline v1.0, chapter 9.3. |
 | SP-A-012 | Golden fixtures MUST include duplicate, out-of-order, gap, and permission-denial cases and MUST normalize to identical Sync and Plugin outcomes across both backend profiles. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
 | SP-A-013 | Given repeated execution of the same Action, the runner MUST assert one idempotent observable outcome with no duplicate side effect and MUST retain audit evidence for every execution attempt. | Architecture Baseline v1.0, chapter 8.1. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.

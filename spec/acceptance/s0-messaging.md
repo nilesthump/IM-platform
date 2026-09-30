@@ -12,3 +12,9 @@ These checks are executable requirements for the future canonical contract runne
 | MSG-A-006 | Given a GROUP send, the runner MUST assert one logical Message and one Outbox event regardless of member count, with local online fan-out treated separately from persistence. | Architecture Baseline v1.0, chapter 5.3. |
 | MSG-A-007 | Correctness fixtures MUST assert zero lost committed Messages, zero duplicate logical Messages, zero wrong-Conversation deliveries, zero permanent sequence gaps, and zero ACK-before-commit cases. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
 | MSG-A-008 | Both backend profiles MUST consume identical fixtures and normalize to the same ACK, idempotency, authorization, ordering, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.

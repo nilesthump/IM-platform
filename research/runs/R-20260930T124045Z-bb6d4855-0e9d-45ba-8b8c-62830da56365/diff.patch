@@ -1,0 +1,605 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index bad9f7c..7bd8481 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -9,7 +9,7 @@ Before doing any work, every agent MUST read and inspect, in this order:
+ 1. `spec/handoff/agent-context.md`.
+ 2. `spec/progress/current.md`.
+ 3. Read the `Current Task` ID and resolve that exact ID across `spec/tasks/{review,active,ready,backlog,done}/`. It MUST exist in exactly one queue and its declared status MUST match that queue. Resume by actual state: `review` completes the independent review/fix cycle; `active` continues implementation; `ready` may activate only when dependencies and inputs are satisfied; `backlog` remains blocked on prerequisites; `done` permits selection of the next dependency-satisfied task. Never select work merely because `active/` is empty. Select another task only when the current task is complete and no unfinished current task exists.
+-4. Every architecture document, approved ADR or frozen decision, domain document, invariant, acceptance criterion, and contract referenced by the current Task Spec. First resolve and hash-check the canonical Frozen Architecture Markdown through `spec/architecture/README.md` and `spec/architecture/baseline.md`. The retained PDF is historical provenance.
++4. Every architecture document, approved ADR or frozen decision, domain document, invariant, acceptance criterion, and contract referenced by the current Task Spec. First resolve and hash-check the canonical Frozen Architecture Markdown through `spec/architecture/README.md` and `spec/architecture/baseline.md`. The retained PDF is historical provenance. Every business task MUST also read canonical sections §3, §10 (SRC-01 through SRC-07) and §11 before implementation, including responsibilities, source ownership and dependency direction.
+ 5. `git status`.
+ 6. The current diff.
+ 7. Recent commits.
+@@ -42,6 +42,12 @@ Without explicit approval, an agent MUST NOT change Frozen Architecture, public
+ - Keep task state in exactly one queue: `backlog -> ready -> active -> review -> done`.
+ - A task may enter `done` only after accepted independent review and the applicable independent acceptance mechanism.
+ 
++## Applicable execution constraints
++
++Read [execution constraints](spec/governance/execution-boundaries.md) and [the independent Review checklist](spec/governance/independent-review.md). allowed_paths never overrides or exempts architecture. Ordinary business tasks narrow paths by responsibility; one-time cross-service migration lists affected files/responsibilities, scope and exit before edits. Applicable source/dependency checks supplement behavior. Reviewer inspects actual logic and imports plus minimality; Java inherits canonical boundaries, never Go layout. Escalate conflicts before implementation; do not legalize errors after implementation.
++
++LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers remain pending until independently accepted; expected old Go failures permit only stage-four migration, not product or Gate PASS.
++
+ ## Verification, handoff, and checkpoints
+ 
+ CI is the independent acceptance judge. An agent's statement that tests pass is local evidence, not final Gate PASS.
+diff --git a/README.md b/README.md
+index 0587a52..7b52bd3 100644
+--- a/README.md
++++ b/README.md
+@@ -4,3 +4,5 @@ Monorepo for the milestone-gated implementation of the Loop 1 architecture basel
+ 
+ AI / coding agents must read [AGENTS.md](./AGENTS.md) first.
+ 
++
++Resolve [current architecture](spec/architecture/README.md), follow [execution constraints](spec/governance/execution-boundaries.md) and [independent Review](spec/governance/independent-review.md), and recover the unique current task before selecting work. Four-stage remediation currently suspends normal business progression; historical Auth acceptance does not prove new source compliance.
+diff --git a/spec/acceptance/s0-auth-user-friend.md b/spec/acceptance/s0-auth-user-friend.md
+index 921630a..1685361 100644
+--- a/spec/acceptance/s0-auth-user-friend.md
++++ b/spec/acceptance/s0-auth-user-friend.md
+@@ -12,3 +12,9 @@ These checks are executable requirements for the future canonical contract runne
+ | AUF-A-006 | Logout fixtures MUST assert Session and Refresh Token revocation plus WSS closure, while making no assertion that local client history is deleted. | Architecture Baseline v1.0, chapter 7.1. |
+ | AUF-A-007 | Security fixtures MUST reject tokens in URL query input and MUST assert that responses and captured structured logs contain no token or password material. | Architecture Baseline v1.0, chapter 7.4. |
+ | AUF-A-008 | Both backend profiles MUST run the same positive and negative fixtures and normalize to the same observable auth, friendship, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
++
++## Current implementation acceptance overlay
++
++Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
++
++Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/acceptance/s0-messaging.md b/spec/acceptance/s0-messaging.md
+index b96b894..4aa082d 100644
+--- a/spec/acceptance/s0-messaging.md
++++ b/spec/acceptance/s0-messaging.md
+@@ -12,3 +12,9 @@ These checks are executable requirements for the future canonical contract runne
+ | MSG-A-006 | Given a GROUP send, the runner MUST assert one logical Message and one Outbox event regardless of member count, with local online fan-out treated separately from persistence. | Architecture Baseline v1.0, chapter 5.3. |
+ | MSG-A-007 | Correctness fixtures MUST assert zero lost committed Messages, zero duplicate logical Messages, zero wrong-Conversation deliveries, zero permanent sequence gaps, and zero ACK-before-commit cases. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+ | MSG-A-008 | Both backend profiles MUST consume identical fixtures and normalize to the same ACK, idempotency, authorization, ordering, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
++
++## Current implementation acceptance overlay
++
++Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
++
++Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/acceptance/s0-sync-plugin.md b/spec/acceptance/s0-sync-plugin.md
+index 5c0a348..e23c317 100644
+--- a/spec/acceptance/s0-sync-plugin.md
++++ b/spec/acceptance/s0-sync-plugin.md
+@@ -17,3 +17,9 @@ These checks are executable requirements for the future canonical contract runne
+ | SP-A-011 | Lifecycle fixtures MUST assert that DISABLE preserves data, UNINSTALL defaults to RETAINED, and PURGE requires an explicit elevated, audited, retention-confirmed operation. | Architecture Baseline v1.0, chapter 9.3. |
+ | SP-A-012 | Golden fixtures MUST include duplicate, out-of-order, gap, and permission-denial cases and MUST normalize to identical Sync and Plugin outcomes across both backend profiles. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+ | SP-A-013 | Given repeated execution of the same Action, the runner MUST assert one idempotent observable outcome with no duplicate side effect and MUST retain audit evidence for every execution attempt. | Architecture Baseline v1.0, chapter 8.1. |
++
++## Current implementation acceptance overlay
++
++Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
++
++Stage-three effective checkers are pending; bind independently accepted exact commands before business activation. Existing Go compliance is unproven until stage four. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+diff --git a/spec/architecture/baseline.md b/spec/architecture/baseline.md
+index f208ee3..6ebd431 100644
+--- a/spec/architecture/baseline.md
++++ b/spec/architecture/baseline.md
+@@ -2,7 +2,7 @@
+ 
+ - baseline_title: 面向十万级在线连接的可扩展分布式即时通信平台
+ - version: `v1.1`
+-- status: Human-approved conflict resolution; candidate independent acceptance pending
++- status: Human-approved conflict resolution; stage-one bounded independent Review and hosted CI accepted
+ - canonical_format: `markdown`
+ - repository_path: `spec/architecture/frozen-architecture.md`
+ - sha256: `83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e`
+@@ -20,4 +20,4 @@
+ - approval_source: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md`
+ - baseline_date: 2026-09-30
+ 
+-The Markdown is the single current candidate canonical source under the explicitly approved revision. Independent review and applicable CI acceptance remain required before task closure. This revision tightens executable source ownership and governance semantics; it is NOT the historical representation-only migration. ADR-0002 and its original v1.0 migration facts are immutable history. The PDF remains the byte-for-byte immutable historical snapshot and is not a second current authority. No public wire, database, ACK/Sync, compatibility or security boundary is changed.
++The Markdown is the single current canonical source under the explicitly approved revision. Stage-one bounded acceptance: fresh Review of a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d and hosted run 36714913796 on exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md. This does not accept pending stages two through four, source compliance or remediation/S1 Gate. This revision tightens executable source ownership and governance semantics; it is NOT the historical representation-only migration. ADR-0002 and its original v1.0 migration facts are immutable history. The PDF remains the byte-for-byte immutable historical snapshot and is not a second current authority. No public wire, database, ACK/Sync, compatibility or security boundary is changed.
+diff --git a/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md b/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md
+index 0fcc538..a746cf0 100644
+--- a/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md
++++ b/spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md
+@@ -1,6 +1,6 @@
+ # ADR-0003: Whole-document architecture conflict resolution and executable service boundaries
+ 
+-Status: Human-approved bounded conflict resolution; candidate implementation pending independent acceptance.
++Status: Human-approved bounded conflict resolution; stage-one canonical revision independently accepted; downstream remediation pending.
+ Date: 2026-09-30
+ Approval source: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md; visible Human four-stage instruction and registered prompt P-ddf5a00c-27a1-412c-ad9b-2305e1aad734 (delegation plus exact approval excerpt, not complete Human prompt).
+ 
+@@ -23,3 +23,7 @@ semantic_change=true: source-boundary and governance ambiguity is tightened into
+ Four sequential tasks repair authority, execution constraints, effective checkers/CI, then Go implementation. Stage-one verifier preserves hash checks and replaces historical arrow/figure/format counts with section-bound graph/structure checks and negative controls. Stage three supplies product ownership/import/trigger tests; until stage four repairs old Go violations those are expected failures, never a permanent exception or product PASS. Java remains stage-appropriate and its future business boundaries are tested with fixtures.
+ 
+ Each bounded stage needs new independent Review and applicable CI. Final batch acceptance requires final candidate exact-head hosted CI, all applicable live regressions, no unresolved blocker and recovery checkpoint. Historical Auth acceptance remains valid for its old requirements. Rollback of this candidate is a new corrective commit/approved decision; do not rewrite historical source/evidence or discard Auth implementation. No data migration or public-wire migration is needed.
++
++## Actual bounded acceptance point
++
++Fresh stage-one Review accepted a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. Hosted run 36714913796 accepted exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md and task001 done. This discovery update preserves decision/approval/history. Stages002-004 and product/batch/S1 acceptance remain outstanding.
+diff --git a/spec/batches/LOOP1-ARCH-REMEDIATION.md b/spec/batches/LOOP1-ARCH-REMEDIATION.md
+index 779f3e8..48fa0cd 100644
+--- a/spec/batches/LOOP1-ARCH-REMEDIATION.md
++++ b/spec/batches/LOOP1-ARCH-REMEDIATION.md
+@@ -20,3 +20,7 @@ Human four-stage instruction dated 2026-09-30 authorizes bounded architectural c
+ Each uses a fresh implementation/fix context and a new independent Review Agent, one writer at a time. Task dependencies are exact and sequential. Real applicable CI remains required for closure; ADR-0001 is expired. Stages 1-3 may accept their bounded deliverables independently; stage 3 must prove rejection of the old Go layout and record its expected violations. That expected product failure does not block the authorized stage 4 migration, but is never Go compliance or overall Gate PASS and cannot become a permanent exception.
+ 
+ Batch PASS requires all four tasks done, no unresolved current architecture decision, product/structure/dependency/live integration/entrypoint/hosted CI all applicable checks passing on the final candidate, valid independent Review, current recovery and stable checkpoint. S1 product Gate remains separate and not yet passed. Only normal non-force push to dedicated task branches is authorized; no main push or merge.
++
++## Execution and Review inputs
++
++Read canonical §3/§10 SRC-01 through SRC-07/§11 and execution-boundaries.md; fresh reviewers use independent-review.md. Only current.md names unique Current Task. Historical Auth done persists; Social/Message/E2E stay suspended. Bind stage-three accepted exact checker commands into stage-four Verification before migration; its actual file/responsibility map precedes edits and its broad scope exits on batch completion. Stage001 bounded done at head3e6e89f/run36714913796 does not accept remaining stages.
+diff --git a/spec/batches/LOOP1-S0.md b/spec/batches/LOOP1-S0.md
+index f061c9e..b166106 100644
+--- a/spec/batches/LOOP1-S0.md
++++ b/spec/batches/LOOP1-S0.md
+@@ -29,3 +29,7 @@ Dependency order, not filename order, controls execution:
+ ## Completion
+ 
+ The batch completes only when every required task is `done`, the actual S0 Gate Checklist passes, no blocker remains, `spec/progress/current.md` is current, a Last Known Good Commit and stable checkpoint exist, the Frozen Architecture resolves from the repository index and verified manifest, and real CI is operational. Task filenames or local self-reported PASS results do not establish Stage PASS. S1 must not activate during this batch.
++
++## Current historical status
++
++Original bootstrap condition above is retained as history. LOOP1-CI-001 is operational and done, so ADR-0001 is expired and cannot substitute current hosted acceptance. Preserve historical S0 PASS; current remediation/later applicable tasks use exact-head hosted CI and fresh Review. S1 business waits for remediation batch PASS.
+diff --git a/spec/batches/LOOP1-S1.md b/spec/batches/LOOP1-S1.md
+index 9492790..ad91b19 100644
+--- a/spec/batches/LOOP1-S1.md
++++ b/spec/batches/LOOP1-S1.md
+@@ -10,7 +10,7 @@ ci_acceptance_required: true
+ 
+ # LOOP1-S1 Execution Manifest
+ 
+-S0 Gate PASS is the entry condition. Execute these architecture-listed tasks in dependency order:
++S0 Gate PASS and LOOP1-ARCH-REMEDIATION final batch PASS are current entry conditions. Historical Auth remains valid under old checks; Social/Message/E2E stay suspended until remediation finishes. Execute these architecture-listed tasks in dependency order:
+ 
+ 1. `LOOP1-GO-AUTH-001`
+ 2. `LOOP1-GO-SOCIAL-001`
+@@ -20,3 +20,5 @@ S0 Gate PASS is the entry condition. Execute these architecture-listed tasks in
+ Each task enters `ready` only after its listed dependencies and inputs are present, then `active` in a single writer context. A fresh independent reviewer and applicable real CI are required before `done`.
+ 
+ The S1 Gate passes only when the Go Auth -> Friend -> Direct -> Message chain works through the real TLS entrypoint with durable ACK, Outbox and NATS; contract, integration and end-to-end checks pass; all four tasks are `done`; recovery state and a stable checkpoint are current. S2 stays inactive until then.
++
++Business tasks read canonical §3/§10 SRC-01 through SRC-07/§11 and the execution/review guides, narrow paths by responsibility and require accepted source/import checks alongside behavior. Future Java task creation follows canonical §20 and TASK_TEMPLATE.md, never Go layout.
+diff --git a/spec/handoff/agent-context.md b/spec/handoff/agent-context.md
+index 8fc67b2..44ce689 100644
+--- a/spec/handoff/agent-context.md
++++ b/spec/handoff/agent-context.md
+@@ -23,3 +23,9 @@ After the independently accepted Research Recorder Instrumentation Epoch, regist
+ ## Checkpoints
+ 
+ Create a checkpoint for a stable Gate, important vertical slice, contract/schema version transition, release recovery point, or other important stable recovery state. A checkpoint records the commit (or `none` before the first commit), contract and migration versions when applicable, fixture/artifact versions when applicable, verified Gate state, and known limitations. `spec/progress/current.md` points to the latest checkpoint.
++
++## Current execution constraints
++
++Before business implementation read canonical §3/§10 SRC-01 through SRC-07/§11 and spec/governance/execution-boundaries.md. allowed_paths is never an architecture exemption; narrow ordinary scopes, explicitly authorize temporary migration maps and exit. Review uses spec/governance/independent-review.md for behavior, actual ownership, imports and minimality. Java future tasks derive from canonical §20 and the current task template, not Go layout.
++
++LOOP1-CI-001 is operational and done, so ADR-0001 is expired. Verify hosted candidate SHA and actual required job conclusions. Current four-stage remediation suspends Social/Message/E2E/Java/plugin business. Historical Auth done is retained under old checks; new structure remains unaccepted until stage four. The unique task in current.md controls resumption. Stage-three checkers are pending, not available proven checks; stage-three expected Go failures cannot close the batch or S1 Gate.
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 21db591..5b21204 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -6,7 +6,7 @@ Current Gate: LOOP1-ARCH-REMEDIATION
+ Gate Status: NOT YET PASSED (historical S0 PASS retained; S1 product Gate open)
+ Current Batch: LOOP1-ARCH-REMEDIATION
+ Current Task: LOOP1-ARCH-REMEDIATION-002
+-Current Task State: active
++Current Task State: review
+ 
+ ## Immediately Relevant Completed Work
+ 
+@@ -18,20 +18,23 @@ No blocking substantive architecture choice within audited scope. Stage002 D01 s
+ 
+ ## Verification
+ 
+-- Command: `gh run view 36714913796 --repo nilesthump/IM-platform --json headSha,status,conclusion,jobs,url`
+-  - Result: exact-head hosted success, all ten jobs completed success; stage-one bounded acceptance only.
+-  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md`
++- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
++  - Result: exit0, four integrity/semantic negative tests PASS; no canonical/PDF hash change.
++  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md`
+ - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+-  - Result: Coordinator first draft failed existing current.md section/schema requirements; corrected to exact required headings and LF transport, rerun PASS (task002 active, five queues, 20 tasks) before closure commit. Not acceptance.
+-  - Evidence: linked Coordinator Recorder `R-20260930T122736Z-79ec642d-7e56-49aa-be79-2cd91a9c7881` and stage-one hosted evidence directory.
++  - Result: exit0 during edits; task002 unique, queues5/tasks20; Development is not acceptance.
++  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md`
++- Command: `bundled Python spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/recovery-controls.py`
++  - Result: exit0; three disposable memory recovery negative controls and actual delta scope PASS. No source/import/trigger checker effectiveness claim.
++  - Evidence: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md`
+ 
+ ## Changed Files or Migrations
+ 
+-Stage-one current architecture/baseline/checker/control artifacts accepted; closure only adds hosted evidence, task001 done/task002 active, accepted checkpoint and linked Recorder. No product, contract, database migration, historical evidence or PDF change.
++Stage002 synchronized entry/handoff/template, existing backlog tasks/batches/acceptance, README, subordinate execution/review guides and current baseline/ADR0003 accepted discovery metadata under Coordinator narrow scope. D01 stage-two propagation candidate complete; independent Review pending. No product, contract, database migration, canonical body or historical evidence/PDF change.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-Four local Windows symlink subcase skips disclosed; hosted Linux test job succeeded. Original Recorder one raw/UTF-8 replacement limitation and partial interrupted transport run preserved; independent new Review trace verified. Recorder PASS is not acceptance. New Go structural rules still pending stage003; old layout must be repaired in stage004, not grandfathered.
++Historical stage001: four local Windows symlink subcase skips disclosed; its hosted Linux test job succeeded. Original Recorder one raw/UTF-8 replacement limitation and partial interrupted transport run preserved; independent new Review trace verified. Recorder PASS is not acceptance. New Go structural rules still pending stage003; old layout must be repaired in stage004, not grandfathered.
+ 
+ ## Last Known Good Commit
+ 
+@@ -43,12 +46,12 @@ Four local Windows symlink subcase skips disclosed; hosted Linux test job succee
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Coordinator /root owns only task001 closure, current/task002 activation/checkpoint and linked Recorder until commit. Original H:/IM-platform unknown files and separate Social worktree untouched. After commit fresh stage002 Implementation Agent receives sole write ownership.
++Fresh Implementation Agent /root/stage2_impl owns only stage002 candidate and its linked Recorder until commit; after commit releases sole writing ownership to Coordinator. Original H:/IM-platform unknown files and Social worktree untouched.
+ 
+ ## Next Exact Action
+ 
+-Fresh Implementation Agent: recover task002 and v1.1 SRC/dependency/review inputs, synchronize permitted execution constraints only, verify and submit candidate for new independent Review. Stages003/004 remain backlog; do not resume business.
++Coordinator delegates a new independent Review Agent on the committed stage002 candidate, verifies clean-checkout applicable checks and Reviewer independence, then obtains applicable exact-head hosted CI before bounded closure. Stage003/004 remain backlog; do not resume business.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01/I01 downstream changes pending.
++ADR-0003 bounded Human-authorized conflict resolution v1.1 accepted for stage-one deliverable. No known unresolved substantive choice within audited scope. ADR-0001 expired; D01 propagation implemented in stage002 candidate, independent acceptance and stage003 enforcement pending; I01 Go migration pending stage004.
+diff --git a/spec/tasks/TASK_TEMPLATE.md b/spec/tasks/TASK_TEMPLATE.md
+index 36c096b..5c4de3a 100644
+--- a/spec/tasks/TASK_TEMPLATE.md
++++ b/spec/tasks/TASK_TEMPLATE.md
+@@ -13,7 +13,8 @@ State one bounded outcome.
+ 
+ # Inputs
+ 
+-- List the exact architecture, approved ADR/frozen decision, domain, invariant, acceptance, and contract inputs.
++- Resolve/hash-check spec/architecture/README.md -> baseline.md -> canonical Markdown; list exact approved ADR, domain, invariant, acceptance and contract inputs.
++- Business tasks MUST read canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/minimality.md, execution-boundaries.md and independent-review.md. Java uses these same authorities, never Go layout.
+ 
+ # Dependencies
+ 
+@@ -21,11 +22,14 @@ State one bounded outcome.
+ 
+ # Allowed Paths
+ 
+-- `path/or/glob/**`
++- `backend/<language>/<responsible-service>/<task-area>/**` (replace with actual narrow paths)
++- List exact presently required assembly/build/test/support exceptions within SRC rules. allowed_paths is never an architecture waiver.
++- Temporary migration: name source/destination files, responsibility, approval, scope and acceptance exit before edits; unresolved conflicts escalate before implementation.
+ 
+ # Acceptance
+ 
+-- State independently verifiable outcomes.
++- State independently verifiable behavior plus applicable ownership, root whitelist and service/shared dependency outcomes.
++- Require fresh independent Review of actual responsibility/imports/minimality and hosted CI for exact candidate SHA/required jobs. Local or Recorder PASS is not acceptance; Task PASS is not Stage Gate PASS.
+ 
+ # Forbidden
+ 
+@@ -40,7 +44,9 @@ State one bounded outcome.
+ 
+ # Verification
+ 
+-- Record exact commands, expected results, and the minimum baseline verification.
++- Record exact available commands, expected results and minimum baseline verification, including frozen integrity and recovery.
++- Bind structural/dependency commands to independently accepted stage-three checkers before business activation; planned tools are not executable evidence.
++- List integration enable conditions/services; an unset-variable skip is unexecuted. Check each backend stage independently without requiring premature Java business or permanent exemptions.
+ 
+ # Evidence
+ 
+diff --git a/spec/tasks/active/LOOP1-ARCH-REMEDIATION-002.md b/spec/tasks/active/LOOP1-ARCH-REMEDIATION-002.md
+deleted file mode 100644
+index 3f1f480..0000000
+--- a/spec/tasks/active/LOOP1-ARCH-REMEDIATION-002.md
++++ /dev/null
+@@ -1,82 +0,0 @@
+----
+-task_id: LOOP1-ARCH-REMEDIATION-002
+-title: Synchronize execution constraints
+-status: active
+-owner: fresh Implementation Agent pending delegation
+-stage: S1 remediation 2/4
+-gate: LOOP1-ARCH-REMEDIATION
+----
+-
+-# Goal
+-
+-Synchronize execution constraints within the explicitly authorized four-stage remediation.
+-
+-# Inputs
+-
+-- User four-stage instruction; approval-and-recovery evidence for stage 1.
+-- spec/architecture/README.md -> baseline.md -> current Frozen Architecture, all approved ADRs; applicable §3/§10/§11/§12-14 and Minimality Contract.
+-- spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+-- spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+-
+-# Dependencies
+-
+-- LOOP1-ARCH-REMEDIATION-001 independently accepted bounded deliverable; no blocking architecture decision.
+-
+-# Allowed Paths
+-
+-- `AGENTS.md`
+-- `CLAUDE.md only if present`
+-- `spec/handoff/agent-context.md`
+-- `spec/tasks/TASK_TEMPLATE.md`
+-- `spec/tasks/backlog/**`
+-- `spec/tasks/ready/**`
+-- `spec/batches/**`
+-- `spec/acceptance/** only execution constraints`
+-- `spec/governance/**`
+-- `README.md and tools/** documentation only`
+-- `spec/tasks/**/LOOP1-ARCH-REMEDIATION-*.md`
+-- `spec/batches/LOOP1-ARCH-REMEDIATION.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/**`
+-- `spec/progress/checkpoints/*architecture-remediation*.md`
+-- `research/prompts/** and research/runs/** only this task-linked artifacts`
+-
+-User authority explicitly permits these task-control and bounded stage paths. Stage 4 backend/go/** is a one-time migration authorization, not an architecture exemption; it exits on batch completion. Normal later tasks must narrow paths. No unknown original-worktree files may be read or changed.
+-
+-# Acceptance
+-
+-New Agent can recover the unique current remediation task, responsibilities, allowed scope and acceptance. Active templates/tasks reference service ownership; allowed_paths never exempts authority; Java task source inherits boundaries. Reviewer checks behavior, ownership, imports and minimality. Preserve done tasks and historical evidence.
+-
+-# Forbidden
+-
+-- No changes to public HTTP/WSS/database/ACK/Sync/compatibility/security semantics or history; unresolved substantive decisions block their dependent portion.
+-- No future business, RPC, multi-module mandate, infrastructure, or broad abstraction expansion.
+-- No Go/Java product implementation edits.
+-- No self-acceptance, old-head CI substitution, main push, force push, remote deletion or automatic merge.
+-
+-# Minimality
+-
+-Use existing mechanisms and smallest presently necessary changes. Boundaries are existing responsibilities; no additional layers without a present justification.
+-
+-# Verification
+-
+-- Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+-- Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+-- Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+-
+-# Evidence
+-
+-- spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/ (pending independent acceptance).
+-
+-# Handoff
+-
+-- Base inherited 8cd90a7; last independently accepted Auth head 59d92f39234596a5b66841e8aa2ef7db0bf65e8a. Old Auth PASS retained, does not cover new rules.
+-- Sole writer is current fresh Implementation/Fix Agent; original and Social worktrees remain untouched.
+-
+-# Next Action
+-
+-- Wait for predecessor bounded independent acceptance, then activate in a fresh Implementation Agent context.
+-
+-# Activation
+-
+-Predecessor 001 bounded independent Review and exact-head hosted matrix accepted at 3e6e89f/run36714913796. No known blocking architecture decision. Inputs inspected and v1.1 integrity independently verified. Coordinator transitions backlog->ready->active in dependency order; fresh Implementation Agent must implement stage two only. New run-local Recorder .gitattributes blobs/** -text is authorized within task-linked research/runs/** before capture, preserving evidence transport. No business implementation authorized.
+diff --git a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-003.md b/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-003.md
+index df417f8..d47e54e 100644
+--- a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-003.md
++++ b/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-003.md
+@@ -18,6 +18,10 @@ Enforce architecture in CI and independent review within the explicitly authoriz
+ - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+ - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+ 
++# Execution Constraints
++
++Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
++
+ # Dependencies
+ 
+ - LOOP1-ARCH-REMEDIATION-002 independently accepted bounded deliverable; no blocking architecture decision.
+diff --git a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md b/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md
+index e307b86..84abd70 100644
+--- a/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md
++++ b/spec/tasks/backlog/LOOP1-ARCH-REMEDIATION-004.md
+@@ -18,6 +18,10 @@ Migrate Go responsibility packages and regress within the explicitly authorized
+ - spec/domain/, spec/invariants/, spec/acceptance/ and contracts/ for every affected responsibility. Contracts remain unchanged.
+ - spec/batches/LOOP1-ARCH-REMEDIATION.md; original Auth done task and accepted checkpoint.
+ 
++# Execution Constraints
++
++Apply spec/governance/execution-boundaries.md and spec/governance/independent-review.md, canonical §3/§10 SRC-01 through SRC-07/§11. allowed_paths does not waive responsibility/import rules. Boundaries are authority; neither Go implementation nor future Java layout can redefine them.
++
+ # Dependencies
+ 
+ - LOOP1-ARCH-REMEDIATION-003 independently accepted bounded deliverable; no blocking architecture decision.
+@@ -55,6 +59,9 @@ Use existing mechanisms and smallest presently necessary changes. Boundaries are
+ 
+ # Verification
+ 
++Before migration, bind exact commands/results from independently accepted stage003 evidence; publish the actual file/responsibility migration table before edits. Pending checker tools cannot be counted as executable PASS. The broad migration scope is a one-time authorization ending at batch completion; preserve behavioral fixtures and minimize exported APIs.
++
++
+ - Minimum entry point: `tools/verify-frozen-architecture.ps1`; execute with `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`; existing task/recovery checker in Development during edits and Acceptance from clean candidate.
+ - Execute acceptance-specific positive/negative checks; record exact commands, exit code, duration, environment, skips, SHA and reviewer independence.
+ - Fresh independent review plus applicable hosted CI; stage 3 transition evidence distinguishes checker PASS and expected product violations.
+diff --git a/spec/tasks/backlog/LOOP1-E2E-001.md b/spec/tasks/backlog/LOOP1-E2E-001.md
+index 548fd81..197fbac 100644
+--- a/spec/tasks/backlog/LOOP1-E2E-001.md
++++ b/spec/tasks/backlog/LOOP1-E2E-001.md
+@@ -13,12 +13,16 @@ Prove A can log in, search/add B, obtain the unique DIRECT Conversation, send `h
+ 
+ # Inputs
+ 
+-- Frozen Architecture v1.0 chapters 5, 7, 11, 15, 19 and appendix A; approved ADRs and Minimality Contract.
++- Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus §3/§10 SRC-01 through SRC-07/§11/§12-14; approved ADRs and Minimality Contract.
+ - Canonical HTTP, WSS, Sync, error, fixture and database contracts; accepted Go Auth/Social/Message implementations.
+ 
++# Execution Constraints
++
++Read spec/governance/execution-boundaries.md and independent-review.md. allowed_paths never exempts ownership/import direction. Before activation bind these responsibility paths to the actual accepted stage-four layout and any presently required exact assembly file. Coordinator must amend paths before edits if actual file names differ; no duplicate alternate packages or unapproved root/shared business. Canonical fixtures remain sole expectations.
++
+ # Dependencies
+ 
+-- `LOOP1-GO-MSG-001` done; S0 Gate PASS.
++- `LOOP1-GO-MSG-001` done; S0 Gate PASS; LOOP1-ARCH-REMEDIATION batch PASS with final source/dependency/hosted acceptance.
+ 
+ # Allowed Paths
+ 
+@@ -36,6 +40,8 @@ Prove A can log in, search/add B, obtain the unique DIRECT Conversation, send `h
+ - End-to-end retries, authorization, revocation, transaction rollback, Outbox/NATS delivery, and contract outcomes preserve the S1 correctness red lines.
+ - Clean-checkout integration/E2E checks, independent review, and applicable real CI pass; S1 Gate evidence is durable and a stable checkpoint exists.
+ 
++- Applicable source/root/dependency checks pass; independent Review inspects actual behavior/responsibilities/imports/minimality. Java inherits canonical boundaries, not these Go paths.
++
+ # Forbidden
+ 
+ - Rewrite contracts, migrations, or product semantics to make E2E pass; introduce client UI, Java implementation, or future-stage infrastructure.
+@@ -48,6 +54,8 @@ Exercise the accepted Go path with a direct fixture-driven harness; add only tes
+ 
+ - Run Go profile Compose and E2E over real TLS plus all S1 contract/integration checks; evaluate the S1 Gate checklist on a clean integrated candidate.
+ 
++- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
++
+ # Evidence
+ 
+ - Pending activation after Go Message acceptance.
+@@ -58,4 +66,4 @@ Exercise the accepted Go path with a direct fixture-driven harness; add only tes
+ 
+ # Next Action
+ 
+-- Promote only when `LOOP1-GO-MSG-001` is independently accepted and `done`.
++- Remain backlog until remediation batch PASS; then promote only when `LOOP1-GO-MSG-001` is independently accepted and `done`.
+diff --git a/spec/tasks/backlog/LOOP1-GO-MSG-001.md b/spec/tasks/backlog/LOOP1-GO-MSG-001.md
+index adc87be..fc80efe 100644
+--- a/spec/tasks/backlog/LOOP1-GO-MSG-001.md
++++ b/spec/tasks/backlog/LOOP1-GO-MSG-001.md
+@@ -13,17 +13,23 @@ Implement one logical text Message per authorized send with Conversation sequenc
+ 
+ # Inputs
+ 
+-- Frozen Architecture v1.0 chapters 2, 4, 5, 7, 8, 11, 19 and appendix B; approved ADRs and Minimality Contract.
++- Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus §3/§10 SRC-01 through SRC-07/§11/§12-14; approved ADRs and Minimality Contract.
+ - `spec/domain/messaging.md`, `spec/invariants/messaging.md`, `spec/acceptance/s0-messaging.md`.
+ - Canonical WSS/error/fixture, Sync and database contracts in `contracts/`.
+ 
++# Execution Constraints
++
++Read spec/governance/execution-boundaries.md and independent-review.md. allowed_paths never exempts ownership/import direction. Before activation bind these responsibility paths to the actual accepted stage-four layout and any presently required exact assembly file. Coordinator must amend paths before edits if actual file names differ; no duplicate alternate packages or unapproved root/shared business. Canonical fixtures remain sole expectations.
++
+ # Dependencies
+ 
+-- `LOOP1-GO-SOCIAL-001` done; S0 Gate PASS.
++- `LOOP1-GO-SOCIAL-001` done; S0 Gate PASS; LOOP1-ARCH-REMEDIATION batch PASS with final source/dependency/hosted acceptance.
+ 
+ # Allowed Paths
+ 
+-- `backend/go/**`
++- `backend/go/core/message/**`
++- `backend/go/core/outbox/**`
++- `backend/go/gateway/** only WSS forwarding/local fan-out/connection handling and related tests`
+ - Go messaging integration tests under `tests/go/**`
+ - `spec/tasks/**/LOOP1-GO-MSG-001.md`
+ - `spec/progress/current.md`
+@@ -38,6 +44,8 @@ Implement one logical text Message per authorized send with Conversation sequenc
+ - Dispatcher/NATS duplication cannot create duplicate logical Messages or client materialization; Sync closes missed-delivery gaps. One GROUP send stays one Message and Outbox event.
+ - Canonical fixtures, fault-injection integration tests, independent review, and applicable real CI pass.
+ 
++- Applicable source/root/dependency checks pass; independent Review inspects actual behavior/responsibilities/imports/minimality. Java inherits canonical boundaries, not these Go paths.
++
+ # Forbidden
+ 
+ - Weaken ACK/idempotency/order/authorization rules, make NATS the source of truth, change contracts/migrations, or implement clients/Java/future-stage mechanisms.
+@@ -50,6 +58,8 @@ Use the existing PostgreSQL transaction and Outbox/NATS skeleton directly; add n
+ 
+ - Run WSS fixtures and Go messaging integration tests for rollback, ACK timing, duplicate retry/delivery, sequence and wrong-Conversation rejection; run recovery and architecture checks.
+ 
++- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
++
+ # Evidence
+ 
+ - Pending activation after Go Social acceptance.
+@@ -60,4 +70,4 @@ Use the existing PostgreSQL transaction and Outbox/NATS skeleton directly; add n
+ 
+ # Next Action
+ 
+-- Promote only when `LOOP1-GO-SOCIAL-001` is independently accepted and `done`.
++- Remain backlog until remediation batch PASS; then promote only when `LOOP1-GO-SOCIAL-001` is independently accepted and `done`.
+diff --git a/spec/tasks/backlog/LOOP1-GO-SOCIAL-001.md b/spec/tasks/backlog/LOOP1-GO-SOCIAL-001.md
+index 84e3924..2621cce 100644
+--- a/spec/tasks/backlog/LOOP1-GO-SOCIAL-001.md
++++ b/spec/tasks/backlog/LOOP1-GO-SOCIAL-001.md
+@@ -13,17 +13,25 @@ Implement Go user search, immediate bidirectional friendship, and unique DIRECT
+ 
+ # Inputs
+ 
+-- Frozen Architecture v1.0 chapters 2, 4, 7, 11, 19 and appendix B; approved ADRs and Minimality Contract.
++- Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus §3/§10 SRC-01 through SRC-07/§11/§12-14; approved ADRs and Minimality Contract.
+ - `spec/domain/auth-user-friend.md`, `spec/invariants/auth-user-friend.md`, `spec/acceptance/s0-auth-user-friend.md`.
+ - Canonical HTTP/error/fixture, database and Sync contracts in `contracts/`.
+ 
++# Execution Constraints
++
++Read spec/governance/execution-boundaries.md and independent-review.md. allowed_paths never exempts ownership/import direction. Before activation bind these responsibility paths to the actual accepted stage-four layout and any presently required exact assembly file. Coordinator must amend paths before edits if actual file names differ; no duplicate alternate packages or unapproved root/shared business. Canonical fixtures remain sole expectations.
++
+ # Dependencies
+ 
+-- `LOOP1-GO-AUTH-001` done; S0 Gate PASS.
++- `LOOP1-GO-AUTH-001` done; S0 Gate PASS; LOOP1-ARCH-REMEDIATION batch PASS with final source/dependency/hosted acceptance.
+ 
+ # Allowed Paths
+ 
+-- `backend/go/**`
++- `backend/go/core/user/**`
++- `backend/go/core/friend/**`
++- `backend/go/core/conversation/**`
++- `backend/go/core/sync/**`
++- `backend/go/core/outbox/**`
+ - Go social integration tests under `tests/go/**`
+ - `spec/tasks/**/LOOP1-GO-SOCIAL-001.md`
+ - `spec/progress/current.md`
+@@ -38,6 +46,8 @@ Implement Go user search, immediate bidirectional friendship, and unique DIRECT
+ - Immediate bidirectional friendship is observable; no pending approval flow is exposed.
+ - Integration and canonical fixture checks pass; fresh independent review and applicable real CI accept the candidate.
+ 
++- Applicable source/root/dependency checks pass; independent Review inspects actual behavior/responsibilities/imports/minimality. Java inherits canonical boundaries, not these Go paths.
++
+ # Forbidden
+ 
+ - Change public contracts or database invariants; add approval flow, messaging implementation, Java/client behavior, or speculative infrastructure.
+@@ -50,6 +60,8 @@ Use the canonical uniqueness constraints and one direct transaction path; no ext
+ 
+ - Run Go social contract/integration tests including concurrent reverse-order add and rollback, plus recovery and architecture checks.
+ 
++- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
++
+ # Evidence
+ 
+ - Pending activation after Go Auth acceptance.
+@@ -60,4 +72,4 @@ Use the canonical uniqueness constraints and one direct transaction path; no ext
+ 
+ # Next Action
+ 
+-- Promote only when `LOOP1-GO-AUTH-001` is independently accepted and `done`.
++- Remain backlog until remediation batch PASS; then promote only when `LOOP1-GO-AUTH-001` is independently accepted and `done`.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-cee6fb38-f577-472c-9833-9b0d0f396022/metadata.json
+# ?? research/prompts/P-cee6fb38-f577-472c-9833-9b0d0f396022/prompt.txt
+# ?? research/prompts/stage2-implementation-delegation.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/.gitattributes
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-0010ac08-1674-4ba3-9ec0-c3ca6a165c15.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-0010ac08-1674-4ba3-9ec0-c3ca6a165c15.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-191a6c95-9e34-426f-b8b7-2bffd4897f5a.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-191a6c95-9e34-426f-b8b7-2bffd4897f5a.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-28840398-dba0-43fb-9e4e-d0fa693fe12b.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-28840398-dba0-43fb-9e4e-d0fa693fe12b.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-4b054e66-811e-41e7-b4ed-c5f0f8322669.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-4b054e66-811e-41e7-b4ed-c5f0f8322669.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-67511f9c-16f6-4af8-b3f5-6248ff4370e8.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-67511f9c-16f6-4af8-b3f5-6248ff4370e8.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-824974c0-4a50-47e3-b9fa-a2dd30d63144.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-824974c0-4a50-47e3-b9fa-a2dd30d63144.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-85b380e1-2aad-4b2d-8916-fe6c72f9aa1b.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-85b380e1-2aad-4b2d-8916-fe6c72f9aa1b.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-b3c7beb1-779c-429f-9cf3-e0adf219ea46.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-b3c7beb1-779c-429f-9cf3-e0adf219ea46.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-ce24fb70-4a75-4d59-88b1-bead68e403d4.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-ce24fb70-4a75-4d59-88b1-bead68e403d4.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-d9d2d67a-c053-4542-b050-1f51a7faaecd.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-d9d2d67a-c053-4542-b050-1f51a7faaecd.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-e3d1f29c-680a-4ef6-8c42-67598a7c6ea5.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-e3d1f29c-680a-4ef6-8c42-67598a7c6ea5.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-f0a448fe-8060-47f1-b69d-be3e08c35ce6.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-f0a448fe-8060-47f1-b69d-be3e08c35ce6.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-faff89c3-172a-4beb-b9ea-7d59321066ce.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-faff89c3-172a-4beb-b9ea-7d59321066ce.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-ffa613d7-e202-4861-8cc8-27dd525b7822.stderr.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/blobs/C-ffa613d7-e202-4861-8cc8-27dd525b7822.stdout.txt
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/events.jsonl
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/initial_state.json
+# ?? research/runs/R-20260930T124045Z-bb6d4855-0e9d-45ba-8b8c-62830da56365/metadata.json
+# ?? spec/governance/execution-boundaries.md
+# ?? spec/governance/independent-review.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/implementation-evidence.md
+# ?? spec/progress/evidence/LOOP1-ARCH-REMEDIATION-002/recovery-controls.py
+# ?? spec/tasks/review/LOOP1-ARCH-REMEDIATION-002.md
