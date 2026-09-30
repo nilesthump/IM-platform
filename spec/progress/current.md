@@ -7,7 +7,7 @@ Gate Status: OPEN (remediation and integration PASS; Social acceptance unresolve
 Current Batch: LOOP1-S1
 Current Task: LOOP1-GO-SOCIAL-001
 Current Task State: backlog
-Execution Status: ACCEPTANCE_CONTEXT_REVIEW_PENDING; no product writer
+Execution Status: BLOCKED_BY_ARCHITECTURE; no product writer
 
 ## Immediately Relevant Completed Work
 
@@ -15,13 +15,17 @@ Remediation PR2 ordinary merged279c1dc. Fresh independent a9f1393 ReviewPASS, ac
 
 ## Current Blockers
 
-Social canonical friend-add-authorization-denied requires authenticated insufficient-scope principal/403, but current six-claim JWT and implicit-caller friend PUT expose no such authorization context. Old candidate discloses it was not executed. Fresh independent assessment pending. No new public contract/security model or fixture waiver is authorized. Backlog remains until prerequisite acceptance context resolved.
+Social canonical friend-add-authorization-denied requires authenticated insufficient-scope principal/403, but current six-claim JWT and implicit-caller friend PUT expose no such authorization context. Old candidate discloses it was not executed. Fresh independent assessment confirms no approved executable context; bounded report archived in Social evidence. No new public contract/security model or fixture waiver is authorized. Backlog remains until prerequisite acceptance context resolved.
 
 ## Verification
 
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: Actual merged main279c1dc cleanPASS/stateintegrationreview; frozen verifierPASS34controls0skip/sourceallPASS0violations; actual main36764254107 and PR36763289936 all13SUCCESS. These test the accepted merge, not subsequent recovery-control bytes; new controls will be separately verified.
+  - Result: Actual merged main279c1dc cleanPASS/stateintegrationreview; frozen verifierPASS34controls0skip/sourceallPASS0violations; actual main36764254107 and PR36763289936 all13SUCCESS. These test the accepted merge, not subsequent recovery-control bytes; recovery01765 clean Acceptance PASS/actualCI36765878057 all13SUCCESS; no Social business acceptance.
   - Evidence: `spec/progress/evidence/LOOP1-REMEDIATION-INTEGRATION-001/merged-acceptance.md`
+
+- Command: pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; bundled Python3 ci/check_architecture.py --scope governance --json; git diff --check
+  - Result: Final blocked-handoff precommit checks exit0; Development output is not acceptance. Clean committed metadata and hostedCI evidence are external run history, separate from Social acceptance.
+  - Evidence: spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-blocked-handoff.md and 2026-10-01-independent-context-commands.json
 
 ## Changed Files or Migrations
 
@@ -33,7 +37,7 @@ Prior1ccb recovery/CI FAIL preserved and repaired by freshFix/newReview. Histori
 
 ## Next Exact Action
 
-Fresh independent Social acceptance-context review on clean committed controlcandidate. Resolve smallest authority/contract question if confirmed, then readiness/activation/mapped freshImplementation->Review->realCI. Do not bypass fixture or activate Message/E2E/Java/client/plugin/S2. No automaticSocialPRmerge.
+Architect must supply an already approved authenticated credential/ownership context producing required403 for friend PUT, or explicitly approve contract/authorization clarification. Until then retain unique Social backlog/BLOCKED_BY_ARCHITECTURE. After input resolution: readiness/activation/fresh mappedImplementation->Review->realCI. Do not bypass fixture or activate Message/E2E/Java/client/plugin/S2. No automaticSocialPRmerge.
 
 ## Last Known Good Commit
 
@@ -41,12 +45,12 @@ Fresh independent Social acceptance-context review on clean committed controlcan
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-remediation-integrated.md`
+`spec/progress/checkpoints/2026-10-01-loop1-go-social-001-blocked.md`
 
 ## Uncommitted Changes / Ownership
 
-/root Coordinator owns only new Social recovery-control and finite integration closure files until ordinarycommit; no product writer. OldSocial5b35735/Auth/remediation/original worktrees preserved. Actualmainclean279c1dc. New review writes externalonly. Stage004 migration scope expired; Social writes require ready/active and exact boundscope.
+/root Coordinator owns only new bounded blocked-handoff/evidence/task/current/checkpoint files through ordinarycommit; after clean commit ownership is released; no product writer. Candidate01765 committed/pushed; final metadata is separately verified. OldSocial5b35735/Auth/remediation/original worktrees preserved. Actualmainclean279c1dc. Independent reviewer released all writes; report archived. Stage004 migration scope expired; Social writes require ready/active and exact boundscope.
 
 ## Architecture Conflicts / ACP / ADR
 
-Potential unconstructible canonical403 authorization context under independent review; no new decision approved. Human2026-10-01 authorizes integration/Social restoration but explicitly excludes publiccontract/security-boundary changes. If confirmed markBLOCKED_BY_ARCHITECTURE, keep unmet readiness and ask smallest existing-authority/contract clarification.
+Confirmed BLOCKED_BY_ARCHITECTURE: unconstructible canonical403 authorization context; no new decision approved. Human2026-10-01 authorizes integration/Social restoration but explicitly excludes publiccontract/security-boundary changes. Unmet readiness retained; exact smallest authority question in Social2026-10-01-blocked-handoff.md.

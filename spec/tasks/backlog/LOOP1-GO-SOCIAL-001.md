@@ -69,11 +69,11 @@ Recovery/old-to-current file map: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/20
 
 # Handoff
 
-S0PASS/Authdone/remediationPASS/integrationdone dependencies verified; new clean restoration branch task/LOOP1-GO-SOCIAL-001-v1.1 from actualaccepted merge279c1dc. Old Social clean5b35735 intentionally paused and no active writer observed. Do not merge old AGENTS/current/task/package-main structure. Current Task remains backlog because required acceptance input is not executable: friend-add-authorization-denied presupposes insufficient-scope authenticated principal, absent from current six-claim JWT/implicit-caller PUT ownership. Fresh independent context must assess; Coordinator does not invent model or waive fixture.
+S0PASS/Authdone/remediationPASS/integrationdone dependencies verified; new clean restoration branch task/LOOP1-GO-SOCIAL-001-v1.1 from actualaccepted merge279c1dc. Old Social clean5b35735 intentionally paused and no active writer observed. Do not merge old AGENTS/current/task/package-main structure. Current Task remains backlog because required acceptance input is not executable: friend-add-authorization-denied presupposes insufficient-scope authenticated principal, absent from current six-claim JWT/implicit-caller PUT ownership. Fresh independent context confirms BLOCKED_BY_ARCHITECTURE; report and blocked-handoff archived under Social evidence. Recovery01765 cleanAcceptancePASS/CI36765878057 all13SUCCESS; no Social TaskPASS. Coordinator does not invent model or waive fixture.
 
 # Next Action
 
-Independent acceptance-context reviewer reads canonical credential/ownership contracts and old candidate, verifies whether an existing approved input can produce required403. If none, record BLOCKED_BY_ARCHITECTURE and smallest Architect decision; no contract or acceptance changes under this request. Only after approved constructible inputs complete backlog->ready->active and delegate fresh mapped Implementation, fresh Review/real hostedCI. No Message/E2E/Java/client/plugin/S2 and no automatic Social PR merge.
+Architect must supply an already approved authenticated credential/ownership context producing required403 for PUT /v1/friends/{friendUserId}, or explicitly approve contract/authorization clarification. BLOCKED_BY_ARCHITECTURE confirmed; no contract or acceptance changes under this request. Only after approved constructible inputs complete backlog->ready->active and delegate fresh mapped Implementation, fresh Review/real hostedCI. No Message/E2E/Java/client/plugin/S2 and no automatic Social PR merge.
 
 # Last Known Good Commit
 
