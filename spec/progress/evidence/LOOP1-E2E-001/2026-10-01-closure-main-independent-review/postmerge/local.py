@@ -1,0 +1,5 @@
+from pathlib import Path
+import subprocess,json,hashlib
+r=Path.cwd();out=Path('H:/.codex/evidence/s1-closure-review/postmerge');assert subprocess.check_output(['git','rev-parse','HEAD']).decode().strip()=='dd24a9c65a36dd775ca68ae7847c2c283b6f348f';assert not subprocess.check_output(['git','status','--porcelain']).strip();assert subprocess.check_output(['git','rev-parse','HEAD^{tree}']).decode().strip()==subprocess.check_output(['git','rev-parse','cb2cf431^{tree}']).decode().strip()
+for p,h in [('spec/architecture/frozen-architecture.md','83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e'),('scalable-distributed-im-architecture.pdf','546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510')]:assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h
+b=subprocess.check_output(['C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe','-B','ci/check_architecture.py','--scope','all','--json']);(out/'sourceall.json').write_bytes(b);j=json.loads(b);print('clean exactmain treeequal/hash/sourceall PASS',list(j.keys()))

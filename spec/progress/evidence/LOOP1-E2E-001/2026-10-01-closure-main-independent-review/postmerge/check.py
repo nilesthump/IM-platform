@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,subprocess,time
+r=Path('H:/.codex/evidence/s1-closure-review/postmerge');t=str(time.time_ns());head='dd24a9c65a36dd775ca68ae7847c2c283b6f348f'
+def api(path,name):
+ b=subprocess.check_output(['gh','api','repos/nilesthump/IM-platform/'+path]);(r/(name+'-'+t+'.json')).write_bytes(b);return json.loads(b)
+pr=api('pulls/5','pr5');main=api('git/ref/heads/main','main');c=api('git/commits/'+head,'main-commit');old=api('pulls/4','pr4');assert pr['merged'] and pr['merge_commit_sha']==head and main['object']['sha']==head;assert [p['sha'] for p in c['parents']]==['b442acd26777c481620a6bd917863cebfaf79b35','cb2cf431a59e0318a1163073a1c76432135c86d9'];assert c['tree']['sha']=='7d54c2dc83f964dd159a608fbf2d6ec34d414043';runs=api('actions/runs?branch=main&event=push&per_page=10','runs');run=next(x for x in runs['workflow_runs'] if x['head_sha']==head);job=api('actions/runs/'+str(run['id'])+'/jobs?per_page=100','jobs');d={x['name']:(x['status'],x['conclusion']) for x in job['jobs']};req={'classify','architecture','source_go','source_java','gate','go','java','web','desktop','mobile','shared','compatibility','deploy'};ok=set(d)==req and all(d[x]==('completed','success') for x in req);s={'result':'PASS' if ok else 'PENDING','sha':head,'run':run['id'],'tree':c['tree']['sha'],'parents':[p['sha'] for p in c['parents']],'jobs':d,'pr4':{k:old[k] for k in ['state','merged','merged_at','merge_commit_sha']},'raw_suffix':t};(r/('summary-'+t+'.json')).write_text(json.dumps(s,indent=2));print(s)
+

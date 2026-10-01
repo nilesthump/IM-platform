@@ -1,0 +1,144 @@
+
+1:# 面向十万级在线连接的可扩展分布式即时通信平台
+7:## 决策状态
+23:## 目录
+115:## 0. 执行摘要
+161:## 1. 项目目标、成功定义与边界
+164:### 1.1 目标
+177:### 1.2 Loop 1 成功定义
+189:### 1.3 非目标与延后项
+198:## 2. 冻结架构原则与变更治理
+214:### 2.1 Frozen Architecture 变更协议
+223:### 2.2 权威顺序
+238:## 3. 系统总体架构与部署单元
+267:### 3.1 三个物理部署单元
+276:### 3.2 运行 profile
+280:# gateway-go + core-go + plugin-host-go adapter + shared PostgreSQL/NATS/TLS
+282:# gateway-java + core-java + plugin-host adapter + same canonical schema/contracts
+288:### 3.3 Loop 1 单机部署
+299:## 4. 领域模型与业务不变量
+327:### 4.1 账号与 Session
+337:### 4.2 好友与唯一私聊
+346:### 4.3 群聊最小实现
+351:### 4.4 消息身份与序号
+361:## 5. 消息写入、Outbox 与实时 fan-out
+387:### 5.1 发送事务
+401:### 5.2 NATS 与 Gateway fan-out
+416:### 5.3 群聊 fan-out
+425:## 6. 客户端状态、本地存储与离线同步
+428:### 6.1 三端差异
+437:### 6.2 Optimistic write 与状态机
+453:### 6.3 SQLite 事务不变量
+475:### 6.4 双层 Cursor
+480:## 7. HTTPS/WSS/TLS 与认证协议
+483:### 7.1 登录与 Token
+494:### 7.2 WSS 状态机
+503:### 7.3 Session 缓存一致性
+508:### 7.4 传输与日志安全
+519:## 8. 插件平台架构
+522:### 8.1 包结构与公共 API
+544:### 8.2 Custom Render Bundle
+553:### 8.3 WASM 后端 Sandbox
+564:## 9. 插件版本、热插拔与回滚
+585:### 9.1 安装
+593:### 9.2 升级与双版本共存
+598:### 9.3 Disable / Uninstall / Purge
+607:### 9.4 官方兼容 fixtures
+612:## 10. Monorepo 与规范控制面
+651:### 服务源码与依赖规则（Go / Java 共同适用）
+662:### 10.1 spec/ 各目录的职责
+676:## 11. 公共契约与双后端实现
+679:### 11.1 唯一权威
+684:### 11.2 等价而非同构
+692:### 11.3 Golden Contract Tests
+702:### 11.4 数据库迁移
+707:## 12. AI Development Loop
+725:### 12.1 Task Spec 模板
+751:### 12.2 状态队列
+761:### 12.3 Git 工作模式
+766:## 13. Agent 启动与交接协议
+769:### 13.1 强制读取顺序
+782:### 13.2 Handoff 必填项
+795:### 13.3 Checkpoint 规则
+804:## 14. CI/CD 独立校验架构
+831:### 14.1 路径感知规则
+844:### 14.2 流水线层次
+851:### 14.3 兼容矩阵
+856:### 14.4 CI 与 Agent 的信任边界
+861:## 15. Loop 1: 12 周预算、里程碑门禁驱动
+892:## 16. Loop 1 性能与可靠性验收
+895:### 16.1 固定环境与连接定义
+907:### 16.2 必测场景
+919:### 16.3 观测指标
+924:### 16.4 Gate 判定
+931:## 17. Release、迁移与回滚规则
+934:### 17.1 Release Manifest
+948:### 17.2 发布规则
+961:### 17.3 数据库迁移
+971:### 17.4 回滚
+976:### 17.5 发布失败判定
+981:## 18. 可观测性、安全与运维基线
+984:### 18.1 关联标识
+989:### 18.2 健康与就绪
+998:### 18.3 安全清单
+1011:### 18.4 告警优先级
+1016:## 19. 第一批 Agent 可执行任务
+1040:## 20. 后续任务队列与依赖
+1060:### 20.1 依赖纪律
+1071:## 21. Agent 首日执行清单
+1074:### 21.1 第 0-2 小时
+1084:### 21.2 第一个实现回合
+1093:### 21.3 Agent 的停止条件
+1108:## 附录 A. Gate Checklist
+1133:## 附录 B. 冻结不变量速查
+spec/acceptance\s0-sync-plugin.md:25:Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+spec/batches\LOOP1-S1.md:2:batch_id: LOOP1-S1
+spec/batches\LOOP1-S1.md:4:stage: S1
+spec/batches\LOOP1-S1.md:11:# LOOP1-S1 Execution Manifest
+spec/batches\LOOP1-S1.md:13:S0 Gate PASS and LOOP1-ARCH-REMEDIATION final batch PASS are current entry conditions. Historical Auth remains valid under old checks; Social/Message/E2E stay suspended until remediation finishes. Execute these architecture-listed tasks in dependency order:
+spec/batches\LOOP1-S1.md:15:1. `LOOP1-GO-AUTH-001`
+spec/batches\LOOP1-S1.md:16:2. `LOOP1-GO-SOCIAL-001`
+spec/batches\LOOP1-S1.md:17:3. `LOOP1-GO-MSG-001`
+spec/batches\LOOP1-S1.md:22:The S1 Gate passes only when the Go Auth -> Friend -> Direct -> Message chain works through the real TLS entrypoint with durable ACK, Outbox and NATS; contract, integration and end-to-end checks pass; all four tasks are `done`; recovery state and a stable checkpoint are current. S2 stays inactive until then.
+spec/acceptance\s0-auth-user-friend.md:20:Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+spec/batches\LOOP1-S0.md:31:The batch completes only when every required task is `done`, the actual S0 Gate Checklist passes, no blocker remains, `spec/progress/current.md` is current, a Last Known Good Commit and stable checkpoint exist, the Frozen Architecture resolves from the repository index and verified manifest, and real CI is operational. Task filenames or local self-reported PASS results do not establish Stage PASS. S1 must not activate during this batch.
+spec/batches\LOOP1-S0.md:35:Original bootstrap condition above is retained as history. LOOP1-CI-001 is operational and done, so ADR-0001 is expired and cannot substitute current hosted acceptance. Preserve historical S0 PASS; current remediation/later applicable tasks use exact-head hosted CI and fresh Review. S1 business waits for remediation batch PASS.
+spec/acceptance\s0-messaging.md:20:Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+spec/batches\LOOP1-ARCH-REMEDIATION.md:4:stage: S1 remediation
+spec/batches\LOOP1-ARCH-REMEDIATION.md:17:3. LOOP1-ARCH-REMEDIATION-003: effective ownership/import/task/trigger/Gate checks with positive and negative fixtures.
+spec/batches\LOOP1-ARCH-REMEDIATION.md:20:Each uses a fresh implementation/fix context and a new independent Review Agent, one writer at a time. Task dependencies are exact and sequential. Real applicable CI remains required for closure; ADR-0001 is expired. Stages 1-3 may accept their bounded deliverables independently; stage 3 must prove rejection of the old Go layout and record its expected violations. That expected product failure does not block the authorized stage 4 migration, but is never Go compliance or overall Gate PASS and cannot become a permanent exception.
+spec/batches\LOOP1-ARCH-REMEDIATION.md:22:Batch PASS requires all four tasks done, no unresolved current architecture decision, product/structure/dependency/live integration/entrypoint/hosted CI all applicable checks passing on the final candidate, valid independent Review, current recovery and stable checkpoint. S1 product Gate remains separate and not yet passed. Only normal non-force push to dedicated task branches is authorized; no main push or merge.
+spec/batches\LOOP1-ARCH-REMEDIATION.md:30:Tasks001-003 done;004 remainsreview due CAPABILITY_BLOCKED_SUBAGENTS final administrative Review (agent thread limit reached). Product remediation acceptance PASS is independently reviewed d0ae52f5615320790ae7039cb48831873de6f486 / hosted36744072690; current authority/source/behavior/live regression evidence is linked in evidence004/final-hosted-acceptance.md. No known current architecture blocker within audited coverage. Final batch administrative closure is pending a NEW independent Review and exact-head hosted acceptance of this documentation/evidence candidate; do not claim that pending run passed. Final capture location: H:/.codex/worktrees/architecture-remediation/final-acceptance-research. S1 product Gate remains OPEN, original Auth historical PASS retained, no Social/Message/Java/plugin activation.
+spec/batches\LOOP1-ARCH-REMEDIATION.md:36:Status: PASS for four-stage remediation only; tasks001-004 done. No known blocking architecture conflict within the full audit coverage. NEW independent CLI Review exactf4fdd82f8f3179034fb74700c1b4e9aa43e4637e and hosted36749210695 SUCCESS (five required successes/eight inactive skips), plus product d0ae52f independent Review/hosted36744072690 SUCCESS. The final state-record commit requires NEW independent Review and exact-head hosted confirmation before final delivery, captured externally at H:/.codex/worktrees/architecture-remediation/final-acceptance-research/final-acceptance-summary.json. S1 product Gate OPEN; no downstream business activated. Earlier quota/pending paragraphs are historical, superseded by actual new CLI independence and CI. Both one-time broad migration and administrative scopes expired.
+ M spec/progress/current.md
+ D spec/tasks/review/LOOP1-E2E-001.md
+ spec/progress/current.md           |  36 +++++-------
+ spec/tasks/review/LOOP1-E2E-001.md | 113 -------------------------------------
+ 2 files changed, 15 insertions(+), 134 deletions(-)
+6346f39 Record E2E development evidence and hand off clean review candidate
+7a980ca Verify Go S1 messaging through strict TLS and wire existing CI
+0d4df7a Activate approved S1 TLS E2E and bind exact CI scope
+b51e62a Archive independent recovery acceptance and record pending E2E scope approval
+273afa5 Record verified original checkout synchronization and handoff stop
+FullName                                                                                                       
+--------                                                                                                       
+H:\IM-platform\spec\architecture\decisions\.gitkeep                                                            
+H:\IM-platform\spec\architecture\decisions\ADR-0001-temporary-s0-bootstrap-acceptance-before-ci-availability.md
+H:\IM-platform\spec\architecture\decisions\ADR-0002-frozen-architecture-canonical-markdown-migration.md        
+H:\IM-platform\spec\architecture\decisions\ADR-0003-architecture-conflict-resolution.md                        
+H:\IM-platform\spec\architecture\decisions\ADR-0004-loop1-friend-403-exception.md                              
+H:\IM-platform\spec\domain\.gitkeep                                                                            
+H:\IM-platform\spec\domain\auth-user-friend.md                                                                 
+H:\IM-platform\spec\domain\messaging.md                                                                        
+H:\IM-platform\spec\domain\sync-plugin.md                                                                      
+H:\IM-platform\spec\invariants\.gitkeep                                                                        
+H:\IM-platform\spec\invariants\auth-user-friend.md                                                             
+H:\IM-platform\spec\invariants\messaging.md                                                                    
+H:\IM-platform\spec\invariants\sync-plugin.md                                                                  
+H:\IM-platform\spec\acceptance\.gitkeep                                                                        
+H:\IM-platform\spec\acceptance\s0-auth-user-friend.md                                                          
+H:\IM-platform\spec\acceptance\s0-messaging.md                                                                 
+H:\IM-platform\spec\acceptance\s0-sync-plugin.md                                                               
+H:\IM-platform\spec\acceptance\verify-s0-spec-materialization.ps1                                              
+
+

@@ -1,0 +1,208 @@
+
+FullName                                         
+--------                                         
+H:\IM-platform\spec\tasks\review\LOOP1-E2E-001.md
+---
+task_id: LOOP1-E2E-001
+title: Verify first Go end-to-end messaging slice
+status: review
+owner: /root/s1_e2e_preparation (sole Implementation writer after release)
+stage: S1
+gate: S1
+---
+
+# Goal
+
+Prove A can log in, search/add B, obtain the unique DIRECT Conversation, send `hello`, receive durable ACK, and B receives it in realtime through the real TLS entrypoint.
+
+# Inputs
+
+- Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus 搂3/搂10 SRC-01 through SRC-07/搂11/搂12-14; approved ADRs and Minimality Contract.
+- Canonical HTTP, WSS, Sync, error, fixture and database contracts; accepted Go Auth/Social/Message implementations.
+
+# Execution Constraints
+
+Read spec/governance/execution-boundaries.md and independent-review.md. allowed_paths never exempts ownership/import direction. Before activation bind these responsibility paths to the actual accepted stage-four layout and any presently required exact assembly file. Coordinator must amend paths before edits if actual file names differ; no duplicate alternate packages or unapproved root/shared business. Canonical fixtures remain sole expectations.
+
+# Dependencies
+
+- `LOOP1-GO-MSG-001` done; S0 Gate PASS; LOOP1-ARCH-REMEDIATION batch PASS with final source/dependency/hosted acceptance.
+
+# Allowed Paths
+
+- `tests/e2e/go_tls_messaging.py` (canonical fixture-driven real Go HTTPS/WSS entrypoint harness; standard library only)
+- `tests/e2e/README.md` (exact run/environment/result boundaries)
+- `.github/workflows/ci.yml` (only existing deploy-job E2E step; no product contract or new stage mechanism)
+- `ci/classify.py` (only tests/e2e selection of existing go/deploy/architecture/source_go jobs)
+- `tests/ci/test_classify.py` (positive/deleted E2E path selection tests)
+- `spec/tasks/**/LOOP1-E2E-001.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-E2E-001/**`
+- `spec/progress/checkpoints/*loop1-e2e-001*.md`
+- `research/prompts/**` and `research/runs/**` only for this task's Recorder artifacts.
+
+# Acceptance
+
+- A-to-B `hello` succeeds through HTTPS/WSS/TLS and B receives one correct realtime Message after a durable ACK.
+- End-to-end retries, authorization, revocation, transaction rollback, Outbox/NATS delivery, and contract outcomes preserve the S1 correctness red lines.
+- Clean-checkout integration/E2E checks, independent review, and applicable real CI pass; S1 Gate evidence is durable and a stable checkpoint exists.
+
+- Applicable source/root/dependency checks pass; independent Review inspects actual behavior/responsibilities/imports/minimality. Java inherits canonical boundaries, not these Go paths.
+
+# Forbidden
+
+- Rewrite contracts, migrations, or product semantics to make E2E pass; introduce client UI, Java implementation, or future-stage infrastructure.
+
+# Minimality
+
+Exercise the accepted Go path with a direct fixture-driven harness; add only test wiring needed for actual TLS and service interaction.
+
+# Verification
+
+- Discoverable existing tools entry points: `tools/verify-loop1-ctrl-002.ps1` (Development while editing; clean committed Acceptance for independent candidate) and `tools/verify-frozen-architecture.ps1`.
+
+- Run Go profile Compose and E2E over real TLS plus all S1 contract/integration checks; evaluate the S1 Gate checklist on a clean integrated candidate.
+
+- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
+
+# Evidence
+
+- Activated after Go Message acceptance and exact administrativeb51 independent/hosted acceptance; Human approved CI path scope. See bounded readiness below.
+
+# Handoff
+
+- Coordinator owns activation governance until committed; fresh /root/s1_e2e_preparation owns only bounded test/CI implementation after explicit release in isolated worktree.
+
+# Next Action
+
+NEW independent Review clean exactfinalcandidate/fullb442acd..HEAD, then exacthostedCI/directselectedjobs/newPRtreebinding beforedone. No selfacceptance. Coordinator owns administrativeclosure afterwriterrelease.
+
+# Approved readiness and source/path binding (2026-10-01)
+
+Human approve explicitly covers the three CI paths in this Task, solely E2E wiring/classification. Coordinator narrows tests/e2e to two exact files and removes speculative deploy write scope: existing Go Compose/Caddy/config suffice. This is no Frozen/public/security/ACK/schema/compatibility change. Product Auth/Social/Message accepted in this lineage; MSGuniquedone; S0/remediationPASS and latestboundedadministrativeb51 independentReview/hosted36828991394 PASS. PR4OPEN remainsunmerged; completedS1 will use NEW reviewedPR including inheritedacceptedMSG plusE2E.
+
+Inputs exact: spec/architecture/frozen-architecture.md currentSHA83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e viaresolver/baseline; ADR0001expired/0002/0003/0004; canonical 搂搂3/7/10 SRC01..07/11/12..15/AppendixA; spec/governance/{minimality,execution-boundaries,independent-review}.md; spec/domain and invariants Auth/Social/Messaging inputs; spec/acceptance/s0-auth-user-friend.md and s0-messaging.md; contracts/http/auth-user-friend.openapi.json, websocket/envelope.schema.json/sync-v1.schema.json, fixtures/{auth-user-friend,websocket}, errors/http-errors.schema.json, database/migrations/0001_initial.up.sql and accepted Go tests. Never use nonexistent s1.md/loop-1.md as authority. Friend403 solelynamedDEFERRED_BY_HUMAN, never appliesmessage-membershipdenial.
+
+Minimum pre-edit baseline: bundledPython -B contracts/websocket/verify.py; bundledPython -B ci/check_architecture.py --scope all --json; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; pwsh -NoProfile -File tools/verify-frozen-architecture.ps1; actual live Go normal/race on owned disposablePG16/NATS2.10 with canonical0001, DB_TEST_ENABLE=1, loopbackPGHOST/PGPORT/PGUSER/PGDATABASE, NATS_URL. Commands go -C backend/go test -count=1 -v ./... and go -C backend/go test -race -count=1 -v ./...; runtime ---SKIP is not PASS. Historical launchers hardcode oldRecorder/evidence/container identities: do not execute them; this Task may create its own bounded evidence launcher, only same current commands. cleanup verifiesownedlabels/container/volume before removing own services. ActualDocker server29.5.2 Linux/DockerDesktop/Compose5.1.4 read-onlyavailable; PG16/NATS2.10/Caddy2 imagescached. This is environmentavailability, not integrationPASS.
+
+Final local verification includes actual strictTLS E2E (bundledPython -B tests/e2e/go_tls_messaging.py), full Go normal/race/live fixture/fault probes, build/vet/gofmt, WSS/HTTP/architecture34/frozen/sourceall/CI path/Gate controls and Development recovery. Four localWindows symlink CI subcase skips must be disclosed and covered byexacthostedLinux; no runtimeintegration skip permitted. Independent Review replays from clean committed candidate with actualservices and validates fullPRrange responsibility/logic/imports/minimality/requiredjobs. All required exactcandidate hostedCI jobs completedSUCCESS; gate alone isnotenough. One writer; newReviewer neitherimplemented norfixed; ordinaryFAIL invokes freshFix then NEWfreshReview. No selfdone/merge/S1GatePASS.
+
+StrictTLS: copy only publicCaddyroot.crt fromownedCompose intoTEMP, ssl.create_default_context(cafile), CERT_REQUIRED/check_hostname true; executeuntrustedCA/wronghostnamenegatives. Register/login/search/addfriend/uniqueDIRECT/sendcanonicalhello/ACK durablerows/OutboxNATSreceiver/retry/conflict/nonmember/revocationclose/staletoken throughtrueHTTPS/WSS. Accepted Go actual deferredCOMMIT probe plusentrypointdurablerows establish ACK-aftercommit; concurrentnetwork receiver read scheduling must not be treated as a new server ordering guarantee. Existing live fault probes cover rollback/duplicate/outoforder/Sync/GROUP500; no new publichistoryroute/clientfeature ortestframework. Fixture expectations remaincanonicalonly.
+
+Preparation /root/s1_e2e_preparation read-only and incompletepreRecorder, nofiles/services. After activationcommit released, create isolated task/LOOP1-E2E-001 worktree, register delegatedvisibleprompt/start prospective_resume beforecommands/edits, then solewriter. All historyFAIL/partial/unknown605 files remainimmutable. Durable path/readiness: spec/progress/evidence/LOOP1-E2E-001/2026-10-01-activation-and-path-map.md. Coordinator owns onlyactivation/task/current/archive untilcommit; productwriter is released explicitlyafter. Lastacceptedadminb51/product183/mainb442acd. S1OPEN; stopgoalS2OPEN.
+
+# Development implementation handoff (2026-10-01)
+
+
+Development product commit `7a980cac3f3c129c78bfe65fc974ce6839091cb9`; branch `task/LOOP1-E2E-001`, isolated checkout `H:/.codex/worktrees/s1-e2e-approved`. Bounded implementation diff starts `0d4df7aa8a39426976a44ff0c42c94befe2e0b2e`; complete new S1 PR/review starts actual main `b442acd26777c481620a6bd917863cebfaf79b35` and includes independently accepted inherited MSG. The final administrative closure SHA is reported to Coordinator after commit; product bytes remain this commit. This is development evidence, never Task/S1 acceptance.
+
+Five exact authorized files changed: two new E2E harness/README, two-line existing deploy CI step, classifier branch and positive/deleted-path tests. No backend/deploy/contract/migration/frozen/public/security/ACK change. Standard library only, no new job/framework/dependency/service. Present extra test setup: real deferred COMMIT failure is required by E2E transaction acceptance; scoped unique trigger/function exists only in the owned disposable database and is dropped in finally. Actual default Caddy unknown-SNI rejection cannot prove client hostname validation, as first FAIL showed; temporary owned in-memory fallback_sni delivers its existing localhost certificate to wrong.invalid. Strict CERT_REQUIRED/check_hostname remains enabled; only certificate verify code62/64 is accepted. Original JSON is restored and equality asserted before any positive business traffic. No private key copied. Official reference: https://caddyserver.com/docs/caddyfile/options#fallback-sni. Coordinator explicitly confirmed bounded temporary wiring.
+
+Command: bundledPython -B tests/e2e/go_tls_messaging.py.
+Result: fifth attempt exit0,32.547s, no runtime skips. Real Go3roles/PG16/NATS2.10/migration0001/Caddy; trustedCA/untrustedCA/hostname; HTTPS register/login/search/normalized friend uniqueDIRECT; WSS canonical hello/ACK backed by independent SQL Message+Outbox+sequence; NATS publication and correct one recipient; retry/conflict/nonmember no effects; actual deferred COMMIT rollback MESSAGE_COMMIT_FAILED/no rows/no sequence advance; replacement/logout revocation then close/staletokenreject. Original Caddy policy restoration verified. Receiver socket read scheduling does not establish a new cross-socket ACK ordering guarantee. Exact named friend403 separately DEFERRED_BY_HUMAN, never counted PASS.
+Evidence: E2E individual ledgers/raw outputs plus `2026-10-01-implementation-command-results.json` and own Recorder.
+
+Command: go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./....
+Result: pre-edit normal21.859s/race85.594s and final normal20.281s/race82.250s all exit0, zero runtime skips. DB_TEST_ENABLE=1,PGHOST127.0.0.1,PGPORT55651,PGUSERpostgres,PGDATABASEs1_e2e_regression,NATS_URLnats://127.0.0.1:42651; owned task-labeled disposable PostgreSQL16/NATS2.10 with unchanged canonical0001. Actual existing ACK-blocked COMMIT/rollback/idempotency/duplicate/outorder/Sync/wrongConversation/GROUP500/Auth/Social/Session/fallback regression executed. No runtime environments omitted.
+Evidence: baseline/final ledgers and redacted raw command outputs.
+
+Command: WSS/sourceall/Development/frozen/build/vet/HTTP/tests architecture/tests ci/gofmt.
+Result: all exit0; architecture34/frozen34/CI29, WSS8positive10negative plus18schema26behavior mutations. Exactly4 Windows symlink-creation CI subcase skips WinError1314 disclosed; applicable exact Linux hosted checks still required. No integration skip. No full future Java/client/plugin/capacity/release claim.
+Evidence: checks ledger/raw output; `tests/e2e/README.md` executable boundaries.
+
+Four failed E2E attempts remain immutable: initial unknownSNI does not prove hostname verification; container-local localhost admin addressing corrected to127.0.0.1; missing explicit Caddy TLS policy corrected only in temporary negative JSON; transient Docker mirror alpine3.21 metadata403 succeeded on unchanged retry. Each attempt cleaned owned Compose containers/volumes with real project label inspection and absence checks. No registry/daemon config change. Failed Recorder verification_result event missing observed result key rejectedexit2, explicitly disclosed instrumentation_warning then corrected. Initial Windows text writes expanded CI newline diff; original HEADLF restored before commit. Preparation guessed-path/quoting/GBK/truncation failures before Recorder are incomplete pre-trace, never full prospective. None of these replace or hide a FAIL.
+
+Research R-E2E-IMPLEMENTATION-20261001 prospective_resume, P-E2E-IMPLEMENTATION-20261001 delegated full visible release prompt. Only own nested .gitattributes preserve raw prompt/run/evidence bytes; old FAIL/partial/prior evidence unchanged. Finish/validate and stage audit precede final administrative candidate; post-finish staging/commit/status closure is disclosed separately. Research PASS is not Task PASS or S1 Gate PASS.
+
+Cleanup: all five Compose attempts ownedresources removed; separate normal/race PG/NATS cleaned after exact owner label, actual mounted anonymous-volume inspection and exclusive container-volume binding. No active owned test services or writer after final commit/release. Original H:/IM-platform and605 unknown files untouched. Coordinator owns final review/CI/queue closure after release. Next exact action NEW independent Review from clean exact final SHA/fullmain range; exact hosted CI/direct selected jobs and new PR tree binding before taskdone. PR4 not merged; Coordinator authorized NEW reviewed S1 PR only. S1 OPEN; stop goal S2OPEN after approved newPRmerge/main verification. Lastaccepted adminb51/product183/mainb442acd. No architecture conflict.
+# Architecture Index
+
+This file is a resolver, not an independent architecture specification.
+
+1. Read the [baseline manifest](./baseline.md).
+2. Resolve and SHA-256-check the single canonical Markdown artifact named by that manifest.
+3. Verify the retained historical PDF against the manifest's separate `previous_sha256` provenance value.
+4. Apply approved decisions in [`decisions/`](./decisions/) through the documented architecture process.
+
+The manifest and this index contain discovery and migration metadata only. They do not summarize, replace, or silently reinterpret the canonical Markdown. The PDF is an immutable pre-migration snapshot, not an active second canonical source. The Markdown remains frozen under the same ACP/ADR approval rule.
+
+Current revision: v1.1 conflict resolution under ADR-0003. The manifest separates current revision semantics from ADR-0002 historical representation-only migration. Review/CI acceptance status is recorded in the current task and evidence; historical PDF bytes remain immutable.
+# Frozen Architecture Baseline Manifest
+
+- baseline_title: 闈㈠悜鍗佷竾绾у湪绾胯繛鎺ョ殑鍙墿灞曞垎甯冨紡鍗虫椂閫氫俊骞冲彴
+- version: `v1.1`
+- status: Human-approved conflict resolution; stage-one bounded independent Review and hosted CI accepted
+- canonical_format: `markdown`
+- repository_path: `spec/architecture/frozen-architecture.md`
+- sha256: `83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e`
+- previous_canonical_format: `pdf`
+- previous_repository_path: `scalable-distributed-im-architecture.pdf`
+- previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
+- historical_migration_type: `representation_only`
+- historical_semantic_change: `false`
+- historical_migration_task_id: `LOOP1-ARCHDOC-001`
+- historical_markdown_sha256: `ff498f37ade3328fac97a905d6cb8dd7148fed935af5173e69b6b48a14277e91`
+- revision_type: `conflict_resolution`
+- semantic_change: `true`
+- revision_task_id: `LOOP1-ARCH-REMEDIATION-001`
+- revision_adr: `spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md`
+- approval_source: `spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md`
+- baseline_date: 2026-09-30
+
+The Markdown is the single current canonical source under the explicitly approved revision. Stage-one bounded acceptance: fresh Review of a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d and hosted run 36714913796 on exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md. This does not accept pending stages two through four, source compliance or remediation/S1 Gate. This revision tightens executable source ownership and governance semantics; it is NOT the historical representation-only migration. ADR-0002 and its original v1.0 migration facts are immutable history. The PDF remains the byte-for-byte immutable historical snapshot and is not a second current authority. No public wire, database, ACK/Sync, compatibility or security boundary is changed.
+
+## Current completion discovery (2026-10-01)
+
+The preceding stage-one paragraph is its bounded historical acceptance point. Subsequent task/product acceptance is now recorded in evidence004/final-hosted-acceptance.md (d0ae52f / hosted36744072690). Administrative finalization requires a new independent Review and exact-head hosted run. Version, hashes, approval and historical source metadata remain unchanged; S1 product Gate OPEN.
+# Minimality Contract
+
+Every additional abstraction must pay rent. This is a development and review rule subordinate to Frozen Architecture, approved ADRs, public contracts, invariants, acceptance criteria, and the current Task Spec. It creates no product requirement or authority to rewrite a contract.
+
+Implement the smallest direct mechanism that satisfies current approved requirements, invariants, acceptance criteria, and observed implementation constraints. A new interface, layer, framework, dependency, option, database object, worker, service, compatibility layer, or extension point needs a present responsibility. Possible future reuse, future stages, elegance, and generic 鈥渂est practice鈥?are insufficient on their own.
+
+When a less direct mechanism is needed, identify the current requirement or observed failure it serves, why the simpler path falls short, and the smallest added mechanism. Record measurements where performance or reliability motivates the change, and a removal or replacement condition if the mechanism is provisional. Do not use lines of code as a decision rule.
+
+Necessary boundaries and abstractions remain valid: for example, a real transaction boundary, shared Go/Java observable contract checks, an existing plugin capability boundary, or required Outbox reliability. Prefer one direct path when only one behavior exists. Do not add a strategy/factory hierarchy for a hypothetical second implementation, compatibility for nonexistent versions, or Loop 2 infrastructure in Loop 1 without current evidence and the required architecture approval.
+
+The Frozen Architecture already applies this judgment: Loop 2 goals do not expand Loop 1 implementation scope (chapter 1.3); Redis, Kafka, sharding, and automatic failover require fault or load evidence and an approved ADR (chapter 1.3); the simple conversation sequence row is allowed to be hot until load testing proves contention unacceptable (chapter 5); tasks do not grant architectural discretion, and agents stop at architecture conflicts (chapters 2 and 21). This document does not reinterpret those decisions or permanently ban a technology.
+
+## Independent review
+
+Alongside correctness, security, contracts, and acceptance, review added complexity against current responsibility. Inspect abstractions without current consumers; production code for future stages; new dependencies; strategy, factory, or framework layers for one current path; speculative compatibility or infrastructure; and production mechanisms whose removal would leave every approved acceptance criterion satisfied.
+
+Ask: **If this code or abstraction were removed or simplified, would every currently approved acceptance criterion still pass?** If yes, request deletion or simplification, or a concrete current requirement and evidence justifying it. A finding must cite that requirement or evidence gap and the affected code. Personal style preference and a raw size or LOC threshold are not findings. Reviewers cannot change product requirements, public contracts, or Frozen Architecture; a conflict follows the approved architecture process.
+
+Complexity delta (files, production/test lines, dependencies, public symbols, configuration, database objects, services) may help focus review. It is a signal, never an automatic score or FAIL.
+# Executing canonical source boundaries
+
+This subordinate execution guide does not create a second architecture authority. Resolve/hash-check spec/architecture/README.md -> baseline.md; business tasks read canonical 搂3/搂10 SRC-01 through SRC-07/搂11. These sections decide responsibility, root assembly/build/test whitelist, minimal shared support, import direction and separate backend placeholder expiry.
+
+allowed_paths limits writes and cannot waive higher authority. Ordinary tasks name service responsibility areas and presently required specific tests/assembly files. Escalate conflicts before implementation. A temporary migration records actual source/destination file/responsibility map, authorization, scope and acceptance exit before edits. No post-implementation architecture legalization.
+
+Acceptance combines canonical behavior/security/transaction fixtures with applicable ownership/import checks. Inspect actual logic and runtime graph: directory names and passing behavior cannot prove responsibility. Shared support cannot hide complete Auth/session-write business. Backend equivalence never exempts these rules; the Minimality Contract justifies only presently necessary interfaces/dependencies.
+
+## Current transition and recovery
+
+Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. These tools are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture, with evidence003/hosted-acceptance.md; Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. Stage004 bound accepted exact checker commands before migration and eliminated I01 old Go deviations; see evidence004/conflict-closure-supplement.md. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
+
+The stage004 language-wide scope is a single migration authorization ending at batch completion. Its actual file/responsibility map precedes edits. Social/Message/E2E activation waits for the entire remediation batch and final exact-head hosted acceptance. Original Auth remains historical done under old checks. Resolve the unique current task; no parallel unique Current Task or normal business resumption.
+
+## Future Java task creation
+
+Canonical 搂20 supplies planning IDs; actual queue dependencies and TASK_TEMPLATE.md govern readiness. Before future S3 Java activation use canonical contracts and 搂3/搂10/搂11, the same service boundaries, exact narrow task paths and accepted structural/dependency commands. Choose Java service-internal structure independently; Go layout is not authority. No mandate for three modules/binaries or extra layers. The explicit Java S0 placeholder is checked now; its own first business implementation expires its allowance. Go expiry never forces early Java business or a permanent Java skip.
+# Independent candidate Review checklist
+
+This checklist executes canonical 搂12-14/搂21 and SRC-01 through SRC-07; it does not redefine architecture/contracts. A fresh Review Agent who neither implemented nor fixed the candidate reads unique current task, canonical hash/ADRs, task inputs, Minimality Contract and diff. Record independence, exact reviewed SHA/branch/range and clean committed checkout method. Renaming roles is not independence.
+
+- Check behavioral fixtures, transaction/ACK/Session/epoch/Sync invariants, authorization, security negative cases and actual live test enable conditions/skips. Tokens/passwords cannot appear in query, logs, traces or errors.
+- Inspect real service responsibility, root assembly whitelist, shared support semantics and runtime import graph against canonical 搂3/搂10/搂11. Reject cross-service internal imports, shared reverse imports, full Auth hidden in shared, business disguised as tests or task globs treated as waivers.
+- Check exact write scope, migration file/responsibility map, temporary authorization/exit and effective positive/negative structural checks. Directory/file names and observable equivalence alone are insufficient.
+- Apply separate backend stages. Java placeholder rules apply now; future Java business uses canonical boundaries and expiry, never Go layout. Stage003 exposes old Go deviations for stage004, not grandfathering.
+- Review interfaces/exports/dependencies against present responsibility and Minimality Contract; no speculative layers or future infrastructure.
+- Verify task queue/status uniqueness, dependencies, recovery and evidence; preserve historical PDF/done/checkpoints/Recorder. Check current accepted baseline discovery.
+- Verify exact final candidate hosted head, changed-path job selection and actual required conclusions. Execution-rule Markdown changes require applicable checks; missing/failed/cancelled/anomalously skipped jobs fail acceptance. Old CI and expired ADR-0001 cannot substitute.
+- Distinguish bounded stages from product, batch and S1 Gate. Stage003 checker effectiveness can pass while old Go fails; final migration must pass applicable structure/live regression.
+
+FAIL remains unfinished: fresh Fix Agent repairs within authorized scope, then a new Review Agent reviews the candidate. Local independent PASS still requires applicable hosted CI before closure. An irreducible authority conflict blocks its dependent portion and records the smallest decision question.
+
+
