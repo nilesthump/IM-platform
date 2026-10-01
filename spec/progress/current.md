@@ -16,6 +16,10 @@ Architecture prerequisite fully closed: independent e7/b1 Review/CI, PR9 exactb1
 
 ## Verification
 
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: Initial ready baseline PASS; post-activation check failed because this summary omitted required Command/Result/Evidence labels. Labels restored; active-state rerun PASS (23 task specs, 6.949s). Development evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/readiness.md`
+
 - Readiness Development recovery PASS (23 task specs, 7.512s), architecture all scope PASS (0 violations, 0.583s), WSS PASS (8 positive/10 negative/26 mutations, 0.280s), Sync/Plugin PASS (79 outcome artifacts/16 mutations). These are prerequisites, not client runtime acceptance.
 - Evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/readiness.md; current Coordinator Recorder retains exact commands/results.
 - Generated current.md trailing blank caused diff check failure and was corrected before activation. Historical branch collision preserved without overwrite.
