@@ -1,0 +1,1 @@
+Coordinator prospectively authorized backend/go/tests/auth_test.go only: malformed message.send payload={} moves from pre-feature blanket AUTHORIZATION_DENIED to canonical VALIDATION_FAILED with local live Core URL. Session table lock still proves Gateway does not query Session per message. No valid denial is weakened; contracts unchanged. Task amended before test edit.

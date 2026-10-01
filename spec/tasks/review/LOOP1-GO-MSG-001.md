@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-GO-MSG-001
 title: Implement Go text messaging, durable ACK, Outbox, and NATS
-status: active
-owner: /root/message_implementation (sole product writer after Coordinator release)
+status: review
+owner: Coordinator (fresh independent Review pending; implementation writer released after commit)
 stage: S1
 gate: S1
 ---
@@ -37,6 +37,7 @@ Read spec/governance/execution-boundaries.md and independent-review.md. allowed_
 - `backend/go/gateway/gateway.go` (canonical WSS forwarding/local bound fan-out only)
 - `backend/go/gateway/http.go` (existing transport/subscription assembly only)
 - `backend/go/gateway/message_test.go` (transport/duplicate/wrong-Conversation local delivery tests)
+- `backend/go/tests/auth_test.go` (only existing malformed message probe setup/comment/oracle; canonical VALIDATION_FAILED, live local Core URL; preserve all Auth assertions)
 - `backend/go/tests/message_test.go` (blackbox canonical/live combined tests using existing helpers)
 - `backend/go/main.go` (only dispatcher startup assembly if a name change is necessary)
 - `spec/tasks/**/LOOP1-GO-MSG-001.md`
@@ -89,3 +90,13 @@ Use the existing PostgreSQL transaction and Outbox/NATS skeleton directly; add n
 # Bound verification and recovery (2026-10-01)
 
 Minimum pre-edit baseline: `python -B contracts/websocket/verify.py`, `python -B ci/check_architecture.py --scope all --json`, Development recovery, existing live normal/race Go suites on unique migrated disposable PostgreSQL16/NATS2.10 with DB_TEST_ENABLE=1. Record actual enable variables/services/skips; environment skips are not live PASS. Frozen verifier/source tests/CI controls plus recursive gofmt/build/vet and normal/race remain applicable before handoff. Clean committed Acceptance only; NEW independent Review then applicable real exact-head hosted CI before done. Last known good actualmain b442acd26777c481620a6bd917863cebfaf79b35/CI36813501417. No known product baseline failure; Social friend403 DEFERRED_BY_HUMAN never applies to message membership. Governance activation owned by Coordinator until commit; product writes owned solely by fresh Implementation Agent after release.
+
+# Prospective regression-scope binding
+
+Coordinator authorizes exact tests/auth_test.go before edit: prior payload={} blanket AUTHORIZATION_DENIED stub oracle conflicts with canonical MessageSend required content/Conversation shape. Change only local live Core assembly and malformed-frame VALIDATION_FAILED expectation; retain Gateway no-per-message Session-query check, all valid authentication/membership denials. No runtime_test.go or contract change.
+
+# Development candidate handoff (2026-10-01)
+
+Six bound product files and six matching test files complete; main/shared/Auth/Social/contracts/schema/workflows untouched. Local migrated disposablePG16/NATS2.10 pre-edit baseline and final normal/race PASS with zero runtime skips. Canonical sends/duplication/order/wrongConversation/private gap, true PostgreSQL COMMIT fault probes, membership/content/cross-sender conflicts, GROUP500 and existing Auth/Social/Session/WSS/fallback regression executed. Build/vet/gofmt/sourceall/WSS/architecture34/frozen34/CI27/Development recovery PASS; exactly four Windows symlink-creation subcase skips (WinError1314) disclosed in implementation handoff, hostedLinux checks still required. This is local development evidence only. Recorder prospective_resume with startup/UTF8/redaction/truncation limitations exposed; finish/validate before candidate handoff. Failed attempts preserved, not overwritten into PASS.
+
+Durable commands/hashes/results: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-command-results.json; behavior/limits/ownership: 2026-10-01-implementation-handoff.md. Owned disposable services/volume removed after label verification; no product writer remains after candidate commit. Active->review, never self-done. Last known accepted main b442acd26777c481620a6bd917863cebfaf79b35/CI36813501417; next exact action NEW independent Review and exact hosted candidate CI/full PR range. S1 remains OPEN.

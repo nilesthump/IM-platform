@@ -1,0 +1,151 @@
+{
+  "owner": "R-MSG-IMPLEMENTATION-20261001",
+  "phase": "baseline",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55631",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_test",
+    "NATS_URL": "nats://127.0.0.1:42631"
+  },
+  "containers": [
+    "loop1-msg-impl-pg-20261001",
+    "loop1-msg-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "loop1-msg-impl-pg-20261001",
+        "--label",
+        "im.task=LOOP1-GO-MSG-001",
+        "-e",
+        "POSTGRES_HOST_AUTH_METHOD=trust",
+        "-e",
+        "POSTGRES_DB=msg_test",
+        "-p",
+        "127.0.0.1:55631:5432",
+        "postgres:16"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.61,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "loop1-msg-impl-nats-20261001",
+        "--label",
+        "im.task=LOOP1-GO-MSG-001",
+        "-p",
+        "127.0.0.1:42631:4222",
+        "nats:2.10"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.562,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "exec",
+        "-i",
+        "loop1-msg-impl-pg-20261001",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "msg_test",
+        "-v",
+        "ON_ERROR_STOP=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.328,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.906,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 11.094,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 37.422,
+      "skips": 0
+    }
+  ]
+}

@@ -1,10 +1,13 @@
 package gateway
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -16,14 +19,17 @@ type hub struct {
 	auth     *validator
 	mu       sync.Mutex
 	sessions map[string]map[*connection]bool
+	coreURL  string
+	client   *http.Client
 }
 type connection struct {
-	ws    *websocket.Conn
-	mu    sync.Mutex
-	done  chan struct{}
-	once  sync.Once
-	bound *shared.Claims
-	token string
+	ws      *websocket.Conn
+	mu      sync.Mutex
+	done    chan struct{}
+	once    sync.Once
+	bound   *shared.Claims
+	token   string
+	origins map[string]bool
 }
 type envelope struct {
 	ProtocolVersion string          `json:"protocolVersion"`
@@ -37,7 +43,7 @@ var requestIDPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-
 func validUUID(id string) bool { return requestIDPattern.MatchString(id) }
 
 func newHub(auth *validator) *hub {
-	return &hub{auth: auth, sessions: make(map[string]map[*connection]bool)}
+	return &hub{auth: auth, sessions: make(map[string]map[*connection]bool), client: &http.Client{Timeout: 10 * time.Second}}
 }
 func (c *connection) send(v any) error { c.mu.Lock(); defer c.mu.Unlock(); return c.ws.WriteJSON(v) }
 func (c *connection) close() {
@@ -166,7 +172,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if e.Type == "message.send" {
-			_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "AUTHORIZATION_DENIED", "message": "Request rejected"}}))
+			h.forward(r.Context(), c, e)
 			continue
 		}
 		return
@@ -207,4 +213,113 @@ func writeError(w http.ResponseWriter, r *http.Request, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(e.Status)
 	_ = json.NewEncoder(w).Encode(map[string]any{"error": map[string]string{"code": e.Code, "message": e.Message}, "requestId": id})
+}
+
+// Forward only the canonical frame, using the validated connection's bearer.
+// There are no membership or persistence decisions in Gateway.
+func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
+	var payload struct {
+		ConversationID string `json:"conversationId"`
+	}
+	_ = json.Unmarshal(e.Payload, &payload)
+	key := strings.ToLower(payload.ConversationID) + ":" + strings.ToLower(e.RequestID)
+	c.mu.Lock()
+	if c.origins == nil {
+		c.origins = make(map[string]bool)
+	}
+	c.origins[key] = true
+	c.mu.Unlock()
+	reject := func() {
+		_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "MESSAGE_COMMIT_FAILED", "message": "Request rejected"}}))
+	}
+	b, err := json.Marshal(e)
+	if err != nil {
+		reject()
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", strings.TrimRight(h.coreURL, "/")+"/__core/message", bytes.NewReader(b))
+	if err != nil {
+		reject()
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("Content-Type", "application/json")
+	response, err := h.client.Do(req)
+	if err != nil {
+		reject()
+		return
+	}
+	defer response.Body.Close()
+	var ack envelope
+	if response.StatusCode != 200 || json.NewDecoder(io.LimitReader(response.Body, 65536)).Decode(&ack) != nil || ack.ProtocolVersion != "1.0" || ack.Type != "message.ack" || !strings.EqualFold(ack.RequestID, e.RequestID) {
+		reject()
+		return
+	}
+	var outcome struct {
+		Status string `json:"status"`
+	}
+	if json.Unmarshal(ack.Payload, &outcome) != nil {
+		reject()
+		return
+	}
+	if outcome.Status != "committed" {
+		c.mu.Lock()
+		delete(c.origins, key)
+		c.mu.Unlock()
+	}
+	_ = c.send(ack)
+}
+
+func (h *hub) fanout(user string, data []byte) {
+	if !validUUID(user) {
+		return
+	}
+	var e envelope
+	if json.Unmarshal(data, &e) != nil || e.ProtocolVersion != "1.0" || e.Type != "message.created" || !validUUID(e.RequestID) {
+		return
+	}
+	var p struct {
+		ConversationID string `json:"conversationId"`
+		MessageID      string `json:"messageId"`
+		SenderID       string `json:"senderId"`
+		Seq            int64  `json:"seq"`
+		CreatedAt      string `json:"createdAt"`
+		Content        struct {
+			Kind string `json:"kind"`
+			Text string `json:"text"`
+		} `json:"content"`
+	}
+	if json.Unmarshal(e.Payload, &p) != nil || !validUUID(p.ConversationID) || !validUUID(p.MessageID) || !validUUID(p.SenderID) || p.Seq < 1 || p.Content.Kind != "TEXT" {
+		return
+	}
+	if _, err := time.Parse(time.RFC3339Nano, p.CreatedAt); err != nil {
+		return
+	}
+	h.mu.Lock()
+	var conns []*connection
+	for _, slot := range h.sessions {
+		for c := range slot {
+			if c.bound != nil && c.bound.UserID == user {
+				conns = append(conns, c)
+			}
+		}
+	}
+	h.mu.Unlock()
+	key := strings.ToLower(p.ConversationID) + ":" + strings.ToLower(e.RequestID)
+	for _, c := range conns {
+		select {
+		case <-c.done:
+			continue
+		default:
+		}
+		if h.auth.now().Unix() >= c.bound.ExpiresAt {
+			continue
+		}
+		c.mu.Lock()
+		origin := p.SenderID == user && c.origins[key]
+		c.mu.Unlock()
+		if !origin {
+			_ = c.send(e)
+		}
+	}
 }

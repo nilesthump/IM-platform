@@ -3,53 +3,47 @@
 Current Loop: Loop 1
 Current Stage: S1
 Current Gate: S1
-Gate Status: OPEN (Social Task accepted/merged; complete S1 Gate not claimed)
+Gate Status: OPEN (Social accepted/merged; MSG local development complete, independent acceptance pending)
 Current Batch: LOOP1-S1
 Current Task: LOOP1-GO-MSG-001
-Current Task State: active
-Execution Status: MSG_ACTIVE_INPUTS_AND_PATHS_BOUND
+Current Task State: review
+Execution Status: MSG_READY_FOR_FRESH_INDEPENDENT_REVIEW
 
 ## Immediately Relevant Completed Work
 
-Human explicitly requested PR merge and continuation. PR3 merged at accepted final headfbf8759 into actual main b442acd26777c481620a6bd917863cebfaf79b35. Fresh independent Social product review27862b95 remains PASS; final-head PRCI36811766142 and actual-mainCI36813501417 completed SUCCESS,12 selected jobs/deploy inactive. Protected product/authority/checker/workflow blobs unchanged.
+PR3 merged actual main b442acd26777c481620a6bd917863cebfaf79b35; actual-mainCI36813501417 SUCCESS. MSG activation78129e8 exact-bound; fresh Implementation Agent completed six production/six test files, local real normal/race and structural verification. No MSG/S1 PASS claimed.
 
 ## Current Blockers
 
-No Social merge blocker. MSG inputs/path readiness resolved; backlog->ready->active after actual-mainCI PASS. No product edits yet. Private existing-boundary adapter locators are implementation choices under SRC-04/11.2; no authority change. Friend403 remains single DEFERRED_BY_HUMAN future item, never messaging authorization exemption.
+No unresolved local product failure. NEW independent Review and exact-head hosted CI remain required. Social friend403 only DEFERRED_BY_HUMAN, no messaging waiver.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: exit0 on clean isolated PRheadfbf8759; task Social done, no status entries.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-human-authorized-merge.md`
-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
-  - Result: exit0,34 tests, zero skips; frozen v1.1/PDF hashes matched.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-human-authorized-merge.md`
-- Command: `gh run view 36813501417 --repo nilesthump/IM-platform --json headSha,event,status,conclusion,jobs`
-  - Result: actualmain push b442acd completed SUCCESS; twelve selected jobs SUCCESS/deploy legitimately inactive. PR3 live state MERGED.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-human-authorized-merge.md`
-- Command: `python -B contracts/websocket/verify.py`
-  - Result: baseline PASS,8positive/10negative,18schema/26behavior controls. Local baseline only, not MSG acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-activation-and-path-map.md`
-- Command: `python -B ci/check_architecture.py --scope all --json`
-  - Result: baseline PASS/no violations; local baseline only. Initial activation recovery failed exact Markdown field syntax; corrected before writer release.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-activation-and-path-map.md`
+- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
+  - Result: exit0 on unique migrated disposablePG16/NATS2.10, DB_TEST_ENABLE=1; zero runtime skips. Core4.923/6.922s, blackbox17.143/76.300s; messaging/canonical/fault/Auth/Social/Session/fallback PASS locally.
+  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-command-results.json`
+- Command: `python -B contracts/websocket/verify.py; python -B ci/check_architecture.py --scope all --json; python -B -m unittest discover -s tests/architecture -v; python -B -m unittest discover -s tests/ci -v`
+  - Result: exit0; WSS8positive/10negative/18schema+26behavior controls, sourceall/no violations, architecture34, CI27 with exactly four Windows symlink-creation subcase skips (WinError1314). Local checks never replace hostedLinux CI.
+  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-handoff.md`
+- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; go -C backend/go build ./...; go -C backend/go vet ./...`
+  - Result: exit0; frozen34/no skips, Development recovery PASS, build/vet/recursive formatting clean. Clean committed Acceptance still belongs to independent candidate review/CI.
+  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-checks-commands.json`
 
 ## Changed Files or Migrations
 
-Only Social merge/recovery/evidence/checkpoint and task-linked Recorder additions. No product/contract/schema/architecture change. Database0001 unchanged.
+Core message/private history/http/outbox and Gateway forwarding/subscription, six matching tests. Narrow preauthorized stale malformed Auth test oracle uses canonical VALIDATION_FAILED/live local Core; original Session-lock invariant retained. DB0001/frozen/contracts/profile/ADR/workflows/shared/root assembly unchanged.
 
 ## Known Failures, Risks, and Assumptions
 
-Ready connector permission denied; authenticated CLI succeeded under existing branch protection. Original startup Recorder pipe/base64/UTF8 failures preserved and exposed; corrected original run validates22events, failed empty-prompt run validates4events. Worktree run is prospective_resume/incomplete prior trace; pre-start reads/connector calls disclosed. No universal Recorder trace completeness claimed. Actual main CI success does not close S1 without MSG/E2E.
+Setup/compile/canonical precondition/untouched GROUP fixture-oracle failures corrected and preserved in Recorder. Default Windows GBK log inspection failures corrected/disclosed. Recorder startup and limited direct reads/launcher initialization incomplete prospective trace; redaction/UI truncation disclosed. Private history is bounded gap compensation, not a new public Sync feature or TLS-entry E2E. Publication permits duplicates; only test materializer exists. Independent review/security/minimality and real hosted acceptance still pending.
 
 ## Next Exact Action
 
-Fresh /root/message_implementation registers its delegated visible prompt and prospective Recorder, runs active-task minimum baseline, then implements only prospectively bound Core/Gateway/message-gap paths. Durable activation: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-activation-and-path-map.md. Commit development candidate, then NEW independent Review and exact hosted CI; ordinary failures enter repair cycles. No MSG acceptance or S1 PASS yet.
+NEW independent Review of final clean committed candidate/full branch range; verify actual canonical security/transaction/routing/source/minimality and live normal/race with independent unique migrated services. Then exact-head hosted required jobs. Ordinary failures enter fresh Fix/new Review; never self-done or claim S1 Gate. Verification entrypoints: tools/verify-loop1-ctrl-002.ps1 and tools/verify-frozen-architecture.ps1.
 
 ## Last Known Good Commit
 
-`b442acd26777c481620a6bd917863cebfaf79b35` (accepted actualmain merge, CI36813501417); independently reviewed Social product27862b95.
+`b442acd26777c481620a6bd917863cebfaf79b35` (accepted actualmain, CI36813501417); activation78129e8 is control-plane input binding, not MSG acceptance.
 
 ## Latest Checkpoint
 
@@ -57,8 +51,8 @@ Fresh /root/message_implementation registers its delegated visible prompt and pr
 
 ## Uncommitted Changes / Ownership
 
-Coordinator owns only Social merge recovery and Recorder in H:/.codex/worktrees/social-merge-continue/IM-platform until checkpoint commit. Fresh /root/message_implementation becomes sole bound product writer after Coordinator activation commit/release; no parallel writer. Task/current/evidence updates bound prospectively. Original H:/IM-platform stale Contract branch, five pre-existing unknown/other-agent paths and prior worktrees untouched; this Coordinator's original startup Recorder artifacts remain uncommitted there, separately disclosed and not imported.
+All bound MSG changes and this Task's Recorder/evidence owned by /root/message_implementation until candidate commit, then writer released and clean committed head required. Owned labeled PG/NATS containers/anonymous volume removed, exit0. Original H:/IM-platform and old worktrees/unknown untracked paths untouched; no other writer modified this worktree.
 
 ## Architecture Conflicts / ACP / ADR
 
-No new decision or waiver. Messaging internal locator question resolved under existing authorized transport and SRC-04/11.2; no new public contract/security boundary. Only approved friend403 exception remains.
+None. Private Core-only HTTP adapters and per-user NATS locators reuse authorized boundaries with unchanged canonical payloads/bound bearer; no public contract/security rule change. Only approved Social friend403 exception remains.
