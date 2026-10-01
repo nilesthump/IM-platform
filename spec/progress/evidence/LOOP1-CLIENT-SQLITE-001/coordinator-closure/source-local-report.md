@@ -1,0 +1,29 @@
+# Independent Review5 source/local assessment
+Reviewed SHA: 5998b5bebc9c407b74f4adf7fe70c1b9865d85a6.
+Range: a28752967ddd471cd281aece7ea9b343521356e8..5998b5bebc9c407b74f4adf7fe70c1b9865d85a6.
+Actor: fresh independent /root/s2_sqlite_review5, never implementer/fixer/Coordinator or earlier reviewer.
+Method: new detached H:/isv5-sqlite, exact committed HEAD and empty status; read-only source/original, external evidence only.
+Current source/local verdict PASS; full verdict PENDING actual current hosted acceptance. S1 PASS / S2 OPEN, Task remains review.
+
+## Scope and authority
+321 changed paths all within exact Task allowed_paths, six archives inspected. Canonical aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c and historical PDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 match. Applicable canonical3/10(SRC01..07)/11,2.3/4.4/6/7/12..15/19/21/AppendixA/B, ADR0001..5 and domain/invariants/acceptance/contracts read. Approved Desktop Tauri/SQLx and Android Kotlin/Compose SDKSQLite only. Historical GString FAIL stays WAIVED_BY_HUMAN, never repaired/relabelled. No Frozen/contracts/backend/Web or other-task edits; no original unknown/local preservation backup/toolchain/private key payload.
+One scanner initially failed on two literal PRIVATE KEY scanner markers in immutable historical Review2 audit.py. Exact matching lines inspected; no key material. Original failed scope output retained; resolution separate scope-audit-resolved.json.
+
+## Actual responsibilities, logic and minimality
+TS shared Repository/models/schema owns migration and statement intent; Desktop accountDatabase invokes one transaction command with whole batch. Rust commands supply only validated per-account paths, connection/query and generic single SQLx begin/rollback/commit transaction with expected-row assertion. Read query physically read-only connection supplements query_only. Native private transport reuses same adapter, bounded test consumer, no network or new public contract. No separate execute pseudo-transaction.
+Kotlin built-in SDKSQLite encloses every localSend/ACK/realtime/Sync/userPage and migration in actual beginTransaction/setTransactionSuccessful/endTransaction. Account UUID filenames and reopen preserve isolation. UNIQUE conversation/request, global messageId and conv/seq; conflict identity/content guard precedes any unkeyed realtime merge/delete. Local/timeout updates preserve terminal SENT. Real gap advance stops at missing next seq; data/cursor advance within same transaction; fault injection rolls back both.
+Text/cursor use Unicode codepoints4096/256; overflow/staleexpected rejection preserves durable state. Exact signed64 TS safe-number/bigint decimal bindings plus bigint getter, Kotlin Long, MAX guard prevents SQLite REAL promotion; tests exercise2^53/2^53+1 gap/ACK/convergence/MAX/revision/reopen. Physical signed64 implementation does not redefine public maximum or introduce future wire parser.
+Minimal direct Repo/native boundary and current fixtures, no future retry/fetch/Sync engine/Web/plugin/state-manager/ORM/network library. Necessary neutral Tauri icons and Gradle wrapper are current build requirements. CI classifier includes storage tests/verifiers/deletions; Desktop/Mobile placeholders expire with real tests, other checks retained.
+
+## Current bounded Fix4
+Product clients/tests/SQLite verifiers exactly identical9a86d3b641ca60b526c65abcc7a9aeee0b48d082 (actual gitdiff exit0). Change only hosted existing real character /dev/kvm preparation plus own evidence/recovery. id/stat diagnostics, synchronous current runner chown+0600, explicit read/write fail; no fabricated device/driver/fallback/new runner. enable acceleration and prelaunch accel-check, API34, official wrapper,180sec and two full rounds retained. Previous cdb permission failure concrete cause unknown; no invented diagnosis. Reviewed permission change applies disposable CI runner, no product security/contract change.
+
+## Independent local checks
+retry-clean-checks.json actual cwd H:/isv5-sqlite:
+Recovery Acceptance23 specs8.500s PASS; architecture --scope all0 violations0.469s; frozen53 6.609s; tests/architecture53 6.297s; tests/ci31 with4 explicit existing Windows privilege skips2.906s; WSS8positive/10negative/18schema/26mutation PASS; SyncPlugin79artifacts(22positive57negative)/16mutation PASS. Raw stdout/stderr gzip with original and compressed SHA preserved.
+Fresh source checks do not replace hosted Linux/runtime acceptance. Previous Review3 actual native13cases141assertions/unit1 and API34/SQLite3.39.2 first-install/pmclear13/137 each are PRIOR independently recorded evidence with byte-identical source, not my runtime rerun.
+Four archived internal manifests:59+72+80+91 byte/SHA verified; full archive scanning six. Full diffcheck exit2 only original retained36905605691-mobile-job-api.log trailing whitespace; actual exact-file exclusion remaining diff exit0. Clean status0, no source writes.
+
+## Instrumentation and limitations
+Prospective_resume incomplete. Necessary initial/passive reads and some later source reads outside command recorder disclosed. Initial full canonical output GBK rendered poorly/truncated, required sections separately re-read UTF8. First clean helper accidentally ran through Recorder --repo H:/ica despite tool cwd, exposed existing ignored node_modules controls FAIL plus GBK stdout failure; retained immutable logs labeled actual H:/ica. Correct --repo H:/isv5-sqlite retry all checks PASS. One malformed helper pathspec attempt failed128; corrected actual exact pathspec passed; no checker/cache/source/old evidence changes. Missing guessed Database.kt/tauri.ts reads retained passive missing-file errors, actual files enumerated and read.
+Recorder research validation alone never means Task/Gate acceptance.
