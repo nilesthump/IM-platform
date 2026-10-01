@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 title: Human-approved v1.1 client technology clarification and selection guards
 status: review
-owner: Coordinator (stopped by Human; independent Review FAIL)
+owner: Coordinator (Human GString waiver; pending administrative closure)
 stage: S2
 gate: S2
 ---
@@ -158,3 +158,11 @@ After sole quoted-selector Fix release at clean b0eedea, Coordinator labels the 
 ## Human stop after completed independent Review (2026-10-01)
 
 Exact4b5d6b8 fresh Review FAIL: ordinary Groovy GString expression and closure execute pluginManager.apply Java while checker reports no violation. Current local checks/actual exact-head PR36875541572 and push36875532891 all13 SUCCESS do not override semantic failure. Byte-identical final independent report/runtime/CI/Recorder packaging proof archived in 2026-10-01-human-stop-handoff/; Reviewer finishedFAIL31/validated, manifest2fee94fbd5e0e3673806955c94d934554bfc46cd44d0e3d7f13c8bf2aabaff6c. Human explicitly directs handoff/next-agent text prompt then stop; no further Fix, product implementation, done/merge or task selection in this session. Task remains uniquely review; S1 unchanged/PASS/S2 OPEN; lastgood rollback3f. Coordinator owns only stop record/archive until clean local commit, then all writers released. New authorization is required to resume fresh Fix/NEW Review/exact-head CI; client/Web work remains stopped. Local stop metadata itself is not independently accepted. Latest checkpoint2026-10-01-client-architecture-human-stop.md. Prospective Coordinator Recorder will finish CANCELLED and validate; immutable archive/postfinish boundary external, never acceptance.
+
+## Human GString waiver and next-agent continuation (2026-10-01)
+
+The latest exact Human request supersedes the prior stop-only next-agent scope. GString expression/closure finding is WAIVED_BY_HUMAN, no longer blocking and no Fix required for that finding. Preserve original independent Review FAIL as history; do not claim reviewer PASS. Decision and exact request: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-human-gstring-waiver/decision.md`. Current task remains review pending bounded administrative closure and remaining independent Review/exact-head CI. Next Agent resumes here, records waiver in acceptance, then after done selects dependency-satisfied S2 client/Web tasks. No product implementation in this handoff-update session; S1 PASS/S2 OPEN. Lastgood rollback3f352a8; pre-update local metadata00797514b15b5bd2c55b738eedc2adce59985f41. Coordinator owns only waiver Task/current/evidence changes, uncommitted until next recovery; original744 files untouched. New linked Recorder external client-architecture-waiver-20261001, prior completed traces immutable.
+
+## Coordinator continuation recovery (2026-10-01)
+
+Recovered exact review task at00797514 with prior Coordinator waiver edits preserved. Human GString finding WAIVED_BY_HUMAN; original FAIL immutable and no repair loop for that finding. Startup Recovery Development PASS exit0/7.890s, canonical hash matches; prospective_resume Recorder R-CLIENT-RESUME-20261001 discloses initial read-only startup. Evidence2026-10-01-coordinator-resume/recovery.md contains exact new prompt and recovery limitations. Coordinator owns only administrative metadata; original H:/IM-platform unchanged. Next fresh independent Review of clean full3f352a8..HEAD, clean Recovery Acceptance and actual exact-head hosted required jobs before done/S2 product. Lastgood rollback3f352a8; S1PASS/S2OPEN.
