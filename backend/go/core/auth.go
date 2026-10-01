@@ -139,6 +139,8 @@ func (s *authService) handler() http.Handler {
 	m.HandleFunc("POST /v1/auth/logout", s.logout)
 	m.HandleFunc("GET /v1/users/me", s.me)
 	m.HandleFunc("GET /v1/users/search", s.search)
+	m.HandleFunc("GET /v1/friends", s.listFriends)
+	m.HandleFunc("PUT /v1/friends/{friendUserId}", s.addFriend)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		for key := range r.URL.Query() {
 			lower := strings.ToLower(key)

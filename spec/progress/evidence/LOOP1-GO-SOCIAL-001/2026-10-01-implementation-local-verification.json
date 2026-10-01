@@ -1,0 +1,349 @@
+{
+  "task": "LOOP1-GO-SOCIAL-001",
+  "base": "cc49b98a103a3426d23bfcbbd09958060b7e790b",
+  "writer": "/root/social_implementation",
+  "local_evidence_only": true,
+  "live_enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "63402",
+    "PGUSER": "postgres",
+    "PGDATABASE": "social_test",
+    "NATS_URL": "nats://127.0.0.1:63779"
+  },
+  "containers": {
+    "postgres": "loop1-social-impl-pg-20261001/postgres:16",
+    "nats": "loop1-social-impl-nats-20261001/nats:2.10",
+    "owner": "R-SOCIAL-IMPLEMENTATION-20261001",
+    "cleanup": "label verified; docker rm -fv only these two containers and owned anonymous test volume; exit0"
+  },
+  "commands": [
+    {
+      "command_id": "C-46ea737f-4f11-435c-a713-3cc8b9e69d6a",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Acceptance"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 6219.0,
+      "stdout_sha256": "979c1c2c3136fc68bae53dc804cfdf31df49c80b79c0197f02c653932ce9c8c8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-e0b20467-0330-41fa-9dce-85969b0bacb9",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "Get-Content -Raw backend/go/core/auth.go; Get-Content -Raw backend/go/tests/auth_test.go; git -C H:/.codex/worktrees/loop1-s1/IM-platform show 2a6eaa1:backend/go/social.go; git -C H:/.codex/worktrees/loop1-s1/IM-platform show 2a6eaa1:backend/go/social_test.go"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 593.0,
+      "stdout_sha256": "db3c1d589439d67e0923bf090d397e0fac054c98bd26f64823127590674568c4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": true
+    },
+    {
+      "command_id": "C-f6db72f5-98de-42a5-8134-2582cbd47ceb",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "rg -n '^func |^type |NewAuth|Codec|DB_TEST|readFixture|Normalizer|fixture' backend/go/tests backend/go/core/*test.go; Get-Content -Raw backend/go/core/http.go; rg -n 'friend|membership|revision|subjectId' contracts/fixtures/sync* contracts -g '*sync*'"
+      ],
+      "exit_code": 1,
+      "elapsed_ms": 688.0,
+      "stdout_sha256": "6ece3f9f01d1cd1376365ec5ec752232f2d8c47777075f623ed5dff03d1dd005",
+      "stderr_sha256": "29229c029bde31ecfbcd62152a614e0c3ec64083b84c2be2e839ca9f1c783d76",
+      "redaction": true
+    },
+    {
+      "command_id": "C-d7a13dbe-3e6c-4d90-bdee-0a55efca592f",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "rg -n 'func validUUID|validUUID|^func Test' backend/go/core; Get-Content -Raw contracts/websocket/sync-v1.schema.json; Get-Content -Raw spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md; Get-Content -Raw backend/go/tests/runtime_test.go; Get-Content backend/go/tests/contract_fixture_test.go -TotalCount 205; & 'C:/Program Files/Docker/Docker/resources/bin/docker.exe' version --format '{{.Server.Version}}'"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 813.0,
+      "stdout_sha256": "0dca6cf59dfc2ebd6bfccd9f66fde82a078605c7f5c6c9da802344577e09db13",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-12bb5316-03c8-4ed7-87b3-a812a7ebd043",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "Get-Content -Raw spec/tasks/active/LOOP1-GO-SOCIAL-001.md; Get-Content -Raw spec/progress/current.md; git status --porcelain=v1; git log -2 --oneline; git diff --stat; Get-Content -Raw backend/go/core/rollback_test.go; Get-Content -Raw backend/go/shared/config.go; Get-Content -Raw backend/go/tests/auth_test.go"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 656.0,
+      "stdout_sha256": "347296fa903d9b94ccbbc894001f09270fb76c35620348e3bb1ac779a47629b7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": true
+    },
+    {
+      "command_id": "C-aa98ecc8-2d5e-4786-b745-0d059832d486",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Acceptance"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 5719.0,
+      "stdout_sha256": "8c9feaab64eec84477e8b217888e512b4cc91043dbce317fc74de207ac6c4869",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-e9e62a0e-896e-49e0-8039-4f625e7b3228",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "H:/.codex/worktrees/architecture-remediation/social-implementation-20261001/adapt.py"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 125.0,
+      "stdout_sha256": "ceac0f02ffc5dd23aad06e2e45282817a235773bfe46c670c03088a53fea499f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-4034ec8d-1d3d-4d18-9d9e-eacfc11376d3",
+      "argv": [
+        "C:/Program Files/Docker/Docker/resources/bin/docker.exe",
+        "run",
+        "-d",
+        "--name",
+        "loop1-social-impl-pg-20261001",
+        "--label",
+        "im-platform.owner=R-SOCIAL-IMPLEMENTATION-20261001",
+        "-e",
+        "POSTGRES_HOST_AUTH_METHOD=trust",
+        "-e",
+        "POSTGRES_DB=social_test",
+        "-p",
+        "127.0.0.1::5432",
+        "postgres:16"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 687.0,
+      "stdout_sha256": "cf0dbea177f5b4ca42eaecc7c9f58efda345600d2b5b926fa36b0fb27aeb9831",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-645e2125-50c9-490d-813a-f01bcc47b9ec",
+      "argv": [
+        "C:/Program Files/Docker/Docker/resources/bin/docker.exe",
+        "port",
+        "loop1-social-impl-pg-20261001",
+        "5432"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 172.0,
+      "stdout_sha256": "024f806e356cc60bb42356c8a849d26486d5a7750332f49c9fd46f8ade0d233e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-a5298b5f-d356-4726-adec-353b2b092e09",
+      "argv": [
+        "C:/Program Files/Docker/Docker/resources/bin/docker.exe",
+        "run",
+        "-d",
+        "--name",
+        "loop1-social-impl-nats-20261001",
+        "--label",
+        "im-platform.owner=R-SOCIAL-IMPLEMENTATION-20261001",
+        "-p",
+        "127.0.0.1::4222",
+        "nats:2.10"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 39609.0,
+      "stdout_sha256": "4969617405f7cbd841b7c16be7c9e7551a1fb772803dd08d231d9874d5927ec7",
+      "stderr_sha256": "cd5a4a6126cf4d45989e45d0a44d81c4b700a3384abfacbb2f53cee65a13e304",
+      "redaction": false
+    },
+    {
+      "command_id": "C-f614b58e-bc6d-4dfb-88dd-9d1b9a0ae303",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "Get-Content contracts/database/migrations/0001_initial.up.sql -Raw | & 'C:/Program Files/Docker/Docker/resources/bin/docker.exe' exec -i loop1-social-impl-pg-20261001 psql -U postgres -d social_test -v ON_ERROR_STOP=1; & 'C:/Program Files/Docker/Docker/resources/bin/docker.exe' port loop1-social-impl-nats-20261001 4222"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 1250.0,
+      "stdout_sha256": "75d7d8896297a92a7fba9d68a280f8e9f341b8f92c6098a61da6f5d56da3f5a0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-31e9d408-e142-4c42-b400-607c9a48c866",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "\\='1'; \\='127.0.0.1'; \\='63402'; \\='postgres'; \\='social_test'; \\='nats://127.0.0.1:63779'; & 'H:/go/bin/go.exe' -C backend/go test -count=1 -v ./..."
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 3079.0,
+      "stdout_sha256": "8b54a281d6cd932b86c0742a09d1af433b9b61a3b036e8d9c064f9fdefef1f70",
+      "stderr_sha256": "e71a3356cb474e0d7d7fae1d484fd80d689bca0b5e89f8ed5cc355b5ae278262",
+      "redaction": false
+    },
+    {
+      "command_id": "C-d4b7aa20-68fb-4ae1-be03-9530ff101b5f",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "H:/.codex/worktrees/architecture-remediation/social-implementation-20261001/live.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 12109.0,
+      "stdout_sha256": "c2e75e721dbf8d585cab133be1eed11d28f052d0d620d702edc225a9e0de214b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": true
+    },
+    {
+      "command_id": "C-4a3fe96f-c606-4b3e-b27d-266d911df489",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "H:/.codex/worktrees/architecture-remediation/social-implementation-20261001/race.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 40468.0,
+      "stdout_sha256": "0b4a48db64ea3bc2fb4a556007e1dbb672fa450fa3ee9bef672b5be10502f6f4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": true
+    },
+    {
+      "command_id": "C-b7c7a109-761e-4c55-9092-2a120f6381d4",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 532.0,
+      "stdout_sha256": "de8f02cbcbeab226b17d2cdaea844098cd7dd31442385d815ed33b1102b706e7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": true
+    },
+    {
+      "command_id": "C-82f8353e-1bb4-4c40-a166-d8d2387db477",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-frozen-architecture.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 6188.0,
+      "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+      "stderr_sha256": "38944f38c2d4a33936784eded523b99dc9b91ed1a6d09a9b8d893974367bb397",
+      "redaction": false
+    },
+    {
+      "command_id": "C-e2c27bf1-833b-4c63-a86e-c23d74164271",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 2781.0,
+      "stdout_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52",
+      "stderr_sha256": "540ff32c060509ea097a607dc2064d124301f46e2f407e270e0f691e9159d7ca",
+      "redaction": false
+    },
+    {
+      "command_id": "C-aa95378c-a47c-4456-baa8-d6013cbda990",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        " $ErrorActionPreference=\"Stop\"; $files=Get-ChildItem backend/go -Recurse -Filter *.go | ForEach-Object FullName; $bad=& \"H:/go/bin/gofmt.exe\" -l $files; if ($bad) { $bad; exit 1 }; & \"H:/go/bin/go.exe\" -C backend/go build ./...; if ($LASTEXITCODE) {exit $LASTEXITCODE}; & \"H:/go/bin/go.exe\" -C backend/go vet ./...; exit $LASTEXITCODE "
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 2266.0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    },
+    {
+      "command_id": "C-d0477e03-d438-4f28-9ff5-7da0894d56c2",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "H:/.codex/worktrees/architecture-remediation/social-implementation-20261001/live.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 11157.0,
+      "stdout_sha256": "2d0324993f69adefcd1942b0ca912f0dd57c0fbed9e743e53cd9cab688884679",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": true
+    },
+    {
+      "command_id": "C-3e2347cb-02af-48a1-8eb9-184c833947b7",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        " $ErrorActionPreference=\"Stop\"; $docker=\"C:/Program Files/Docker/Docker/resources/bin/docker.exe\"; foreach($name in @(\"loop1-social-impl-pg-20261001\",\"loop1-social-impl-nats-20261001\")){ $info=(& $docker inspect $name | ConvertFrom-Json)[0]; if($info.Config.Labels.\"im-platform.owner\" -ne \"R-SOCIAL-IMPLEMENTATION-20261001\"){throw \"Ownership mismatch\"}; Write-Output \"Removing verified owned disposable container $name\"; & $docker rm -fv $name; if($LASTEXITCODE){exit $LASTEXITCODE} } "
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 2016.0,
+      "stdout_sha256": "718c2a3c74fa54a03a1758c68dcbcab67c25d6ece9401167fd4bf0caa98b6fd9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redaction": false
+    }
+  ],
+  "limits": [
+    "Startup reads and several edit commands outside Recorder, prospective_resume incomplete; not complete trace.",
+    "One inline environment command was malformed; subprocess exit0 but runtime integration skipped. EXCLUDED acceptance. Corrected explicit live.ps1/race.ps1 both executed all live integrations without skips.",
+    "Tool display sometimes truncated; external Recorder command artifacts retained.",
+    "Four Windows symlink privilege subcases skipped in 27 CI controls; hosted Linux must verify applicable controls.",
+    "Recorder secret redaction applied to test output; bounded public command hashes retained; not Task PASS."
+  ],
+  "disposition": {
+    "friend-add-authorization-denied": "DEFERRED_BY_HUMAN; not executed; does not count as PASS"
+  },
+  "product_files": {
+    "backend/go/core/auth.go": "e49d2b7335ab1e97928a631ac47bf99e318977fab85407ebad497fd7f06bccd7",
+    "backend/go/core/social.go": "ca719855b3848d4a07d47225c238f8698f625d2d00aa67f01202cc4a40976a2c",
+    "backend/go/core/social_test.go": "a2cf077bd270c7466dddb6af5da4d4cb6cdd03b978f7e91824d7840c78b8bc68",
+    "backend/go/tests/social_test.go": "cb5f54600f93b37cc25e9de5a3fa6d6cd2b60ebb4182284c5d3786981b07fe80"
+  }
+}

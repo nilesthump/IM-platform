@@ -1,0 +1,26 @@
+{
+  "exceptionVersion": "1.0",
+  "loop": "Loop1",
+  "fixtureVersion": "1.1",
+  "contractVersion": "1.0.0",
+  "defaultApplicability": "required_when_backend_task_stage_is_applicable",
+  "exceptions": [
+    {
+      "scenarioId": "friend-add-authorization-denied",
+      "fixture": "negative.json",
+      "operationId": "addFriend",
+      "method": "PUT",
+      "path": "/v1/friends/{friendUserId}",
+      "status": "DEFERRED_BY_HUMAN",
+      "implementationRequired": false,
+      "runtimeAcceptanceRequired": false,
+      "countsAsPass": false,
+      "openapiDisposition": "retain_403_placeholder_unchanged",
+      "futureWorkId": "FRIEND-AUTHORIZATION-403",
+      "targetIteration": "later_than_Loop1_unassigned",
+      "decision": "spec/architecture/decisions/ADR-0004-loop1-friend-403-exception.md"
+    }
+  ],
+  "reporting": "Report this single exception explicitly and separately from required-case results; do not claim all canonical cases executed.",
+  "expiry": "Applicable only to Loop1; later iteration activation must explicitly resolve future authorization inputs and retire exception."
+}

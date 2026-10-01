@@ -1,0 +1,105 @@
+{
+  "result": "PASS",
+  "subject": "f8d1a287a295ff9f882843f2191cf8c220efeff2",
+  "base": "2560dd55e32ed3f9601f6c5404b607a29084629c",
+  "branch": "task/LOOP1-GO-SOCIAL-001-v1.1",
+  "status": "",
+  "changed": [
+    "contracts/fixtures/auth-user-friend/loop1-exceptions.json",
+    "spec/acceptance/s0-auth-user-friend.md",
+    "spec/architecture/decisions/ADR-0004-loop1-friend-403-exception.md",
+    "spec/progress/checkpoints/2026-10-01-loop1-go-social-001-exception.md",
+    "spec/progress/current.md",
+    "spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-loop1-403-exception.md",
+    "spec/tasks/backlog/LOOP1-GO-SOCIAL-001.md"
+  ],
+  "unchangedTrackedFiles": 3792,
+  "unchangedMethod": "Single git diff --raw --no-abbrev confirms only exact7paths differ; all other tracked blobs identical",
+  "hashes": {
+    "spec/architecture/frozen-architecture.md": "83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e",
+    "scalable-distributed-im-architecture.pdf": "546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510",
+    "contracts/http/auth-user-friend.openapi.json": "bb115fe9cd82010d6cf94b7ee5cf6aaeaf915d072c6e105f70384637c49a14a2",
+    "contracts/fixtures/auth-user-friend/negative.json": "1d6df9be8f11c5cde3e7ca71719c14de57b2d3583cb0abe63d8aa4bda0d711bb"
+  },
+  "scenario": "friend-add-authorization-denied",
+  "method": "PUT",
+  "path": "/v1/friends/{friendUserId}",
+  "futureExpectedStatus": 403,
+  "futureError": "AUTHORIZATION_DENIED",
+  "profileExceptionCount": 1,
+  "deferredResult": "DEFERRED_BY_HUMAN",
+  "businessAcceptance": "NOT_TESTED_NOT_ACCEPTED",
+  "hostedCI": {
+    "headSha": "f8d1a287a295ff9f882843f2191cf8c220efeff2",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/nilesthump/IM-platform/actions/runs/36807927903",
+    "jobs": [
+      {
+        "name": "classify",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "java",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "web",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "source_java",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "source_go",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "shared",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "architecture",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "go",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "desktop",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "compatibility",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "mobile",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "deploy",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "gate",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  }
+}

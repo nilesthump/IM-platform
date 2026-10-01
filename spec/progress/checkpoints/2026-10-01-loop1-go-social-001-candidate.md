@@ -1,0 +1,3 @@
+# Social local candidate recovery point - 2026-10-01
+
+Base activationcc49b98; accepted actualmain279c1dc; new product candidate commit identified by its handoff/review evidence. Frozenv1.1/DB0001/golden1.1 unchanged; single Loop1 friend403 DEFERRED_BY_HUMAN under acceptedADR-0004. Four mapped product paths locally passed migratedPG16/NATS2.10 normal/race tests with zero live skips; sourceall/frozen34/CI27 checks passed (four Windows symlink subcases skipped). Local evidence only, taskreview/S1OPEN. IndependentReview/realCI next; no automaticmerge or furtherbusiness. Exact limits/commands/cleanup in own implementation handoff/JSON.
