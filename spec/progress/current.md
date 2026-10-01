@@ -3,61 +3,52 @@
 Current Loop: Loop 1
 Current Stage: S1
 Current Gate: S1
-Gate Status: OPEN (Social accepted/merged; MSG local development complete, independent acceptance pending)
+Gate Status: OPEN (Social accepted/merged; MSG repair development complete, independent acceptance pending)
 Current Batch: LOOP1-S1
 Current Task: LOOP1-GO-MSG-001
 Current Task State: review
-Execution Status: MSG_INDEPENDENT_FAIL_FRESH_FIX
+Execution Status: MSG_FIXED_READY_FOR_NEW_INDEPENDENT_REVIEW
 
 ## Immediately Relevant Completed Work
 
-PR3 merged actual main b442acd26777c481620a6bd917863cebfaf79b35; actual-mainCI36813501417 SUCCESS. MSG activation78129e8 exact-bound; fresh Implementation Agent completed six production/six test files, local real normal/race and structural verification. Independent Review returned FAIL on f1764fd; no MSG/S1 PASS claimed.
+Accepted PR3 actualmain b442acd/CI36813501417. Independent Review rejected MSGf1764fd; immutable FAILarchive84b7a63. Fresh Fix product `0a13b119e0e4c8788c5b264571df35df76ad94cb` preserves earlier origin marker across rejected retry and rejects missing/null required afterSeq. Three targeted tests REDthenGREEN, actual Core/Gateway/WSS/PG/NATS included. No MSG/S1PASS.
 
 ## Current Blockers
 
-Fresh independent Review FAIL on f1764fd: rejected conflicting retry deletes original-socket marker (gateway.go265-268), and missing/null required afterSeq is accepted (sync.go13/21). New bounded Fix/new independent Review cycle in progress; green actual CI never substitutes acceptance. Friend403 exception remains unrelated. No architecture conflict.
+NEW independent Review and new exact-head hostedCI required. Prior f176greenCI never overrides FAIL. No known remaining local failure/architecture conflict. Social friend403 only DEFERRED_BY_HUMAN, unrelated to messaging.
 
 ## Verification
 
 - Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
-  - Result: independent actual normal18.797s/race80.640s exit0/zero runtime skips; extra actual production-chain origin probe and missing/null history probes each exit1 and establish ReviewFAIL. Mandatory structure/byte checks and exact hostedCI pass but do not accept candidate.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md`
-
-- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
-  - Result: exit0 on unique migrated disposablePG16/NATS2.10, DB_TEST_ENABLE=1; zero runtime skips. Core4.923/6.922s, blackbox17.143/76.300s; messaging/canonical/fault/Auth/Social/Session/fallback PASS locally.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-command-results.json`
-- Command: `python -B contracts/websocket/verify.py; python -B ci/check_architecture.py --scope all --json; python -B -m unittest discover -s tests/architecture -v; python -B -m unittest discover -s tests/ci -v`
-  - Result: exit0; WSS8positive/10negative/18schema+26behavior controls, sourceall/no violations, architecture34, CI27 with exactly four Windows symlink-creation subcase skips (WinError1314). Local checks never replace hostedLinux CI.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-handoff.md`
-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; go -C backend/go build ./...; go -C backend/go vet ./...`
-  - Result: exit0; frozen34/no skips, Development recovery PASS, build/vet/recursive formatting clean. Clean committed Acceptance still belongs to independent candidate review/CI.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-checks-commands.json`
+  - Result: final local exit0 on owned migrated PG16/NATS2.10 DB_TEST_ENABLE1, zero runtime skips. New targeted gateway/core/actualblackbox regressions each REDexit1 thenGREENexit0. WSS/sourceall/architecture34/frozen34/CI27/build/vet/recursivegofmt/Development checks local exit0; exactly four Windows symlink CI subcase skips WinError1314. Post-handoff recovery check initially failed missing structured Command/Result/Evidence fields; corrected and rerun. Local checks never acceptance; hostedLinux required.
+  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-command-results.json`
 
 ## Changed Files or Migrations
 
-Core message/private history/http/outbox and Gateway forwarding/subscription, six matching tests. Narrow preauthorized stale malformed Auth test oracle uses canonical VALIDATION_FAILED/live local Core; original Session-lock invariant retained. DB0001/frozen/contracts/profile/ADR/workflows/shared/root assembly unchanged.
+Product gateway/gateway.go/core/sync.go and tests gateway/message_test.go/core/sync_test.go/tests/message_test.go only. No schema/migration/contracts/architecture/security-boundary/shared/root/Auth/Social/dependency/workflow change. Prior implementation and immutableFAIL evidence preserved.
 
 ## Known Failures, Risks, and Assumptions
 
-Setup/compile/canonical precondition/untouched GROUP fixture-oracle failures corrected and preserved in Recorder. Default Windows GBK log inspection failures corrected/disclosed. Recorder finished/validated121events (research-only PASS); startup and limited direct reads/launcher initialization incomplete prospective trace; redaction/UI truncation and terminal post-finish closure disclosed. Private history is bounded gap compensation, not a new public Sync feature or TLS-entry E2E. Publication permits duplicates; only test materializer exists. Independent review/security/minimality and real hosted acceptance still pending.
+Origin markers remain connection-lifetime preserving earlier committed/uncertain identity. History only private canonical bounded Conversation gap pages; TLS-entry E2E remains next task. Recorder sourceagent/prospective_resume R-MSG-FIX-20261001 exposes incomplete preparation/bootstrap/direct-inspection trace and failed handoff syntax attempt (nofiles changed). Main edits/checks routed; REDfailures preserved, UItruncation/redaction disclosed. Own prompt/run -text beforeoutputs. Final validation/staging/commit outside finishedtrace. Pre-existing interrupted Recorder remains partial untouched. Independent acceptancepending.
 
 ## Next Exact Action
 
-New /root/message_fix takes sole writer after Coordinator handoff commit, fixes only confirmed origin-marker and required-afterSeq defects with targeted regressions, then actual live normal/race/structural candidate verification. Commit development candidate/release, delegate NEW independent Review and exact hostedCI. Task remains review unfinished; no merge/MSG/S1PASS. Permanent FAIL evidence: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md.
+NEW independent Review exact clean finalhead/fullbranch b442acd..finalHead with newunique migratedservices actual normal/race/regressions/source/security/minimality, then real exact-head hostedCI beforetaskdone. Ordinary failure freshFix/newReview. Do not merge/claim S1PASS yet.
 
 ## Last Known Good Commit
 
-`b442acd26777c481620a6bd917863cebfaf79b35` (accepted actualmain, CI36813501417); activation78129e8 is control-plane input binding, not MSG acceptance.
+`b442acd26777c481620a6bd917863cebfaf79b35` acceptedactualmain/CI36813501417. Product `0a13b119e0e4c8788c5b264571df35df76ad94cb` is developmentcandidate, notacceptedbaseline.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-local-review.md`
+`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-fix-review.md`
 
 ## Uncommitted Changes / Ownership
 
-Development product committed at f64ae64e6e333ee52242b7b2100c663cd1f378c2; latest checkpoint is local review recovery, not accepted Gate. Implementation/review writers released. Coordinator owns FAIL archive/current/Task handoff until commit; new /root/message_fix takes sole bounded writer after release. Candidate f176 remains permanently rejected. Owned labeled PG/NATS containers/anonymous volume removed, exit0. Original H:/IM-platform and old worktrees/unknown untracked paths untouched; no other writer modified this worktree.
+/root/message_fix owns this Taskfix Recorder/evidence/recovery until clean finalcandidatecommit then writerreleasedtoCoordinator. Product committed `0a13b119e0e4c8788c5b264571df35df76ad94cb`. Owned message_fix-labeled PG/NATS/anonymousvolume removedexit0. Original H:/IM-platform and unrelatedworktrees/services untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Private Core-only HTTP adapters and per-user NATS locators reuse authorized boundaries with unchanged canonical payloads/bound bearer; no public contract/security rule change. Only approved Social friend403 exception remains.
-Transport closure: research/.gitattributes originally filtered36 immutable raw artifacts CRLF toLF during staging; raw working validation remained PASS. Coordinator explicitly authorized only own-run .gitattributes, after separate pre-edit path/hash diagnosis. Ordinary add retained cached filtered entries and byte assertion failed; own-run add --renormalize repaired index transport. All124 original prompt/run files now working/index byte-identical; no raw event/blob/hash mutation. Diagnosis and full audit in 2026-10-01-transport-preservation.json / 2026-10-01-transport-byte-audit.json. Initial stage mismatch and dirty Acceptance remain disclosed development failures. Finished Recorder administrative closure remains outside trace.
+None. Frozenhash/contracts/publicwire/ACK/security/database0001 unchanged; MSGreview/S1OPEN.
+
+Final fix Recorder finished/validated97events (research-only PASS). Post-finish rawbyte staging audit and administrative commit lie outside finished trace. Own fix services removed. All bounded development work committed at final candidate; writer released to Coordinator on clean-status confirmation. NEW independent Review and exact-head hostedCI remain required.

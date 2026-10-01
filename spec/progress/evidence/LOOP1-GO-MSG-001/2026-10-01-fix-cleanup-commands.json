@@ -1,0 +1,64 @@
+{
+  "owner": "R-MSG-FIX-20261001",
+  "phase": "cleanup",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55634",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_fix_test",
+    "NATS_URL": "nats://127.0.0.1:42634"
+  },
+  "containers": [
+    "loop1-msg-fix-pg-20261001",
+    "loop1-msg-fix-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "--format",
+        "{{index .Config.Labels \"im.owner\"}}",
+        "loop1-msg-fix-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.234,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-msg-fix-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.704,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "--format",
+        "{{index .Config.Labels \"im.owner\"}}",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.265,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.594,
+      "go_runtime_skips": 0
+    }
+  ]
+}

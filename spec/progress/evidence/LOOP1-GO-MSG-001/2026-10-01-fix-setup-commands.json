@@ -1,0 +1,147 @@
+{
+  "owner": "R-MSG-FIX-20261001",
+  "phase": "setup",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55634",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_fix_test",
+    "NATS_URL": "nats://127.0.0.1:42634"
+  },
+  "containers": [
+    "loop1-msg-fix-pg-20261001",
+    "loop1-msg-fix-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "loop1-msg-fix-pg-20261001",
+        "--label",
+        "im.task=LOOP1-GO-MSG-001",
+        "--label",
+        "im.owner=message_fix",
+        "-e",
+        "POSTGRES_HOST_AUTH_METHOD=trust",
+        "-e",
+        "POSTGRES_DB=msg_fix_test",
+        "-p",
+        "127.0.0.1:55634:5432",
+        "postgres:16"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.515,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "loop1-msg-fix-nats-20261001",
+        "--label",
+        "im.task=LOOP1-GO-MSG-001",
+        "--label",
+        "im.owner=message_fix",
+        "-p",
+        "127.0.0.1:42634:4222",
+        "nats:2.10"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.547,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "import subprocess,time; name='loop1-msg-fix-pg-20261001'; ready=False\nfor _ in range(60):\n if subprocess.run(['docker','exec',name,'pg_isready','-U','postgres','-d','msg_fix_test'],capture_output=True).returncode==0: ready=True;break\n time.sleep(.5)\nassert ready,'PG readiness failed'"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.188,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "import subprocess,pathlib;subprocess.run(['docker','exec','-i','loop1-msg-fix-pg-20261001','psql','-U','postgres','-d','msg_fix_test','-v','ON_ERROR_STOP=1'],input=pathlib.Path('contracts/database/migrations/0001_initial.up.sql').read_bytes(),check=True)"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.515,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 18.235,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 79.328,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "contracts/websocket/verify.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.156,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.609,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.375,
+      "go_runtime_skips": 0
+    }
+  ]
+}

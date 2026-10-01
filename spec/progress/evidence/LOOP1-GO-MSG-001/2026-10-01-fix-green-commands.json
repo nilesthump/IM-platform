@@ -1,0 +1,66 @@
+{
+  "owner": "R-MSG-FIX-20261001",
+  "phase": "green",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55634",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_fix_test",
+    "NATS_URL": "nats://127.0.0.1:42634"
+  },
+  "containers": [
+    "loop1-msg-fix-pg-20261001",
+    "loop1-msg-fix-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./gateway",
+        "-run",
+        "TestRejectedRetryPreservesCommittedOrigin"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.25,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./core",
+        "-run",
+        "TestHistoryRequiresPresentIntegerAfterSeq"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.281,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./tests",
+        "-run",
+        "TestLiveConflictingRetryDelayedOrigin"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.235,
+      "go_runtime_skips": 0
+    }
+  ]
+}
