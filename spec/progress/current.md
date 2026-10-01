@@ -37,7 +37,7 @@ NEW fresh independent Review of full final clean candidate; actual applicable ex
 
 ## Last Known Good Commit
 
-Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Locally verified product/review-state candidate e67953a2067810c2b85f6adaf3c494db7cfd0e49; final metadata closure SHA returned by git HEAD in implementation handoff, independent acceptance pending.
+Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Prior product e67953a/failedReviewee82 immutable. Corrected locally verified product78ee723a4130d237d824b7d9c313dd77297fcbe8; final evidence-only candidate SHA returned by gitHEAD/Fix handoff, independent acceptance pending.
 
 ## Latest Checkpoint
 

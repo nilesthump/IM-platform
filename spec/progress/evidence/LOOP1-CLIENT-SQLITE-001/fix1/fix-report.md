@@ -5,7 +5,7 @@ Starting ee82e9ff459558907998d5e68e7097386e2b7f14; fresh sole Fix /root/s2_sqlit
 ## Findings and minimality
 
 P1: minSdk34 replaces unaccepted minSdk26 engineering binding. Targeted UPSERT/conflict-DO-NOTHING requireSQLite3.24; targetless conflict-DO-UPDATE requires3.35. API26=3.18, API30=3.28, API31-33=3.32; API34=3.39/3.42. Strongest current SQL requirement3.35. Current CREATE TABLE/UNIQUE/CHECK, ordinary SELECT/INSERT/UPDATE/DELETE/EXISTS/COALESCE/MAX/CAST, PRAGMA user_version/transactions are older; recursive CTE UPDATE3.8.3. No newer constructs, product RETURNING, JSON/virtual/generated/STRICT/window features used. Actual minimum34 config/README/CI/verifier aligned; verifier rejects newer substitutes, checks boot1/CEtrue and requires install+cleared-data full runs. Built-in SDKSQLite and current authority/responsibilities unchanged. minSDK26 was never accepted; no frozen minimumOS constraint found. This corrects an engineering binding without changing canonical public protocol compatibility/contracts.
-Sources: https://developer.android.com/reference/android/database/sqlite/package-summary ; https://www.sqlite.org/lang_upsert.html ; https://www.sqlite.org/lang_with.html .
+Sources: https://developer.android.com/reference/android/database/sqlite/package-summary ; https://www.sqlite.org/lang_upsert.html ; https://www.sqlite.org/lang_with.html ; https://www.sqlite.org/releaselog/3_8_3.html .
 
 P2: TS string iteration codepoints and Kotlin built-in codePointCount match unchanged canonical4096character maxLength. Actual two-platform assertions accept4096 U+1F600, reject4097 for local/Sync, preserve durable rows/cursor/contiguous and reopened history. No new library/parser/adapter/contract.
 
