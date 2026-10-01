@@ -7,65 +7,38 @@ Gate Status: OPEN
 Current Batch: client-architecture-clarification-before-S2
 Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 Current Task State: review
-Execution Status: PLUGIN_APPLICATION_GUARD_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
+Execution Status: QUOTED_GRADLE_SELECTOR_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
 
-## Immediately Relevant Completed Work
+## Completed Work
 
-Human-approved v1.1 clarification corrected before acceptance: Mobile Android Kotlin + Jetpack Compose, Web/Desktop/shared TypeScript, Desktop SQLx(SQLite), ADR0005 approval chain and direct Android Gradle/catalog/import/build/workflow/source guards in H:/ica. Rollback main3f352a8 restores accepted pre-PR7 tree; PR7 is withdrawn historical deviation. S1 PASS/S2 OPEN. Product coding waits for acceptance of this prerequisite.
+Human-approved v1.1 candidate retains Android Kotlin/Jetpack Compose Mobile, React/TypeScript Web, Tauri/React/TypeScript Desktop + SQLx(SQLite), equivalent Mobile contracts/fixtures and universal selection governance. Rollback main3f352a8 restores accepted pre-PR7 tree; withdrawn PR7/approval/history remain immutable. S1 PASS/S2 OPEN; product coding waits for this prerequisite acceptance.
 
-## Current Blockers
+Fresh Fix repairs runtime-confirmed quoted Gradle member/pointer/interpolated selectors in existing checker and adds bounded RED/GREEN controls. No product/schema/public contract/dependency/authority changes. Earlier recovery history is preserved byte-for-byte in plugin-quoted-method-guard-fix/independent-review-proofs.zip (prior-current.md), with prior evidence directories unchanged.
 
-Fresh independent Review exactdbb3 FAIL: ordinary Groovy plugins.apply/pluginManager.apply command forms apply builtin Java despite all13 hosted36866888054/36866880629 SUCCESS. Fresh bounded residual-apply correction locally passes; NEW independent Review and new actual exact-head hosted CI required. Task remains review; S2 OPEN; product not started.
+## Verification and Evidence
 
-## Verification
+Frozen/architecture53 no skips, sourceall0 violations, CI30 with4 exposed existing Windows real-symlink privilege skips, Recovery Development PASS. Clean committed Acceptance/preservation/Recorder/archive discovery follows durable spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-quoted-method-guard-fix/local.md, command-history.json, preservation.json and recorder-summary.md. RED10 on prior54ab; GREEN19 client tests; actual isolated offline Gradle8 runtime forms apply Java and now reject. Local/Recorder PASS is not acceptance.
 
-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
-  - Result: PASS51 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-application-guard-fix/local.md`
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: Application correction Recovery Development PASS; clean committed Acceptance PASS atdfd95ecee6687a5d11b9e5f1baf0b9aa7e2978e7. Final archive-only HEAD recheck remains exposed outside finished trace.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-application-guard-fix/command-history.json`
+## Blockers and Risks
 
-## Changed Files or Migrations
-
-Authority/hash/ADR0005, governance/Agent/template, existing architecture checker/classifier/workflow and controls; task/evidence/checkpoint only. No product/schema/contract change. Full list from candidate committed diff.
-
-## Known Failures, Risks, and Assumptions
-
-Prior implementation failures/evidence/Recorder immutable. Correction read-only startup encoding/quoting errors and unsupported Recorder event type exposed; no evidence rewritten. Mixed appended manifest whitespace repaired. Intermediate Recovery FAIL3 from evidence/checkpoint references before files existed, repaired final Development/clean committed Acceptance PASS. CI30 exposes4 existing Windows real-symlink privilege skips; hosted Linux must execute actual links. Direct Android guards supplement semantic independent Review; no product or Android emulator acceptance in this authority prerequisite. Correction Recorder prospective_resume discloses pre-Recorder startup; finished/validated PASS52, immutable archive/postfinish boundary recorded in mobile-correction-recorder-summary.md.
+Independent54ab Review FAIL despite PRall13 SUCCESS and pushretry2 effective13 SUCCESS; original pushattempt1 TLS smoke/gateFAIL preserved. NEW independent Review and actual final exact-head CI required. Linux must execute real-link controls without skips. Initial sandbox/encoding/test-seam/slashy failures and ancillary runtime metadata/raw output filename loss are exposed in local.md; new reruns are distinct evidence. Prior historical authority/approval/PDF/Recorder/rawHuman12 hardbreaks and original744 unknown files preserved.
 
 ## Next Exact Action
 
-NEW fresh independent Review of clean final committed HEAD/range from rollback base; clean Recovery Acceptance then actual applicable exact-head hosted CI; no done/product activation before acceptance.
+Finish clean candidate/Recorder/archive and release sole writer; NEW fresh independent Review finalHEAD/full3f..HEAD + clean Recovery Acceptance + actual applicable new exact-head hosted CI. No done/product activation before acceptance; S2 OPEN.
 
 ## Last Known Good Commit
 
-Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0f13759ffb2a861b08c4820a1504b76d5c08a` tree restored.
+Rollback main3f352a8e465c0c4b093cca8e5f404ea587550b6e; accepted pre-PR7 a0f0f13759ffb2a861b08c4820a1504b76d5c08a tree restored.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-client-architecture-plugin-application-guard-fix.md`.
+spec/progress/checkpoints/2026-10-01-client-architecture-plugin-quoted-method-guard-fix.md.
 
 ## Uncommitted Changes / Ownership
 
-Fix Agent owns only final archive/discovery edits until clean final candidate commit/checks, then releases sole writer to Coordinator/fresh Reviewer; no unknown uncommitted candidate work. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No product services started. Coordinator owns adb tooling daemon; Fix Agent starts no services.
+Fresh Fix /root/plugin_quoted_method_guard_fix owns only bounded checker/tests/current/task/new evidence/checkpoint until clean final archivecommit/external checks and explicit release. Original H:/IM-platform unknown744 files unchanged; Coordinator approval/recovery/full prompt copies unchanged. No product services; Coordinator owns adb tooling daemon.
 
-## Architecture Conflicts / ACP / ADR
+## Architecture / Selection
 
-Human authorizes only client clarification ADR0005/v1.1 and guards; version remains v1.1, canonical bytes/hash changed. Mobile Android Kotlin/Compose authorized by exact supplemental Human decision; all additional undecided sensitive dependencies follow BLOCKED_BY_ARCHITECTURE. Desktop uses approved Tauri + SQLx(SQLite) atomic transaction adapter. S2 OPEN.
-
-## Complete plugin selector correction (2026-10-01; unfinished review)
-
-Fresh Fix /root/plugin_literal_guard_fix validates complete id/kotlin selectors and supported plugin-block entries; preserves literal/catalog/version/applyfalse/Kotlin configuration. Concrete runtime proofs also confirm java shortcut/typedapply bypasses; repair rejects them. Local Frozen49/no skips, sourceall0, CI30/4 exposed existing Windows symlink privilege skips PASS. RED18/first GREEN1 repaired, prior independent FAIL/CI/runtime evidence unchanged. Recovery Development/clean committed Acceptance/scope-preservation discovery and exact command histories in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-literal-guard-fix/. Recorder R-PLUGIN-LITERAL-FIX-20261001 prospective_resume captures complete assignment/dispatch/activation; incomplete read-only startup/errors disclosed. Fix owns bounded correction until final cleancommit/release. NEW fresh independent Review finalHEAD/full3f..HEAD and actual exact-head CI remain necessary; task review/S1 PASS/S2 OPEN, last known good rollback3f352a8. Original744 files/authority/approval/previous evidence/Recorder immutable; no product/services; Coordinator adb ownership.
-
-Complete-selector Fix local Recovery Acceptance PASS clean0479af2;5943 prior Git tree objects and744 original unknown files unchanged,23 copied raw proof hashes verified. CR-aware correction/fullrange excludingONLY unchangedrawHuman PASS; fullrangeFAIL12 intentional rawHuman hardbreaks preserved. Raw Gradle/CI logs stored byte-identical ZIP members; initial staged log whitespace/audit/provenance errors retained and corrected. Final clean Recorder archive and release discovery follows plugin-literal-guard-fix/recorder-summary.md; NEW fresh independent Review/exact-head CI required. Task review/S2 OPEN, no product changes.
-
-Literal selector Fix Recorder finished/validated PASS88 manifested9d59b79bcc1554fc1ee2931640048a46cebe0652a9c833fb5fc3ac1c8afb26; immutable archive and postfinish limitations in plugin-literal-guard-fix/recorder-summary.md. Clean prearchive Recovery Acceptance/audit PASS0aaf5af;5943 priorobjects/744unknownfiles/23rawproofcopies unchanged. Sole writer releases after finalclean archivecommit and external postfinish checks. NEW independent Review/finalexactheadCI required; task review/S2 OPEN, product not started.
-
-## Plugin application correction (2026-10-01; unfinished review)
-
-Fresh Fix /root/plugin_application_guard_fix owns bounded checker/tests/evidence/current/task/checkpoint correction until clean archive commit/release. Independent dbb3 FAIL/13 hosted SUCCESS copied unchanged to plugin-application-guard-fix/independent-review. Actual offline runtime proves command/variable/closure/methodreference application; RED8/GREEN17 controls, Frozen51/no skips/sourceall0/CI30 with4 exposed Windows1314 skips PASS. No product/authority/publiccontract/dependency changes. Local verification/recovery/preservation discovery in plugin-application-guard-fix/local.md, command-history.json and preservation.json; Recorder/archive/postfinish limitations follow recorder-summary.md. Unique current task review; S1 PASS/S2 OPEN; last known good rollback3f352a8. Next NEW fresh independent Review finalcleanHEAD/full3f..HEAD + actual new exact-head CI, no done/product until acceptance. Prior authority/approval/PDF/human12 hardbreaks/history/Recorder and original744 unknown files preserved. No services; Coordinator adb ownership.
-
-Application Fix clean Recovery/preservation PASSdfd95ec:5966 priorobjects/744 unknownfiles/54rawcopy-source hashes. Initial evidence-directory glob PermissionError and rawscript whitespaceFAIL1 preserved; identical script transported inZIP, focused/full-except-only-rawHuman CR-aware PASS; fullrangeFAIL12 original hardbreaks remains disclosed. Finished Recorder/archive discovery and postfinish boundary follow plugin-application-guard-fix/recorder-summary.md. Fix releases only after final clean archivecommit/recheck; NEW independent Review/actualexactheadCI required.
-
-Application Fix Recorder finished/validated PASS70 manifestc368d73c887d1bebf9238f581cf94cf3f9ee1e87f802d12ea97976d77e63016c; immutable archive and postfinish limitations in plugin-application-guard-fix/recorder-summary.md. Clean prearchive Recovery/preservation PASS5818eed;5966 priorobjects/744unknownfiles/54rawcopy-source hashes unchanged. Sole Fix writer releases after finalclean archivecommit/externalchecks, then NEW independent Review/newexactheadCI. Task review/S2 OPEN; no product/selfacceptance.
+Canonical v1.1 aa239802 and PDF546915 remain unchanged. Additional sensitive choices require architecture process; task paths/tests do not authorize them. No unresolved new selection.

@@ -237,6 +237,44 @@ class ClientTechnologyControls(unittest.TestCase):
                 errors = checker.check_clients(self.root)
                 self.assertTrue(any('plugin' in error for error in errors), errors)
 
+    def test_android_quoted_member_dispatch_fails_closed(self):
+        # Review proved literal quoted dispatch applies builtin Java in Gradle.
+        # Quoted/dynamic members are outside the supported direct declaration DSL.
+        forms = (
+            "plugins.'apply'('java')",
+            'pluginManager."apply"("java")',
+            "def selected = pluginManager.&'apply'\nselected('java')",
+            "def selected = 'apply'\nplugins.\"${selected}\"('java')",
+            "pluginManager?.'apply'('java')",
+            "def selected = pluginManager\nselected.'apply'('java')",
+            "plugins.'apply'('com.android.application')",
+            "dependencies.'add'(configuration, selected)",
+            'def selected = "apply"\nplugins./${selected}/("java")',
+            'def selected = "apply"\npluginManager.$/${selected}/$("java")',
+        )
+        for source in forms:
+            with self.subTest(source=source):
+                self.put('clients/mobile/build.gradle', source)
+                errors = checker.check_clients(self.root)
+                self.assertTrue(any('plugin' in error for error in errors), errors)
+
+    def test_android_quoted_dispatch_text_remains_data(self):
+        forms = (
+            'def note = "plugins.\'apply\'(\'java\')"',
+            "def note = 'pluginManager.\"apply\"(\"java\")'",
+            "// plugins.'apply'('java')\napply plugin: 'com.android.application'",
+            "/* pluginManager.\"apply\"(\"java\") */\nplugins { id 'com.android.library' }",
+            'def note = ' + '"' * 3 + "plugins.'apply'('java')\npluginManager.&'apply'" + '"' * 3,
+            "def note = " + "'" * 3 + 'pluginManager."apply"("java")\nplugins."${selected}"' + "'" * 3,
+            "def note = \"text.\"\n'data'",
+            "def note = /plugins.'apply'('java')/",
+            "def note = $/plugins.'apply'('java')/$",
+        )
+        for source in forms:
+            with self.subTest(source=source):
+                self.put('clients/mobile/build.gradle', source)
+                self.assertEqual([], checker.check_clients(self.root))
+
     def test_android_supported_apply_and_quoted_contexts_remain_approved(self):
         forms = (
             "apply plugin: 'com.android.application'",

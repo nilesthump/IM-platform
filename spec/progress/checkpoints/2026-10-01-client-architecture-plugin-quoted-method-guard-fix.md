@@ -1,0 +1,7 @@
+# Quoted Gradle selector correction recovery point
+
+Current Task LOOP1-CLIENT-ARCH-CLARIFICATION-001 remainsreview; S1 PASS/S2 OPEN. Last known good rollback3f352a8e465c0c4b093cca8e5f404ea587550b6e. Parent candidate54ab4a7f0422c96b84c5dbf0afe1aac071e891b7 failed NEW independent Review. Repair commit is the commit introducing this checkpoint; final archive-only HEAD follows Recorder summary.
+
+No contract/schema/migration/fixture/product dependency transition; canonical v1.1 aa239802 and PDF546915 unchanged. Bounded existing lexical guard rejects quoted selectors; runtime/RED10/GREEN19/Frozen53/sourceall0/CI30 with4 explicit Windows privilege skips/Recovery Development local PASS. Clean committed Acceptance and protected object/original744/raw source/member/whitespace audit recorded in plugin-quoted-method-guard-fix/preservation.json and command-history.json. Initial errors and unavailable first-runtime per-probe bytes are exposed in local.md. Prior current.md history bytes are archived unchanged; prior evidence/Recorder/authority preserved.
+
+Fresh Fix sole writer releases after clean final archivecommit/checks; NEW fresh independent Review/full3f..finalHEAD + actual new exact-head hosted CI needed. No selfacceptance/done/product/services; Coordinator adb ownership. Recorder/archive/postfinish boundary in plugin-quoted-method-guard-fix/recorder-summary.md.

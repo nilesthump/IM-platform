@@ -383,7 +383,18 @@ def check_android(root, policy):
             direct_apply = r'(?m)(?:^|[;{}])([ \t]*apply\s+plugin\s*:\s*' + text_literal + r'[ \t]*(?=$|[\n;}]))'
             build_code = re.sub(direct_apply, lambda m: m.group(0)[:m.start(1) - m.start()], build_code)
             quoted = r'"{3}[\s\S]*?"{3}|\x27{3}[\s\S]*?\x27{3}|"(?:\\.|[^"\\])*"|\x27(?:\\.|[^\x27\\])*\x27'
-            build_code = re.sub(quoted, ' ', build_code)
+            # Slashy literals have an unambiguous expression-start/member prefix;
+            # dollar-slashy literals have their own delimiter. Keep division as code.
+            quoted += r'|\$/[\s\S]*?/\$|(?P<slashy_prefix>(?:^|[=(\[,:.]|\.\s*&)\s*)/(?:\\.|[^/\\])*/'
+            def mask_build_literal(match):
+                # Groovy quoted members are executable selectors, including method
+                # pointers and interpolation. Ordinary entire strings remain data.
+                # Unsupported member notation must not evade plugin/dependency checks.
+                prefix = match.group('slashy_prefix') or ''
+                if re.search(r'\.\s*&?\s*$', prefix or build_code[:match.start()]):
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android quoted plugin/dependency/build selector')
+                return prefix + ' '
+            build_code = re.sub(quoted, mask_build_literal, build_code, flags=re.MULTILINE)
             if re.search(r'\bapply\b|\b(?:includeBuild|useModule|usePlugin)\s*\(', build_code):
                 errors.append(f'CLIENT {relative}: unapproved/dynamic Android Gradle plugin/build inclusion')
     # Build/install/CI commands must not restore Mobile TS or choose another stack.
