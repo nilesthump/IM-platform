@@ -129,6 +129,9 @@ class StorageInstrumentation : Instrumentation() {
         val id="50000000-0000-4000-8000-000000000001"
         val emoji="\uD83D\uDE00".repeat(4096)
         var durable: List<List<String?>> = emptyList()
+        val cursor256="\uD83D\uDE00".repeat(256)
+        val events=listOf(UserEvent("friend.changed",account,1))
+        var userState: List<List<String?>> = emptyList()
         Repository(targetContext,account).use { repo ->
             repo.initialize()
             val local=LocalMessage(c,r,account,emoji)
@@ -139,8 +142,18 @@ class StorageInstrumentation : Instrumentation() {
             equal(repo.messages(c),durable)
             reject { repo.syncMessages(listOf(server.copy(requestId="40000000-0000-4000-8000-000000000009",messageId="50000000-0000-4000-8000-000000000009",seq=2,text=emoji+"\uD83D\uDE00"))) }
             equal(repo.messages(c),durable); equal(repo.contiguous(c),1L); equal(repo.cursor(),"0")
+            repo.userPage(events,cursor256,"0"); equal(repo.cursor(),cursor256)
+            userState=repo.query("SELECT kind,subject_id,CAST(revision AS TEXT) FROM user_state")
+            equal(userState,listOf(listOf("friend.changed",account,"1")))
+            reject { repo.userPage(listOf(events[0].copy(revision=2)),cursor256+"\uD83D\uDE00",cursor256) }
+            reject { repo.userPage(listOf(events[0].copy(revision=2)),"stale","0") }
+            equal(repo.cursor(),cursor256); equal(repo.query("SELECT kind,subject_id,CAST(revision AS TEXT) FROM user_state"),userState)
+            equal(repo.messages(c),durable); equal(repo.contiguous(c),1L)
         }
-        Repository(targetContext,account).use { repo -> repo.initialize(); equal(repo.messages(c),durable) }
+        Repository(targetContext,account).use { repo -> repo.initialize(); equal(repo.messages(c),durable)
+            equal(repo.cursor(),cursor256); equal(repo.query("SELECT kind,subject_id,CAST(revision AS TEXT) FROM user_state"),userState)
+            equal(repo.contiguous(c),1L)
+        }
         targetContext.deleteDatabase("im-$account.sqlite")
     }
     override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); start() }

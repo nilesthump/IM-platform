@@ -118,7 +118,7 @@ class Repository(context: Context, accountId: String) : Closeable {
         }
     }
     fun userPage(events: List<UserEvent>, nextCursor: String, expectedCursor: String, failBeforeAdvance: Boolean=false) {
-        require(nextCursor.isNotEmpty() && nextCursor.length<=256)
+        require(nextCursor.isNotEmpty() && nextCursor.codePointCount(0, nextCursor.length)<=256)
         require(events.all { it.kind in listOf("friend.changed","conversation.changed","membership.changed","plugin.changed") && it.revision>0 })
         transaction {
             require(cursor()==expectedCursor) { "Stale user page" }

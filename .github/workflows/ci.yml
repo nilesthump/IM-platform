@@ -222,6 +222,8 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34

@@ -105,7 +105,7 @@ export class Repository {
     ]);
   }
   async userPage(page: UserPage, expectedCursor: string, failBeforeAdvance = false): Promise<void> {
-    if (page.syncVersion !== "1.0" || page.type !== "sync.user.page" || !page.nextCursor || page.nextCursor.length > 256) throw new Error("Invalid user page");
+    if (page.syncVersion !== "1.0" || page.type !== "sync.user.page" || !page.nextCursor || [...page.nextCursor].length > 256) throw new Error("Invalid user page");
     const statements: Statement[] = [assert("cursor=?", [expectedCursor])];
     for (const event of page.events) {
       if (!["friend.changed","conversation.changed","membership.changed","plugin.changed"].includes(event.kind)) throw new Error("Message in user cursor");
