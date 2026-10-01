@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: client-architecture-clarification-before-S2
 Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 Current Task State: review
-Execution Status: PLUGIN_LITERAL_GUARD_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
+Execution Status: PLUGIN_APPLICATION_GUARD_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
 
 ## Immediately Relevant Completed Work
 
@@ -15,7 +15,7 @@ Human-approved v1.1 clarification corrected before acceptance: Mobile Android Ko
 
 ## Current Blockers
 
-Fresh independent Review exact8109 FAIL: approved plugin literal prefix transforms into builtin java; actual Gradle runtime proves bypass despite hosted36863598509 all13 SUCCESS. Fresh bounded complete selector fix locally passes; NEW independent Review and exact-head hosted CI required before done/product. S2 OPEN; no additional dependency choice authorized.
+Fresh independent Review exactdbb3 FAIL: ordinary Groovy plugins.apply/pluginManager.apply command forms apply builtin Java despite all13 hosted36866888054/36866880629 SUCCESS. Fresh bounded residual-apply correction locally passes; NEW independent Review and new actual exact-head hosted CI required. Task remains review; S2 OPEN; product not started.
 
 ## Verification
 
@@ -44,7 +44,7 @@ Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-client-architecture-plugin-literal-guard-fix.md`.
+`spec/progress/checkpoints/2026-10-01-client-architecture-plugin-application-guard-fix.md`.
 
 ## Uncommitted Changes / Ownership
 
@@ -61,3 +61,7 @@ Fresh Fix /root/plugin_literal_guard_fix validates complete id/kotlin selectors 
 Complete-selector Fix local Recovery Acceptance PASS clean0479af2;5943 prior Git tree objects and744 original unknown files unchanged,23 copied raw proof hashes verified. CR-aware correction/fullrange excludingONLY unchangedrawHuman PASS; fullrangeFAIL12 intentional rawHuman hardbreaks preserved. Raw Gradle/CI logs stored byte-identical ZIP members; initial staged log whitespace/audit/provenance errors retained and corrected. Final clean Recorder archive and release discovery follows plugin-literal-guard-fix/recorder-summary.md; NEW fresh independent Review/exact-head CI required. Task review/S2 OPEN, no product changes.
 
 Literal selector Fix Recorder finished/validated PASS88 manifested9d59b79bcc1554fc1ee2931640048a46cebe0652a9c833fb5fc3ac1c8afb26; immutable archive and postfinish limitations in plugin-literal-guard-fix/recorder-summary.md. Clean prearchive Recovery Acceptance/audit PASS0aaf5af;5943 priorobjects/744unknownfiles/23rawproofcopies unchanged. Sole writer releases after finalclean archivecommit and external postfinish checks. NEW independent Review/finalexactheadCI required; task review/S2 OPEN, product not started.
+
+## Plugin application correction (2026-10-01; unfinished review)
+
+Fresh Fix /root/plugin_application_guard_fix owns bounded checker/tests/evidence/current/task/checkpoint correction until clean archive commit/release. Independent dbb3 FAIL/13 hosted SUCCESS copied unchanged to plugin-application-guard-fix/independent-review. Actual offline runtime proves command/variable/closure/methodreference application; RED8/GREEN17 controls, Frozen51/no skips/sourceall0/CI30 with4 exposed Windows1314 skips PASS. No product/authority/publiccontract/dependency changes. Local verification/recovery/preservation discovery in plugin-application-guard-fix/local.md, command-history.json and preservation.json; Recorder/archive/postfinish limitations follow recorder-summary.md. Unique current task review; S1 PASS/S2 OPEN; last known good rollback3f352a8. Next NEW fresh independent Review finalcleanHEAD/full3f..HEAD + actual new exact-head CI, no done/product until acceptance. Prior authority/approval/PDF/human12 hardbreaks/history/Recorder and original744 unknown files preserved. No services; Coordinator adb ownership.

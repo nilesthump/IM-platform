@@ -376,7 +376,15 @@ def check_android(root, policy):
                 resolved = bool(alias and (alias.group(2) in (catalog_bundles if alias.group(1) else catalog_libraries)))
                 if not (literal or internal or resolved):
                     errors.append(f'CLIENT {relative}: unresolved/dynamic Android dependency declaration {expression}')
-            if re.search(r'\bapply\s*(?:<|\(|from\s*:)|\b(?:includeBuild|useModule|usePlugin)\s*\(', build_code):
+            # Consume supported direct Groovy declarations, then reject every
+            # remaining apply identifier outside strings/comments. This covers
+            # command calls, variables, closures, references and typed calls
+            # without a receiver/plugin-name blacklist or executing Gradle.
+            direct_apply = r'(?m)(?:^|[;{}])([ \t]*apply\s+plugin\s*:\s*' + text_literal + r'[ \t]*(?=$|[\n;}]))'
+            build_code = re.sub(direct_apply, lambda m: m.group(0)[:m.start(1) - m.start()], build_code)
+            quoted = r'"{3}[\s\S]*?"{3}|\x27{3}[\s\S]*?\x27{3}|"(?:\\.|[^"\\])*"|\x27(?:\\.|[^\x27\\])*\x27'
+            build_code = re.sub(quoted, ' ', build_code)
+            if re.search(r'\bapply\b|\b(?:includeBuild|useModule|usePlugin)\s*\(', build_code):
                 errors.append(f'CLIENT {relative}: unapproved/dynamic Android Gradle plugin/build inclusion')
     # Build/install/CI commands must not restore Mobile TS or choose another stack.
     configurations = paths + list((root / '.github/workflows').glob('*'))

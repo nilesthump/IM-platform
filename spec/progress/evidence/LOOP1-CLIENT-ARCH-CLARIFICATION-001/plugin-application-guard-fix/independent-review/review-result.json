@@ -1,0 +1,249 @@
+{
+  "result": "FAIL",
+  "reviewer": "/root/plugin_guard_final_independent_review; fresh agent neither implementer nor fixer",
+  "candidate": "dbb3c99f8f201ebb0d512c78aa7853f9a91f225d",
+  "checkout": "H:/icp clean detached HEAD; Acceptance status_entries=0; no candidate writes",
+  "full_range": "3f352a8e465c0c4b093cca8e5f404ea587550b6e..dbb3c99f8f201ebb0d512c78aa7853f9a91f225d",
+  "focused_range": "8109b5ec1101efc18294618fd0a88b7499d4cccf..dbb3c99f8f201ebb0d512c78aa7853f9a91f225d",
+  "findings": [
+    {
+      "priority": "P1",
+      "file": "ci/check_architecture.py",
+      "lines": [
+        379,
+        380
+      ],
+      "title": "Reject ordinary Groovy command-style plugin application",
+      "requirement": "Current Task Acceptance effective Android plugin/dependency/build guards; ci/architecture-checks.md unknown/dynamic Gradle dependencies/plugins fail closed; canonical2.3/6.1 hash-bound mobile_plugins allow only Android/Kotlin/Compose engineering identifiers",
+      "reproduction": [
+        "clients/mobile/build.gradle: plugins.apply 'java'",
+        "clients/mobile/build.gradle: pluginManager.apply 'java'"
+      ],
+      "checker_result": "check_clients(disposable authority-bound probe root) returns [] for both",
+      "runtime_result": "Both independent offline Gradle9.1/Java25 probe runs exit0, print UNAPPROVED_JAVA_PLUGIN_APPLIED=true, BUILD SUCCESSFUL; builtin java plugin actually applied",
+      "cause": "Outside recognized plugins blocks, the fallback detects apply followed by <, (, or from:. Ordinary Groovy method-command calls use whitespace and a literal argument, so neither apply plugin: recognition nor fallback sees them. Parenthesized equivalent plugins.apply(\"java\") rejects.",
+      "requested_change": "Bounded fail-closed application-form recognition outside approved literal/directcatalog plugins forms; add runtime-confirmed command-form negatives and preserve approved forms. Do not patch candidate from this Review."
+    }
+  ],
+  "positive_results": [
+    "Unique exact Current Task review; dependencies S1/CI/Recorder done; no product implementation",
+    "Canonical hash aa239802 and v1.1 approved original/supplement/mobile correction lineage consistent; PDF/old ADR/history unchanged",
+    "Frozen verifier includes architecture49 PASS no skips; all-scope checker PASS0 violations; clean Recovery Acceptance PASS",
+    "CI controls30 local PASS with4 exposed Windows symlink privilege skips; actual Linux CI30 PASS no skips with real links",
+    "Prior variable apply/unresolved alias.get/literalprefix transformation/plugin shortcuts/typed apply all reject; approved Kotlin/Groovy literal/version/applyfalse/configuration positives pass",
+    "Direct import/dependency/build/workflow/governance and source ownership logic inspected; no unrelated product/contract/native business change; added parser complexity addresses actual prior finding",
+    "Scope/preservation: 1921 baseline immutable and5806 prior immutable Git objects unchanged;744 original unknown files unchanged;23 raw proof copies/source hashes unchanged including ZIP members; finished67/52/61/88 archive streams preserved"
+  ],
+  "hosted_ci": {
+    "pr": 36866888054,
+    "push": 36866880629,
+    "head": "dbb3c99f8f201ebb0d512c78aa7853f9a91f225d",
+    "jobs": "13 actual jobs all success; every recorded step success; no skipped jobs/steps",
+    "selection": "Actual full baseline3f352a8..exactHEAD logs select all jobs; classify checks exactHEAD clean",
+    "pr_checkout": "Remaining12 jobs checkout ed3ba3eb3f3d6454d98196f34e23e3f4db0ba47f merge of accepted3f352a8 + exactcandidate; merge tree735a8211 equals candidate tree; push exactHEAD all13 success",
+    "linux_links": "actual classify log real-symlink test ok, Ran30 tests, no skips",
+    "limitation": "CI success cannot override reproduced logic FAIL"
+  },
+  "whitespace": "Full CR-aware range FAIL exit2 solely12 intentional original rawHuman Markdown hardbreaks. Original byte-identical since8109; focused and full excluding ONLY exact unchanged attachment PASS0. No log whitespace rewrite.",
+  "commands": [
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-frozen-architecture.ps1"
+      ],
+      "command_id": "C-b2490e69-31fb-4768-96cf-47adb1926883",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 10312.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-b2490e69-31fb-4768-96cf-47adb1926883.stderr.txt",
+      "stderr_sha256": "1f9c8ed2c261a0f29c98cb72f24051e1e45c6b2a2897564a971e09dc7ccbae84",
+      "stdout_blob": "blobs/C-b2490e69-31fb-4768-96cf-47adb1926883.stdout.txt",
+      "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+    },
+    {
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "H:/.codex/evidence/plugin-guard-final-independent-review-20261001/probe.py"
+      ],
+      "command_id": "C-8d7c1802-1a2d-46e9-849e-ad09b439f74f",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 125.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-8d7c1802-1a2d-46e9-849e-ad09b439f74f.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-8d7c1802-1a2d-46e9-849e-ad09b439f74f.stdout.txt",
+      "stdout_sha256": "e27d34c0581006442785126b8366b91f0f0549f6a6c298fb715222039b2acb06"
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "H:/.codex/evidence/plugin-guard-final-independent-review-20261001/runtime.ps1"
+      ],
+      "command_id": "C-3ad0bf0f-fa58-48cf-aaf7-cfa7ca433f14",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 5032.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-3ad0bf0f-fa58-48cf-aaf7-cfa7ca433f14.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-3ad0bf0f-fa58-48cf-aaf7-cfa7ca433f14.stdout.txt",
+      "stdout_sha256": "ea7a7acdc292f9379d15ae7df52c9f73099534c92dd3ec5275225b8a796b182d"
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Acceptance"
+      ],
+      "command_id": "C-6244791b-77db-423f-89b1-ad9115c26f2d",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 6766.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-6244791b-77db-423f-89b1-ad9115c26f2d.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-6244791b-77db-423f-89b1-ad9115c26f2d.stdout.txt",
+      "stdout_sha256": "751cbb832872b1f67ede1c26875424697840ae77e94a2a5a9cbcececa45422ce"
+    },
+    {
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "command_id": "C-e41cb553-3f77-4d5b-8190-d75be1c52643",
+      "cwd": ".",
+      "secret_redaction_applied": true,
+      "duration_ms": 375.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-e41cb553-3f77-4d5b-8190-d75be1c52643.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-e41cb553-3f77-4d5b-8190-d75be1c52643.stdout.txt",
+      "stdout_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f"
+    },
+    {
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "command_id": "C-a2f80a1f-ef1b-4b67-92c4-edc269c83414",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 3047.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-a2f80a1f-ef1b-4b67-92c4-edc269c83414.stderr.txt",
+      "stderr_sha256": "0c23dfd63c520b239c5dcce6539b5450187f42a9b391022c97333a7d6db04772",
+      "stdout_blob": "blobs/C-a2f80a1f-ef1b-4b67-92c4-edc269c83414.stdout.txt",
+      "stdout_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52"
+    },
+    {
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "H:/.codex/evidence/plugin-guard-final-independent-review-20261001/audit.py"
+      ],
+      "command_id": "C-fcc73554-8f9b-4ec8-9c42-8c393c85645e",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 515.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-fcc73554-8f9b-4ec8-9c42-8c393c85645e.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-fcc73554-8f9b-4ec8-9c42-8c393c85645e.stdout.txt",
+      "stdout_sha256": "0efa8337e0bbc52b3b0d54962a7abe0cb1ba5ba7098c13992ff886a5e18b3189"
+    },
+    {
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "H:/.codex/evidence/plugin-guard-final-independent-review-20261001/ci-inspect.py"
+      ],
+      "command_id": "C-1242cb43-55a7-45e5-8eab-0ceb641e10b9",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 9609.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-1242cb43-55a7-45e5-8eab-0ceb641e10b9.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-1242cb43-55a7-45e5-8eab-0ceb641e10b9.stdout.txt",
+      "stdout_sha256": "08c73e1304a6c9e7f98dfbe30a3e16f0d7f86d9864bd5dab95ddfa75bad82ef8"
+    },
+    {
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "H:/.codex/evidence/plugin-guard-final-independent-review-20261001/additional-audit.py"
+      ],
+      "command_id": "C-e916ba39-5eef-4a79-ad83-809963229cb4",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 6781.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-e916ba39-5eef-4a79-ad83-809963229cb4.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-e916ba39-5eef-4a79-ad83-809963229cb4.stdout.txt",
+      "stdout_sha256": "4f18aae21e898c837baf3a85e55b8c08fffcc9c3a7e0a778b0303aad9f4ba2ce"
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "H:/.codex/evidence/plugin-guard-final-independent-review-20261001/runtime-manager.ps1"
+      ],
+      "command_id": "C-c334569c-8240-4280-ba63-f5ad976b140d",
+      "cwd": ".",
+      "secret_redaction_applied": false,
+      "duration_ms": 4891.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stderr_blob": "blobs/C-c334569c-8240-4280-ba63-f5ad976b140d.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-c334569c-8240-4280-ba63-f5ad976b140d.stdout.txt",
+      "stdout_sha256": "9813b65cbc69c5259f5ddb268ba85f4abdf2dfad8570606556ac0034a6ef79cb"
+    }
+  ],
+  "instrumentation": {
+    "capture_mode": "prospective_resume",
+    "pre_recorder_trace_complete": false,
+    "prompt": "Complete assignment file + exact initial dispatch retained and registered; P-PLUGIN-FINAL-REVIEW-20261001 fd22f3c94796cd2d85dc4f3738c85a9611cb09f667ee757154ff58bfabb5475a",
+    "disclosure": "Read-only startup, ancillary reads/status/diff/log/help and external script construction not command-recorded. Truncated read output/encoding issues prompted rereads; attempted Console.OutputEncoding initialization failed under read-only constrained language, no file writes/tests affected. Tests, probes, runtime, CI and audits routed where possible. No pre-Recorder candidate edits/test execution.",
+    "limitations": "Recorder validation means instrumentation structure, not Task/Gate acceptance; final finish/validate outside report generation commands appended normally."
+  },
+  "handoff": {
+    "task": "retain review unfinished",
+    "S1": "PASS",
+    "S2": "OPEN",
+    "last_known_good": "3f352a8e465c0c4b093cca8e5f404ea587550b6e",
+    "next": "Coordinator fresh Fix Agent followed by NEW independent Review and new exact-head CI; no product coding before accepted prerequisite",
+    "ownership": "Candidate unchanged clean; sole candidate writer released to Coordinator. External report/probes/Recorder owned by this Reviewer. No product services started; isolated Gradle single-use daemons stopped automatically; Coordinator adb unchanged."
+  }
+}

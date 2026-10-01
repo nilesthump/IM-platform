@@ -219,6 +219,41 @@ class ClientTechnologyControls(unittest.TestCase):
                 errors = checker.check_clients(self.root)
                 self.assertTrue(any('plugin' in error for error in errors), errors)
 
+    def test_android_unsupported_plugin_applications_fail_closed(self):
+        # Gradle9.1/Java25 confirms these application forms apply builtin Java.
+        forms = (
+            "plugins.apply 'java'", "pluginManager.apply 'java'",
+            "def selected = 'java'\nplugins.apply selected",
+            "def selected = pluginManager\nselected.apply 'java'",
+            "apply { plugin 'java' }",
+            "def selected = pluginManager.&apply\nselected('java')",
+            'plugins.apply("java")', 'apply<JavaPlugin>()',
+            "plugins.apply 'com.android.application'",
+            "apply plugin: 'com.android.application'\nplugins.apply 'java'",
+        )
+        for source in forms:
+            with self.subTest(source=source):
+                self.put('clients/mobile/build.gradle', source)
+                errors = checker.check_clients(self.root)
+                self.assertTrue(any('plugin' in error for error in errors), errors)
+
+    def test_android_supported_apply_and_quoted_contexts_remain_approved(self):
+        forms = (
+            "apply plugin: 'com.android.application'",
+            "apply plugin: 'org.jetbrains.kotlin.android'; apply plugin: 'org.jetbrains.kotlin.plugin.compose'",
+            "// plugins.apply 'java'\napply plugin: 'com.android.application'",
+            "/* apply { plugin 'java' } */\napply plugin: 'com.android.library'",
+            'def note = "pluginManager.apply"',
+            "def note = 'apply'",
+            'def note = ' + '"' * 3 + 'plugins.apply\napply' + '"' * 3,
+            'def note = ' + "'" * 3 + 'pluginManager.&apply\napply' + "'" * 3,
+            "plugins { id 'com.android.application' version '8.9' apply false }\napply plugin: 'org.jetbrains.kotlin.android'",
+        )
+        for source in forms:
+            with self.subTest(source=source):
+                self.put('clients/mobile/build.gradle', source)
+                self.assertEqual([], checker.check_clients(self.root))
+
     def test_android_complete_literal_plugin_notations_remain_approved(self):
         self.put('clients/mobile/gradle/libs.versions.toml',
                  '[plugins]\nandroid-application={id="com.android.application",version="8.9"}')
