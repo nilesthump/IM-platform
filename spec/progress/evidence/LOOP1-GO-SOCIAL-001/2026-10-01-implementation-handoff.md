@@ -1,0 +1,15 @@
+# Fresh Social implementation handoff - 2026-10-01
+
+Implementation base cc49b98a103a3426d23bfcbbd09958060b7e790b; author /root/social_implementation, sole writer. This is local evidence, not independent Review/CI or Task/S1 PASS.
+
+Only four product files: auth.go two friend registrations; Core/social.go private normalized pair/DIRECT/membership/Sync/Outbox transaction; Core/private tests; public tests using accepted Auth and golden normalizer. Old package-main candidate selectively adapted, never wholesale cherry-picked. No new dependency/export/router/dispatcher/schema. Authentication/error primitives reused; ordered user locks serialize reverse pair and replacement login, in-transaction Session expiry/binding rechecked. Stable friendship UUID derives from normalized pair; schema has no separate friendship ID column.
+
+Recursive gofmt/build/vet exit0; final normal go test -count=1 -v ./... and race go test -race -count=1 -v ./... exit0 with DB_TEST_ENABLE=1, disposable migrated PostgreSQL16/NATS2.10 and zero live integration skips. Exact wrapper commands/env/durations/output hashes in 2026-10-01-implementation-local-verification.json. Canonical applicable positives/negative missing authentication, target404, self422, conflict409 execute; accepted Auth/WSS/revocation/fallback regressions execute. Tests assert immediate bidirectional list, reversed concurrent201+200/same DIRECT/one normalized pair/two memberships, existing DIRECT reuse, six matched Sync/Outbox events/no retry duplication, caller rollback and partial assembly failure rollback, expiry after waiting on account lock produces401/no effects.
+
+Only friend-add-authorization-denied is DEFERRED_BY_HUMAN under parsed canonical Loop1 profile; future403 golden/OpenAPI unchanged. Applicability test PASS validates the disposition only, never runtime403PASS.
+
+Source checker all exit0/zero violations; frozen verifier34controls exit0/no skips; CI controls27 exit0 with four Windows symlink privilege subcase skips. First malformed inline env attempt skipped integrations despite exit0; excluded from acceptance and retained trace. Corrected runner executes live normally and race. Startup/direct edit instrumentation gaps and redacted/truncated output disclosed in JSON; external Recorder is not complete prospective trace and not product acceptance.
+
+Two owned containers verified by exact label R-SOCIAL-IMPLEMENTATION-20261001 before docker rm -fv; only their disposable volume removed. No unknown services/worktrees/content touched. Current task enters review; next fresh independent Review of clean committed candidate and actual hosted CI/full PR range. No automatic Social merge or follow-on business. Last accepted product/main279c1dc; active activationcc49b98.
+
+First new handoff recovery Development verification failed four format checks (literal backtick-delimited command/evidence/full SHA/checkpoint expected); repaired exact formatting, no checker change. Original failure remains external Recorder history.

@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-GO-SOCIAL-001
 title: Implement Go search, friendship, and unique direct conversation
-status: active
-owner: /root/social_implementation (sole product writer after activation commit)
+status: review
+owner: Coordinator awaiting fresh independent Review; implementation released after clean candidate commit
 stage: S1
 gate: S1
 ---
@@ -98,3 +98,7 @@ Exact instruction: 保留openapi占位，记为loop1特例. This approves the di
 # Activation evidence
 
 2026-10-01-social-activation.md binds acceptedexception subject/Review/CI, S0/Auth/remediation/integration dependencies, ownership and backlog->ready->active transitions. Implementation must preserve stageprofile and reportdeferrednotPASS; no selfreviewdone.
+
+# Fresh implementation candidate handoff (2026-10-01)
+
+Completed four bound product files; local normal/live race, recursive formatting/build/vet/sourceall/frozen34 checks PASS; CI controls27 PASS with four disclosed Windows symlink subcase skips. Exact commands/results/durations/live enable and ownership cleanup in 2026-10-01-implementation-local-verification.json; behavior/limits in 2026-10-01-implementation-handoff.md. Single canonical403 remains DEFERRED_BY_HUMAN/notPASS. No other contract/ADR/profile/schema edits. Next exact action: NEW independent Review plus actual candidate hostedCI/fullPRrange; never selfaccept/done/S1PASS. Last accepted product/main279c1dc, activationcc49b98. No uncommitted ownership after candidate commit.
