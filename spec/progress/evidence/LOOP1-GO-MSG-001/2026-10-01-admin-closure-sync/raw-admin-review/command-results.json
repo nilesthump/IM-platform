@@ -1,0 +1,173 @@
+[
+  {
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.15599999998812564,
+    "stdout": "check-0-stdout.txt",
+    "stderr": "check-0-stderr.txt"
+  },
+  {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.11000000000058208,
+    "stdout": "check-1-stdout.txt",
+    "stderr": "check-1-stderr.txt"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--name-status",
+      "183be639..HEAD"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.125,
+    "stdout": "check-2-stdout.txt",
+    "stderr": "check-2-stderr.txt"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.734000000011292,
+    "stdout": "check-3-stdout.txt",
+    "stderr": "check-3-stderr.txt"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.5939999999973224,
+    "stdout": "check-4-stdout.txt",
+    "stderr": "check-4-stderr.txt"
+  },
+  {
+    "command": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.5,
+    "stdout": "check-5-stdout.txt",
+    "stderr": "check-5-stderr.txt"
+  },
+  {
+    "command": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--run-id",
+      "R-MSG-IMPLEMENTATION-20261001"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.15600000000267755,
+    "stdout": "check-6-stdout.txt",
+    "stderr": "check-6-stderr.txt"
+  },
+  {
+    "command": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--run-id",
+      "R-MSG-INDEPENDENT-REVIEW-20261001"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.17199999999138527,
+    "stdout": "check-7-stdout.txt",
+    "stderr": "check-7-stderr.txt"
+  },
+  {
+    "command": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--run-id",
+      "R-MSG-FIX-20261001"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.17200000000593718,
+    "stdout": "check-8-stdout.txt",
+    "stderr": "check-8-stderr.txt"
+  },
+  {
+    "command": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--run-id",
+      "R-MSG-REREVIEW-20261001"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.15600000000267755,
+    "stdout": "check-9-stdout.txt",
+    "stderr": "check-9-stderr.txt"
+  },
+  {
+    "command": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--run-id",
+      "R-MSG-COORDINATOR-20261001"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.17199999999138527,
+    "stdout": "check-10-stdout.txt",
+    "stderr": "check-10-stderr.txt"
+  },
+  {
+    "command": [
+      "gh",
+      "run",
+      "view",
+      "36820491515",
+      "--repo",
+      "nilesthump/IM-platform",
+      "--json",
+      "headSha,status,conclusion,jobs,event,url"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 2.047000000005937,
+    "stdout": "check-11-stdout.txt",
+    "stderr": "check-11-stderr.txt"
+  },
+  {
+    "command": [
+      "gh",
+      "run",
+      "view",
+      "36820486384",
+      "--repo",
+      "nilesthump/IM-platform",
+      "--json",
+      "headSha,status,conclusion,jobs,event,url"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.9219999999913853,
+    "stdout": "check-12-stdout.txt",
+    "stderr": "check-12-stderr.txt"
+  }
+]

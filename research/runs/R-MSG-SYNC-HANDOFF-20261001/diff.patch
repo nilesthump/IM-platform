@@ -1,0 +1,525 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 9fe2da1..bb6e8c5 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -1,52 +1,52 @@
+-# Current Execution State
+-
+-Current Loop: Loop 1
+-Current Stage: S1
+-Current Gate: S1
+-Gate Status: OPEN (MSG independently accepted; TLS entrypoint E2E pending)
+-Current Batch: LOOP1-S1
+-Current Task: LOOP1-GO-MSG-001
+-Current Task State: done
+-Execution Status: MSG_ACCEPTED_ADMINISTRATIVE_CLOSURE
+-
+-## Immediately Relevant Completed Work
+-
+-PR3 merged at b442acd, actualmain CI36813501417 PASS. MSG fresh independent rereview PASS exact183be639; repaired origin exclusion and required cursor independently verified. Prior FAIL remains immutable.
+-
+-## Current Blockers
+-
+-No product blocker. Administrative clean closure verification and exact-head CI pending before next task activation. S1 real TLS entrypoint E2E remains required.
+-
+-## Verification
+-
+-- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
+-  - Result: independent exit0 20.735s/82.797s on migrated PG16/NATS2.10, zero runtime skips. All independent defect probes PASS. Hosted PR36819292528/push36819288126 selected six SUCCESS, inactive seven correctly skipped; virtual merge exact tree binding proven. Source/architecture/frozen/CI controls PASS; four local Windows symlink subcases covered by actual Linux.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-183be63/2026-10-01-independent-rereview-report.md`
+-
+-## Changed Files or Migrations
+-
+-Administrative evidence/task queue/current/checkpoint and Task-linked Recorder only. Product accepted183be639 unchanged; contracts/database0001/frozen authority unchanged.
+-
+-## Known Failures, Risks, and Assumptions
+-
+-Historical f176 FAIL and interrupted historical Recorder preserved. Recorder scoped research validation never substitutes product acceptance. Private bounded Conversation history does not implement S2 clients/user Sync. Social friend403 remains DEFERRED_BY_HUMAN. No S1 Gate PASS.
+-
+-## Next Exact Action
+-
+-Fresh independent administrative closure verification plus final exact-head hosted CI; then resolve LOOP1-E2E-001 dependencies/inputs/allowed paths and activate fresh implementation writer. No S2 work.
+-
+-## Last Known Good Commit
+-
+-`183be639640cf652dc7a9f18152071c617f2ceac` independently accepted messaging candidate. Actualmain `b442acd26777c481620a6bd917863cebfaf79b35` accepted merged baseline.
+-
+-## Latest Checkpoint
+-
+-`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-accepted.md`
+-
+-## Uncommitted Changes / Ownership
+-
+-Coordinator owns MSG administrative closure only until clean commit; all implementation/fix/review writers released and owned disposable services removed. Original checkout and unrelated artifacts untouched.
+-
+-## Architecture Conflicts / ACP / ADR
+-
+-None. S1 OPEN.
++# Current Execution State
++
++Current Loop: Loop 1
++Current Stage: S1
++Current Gate: S1
++Gate Status: OPEN (MSG accepted; real TLS entrypoint E2E pending)
++Current Batch: LOOP1-S1
++Current Task: LOOP1-GO-MSG-001
++Current Task State: done
++Execution Status: HUMAN_REQUESTED_SYNC_HANDOFF_STOP
++
++## Immediately Relevant Completed Work
++
++PR3 merged at actualmain b442acd26777c481620a6bd917863cebfaf79b35 / CI36813501417 SUCCESS. Product183be639640cf652dc7a9f18152071c617f2ceac independently accepted; original FAIL and repair history preserved. Administrative33b1522 local independent PASS; new direct classify110234807646 API completed/success/exact33b. Fresh /root/msg_admin_ci_confirmation independently PASS exact33b1522: PR36820491515 six selected SUCCESS, push36820486384 five selected SUCCESS,13+13 direct job APIs completed and PR merge-parent/tree binding PASS. Original pending report/FAIL92events unchanged; fresh supplement under task evidence2026-10-01-admin-closure-sync/fresh-ci-confirmation/. PR4 remains OPEN and unmerged; no merge authorization.
++
++## Current Blockers
++
++E2E allowed_paths still excludes required .github/workflows/ci.yml, ci/classify.py, tests/ci/test_classify.py. Human has NOT authorized this expansion. E2E stays backlog; no S1 PASS or next-task activation. New administrative recovery/evidence commit requires fresh independent review and exact-head hosted CI before acceptance; product183 acceptance is unaffected.
++
++## Verification
++
++- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
++  - Result: local exit0 WSS/sourceall/Development recovery/frozen34 PASS. No new product changes or rerun live-product claim. Original605 unknown files byte-preserved; original tracked state clean. Own recovery formatting first failed4 then1 requirements, corrected and rerun exit0; failures retained. Startup default Python was incompatible, py unavailable, sandboxed gh read denied; corrected using bundled Python and authorized escalation. Command failures and output truncation disclosed; startup/preparation is incomplete pre-Recorder trace.
++  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/archive-byte-manifest.json`
++
++## Changed Files or Migrations
++
++Task/current/checkpoint, task evidence and own Recorder only. Contracts, frozen authority, migration0001, product and CI wiring unchanged. Prior Coordinator handoff-only notes retained as original bytes under evidence/coordinator-inherited-notes/.
++
++## Known Failures, Risks, and Assumptions
++
++Old administrative Recorder92events remains FAIL (then-incomplete hosted acceptance), structure PASS; supplemental confirmation never rewrites it. Historical FAIL/partial traces remain immutable. No full prospective startup claim. Original checkout retains unknown-owner605 files (one human-approved relocation); it is not a clean Acceptance checkout. Social friend403 DEFERRED_BY_HUMAN persists. E2E must use Go Compose/PG16/NATS2.10/migration0001/Caddy and verify TLS certificate plus hostname.
++
++## Next Exact Action
++
++Resume from H:/IM-platform using mandatory startup. Independently review the final administrative recovery candidate and verify exact-head hosted required jobs before treating that candidate as accepted. Obtain explicit E2E CI-path expansion approval before activation. PR4 merge requires separate human authorization. No S2 work. Human requested handoff and stop; do not start another task in this session.
++
++## Last Known Good Commit
++
++Product `183be639640cf652dc7a9f18152071c617f2ceac`; actualmain `b442acd26777c481620a6bd917863cebfaf79b35`. Administrative `33b1522c7f315b7aeb25fc31c05756c2bc950a9c` independently accepted with exact hostedCI and fresh supplement. Latest recovery HEAD may be a newer administrative commit pending acceptance.
++
++## Latest Checkpoint
++
++`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-sync-handoff.md`
++
++## Uncommitted Changes / Ownership
++
++Coordinator owns only this task's administrative recovery/Recorder/evidence until committed; no product writer. Original H:/IM-platform branch recovery/s1-handoff-20261001 safely synchronized first to33b; final committed recovery will be fast-forwarded before handoff. Original605 unknown files remain unknown-owned and preserved; relocation explicitly approved: spec/progress/evidence/LOOP1-CI-001/review2-negative-probe.py -> spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/preserved-original/review2-negative-probe.py (22bytes SHA256d82df66ed3ab2065e785321b8b08a47fae48abbb0224011168832e9ec0534aa2). Exact sync SHA and verification are in durable original-sync-verification evidence. No force/reset/clean/overwrite.
++
++## Architecture Conflicts / ACP / ADR
++
++None; pending task write-scope approval is not an approved architecture change. S1 OPEN.
+diff --git a/spec/tasks/done/LOOP1-GO-MSG-001.md b/spec/tasks/done/LOOP1-GO-MSG-001.md
+index 8cab621..2abdcfd 100644
+--- a/spec/tasks/done/LOOP1-GO-MSG-001.md
++++ b/spec/tasks/done/LOOP1-GO-MSG-001.md
+@@ -123,3 +123,20 @@ Final fix Recorder finished/validated97events (research-only PASS). Post-finish
+ # Independent acceptance closure (2026-10-01)
+ 
+ Fresh /root/message_rereview independently PASS on exact clean `183be639640cf652dc7a9f18152071c617f2ceac`, full b442acd..183be63. Durable report/commands/clean-state/probes/CI/tree-binding under spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-183be63/. Actual PG16/NATS2.10 full normal20.735s/race82.797s exit0, zero runtime skips; original two failure probes and expanded required-cursor cases PASS. Hosted PR36819292528/push36819288126 selected six jobs SUCCESS; PR virtual merge parents and tree equality verified. Four local Windows symlink subcase skips covered by actual Linux checks. All225 tracked prior raw artifacts exact; prior FAIL and interrupted historical Recorder preserved. Reviewer services/volume cleaned, writer released. Task acceptance PASS; S1 OPEN pending LOOP1-E2E-001 real TLS entrypoint. No product changes during closure. Next exact action independently verify administrative closure and hosted final head, then resolve dependency-satisfied E2E task. Accepted product candidate183be63; accepted actualmain remains b442acd until merge. Coordinator owns only evidence/recovery closure.
++
++# Human-requested review handoff and stop (2026-10-01)
++
++Fresh administrative Review /root/message_closure_review exact clean33b1522c7f315b7aeb25fc31c05756c2bc950a9c local PASS, hosted closure PENDING: PR36820491515 classify110234807646 direct API in_progress/conclusionnull despite overallSUCCESS. Remaining selected jobs and push36820486384 SUCCESS. Product183 independent acceptance remains valid. Report external H:/.codex/worktrees/msg-closure-review-20261001/evidence/2026-10-01-independent-administrative-review-report.md; Recorder92events honestFAIL/structuralPASS, reviewerreleased. User explicitly requests immediatehandoffstop; no E2E activation/merge/S1PASS. Coordinator owns only uncommitted handoffnotes in this Task/current, outside finished trace. Nextagent rechecks exactCI/directjob, archives report/raw evidence, then awaits explicit E2E CI-path authorization beforeactivation. Source commit33b1522, acceptedproduct183, acceptedmainb442acd. All services cleaned; unrelated source preserved.
++
++# Safe original-checkout synchronization and handoff (2026-10-01)
++
++Coordinator resumes33b mandatory startup; uniqueTaskdone/statusdone. Inherited current/task handoff-only notes archived byte-identically before edits under evidence/2026-10-01-admin-closure-sync/coordinator-inherited-notes. Prior administrative external evidence archived raw with byte manifest and immutableFAIL92events/validatePASS. New directclassify110234807646 completed/success exact33b; NEW independent supplemental review verifies complete actual job conclusions separately, never mutates oldFAIL. No product/contracts/frozen/schema/CI changes; E2E staysbacklog pending explicit .github/workflows/ci.yml + ci/classify.py + tests/ci/test_classify.py scopeapproval. PR4 remainsunmerged, noautomaticmerge authorization; S1OPEN.
++
++Command: bundledPython -B contracts/websocket/verify.py; bundledPython -B ci/check_architecture.py --scope all --json; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; pwsh -NoProfile -File tools/verify-frozen-architecture.ps1.
++Result: localexit0 WSS/sourceall/Development/frozen34PASS; unchanged acceptedproduct183, no new liveproduct acceptance claim. DefaultPython syntaxfailure/pyunavailable/sandboxnetworkfailure corrected and disclosed; incomplete startup/preparation/outputtruncation means prospective_resume only. Evidence: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync and research/runs/R-MSG-SYNC-HANDOFF-20261001.
++
++Original H:/IM-platform inspected branch task/LOOP1-CONTRACT-001 head2a3812e0b4a23157ecd6fe341f0011ca96390229, zero tracked modifications,605 unknown files; origin fetched. One22byte colliding historicalprobe SHA256d82df66ed3ab2065e785321b8b08a47fae48abbb0224011168832e9ec0534aa2 was moved byte-identically only after explicit Human approval to original MSG evidence/preserved-original/review2-negative-probe.py; source/method recorded in original-relocation.json. Remaining604 files unchanged. Neworiginal branch recovery/s1-handoff-20261001 safely switched to33b,605-bytehash preservation auditPASS. Final committed recovery must be fast-forwarded there and reverified before handoff; final sync SHA belongs in durable original-sync-verification evidence. Original unknown ownership preserved, not claimed cleanAcceptance. No reset--hard/clean/forcedoverwrite/delete/merge.
++
++Next exact action: handoff/stop after committed recovery sync; future agent fromoriginal mandatory startup, NEW independent review/exact-headCI for administrative recovery, explicitE2E scopeapproval beforeactivation, separateauthorization beforePR4merge. Lastacceptedproduct183/mainb442acd; no productwriter; Coordinatorowns task/current/checkpoint/evidence/ownRecorder untilcommit. Complete handoff stored insystemTEMP after original verified. Final finish/staging/commit/sync/document operations after Recorder finish must be disclosed as outside finished trace.
++
++Fresh administrative confirmation accepted exact33b1522: /root/msg_admin_ci_confirmation clean detached Acceptance6.160s/frozen34 5.334s/sourceall .361s exit0; all26 direct PR/push jobs completed, PRsix/pushfive selectedSUCCESS and otherseven/eight correctlyskipped. Originalclassify110234807646 nowcompleted/success; virtualmerge4fb552a0412d0b970f930181fed0ae299a4a92d8 exactbase/head parents and candidate tree7199bcfcb381b0747ca843b84a70427dfb405f3a equality verified. Freshreport/raw ledger/manifest/Recorder7eventsPASS/validatePASS archived byte-identically under2026-10-01-admin-closure-sync/fresh-ci-confirmation. Oldreport andFAIL92events unchanged. Own recovery-format failures4then1 corrected toDevelopmentPASS, preserved inRecorder. Newadministrative archive/recovery candidate remains pending its own freshreview/exactheadCI. No selfacceptance/merge/E2Eactivation/S1PASS.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-MSG-SYNC-HANDOFF-20261001/.gitattributes
+# ?? research/prompts/P-MSG-SYNC-HANDOFF-20261001/metadata.json
+# ?? research/prompts/P-MSG-SYNC-HANDOFF-20261001/prompt.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/.gitattributes
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-018fb03d-f7bf-4434-b43d-93471cf8b44b.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-018fb03d-f7bf-4434-b43d-93471cf8b44b.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-03d62f11-1ce0-4e4c-aab1-7fb6b5ab1f5d.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-03d62f11-1ce0-4e4c-aab1-7fb6b5ab1f5d.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-137b69e9-ed92-4908-84fa-6f6aeea6c50e.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-137b69e9-ed92-4908-84fa-6f6aeea6c50e.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-146a2d76-31a8-46b3-be17-26a5137d6bec.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-146a2d76-31a8-46b3-be17-26a5137d6bec.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-4ca7341f-499d-4bb0-bbf0-347fee5ca4e5.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-4ca7341f-499d-4bb0-bbf0-347fee5ca4e5.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-543247e1-e8e2-4591-93c4-b6f24da8ce10.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-543247e1-e8e2-4591-93c4-b6f24da8ce10.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-8c355654-8b27-499a-9c51-cb9b48520789.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-8c355654-8b27-499a-9c51-cb9b48520789.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-9b58f336-2dde-4267-8f30-9d69e6a7449d.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-9b58f336-2dde-4267-8f30-9d69e6a7449d.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-a16340bc-d224-4356-9f87-6138e4364fc3.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-a16340bc-d224-4356-9f87-6138e4364fc3.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-a3a2f6d1-723b-41ae-ac9a-e3c286c4a2b0.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-a3a2f6d1-723b-41ae-ac9a-e3c286c4a2b0.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-a744ccf2-c8f0-446f-9f7c-ee144cd81b72.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-a744ccf2-c8f0-446f-9f7c-ee144cd81b72.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-b176dd3d-1e18-4e75-b214-ef4f798cb3c7.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-b176dd3d-1e18-4e75-b214-ef4f798cb3c7.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-b1953a53-0626-4f20-8ebf-856199cffdf4.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-b1953a53-0626-4f20-8ebf-856199cffdf4.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-d035bb32-ed9c-4a98-96b4-59f9ca26b71a.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-d035bb32-ed9c-4a98-96b4-59f9ca26b71a.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-e995d238-fb3f-44ce-a386-986808e24a47.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-e995d238-fb3f-44ce-a386-986808e24a47.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-ece9183f-81cf-41c1-b12b-3e55f06ca791.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-ece9183f-81cf-41c1-b12b-3e55f06ca791.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-f4062431-0a53-4513-b046-d607149a186c.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-f4062431-0a53-4513-b046-d607149a186c.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-f7611e30-3efc-43c2-8a35-4daa4a5f0c29.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-f7611e30-3efc-43c2-8a35-4daa4a5f0c29.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-fa1434bf-1dda-4c55-8bd0-67f8e377ee66.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-fa1434bf-1dda-4c55-8bd0-67f8e377ee66.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-fc353422-392c-40de-add7-293a8cc105dd.stderr.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/blobs/C-fc353422-392c-40de-add7-293a8cc105dd.stdout.txt
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/events.jsonl
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/initial_state.json
+# ?? research/runs/R-MSG-SYNC-HANDOFF-20261001/metadata.json
+# ?? spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-sync-handoff.md
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/.gitattributes
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/archive-byte-manifest.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/command-results.jsonl
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/coordinator-inherited-notes/LOOP1-GO-MSG-001.md
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/coordinator-inherited-notes/current.md
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/coordinator-tools/im-platform-s1-prepare-recovery.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/coordinator-tools/im-platform-s1-sync-coordinator.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/coordinator-tools/im-platform-s1-verify-original.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/2026-10-01-independent-administrative-ci-confirmation.md
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/acceptance.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/acceptance.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/admin-range.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/admin-range.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/candidate-commit.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/candidate-commit.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/ci-summary.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/command-results.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/delegated-prompt.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/final-status.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/final-status.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/finish-retry.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/finish-run.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/finish-run.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/finish.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/frozen.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/frozen.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/initial-head.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/initial-head.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/initial-status.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/initial-status.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-classification.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-classification.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234807646.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234807646.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935445.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935445.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935466.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935466.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935491.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935491.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935521.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234935521.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936588.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936588.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936794.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936794.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936795.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936795.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936814.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936814.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936815.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936815.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936966.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234936966.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234937094.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110234937094.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110235657746.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-job-110235657746.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-jobs.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-jobs.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-run-details.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-run-details.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-run.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-run.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-virtual-merge.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pr-virtual-merge.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pull-request.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/pull-request.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-classification.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-classification.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234792574.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234792574.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234903429.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234903429.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234903446.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234903446.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234903480.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234903480.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904429.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904429.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904440.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904440.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904543.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904543.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904679.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904679.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904735.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904735.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904933.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234904933.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234905064.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234905064.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234905166.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110234905166.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110235091102.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-job-110235091102.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-jobs.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-jobs.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-run.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/push-run.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/raw-sha256-manifest.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/record-event-invalid-type.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/record-event-invalid-type.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/record-event.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/record-event.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/prompts/P-MSG-ADMIN-CONFIRMATION-20261001/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/prompts/P-MSG-ADMIN-CONFIRMATION-20261001/prompt.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/blobs/C-de7886be-e599-4442-af80-21baa3111603.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/blobs/C-de7886be-e599-4442-af80-21baa3111603.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/diff.patch
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/events.jsonl
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/final_state.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/initial_state.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/research/runs/R-MSG-ADMIN-CONFIRMATION-20261001/summary.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/sourceall.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/sourceall.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/unchanged-product.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/unchanged-product.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/validate-run.stderr
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/validate-run.stdout
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/fresh-ci-confirmation/verify.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/inherited-notes-diff-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/inherited-notes-diff-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-content-LOOP1-GO-MSG-001.md-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-content-LOOP1-GO-MSG-001.md-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-content-current.md-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-content-current.md-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-initial-branch-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-initial-branch-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-initial-head-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-initial-head-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-initial-status-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-initial-status-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-inventory.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-postsync-branch-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-postsync-branch-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-postsync-head-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-postsync-head-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-postsync-status-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-postsync-status-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-relocation.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-sync-at33b1522.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-sync-verification.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-untracked-names-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-untracked-names-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/2026-10-01-independent-administrative-review-report.md
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/auditonly.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/bootstrap-checkout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/byte-audit.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-0-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-0-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-10-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-10-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-11-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-11-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-12-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-12-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-2-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-2-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-3-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-3-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-4-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-4-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-5-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-5-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-6-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-6-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-7-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-7-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-8-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-8-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-9-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check-9-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/check.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/clean-state.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/command-results.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/delegated-prompt.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/final-clean-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/final-clean.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/final-command-results.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/finalcheck.py
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/finish-run.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-architecture-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-architecture.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-classify-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-classify.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-gate-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-gate.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-source_go-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-source_go.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-source_java-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-source_java.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820486384.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-architecture-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-architecture.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-classify-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-classify.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-gate-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-gate.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-go-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-go.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-source_go-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-source_go.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-source_java-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-source_java.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/hosted-36820491515.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234792574-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234792574.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234807646-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234807646.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234903429-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234903429.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234903446-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234903446.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234903480-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234903480.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935445-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935445.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935466-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935466.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935491-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935491.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935521-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110234935521.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110235091102-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110235091102.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110235657746-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/job-110235657746.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/.gitattributes
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/prompts/P-MSG-CLOSURE-REVIEW-20261001/.gitattributes
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/prompts/P-MSG-CLOSURE-REVIEW-20261001/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/prompts/P-MSG-CLOSURE-REVIEW-20261001/prompt.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/.gitattributes
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-014738c9-ff77-499f-a695-7e06ac7780ed.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-014738c9-ff77-499f-a695-7e06ac7780ed.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-08262de4-28ae-4c51-8307-b466f76e7572.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-08262de4-28ae-4c51-8307-b466f76e7572.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-08a2ed9d-a6e5-4439-9924-31cdac3842e5.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-08a2ed9d-a6e5-4439-9924-31cdac3842e5.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-0b2ab42d-43ce-41f0-8086-8654bfd88a6d.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-0b2ab42d-43ce-41f0-8086-8654bfd88a6d.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-1a482a55-4a33-4f20-af5c-07b65da04a1e.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-1a482a55-4a33-4f20-af5c-07b65da04a1e.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-24876f2e-d6eb-4de5-9c3b-b8df48bdab04.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-24876f2e-d6eb-4de5-9c3b-b8df48bdab04.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-2b7fc4c5-6fb1-4752-a907-cfa3d1f15c59.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-2b7fc4c5-6fb1-4752-a907-cfa3d1f15c59.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-36f36eec-0ec6-4602-aff5-bc2d11e650aa.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-36f36eec-0ec6-4602-aff5-bc2d11e650aa.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-471d8d56-f7cd-47ce-90e3-597d5323b759.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-471d8d56-f7cd-47ce-90e3-597d5323b759.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-4a5e454f-d623-42de-be82-8a3a9dea1955.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-4a5e454f-d623-42de-be82-8a3a9dea1955.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-4e430e58-4e41-4064-8f2e-e0d15b5ec974.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-4e430e58-4e41-4064-8f2e-e0d15b5ec974.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-572363bd-17c7-469d-8f30-b9f6e1474e6f.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-572363bd-17c7-469d-8f30-b9f6e1474e6f.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-58d0a62d-b96e-4506-aae5-390641bf336e.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-58d0a62d-b96e-4506-aae5-390641bf336e.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-5ee16251-0100-4224-b97f-3bed8e4ae011.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-5ee16251-0100-4224-b97f-3bed8e4ae011.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-624c1353-b6b0-40c1-a208-3616900f1cf9.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-624c1353-b6b0-40c1-a208-3616900f1cf9.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-65370c48-a75b-4ab4-a12e-e36f28c93281.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-65370c48-a75b-4ab4-a12e-e36f28c93281.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-7e8ada7a-3eab-4521-8557-0b18a04dce01.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-7e8ada7a-3eab-4521-8557-0b18a04dce01.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-85ad5af1-df1e-45b6-9eaa-4c5f2f36f4bd.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-85ad5af1-df1e-45b6-9eaa-4c5f2f36f4bd.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-863c0e8b-8ccf-478e-afd0-076465ddf153.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-863c0e8b-8ccf-478e-afd0-076465ddf153.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-8662dbb0-04ac-4547-8e5e-475359ddd62a.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-8662dbb0-04ac-4547-8e5e-475359ddd62a.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-8c3f3ce0-23e5-4345-b636-08d8c5034365.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-8c3f3ce0-23e5-4345-b636-08d8c5034365.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-9926d148-8857-40f9-9710-15fecfec92b3.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-9926d148-8857-40f9-9710-15fecfec92b3.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-af9e4aa0-8e19-4634-8eb5-0801fa9b4199.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-af9e4aa0-8e19-4634-8eb5-0801fa9b4199.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b0497a7c-e7d3-4b37-b3ee-4a80b08dcb77.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b0497a7c-e7d3-4b37-b3ee-4a80b08dcb77.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b4da542d-58b7-496b-aac0-77c096a3331d.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b4da542d-58b7-496b-aac0-77c096a3331d.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b5e90930-2415-4afc-bba3-2f40bdc2fcfc.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b5e90930-2415-4afc-bba3-2f40bdc2fcfc.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b65dc609-284c-40ba-92e6-1d40c1f83f6a.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-b65dc609-284c-40ba-92e6-1d40c1f83f6a.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-bb959b01-c5cd-4e8f-8782-c43056400504.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-bb959b01-c5cd-4e8f-8782-c43056400504.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-c65eff7c-d3b7-4c9f-a51b-1b1f4635d45a.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-c65eff7c-d3b7-4c9f-a51b-1b1f4635d45a.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-c7e66833-16f8-464d-8339-05d80beb79f6.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-c7e66833-16f8-464d-8339-05d80beb79f6.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-cc96cef5-2683-485f-ab3a-797d338bdae0.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-cc96cef5-2683-485f-ab3a-797d338bdae0.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-d44aadd2-4b65-4ba0-998e-3dc163a88d0d.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-d44aadd2-4b65-4ba0-998e-3dc163a88d0d.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-dd9e87e3-5618-49c8-b720-10e46f6d5544.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-dd9e87e3-5618-49c8-b720-10e46f6d5544.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-e0741bfe-8196-4138-92a9-1294d3420b92.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-e0741bfe-8196-4138-92a9-1294d3420b92.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-e4870da8-4cb3-4b8a-8c15-e8cd5820ed95.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-e4870da8-4cb3-4b8a-8c15-e8cd5820ed95.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-e66216ad-9ad7-40b7-94c9-def0fe05eebc.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-e66216ad-9ad7-40b7-94c9-def0fe05eebc.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-ebfc99ae-15bf-4a7e-8502-54a9944a2663.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-ebfc99ae-15bf-4a7e-8502-54a9944a2663.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-ed576ce6-e698-40cf-88df-437fad91aa27.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-ed576ce6-e698-40cf-88df-437fad91aa27.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-f5f20339-c1aa-4bd6-81e1-4fbd0140a91a.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-f5f20339-c1aa-4bd6-81e1-4fbd0140a91a.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-f68854c9-0205-49e7-84e5-f4136e62a2f2.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-f68854c9-0205-49e7-84e5-f4136e62a2f2.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-f7872d5f-cef3-4ee5-a040-a01a5378755e.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-f7872d5f-cef3-4ee5-a040-a01a5378755e.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-fb925c62-60b5-449f-85ee-824c6743fe10.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-fb925c62-60b5-449f-85ee-824c6743fe10.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-fbe75ff4-c004-4bf6-94fa-16014da1bd77.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-fbe75ff4-c004-4bf6-94fa-16014da1bd77.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-ff646ebd-62b2-49a9-806a-594f15f65f3b.stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/blobs/C-ff646ebd-62b2-49a9-806a-594f15f65f3b.stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/diff.patch
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/events.jsonl
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/final_state.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/initial_state.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/metadata.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/research/runs/R-MSG-CLOSURE-REVIEW-20261001/summary.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/raw-admin-review/validate-run.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/source-initial-head-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/source-initial-head-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/source-tree-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/source-tree-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/validate-R-MSG-ADMIN-CONFIRMATION-20261001-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/validate-R-MSG-ADMIN-CONFIRMATION-20261001-stdout.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/validate-R-MSG-CLOSURE-REVIEW-20261001-stderr.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/validate-R-MSG-CLOSURE-REVIEW-20261001-stdout.txt
