@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-GO-SOCIAL-001
 title: Implement Go search, friendship, and unique direct conversation
-status: backlog
-owner: /root Coordinator (recovery; no product writer)
+status: active
+owner: /root/social_implementation (sole product writer after activation commit)
 stage: S1
 gate: S1
 ---
@@ -15,6 +15,7 @@ Implement Go user search, immediate bidirectional friendship, and unique DIRECT 
 
 - Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus §3/§10 SRC-01 through SRC-07/§11/§12-14; approved ADRs and Minimality Contract.
 - `spec/domain/auth-user-friend.md`, `spec/invariants/auth-user-friend.md`, `spec/acceptance/s0-auth-user-friend.md`.
+- Approved ADR-0004-loop1-friend-403-exception.md and canonical contracts/fixtures/auth-user-friend/loop1-exceptions.json (only friend403 deferred).
 - Canonical HTTP/error/fixture, database and Sync contracts in `contracts/`.
 
 # Execution Constraints
@@ -72,11 +73,11 @@ Recovery/old-to-current file map: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/20
 
 # Handoff
 
-Accepted main279c1dc and oldSocial2a6eaa1/5b35735 are preserved; no Social product transplanted. Old blocked403 finding remains historical. Human now explicitly approves a Loop1 exception while retaining OpenAPI placeholder under ADR-0004/canonical loop1-exceptions.json. Later workFRIEND-AUTHORIZATION-403 remains unimplemented. Task backlog while bounded propagation Review/CI pending; no product writer or TaskPASS.
+Accepted main279c1dc and oldSocial2a6eaa1/5b35735 are preserved; no Social product transplanted. Old blocked403 finding remains historical. Human now explicitly approves a Loop1 exception while retaining OpenAPI placeholder under ADR-0004/canonical loop1-exceptions.json. Later workFRIEND-AUTHORIZATION-403 remains unimplemented. Bounded propagation independently accepted atf8d1a28/CI36807927903. Dependencies/readiness rechecked; task promoted backlog->ready->active for fresh /root/social_implementation. No productTaskPASS.
 
 # Next Action
 
-Fresh independent Review and real applicableCI verify exact approved exception propagation. After acceptance, reassess dependencies/inputs and move backlog->ready->active before fresh mapped Social Implementation, independent business Review and live/hosted acceptance. Do not invent restricted token or count deferred403PASS. No Message/E2E/Java/client/plugin/S2 or automatic Social PR merge.
+Fresh /root/social_implementation implements exact mapped Core/test scope after committedactivation; allrequired canonical/race/concurrency/rollback/atomicity/Authregressions, candidatecommit/newIndependentReview/realCI. Scopepropagation already accepted; see2026-10-01-social-activation.md. Do not invent restricted token or count deferred403PASS. No Message/E2E/Java/client/plugin/S2 or automatic Social PR merge.
 
 # Last Known Good Commit
 
@@ -93,3 +94,7 @@ Historical approval review blocked the broader proposal at2560dd5. Subsequent ex
 # Additional explicit Human authorization (2026-10-01)
 
 Exact instruction: 保留openapi占位，记为loop1特例. This approves the discussed friend403 Loop1 exception while retaining the OpenAPI placeholder. Before edits, exact additional ADR/applicability/acceptance paths above are bound for propagation; all other paths/requirements remain unchanged. No permission model, wire response, fixture expectation or database changes are authorized.
+
+# Activation evidence
+
+2026-10-01-social-activation.md binds acceptedexception subject/Review/CI, S0/Auth/remediation/integration dependencies, ownership and backlog->ready->active transitions. Implementation must preserve stageprofile and reportdeferrednotPASS; no selfreviewdone.

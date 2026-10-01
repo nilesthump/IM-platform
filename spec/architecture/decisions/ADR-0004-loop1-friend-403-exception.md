@@ -1,6 +1,6 @@
 # ADR-0004: Loop1 exception for restricted-principal friend403
 
-Status: Human-approved decision; propagation independent Review/CI pending.
+Status: Human-approved decision; bounded propagation independently accepted at f8d1a287a295ff9f882843f2191cf8c220efeff2 / hostedCI36807927903 (12success, deploypathinactive).
 Date:2026-10-01
 Approval: exact visible Human instructions "明确loop1不实现403，记录为后续迭代待实现内容" and "保留openapi占位，记为loop1特例".
 Evidence:spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-loop1-403-exception.md.
@@ -23,3 +23,7 @@ Preserve authentication401, self-friend422, other-domain membership/plugin autho
 The future403 response/error/no-effects expectation remains intact for Go/Java. OpenAPI is retained as a placeholder, not evidence of currently supported restricted-principal authorization. Report required-case results and the single deferred case separately. Required-case acceptance may pass without executing this approved deferred case, but a universal all-fixtures-executed statement is false. No SocialTaskPASS or S1GatePASS follows from this decision.
 
 Frozen v1.1 Markdown/manifest/PDF, historical ADRs, goldenfixture1.1/database0001, OpenAPI/error schemas and historical evidence remain immutable. Independent Review and applicable realCI verify exact bounded propagation before Social readiness.
+
+## Bounded acceptance discovery
+
+Fresh independent /root/loop1_exception_review accepted exactf8d1a28 with cleancheckout and exactCI36807927903. Shared report and separate source/archivehashes:spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-exception-independent-review.md and exception-transport.json. This discovery binds the prior reviewed decision bytes, not Socialbusiness or S1PASS.

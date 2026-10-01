@@ -6,8 +6,8 @@ Current Gate: S1
 Gate Status: OPEN (remediation and integration PASS; Social acceptance unresolved)
 Current Batch: LOOP1-S1
 Current Task: LOOP1-GO-SOCIAL-001
-Current Task State: backlog
-Execution Status: LOOP1_FRIEND403_EXCEPTION_REVIEW_PENDING; no product writer
+Current Task State: active
+Execution Status: SOCIAL_IMPLEMENTATION_ACTIVE; sole writer /root/social_implementation after activation commit
 
 ## Immediately Relevant Completed Work
 
@@ -15,7 +15,7 @@ Remediation PR2 ordinary merged279c1dc. Fresh independent a9f1393 ReviewPASS, ac
 
 ## Current Blockers
 
-Latest Human explicitly approves retaining OpenAPI403 as placeholder and making friend-add-authorization-denied a Loop1 exception. ADR-0004/canonical loop1-exceptions.json/acceptance overlay propagate this stage-only scope. No unresolved403policy is required for Loop1 once independent propagation Review/CI accepts. Until then retain unique Social backlog; no product writer. FutureFRIEND-AUTHORIZATION-403 remains unimplemented, all other applicable tests required.
+None at activation: approved friend403 exception independently accepted exactf8d1a28/CI36807927903; readiness/dependencies verified in2026-10-01-social-activation.md. FutureFRIEND-AUTHORIZATION-403 remains explicitly deferred, notPASS. Socialbusiness is not yet implemented/accepted; required actualtests/Review/CI remain.
 
 ## Verification
 
@@ -35,17 +35,21 @@ Latest Human explicitly approves retaining OpenAPI403 as placeholder and making 
   - Result: Approved exception propagation precommit checks exit0; not acceptance. New independent candidate Review/hostedCI pending; OpenAPI and golden untouched.
   - Evidence: spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-loop1-403-exception.md; external R-SOCIAL-403-EXCEPTION-20261001 run history
 
+- Command: independent recovery Acceptance/frozen/sourceall/HTTPcontract verifier and gh actualCI36807927903
+  - Result: Exception subjectf8d1a28 ReviewPASS/12selectedjobSUCCESS/onlydeployinactiveSKIP; allother3792basefilesblobidentical. Dependenciesinputsverified, backlog->ready->active; no SocialbusinessPASS.
+  - Evidence: spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-social-activation.md
+
 ## Changed Files or Migrations
 
 Bounded exception edits newADR-0004/canonicalstageprofile/acceptanceoverlay/ownTask-current-evidence-checkpoint. OpenAPI/goldenfixture/schema/frozenbody/PDF/database/product/checker/workflow unchanged. Canonicalfixture1.1/DB0001/frozenv1.1 retained.
 
 ## Known Failures, Risks, and Assumptions
 
-Prior1ccb recovery/CI FAIL preserved and repaired by freshFix/newReview. Historical/localfourWindows symlink subcases skipped; hostedLinux0skip/liveintegrations0skip. Recorderstartup/directreads incomplete, historicalUTF8/redactionlimits remain exposed. Prior refusal/deferral preserved as history. Latest Human approves stage exception; independent propagation Review/CI pending. Deferred403 never countsPASS. No Socialbusiness/Taskdone.
+Prior1ccb recovery/CI FAIL preserved and repaired by freshFix/newReview. Historical/localfourWindows symlink subcases skipped; hostedLinux0skip/liveintegrations0skip. Recorderstartup/directreads incomplete, historicalUTF8/redactionlimits remain exposed. Prior refusal/deferral preserved as history. Exceptionpropagation accepted; deferred403 never countsPASS. No Socialbusiness/Taskdone. Reviewerinterruptedslowproof/directstartupreadlimitations disclosed.
 
 ## Next Exact Action
 
-Fresh independent Review and actual applicableCI of exact approved friend403 exception propagation, preserving OpenAPI/golden bytes. After accepted propagation reassess readiness then ready/active/fresh mappedSocial Implementation, independent Review/live tests/CI. No automatic Social merge or Message/E2E/Java/client/plugin/S2.
+Fresh /root/social_implementation continues exactmappedCore/test implementation, requiredcanonical/concurrentpair/rollback/membershipSyncOutboxatomicity and AuthSessionWSSfallback live/race checks, candidatecommit then fresh independentReview/realCI. No deferred403permissionmodel or automaticSocialPRmerge; no Message/E2E/Java/client/plugin/S2.
 
 ## Last Known Good Commit
 
@@ -53,12 +57,12 @@ Fresh independent Review and actual applicableCI of exact approved friend403 exc
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-go-social-001-exception.md`
+`spec/progress/checkpoints/2026-10-01-loop1-go-social-001-activated.md`
 
 ## Uncommitted Changes / Ownership
 
-/root Coordinator owns only bounded exception propagation files until ordinarycommit; after clean commit no uncommitted ownership remains; no product writer. Candidate01765 committed/pushed; final metadata is separately verified. OldSocial5b35735/Auth/remediation/original worktrees preserved. Actualmainclean279c1dc. Independent reviewer released all writes; report archived. Stage004 migration scope expired; Social writes require ready/active and exact boundscope.
+/root Coordinator owns only finite activation/evidence/ADRstatus/task/current/checkpoint until cleanactivationcommit, then releasesallrepo writes; /root/social_implementation becomes soleproductwriter onlyafterrootmessage. Candidate01765 committed/pushed; final metadata is separately verified. OldSocial5b35735/Auth/remediation/original worktrees preserved. Actualmainclean279c1dc. Independent reviewer released all writes; report archived. Stage004 migration scope expired; Social writes require ready/active and exact boundscope.
 
 ## Architecture Conflicts / ACP / ADR
 
-Explicit Human Loop1 exception under ADR-0004; OpenAPIplaceholder/golden403 unchanged. Prior auto-review refusal is history superseded only for this approved bounded propagation. No general security/403waiver or newpermissionmodel. Propagation Review/CI pending, not architecture-policy redesign.
+Explicit Human Loop1 exception under ADR-0004; OpenAPIplaceholder/golden403 unchanged. Prior auto-review refusal is history superseded only for this approved bounded propagation. No general security/403waiver or newpermissionmodel. PropagationReview/CI acceptedexactf8d1a28; no architecture-policy redesign or SocialTaskPASS.

@@ -1,0 +1,203 @@
+{
+  "subject": "f8d1a287a295ff9f882843f2191cf8c220efeff2",
+  "run": "R-SOCIAL403-EXCEPTION-REVIEW-20261001",
+  "independence": "fresh reviewer; no implementer/fixer role; no repository writes",
+  "commands": [
+    {
+      "command_id": "C-2bd43ef9-9c91-49ca-9f53-3a6bfa3a18fb",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "Get-Content spec/architecture/README.md,spec/architecture/baseline.md,spec/architecture/decisions/ADR-0004-loop1-friend-403-exception.md,spec/domain/auth-user-friend.md,spec/invariants/auth-user-friend.md,spec/acceptance/s0-auth-user-friend.md,spec/governance/execution-boundaries.md,spec/governance/independent-review.md,contracts/fixtures/auth-user-friend/loop1-exceptions.json -Encoding UTF8"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:54:41.156296Z",
+      "finished": "2026-10-01T02:54:41.776513Z",
+      "exit_code": 0,
+      "duration_ms": 625.0,
+      "result": "PASS",
+      "stdout_sha256": "d56691700c8c684203ec5214d8366714ae876ee915c9da379421effafd69ca5e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command_id": "C-ad0d7638-62c4-4d89-9224-27667c2a5998",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "Get-Content spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md -Encoding UTF8; rg -n '^#|Minimality|SRC-0' spec/architecture/frozen-architecture.md; Get-Content contracts/fixtures/auth-user-friend/README.md,contracts/database/README.md -Encoding UTF8; git status --porcelain=v1; git rev-parse HEAD; git diff 2560dd55e32ed3f9601f6c5404b607a29084629c..HEAD --stat; git diff 2560dd55e32ed3f9601f6c5404b607a29084629c..HEAD; git log -3 --oneline"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:54:56.951341Z",
+      "finished": "2026-10-01T02:54:57.854568Z",
+      "exit_code": 0,
+      "duration_ms": 907.0,
+      "result": "PASS",
+      "stdout_sha256": "58acf64628210325856ea69c1eefce56159957fcd15bd10eb52a26ff7aa90086",
+      "stderr_sha256": "c9084681fd9633002aa45f128102448c383b3b707f568d1e16f4d25fc5631194"
+    },
+    {
+      "command_id": "C-5f92f925-c8dd-4c8f-802e-a9e917e58f03",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Acceptance"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:55:13.473840Z",
+      "finished": "2026-10-01T02:55:19.933420Z",
+      "exit_code": 0,
+      "duration_ms": 6453.0,
+      "result": "PASS",
+      "stdout_sha256": "979c1c2c3136fc68bae53dc804cfdf31df49c80b79c0197f02c653932ce9c8c8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command_id": "C-3513e620-211d-4e48-a4ae-9de817c523a8",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-frozen-architecture.ps1"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:55:26.071763Z",
+      "finished": "2026-10-01T02:55:31.318543Z",
+      "exit_code": 0,
+      "duration_ms": 5250.0,
+      "result": "PASS",
+      "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+      "stderr_sha256": "6085513b4d34b51e1612b232d61ee446dd153019b9ecef6c47c3b5f6ffd0e467"
+    },
+    {
+      "command_id": "C-38922b74-aad8-4546-9727-cdc4657d0720",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:55:38.096942Z",
+      "finished": "2026-10-01T02:55:38.458668Z",
+      "exit_code": 0,
+      "duration_ms": 343.0,
+      "result": "PASS",
+      "stdout_sha256": "32517c7a5b9c8d7951d24cd7fa2a9130d61bfa98c305b23e84165769de325831",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command_id": "C-59692885-dd17-42b7-b7ef-ed079c4f823b",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-c",
+        "import json,pathlib; p=json.loads(pathlib.Path('contracts/fixtures/auth-user-friend/negative.json').read_text(encoding='utf-8')); print(type(p).__name__); print(list(p) if isinstance(p,dict) else 'list'); print(json.dumps(p,ensure_ascii=False)[-12000:]); print(pathlib.Path('spec/architecture/frozen-architecture.md').read_text(encoding='utf-8').splitlines()[237:287]);"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:56:12.701008Z",
+      "finished": "2026-10-01T02:56:12.752228Z",
+      "exit_code": 0,
+      "duration_ms": 47.0,
+      "result": "PASS",
+      "stdout_sha256": "7a0d76531cbdd9319eed6dd855b310f85da56d43b44f5ecada761574cc685877",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command_id": "C-6ca4645a-eace-4f45-8883-a3be7855ca64",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "rg --files tools tests/contracts | Select-String 'contract|fixture'; Get-Content spec/architecture/frozen-architecture.md -Encoding UTF8 | Select-Object -Skip 650 -First 210"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:56:29.303184Z",
+      "finished": "2026-10-01T02:56:29.905489Z",
+      "exit_code": 0,
+      "duration_ms": 594.0,
+      "result": "PASS",
+      "stdout_sha256": "b58b4b7ba9f89de9c6622f777a619f84552894d5de99af7fb7f15c5552403de7",
+      "stderr_sha256": "6167a2fb5daa372f661a0654c482dd5afe7787f4bf46533335abf0481a1981aa"
+    },
+    {
+      "command_id": "C-74779652-e1bd-4cad-8ffd-778998ffccfc",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "rg --files contracts | Select-String 'verify|README|run|lint'; gh run view 36807927903 --repo nilesthump/IM-platform --json headSha,status,conclusion,url,jobs"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:56:44.742688Z",
+      "finished": "2026-10-01T02:56:47.841215Z",
+      "exit_code": 0,
+      "duration_ms": 3094.0,
+      "result": "PASS",
+      "stdout_sha256": "1871ef499cf032699e95135628cc1dcd1ddfea00a909f0a8b99d71973d972554",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command_id": "C-4006ea15-68b4-43ac-a9fc-d51e1cf84d89",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "H:/.codex/worktrees/architecture-remediation/social-403-exception-review-20261001/semantic-proof.py"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:57:36.082473Z"
+    },
+    {
+      "command_id": "C-2774c438-564f-47c2-b5cb-7b0f6ec32617",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "contracts/http/verify-auth-user-friend.ps1"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:58:09.611652Z",
+      "finished": "2026-10-01T02:58:16.048285Z",
+      "exit_code": 0,
+      "duration_ms": 6422.0,
+      "result": "PASS",
+      "stdout_sha256": "9319b415bda0de93cd5905fa183e8e09b44e61e4172c5a22b14c645f2c9c4811",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command_id": "C-abc1c5a5-b529-46c2-b11e-7930b29e8171",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "H:/.codex/worktrees/architecture-remediation/social-403-exception-review-20261001/semantic-proof.py"
+      ],
+      "cwd": ".",
+      "started": "2026-10-01T02:59:08.574743Z",
+      "finished": "2026-10-01T02:59:10.838200Z",
+      "exit_code": 0,
+      "duration_ms": 2266.0,
+      "result": "PASS",
+      "stdout_sha256": "abee09d3c984b3df52d0184906419a0b4be4024d8c712998ea0269849e385bd0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "interruptedCommandsWithoutRecordedFinish": [
+    "C-4006ea15-68b4-43ac-a9fc-d51e1cf84d89"
+  ],
+  "recorderStatus": "finished validated25events",
+  "limitation": "Interrupted slow proof not acceptance; complete bounded replacement PASS. Missing finish preserved, not backfilled."
+}
