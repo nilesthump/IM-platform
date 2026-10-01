@@ -1,0 +1,5 @@
+Canonical REJECTED: conflicting user event
+Exact prior mutation REJECTED: Bad state: Conflicting user event
+Actual SQLite identity INSERT fault REJECTED: SqliteException(1811): while executing statement, independent identity insert failure, constraint failed (code 1811)
+  Causing statement: INSERT INTO user_events VALUES (?,?,?,?,?), parameters: 50000000-0000-4000-8000-000000000098, 1, friend.changed, 10000000-0000-4000-8000-000000000003, 1
+PASS prior mutation/reopen unchanged; identity insert failure rolls back earlier event identity/state/cursor; changed retry commits

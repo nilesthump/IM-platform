@@ -191,8 +191,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Desktop S0 skeleton boundary
-        run: python3 ci/check_s0_boundary.py desktop
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.12.2'
+      - name: Desktop native storage, migration and protocol fixtures
+        run: |
+          cd clients/shared/local-store
+          dart pub get --enforce-lockfile
+          dart format --output=none --set-exit-if-changed lib test
+          dart analyze
+          dart test
+          cd ../../desktop/storage
+          dart pub get --enforce-lockfile
+          dart format --output=none --set-exit-if-changed lib test
+          dart analyze
+          dart test
 
   mobile:
     needs: classify
@@ -200,8 +213,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Mobile S0 skeleton boundary
-        run: python3 ci/check_s0_boundary.py mobile
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.12.2'
+      - name: Mobile native storage, migration and protocol fixtures
+        run: |
+          cd clients/shared/local-store
+          dart pub get --enforce-lockfile
+          dart format --output=none --set-exit-if-changed lib test
+          dart analyze
+          dart test
+          cd ../../mobile/storage
+          dart pub get --enforce-lockfile
+          dart format --output=none --set-exit-if-changed lib test
+          dart analyze
+          dart test
 
   shared:
     needs: classify
@@ -257,11 +283,17 @@ jobs:
           python3 contracts/websocket/verify.py
           python3 contracts/plugin-api/verify.py
           python3 -m unittest discover -s tests/database -v
-      - name: Future client and plugin fixture boundary
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.12.2'
+      - name: Initial native SQLite migration and current protocol fixtures
         run: |
-          python3 ci/check_s0_boundary.py web
-          python3 ci/check_s0_boundary.py desktop
-          python3 ci/check_s0_boundary.py mobile
+          cd clients/shared/local-store
+          dart pub get --enforce-lockfile
+          dart analyze
+          dart test
+      - name: Future Web fixture boundary
+        run: python3 ci/check_s0_boundary.py web
 
   deploy:
     needs: classify

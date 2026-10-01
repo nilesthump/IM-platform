@@ -1,0 +1,59 @@
+Resolving dependencies...
+Downloading packages...
+Got dependencies!
+Formatted 4 files (0 changed) in 0.01 seconds.
+Analyzing local-store...
+No issues found!
+Running build hooks...Running build hooks...00:00 +0: loading test\native_test.dart
+00:00 +0: test\native_test.dart: loads the real native SQLite library
+00:00 +1: test\store_test.dart: canonical storage case selection is complete
+00:00 +2: test\store_test.dart: canonical SQLite gap-out-of-order-duplicate
+00:00 +3: test\user_event_test.dart: identical event replay ignores object key order within page and after reopen
+00:00 +4: test\user_event_test.dart: identical event replay ignores object key order within page and after reopen
+00:00 +5: test\user_event_test.dart: identical event replay ignores object key order within page and after reopen
+00:00 +6: test\store_test.dart: canonical SQLite message-rollback-and-retry
+00:00 +7: test\user_event_test.dart: canonical same-event revision mutation rolls back state and cursor across pages and reopen
+00:00 +8: test\store_test.dart: canonical SQLite user-rollback-and-retry
+00:00 +9: test\store_test.dart: canonical SQLite user-rollback-and-retry
+00:00 +10: test\user_event_test.dart: same event identity rejects changed kind after reopen
+00:00 +11: test\user_event_test.dart: same event identity rejects changed kind after reopen
+00:00 +12: test\store_test.dart: canonical SQLite user-conversation.changed
+00:00 +13: test\user_event_test.dart: same event identity rejects changed subjectId after reopen
+00:00 +14: test\store_test.dart: canonical SQLite user-membership.changed
+00:00 +15: test\user_event_test.dart: conflicting identity within a page rolls back the first event and persists nothing
+00:00 +16: test\store_test.dart: canonical SQLite user-plugin.changed
+00:00 +17: test\user_event_test.dart: later conflict rolls back prior new event identity and materialization in the same page
+00:00 +18: test\user_event_test.dart: later conflict rolls back prior new event identity and materialization in the same page
+00:00 +19: test\store_test.dart: canonical SQLite sequence-collision
+00:00 +20: test\user_event_test.dart: fault between materialization and cursor commit also rolls back event identity
+00:00 +21: test\user_event_test.dart: fault between materialization and cursor commit also rolls back event identity
+00:00 +22: test\store_test.dart: canonical SQLite per-conversation-independent-sequence
+00:00 +23: test\user_event_test.dart: two already-open connections observe committed event identity before applying their pages
+00:00 +24: test\store_test.dart: all four entrances interleave and persist one canonical message
+00:00 +25: test\store_test.dart: ACK merges local data and rejects uncommitted or missing confirmation
+00:00 +26: test\store_test.dart: identity conflicts roll back whole page and preserve committed row
+00:00 +27: test\store_test.dart: account binding and separate native stores survive reopen
+00:00 +28: test\store_test.dart: migration from an empty version0 database is transactional and idempotent
+00:00 +29: test\store_test.dart: failed initial migration rolls back all newly created objects
+00:00 +30: test\store_test.dart: future schema is rejected without destructive downgrade
+00:00 +31: test\store_test.dart: batch conflict rolls back earlier materialization and prefix updates
+00:00 +32: test\store_test.dart: opaque user cursor compare protects a page fetched before concurrent change
+00:00 +33: All tests passed!
+Resolving dependencies...
+Downloading packages...
+Got dependencies!
+Formatted 2 files (0 changed) in 0.00 seconds.
+Analyzing storage...
+No issues found!
+Running build hooks...Running build hooks...00:00 +0: loading test\storage_test.dart
+00:00 +0: test\storage_test.dart: desktop uses persistent isolated native account storage
+00:00 +1: All tests passed!
+Resolving dependencies...
+Downloading packages...
+Got dependencies!
+Formatted 2 files (0 changed) in 0.00 seconds.
+Analyzing storage...
+No issues found!
+Running build hooks...Running build hooks...00:00 +0: loading test\storage_test.dart
+00:00 +0: test\storage_test.dart: mobile uses persistent isolated native account storage
+00:00 +1: All tests passed!

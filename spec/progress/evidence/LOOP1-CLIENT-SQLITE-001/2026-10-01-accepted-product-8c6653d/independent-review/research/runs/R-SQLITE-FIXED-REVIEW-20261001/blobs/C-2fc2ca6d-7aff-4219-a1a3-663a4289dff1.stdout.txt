@@ -1,0 +1,1010 @@
+clients/shared/local-store/test\user_event_test.dart:1:import 'dart:convert';
+clients/shared/local-store/test\user_event_test.dart:2:import 'dart:io';
+clients/shared/local-store/test\user_event_test.dart:3:import 'package:plugworld_local_store/local_store.dart';
+clients/shared/local-store/test\user_event_test.dart:4:import 'package:sqlite3/sqlite3.dart';
+clients/shared/local-store/test\user_event_test.dart:5:import 'package:test/test.dart';
+clients/shared/local-store/test\user_event_test.dart:6:
+clients/shared/local-store/test\user_event_test.dart:7:const account = '10000000-0000-4000-8000-000000000001';
+clients/shared/local-store/test\user_event_test.dart:8:const other = '10000000-0000-4000-8000-000000000002';
+clients/shared/local-store/test\user_event_test.dart:9:const newEventId = '50000000-0000-4000-8000-000000000099';
+clients/shared/local-store/test\user_event_test.dart:10:Map<String, Object?> object(dynamic input) =>
+clients/shared/local-store/test\user_event_test.dart:11:    Map<String, Object?>.from(input as Map);
+clients/shared/local-store/test\user_event_test.dart:12:final fixture =
+clients/shared/local-store/test\user_event_test.dart:13:    jsonDecode(
+clients/shared/local-store/test\user_event_test.dart:14:          File(
+clients/shared/local-store/test\user_event_test.dart:15:            '../../../contracts/fixtures/sync-plugin/golden.json',
+clients/shared/local-store/test\user_event_test.dart:16:          ).readAsStringSync(),
+clients/shared/local-store/test\user_event_test.dart:17:        )
+clients/shared/local-store/test\user_event_test.dart:18:        as Map;
+clients/shared/local-store/test\user_event_test.dart:19:final canonicalCase = (fixture['cases'] as List).firstWhere(
+clients/shared/local-store/test\user_event_test.dart:20:  (c) => c['id'] == 'user-friend.changed',
+clients/shared/local-store/test\user_event_test.dart:21:);
+clients/shared/local-store/test\user_event_test.dart:22:final page = object(canonicalCase['steps'][0]['page']);
+clients/shared/local-store/test\user_event_test.dart:23:final event = object((page['events'] as List).single);
+clients/shared/local-store/test\user_event_test.dart:24:Map<String, Object?> withEvents(List<Map<String, Object?>> events) => {
+clients/shared/local-store/test\user_event_test.dart:25:  ...page,
+clients/shared/local-store/test\user_event_test.dart:26:  'events': events,
+clients/shared/local-store/test\user_event_test.dart:27:  'nextCursor': 'conflicting-cursor',
+clients/shared/local-store/test\user_event_test.dart:28:};
+clients/shared/local-store/test\user_event_test.dart:29:
+clients/shared/local-store/test\user_event_test.dart:30:void main() {
+clients/shared/local-store/test\user_event_test.dart:31:  late Directory temp;
+clients/shared/local-store/test\user_event_test.dart:32:  late String path;
+clients/shared/local-store/test\user_event_test.dart:33:  late LocalStore store;
+clients/shared/local-store/test\user_event_test.dart:34:  setUp(() {
+clients/shared/local-store/test\user_event_test.dart:35:    temp = Directory.systemTemp.createTempSync('plugworld-user-events-');
+clients/shared/local-store/test\user_event_test.dart:36:    path = '${temp.path}/account.sqlite';
+clients/shared/local-store/test\user_event_test.dart:37:    store = LocalStore.open(path, account);
+clients/shared/local-store/test\user_event_test.dart:38:  });
+clients/shared/local-store/test\user_event_test.dart:39:  tearDown(() {
+clients/shared/local-store/test\user_event_test.dart:40:    store.close();
+clients/shared/local-store/test\user_event_test.dart:41:    temp.deleteSync(recursive: true);
+clients/shared/local-store/test\user_event_test.dart:42:  });
+clients/shared/local-store/test\user_event_test.dart:43:  void reopen() {
+clients/shared/local-store/test\user_event_test.dart:44:    store.close();
+clients/shared/local-store/test\user_event_test.dart:45:    store = LocalStore.open(path, account);
+clients/shared/local-store/test\user_event_test.dart:46:  }
+clients/shared/local-store/test\user_event_test.dart:47:
+clients/shared/local-store/test\user_event_test.dart:48:  void expectCanonical() {
+clients/shared/local-store/test\user_event_test.dart:49:    expect(store.userCursor, page['nextCursor']);
+clients/shared/local-store/test\user_event_test.dart:50:    expect(store.userState, {
+clients/shared/local-store/test\user_event_test.dart:51:      '${event['kind']}/${event['subjectId']}': event['revision'],
+clients/shared/local-store/test\user_event_test.dart:52:    });
+clients/shared/local-store/test\user_event_test.dart:53:  }
+clients/shared/local-store/test\user_event_test.dart:54:
+clients/shared/local-store/test\user_event_test.dart:55:  test(
+clients/shared/local-store/test\user_event_test.dart:56:    'identical event replay ignores object key order within page and after reopen',
+clients/shared/local-store/test\user_event_test.dart:57:    () {
+clients/shared/local-store/test\user_event_test.dart:58:      final reordered = {
+clients/shared/local-store/test\user_event_test.dart:59:        for (final entry in event.entries.toList().reversed)
+clients/shared/local-store/test\user_event_test.dart:60:          entry.key: entry.value,
+clients/shared/local-store/test\user_event_test.dart:61:      };
+clients/shared/local-store/test\user_event_test.dart:62:      store.applyUserPage({
+clients/shared/local-store/test\user_event_test.dart:63:        ...page,
+clients/shared/local-store/test\user_event_test.dart:64:        'events': [event, reordered],
+clients/shared/local-store/test\user_event_test.dart:65:      });
+clients/shared/local-store/test\user_event_test.dart:66:      expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:67:      reopen();
+clients/shared/local-store/test\user_event_test.dart:68:      store.applyUserPage({
+clients/shared/local-store/test\user_event_test.dart:69:        ...page,
+clients/shared/local-store/test\user_event_test.dart:70:        'events': [reordered],
+clients/shared/local-store/test\user_event_test.dart:71:      });
+clients/shared/local-store/test\user_event_test.dart:72:      expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:73:      final db = sqlite3.open(path);
+clients/shared/local-store/test\user_event_test.dart:74:      try {
+clients/shared/local-store/test\user_event_test.dart:75:        expect(db.select('SELECT * FROM user_events'), hasLength(1));
+clients/shared/local-store/test\user_event_test.dart:76:      } finally {
+clients/shared/local-store/test\user_event_test.dart:77:        db.close();
+clients/shared/local-store/test\user_event_test.dart:78:      }
+clients/shared/local-store/test\user_event_test.dart:79:    },
+clients/shared/local-store/test\user_event_test.dart:80:  );
+clients/shared/local-store/test\user_event_test.dart:81:
+clients/shared/local-store/test\user_event_test.dart:82:  test(
+clients/shared/local-store/test\user_event_test.dart:83:    'canonical same-event revision mutation rolls back state and cursor across pages and reopen',
+clients/shared/local-store/test\user_event_test.dart:84:    () {
+clients/shared/local-store/test\user_event_test.dart:85:      store.applyUserPage(page);
+clients/shared/local-store/test\user_event_test.dart:86:      final changed = withEvents([
+clients/shared/local-store/test\user_event_test.dart:87:        {...event, 'revision': 2},
+clients/shared/local-store/test\user_event_test.dart:88:      ]);
+clients/shared/local-store/test\user_event_test.dart:89:      expect(() => store.applyUserPage(changed), throwsStateError);
+clients/shared/local-store/test\user_event_test.dart:90:      expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:91:      reopen();
+clients/shared/local-store/test\user_event_test.dart:92:      expect(() => store.applyUserPage(changed), throwsStateError);
+clients/shared/local-store/test\user_event_test.dart:93:      expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:94:      store.applyUserPage(page);
+clients/shared/local-store/test\user_event_test.dart:95:      expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:96:    },
+clients/shared/local-store/test\user_event_test.dart:97:  );
+clients/shared/local-store/test\user_event_test.dart:98:
+clients/shared/local-store/test\user_event_test.dart:99:  for (final mutation in <String, Object?>{
+clients/shared/local-store/test\user_event_test.dart:100:    'cursor': 'changed-event-cursor',
+clients/shared/local-store/test\user_event_test.dart:101:    'kind': 'membership.changed',
+clients/shared/local-store/test\user_event_test.dart:102:    'subjectId': other,
+clients/shared/local-store/test\user_event_test.dart:103:  }.entries) {
+clients/shared/local-store/test\user_event_test.dart:104:    test(
+clients/shared/local-store/test\user_event_test.dart:105:      'same event identity rejects changed ${mutation.key} after reopen',
+clients/shared/local-store/test\user_event_test.dart:106:      () {
+clients/shared/local-store/test\user_event_test.dart:107:        store.applyUserPage(page);
+clients/shared/local-store/test\user_event_test.dart:108:        reopen();
+clients/shared/local-store/test\user_event_test.dart:109:        expect(
+clients/shared/local-store/test\user_event_test.dart:110:          () => store.applyUserPage(
+clients/shared/local-store/test\user_event_test.dart:111:            withEvents([
+clients/shared/local-store/test\user_event_test.dart:112:              {...event, mutation.key: mutation.value},
+clients/shared/local-store/test\user_event_test.dart:113:            ]),
+clients/shared/local-store/test\user_event_test.dart:114:          ),
+clients/shared/local-store/test\user_event_test.dart:115:          throwsStateError,
+clients/shared/local-store/test\user_event_test.dart:116:        );
+clients/shared/local-store/test\user_event_test.dart:117:        expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:118:      },
+clients/shared/local-store/test\user_event_test.dart:119:    );
+clients/shared/local-store/test\user_event_test.dart:120:  }
+clients/shared/local-store/test\user_event_test.dart:121:
+clients/shared/local-store/test\user_event_test.dart:122:  test(
+clients/shared/local-store/test\user_event_test.dart:123:    'conflicting identity within a page rolls back the first event and persists nothing',
+clients/shared/local-store/test\user_event_test.dart:124:    () {
+clients/shared/local-store/test\user_event_test.dart:125:      expect(
+clients/shared/local-store/test\user_event_test.dart:126:        () => store.applyUserPage(
+clients/shared/local-store/test\user_event_test.dart:127:          withEvents([
+clients/shared/local-store/test\user_event_test.dart:128:            event,
+clients/shared/local-store/test\user_event_test.dart:129:            {...event, 'revision': 2},
+clients/shared/local-store/test\user_event_test.dart:130:          ]),
+clients/shared/local-store/test\user_event_test.dart:131:        ),
+clients/shared/local-store/test\user_event_test.dart:132:        throwsStateError,
+clients/shared/local-store/test\user_event_test.dart:133:      );
+clients/shared/local-store/test\user_event_test.dart:134:      reopen();
+clients/shared/local-store/test\user_event_test.dart:135:      expect(store.userState, isEmpty);
+clients/shared/local-store/test\user_event_test.dart:136:      expect(store.userCursor, '0');
+clients/shared/local-store/test\user_event_test.dart:137:      // A changed payload can now commit: the rolled-back first event left no identity.
+clients/shared/local-store/test\user_event_test.dart:138:      store.applyUserPage(
+clients/shared/local-store/test\user_event_test.dart:139:        withEvents([
+clients/shared/local-store/test\user_event_test.dart:140:          {...event, 'revision': 2},
+clients/shared/local-store/test\user_event_test.dart:141:        ]),
+clients/shared/local-store/test\user_event_test.dart:142:      );
+clients/shared/local-store/test\user_event_test.dart:143:      expect(store.userState, {'${event['kind']}/${event['subjectId']}': 2});
+clients/shared/local-store/test\user_event_test.dart:144:    },
+clients/shared/local-store/test\user_event_test.dart:145:  );
+clients/shared/local-store/test\user_event_test.dart:146:
+clients/shared/local-store/test\user_event_test.dart:147:  test(
+clients/shared/local-store/test\user_event_test.dart:148:    'later conflict rolls back prior new event identity and materialization in the same page',
+clients/shared/local-store/test\user_event_test.dart:149:    () {
+clients/shared/local-store/test\user_event_test.dart:150:      store.applyUserPage(page);
+clients/shared/local-store/test\user_event_test.dart:151:      final newEvent = {...event, 'eventId': newEventId, 'subjectId': other};
+clients/shared/local-store/test\user_event_test.dart:152:      expect(
+clients/shared/local-store/test\user_event_test.dart:153:        () => store.applyUserPage(
+clients/shared/local-store/test\user_event_test.dart:154:          withEvents([
+clients/shared/local-store/test\user_event_test.dart:155:            newEvent,
+clients/shared/local-store/test\user_event_test.dart:156:            {...event, 'revision': 2},
+clients/shared/local-store/test\user_event_test.dart:157:          ]),
+clients/shared/local-store/test\user_event_test.dart:158:        ),
+clients/shared/local-store/test\user_event_test.dart:159:        throwsStateError,
+clients/shared/local-store/test\user_event_test.dart:160:      );
+clients/shared/local-store/test\user_event_test.dart:161:      reopen();
+clients/shared/local-store/test\user_event_test.dart:162:      expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:163:      store.applyUserPage({
+clients/shared/local-store/test\user_event_test.dart:164:        ...page,
+clients/shared/local-store/test\user_event_test.dart:165:        'events': [
+clients/shared/local-store/test\user_event_test.dart:166:          {...newEvent, 'revision': 3},
+clients/shared/local-store/test\user_event_test.dart:167:        ],
+clients/shared/local-store/test\user_event_test.dart:168:        'nextCursor': 'new-cursor',
+clients/shared/local-store/test\user_event_test.dart:169:      });
+clients/shared/local-store/test\user_event_test.dart:170:      expect(store.userState, {
+clients/shared/local-store/test\user_event_test.dart:171:        '${event['kind']}/${event['subjectId']}': 1,
+clients/shared/local-store/test\user_event_test.dart:172:        '${event['kind']}/$other': 3,
+clients/shared/local-store/test\user_event_test.dart:173:      });
+clients/shared/local-store/test\user_event_test.dart:174:      expect(store.userCursor, 'new-cursor');
+clients/shared/local-store/test\user_event_test.dart:175:    },
+clients/shared/local-store/test\user_event_test.dart:176:  );
+clients/shared/local-store/test\user_event_test.dart:177:
+clients/shared/local-store/test\user_event_test.dart:178:  test(
+clients/shared/local-store/test\user_event_test.dart:179:    'fault between materialization and cursor commit also rolls back event identity',
+clients/shared/local-store/test\user_event_test.dart:180:    () {
+clients/shared/local-store/test\user_event_test.dart:181:      final db = sqlite3.open(path);
+clients/shared/local-store/test\user_event_test.dart:182:      try {
+clients/shared/local-store/test\user_event_test.dart:183:        db.execute(
+clients/shared/local-store/test\user_event_test.dart:184:          "CREATE TRIGGER cursor_failure BEFORE UPDATE ON account BEGIN SELECT RAISE(ABORT,'fixture failure'); END",
+clients/shared/local-store/test\user_event_test.dart:185:        );
+clients/shared/local-store/test\user_event_test.dart:186:        expect(
+clients/shared/local-store/test\user_event_test.dart:187:          () => store.applyUserPage(page),
+clients/shared/local-store/test\user_event_test.dart:188:          throwsA(isA<SqliteException>()),
+clients/shared/local-store/test\user_event_test.dart:189:        );
+clients/shared/local-store/test\user_event_test.dart:190:        expect(store.userState, isEmpty);
+clients/shared/local-store/test\user_event_test.dart:191:        expect(store.userCursor, '0');
+clients/shared/local-store/test\user_event_test.dart:192:        expect(db.select('SELECT * FROM user_events'), isEmpty);
+clients/shared/local-store/test\user_event_test.dart:193:        db.execute('DROP TRIGGER cursor_failure');
+clients/shared/local-store/test\user_event_test.dart:194:      } finally {
+clients/shared/local-store/test\user_event_test.dart:195:        db.close();
+clients/shared/local-store/test\user_event_test.dart:196:      }
+clients/shared/local-store/test\user_event_test.dart:197:      reopen();
+clients/shared/local-store/test\user_event_test.dart:198:      store.applyUserPage(
+clients/shared/local-store/test\user_event_test.dart:199:        withEvents([
+clients/shared/local-store/test\user_event_test.dart:200:          {...event, 'revision': 2},
+clients/shared/local-store/test\user_event_test.dart:201:        ]),
+clients/shared/local-store/test\user_event_test.dart:202:      );
+clients/shared/local-store/test\user_event_test.dart:203:      reopen();
+clients/shared/local-store/test\user_event_test.dart:204:      expect(store.userState, {'${event['kind']}/${event['subjectId']}': 2});
+clients/shared/local-store/test\user_event_test.dart:205:      expect(store.userCursor, 'conflicting-cursor');
+clients/shared/local-store/test\user_event_test.dart:206:      expect(() => store.applyUserPage(page), throwsStateError);
+clients/shared/local-store/test\user_event_test.dart:207:    },
+clients/shared/local-store/test\user_event_test.dart:208:  );
+clients/shared/local-store/test\user_event_test.dart:209:
+clients/shared/local-store/test\user_event_test.dart:210:  test(
+clients/shared/local-store/test\user_event_test.dart:211:    'two already-open connections observe committed event identity before applying their pages',
+clients/shared/local-store/test\user_event_test.dart:212:    () {
+clients/shared/local-store/test\user_event_test.dart:213:      final second = LocalStore.open(path, account);
+clients/shared/local-store/test\user_event_test.dart:214:      try {
+clients/shared/local-store/test\user_event_test.dart:215:        store.applyUserPage(page);
+clients/shared/local-store/test\user_event_test.dart:216:        expect(
+clients/shared/local-store/test\user_event_test.dart:217:          () => second.applyUserPage(
+clients/shared/local-store/test\user_event_test.dart:218:            withEvents([
+clients/shared/local-store/test\user_event_test.dart:219:              {...event, 'revision': 2},
+clients/shared/local-store/test\user_event_test.dart:220:            ]),
+clients/shared/local-store/test\user_event_test.dart:221:          ),
+clients/shared/local-store/test\user_event_test.dart:222:          throwsStateError,
+clients/shared/local-store/test\user_event_test.dart:223:        );
+clients/shared/local-store/test\user_event_test.dart:224:        expect(second.userCursor, page['nextCursor']);
+clients/shared/local-store/test\user_event_test.dart:225:        expect(second.userState, store.userState);
+clients/shared/local-store/test\user_event_test.dart:226:        second.applyUserPage(page);
+clients/shared/local-store/test\user_event_test.dart:227:        expectCanonical();
+clients/shared/local-store/test\user_event_test.dart:228:      } finally {
+clients/shared/local-store/test\user_event_test.dart:229:        second.close();
+clients/shared/local-store/test\user_event_test.dart:230:      }
+clients/shared/local-store/test\user_event_test.dart:231:    },
+clients/shared/local-store/test\user_event_test.dart:232:  );
+clients/shared/local-store/test\user_event_test.dart:233:}
+clients/shared/local-store/test\native_test.dart:1:import 'package:sqlite3/sqlite3.dart';
+clients/shared/local-store/test\native_test.dart:2:import 'package:test/test.dart';
+clients/shared/local-store/test\native_test.dart:3:
+clients/shared/local-store/test\native_test.dart:4:void main() {
+clients/shared/local-store/test\native_test.dart:5:  test('loads the real native SQLite library', () {
+clients/shared/local-store/test\native_test.dart:6:    final db = sqlite3.openInMemory();
+clients/shared/local-store/test\native_test.dart:7:    try {
+clients/shared/local-store/test\native_test.dart:8:      expect(
+clients/shared/local-store/test\native_test.dart:9:        db.select('SELECT sqlite_version() AS version').single['version'],
+clients/shared/local-store/test\native_test.dart:10:        isNotEmpty,
+clients/shared/local-store/test\native_test.dart:11:      );
+clients/shared/local-store/test\native_test.dart:12:      db.execute('CREATE TABLE probe (value TEXT NOT NULL)');
+clients/shared/local-store/test\native_test.dart:13:      db.execute('INSERT INTO probe VALUES (?)', ['native']);
+clients/shared/local-store/test\native_test.dart:14:      expect(db.select('SELECT value FROM probe').single['value'], 'native');
+clients/shared/local-store/test\native_test.dart:15:    } finally {
+clients/shared/local-store/test\native_test.dart:16:      db.close();
+clients/shared/local-store/test\native_test.dart:17:    }
+clients/shared/local-store/test\native_test.dart:18:  });
+clients/shared/local-store/test\native_test.dart:19:}
+clients/shared/local-store/test\store_test.dart:1:import 'dart:convert';
+clients/shared/local-store/test\store_test.dart:2:import 'dart:io';
+clients/shared/local-store/test\store_test.dart:3:import 'package:sqlite3/sqlite3.dart';
+clients/shared/local-store/test\store_test.dart:4:import 'package:test/test.dart';
+clients/shared/local-store/test\store_test.dart:5:import 'package:plugworld_local_store/local_store.dart';
+clients/shared/local-store/test\store_test.dart:6:
+clients/shared/local-store/test\store_test.dart:7:const account = '10000000-0000-4000-8000-000000000001';
+clients/shared/local-store/test\store_test.dart:8:const other = '10000000-0000-4000-8000-000000000002';
+clients/shared/local-store/test\store_test.dart:9:final root = Directory('../../../').absolute.path;
+clients/shared/local-store/test\store_test.dart:10:Map<String, dynamic> fixture(String path) =>
+clients/shared/local-store/test\store_test.dart:11:    jsonDecode(File('$root/$path').readAsStringSync()) as Map<String, dynamic>;
+clients/shared/local-store/test\store_test.dart:12:Map<String, Object?> object(dynamic input) =>
+clients/shared/local-store/test\store_test.dart:13:    Map<String, Object?>.from(input as Map);
+clients/shared/local-store/test\store_test.dart:14:final cases =
+clients/shared/local-store/test\store_test.dart:15:    (fixture('contracts/fixtures/sync-plugin/golden.json')['cases'] as List)
+clients/shared/local-store/test\store_test.dart:16:        .where(
+clients/shared/local-store/test\store_test.dart:17:          (c) => (c['steps'] as List).every(
+clients/shared/local-store/test\store_test.dart:18:            (s) =>
+clients/shared/local-store/test\store_test.dart:19:                ['sync.message', 'sync.user', 'local.failed'].contains(s['op']),
+clients/shared/local-store/test\store_test.dart:20:          ),
+clients/shared/local-store/test\store_test.dart:21:        )
+clients/shared/local-store/test\store_test.dart:22:        .toList();
+clients/shared/local-store/test\store_test.dart:23:final scenario =
+clients/shared/local-store/test\store_test.dart:24:    (fixture('contracts/fixtures/websocket/golden.json')['scenarios'] as List)
+clients/shared/local-store/test\store_test.dart:25:        .firstWhere((s) => s['id'] == 'durable-send-and-created');
+clients/shared/local-store/test\store_test.dart:26:final step = (scenario['steps'] as List).firstWhere(
+clients/shared/local-store/test\store_test.dart:27:  (s) => s['in']['type'] == 'message.send',
+clients/shared/local-store/test\store_test.dart:28:);
+clients/shared/local-store/test\store_test.dart:29:final send = object(step['in']);
+clients/shared/local-store/test\store_test.dart:30:final outputs = step['out'] as List;
+clients/shared/local-store/test\store_test.dart:31:final ack = object(outputs.firstWhere((s) => s['type'] == 'message.ack'));
+clients/shared/local-store/test\store_test.dart:32:final realtime = object(
+clients/shared/local-store/test\store_test.dart:33:  outputs.firstWhere((s) => s['type'] == 'message.created'),
+clients/shared/local-store/test\store_test.dart:34:);
+clients/shared/local-store/test\store_test.dart:35:final server = <String, Object?>{
+clients/shared/local-store/test\store_test.dart:36:  ...object(realtime['payload']),
+clients/shared/local-store/test\store_test.dart:37:  'requestId': realtime['requestId'],
+clients/shared/local-store/test\store_test.dart:38:};
+clients/shared/local-store/test\store_test.dart:39:final conversation = server['conversationId'] as String;
+clients/shared/local-store/test\store_test.dart:40:final request = server['requestId'] as String;
+clients/shared/local-store/test\store_test.dart:41:
+clients/shared/local-store/test\store_test.dart:42:void main() {
+clients/shared/local-store/test\store_test.dart:43:  late Directory temp;
+clients/shared/local-store/test\store_test.dart:44:  late String path;
+clients/shared/local-store/test\store_test.dart:45:  late LocalStore store;
+clients/shared/local-store/test\store_test.dart:46:  setUp(() {
+clients/shared/local-store/test\store_test.dart:47:    temp = Directory.systemTemp.createTempSync('plugworld-store-');
+clients/shared/local-store/test\store_test.dart:48:    path = '${temp.path}/account.sqlite';
+clients/shared/local-store/test\store_test.dart:49:    store = LocalStore.open(path, account);
+clients/shared/local-store/test\store_test.dart:50:  });
+clients/shared/local-store/test\store_test.dart:51:  tearDown(() {
+clients/shared/local-store/test\store_test.dart:52:    store.close();
+clients/shared/local-store/test\store_test.dart:53:    temp.deleteSync(recursive: true);
+clients/shared/local-store/test\store_test.dart:54:  });
+clients/shared/local-store/test\store_test.dart:55:
+clients/shared/local-store/test\store_test.dart:56:  test(
+clients/shared/local-store/test\store_test.dart:57:    'canonical storage case selection is complete',
+clients/shared/local-store/test\store_test.dart:58:    () => expect(cases.length, 13),
+clients/shared/local-store/test\store_test.dart:59:  );
+clients/shared/local-store/test\store_test.dart:60:  for (final c in cases) {
+clients/shared/local-store/test\store_test.dart:61:    test('canonical SQLite ${c['id']}', () {
+clients/shared/local-store/test\store_test.dart:62:      final steps = c['steps'] as List;
+clients/shared/local-store/test\store_test.dart:63:      final timelines =
+clients/shared/local-store/test\store_test.dart:64:          (c['expect']?['timeline'] ?? c['expect']?['localTimeline']) as List?;
+clients/shared/local-store/test\store_test.dart:65:      var last = '';
+clients/shared/local-store/test\store_test.dart:66:      var rejected = false;
+clients/shared/local-store/test\store_test.dart:67:      final ids = <String>{};
+clients/shared/local-store/test\store_test.dart:68:      for (var index = 0; index < steps.length; index++) {
+clients/shared/local-store/test\store_test.dart:69:        final s = steps[index];
+clients/shared/local-store/test\store_test.dart:70:        final op = s['op'];
+clients/shared/local-store/test\store_test.dart:71:        final conv = s['message']?['conversationId'] ?? s['conversationId'];
+clients/shared/local-store/test\store_test.dart:72:        if (conv != null) ids.add(conv as String);
+clients/shared/local-store/test\store_test.dart:73:        Database? probe;
+clients/shared/local-store/test\store_test.dart:74:        if (s['fault'] == 'before_commit') {
+clients/shared/local-store/test\store_test.dart:75:          probe = sqlite3.open(path);
+clients/shared/local-store/test\store_test.dart:76:          final table = op == 'sync.user' ? 'account' : 'conversation_cursors';
+clients/shared/local-store/test\store_test.dart:77:          probe.execute(
+clients/shared/local-store/test\store_test.dart:78:            "CREATE TRIGGER fixture_failure BEFORE UPDATE ON $table BEGIN SELECT RAISE(ABORT,'fixture failure'); END",
+clients/shared/local-store/test\store_test.dart:79:          );
+clients/shared/local-store/test\store_test.dart:80:        }
+clients/shared/local-store/test\store_test.dart:81:        try {
+clients/shared/local-store/test\store_test.dart:82:          if (op == 'sync.message') {
+clients/shared/local-store/test\store_test.dart:83:            store.applyMessages([object(s['message'])]);
+clients/shared/local-store/test\store_test.dart:84:            last = 'APPLIED';
+clients/shared/local-store/test\store_test.dart:85:          } else if (op == 'sync.user') {
+clients/shared/local-store/test\store_test.dart:86:            store.applyUserPage(object(s['page']));
+clients/shared/local-store/test\store_test.dart:87:            last = 'APPLIED';
+clients/shared/local-store/test\store_test.dart:88:          } else {
+clients/shared/local-store/test\store_test.dart:89:            store.localFailed(
+clients/shared/local-store/test\store_test.dart:90:              s['conversationId'] as String,
+clients/shared/local-store/test\store_test.dart:91:              s['requestId'] as String,
+clients/shared/local-store/test\store_test.dart:92:            );
+clients/shared/local-store/test\store_test.dart:93:            last =
+clients/shared/local-store/test\store_test.dart:94:                store.item(
+clients/shared/local-store/test\store_test.dart:95:                      s['conversationId'] as String,
+clients/shared/local-store/test\store_test.dart:96:                      s['requestId'] as String,
+clients/shared/local-store/test\store_test.dart:97:                    )!['state']
+clients/shared/local-store/test\store_test.dart:98:                    as String;
+clients/shared/local-store/test\store_test.dart:99:          }
+clients/shared/local-store/test\store_test.dart:100:        } catch (_) {
+clients/shared/local-store/test\store_test.dart:101:          if (s['fault'] == 'before_commit') {
+clients/shared/local-store/test\store_test.dart:102:            last = 'ROLLED_BACK';
+clients/shared/local-store/test\store_test.dart:103:          } else {
+clients/shared/local-store/test\store_test.dart:104:            rejected = true;
+clients/shared/local-store/test\store_test.dart:105:          }
+clients/shared/local-store/test\store_test.dart:106:        } finally {
+clients/shared/local-store/test\store_test.dart:107:          if (probe != null) {
+clients/shared/local-store/test\store_test.dart:108:            probe.execute('DROP TRIGGER fixture_failure');
+clients/shared/local-store/test\store_test.dart:109:            probe.close();
+clients/shared/local-store/test\store_test.dart:110:          }
+clients/shared/local-store/test\store_test.dart:111:        }
+clients/shared/local-store/test\store_test.dart:112:        if (timelines != null) {
+clients/shared/local-store/test\store_test.dart:113:          assertExpected(store, object(timelines[index]), ids, last);
+clients/shared/local-store/test\store_test.dart:114:        }
+clients/shared/local-store/test\store_test.dart:115:        if (rejected) break;
+clients/shared/local-store/test\store_test.dart:116:      }
+clients/shared/local-store/test\store_test.dart:117:      expect(rejected, c['expectError'] == true);
+clients/shared/local-store/test\store_test.dart:118:      if (!rejected) assertExpected(store, object(c['expect']), ids, last);
+clients/shared/local-store/test\store_test.dart:119:    });
+clients/shared/local-store/test\store_test.dart:120:  }
+clients/shared/local-store/test\store_test.dart:121:
+clients/shared/local-store/test\store_test.dart:122:  test('all four entrances interleave and persist one canonical message', () {
+clients/shared/local-store/test\store_test.dart:123:    store.localSend(
+clients/shared/local-store/test\store_test.dart:124:      conversation,
+clients/shared/local-store/test\store_test.dart:125:      request,
+clients/shared/local-store/test\store_test.dart:126:      account,
+clients/shared/local-store/test\store_test.dart:127:      object(server['content'])['text'] as String,
+clients/shared/local-store/test\store_test.dart:128:    );
+clients/shared/local-store/test\store_test.dart:129:    store.localSend(
+clients/shared/local-store/test\store_test.dart:130:      conversation,
+clients/shared/local-store/test\store_test.dart:131:      request,
+clients/shared/local-store/test\store_test.dart:132:      account,
+clients/shared/local-store/test\store_test.dart:133:      object(server['content'])['text'] as String,
+clients/shared/local-store/test\store_test.dart:134:    );
+clients/shared/local-store/test\store_test.dart:135:    store.applyRealtime(realtime);
+clients/shared/local-store/test\store_test.dart:136:    store.applyAck(ack);
+clients/shared/local-store/test\store_test.dart:137:    store.applyMessages([server, server]);
+clients/shared/local-store/test\store_test.dart:138:    store.localFailed(conversation, request);
+clients/shared/local-store/test\store_test.dart:139:    store.close();
+clients/shared/local-store/test\store_test.dart:140:    store = LocalStore.open(path, account);
+clients/shared/local-store/test\store_test.dart:141:    expect(store.messages(conversation), hasLength(1));
+clients/shared/local-store/test\store_test.dart:142:    final row = store.item(conversation, request)!;
+clients/shared/local-store/test\store_test.dart:143:    expect(row['state'], 'SENT');
+clients/shared/local-store/test\store_test.dart:144:    expect(row['server_message_id'], server['messageId']);
+clients/shared/local-store/test\store_test.dart:145:    expect(row['server_seq'], server['seq']);
+clients/shared/local-store/test\store_test.dart:146:    expect(row['server_time'], server['createdAt']);
+clients/shared/local-store/test\store_test.dart:147:    expect(store.contiguous(conversation), server['seq']);
+clients/shared/local-store/test\store_test.dart:148:  });
+clients/shared/local-store/test\store_test.dart:149:
+clients/shared/local-store/test\store_test.dart:150:  test(
+clients/shared/local-store/test\store_test.dart:151:    'ACK merges local data and rejects uncommitted or missing confirmation',
+clients/shared/local-store/test\store_test.dart:152:    () {
+clients/shared/local-store/test\store_test.dart:153:      expect(() => store.applyAck(ack), throwsStateError);
+clients/shared/local-store/test\store_test.dart:154:      store.localSend(
+clients/shared/local-store/test\store_test.dart:155:        conversation,
+clients/shared/local-store/test\store_test.dart:156:        request,
+clients/shared/local-store/test\store_test.dart:157:        account,
+clients/shared/local-store/test\store_test.dart:158:        object(server['content'])['text'] as String,
+clients/shared/local-store/test\store_test.dart:159:      );
+clients/shared/local-store/test\store_test.dart:160:      store.localFailed(conversation, request);
+clients/shared/local-store/test\store_test.dart:161:      final invalid = {
+clients/shared/local-store/test\store_test.dart:162:        ...ack,
+clients/shared/local-store/test\store_test.dart:163:        'payload': {...object(ack['payload']), 'status': 'rejected'},
+clients/shared/local-store/test\store_test.dart:164:      };
+clients/shared/local-store/test\store_test.dart:165:      expect(() => store.applyAck(invalid), throwsFormatException);
+clients/shared/local-store/test\store_test.dart:166:      expect(store.item(conversation, request)!['state'], 'FAILED');
+clients/shared/local-store/test\store_test.dart:167:      store.applyAck(ack);
+clients/shared/local-store/test\store_test.dart:168:      expect(store.item(conversation, request)!['state'], 'SENT');
+clients/shared/local-store/test\store_test.dart:169:    },
+clients/shared/local-store/test\store_test.dart:170:  );
+clients/shared/local-store/test\store_test.dart:171:
+clients/shared/local-store/test\store_test.dart:172:  test(
+clients/shared/local-store/test\store_test.dart:173:    'identity conflicts roll back whole page and preserve committed row',
+clients/shared/local-store/test\store_test.dart:174:    () {
+clients/shared/local-store/test\store_test.dart:175:      store.applyMessages([server]);
+clients/shared/local-store/test\store_test.dart:176:      final initial = store.messages(conversation);
+clients/shared/local-store/test\store_test.dart:177:      final conflicting = {...server, 'seq': (server['seq'] as int) + 1};
+clients/shared/local-store/test\store_test.dart:178:      expect(() => store.applyMessages([conflicting]), throwsStateError);
+clients/shared/local-store/test\store_test.dart:179:      final another = {
+clients/shared/local-store/test\store_test.dart:180:        ...server,
+clients/shared/local-store/test\store_test.dart:181:        'requestId': '40000000-0000-4000-8000-000000000099',
+clients/shared/local-store/test\store_test.dart:182:      };
+clients/shared/local-store/test\store_test.dart:183:      expect(
+clients/shared/local-store/test\store_test.dart:184:        () => store.applyMessages([another]),
+clients/shared/local-store/test\store_test.dart:185:        throwsA(isA<SqliteException>()),
+clients/shared/local-store/test\store_test.dart:186:      );
+clients/shared/local-store/test\store_test.dart:187:      expect(store.messages(conversation), initial);
+clients/shared/local-store/test\store_test.dart:188:      expect(store.contiguous(conversation), server['seq']);
+clients/shared/local-store/test\store_test.dart:189:      final cross = {
+clients/shared/local-store/test\store_test.dart:190:        ...another,
+clients/shared/local-store/test\store_test.dart:191:        'conversationId': '30000000-0000-4000-8000-000000000099',
+clients/shared/local-store/test\store_test.dart:192:      };
+clients/shared/local-store/test\store_test.dart:193:      expect(
+clients/shared/local-store/test\store_test.dart:194:        () => store.applyMessages([cross]),
+clients/shared/local-store/test\store_test.dart:195:        throwsA(isA<SqliteException>()),
+clients/shared/local-store/test\store_test.dart:196:      );
+clients/shared/local-store/test\store_test.dart:197:      expect(store.messages(cross['conversationId'] as String), isEmpty);
+clients/shared/local-store/test\store_test.dart:198:    },
+clients/shared/local-store/test\store_test.dart:199:  );
+clients/shared/local-store/test\store_test.dart:200:
+clients/shared/local-store/test\store_test.dart:201:  test('account binding and separate native stores survive reopen', () {
+clients/shared/local-store/test\store_test.dart:202:    store.applyMessages([server]);
+clients/shared/local-store/test\store_test.dart:203:    expect(() => LocalStore.open(path, other), throwsStateError);
+clients/shared/local-store/test\store_test.dart:204:    final a = LocalStore.openAccount('${temp.path}/accounts', account);
+clients/shared/local-store/test\store_test.dart:205:    final b = LocalStore.openAccount('${temp.path}/accounts', other);
+clients/shared/local-store/test\store_test.dart:206:    try {
+clients/shared/local-store/test\store_test.dart:207:      a.applyMessages([server]);
+clients/shared/local-store/test\store_test.dart:208:      expect(b.messages(conversation), isEmpty);
+clients/shared/local-store/test\store_test.dart:209:      expect(a.messages(conversation), hasLength(1));
+clients/shared/local-store/test\store_test.dart:210:    } finally {
+clients/shared/local-store/test\store_test.dart:211:      a.close();
+clients/shared/local-store/test\store_test.dart:212:      b.close();
+clients/shared/local-store/test\store_test.dart:213:    }
+clients/shared/local-store/test\store_test.dart:214:  });
+clients/shared/local-store/test\store_test.dart:215:
+clients/shared/local-store/test\store_test.dart:216:  test(
+clients/shared/local-store/test\store_test.dart:217:    'migration from an empty version0 database is transactional and idempotent',
+clients/shared/local-store/test\store_test.dart:218:    () {
+clients/shared/local-store/test\store_test.dart:219:      final migrationPath = '${temp.path}/initial.sqlite';
+clients/shared/local-store/test\store_test.dart:220:      var probe = sqlite3.open(migrationPath);
+clients/shared/local-store/test\store_test.dart:221:      expect(probe.select('PRAGMA user_version').single['user_version'], 0);
+clients/shared/local-store/test\store_test.dart:222:      probe.close();
+clients/shared/local-store/test\store_test.dart:223:      var migrated = LocalStore.open(migrationPath, account);
+clients/shared/local-store/test\store_test.dart:224:      migrated.applyMessages([server]);
+clients/shared/local-store/test\store_test.dart:225:      migrated.close();
+clients/shared/local-store/test\store_test.dart:226:      migrated = LocalStore.open(migrationPath, account);
+clients/shared/local-store/test\store_test.dart:227:      expect(migrated.messages(conversation), hasLength(1));
+clients/shared/local-store/test\store_test.dart:228:      migrated.close();
+clients/shared/local-store/test\store_test.dart:229:      probe = sqlite3.open(migrationPath);
+clients/shared/local-store/test\store_test.dart:230:      expect(probe.select('PRAGMA user_version').single['user_version'], 1);
+clients/shared/local-store/test\store_test.dart:231:      probe.close();
+clients/shared/local-store/test\store_test.dart:232:    },
+clients/shared/local-store/test\store_test.dart:233:  );
+clients/shared/local-store/test\store_test.dart:234:
+clients/shared/local-store/test\store_test.dart:235:  test('failed initial migration rolls back all newly created objects', () {
+clients/shared/local-store/test\store_test.dart:236:    final migrationPath = '${temp.path}/broken.sqlite';
+clients/shared/local-store/test\store_test.dart:237:    final probe = sqlite3.open(migrationPath);
+clients/shared/local-store/test\store_test.dart:238:    probe.execute('CREATE TABLE messages (preserved TEXT)');
+clients/shared/local-store/test\store_test.dart:239:    probe.execute("INSERT INTO messages VALUES ('original')");
+clients/shared/local-store/test\store_test.dart:240:    expect(
+clients/shared/local-store/test\store_test.dart:241:      () => LocalStore.open(migrationPath, account),
+clients/shared/local-store/test\store_test.dart:242:      throwsA(isA<SqliteException>()),
+clients/shared/local-store/test\store_test.dart:243:    );
+clients/shared/local-store/test\store_test.dart:244:    expect(probe.select('PRAGMA user_version').single['user_version'], 0);
+clients/shared/local-store/test\store_test.dart:245:    expect(
+clients/shared/local-store/test\store_test.dart:246:      probe.select("SELECT name FROM sqlite_master WHERE name='account'"),
+clients/shared/local-store/test\store_test.dart:247:      isEmpty,
+clients/shared/local-store/test\store_test.dart:248:    );
+clients/shared/local-store/test\store_test.dart:249:    expect(
+clients/shared/local-store/test\store_test.dart:250:      probe.select('SELECT preserved FROM messages').single['preserved'],
+clients/shared/local-store/test\store_test.dart:251:      'original',
+clients/shared/local-store/test\store_test.dart:252:    );
+clients/shared/local-store/test\store_test.dart:253:    probe.close();
+clients/shared/local-store/test\store_test.dart:254:  });
+clients/shared/local-store/test\store_test.dart:255:
+clients/shared/local-store/test\store_test.dart:256:  test('future schema is rejected without destructive downgrade', () {
+clients/shared/local-store/test\store_test.dart:257:    final probe = sqlite3.open(path);
+clients/shared/local-store/test\store_test.dart:258:    probe.execute('PRAGMA user_version=2');
+clients/shared/local-store/test\store_test.dart:259:    expect(() => LocalStore.open(path, account), throwsStateError);
+clients/shared/local-store/test\store_test.dart:260:    expect(probe.select('PRAGMA user_version').single['user_version'], 2);
+clients/shared/local-store/test\store_test.dart:261:    probe.close();
+clients/shared/local-store/test\store_test.dart:262:  });
+clients/shared/local-store/test\store_test.dart:263:
+clients/shared/local-store/test\store_test.dart:264:  test(
+clients/shared/local-store/test\store_test.dart:265:    'batch conflict rolls back earlier materialization and prefix updates',
+clients/shared/local-store/test\store_test.dart:266:    () {
+clients/shared/local-store/test\store_test.dart:267:      final second = {
+clients/shared/local-store/test\store_test.dart:268:        ...server,
+clients/shared/local-store/test\store_test.dart:269:        'requestId': '40000000-0000-4000-8000-000000000099',
+clients/shared/local-store/test\store_test.dart:270:      };
+clients/shared/local-store/test\store_test.dart:271:      expect(
+clients/shared/local-store/test\store_test.dart:272:        () => store.applyMessages([server, second]),
+clients/shared/local-store/test\store_test.dart:273:        throwsA(isA<SqliteException>()),
+clients/shared/local-store/test\store_test.dart:274:      );
+clients/shared/local-store/test\store_test.dart:275:      expect(store.messages(conversation), isEmpty);
+clients/shared/local-store/test\store_test.dart:276:      expect(store.contiguous(conversation), 0);
+clients/shared/local-store/test\store_test.dart:277:    },
+clients/shared/local-store/test\store_test.dart:278:  );
+clients/shared/local-store/test\store_test.dart:279:
+clients/shared/local-store/test\store_test.dart:280:  test(
+clients/shared/local-store/test\store_test.dart:281:    'opaque user cursor compare protects a page fetched before concurrent change',
+clients/shared/local-store/test\store_test.dart:282:    () {
+clients/shared/local-store/test\store_test.dart:283:      final c = cases.firstWhere((c) => c['id'] == 'user-friend.changed');
+clients/shared/local-store/test\store_test.dart:284:      final page = object(c['steps'][0]['page']);
+clients/shared/local-store/test\store_test.dart:285:      store.applyUserPage(page, expectedCursor: '0');
+clients/shared/local-store/test\store_test.dart:286:      final before = store.userState;
+clients/shared/local-store/test\store_test.dart:287:      expect(
+clients/shared/local-store/test\store_test.dart:288:        () => store.applyUserPage({
+clients/shared/local-store/test\store_test.dart:289:          ...page,
+clients/shared/local-store/test\store_test.dart:290:          'nextCursor': 'opaque',
+clients/shared/local-store/test\store_test.dart:291:        }, expectedCursor: '0'),
+clients/shared/local-store/test\store_test.dart:292:        throwsStateError,
+clients/shared/local-store/test\store_test.dart:293:      );
+clients/shared/local-store/test\store_test.dart:294:      expect(store.userCursor, page['nextCursor']);
+clients/shared/local-store/test\store_test.dart:295:      expect(store.userState, before);
+clients/shared/local-store/test\store_test.dart:296:    },
+clients/shared/local-store/test\store_test.dart:297:  );
+clients/shared/local-store/test\store_test.dart:298:}
+clients/shared/local-store/test\store_test.dart:299:
+clients/shared/local-store/test\store_test.dart:300:void assertExpected(
+clients/shared/local-store/test\store_test.dart:301:  LocalStore store,
+clients/shared/local-store/test\store_test.dart:302:  Map<String, Object?> expected,
+clients/shared/local-store/test\store_test.dart:303:  Set<String> ids,
+clients/shared/local-store/test\store_test.dart:304:  String last,
+clients/shared/local-store/test\store_test.dart:305:) {
+clients/shared/local-store/test\store_test.dart:306:  final conv = ids.isEmpty ? conversation : ids.first;
+clients/shared/local-store/test\store_test.dart:307:  final rows = store.messages(conv);
+clients/shared/local-store/test\store_test.dart:308:  final normalized = {
+clients/shared/local-store/test\store_test.dart:309:    for (final row in rows.where((r) => r['server_seq'] != null))
+clients/shared/local-store/test\store_test.dart:310:      '${row['server_seq']}': row['server_message_id'],
+clients/shared/local-store/test\store_test.dart:311:  };
+clients/shared/local-store/test\store_test.dart:312:  if (expected.containsKey('cursor'))
+clients/shared/local-store/test\store_test.dart:313:    expect(store.userCursor, expected['cursor']);
+clients/shared/local-store/test\store_test.dart:314:  if (expected.containsKey('contiguous'))
+clients/shared/local-store/test\store_test.dart:315:    expect(store.contiguous(conv), expected['contiguous']);
+clients/shared/local-store/test\store_test.dart:316:  if (expected.containsKey('messages'))
+clients/shared/local-store/test\store_test.dart:317:    expect(normalized, expected['messages']);
+clients/shared/local-store/test\store_test.dart:318:  if (expected.containsKey('userState'))
+clients/shared/local-store/test\store_test.dart:319:    expect(store.userState, expected['userState']);
+clients/shared/local-store/test\store_test.dart:320:  if (expected.containsKey('last')) expect(last, expected['last']);
+clients/shared/local-store/test\store_test.dart:321:  if (expected.containsKey('local')) {
+clients/shared/local-store/test\store_test.dart:322:    final local = object(expected['local']);
+clients/shared/local-store/test\store_test.dart:323:    for (final entry in local.entries) {
+clients/shared/local-store/test\store_test.dart:324:      final parts = entry.key.split('/');
+clients/shared/local-store/test\store_test.dart:325:      expect(store.item(parts[0], parts[1])!['state'], entry.value);
+clients/shared/local-store/test\store_test.dart:326:    }
+clients/shared/local-store/test\store_test.dart:327:  }
+clients/shared/local-store/test\store_test.dart:328:  if (expected.containsKey('itemCount'))
+clients/shared/local-store/test\store_test.dart:329:    expect(rows.length, expected['itemCount']);
+clients/shared/local-store/test\store_test.dart:330:  if (expected.containsKey('conversations')) {
+clients/shared/local-store/test\store_test.dart:331:    for (final entry in object(expected['conversations']).entries) {
+clients/shared/local-store/test\store_test.dart:332:      assertExpected(store, object(entry.value), {entry.key}, last);
+clients/shared/local-store/test\store_test.dart:333:    }
+clients/shared/local-store/test\store_test.dart:334:  }
+clients/shared/local-store/test\store_test.dart:335:}
+clients/desktop/storage/lib\storage.dart:1:import 'package:plugworld_local_store/local_store.dart';
+clients/desktop/storage/lib\storage.dart:2:export 'package:plugworld_local_store/local_store.dart' show LocalStore;
+clients/desktop/storage/lib\storage.dart:3:
+clients/desktop/storage/lib\storage.dart:4:/// Native desktop account storage; the app supplies its private data directory.
+clients/desktop/storage/lib\storage.dart:5:LocalStore openAccountStorage(String privateDirectory, String accountId) =>
+clients/desktop/storage/lib\storage.dart:6:    LocalStore.openAccount(privateDirectory, accountId);
+clients/shared/local-store/lib\local_store.dart:1:import 'dart:io';
+clients/shared/local-store/lib\local_store.dart:2:import 'package:sqlite3/sqlite3.dart';
+clients/shared/local-store/lib\local_store.dart:3:
+clients/shared/local-store/lib\local_store.dart:4:/// Private native materialized view. It never stores authentication credentials.
+clients/shared/local-store/lib\local_store.dart:5:class LocalStore {
+clients/shared/local-store/lib\local_store.dart:6:  final Database _db;
+clients/shared/local-store/lib\local_store.dart:7:  final String accountId;
+clients/shared/local-store/lib\local_store.dart:8:  LocalStore._(this._db, this.accountId);
+clients/shared/local-store/lib\local_store.dart:9:
+clients/shared/local-store/lib\local_store.dart:10:  static LocalStore openAccount(String directory, String accountId) {
+clients/shared/local-store/lib\local_store.dart:11:    _id(accountId);
+clients/shared/local-store/lib\local_store.dart:12:    Directory(directory).createSync(recursive: true);
+clients/shared/local-store/lib\local_store.dart:13:    return open('${directory}/${accountId}.sqlite', accountId);
+clients/shared/local-store/lib\local_store.dart:14:  }
+clients/shared/local-store/lib\local_store.dart:15:
+clients/shared/local-store/lib\local_store.dart:16:  static LocalStore open(String path, String accountId) {
+clients/shared/local-store/lib\local_store.dart:17:    _id(accountId);
+clients/shared/local-store/lib\local_store.dart:18:    final db = sqlite3.open(path);
+clients/shared/local-store/lib\local_store.dart:19:    final store = LocalStore._(db, accountId);
+clients/shared/local-store/lib\local_store.dart:20:    try {
+clients/shared/local-store/lib\local_store.dart:21:      store._transaction(() {
+clients/shared/local-store/lib\local_store.dart:22:        final version = db.select('PRAGMA user_version').single['user_version'];
+clients/shared/local-store/lib\local_store.dart:23:        if (version != 0 && version != 1) {
+clients/shared/local-store/lib\local_store.dart:24:          throw StateError('Unsupported local schema version');
+clients/shared/local-store/lib\local_store.dart:25:        }
+clients/shared/local-store/lib\local_store.dart:26:        if (version == 0) {
+clients/shared/local-store/lib\local_store.dart:27:          db.execute('''
+clients/shared/local-store/lib\local_store.dart:28:CREATE TABLE account (singleton INTEGER PRIMARY KEY CHECK(singleton=1),
+clients/shared/local-store/lib\local_store.dart:29: account_id TEXT NOT NULL, user_cursor TEXT NOT NULL);
+clients/shared/local-store/lib\local_store.dart:30:CREATE TABLE messages (
+clients/shared/local-store/lib\local_store.dart:31: conversation_id TEXT NOT NULL, request_id TEXT NOT NULL,
+clients/shared/local-store/lib\local_store.dart:32: sender_id TEXT, content TEXT, state TEXT NOT NULL
+clients/shared/local-store/lib\local_store.dart:33: CHECK(state IN ('SENDING','SENT','FAILED')),
+clients/shared/local-store/lib\local_store.dart:34: server_message_id TEXT, server_seq INTEGER CHECK(server_seq > 0),
+clients/shared/local-store/lib\local_store.dart:35: server_time TEXT,
+clients/shared/local-store/lib\local_store.dart:36: UNIQUE(conversation_id, request_id),
+clients/shared/local-store/lib\local_store.dart:37: CHECK((state='SENT' AND server_message_id IS NOT NULL AND server_seq IS NOT NULL
+clients/shared/local-store/lib\local_store.dart:38: AND server_time IS NOT NULL AND sender_id IS NOT NULL AND content IS NOT NULL)
+clients/shared/local-store/lib\local_store.dart:39: OR (state!='SENT' AND server_message_id IS NULL AND server_seq IS NULL AND server_time IS NULL)));
+clients/shared/local-store/lib\local_store.dart:40:CREATE UNIQUE INDEX message_server_identity ON messages(server_message_id)
+clients/shared/local-store/lib\local_store.dart:41: WHERE server_message_id IS NOT NULL;
+clients/shared/local-store/lib\local_store.dart:42:CREATE UNIQUE INDEX message_conversation_sequence ON messages(conversation_id, server_seq)
+clients/shared/local-store/lib\local_store.dart:43: WHERE server_seq IS NOT NULL;
+clients/shared/local-store/lib\local_store.dart:44:CREATE TABLE conversation_cursors (
+clients/shared/local-store/lib\local_store.dart:45: conversation_id TEXT PRIMARY KEY, contiguous_seq INTEGER NOT NULL CHECK(contiguous_seq >= 0));
+clients/shared/local-store/lib\local_store.dart:46:CREATE TABLE user_events (
+clients/shared/local-store/lib\local_store.dart:47: event_id TEXT PRIMARY KEY, cursor TEXT NOT NULL, kind TEXT NOT NULL,
+clients/shared/local-store/lib\local_store.dart:48: subject_id TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision > 0));
+clients/shared/local-store/lib\local_store.dart:49:CREATE TABLE user_state (
+clients/shared/local-store/lib\local_store.dart:50: kind TEXT NOT NULL, subject_id TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision > 0),
+clients/shared/local-store/lib\local_store.dart:51: PRIMARY KEY(kind, subject_id));
+clients/shared/local-store/lib\local_store.dart:52:''');
+clients/shared/local-store/lib\local_store.dart:53:          db.execute('INSERT INTO account VALUES (1, ?, ?)', [accountId, '0']);
+clients/shared/local-store/lib\local_store.dart:54:          db.execute('PRAGMA user_version=1');
+clients/shared/local-store/lib\local_store.dart:55:        }
+clients/shared/local-store/lib\local_store.dart:56:        if (db
+clients/shared/local-store/lib\local_store.dart:57:                .select('SELECT account_id FROM account WHERE singleton=1')
+clients/shared/local-store/lib\local_store.dart:58:                .single['account_id'] !=
+clients/shared/local-store/lib\local_store.dart:59:            accountId) {
+clients/shared/local-store/lib\local_store.dart:60:          throw StateError('Account does not match this store');
+clients/shared/local-store/lib\local_store.dart:61:        }
+clients/shared/local-store/lib\local_store.dart:62:      });
+clients/shared/local-store/lib\local_store.dart:63:      return store;
+clients/shared/local-store/lib\local_store.dart:64:    } catch (_) {
+clients/shared/local-store/lib\local_store.dart:65:      db.close();
+clients/shared/local-store/lib\local_store.dart:66:      rethrow;
+clients/shared/local-store/lib\local_store.dart:67:    }
+clients/shared/local-store/lib\local_store.dart:68:  }
+clients/shared/local-store/lib\local_store.dart:69:
+clients/shared/local-store/lib\local_store.dart:70:  void close() => _db.close();
+clients/shared/local-store/lib\local_store.dart:71:
+clients/shared/local-store/lib\local_store.dart:72:  T _transaction<T>(T Function() body) {
+clients/shared/local-store/lib\local_store.dart:73:    _db.execute('BEGIN IMMEDIATE');
+clients/shared/local-store/lib\local_store.dart:74:    try {
+clients/shared/local-store/lib\local_store.dart:75:      final result = body();
+clients/shared/local-store/lib\local_store.dart:76:      _db.execute('COMMIT');
+clients/shared/local-store/lib\local_store.dart:77:      return result;
+clients/shared/local-store/lib\local_store.dart:78:    } catch (_) {
+clients/shared/local-store/lib\local_store.dart:79:      _db.execute('ROLLBACK');
+clients/shared/local-store/lib\local_store.dart:80:      rethrow;
+clients/shared/local-store/lib\local_store.dart:81:    }
+clients/shared/local-store/lib\local_store.dart:82:  }
+clients/shared/local-store/lib\local_store.dart:83:
+clients/shared/local-store/lib\local_store.dart:84:  static String _id(Object? value) {
+clients/shared/local-store/lib\local_store.dart:85:    if (value is! String ||
+clients/shared/local-store/lib\local_store.dart:86:        !RegExp(
+clients/shared/local-store/lib\local_store.dart:87:          r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+clients/shared/local-store/lib\local_store.dart:88:        ).hasMatch(value)) {
+clients/shared/local-store/lib\local_store.dart:89:      throw FormatException('Invalid identity');
+clients/shared/local-store/lib\local_store.dart:90:    }
+clients/shared/local-store/lib\local_store.dart:91:    return value;
+clients/shared/local-store/lib\local_store.dart:92:  }
+clients/shared/local-store/lib\local_store.dart:93:
+clients/shared/local-store/lib\local_store.dart:94:  static String _text(Object? value) {
+clients/shared/local-store/lib\local_store.dart:95:    if (value is! String || value.isEmpty || value.length > 4096) {
+clients/shared/local-store/lib\local_store.dart:96:      throw FormatException('Invalid message text');
+clients/shared/local-store/lib\local_store.dart:97:    }
+clients/shared/local-store/lib\local_store.dart:98:    return value;
+clients/shared/local-store/lib\local_store.dart:99:  }
+clients/shared/local-store/lib\local_store.dart:100:
+clients/shared/local-store/lib\local_store.dart:101:  static Map<String, Object?> _map(Object? value) {
+clients/shared/local-store/lib\local_store.dart:102:    if (value is! Map) throw FormatException('Expected object');
+clients/shared/local-store/lib\local_store.dart:103:    return Map<String, Object?>.from(value);
+clients/shared/local-store/lib\local_store.dart:104:  }
+clients/shared/local-store/lib\local_store.dart:105:
+clients/shared/local-store/lib\local_store.dart:106:  Map<String, Object?>? item(String conversationId, String requestId) {
+clients/shared/local-store/lib\local_store.dart:107:    final rows = _db.select(
+clients/shared/local-store/lib\local_store.dart:108:      'SELECT * FROM messages WHERE conversation_id=? AND request_id=?',
+clients/shared/local-store/lib\local_store.dart:109:      [conversationId, requestId],
+clients/shared/local-store/lib\local_store.dart:110:    );
+clients/shared/local-store/lib\local_store.dart:111:    return rows.isEmpty ? null : Map<String, Object?>.from(rows.single);
+clients/shared/local-store/lib\local_store.dart:112:  }
+clients/shared/local-store/lib\local_store.dart:113:
+clients/shared/local-store/lib\local_store.dart:114:  List<Map<String, Object?>> messages(String conversationId) => _db
+clients/shared/local-store/lib\local_store.dart:115:      .select(
+clients/shared/local-store/lib\local_store.dart:116:        'SELECT * FROM messages WHERE conversation_id=? ORDER BY server_seq, request_id',
+clients/shared/local-store/lib\local_store.dart:117:        [conversationId],
+clients/shared/local-store/lib\local_store.dart:118:      )
+clients/shared/local-store/lib\local_store.dart:119:      .map((r) => Map<String, Object?>.from(r))
+clients/shared/local-store/lib\local_store.dart:120:      .toList();
+clients/shared/local-store/lib\local_store.dart:121:
+clients/shared/local-store/lib\local_store.dart:122:  String get userCursor =>
+clients/shared/local-store/lib\local_store.dart:123:      _db
+clients/shared/local-store/lib\local_store.dart:124:              .select('SELECT user_cursor FROM account WHERE singleton=1')
+clients/shared/local-store/lib\local_store.dart:125:              .single['user_cursor']
+clients/shared/local-store/lib\local_store.dart:126:          as String;
+clients/shared/local-store/lib\local_store.dart:127:
+clients/shared/local-store/lib\local_store.dart:128:  int contiguous(String conversationId) {
+clients/shared/local-store/lib\local_store.dart:129:    final rows = _db.select(
+clients/shared/local-store/lib\local_store.dart:130:      'SELECT contiguous_seq FROM conversation_cursors WHERE conversation_id=?',
+clients/shared/local-store/lib\local_store.dart:131:      [conversationId],
+clients/shared/local-store/lib\local_store.dart:132:    );
+clients/shared/local-store/lib\local_store.dart:133:    return rows.isEmpty ? 0 : rows.single['contiguous_seq'] as int;
+clients/shared/local-store/lib\local_store.dart:134:  }
+clients/shared/local-store/lib\local_store.dart:135:
+clients/shared/local-store/lib\local_store.dart:136:  Map<String, int> get userState => {
+clients/shared/local-store/lib\local_store.dart:137:    for (final row in _db.select('SELECT * FROM user_state'))
+clients/shared/local-store/lib\local_store.dart:138:      '${row['kind']}/${row['subject_id']}': row['revision'] as int,
+clients/shared/local-store/lib\local_store.dart:139:  };
+clients/shared/local-store/lib\local_store.dart:140:
+clients/shared/local-store/lib\local_store.dart:141:  void localSend(
+clients/shared/local-store/lib\local_store.dart:142:    String conversationId,
+clients/shared/local-store/lib\local_store.dart:143:    String requestId,
+clients/shared/local-store/lib\local_store.dart:144:    String senderId,
+clients/shared/local-store/lib\local_store.dart:145:    String text,
+clients/shared/local-store/lib\local_store.dart:146:  ) {
+clients/shared/local-store/lib\local_store.dart:147:    _local(
+clients/shared/local-store/lib\local_store.dart:148:      conversationId,
+clients/shared/local-store/lib\local_store.dart:149:      requestId,
+clients/shared/local-store/lib\local_store.dart:150:      'SENDING',
+clients/shared/local-store/lib\local_store.dart:151:      senderId: _id(senderId),
+clients/shared/local-store/lib\local_store.dart:152:      content: _text(text),
+clients/shared/local-store/lib\local_store.dart:153:    );
+clients/shared/local-store/lib\local_store.dart:154:  }
+clients/shared/local-store/lib\local_store.dart:155:
+clients/shared/local-store/lib\local_store.dart:156:  void localFailed(String conversationId, String requestId) =>
+clients/shared/local-store/lib\local_store.dart:157:      _local(conversationId, requestId, 'FAILED');
+clients/shared/local-store/lib\local_store.dart:158:
+clients/shared/local-store/lib\local_store.dart:159:  void _local(
+clients/shared/local-store/lib\local_store.dart:160:    String conversationId,
+clients/shared/local-store/lib\local_store.dart:161:    String requestId,
+clients/shared/local-store/lib\local_store.dart:162:    String state, {
+clients/shared/local-store/lib\local_store.dart:163:    String? senderId,
+clients/shared/local-store/lib\local_store.dart:164:    String? content,
+clients/shared/local-store/lib\local_store.dart:165:  }) {
+clients/shared/local-store/lib\local_store.dart:166:    _id(conversationId);
+clients/shared/local-store/lib\local_store.dart:167:    _id(requestId);
+clients/shared/local-store/lib\local_store.dart:168:    _transaction(() {
+clients/shared/local-store/lib\local_store.dart:169:      final old = item(conversationId, requestId);
+clients/shared/local-store/lib\local_store.dart:170:      if (old != null) {
+clients/shared/local-store/lib\local_store.dart:171:        if ((senderId != null &&
+clients/shared/local-store/lib\local_store.dart:172:                old['sender_id'] != null &&
+clients/shared/local-store/lib\local_store.dart:173:                old['sender_id'] != senderId) ||
+clients/shared/local-store/lib\local_store.dart:174:            (content != null &&
+clients/shared/local-store/lib\local_store.dart:175:                old['content'] != null &&
+clients/shared/local-store/lib\local_store.dart:176:                old['content'] != content)) {
+clients/shared/local-store/lib\local_store.dart:177:          throw StateError('Local request identity conflict');
+clients/shared/local-store/lib\local_store.dart:178:        }
+clients/shared/local-store/lib\local_store.dart:179:      }
+clients/shared/local-store/lib\local_store.dart:180:      _db.execute(
+clients/shared/local-store/lib\local_store.dart:181:        '''
+clients/shared/local-store/lib\local_store.dart:182:INSERT INTO messages(conversation_id,request_id,sender_id,content,state) VALUES(?,?,?,?,?)
+clients/shared/local-store/lib\local_store.dart:183:ON CONFLICT(conversation_id,request_id) DO UPDATE SET
+clients/shared/local-store/lib\local_store.dart:184: sender_id=COALESCE(messages.sender_id,excluded.sender_id),
+clients/shared/local-store/lib\local_store.dart:185: content=COALESCE(messages.content,excluded.content),
+clients/shared/local-store/lib\local_store.dart:186: state=CASE WHEN messages.state='SENT' THEN 'SENT' ELSE excluded.state END
+clients/shared/local-store/lib\local_store.dart:187:''',
+clients/shared/local-store/lib\local_store.dart:188:        [conversationId, requestId, senderId, content, state],
+clients/shared/local-store/lib\local_store.dart:189:      );
+clients/shared/local-store/lib\local_store.dart:190:    });
+clients/shared/local-store/lib\local_store.dart:191:  }
+clients/shared/local-store/lib\local_store.dart:192:
+clients/shared/local-store/lib\local_store.dart:193:  void applyAck(Map<String, Object?> envelope) {
+clients/shared/local-store/lib\local_store.dart:194:    if (envelope['type'] != 'message.ack' ||
+clients/shared/local-store/lib\local_store.dart:195:        envelope['protocolVersion'] != '1.0') {
+clients/shared/local-store/lib\local_store.dart:196:      throw FormatException('Expected committed message ACK');
+clients/shared/local-store/lib\local_store.dart:197:    }
+clients/shared/local-store/lib\local_store.dart:198:    final payload = _map(envelope['payload']);
+clients/shared/local-store/lib\local_store.dart:199:    if (payload['status'] != 'committed')
+clients/shared/local-store/lib\local_store.dart:200:      throw FormatException('ACK is not committed');
+clients/shared/local-store/lib\local_store.dart:201:    final conversation = _id(payload['conversationId']);
+clients/shared/local-store/lib\local_store.dart:202:    final request = _id(envelope['requestId']);
+clients/shared/local-store/lib\local_store.dart:203:    _transaction(() {
+clients/shared/local-store/lib\local_store.dart:204:      final old = item(conversation, request);
+clients/shared/local-store/lib\local_store.dart:205:      if (old == null || old['sender_id'] == null || old['content'] == null) {
+clients/shared/local-store/lib\local_store.dart:206:        throw StateError('ACK has no matching local send');
+clients/shared/local-store/lib\local_store.dart:207:      }
+clients/shared/local-store/lib\local_store.dart:208:      _merge({
+clients/shared/local-store/lib\local_store.dart:209:        ...payload,
+clients/shared/local-store/lib\local_store.dart:210:        'requestId': request,
+clients/shared/local-store/lib\local_store.dart:211:        'senderId': old['sender_id'],
+clients/shared/local-store/lib\local_store.dart:212:        'content': {'kind': 'TEXT', 'text': old['content']},
+clients/shared/local-store/lib\local_store.dart:213:      });
+clients/shared/local-store/lib\local_store.dart:214:    });
+clients/shared/local-store/lib\local_store.dart:215:  }
+clients/shared/local-store/lib\local_store.dart:216:
+clients/shared/local-store/lib\local_store.dart:217:  void applyRealtime(Map<String, Object?> envelope) {
+clients/shared/local-store/lib\local_store.dart:218:    if (envelope['type'] != 'message.created' ||
+clients/shared/local-store/lib\local_store.dart:219:        envelope['protocolVersion'] != '1.0') {
+clients/shared/local-store/lib\local_store.dart:220:      throw FormatException('Expected realtime message');
+clients/shared/local-store/lib\local_store.dart:221:    }
+clients/shared/local-store/lib\local_store.dart:222:    applyMessages([
+clients/shared/local-store/lib\local_store.dart:223:      {..._map(envelope['payload']), 'requestId': envelope['requestId']},
+clients/shared/local-store/lib\local_store.dart:224:    ]);
+clients/shared/local-store/lib\local_store.dart:225:  }
+clients/shared/local-store/lib\local_store.dart:226:
+clients/shared/local-store/lib\local_store.dart:227:  void applyMessages(List<Map<String, Object?>> messages) => _transaction(() {
+clients/shared/local-store/lib\local_store.dart:228:    for (final message in messages) {
+clients/shared/local-store/lib\local_store.dart:229:      _merge(message);
+clients/shared/local-store/lib\local_store.dart:230:    }
+clients/shared/local-store/lib\local_store.dart:231:  });
+clients/shared/local-store/lib\local_store.dart:232:
+clients/shared/local-store/lib\local_store.dart:233:  void _merge(Map<String, Object?> message) {
+clients/shared/local-store/lib\local_store.dart:234:    final conversation = _id(message['conversationId']);
+clients/shared/local-store/lib\local_store.dart:235:    final request = _id(message['requestId']);
+clients/shared/local-store/lib\local_store.dart:236:    final server = _id(message['messageId']);
+clients/shared/local-store/lib\local_store.dart:237:    final sender = _id(message['senderId']);
+clients/shared/local-store/lib\local_store.dart:238:    final seq = message['seq'];
+clients/shared/local-store/lib\local_store.dart:239:    if (seq is! int || seq < 1) throw FormatException('Invalid sequence');
+clients/shared/local-store/lib\local_store.dart:240:    final time = message['createdAt'];
+clients/shared/local-store/lib\local_store.dart:241:    if (time is! String || DateTime.tryParse(time) == null)
+clients/shared/local-store/lib\local_store.dart:242:      throw FormatException('Invalid server time');
+clients/shared/local-store/lib\local_store.dart:243:    final content = _map(message['content']);
+clients/shared/local-store/lib\local_store.dart:244:    if (content['kind'] != 'TEXT')
+clients/shared/local-store/lib\local_store.dart:245:      throw FormatException('Invalid content kind');
+clients/shared/local-store/lib\local_store.dart:246:    final text = _text(content['text']);
+clients/shared/local-store/lib\local_store.dart:247:    final old = item(conversation, request);
+clients/shared/local-store/lib\local_store.dart:248:    if (old != null) {
+clients/shared/local-store/lib\local_store.dart:249:      for (final pair in {
+clients/shared/local-store/lib\local_store.dart:250:        'server_message_id': server,
+clients/shared/local-store/lib\local_store.dart:251:        'server_seq': seq,
+clients/shared/local-store/lib\local_store.dart:252:        'server_time': time,
+clients/shared/local-store/lib\local_store.dart:253:        'sender_id': sender,
+clients/shared/local-store/lib\local_store.dart:254:        'content': text,
+clients/shared/local-store/lib\local_store.dart:255:      }.entries) {
+clients/shared/local-store/lib\local_store.dart:256:        if (old[pair.key] != null && old[pair.key] != pair.value) {
+clients/shared/local-store/lib\local_store.dart:257:          throw StateError('Immutable message identity or content conflict');
+clients/shared/local-store/lib\local_store.dart:258:        }
+clients/shared/local-store/lib\local_store.dart:259:      }
+clients/shared/local-store/lib\local_store.dart:260:    }
+clients/shared/local-store/lib\local_store.dart:261:    _db.execute(
+clients/shared/local-store/lib\local_store.dart:262:      '''
+clients/shared/local-store/lib\local_store.dart:263:INSERT INTO messages(conversation_id,request_id,sender_id,content,state,server_message_id,server_seq,server_time)
+clients/shared/local-store/lib\local_store.dart:264: VALUES(?,?,?,?,'SENT',?,?,?)
+clients/shared/local-store/lib\local_store.dart:265:ON CONFLICT(conversation_id,request_id) DO UPDATE SET
+clients/shared/local-store/lib\local_store.dart:266: sender_id=excluded.sender_id,content=excluded.content,state='SENT',
+clients/shared/local-store/lib\local_store.dart:267: server_message_id=excluded.server_message_id,server_seq=excluded.server_seq,server_time=excluded.server_time
+clients/shared/local-store/lib\local_store.dart:268:''',
+clients/shared/local-store/lib\local_store.dart:269:      [conversation, request, sender, text, server, seq, time],
+clients/shared/local-store/lib\local_store.dart:270:    );
+clients/shared/local-store/lib\local_store.dart:271:    _db.execute(
+clients/shared/local-store/lib\local_store.dart:272:      'INSERT INTO conversation_cursors VALUES (?,0) ON CONFLICT DO NOTHING',
+clients/shared/local-store/lib\local_store.dart:273:      [conversation],
+clients/shared/local-store/lib\local_store.dart:274:    );
+clients/shared/local-store/lib\local_store.dart:275:    var prefix = contiguous(conversation);
+clients/shared/local-store/lib\local_store.dart:276:    while (_db.select(
+clients/shared/local-store/lib\local_store.dart:277:      'SELECT 1 FROM messages WHERE conversation_id=? AND server_seq=?',
+clients/shared/local-store/lib\local_store.dart:278:      [conversation, prefix + 1],
+clients/shared/local-store/lib\local_store.dart:279:    ).isNotEmpty) {
+clients/shared/local-store/lib\local_store.dart:280:      prefix++;
+clients/shared/local-store/lib\local_store.dart:281:    }
+clients/shared/local-store/lib\local_store.dart:282:    _db.execute(
+clients/shared/local-store/lib\local_store.dart:283:      'UPDATE conversation_cursors SET contiguous_seq=? WHERE conversation_id=?',
+clients/shared/local-store/lib\local_store.dart:284:      [prefix, conversation],
+clients/shared/local-store/lib\local_store.dart:285:    );
+clients/shared/local-store/lib\local_store.dart:286:  }
+clients/shared/local-store/lib\local_store.dart:287:
+clients/shared/local-store/lib\local_store.dart:288:  /// Cursor is opaque. A caller can bind a fetched page to its starting cursor.
+clients/shared/local-store/lib\local_store.dart:289:  void applyUserPage(Map<String, Object?> page, {String? expectedCursor}) {
+clients/shared/local-store/lib\local_store.dart:290:    if (page['type'] != 'sync.user.page' ||
+clients/shared/local-store/lib\local_store.dart:291:        page['syncVersion'] != '1.0' ||
+clients/shared/local-store/lib\local_store.dart:292:        page['events'] is! List ||
+clients/shared/local-store/lib\local_store.dart:293:        page['hasMore'] is! bool) {
+clients/shared/local-store/lib\local_store.dart:294:      throw FormatException('Invalid user Sync page');
+clients/shared/local-store/lib\local_store.dart:295:    }
+clients/shared/local-store/lib\local_store.dart:296:    _id(page['requestId']);
+clients/shared/local-store/lib\local_store.dart:297:    final cursor = page['nextCursor'];
+clients/shared/local-store/lib\local_store.dart:298:    if (cursor is! String || cursor.isEmpty || cursor.length > 256)
+clients/shared/local-store/lib\local_store.dart:299:      throw FormatException('Invalid cursor');
+clients/shared/local-store/lib\local_store.dart:300:    _transaction(() {
+clients/shared/local-store/lib\local_store.dart:301:      if (expectedCursor != null && userCursor != expectedCursor) {
+clients/shared/local-store/lib\local_store.dart:302:        throw StateError('Stale user Sync page');
+clients/shared/local-store/lib\local_store.dart:303:      }
+clients/shared/local-store/lib\local_store.dart:304:      for (final input in page['events'] as List) {
+clients/shared/local-store/lib\local_store.dart:305:        final event = _map(input);
+clients/shared/local-store/lib\local_store.dart:306:        final kind = event['kind'];
+clients/shared/local-store/lib\local_store.dart:307:        if (![
+clients/shared/local-store/lib\local_store.dart:308:          'friend.changed',
+clients/shared/local-store/lib\local_store.dart:309:          'conversation.changed',
+clients/shared/local-store/lib\local_store.dart:310:          'membership.changed',
+clients/shared/local-store/lib\local_store.dart:311:          'plugin.changed',
+clients/shared/local-store/lib\local_store.dart:312:        ].contains(kind)) {
+clients/shared/local-store/lib\local_store.dart:313:          throw FormatException('Unsupported user event');
+clients/shared/local-store/lib\local_store.dart:314:        }
+clients/shared/local-store/lib\local_store.dart:315:        final eventId = _id(event['eventId']);
+clients/shared/local-store/lib\local_store.dart:316:        final subject = _id(event['subjectId']);
+clients/shared/local-store/lib\local_store.dart:317:        final revision = event['revision'];
+clients/shared/local-store/lib\local_store.dart:318:        if (revision is! int || revision < 1)
+clients/shared/local-store/lib\local_store.dart:319:          throw FormatException('Invalid revision');
+clients/shared/local-store/lib\local_store.dart:320:        final eventCursor = event['cursor'];
+clients/shared/local-store/lib\local_store.dart:321:        if (eventCursor is! String ||
+clients/shared/local-store/lib\local_store.dart:322:            eventCursor.isEmpty ||
+clients/shared/local-store/lib\local_store.dart:323:            eventCursor.length > 256)
+clients/shared/local-store/lib\local_store.dart:324:          throw FormatException('Invalid event cursor');
+clients/shared/local-store/lib\local_store.dart:325:        final previous = _db.select(
+clients/shared/local-store/lib\local_store.dart:326:          'SELECT * FROM user_events WHERE event_id=?',
+clients/shared/local-store/lib\local_store.dart:327:          [eventId],
+clients/shared/local-store/lib\local_store.dart:328:        );
+clients/shared/local-store/lib\local_store.dart:329:        if (previous.isNotEmpty) {
+clients/shared/local-store/lib\local_store.dart:330:          final old = previous.single;
+clients/shared/local-store/lib\local_store.dart:331:          if (old['cursor'] != eventCursor ||
+clients/shared/local-store/lib\local_store.dart:332:              old['kind'] != kind ||
+clients/shared/local-store/lib\local_store.dart:333:              old['subject_id'] != subject ||
+clients/shared/local-store/lib\local_store.dart:334:              old['revision'] != revision) {
+clients/shared/local-store/lib\local_store.dart:335:            throw StateError('Conflicting user event');
+clients/shared/local-store/lib\local_store.dart:336:          }
+clients/shared/local-store/lib\local_store.dart:337:        } else {
+clients/shared/local-store/lib\local_store.dart:338:          _db.execute('INSERT INTO user_events VALUES (?,?,?,?,?)', [
+clients/shared/local-store/lib\local_store.dart:339:            eventId,
+clients/shared/local-store/lib\local_store.dart:340:            eventCursor,
+clients/shared/local-store/lib\local_store.dart:341:            kind,
+clients/shared/local-store/lib\local_store.dart:342:            subject,
+clients/shared/local-store/lib\local_store.dart:343:            revision,
+clients/shared/local-store/lib\local_store.dart:344:          ]);
+clients/shared/local-store/lib\local_store.dart:345:        }
+clients/shared/local-store/lib\local_store.dart:346:        _db.execute(
+clients/shared/local-store/lib\local_store.dart:347:          '''
+clients/shared/local-store/lib\local_store.dart:348:INSERT INTO user_state VALUES (?,?,?)
+clients/shared/local-store/lib\local_store.dart:349:ON CONFLICT(kind,subject_id) DO UPDATE SET revision=MAX(user_state.revision,excluded.revision)
+clients/shared/local-store/lib\local_store.dart:350:''',
+clients/shared/local-store/lib\local_store.dart:351:          [kind, subject, revision],
+clients/shared/local-store/lib\local_store.dart:352:        );
+clients/shared/local-store/lib\local_store.dart:353:      }
+clients/shared/local-store/lib\local_store.dart:354:      _db.execute('UPDATE account SET user_cursor=? WHERE singleton=1', [
+clients/shared/local-store/lib\local_store.dart:355:        cursor,
+clients/shared/local-store/lib\local_store.dart:356:      ]);
+clients/shared/local-store/lib\local_store.dart:357:    });
+clients/shared/local-store/lib\local_store.dart:358:  }
+clients/shared/local-store/lib\local_store.dart:359:}
+clients/desktop/storage/test\storage_test.dart:1:import 'dart:io';
+clients/desktop/storage/test\storage_test.dart:2:import 'package:plugworld_desktop_storage/storage.dart';
+clients/desktop/storage/test\storage_test.dart:3:import 'package:test/test.dart';
+clients/desktop/storage/test\storage_test.dart:4:
+clients/desktop/storage/test\storage_test.dart:5:void main() {
+clients/desktop/storage/test\storage_test.dart:6:  test('desktop uses persistent isolated native account storage', () {
+clients/desktop/storage/test\storage_test.dart:7:    final directory = Directory.systemTemp.createTempSync('plugworld-desktop-');
+clients/desktop/storage/test\storage_test.dart:8:    const account = '10000000-0000-4000-8000-000000000001';
+clients/desktop/storage/test\storage_test.dart:9:    const other = '10000000-0000-4000-8000-000000000002';
+clients/desktop/storage/test\storage_test.dart:10:    const conversation = '30000000-0000-4000-8000-000000000001';
+clients/desktop/storage/test\storage_test.dart:11:    const request = '40000000-0000-4000-8000-000000000001';
+clients/desktop/storage/test\storage_test.dart:12:    var a = openAccountStorage(directory.path, account);
+clients/desktop/storage/test\storage_test.dart:13:    final b = openAccountStorage(directory.path, other);
+clients/desktop/storage/test\storage_test.dart:14:    try {
+clients/desktop/storage/test\storage_test.dart:15:      a.localSend(conversation, request, account, 'persist');
+clients/desktop/storage/test\storage_test.dart:16:      a.close();
+clients/desktop/storage/test\storage_test.dart:17:      a = openAccountStorage(directory.path, account);
+clients/desktop/storage/test\storage_test.dart:18:      expect(a.item(conversation, request)!['state'], 'SENDING');
+clients/desktop/storage/test\storage_test.dart:19:      expect(b.item(conversation, request), isNull);
+clients/desktop/storage/test\storage_test.dart:20:    } finally {
+clients/desktop/storage/test\storage_test.dart:21:      a.close();
+clients/desktop/storage/test\storage_test.dart:22:      b.close();
+clients/desktop/storage/test\storage_test.dart:23:      directory.deleteSync(recursive: true);
+clients/desktop/storage/test\storage_test.dart:24:    }
+clients/desktop/storage/test\storage_test.dart:25:  });
+clients/desktop/storage/test\storage_test.dart:26:}
+clients/mobile/storage/test\storage_test.dart:1:import 'dart:io';
+clients/mobile/storage/test\storage_test.dart:2:import 'package:plugworld_mobile_storage/storage.dart';
+clients/mobile/storage/test\storage_test.dart:3:import 'package:test/test.dart';
+clients/mobile/storage/test\storage_test.dart:4:
+clients/mobile/storage/test\storage_test.dart:5:void main() {
+clients/mobile/storage/test\storage_test.dart:6:  test('mobile uses persistent isolated native account storage', () {
+clients/mobile/storage/test\storage_test.dart:7:    final directory = Directory.systemTemp.createTempSync('plugworld-mobile-');
+clients/mobile/storage/test\storage_test.dart:8:    const account = '10000000-0000-4000-8000-000000000001';
+clients/mobile/storage/test\storage_test.dart:9:    const other = '10000000-0000-4000-8000-000000000002';
+clients/mobile/storage/test\storage_test.dart:10:    const conversation = '30000000-0000-4000-8000-000000000001';
+clients/mobile/storage/test\storage_test.dart:11:    const request = '40000000-0000-4000-8000-000000000001';
+clients/mobile/storage/test\storage_test.dart:12:    var a = openAccountStorage(directory.path, account);
+clients/mobile/storage/test\storage_test.dart:13:    final b = openAccountStorage(directory.path, other);
+clients/mobile/storage/test\storage_test.dart:14:    try {
+clients/mobile/storage/test\storage_test.dart:15:      a.localSend(conversation, request, account, 'persist');
+clients/mobile/storage/test\storage_test.dart:16:      a.close();
+clients/mobile/storage/test\storage_test.dart:17:      a = openAccountStorage(directory.path, account);
+clients/mobile/storage/test\storage_test.dart:18:      expect(a.item(conversation, request)!['state'], 'SENDING');
+clients/mobile/storage/test\storage_test.dart:19:      expect(b.item(conversation, request), isNull);
+clients/mobile/storage/test\storage_test.dart:20:    } finally {
+clients/mobile/storage/test\storage_test.dart:21:      a.close();
+clients/mobile/storage/test\storage_test.dart:22:      b.close();
+clients/mobile/storage/test\storage_test.dart:23:      directory.deleteSync(recursive: true);
+clients/mobile/storage/test\storage_test.dart:24:    }
+clients/mobile/storage/test\storage_test.dart:25:  });
+clients/mobile/storage/test\storage_test.dart:26:}
+clients/mobile/storage/lib\storage.dart:1:import 'package:plugworld_local_store/local_store.dart';
+clients/mobile/storage/lib\storage.dart:2:export 'package:plugworld_local_store/local_store.dart' show LocalStore;
+clients/mobile/storage/lib\storage.dart:3:
+clients/mobile/storage/lib\storage.dart:4:/// Native mobile account storage; the app supplies its private data directory.
+clients/mobile/storage/lib\storage.dart:5:LocalStore openAccountStorage(String privateDirectory, String accountId) =>
+clients/mobile/storage/lib\storage.dart:6:    LocalStore.openAccount(privateDirectory, accountId);

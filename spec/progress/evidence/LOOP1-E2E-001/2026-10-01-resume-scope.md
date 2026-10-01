@@ -1,0 +1,10 @@
+# Resume scope and verification
+## Resume verification (2026-10-01, R-RESUME-S2-20261001-01)
+
+Visible Human prompt: 阅读AGENTS.md并继续. Startup resolved unique done LOOP1-E2E-001 and accepted final actual-main proof; HEAD remains a0f0f13759ffb2a861b08c4820a1504b76d5c08a. Frozen Markdown/PDF manifest hashes match. Recovery Development PASS; frozen/architecture 34 tests PASS; ci/check_architecture.py --scope all --json PASS with no violations. These are local recovery results, not new independent Task/Gate acceptance.
+
+No S2 task exists in queues. The previous explicit S2 OPEN stop boundary requires explicit new S2 scope. A clarification was presented; pending its answer, no task creation/activation, product implementation, commit, push or merge. Next exact action: resolve whether the current Human instruction authorizes S2, then read canonical S2 inputs and bind a minimal Task Spec before implementation. Existing recovery/brand and unknown-owned untracked work remains preserved. This Coordinator owns only this appended handoff, the matching done Task append and new resume evidence. No services started. No architecture conflict. Research run is prospective_resume; startup reads before initialization are incomplete pre-Recorder trace.
+
+Command: pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; pwsh -NoProfile -File tools/verify-frozen-architecture.ps1; bundled Python -B ci/check_architecture.py --scope all --json.
+Result: all exit0; Development PASS / 34 tests PASS / sourceall PASS.
+Evidence: spec/progress/evidence/LOOP1-E2E-001/2026-10-01-resume-scope.md; external H:/.codex/evidence/resume-s2-20261001-01/research/runs/R-RESUME-S2-20261001-01. Recorder final finish/validation follows handoff; raw command results remain external. Previous historical FAIL evidence is unchanged.
