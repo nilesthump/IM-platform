@@ -11,3 +11,5 @@ Actual behavior: python -B tools/verify_client_sqlite.py --scope desktop.
 The shared job compiles TypeScript; Desktop and Android jobs execute the same canonical storage fixtures. Host mocks cannot establish Android acceptance.
 
 Internal schema v1 is a retained migration test fixture, not a previously released client. v2 adds user materialization/cursor in one transaction. tests/clients/sqlite/v1.sql is the independent old-layout fixture; do not silently regenerate it when changing the current schema. Unsupported schema versions fail without destructive fallback.
+
+Sequence/revision inputs use safe `number` or exact built-in `bigint`; larger integers require `bigint` to avoid already-rounded JS values. SQLite adapter binds decimal strings and `contiguous()` returns `bigint`. Current signed64 SQLite capacity is checked locally; this does not add a public protocol maximum or implement a wire parser. Native Rust receives only string parameters, no BigInt serialization change.

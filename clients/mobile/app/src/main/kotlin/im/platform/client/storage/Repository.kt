@@ -38,7 +38,7 @@ class Repository(context: Context, accountId: String) : Closeable {
         execute("INSERT INTO conversations(conversation_id) VALUES(?) ON CONFLICT DO NOTHING", arrayOf(c))
         execute("""WITH RECURSIVE prefix(n) AS (
             SELECT contiguous_seq FROM conversations WHERE conversation_id=?
-            UNION ALL SELECT n+1 FROM prefix WHERE EXISTS(SELECT 1 FROM messages WHERE conversation_id=? AND server_seq=n+1)
+            UNION ALL SELECT n+1 FROM prefix WHERE n<9223372036854775807 AND EXISTS(SELECT 1 FROM messages WHERE conversation_id=? AND server_seq=n+1)
             ) UPDATE conversations SET contiguous_seq=(SELECT MAX(n) FROM prefix) WHERE conversation_id=?""",arrayOf(c,c,c))
     }
     fun localSend(m: LocalMessage) {

@@ -1,21 +1,23 @@
 // Internal materialized models; wire authority remains contracts/.
+// Safe numeric inputs remain convenient; larger SQLite integers use exact bigint.
+export type Sequence = number | bigint;
 export type State = "SENDING" | "SENT" | "FAILED";
 export interface LocalMessage {
   conversationId: string; requestId: string; senderId: string;
   content: { kind: "TEXT"; text: string };
 }
 export interface ServerMessage extends LocalMessage {
-  messageId: string; seq: number; createdAt: string;
+  messageId: string; seq: Sequence; createdAt: string;
 }
 export interface RealtimeMessage extends Omit<ServerMessage, "requestId"> {}
 export interface Committed {
   status: "committed"; conversationId: string; messageId: string;
-  seq: number; createdAt: string;
+  seq: Sequence; createdAt: string;
 }
 export interface UserEvent {
   eventId: string; cursor: string;
   kind: "friend.changed" | "conversation.changed" | "membership.changed" | "plugin.changed";
-  subjectId: string; revision: number;
+  subjectId: string; revision: Sequence;
 }
 export interface UserPage {
   syncVersion: "1.0"; type: "sync.user.page"; requestId: string;

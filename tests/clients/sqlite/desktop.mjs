@@ -62,7 +62,7 @@ for(const test of cases) {
     const conversation=s.message?.conversationId??c;
     if(expected) {
       equal(await repo.cursor(),expected.cursor);
-      equal(await repo.contiguous(conversation),expected.contiguous);
+      equal(await repo.contiguous(conversation),BigInt(expected.contiguous));
       equal(Object.fromEntries((await repo.messages(conversation)).filter(row=>row[5]!==null).map(row=>[row[5],row[4]])),expected.messages);
       equal(Object.fromEntries((await repo.db.query("SELECT kind,subject_id,CAST(revision AS TEXT) FROM user_state",[])).map(row=>[row[0]+"/"+row[1],Number(row[2])])),expected.userState);
       equal(last,expected.last);
@@ -77,10 +77,10 @@ for(const test of cases) {
   }
   equal(error,Boolean(test.expectError));
   if(!error) {
-    if(test.expect?.contiguous!==undefined) equal(await repo.contiguous(test.steps.find(s=>s.message)?.message.conversationId??c),test.expect.contiguous);
+    if(test.expect?.contiguous!==undefined) equal(await repo.contiguous(test.steps.find(s=>s.message)?.message.conversationId??c),BigInt(test.expect.contiguous));
     if(test.expect?.cursor!==undefined) equal(await repo.cursor(),test.expect.cursor);
     for(const [conversation,expected] of Object.entries(test.expect?.conversations??{})) {
-      equal(await repo.contiguous(conversation),expected.contiguous);
+      equal(await repo.contiguous(conversation),BigInt(expected.contiguous));
       equal(Object.fromEntries((await repo.messages(conversation)).map(row=>[row[5],row[4]])),expected.messages);
     }
   }
@@ -109,11 +109,11 @@ await assert.rejects(repo.syncMessages([{...server,content:{kind:"TEXT",text:"ch
 await assert.rejects(repo.localSend({...local,content:{kind:"TEXT",text:"changed"}})); assertions++;
 await assert.rejects(repo.syncMessages([{...server,conversationId:c2}])); assertions++; // global message identity
 await assert.rejects(repo.syncMessages([{...server,messageId:"50000000-0000-4000-8000-000000000009"}])); assertions++;
-equal((await repo.messages(c))[0][2],"durable"); equal(await repo.contiguous(c),1);
+equal((await repo.messages(c))[0][2],"durable"); equal(await repo.contiguous(c),1n);
 const next={...server,requestId:"40000000-0000-4000-8000-000000000002",messageId:"50000000-0000-4000-8000-000000000002",seq:2};
 await assert.rejects(repo.syncMessages([next],true)); assertions++;
-equal((await repo.messages(c)).length,1); equal(await repo.contiguous(c),1);
-await repo.syncMessages([next]); equal(await repo.contiguous(c),2);
+equal((await repo.messages(c)).length,1); equal(await repo.contiguous(c),1n);
+await repo.syncMessages([next]); equal(await repo.contiguous(c),2n);
 const restart=new Repository(database(account)); await restart.initialize();
 equal(await restart.messages(c),await repo.messages(c));
 const isolated=new Repository(database(other)); await isolated.initialize(); equal(await isolated.messages(c),[]);
@@ -121,7 +121,7 @@ const crossedId="50000000-0000-4000-8000-000000000003";
 const crossed={...server,conversationId:c2,messageId:crossedId};
 await repo.realtime({...realtime,conversationId:c2,messageId:crossedId});
 await repo.localSend({...local,conversationId:c2});
-await repo.syncMessages([crossed]); equal((await repo.messages(c2)).length,1); equal(await repo.contiguous(c2),1);
+await repo.syncMessages([crossed]); equal((await repo.messages(c2)).length,1); equal(await repo.contiguous(c2),1n);
 await repo.committedAck(r,{status:"committed",...crossed}); equal((await repo.messages(c2)).length,1);
 await assert.rejects(db.query("DELETE FROM messages RETURNING content",[])); assertions++;
 equal((await repo.messages(c)).length,2);
@@ -137,7 +137,7 @@ const durableUnicode=await unicode.messages(c);
 await assert.rejects(unicode.localSend({...unicodeLocal,requestId:"40000000-0000-4000-8000-000000000009",content:{kind:"TEXT",text:emoji+"\u{1f600}"}})); assertions++;
 equal(await unicode.messages(c),durableUnicode);
 await assert.rejects(unicode.syncMessages([{...unicodeServer,requestId:"40000000-0000-4000-8000-000000000009",messageId:"50000000-0000-4000-8000-000000000009",seq:2,content:{kind:"TEXT",text:emoji+"\u{1f600}"}}])); assertions++;
-equal(await unicode.messages(c),durableUnicode); equal(await unicode.contiguous(c),1); equal(await unicode.cursor(),"0");
+equal(await unicode.messages(c),durableUnicode); equal(await unicode.contiguous(c),1n); equal(await unicode.cursor(),"0");
 const unicodeRestart=new Repository(database("10000000-0000-4000-8000-000000000003")); await unicodeRestart.initialize();
 equal(await unicodeRestart.messages(c),durableUnicode);
 const cursor256="\u{1f600}".repeat(256);
@@ -150,9 +150,35 @@ await assert.rejects(unicode.userPage({...page,nextCursor:cursor256+"\u{1f600}",
 await assert.rejects(unicode.userPage({...page,nextCursor:"stale",events:[{...page.events[0],revision:2}]},"0")); assertions++;
 equal(await unicode.cursor(),cursor256);
 equal(await unicode.db.query("SELECT kind,subject_id,CAST(revision AS TEXT) FROM user_state",[]),userState);
-equal(await unicode.messages(c),durableUnicode); equal(await unicode.contiguous(c),1);
+equal(await unicode.messages(c),durableUnicode); equal(await unicode.contiguous(c),1n);
 const cursorRestart=new Repository(database("10000000-0000-4000-8000-000000000003")); await cursorRestart.initialize();
 equal(await cursorRestart.cursor(),cursor256);
 equal(await cursorRestart.db.query("SELECT kind,subject_id,CAST(revision AS TEXT) FROM user_state",[]),userState);
-equal(await cursorRestart.messages(c),durableUnicode); equal(await cursorRestart.contiguous(c),1);
+equal(await cursorRestart.messages(c),durableUnicode); equal(await cursorRestart.contiguous(c),1n);
+const largeAccount="10000000-0000-4000-8000-000000000004";
+const large=new Repository(database(largeAccount)); await large.initialize();
+const boundary=9007199254740992n, max=9223372036854775807n;
+// Imported historical gap-free prefix; do not allocate quadrillions of fixture rows.
+await large.db.transaction([["INSERT INTO conversations VALUES(?,?)",[c,(boundary-1n).toString()],1],["INSERT INTO conversations VALUES(?,?)",[c2,(max-1n).toString()],1]]);
+const high={...server,seq:boundary}, odd={...next,seq:boundary+1n};
+await large.localSend(local); await large.syncMessages([odd]); equal(await large.contiguous(c),boundary-1n);
+await large.committedAck(r,{status:"committed",...high}); equal(await large.contiguous(c),boundary+1n);
+await large.realtime({...realtime,seq:boundary}); await large.syncMessages([high,odd]);
+equal((await large.messages(c)).map(row=>row[5]),[boundary.toString(),(boundary+1n).toString()]);
+const top={...crossed,seq:max}; await large.syncMessages([top,top]); equal(await large.contiguous(c2),max);
+const largePage={...page,nextCursor:"large",events:[{...page.events[0],revision:max}]};
+await large.userPage(largePage,"0");
+await large.userPage({...largePage,nextCursor:"large2",events:[{...largePage.events[0],revision:max-1n}]},"large");
+const state64=await large.db.query("SELECT CAST(revision AS TEXT) FROM user_state",[]); equal(state64,[[max.toString()]]);
+const messages64=await large.messages(c), top64=await large.messages(c2);
+for(const invalid of [0n,-1n,max+1n,Number(boundary)]) {
+  await assert.rejects(large.syncMessages([{...odd,seq:invalid}])); assertions++;
+  await assert.rejects(large.userPage({...largePage,nextCursor:"invalid",events:[{...largePage.events[0],revision:invalid}]},"large2")); assertions++;
+}
+equal(await large.messages(c),messages64); equal(await large.messages(c2),top64); equal(await large.cursor(),"large2");
+equal(await large.db.query("SELECT CAST(revision AS TEXT) FROM user_state",[]),state64);
+const largeRestart=new Repository(database(largeAccount)); await largeRestart.initialize();
+equal(await largeRestart.contiguous(c),boundary+1n); equal(await largeRestart.contiguous(c2),max);
+equal(await largeRestart.messages(c),messages64); equal(await largeRestart.messages(c2),top64);
+equal(await largeRestart.db.query("SELECT CAST(revision AS TEXT) FROM user_state",[]),state64); equal(await largeRestart.cursor(),"large2");
 console.log(JSON.stringify({result:"PASS",engine:"actual SQLx SQLite",canonicalCases:cases.length,assertions,root}));

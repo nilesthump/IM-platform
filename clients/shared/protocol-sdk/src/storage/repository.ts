@@ -1,13 +1,16 @@
-import type { Bind, Committed, Database, LocalMessage, RealtimeMessage, ServerMessage, Statement, UserPage } from "./models.js";
+import type { Bind, Committed, Database, LocalMessage, RealtimeMessage, ServerMessage, Sequence, Statement, UserPage } from "./models.js";
 import { v1, v2 } from "./schema.js";
 
 function text(m: LocalMessage | RealtimeMessage): string {
   if (m.content.kind !== "TEXT" || !m.content.text || [...m.content.text].length > 4096) throw new Error("Invalid text");
   return m.content.text;
 }
-function seq(n: number): string {
-  if (!Number.isSafeInteger(n) || n < 1) throw new Error("Invalid sequence");
-  return String(n);
+function seq(n: Sequence): string {
+  // Numbers outside the safe range may already have rounded before this call.
+  if (typeof n === "number" && !Number.isSafeInteger(n)) throw new Error("Use bigint for exact sequence");
+  const value = BigInt(n);
+  if (value < 1n || value > 9223372036854775807n) throw new Error("Sequence outside SQLite integer storage");
+  return value.toString();
 }
 const step = (sql: string, binds: Bind[] = [], expected: number | null = null): Statement => [sql, binds, expected];
 // An assertion is an UPDATE with a predicate over the SAME transaction snapshot.
@@ -19,7 +22,7 @@ function advance(conversationId: string): Statement[] {
     step("INSERT INTO conversations(conversation_id) VALUES(?) ON CONFLICT DO NOTHING", [conversationId]),
     step(`WITH RECURSIVE prefix(n) AS (
       SELECT contiguous_seq FROM conversations WHERE conversation_id=?
-      UNION ALL SELECT n+1 FROM prefix WHERE EXISTS(
+      UNION ALL SELECT n+1 FROM prefix WHERE n<9223372036854775807 AND EXISTS(
         SELECT 1 FROM messages WHERE conversation_id=? AND server_seq=n+1)
     ) UPDATE conversations SET contiguous_seq=(SELECT MAX(n) FROM prefix) WHERE conversation_id=?`,
     [conversationId, conversationId, conversationId], 1),
@@ -121,9 +124,9 @@ export class Repository {
     return this.db.query(`SELECT request_id,sender_id,content,state,server_message_id,CAST(server_seq AS TEXT),server_time
       FROM messages WHERE conversation_id=? ORDER BY server_seq IS NULL,server_seq,local_id`,[conversationId]);
   }
-  async contiguous(conversationId: string): Promise<number> {
+  async contiguous(conversationId: string): Promise<bigint> {
     const rows = await this.db.query("SELECT CAST(contiguous_seq AS TEXT) FROM conversations WHERE conversation_id=?",[conversationId]);
-    return Number(rows[0]?.[0] ?? 0);
+    return BigInt(rows[0]?.[0] ?? "0");
   }
   async cursor(): Promise<string> { return (await this.db.query("SELECT cursor FROM user_cursor WHERE singleton=1",[]))[0][0]!; }
 }

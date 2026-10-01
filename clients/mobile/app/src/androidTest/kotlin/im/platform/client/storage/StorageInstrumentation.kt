@@ -156,11 +156,56 @@ class StorageInstrumentation : Instrumentation() {
         }
         targetContext.deleteDatabase("im-$account.sqlite")
     }
+    private fun largeIntegers() {
+        val account=UUID.randomUUID().toString()
+        val c="30000000-0000-4000-8000-000000000001"; val c2="30000000-0000-4000-8000-000000000002"
+        val r="40000000-0000-4000-8000-000000000001"; val id="50000000-0000-4000-8000-000000000001"
+        val boundary=9007199254740992L; val max=Long.MAX_VALUE
+        Repository(targetContext,account).use { it.initialize() }
+        // Imported gap-free historical prefix, no enormous artificial row allocation.
+        SQLiteDatabase.openDatabase(targetContext.getDatabasePath("im-$account.sqlite").path,null,SQLiteDatabase.OPEN_READWRITE).use { db ->
+            db.beginTransaction()
+            try {
+                db.execSQL("INSERT INTO conversations VALUES(?,?)",arrayOf(c,boundary-1))
+                db.execSQL("INSERT INTO conversations VALUES(?,?)",arrayOf(c2,max-1))
+                db.setTransactionSuccessful()
+            } finally { db.endTransaction() }
+        }
+        var messages: List<List<String?>> = emptyList(); var top: List<List<String?>> = emptyList()
+        val revision=listOf(listOf(max.toString()))
+        Repository(targetContext,account).use { repo ->
+            val high=ServerMessage(c,r,account,"durable",id,boundary,"2026-09-28T00:00:01Z")
+            val odd=high.copy(requestId="40000000-0000-4000-8000-000000000002",messageId="50000000-0000-4000-8000-000000000002",seq=boundary+1)
+            repo.localSend(LocalMessage(c,r,account,"durable")); repo.syncMessages(listOf(odd)); equal(repo.contiguous(c),boundary-1)
+            repo.committedAck(r,Committed(c,id,boundary,high.createdAt)); equal(repo.contiguous(c),boundary+1)
+            repo.realtime(high.copy(requestId=null)); repo.syncMessages(listOf(high,odd))
+            equal(repo.messages(c).map { it[5] },listOf(boundary.toString(),(boundary+1).toString()))
+            val highest=high.copy(conversationId=c2,messageId="50000000-0000-4000-8000-000000000003",seq=max)
+            repo.syncMessages(listOf(highest,highest)); equal(repo.contiguous(c2),max)
+            val event=UserEvent("friend.changed",account,max)
+            repo.userPage(listOf(event),"large","0"); repo.userPage(listOf(event.copy(revision=max-1)),"large2","large")
+            equal(repo.query("SELECT CAST(revision AS TEXT) FROM user_state"),revision)
+            messages=repo.messages(c); top=repo.messages(c2)
+            // Kotlin Long cannot express MAX+1; no fabricated beyond-Long input test.
+            for(invalid in listOf(0L,-1L,Long.MIN_VALUE)) {
+                reject { repo.syncMessages(listOf(odd.copy(seq=invalid))) }
+                reject { repo.userPage(listOf(event.copy(revision=invalid)),"invalid","large2") }
+            }
+            equal(repo.messages(c),messages); equal(repo.messages(c2),top); equal(repo.cursor(),"large2")
+            equal(repo.query("SELECT CAST(revision AS TEXT) FROM user_state"),revision)
+        }
+        Repository(targetContext,account).use { repo ->
+            repo.initialize(); equal(repo.contiguous(c),boundary+1); equal(repo.contiguous(c2),max)
+            equal(repo.messages(c),messages); equal(repo.messages(c2),top); equal(repo.cursor(),"large2")
+            equal(repo.query("SELECT CAST(revision AS TEXT) FROM user_state"),revision)
+        }
+        targetContext.deleteDatabase("im-$account.sqlite")
+    }
     override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); start() }
     override fun onStart() {
         val result=Bundle()
         try {
-            fixtures(); additional(); unicode()
+            fixtures(); additional(); unicode(); largeIntegers()
             Repository(targetContext,UUID.randomUUID().toString()).use { repo ->
                 repo.initialize(); result.putString("sqliteVersion",repo.query("SELECT sqlite_version()").single().single())
             }
