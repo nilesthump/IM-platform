@@ -23,7 +23,7 @@ No implementation blocker for clarification. NEW independent Review and exact-he
   - Result: PASS44 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/mobile-correction-local.md`
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: Correction baseline Recovery Development PASS; final clean committed Acceptance pending final commit.
+  - Result: Correction Recovery Development PASS; clean committed Acceptance PASS at84a8868e9f17924e34caded18f2a1c808e60dbd6. Archive-only finalHEAD recheck is exposed outside finished trace.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/mobile-correction-command-history.json`
 
 ## Changed Files or Migrations
@@ -32,7 +32,7 @@ Authority/hash/ADR0005, governance/Agent/template, existing architecture checker
 
 ## Known Failures, Risks, and Assumptions
 
-Prior implementation failures/evidence/Recorder immutable. Correction read-only startup encoding/quoting errors and unsupported Recorder event type exposed; no evidence rewritten. Mixed appended manifest whitespace repaired. Intermediate Recovery FAIL3 from evidence/checkpoint references before files existed, now repaired and final rerun required. CI30 exposes4 existing Windows real-symlink privilege skips; hosted Linux must execute actual links. Direct Android guards supplement semantic independent Review; no product or Android emulator acceptance in this authority prerequisite. Correction Recorder prospective_resume discloses pre-Recorder startup; final validation/archive boundary to be recorded in mobile-correction-recorder-summary.md.
+Prior implementation failures/evidence/Recorder immutable. Correction read-only startup encoding/quoting errors and unsupported Recorder event type exposed; no evidence rewritten. Mixed appended manifest whitespace repaired. Intermediate Recovery FAIL3 from evidence/checkpoint references before files existed, repaired final Development/clean committed Acceptance PASS. CI30 exposes4 existing Windows real-symlink privilege skips; hosted Linux must execute actual links. Direct Android guards supplement semantic independent Review; no product or Android emulator acceptance in this authority prerequisite. Correction Recorder prospective_resume discloses pre-Recorder startup; finished/validated PASS52, immutable archive/postfinish boundary recorded in mobile-correction-recorder-summary.md.
 
 ## Next Exact Action
 
@@ -48,7 +48,7 @@ Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0
 
 ## Uncommitted Changes / Ownership
 
-Sole Fix Agent owns current H:/ica edits until clean revised candidate/archive commit, then releases writer to Coordinator/fresh Reviewer. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No product services started. Coordinator owns adb tooling daemon; Fix Agent starts no services.
+Fix Agent owns only final archive/discovery edits until clean final candidate commit/checks, then releases sole writer to Coordinator/fresh Reviewer; no unknown uncommitted candidate work. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No product services started. Coordinator owns adb tooling daemon; Fix Agent starts no services.
 
 ## Architecture Conflicts / ACP / ADR
 
