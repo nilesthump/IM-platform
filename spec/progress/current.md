@@ -7,46 +7,53 @@ Gate Status: OPEN
 Current Batch: S2-client-Web
 Current Task: LOOP1-CLIENT-SQLITE-001
 Current Task State: review
-Execution Status: S2_STORAGE_NEW_INDEPENDENT_REVIEW_REQUIRED
+Execution Status: S2_STORAGE_HOSTED_KVM_REPAIR_NEW_REVIEW_REQUIRED
 
 ## Immediately Relevant Completed Work
 
-Architecture prerequisite actualmaina287529 accepted; historical GString FAIL/waiver immutable. Independent ee82 SQLite FAIL retained; NEW fresh Fix corrected unsupported minimumSDK and Unicode limits; subsequent independent Review2 Cursor FAIL preserved and Fresh Fix2 counts256cursor codepoints plus actual SDK setup package fix. Independently confirmed current signed64 precision defect now uses exact built-in bigint/decimal nativebind/getter with safe-number support and both max-prefix guards. Actual minimumAPI34 install/clear and SQLx tests PASS locally; new independent Review/hosted pending.
+Fresh independent Review3 PASS exact candidate 9a86d3b641ca60b526c65abcc7a9aeee0b48d082/full accepted-base a287529..9a86d3b. The bounded storage slice uses TS-owned Desktop Repository/models/intents with generic atomic Rust SQLx and equivalent Kotlin Android SDKSQLite. Unicode text/cursor and exact signed64 history/contiguous boundaries are repaired. Historical failures and Groovy GString FAIL/WAIVED_BY_HUMAN remain preserved. S1 PASS; S2 OPEN.
 
 ## Verification
 
-- Command: `python -B tools/verify_client_sqlite.py --scope desktop`
-  - Result: Corrected actual SQLx13cases/141assertions/nativeunit1PASS; stable minimumAPI34 SDKSQLite3.39.2 first-install/pm-clear13cases137assertions eachPASS via explicit Gradle8.9 fallback. Clean committed Recovery Acceptance23specs10.125s/sourceall0/architecture53/frozen53 PASS; CI31PASS4Windowsprivilegeskips; WSS and SyncPlugin PASS. Live recovery initially FAIL due formatting/ignored build trees; exacte67953a clean detached local recovery Development PASS23specs/status0 and sourceall0 PASS. Independent/hosted acceptance pending.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/fix2/fix-report.md`
+- Command: `python -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554`
+  - Result: Exact9a hosted36910351172 FAIL: first round13cases137assertions PASS; second round180-second timeout with denied KVM and acceleration disabled. No Task acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/fix3/36910351172-logs.txt.gz`
+
+- Independent clean H:/isv3-sqlite: Recovery Acceptance23specs/sourceall0/frozen53/architecture53/CI31 PASS (4 known local Windows privilege skips), WSS/SyncPlugin/diff/status0. Actual current TS/native SQLx13cases/141assertions/nativeunit1 PASS. Actual fresh AndroidAPI34/SQLite3.39.2 first install and pm-clear each13cases137assertions PASS.
+- Evidence: H:/.codex/evidence/s2-sqlite-20261001/review3/review-report.md; finished validated40-event Recorder manifest74feeaa81e270ef8d7adaac04a48161adb0d6c15400ce5c1bbd8b307a6be728e. Research validation is not product acceptance.
+- Exact hosted push run36910351172 for9a86d3b completed FAIL: 11 jobs SUCCESS, Mobile timeout and Gate FAIL. No Task acceptance inferred. The actual provider run must finish all13selected jobs and all required steps SUCCESS.
+- New local public Fix2/Review3 archives are staged externally with byte manifests, excluding owned AVD/build/signing and original unknown files/local protection backups.
 
 ## Current Blockers
 
-No architecture/external blocker; fresh independent review and exact-head hosted selected CI remain required. Local wrapper download unresolved, actual verified Gradle executable used; hosted clean wrapper execution still required. S2OPEN.
+No architecture or authorization blocker. Exact hosted Mobile/Gate failed; Fix3 enables disposable hosted Linux KVM permissions with an explicit acceleration check. New independent Review and actual exact-head CI remain mandatory. Earlier live-log observational failures remain historical.
 
 ## Changed Files or Migrations
 
-Bounded TS shared Repository/schema/migrations/intents, TauriSQLx adapter/build resources, KotlinSDKSQLite equivalent/minimalCompose validation host, real fixtures/runners and actual selected CI/classifier/tests. Only current Task allowed paths and Coordinator clarified two necessary icons. Contracts/canonical/hash/old evidence unchanged.
+Current accepted-architecture Task allowed storage source/tests/build/CI only; source candidate9a86d3b remains unchanged. Coordinator now owns pending local Task/current recovery metadata only. No contracts/canonical/ADRs/backend/Web or next Task edits.
 
 ## Known Failures, Risks, and Assumptions
 
-Historical GString FAIL/waiver never relabeled. Initial tooling/runtime failures preserved and repairs described in own evidence. Live ignored build caches cause source checker failures; clean committed source verification passed locally; independent actual exactHEAD acceptance remains pending. Windows4symlinkskips require actual LinuxCI. Recorder incomplete initial/later uncovered setup/reads disclosed; research result not acceptance.
+Prior ee82 and6dc independent FAIL, hosted36905605691 FAIL and all tooling failures are immutable evidence. Local Gradle8.9 verified fallback is disclosed; current hosted official clean wrapper/real emulator result still pending. Windows privilege skips require actual Linux controls. Recorder initial/uncovered reads and failed live-inspection tools are disclosed, never fabricated as complete trace. Minimum Android SDK34 is the actual bounded product configuration.
 
 ## Next Exact Action
 
-NEW fresh independent Review of full final clean candidate; actual applicable exactHEAD hosted jobs before administrative done. Human directs current SQLite closure only: create/merge authorized PR, safely sync H:/IM-platform preserving unknown files, record progress, STOP before any next implementation. No SEND/SYNC/WEB activation, S2OPEN.
+Review the new clean Fix3 candidate independently and run all13actual hosted selected jobs; preserve failed36910351172. On required SUCCESS, archive product acceptance, perform bounded administrative closure with NEW independent Review and exactHEAD CI, then authorized PR/merge, verify actual main, safely sync H:/IM-platform, record progress and STOP before SEND/SYNC/WEB or any next implementation.
+
+Human explicitly authorizes this Task candidates and closure commits to nilesthump/IM-platform branch task/LOOP1-CLIENT-SQLITE-001-ts-kotlin and PR create/update/merge. Original unknown files and local preservation backups are excluded.
 
 ## Last Known Good Commit
 
-Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Prior product e67953a/failedReviewee82 immutable. Prior corrected product78ee723 preserved; Fix2 prior cursorproducta8c0cd0/89 evidence retained; final locally verified integer product6e62a30087ab316b784daf50dbde10eb4a0b4a03; final evidence-only candidate SHA returned by gitHEAD/Fix handoff, independent acceptance pending.
+Independently accepted main `a28752967ddd471cd281aece7ea9b343521356e8`. Product candidate9a86d3b641ca60b526c65abcc7a9aeee0b48d082 independently reviewed PASS; final hosted acceptance pending. No later implementation selected.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-02-client-sqlite-fix2.md`.
+`spec/progress/checkpoints/2026-10-02-client-sqlite-fix3.md`.
 
 ## Uncommitted Changes / Ownership
 
-Fix2 owns scoped final evidence until clean release; afterward Coordinator owns closure metadata, fresh independent Reviewer read-only. OriginalH:/IM-platform744unknownfiles and withdrawn historical branch/worktree preserved. Task-owned emulator stopped afterPASS, AVD retained; existingPixel/sharedADB untouched.
+Fix3 owns scoped CI/evidence/Task/current changes until clean release; inherited Coordinator metadata preserved. All Implementation/Fix/Review writers and owned emulator processes are released. Original H:/IM-platform744existing files rehashed unchanged; complete byte-verified LOCALONLY original backup at H:/.codex/evidence/s2-sqlite-20261001/original-preservation/original-744-local-only.zip, never stage/send. Original current/E2E modifications and withdrawn historical Task/branch/worktrees remain protected.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. AcceptedADR0005 authorizes TSRepository/models/intent+RustSQLxatomicadapter and KotlinComposeAndroidSDKSQLite. Coordinator clarified exact omitted required Tauri neutral icons without changing architecture/business goal. S1PASS/S2OPEN.
+None. Approved ADR0005 and canonical hashes unchanged. Bounded Human GString waiver stays WAIVED_BY_HUMAN; no review PASS rewrite and no technology/other acceptance exemption.
