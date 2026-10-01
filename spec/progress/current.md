@@ -16,7 +16,7 @@ Architecture prerequisite actualmaina287529 accepted; historical GString FAIL/wa
 ## Verification
 
 - Command: `python -B tools/verify_client_sqlite.py --scope desktop`
-  - Result: Corrected actual SQLx13cases/118assertions/nativeunit1PASS; stable minimumAPI34 SDKSQLite3.39.2 first-install/pm-clear13cases116assertions eachPASS via explicit Gradle8.9 fallback. Source snapshot all0/architecture53/frozen53 PASS; CI31PASS4Windowsprivilegeskips; WSS and SyncPlugin PASS. Live recovery initially FAIL due formatting/ignored build trees; exacte67953a clean detached local recovery Development PASS23specs/status0 and sourceall0 PASS. Independent/hosted acceptance pending.
+  - Result: Corrected actual SQLx13cases/118assertions/nativeunit1PASS; stable minimumAPI34 SDKSQLite3.39.2 first-install/pm-clear13cases116assertions eachPASS via explicit Gradle8.9 fallback. Clean committed Recovery Acceptance23specs9.328s/sourceall0/architecture53/frozen53 PASS; CI31PASS4Windowsprivilegeskips; WSS and SyncPlugin PASS. Live recovery initially FAIL due formatting/ignored build trees; exacte67953a clean detached local recovery Development PASS23specs/status0 and sourceall0 PASS. Independent/hosted acceptance pending.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/fix2/fix-report.md`
 
 ## Current Blockers
@@ -37,7 +37,7 @@ NEW fresh independent Review of full final clean candidate; actual applicable ex
 
 ## Last Known Good Commit
 
-Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Prior product e67953a/failedReviewee82 immutable. Corrected locally verified product78ee723a4130d237d824b7d9c313dd77297fcbe8; final evidence-only candidate SHA returned by gitHEAD/Fix handoff, independent acceptance pending.
+Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Prior product e67953a/failedReviewee82 immutable. Prior corrected product78ee723 preserved; Fix2 locally verified clean producta8c0cd0c183dae6145f60641b8273adb9f09df3a; final evidence-only candidate SHA returned by gitHEAD/Fix handoff, independent acceptance pending.
 
 ## Latest Checkpoint
 
@@ -45,7 +45,7 @@ Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; ac
 
 ## Uncommitted Changes / Ownership
 
-NEW fresh Fix Agent owns only scoped source/tests/currentTask/new evidence until clean final commit/release; Coordinator read-only. OriginalH:/IM-platform744unknownfiles and withdrawn historical branch/worktree preserved. Task-owned emulator stopped afterPASS, AVD retained; existingPixel/sharedADB untouched.
+Fix2 owns scoped final evidence until clean release; afterward Coordinator owns closure metadata, fresh independent Reviewer read-only. OriginalH:/IM-platform744unknownfiles and withdrawn historical branch/worktree preserved. Task-owned emulator stopped afterPASS, AVD retained; existingPixel/sharedADB untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
