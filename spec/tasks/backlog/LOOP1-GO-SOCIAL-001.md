@@ -73,8 +73,16 @@ S0PASS/Authdone/remediationPASS/integrationdone dependencies verified; new clean
 
 # Next Action
 
-Architect must supply an already approved authenticated credential/ownership context producing required403 for PUT /v1/friends/{friendUserId}, or explicitly approve contract/authorization clarification. BLOCKED_BY_ARCHITECTURE confirmed; no contract or acceptance changes under this request. Only after approved constructible inputs complete backlog->ready->active and delegate fresh mapped Implementation, fresh Review/real hostedCI. No Message/E2E/Java/client/plugin/S2 and no automatic Social PR merge.
+Human has chosen later-iteration deferral for friend403; record is complete. Next obtain explicit approval for bounded public-contract applicability synchronization described in2026-10-01-human-403-deferral.md (automatic approval review rejected the broader amendment). No need to invent a Loop1 restricted credential. Public machine applicability is still unresolved; no contract/architecture changes performed. Only after approved constructible inputs complete backlog->ready->active and delegate fresh mapped Implementation, fresh Review/real hostedCI. No Message/E2E/Java/client/plugin/S2 and no automatic Social PR merge.
 
 # Last Known Good Commit
 
 Actual main279c1dc4681683e2af3b3534a00e5222dde36be6. Old unaccepted Social2a6eaa167f90e32d69ee309fe373fd28e0ff3451/handoff5b35735ae6625b82c0de78d7bd64fdb9bd7e1123.
+
+# Human-approved deferred work (2026-10-01)
+
+Exact Human instruction: 明确loop1不实现403，记录为后续迭代待实现内容
+
+Loop1 restricted-principal friend403 is DEFERRED_BY_HUMAN; later-iteration item FRIEND-AUTHORIZATION-403 is recorded in spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-human-403-deferral.md. No implementation or PASS is claimed. This records the discussed friendPUT case only; other-domain authorization remains required. DB/JWT permission model is unchanged.
+
+Public-contract applicability propagation was blocked by automatic approval review; canonical OpenAPI/negative fixture/architecture/acceptance remain unchanged. Before ready/active obtain explicit approval for the concrete minimal synchronization proposal in the decision record, then independently verify propagation. Historical blocked finding and evidence remain intact; no fixture waiver is silently applied.
