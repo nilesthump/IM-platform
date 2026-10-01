@@ -26,3 +26,7 @@ Next: fresh independent reviewer clean full candidate, current Review checklist 
 Final recovery preparation exposed current.md label formatting and live-cache architecture failures; labels repaired; clean committed local recovery rerun follows. Scope check identified generated Tauri gen/schemas files; own native .gitignore now excludes only these actual build outputs, no source scope added.
 
 Byte-retained public raw logs are deterministic .gz archives: decompression restores the exact Recorder bytes/SHA; raw output contains CRCRLF and progress trailing spaces, which source diff whitespace checking cannot normalize honestly. No Recorder source blob edited. Official gradlew.bat CRLF is retained and checked only with cr-at-eol; ordinary source/metadata diffcheck PASS.
+
+## Exact clean committed local check
+
+Product/review-state candidate e67953a2067810c2b85f6adaf3c494db7cfd0e49 verified from clean detached H:/.codex/s2-sqlite-impl-check: status_entries0/diff_lines0, source all0violations PASS0.654s, generic recovery Development PASS8.793s/23Task specs/currentreview. Still implementation local evidence, not independent acceptance. Initial long-path owned worktree attempt failed creating two historical blobs; short owned path/per-command core.longpaths=true fixed checkout, no old evidence edits. Final metadata-only closure candidate follows; product code unchanged.

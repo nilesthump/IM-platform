@@ -16,7 +16,7 @@ Architecture prerequisite accepted/merged actualmaina287529, immutable historica
 ## Verification
 
 - Command: `python -B tools/verify_client_sqlite.py --scope desktop`
-  - Result: Actual SQLx13cases/98assertions/native unit PASS; actual AndroidSDKSQLite13cases/97assertions/build/install PASS through explicit Gradle8.9 fallback. Source snapshot all0/architecture53/frozen53 PASS; CI31PASS4Windowsprivilegeskips; WSS and SyncPlugin PASS. Live recovery initially FAIL due formatting/ignored build trees; clean candidate local rerun required. Independent/hosted acceptance pending.
+  - Result: Actual SQLx13cases/98assertions/native unit PASS; actual AndroidSDKSQLite13cases/97assertions/build/install PASS through explicit Gradle8.9 fallback. Source snapshot all0/architecture53/frozen53 PASS; CI31PASS4Windowsprivilegeskips; WSS and SyncPlugin PASS. Live recovery initially FAIL due formatting/ignored build trees; exacte67953a clean detached local recovery Development PASS23specs/status0 and sourceall0 PASS. Independent/hosted acceptance pending.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/implementation.md`
 
 ## Current Blockers
@@ -33,11 +33,11 @@ Historical GString FAIL/waiver never relabeled. Initial tooling/runtime failures
 
 ## Next Exact Action
 
-Commit full bounded candidate, finish/validate own Recorder and release sole writer to Coordinator; fresh independent reviewer checks clean exactHEAD before authorized selected hosted CI. No Task done/selfaccept. Continue later S2 dependencies only after current accepted.
+Fresh independent reviewer checks final clean exactHEAD and full candidate diff before Coordinator authorized selected hosted CI. Implementation Recorder finishes/validates after final metadata commit and writer releases in handoff. No Task done/selfaccept. Continue later S2 dependencies only after current accepted.
 
 ## Last Known Good Commit
 
-Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. New local candidate SHA returned by git HEAD in implementation handoff, independent acceptance pending.
+Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Locally verified product/review-state candidate e67953a2067810c2b85f6adaf3c494db7cfd0e49; final metadata closure SHA returned by git HEAD in implementation handoff, independent acceptance pending.
 
 ## Latest Checkpoint
 
