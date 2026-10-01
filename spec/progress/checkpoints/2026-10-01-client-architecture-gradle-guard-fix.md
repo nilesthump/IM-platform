@@ -5,3 +5,5 @@ Stable corrective slice from cleanb941df7; final candidate is branch HEAD after 
 Existing Android checker now rejects variable apply plugins and unresolved/dynamic aliases, while approved literal/direct catalog controls pass. Local Frozen46/sourceall0/architecture46/CI30 PASS, 4 exposed Windows symlink skips. Full exact commands/elapsed/results and independent FAIL copies are in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/gradle-plugin-guard-fix/. Finished Recorder archive/clean Recovery Acceptance discovery follow there. No acceptance inferred from priorCI36861112222 SUCCESS.
 
 Fresh Fix Agent owns only this correction until clean finalHEAD writer release. NEW fresh independent Reviewer and actual exact-head hosted CI required before done/product activation. Existing immutable attachments/evidence/history preserved; raw original Human Markdown12 hardbreak diff whitespace exceptions disclosed. No services started.
+
+Clean committed Recovery Acceptance PASS5157b4cdf766acf5e8c1cb50719750481b1e1b5e; preservation5934 existing blob bytes PASS. Final archive-onlyHEAD requires new independent Review/CI.
