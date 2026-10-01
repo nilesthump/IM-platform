@@ -129,23 +129,3 @@ NEWPR5 actuallymerged dd24a9c65a36dd775ca68ae7847c2c283b6f348f afterindependentc
 Correction to earlier pending-state PR4OPEN claims: afterPR5merge GitHubmarkedPR4indirectmerged08:09:01Z/head33b1522, externallyviolatingdesiredOPENstate. OnlyNEWPR5explicitmergecommandissued; noPR4merge/auto-mergeenable. Userimmediatelyinformed; FAILassertion and finishedFAILmain/CoordinatorRecorders retained. NeverclaimallconstraintsPASS or rewriteoldtrace. Namedfriend403onlyDEFERRED_BY_HUMAN unchanged.
 
 Next exactaction finaladministrativerecordfreshReview/CI/newrecordPRmerge/mainverification, original605sync/hash thenTEMPfinalhandoffandstop. Lastacceptedactualmain dd24a9c65a36dd775ca68ae7847c2c283b6f348f, product6346 accepted. Coordinatorowns onlythisstate/archive; zeroactiveownedservices/productwriters. Unknown605filesunchanged. CurrentRecorderexternal newlinkedrun; postfinishdoc/commitboundariesexplicit.
-
-# Recovery and brand input addendum (2026-10-01)
-
-This done Task remains S1 accepted; no queue/status/acceptance change. Earlier final-record-pending prose is historical: PR6 merged actual main a0f0f13759ffb2a861b08c4820a1504b76d5c08a, independently accepted in H:/.codex/evidence/s2-open-record-review/postmerge/independent-main-review.md and exactCI36836677095 (five required SUCCESS/eight inactive SKIPPED); this session confirmed live APIs and ancestor binding. Final TEMP handoff matches; manifest33files and original605size/hash PASS.
-
-User-confirmed brand input only: display 构界 IM+, technical PlugWorldIM, latest attached Logo preferred; repository IM-platform retained; future client technical names may gradually use PlugWorldIM. Durable input/recovery assessment: spec/progress/evidence/LOOP1-E2E-001/2026-10-01-brand-baseline/brand-baseline.md. No logo redesign, product/contracts/Frozen/client engineering or S2 implementation. Existing checkpoint/historical FAIL/partial/PR4 deviation untouched.
-
-Local verification: Recovery Development PASS; frozen verifier34tests PASS; sourceall PASS; final hash/queue/client-placeholder checks PASS. No live product rerun or new acceptance claim. Commands/results and final Recorder validation in the new evidence record/verification.json, external Recorder H:/.codex/evidence/brand-baseline-20261001/research (prospective_resume; incomplete pre-initialization trace disclosed).
-
-Owner: current recovery/brand Agent, only appended Task/current/new brand evidence, unstaged/uncommitted. Last accepted main a0f0f137; HEAD unchanged. Next exact action: stop at S1 PASS / S2 OPEN / S2 not implemented; future session recovers by AGENTS, reads final-main proof and brand input, obtains explicit S2 scope before any new Task activation. No architecture conflict; no new Gate/checkpoint created.
-
-## Resume verification (2026-10-01, R-RESUME-S2-20261001-01)
-
-Visible Human prompt: 阅读AGENTS.md并继续. Startup resolved unique done LOOP1-E2E-001 and accepted final actual-main proof; HEAD remains a0f0f13759ffb2a861b08c4820a1504b76d5c08a. Frozen Markdown/PDF manifest hashes match. Recovery Development PASS; frozen/architecture 34 tests PASS; ci/check_architecture.py --scope all --json PASS with no violations. These are local recovery results, not new independent Task/Gate acceptance.
-
-No S2 task exists in queues. The previous explicit S2 OPEN stop boundary requires explicit new S2 scope. A clarification was presented; pending its answer, no task creation/activation, product implementation, commit, push or merge. Next exact action: resolve whether the current Human instruction authorizes S2, then read canonical S2 inputs and bind a minimal Task Spec before implementation. Existing recovery/brand and unknown-owned untracked work remains preserved. This Coordinator owns only this appended handoff, the matching done Task append and new resume evidence. No services started. No architecture conflict. Research run is prospective_resume; startup reads before initialization are incomplete pre-Recorder trace.
-
-Command: pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; pwsh -NoProfile -File tools/verify-frozen-architecture.ps1; bundled Python -B ci/check_architecture.py --scope all --json.
-Result: all exit0; Development PASS / 34 tests PASS / sourceall PASS.
-Evidence: spec/progress/evidence/LOOP1-E2E-001/2026-10-01-resume-scope.md; external H:/.codex/evidence/resume-s2-20261001-01/research/runs/R-RESUME-S2-20261001-01. Recorder final finish/validation follows handoff; raw command results remain external. Previous historical FAIL evidence is unchanged.

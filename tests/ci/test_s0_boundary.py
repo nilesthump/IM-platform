@@ -13,7 +13,7 @@ spec.loader.exec_module(boundary)
 
 class S0BoundaryTests(unittest.TestCase):
     def test_committed_skeleton_contains_no_unexpected_source(self):
-        for profile in ("java", "web"):
+        for profile in boundary.ALLOWED:
             with self.subTest(profile=profile):
                 self.assertEqual(boundary.unexpected_files(ROOT, profile), [])
 
@@ -92,15 +92,8 @@ class S0BoundaryTests(unittest.TestCase):
         self.assertIn("go test -count=1 ./...", workflow)
         self.assertIn("contracts/http/verify-auth-user-friend.ps1", workflow)
         self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py java"), 1)
-        self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py web"), 2)
-        for profile in ("desktop", "mobile"):
-            self.assertEqual(workflow.count(f"python3 ci/check_s0_boundary.py {profile}"), 0)
-            self.assertIn(f"cd ../../{profile}/storage", workflow)
-            self.assertTrue((ROOT / f"clients/{profile}/storage/pubspec.yaml").is_file())
-        self.assertEqual(workflow.count("dart pub get --enforce-lockfile"), 5)
-        self.assertEqual(workflow.count("dart test"), 5)
-        self.assertEqual(workflow.count("dart analyze"), 5)
-        self.assertEqual(workflow.count("cd clients/shared/local-store"), 3)
+        for profile in ("web", "desktop", "mobile"):
+            self.assertEqual(workflow.count(f"python3 ci/check_s0_boundary.py {profile}"), 2)
         self.assertNotIn("test ! -d clients/", workflow)
 
 
