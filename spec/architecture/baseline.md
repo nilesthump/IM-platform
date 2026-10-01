@@ -2,7 +2,7 @@
 
 - baseline_title: 面向十万级在线连接的可扩展分布式即时通信平台
 - version: `v1.1`
-- status: Human-approved client clarification candidate; independent Review and hosted CI pending
+- status: accepted Human-approved client clarification at e7c80c7; final administrative confirmation pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
 - sha256: `aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c`
@@ -44,3 +44,7 @@ Supplemental Human Desktop decision freezes Tauri + SQLx(SQLite) atomic native t
 - mobile_approval_source: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt`
 
 Candidate188d24a5a53abaa136aa939fded5968dd5fe728f was never accepted. New Human Mobile decision supersedes its TS/TBD clause before Review/CI. Previous accepted revision remains83d124b, not the superseded candidate hash. Android Kotlin/Compose same-contract behavior leaves Web/Desktop/shared TypeScript and Desktop SQLx boundaries unchanged.
+
+## Accepted clarification discovery (2026-10-01)
+
+Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 under scoped Human GString waiver; original4b5 Review FAIL immutable. Exactpush36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS. Canonicalaa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c/PDF546915 unchanged. ADR0005 effective at accepted prerequisite. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md. Earlier pending paragraphs are historical; later administrative closure needs NEW independent Review/exactHEADCI before S2activation. No product/contract change; S1PASS/S2OPEN.

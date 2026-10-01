@@ -1,0 +1,3 @@
+# Accepted client architecture prerequisite recovery point
+
+Acceptedauthority e7c80c726d4799ba3ddab026266be638c9e6b252; acceptedproductrollback3f352a8e465c0c4b093cca8e5f404ea587550b6e. S1PASS/S2OPEN; ownTaskdone after fresh independent Review/exactPR36881397009+push36881391141. OriginalGStringFAIL immutable/scopedWAIVED_BY_HUMAN. Frozenv1.1canonicalaa239802/PDF546915/contracts/migration0001/fixtures/productunchanged. Kotlin/ComposeMobile; Tauri/SQLxDesktop TSRepository/models/transactionintent/Rustatomicadapter; React/TSmemoryWeb. Evidence2026-10-01-coordinator-resume/acceptance.md. Laterclosure itself requires new independent Review/HEADCI beforePR9merge/actualmain/S2activation. Original744unchanged,Coordinatorsoleclosurewriter,no services/product.

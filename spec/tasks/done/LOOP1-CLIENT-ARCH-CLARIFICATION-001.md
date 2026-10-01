@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 title: Human-approved v1.1 client technology clarification and selection guards
-status: review
-owner: Coordinator (Human GString waiver; pending administrative closure)
+status: done
+owner: Coordinator (accepted e7c80c7; final administrative confirmation pending)
 stage: S2
 gate: S2
 ---
@@ -166,3 +166,7 @@ The latest exact Human request supersedes the prior stop-only next-agent scope. 
 ## Coordinator continuation recovery (2026-10-01)
 
 Recovered exact review task at00797514 with prior Coordinator waiver edits preserved. Human GString finding WAIVED_BY_HUMAN; original FAIL immutable and no repair loop for that finding. Startup Recovery Development PASS exit0/7.890s, canonical hash matches; prospective_resume Recorder R-CLIENT-RESUME-20261001 discloses initial read-only startup. Evidence2026-10-01-coordinator-resume/recovery.md contains exact new prompt and recovery limitations. Coordinator owns only administrative metadata; original H:/IM-platform unchanged. Next fresh independent Review of clean full3f352a8..HEAD, clean Recovery Acceptance and actual exact-head hosted required jobs before done/S2 product. Lastgood rollback3f352a8; S1PASS/S2OPEN.
+
+## Independent acceptance and administrative closure (2026-10-01)
+
+Fresh /root/architecture_admin_review PASS clean exacte7c80c726d4799ba3ddab026266be638c9e6b252/full3f..HEAD+4b5..HEAD under bounded Human GString waiver; original Review FAIL immutable. Actual push36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS; hostedLinuxCI30 no skips. RecoveryAcceptance/frozen53/sourceall0/CI30 localPASS,4Windows skips covered by hosted.132pathsallowed/5794blobs/product-contract-client-PDF/original744files preserved. ReviewerRecorderPASS28/validated and byte-identical archives/manifest/report in2026-10-01-coordinator-resume/acceptance.md. Task done after accepted e7c80c7; ADR0005 effective there. S1PASS/S2OPEN. Coordinator sole closure writer; no product/services. Next NEW independent closure Review/effectiveHEADCI, then PR9merge/actualmain verification before dependency-satisfied S2taskmaterialization. Lastgoodproduct3f352a8; acceptedauthoritye7c80c7. No architecture conflict.
