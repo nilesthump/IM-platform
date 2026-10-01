@@ -376,5 +376,148 @@
     "elapsed_seconds": 7.077999999994063,
     "stdout_sha256": "d0239cc6616897febb2694353c812cccbb71e705b7cd157ec1b54a9eb9009168",
     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "evidence",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/plugin-quoted-method-guard-fix-20261001/evidence.py"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.1870000000053551,
+    "stdout_sha256": "823c4d603403e43b918759f89f23780981e47570acbaf417fcf329731c3e28ca",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "preservation",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/plugin-quoted-method-guard-fix-20261001/audit.py"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.0929999999934807,
+    "stdout_sha256": "9a00e1c4f7b3ba42e15dac825f03d53f599ea8f4c83e41ed523ad7c00988f45d",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "development-final",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Development"
+    ],
+    "exit": 1,
+    "elapsed_seconds": 7.125,
+    "stdout_sha256": "9aa4bafb0181d64b4b89655d7ced99f3bc361d47a0b7008e43f92abb21b46c86",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "stage",
+    "argv": [
+      "git",
+      "-c",
+      "core.excludesFile=.git/info/exclude",
+      "add",
+      "--",
+      "ci/check_architecture.py",
+      "tests/architecture/test_client_technology.py",
+      "spec/progress/current.md",
+      "spec/tasks/review/LOOP1-CLIENT-ARCH-CLARIFICATION-001.md",
+      "spec/progress/checkpoints/2026-10-01-client-architecture-plugin-quoted-method-guard-fix.md",
+      "spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-quoted-method-guard-fix"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.1409999999887077,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "staged-whitespace",
+    "argv": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.125,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "commit",
+    "argv": [
+      "git",
+      "-c",
+      "core.excludesFile=.git/info/exclude",
+      "commit",
+      "-m",
+      "Reject unsupported quoted Gradle member selectors"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.17200000000593718,
+    "stdout_sha256": "ac759e91bd62c45df4a339fb3a5784b8c94639843c2b6df4f6233829d61a7902",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "acceptance",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "exit": 1,
+    "elapsed_seconds": 6.827999999994063,
+    "stdout_sha256": "055c14f752a86987e357834f2756b04b001b845d0566412a8e63989c8b64d8cf",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "recovery-fix",
+    "argv": [
+      "C:/Users/21441/.cache/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/plugin-quoted-method-guard-fix-20261001/recovery-fix.py"
+    ],
+    "exit": 2,
+    "elapsed_seconds": 0.07800000000861473,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "ea9cf939d2707248a530ef4d78cd726c33af317719ec7987a5c46d40ff92e902"
+  },
+  {
+    "label": "recovery-fix-attempt2",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/plugin-quoted-method-guard-fix-20261001/recovery-fix.py"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.13999999999941792,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "label": "development-final-attempt2",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Development"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 7.344000000011874,
+    "stdout_sha256": "0e80b86ae73d2d5e9da67ac3d212622e0dfd6bf01a977f66cc567527c5afce45",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   }
 ]
