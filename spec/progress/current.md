@@ -6,47 +6,47 @@ Current Gate: S2
 Gate Status: OPEN
 Current Batch: none (first S2 task only)
 Current Task: LOOP1-CLIENT-SQLITE-001
-Current Task State: active
-Execution Status: S2_AUTHORIZED_SQLITE_ACTIVE
+Current Task State: review
+Execution Status: S2_SQLITE_LOCAL_VERIFIED_INDEPENDENT_REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
-Human approve supersedes the prior S2 stopping boundary for selection/implementation of the first ready S2 task. S1/E2E uniquely done, final actual main a0f0f137 independently accepted; original recovery/brand input preserved byte-for-byte. Storage task readiness binds native Dart SQLite and two native consumers; no implementation yet.
+Bounded native SQLite storage foundation implemented in isolated task branch. Native shared24/Desktop1/Mobile1 tests PASS; thirteen unchanged canonical storage fixture cases and timelines execute against actual SQLite. Private account-bound schema1, uniqueness/UPSERT/terminal SENT/atomic cursor convergence implemented. S1 remains accepted; Task/S2 acceptance pending.
 
 ## Current Blockers
 
-None at task readiness. Independent Review and exact-head hosted CI are pending after implementation. No later S2 task authorized by this first-task scope; S2 full Gate not claimed.
+No implementation blocker. Fresh independent clean-candidate Review and exact-head hosted all13 required jobs pending. No later S2 task authorized.
 
 ## Verification
 
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: baseline all exit0/PASS, architecture34, WSS18 scenarios and Sync79 vectors; Dart3.12.2. Local readiness only, not new Task/Gate acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-activation.md`
+  - Result: pre-edit and final review-state recovery PASS. Native checks all exit0/PASS, no runtime skips; architecture34/frozen34/sourceall/WSS18/Sync79/CI29 PASS. CI4 Windows symlink privilege subcase skips must run on hosted Linux.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-implementation.md`
 
 ## Changed Files or Migrations
 
-Coordinator task/current/readiness/evidence records, plus byte-preserved prior E2E recovery/brand records copied from original directory. No native/client implementation or migrations yet. See task for exact prospective allowed paths.
+clients/shared/local-store package (private initial schema1/repository/runtime tests/locks/README), clients/desktop/storage and clients/mobile/storage thin packages, bounded existing CI steps and current-repo S0 transition assertions, this task/current/development evidence/checkpoint. No contracts/Frozen/backend/public migration changes.
 
 ## Known Failures, Risks, and Assumptions
 
-Historical PR4 desired OPEN constraint FAIL, friend403 sole DEFERRED_BY_HUMAN and previous Recorder FAIL/partial evidence retained. Native package runtime and exact CI remain unexecuted pending implementation. Initial schema only; no fabricated old mobile client/device acceptance. Preparation constrained-language/optional absent-path read failures recorded in activation.md; no hidden product failure.
+Recorder initialization association exit2, initial pub-get cwd exit1 and two final recovery evidence-line format FAILs retained/disclosed; corrected invocations passed. Deprecated API infos corrected, final strict analyze0issues. Recorder finishes FAIL for startup error, structural validation separate. Four local CI symlink skips require hosted Linux. Host Mobile package tests are not device/UI or full S2 acceptance. Historical PR4 constraint FAIL, friend403 sole DEFERRED_BY_HUMAN and previous Recorder FAIL/partial evidence unchanged.
 
 ## Next Exact Action
 
-Activation readiness Development PASS; task branch and sole owner bound. Release fresh Implementation Agent after activation commit. After implementation use fresh independent Review and exact hosted CI before done. No self-acceptance or next-task selection.
+Commit clean review candidate, release sole Implementation writer; Coordinator delegates NEW independent Review of exact candidate then obtains exact-head hosted all13 required jobs before done. No self-acceptance or next-task selection.
 
 ## Last Known Good Commit
 
-`a0f0f13759ffb2a861b08c4820a1504b76d5c08a`: independently accepted final S1 administrative actual main and unchanged accepted S1 product.
+`a0f0f13759ffb2a861b08c4820a1504b76d5c08a`: independently accepted S1 actual main; activation5613aab is implementation base, not new product acceptance.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-e2e-001-s2-open.md` (historical S2 OPEN stopping boundary superseded only by current explicit authorization).
+`spec/progress/checkpoints/2026-10-01-loop1-client-sqlite-001-local-schema1.md`: local schema recovery point, independent acceptance pending.
 
 ## Uncommitted Changes / Ownership
 
-Coordinator owns isolated activation/current/evidence and byte-preserved copies of known prior recovery/brand records until commit; fresh Implementation writer only after explicit release. Original605 unknown-owned files untouched; original H:/IM-platform recovery/brand/resume records preserved. No services or other product writer.
+Sole Implementation writer /root/s2_sqlite_preparation owns bounded isolated changes until candidate commit, then releases. Original H:/IM-platform and unknown611 files untouched; known prior records retained. No services. Package generated Dart files ignored; only source/locks/evidence staged.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Frozen/public/server/security/ACK unchanged. Private native local schema is implementation detail; behavioral expected values remain canonical contracts.
+None. Private schema implements current storage requirements; canonical expected values/public contracts/Frozen/security/ACK unchanged.
