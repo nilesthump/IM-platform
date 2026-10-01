@@ -1,0 +1,139 @@
+{
+  "owner": "R-MSG-REREVIEW-20261001",
+  "phase": "audit",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55642",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_rereview",
+    "NATS_URL": "nats://127.0.0.1:42642"
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\evidence\\raw_audit.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.282,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "git",
+        "-c",
+        "core.excludesFile=.git/info/exclude",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.14,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.11,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--name-status",
+        "b442acd..HEAD"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.156,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "84b7a63..HEAD",
+        "--",
+        "backend/go"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "validate-run",
+        "--run-id",
+        "R-MSG-FIX-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.172,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "validate-run",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.156,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "validate-repository"
+      ],
+      "exit_code": 2,
+      "elapsed_seconds": 0.406,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./tests",
+        "-run",
+        "TestLiveConflictingRetryDelayedOrigin"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.078,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-v",
+        "./tests",
+        "-run",
+        "TestLiveConflictingRetryDelayedOrigin"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.25,
+      "go_skips": 0
+    }
+  ]
+}

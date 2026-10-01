@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-GO-MSG-001
 title: Implement Go text messaging, durable ACK, Outbox, and NATS
-status: review
-owner: /root/message_fix (new Fix writer after Coordinator handoff)
+status: done
+owner: Coordinator (fresh independent PASS closure)
 stage: S1
 gate: S1
 ---
@@ -119,3 +119,7 @@ Fresh /root/message_fix repaired confirmed origin-marker deletion and missing/nu
 Post-handoff recovery format check exit1 corrected to required Command/Result/Evidence fields. Subsequent default GBK read failed on Task existing UTF8; restored prior immutable Task text from84b7a63 before appending only own handoff with explicitUTF8. No raw evidence or product changed; failed commands preserved.
 
 Final fix Recorder finished/validated97events (research-only PASS). Post-finish rawbyte staging audit and administrative commit lie outside finished trace. Own fix services removed. All bounded development work committed at final candidate; writer released to Coordinator on clean-status confirmation. NEW independent Review and exact-head hostedCI remain required.
+
+# Independent acceptance closure (2026-10-01)
+
+Fresh /root/message_rereview independently PASS on exact clean `183be639640cf652dc7a9f18152071c617f2ceac`, full b442acd..183be63. Durable report/commands/clean-state/probes/CI/tree-binding under spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-183be63/. Actual PG16/NATS2.10 full normal20.735s/race82.797s exit0, zero runtime skips; original two failure probes and expanded required-cursor cases PASS. Hosted PR36819292528/push36819288126 selected six jobs SUCCESS; PR virtual merge parents and tree equality verified. Four local Windows symlink subcase skips covered by actual Linux checks. All225 tracked prior raw artifacts exact; prior FAIL and interrupted historical Recorder preserved. Reviewer services/volume cleaned, writer released. Task acceptance PASS; S1 OPEN pending LOOP1-E2E-001 real TLS entrypoint. No product changes during closure. Next exact action independently verify administrative closure and hosted final head, then resolve dependency-satisfied E2E task. Accepted product candidate183be63; accepted actualmain remains b442acd until merge. Coordinator owns only evidence/recovery closure.
