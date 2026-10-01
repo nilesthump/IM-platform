@@ -1,3 +1,5 @@
 # SQLite Fix4 recovery checkpoint
 
 Accepted lastgood main a28752967ddd471cd281aece7ea9b343521356e8. Taskreview/S1PASS/S2OPEN. Product9a independentReview3PASS prioronly. Review4cdb/current36916339328FAIL preserved; no currentemulatorphase. Device-onlypermissions/source0diff; NEWReview/currentexact13jobs/KVM/two137assertionrounds required. Then independentadministrativeclosure/CI, authorizedPRmerge/actualmainverify/protectedoriginalsync/progress/STOP. No contract/schema transition/nextTaskselected. Original744filesprotected.
+
+Fix4 clean committed 0c2af19 Recovery Acceptance23specs7.344s/status0/sourceall0/frozen53/architecture53/CI31(4knownWindowsprivilegeskips)/WSS/SyncPlugin/diffcheck PASS. Product clients/tests/verifier0diff from9a PASS. Actual argv/rawbytes/durations/gzipSHA in fix4/clean-checks.json; no repeated unchanged native/Android runtimes, no hostedPASS. Final evidence-onlycandidate returned separately, NEWindependentReview5/currentexactHEADall13/KVM/twoAndroidrounds required.

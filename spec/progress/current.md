@@ -68,3 +68,5 @@ Exactcdb Review4FAIL/current36916339328 completedFAIL: Mobile KVM setup beforeem
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/fix4/fix-report.md`
 
 Fix4 solewriter owns workflow/currentTask/current/evidence/checkpoint untilcleanrelease. Next exact action NEWReview5/currentexactHEAD13jobs/actualKVM/twoAndroidrounds, then independentadministrativeclosure/CI, authorizedPRmerge/actualmainverify/protectedoriginalsync/progress/STOP beforeSEND/SYNC/WEB. Lastgood main `a28752967ddd471cd281aece7ea9b343521356e8`. Taskreview/S1PASS/S2OPEN; Humanstop/egressauthorization/GStringWAIVED_BY_HUMAN unchanged; original744files/localonlybackup protected.
+
+Fix4 clean committed 0c2af19 Recovery Acceptance23specs7.344s/status0/sourceall0/frozen53/architecture53/CI31(4knownWindowsprivilegeskips)/WSS/SyncPlugin/diffcheck PASS. Product clients/tests/verifier0diff from9a PASS. Actual argv/rawbytes/durations/gzipSHA in fix4/clean-checks.json; no repeated unchanged native/Android runtimes, no hostedPASS. Final evidence-onlycandidate returned separately, NEWindependentReview5/currentexactHEADall13/KVM/twoAndroidrounds required.
