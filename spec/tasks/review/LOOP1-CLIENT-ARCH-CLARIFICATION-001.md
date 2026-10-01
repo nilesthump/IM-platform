@@ -9,7 +9,7 @@ gate: S2
 
 # Goal
 
-Complete the separately accepted authority/governance/machine-guard prerequisite to S2 restart. Freeze Human-approved React/TypeScript Web, Tauri/React/TypeScript Desktop, TypeScript Mobile framework TBD, shared TypeScript direction and strict universal Agent technology-selection process. Keep version v1.1, disclose changed canonical bytes/hash and preserve PDF/history. No S2 product code in this task.
+Complete the separately accepted authority/governance/machine-guard prerequisite to S2 restart. Freeze Human-approved React/TypeScript Web, Tauri/React/TypeScript Desktop, Android Kotlin + Jetpack Compose Mobile, Web/Desktop/shared TypeScript direction and strict universal Agent technology-selection process. Keep version v1.1, disclose changed canonical bytes/hash and preserve PDF/history. No S2 product code in this task.
 
 # Inputs
 
@@ -56,16 +56,16 @@ allowed_paths does not waive architecture. Coordinator owns approval/recovery co
 # Acceptance
 
 - Canonical body explicitly captures every Human-approved client rule; v1.1 remains, current hash and revision metadata updated truthfully. New Human-approved ADR records motivation/impact/effectiveness/migration/rollback, PR7 withdrawn deviation, unchanged PDF and previous hash. Old ADR facts unchanged.
-- Web memory-only/noSQLite/no offline history over HTTPS/WSS; Desktop Tauri native Rust only clients/desktop/src-tauri, business/repository API/protocol/model/plugin SDK stay TypeScript; Mobile TypeScript ecosystem, concrete framework TBD. No S4 implementation.
+- Web memory-only/noSQLite/no offline history over HTTPS/WSS; Desktop Tauri native Rust only clients/desktop/src-tauri, business/repository API/protocol/model/plugin SDK stay TypeScript; Mobile Android Kotlin + Jetpack Compose with equivalent behavior/models/adapters under same contracts/fixtures and Android Studio emulator validation; no mandatory direct TS reuse. No S4 implementation.
 - Universal selection governance covers all listed architecture-sensitive categories; missing decision stops affected work BLOCKED_BY_ARCHITECTURE, smallest question -> Human/Architect decision -> frozen body/approved ADR -> independent Review/applicable CI -> product implementation. Task paths/tests/popularity/installed tools cannot authorize selection. Reviewer traces every new sensitive technology to accepted authority.
 - Effective guard examines current clients/shared/web/desktop/mobile plus client CI/build configuration; rejects Dart/pubspec/Flutter/setup-dart and unapproved framework/runtime/dependency; source allowlist respects TS ecosystem/config/assets and limited Desktop Rust boundary. Historical archives are not active product and remain preserved. No grep-zero destruction.
-- Negative controls prove forbidden sources/config/workflow/dependencies and unapproved new framework proposed in Task or implementation FAIL despite allowed_paths/tests. Positive controls show authorized TS/Tauri/native resources pass. Future authorization only via changed authority/new accepted decision, never task-only allowlist.
+- Negative controls prove forbidden sources/config/workflow/dependencies and unapproved new framework proposed in Task or implementation FAIL despite allowed_paths/tests. Positive controls show authorized TS/Tauri and Mobile Android Kotlin/Compose Gradle/source/tooling resources pass; negative controls directly reject Android plugin/dependency/build/workflow changes including Room/network/unapproved frameworks and Mobile TS. Future authorization only via changed authority/new accepted decision, never task-only allowlist.
 - Path-aware classification selects architecture for every client change including deletion plus applicable jobs; current workflow includes effective checking and gate enforcement with no failure suppression. Sourceall/current tests remain mandatory.
 - Fresh independent Review of clean exact committed candidate/range, followed by actual applicable exact-head hosted successful required jobs. Missing/failed/cancelled/anomalously skipped jobs cannot PASS. S2 product coding begins only after this task is accepted done; S2 Gate stays OPEN.
 
 # Forbidden
 
-- S1 implementation/public contracts/ACK/Sync invariants/security/compatibility/server schema changes; PDF/old ADR/archive changes; Dart/Flutter restoration; selecting Mobile framework or any native SQLite crate/plugin other than explicitly approved SQLx(SQLite); early Java/S4/Loop2.
+- S1 implementation/public contracts/ACK/Sync invariants/security/compatibility/server schema changes; PDF/old ADR/archive changes; Dart/Flutter restoration; selecting any additional Mobile framework/ORM/network/runtime/native dependency, Mobile TS/JS runtime/bridge/codegen/shared native rewrite, or Desktop native SQLite crate/plugin other than approved SQLx(SQLite); early Java/S4/Loop2.
 - Presenting previous PR7 tests/Review, local or Recorder PASS as this task/new TS/S2 acceptance.
 
 # Minimality
@@ -93,16 +93,20 @@ External Coordinator Recorder H:/.codex/evidence/client-architecture-20261001/re
 
 # Handoff
 
-Authority inputs understood; task active, no product implementation. Coordinator initialized and now releases writer to fresh Implementation Agent. Last known good rollback main3f352a8e465c0c4b093cca8e5f404ea587550b6e; S1 PASS/S2 OPEN. Original uncommitted files preserved externally by snapshot; all new edits isolated H:/ica. Existing managed creation failures and startup encoding failures remain exposed in external trace/recovery. No services.
+Current review task remains unfinished during new Human-authorized Mobile correction. Sole writer Fix Agent owns H:/ica candidate edits; original H:/IM-platform and H:/icr preserved. Prior implementation evidence/Recorder immutable. Last known good rollback main3f352a8e465c0c4b093cca8e5f404ea587550b6e; S1 PASS/S2 OPEN. No product code or services started by this Fix Agent; Coordinator owns its adb tooling daemon.
 
 # Next Action
 
-Fresh Implementation Agent completes only authority/governance/guards, records verification, commits review candidate, releases writer. Then NEW independent Review Agent and exact-head hosted CI; no S2 product coding before acceptance.
+Commit locally verified revised candidate, finish/validate linked Recorder and expose any archive-only postfinish commit. Release sole writer to Coordinator; NEW fresh independent Review from rollback base3f352a8, clean Recovery Acceptance and real exact-head hosted CI before done/product activation.
 
 ## Implementation completion (2026-10-01)
 
-Bounded authority/governance/guards completed; local verification above PASS with exposed first Recovery/CI fixture failures repaired. Final architecture42 no skips, CI30 with4 existing Windows privilege skips, sourceall zero violations, frozen/product/hash/diff checks PASS. Durable implementation-local.md and implementation-command-history.json record limitations, exact commands and timings. No product code or Mobile framework choice. Supplemental Human approval freezes Desktop SQLx(SQLite), not product implementation. Last known good rollback main3f352a8e465c0c4b093cca8e5f404ea587550b6e. Isolated writer Implementation Agent owns changed candidate; Coordinator receives clean commit and sole writer release. Next exact action: NEW independent Review of final clean HEAD/range and clean Recovery Acceptance; then actual exact-head hosted CI before done or S2 product activation. S2 OPEN. Checkpoint2026-10-01-client-architecture-review-candidate.md.
+Bounded authority/governance/guards completed; local verification above PASS with exposed first Recovery/CI fixture failures repaired. Final architecture42 no skips, CI30 with4 existing Windows privilege skips, sourceall zero violations, frozen/product/hash/diff checks PASS. Durable implementation-local.md and implementation-command-history.json record limitations, exact commands and timings. No product code. Prior Mobile TBD statement is superseded by the new Human decision below. Supplemental Human approval freezes Desktop SQLx(SQLite), not product implementation. Last known good rollback main3f352a8e465c0c4b093cca8e5f404ea587550b6e. Isolated writer Implementation Agent owns changed candidate; Coordinator receives clean commit and sole writer release. Next exact action: NEW independent Review of final clean HEAD/range and clean Recovery Acceptance; then actual exact-head hosted CI before done or S2 product activation. S2 OPEN. Checkpoint2026-10-01-client-architecture-review-candidate.md.
 
 Prompt raw-byte vs Recorder LF-normalized hashes are distinguished in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/prompt-hash-normalization.md; original approval/recovery and prompt bytes are preserved.
 
 Finished linked Recorder PASS67 events/manifest6277d2e77cfd34d406d133c2ba38fe1d32b2f17040bd51ebe80d4576b7812a46; immutable archive and exposed postfinish boundary in task evidence implementation-recorder-summary.md. Clean Recovery Acceptance PASS at implementation c709c2e87b55717cc92a7a662949457af9aa4beb; final archive-only candidate HEAD needs fresh independent Review/exact-head hosted CI. No Gate acceptance.
+
+## Human Mobile correction (2026-10-01; unfinished review)
+
+New exact prompt spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt (raw SHA1901f6dcd93069a19b6a88f5249858c8017ad36c71d61a109cbbad2ec5e9c061; normalized SHA863da9423040acffa2c11b7e67d6c71673f5d7aeb7edd26954108884b5705dd4) supersedes original Mobile TS/TBD before acceptance. Same allowed_paths; sole correction writer H:/ica, no product changes. Candidate188d24a was never accepted; original full prompt/approval/recovery/Recorder/evidence immutable. New linked Recorder external H:/.codex/evidence/mobile-architecture-correction-20261001/research/runs/R-CLIENT-MOBILE-CORRECTION-20261001; parentR-CLIENT-ARCH-20261001 and relatedR-CLIENT-ARCH-IMPLEMENTATION-20261001. Fresh independent Review from rollback base3f352a8 and real exact-head hosted CI remain mandatory. Current task stays review; S1 PASS/S2 OPEN.

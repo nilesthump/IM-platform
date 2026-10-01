@@ -88,7 +88,7 @@ def structural_errors(doc):
     need('token 严禁进入日志或 trace' in chapter(doc, 18), 'token observability prohibition missing')
     for token in ('Agent 没有未授权技术选型权', '未禁止 ≠ 已批准', 'BLOCKED_BY_ARCHITECTURE', 'machine guard'):
         need(token in chapter(doc, 2), 'universal technology selection rule missing: ' + token)
-    for token in ('Web = React + TypeScript', 'Desktop = Tauri + React + TypeScript', 'Mobile = TypeScript ecosystem', 'framework TBD', 'clients/desktop/src-tauri/**', 'Desktop SQLite native boundary 使用 Tauri + SQLx(SQLite)', '不得通过多个独立 tauri-plugin-sql execute() 调用模拟跨调用事务', 'Repository API', 'protocol/model/plugin SDK 仍为 TypeScript', '无 SQLite', '无离线历史加载', 'S2 Gate OPEN', '<!-- client-technology-policy -->'):
+    for token in ('Web = React + TypeScript', 'Desktop = Tauri + React + TypeScript', 'Mobile = Android + Kotlin + Jetpack Compose', '移除 Mobile TypeScript 技术栈', '同一 canonical contracts/fixtures', '不要求直接复用 TypeScript SDK', 'Android Studio emulator', 'Web/Desktop/shared', 'clients/desktop/src-tauri/**', 'Desktop SQLite native boundary 使用 Tauri + SQLx(SQLite)', '不得通过多个独立 tauri-plugin-sql execute() 调用模拟跨调用事务', 'Repository API', 'protocol/model/plugin SDK 仍为 TypeScript', '无 SQLite', '无离线历史加载', 'S2 Gate OPEN', '<!-- client-technology-policy -->'):
         need(token in chapter(doc, 6), 'approved client boundary missing: ' + token)
     need('不等于可自行选型' in chapter(doc, 11), 'backend variation bypasses selection governance')
     return errors
@@ -102,6 +102,11 @@ def verify(root, base_commit=''):
     for key, value in expected.items():
         if fields.get(key) != value:
             errors.append(f'manifest {key} mismatch')
+    mobile_source = 'spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt'
+    if fields.get('mobile_approval_source') != mobile_source or not (root / mobile_source).is_file() or hashlib.sha256((root / mobile_source).read_bytes()).hexdigest() != '1901f6dcd93069a19b6a88f5249858c8017ad36c71d61a109cbbad2ec5e9c061':
+        errors.append('Mobile Human approval raw-byte linkage/hash mismatch')
+    if fields.get('superseded_preacceptance_candidate_sha256') != 'ac0421074c41589d1d409cc91729953984839aea3c05e805608fcf7677da4f68':
+        errors.append('superseded preacceptance candidate lineage mismatch')
     for path_key, hash_key in [('repository_path','sha256'),('previous_repository_path','previous_sha256')]:
         relative = expected[path_key]
         actual = hashlib.sha256((root / relative).read_bytes()).hexdigest()

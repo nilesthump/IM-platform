@@ -5,7 +5,7 @@
 - status: Human-approved client clarification candidate; independent Review and hosted CI pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `ac0421074c41589d1d409cc91729953984839aea3c05e805608fcf7677da4f68`
+- sha256: `aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -38,4 +38,9 @@ The preceding stage-one paragraph is its bounded historical acceptance point. Su
 
 All preceding acceptance paragraphs are historical bounded discovery, not acceptance of these changed bytes. Version remains v1.1; canonical bytes/hash changed under ADR-0005. Original PDF, representation-only migration and ADR-0003 facts remain historical unchanged. S1 now PASS through accepted E2E/pre-PR7 tree restored by PR8; S2 OPEN. This clarification candidate requires NEW independent Review and exact-head hosted CI before effectiveness/product implementation. No public contract or product source change.
 
-Supplemental Human Desktop decision freezes Tauri + SQLx(SQLite) atomic native transaction adapter; separate tauri-plugin-sql execute calls cannot emulate transaction. Android Studio emulator is testing only, Mobile framework TBD. Approval supplement: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-desktop-sqlx-mobile-emulator-decision.txt.
+Supplemental Human Desktop decision freezes Tauri + SQLx(SQLite) atomic native transaction adapter; separate tauri-plugin-sql execute calls cannot emulate transaction. Mobile is Android Kotlin + Jetpack Compose, validated on Android Studio emulator; Mobile TS/TBD is superseded before candidate acceptance. Approval supplement: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-desktop-sqlx-mobile-emulator-decision.txt.
+
+- superseded_preacceptance_candidate_sha256: `ac0421074c41589d1d409cc91729953984839aea3c05e805608fcf7677da4f68`
+- mobile_approval_source: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt`
+
+Candidate188d24a5a53abaa136aa939fded5968dd5fe728f was never accepted. New Human Mobile decision supersedes its TS/TBD clause before Review/CI. Previous accepted revision remains83d124b, not the superseded candidate hash. Android Kotlin/Compose same-contract behavior leaves Web/Desktop/shared TypeScript and Desktop SQLx boundaries unchanged.

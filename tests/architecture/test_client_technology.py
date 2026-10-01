@@ -40,7 +40,7 @@ class ClientTechnologyControls(unittest.TestCase):
             'clients/desktop/src-tauri/Cargo.toml': '[dependencies]\ntauri="2"\nsqlx={version="0.8",features=["sqlite"]}\n[build-dependencies]\ntauri-build="2"',
             'clients/desktop/src-tauri/capabilities/default.json': '{}',
             'clients/desktop/package.json': '{"dependencies":{"react":"18","@tauri-apps/api":"2"}}',
-            'clients/mobile/data/model.ts': 'export type State = "SENDING" | "SENT" | "FAILED";',
+            'clients/mobile/app/src/main/java/im/Model.kt': 'package im; enum class State { SENDING, SENT, FAILED }',
             'clients/mobile/data/migration.sql': 'CREATE TABLE messages(id TEXT);',
             'clients/web/style.css': 'body {color:black}',
             'clients/web/logo.svg': '<svg/>',
@@ -127,5 +127,70 @@ class ClientTechnologyControls(unittest.TestCase):
                 self.assertTrue(checker.check_clients(self.root))
         else:
             self.assertTrue(checker.check_clients(self.root))
+
+
+    def test_android_compose_gradle_source_and_tooling(self):
+        fixtures = {
+            'clients/mobile/build.gradle.kts': 'plugins {\n id("com.android.application") version "8.9.0" apply false\n id("org.jetbrains.kotlin.android") version "2.1" apply false\n id("org.jetbrains.kotlin.plugin.compose") version "2.1" apply false\n}',
+            'clients/mobile/app/build.gradle.kts': 'plugins {\n id("com.android.application")\n kotlin("android")\n id("org.jetbrains.kotlin.plugin.compose")\n}\ndependencies {\n implementation(platform("androidx.compose:compose-bom:2025.01"))\n implementation("androidx.compose.ui:ui:1.7")\n implementation("androidx.activity:activity-compose:1.10")\n implementation(libs.compose.material3)\n}',
+            'clients/mobile/gradle/libs.versions.toml': '[versions]\ncompose="1.7"\n[libraries]\ncompose-material3={module="androidx.compose.material3:material3",version.ref="compose"}\n[plugins]\nandroid-application={id="com.android.application",version="8.9"}',
+            'clients/mobile/data/build.gradle': 'plugins {\n id "com.android.library"\n id "org.jetbrains.kotlin.android"\n}\ndependencies {\n implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1"\n}',
+            'clients/mobile/settings.gradle.kts': 'rootProject.name="IM"\ninclude(":app", ":data")',
+            'clients/mobile/gradle/wrapper/gradle-wrapper.properties': 'distributionUrl=https\\://services.gradle.org/distributions/gradle-8.13-bin.zip',
+            'clients/mobile/gradle/wrapper/gradle-wrapper.jar': 'standard wrapper fixture',
+            'clients/mobile/gradlew': '#!/bin/sh\nexec java org.gradle.wrapper.GradleWrapperMain "$@"',
+            'clients/mobile/app/src/main/AndroidManifest.xml': '<manifest package="im"><application/></manifest>',
+            'clients/mobile/app/src/main/java/im/Main.kt': 'package im\nimport android.database.sqlite.SQLiteDatabase\nimport androidx.activity.ComponentActivity\nimport androidx.compose.runtime.Composable\nimport kotlin.collections.List\nimport im.data.State\n@Composable fun Main() {}',
+            'clients/mobile/data/src/main/java/im/data/State.kt': 'package im.data\nenum class State { SENDING, SENT, FAILED }',
+            '.github/workflows/android.yml': 'jobs:\n  mobile:\n    steps:\n      - uses: android-actions/setup-android@v3\n      - uses: gradle/actions/setup-gradle@v4\n      - uses: reactivecircus/android-emulator-runner@v2\n        with:\n          script: cd clients/mobile && ./gradlew connectedCheck',
+        }
+        for name, content in fixtures.items(): self.put(name, content)
+        self.assertEqual([], checker.check_clients(self.root))
+        self.put('clients/mobile/app/build.gradle.kts', 'plugins {\n alias(libs.plugins.android.application)\n}\ndependencies {\n implementation(libs.compose.material3)\n}')
+        self.assertEqual([], checker.check_clients(self.root))
+        declarations = '# Allowed Paths\n- `clients/mobile/**`\nclient_language: Kotlin\nclient_framework: Jetpack Compose\nclient_runtime: Android\nclient_dependency: androidx.compose.ui:ui\nclient_dependency: com.android.application\nclient_dependency: Gradle\n'
+        self.assertEqual([], checker.client_task_violations(declarations, 'TASK.md', self.root))
+        mixed = declarations.replace('- `clients/mobile/**`', '- `clients/mobile/**`\n- `clients/shared/**`\n- `clients/desktop/**`')
+        self.assertEqual([], checker.client_task_violations(mixed, 'TASK.md', self.root))
+        for old, new in [('Kotlin','TypeScript'), ('Jetpack Compose','React'), ('Android','Tauri'), ('androidx.compose.ui:ui','androidx.room:room-runtime')]:
+            with self.subTest(new=new):
+                self.assertTrue(checker.client_task_violations(declarations.replace(old, new), 'TASK.md', self.root))
+        self.assertTrue(checker.client_task_violations(declarations.replace('clients/mobile/', 'clients/shared/'), 'TASK.md', self.root))
+
+    def test_android_negative_real_gradle_catalog_import_build_workflow_controls(self):
+        cases = {
+            'clients/mobile/model.ts': 'export type Model = {};',
+            'clients/mobile/build.config.js': 'module.exports={};',
+            'clients/mobile/tsconfig.json': '{}',
+            'clients/mobile/build.gradle.kts': 'plugins {\n id("org.jetbrains.kotlin.multiplatform")\n}',
+            'clients/mobile/build.gradle': 'apply plugin: "org.jetbrains.compose"',
+            'clients/mobile/app/build.gradle.kts': 'dependencies {\n implementation("androidx.room:room-runtime:2.6")\n}',
+            'clients/mobile/app/network.gradle': 'dependencies {\n implementation "com.squareup.okhttp3:okhttp:4"\n}',
+            'clients/mobile/app/kotlin.gradle.kts': 'dependencies {\n implementation("io.ktor:ktor-client-core:3")\n}',
+            'clients/mobile/app/dynamic.gradle': 'dependencies {\n implementation selectedNativeRuntime\n}',
+            'clients/mobile/app/alias.gradle.kts': 'dependencies {\n implementation(libs.new.runtime)\n}',
+            'clients/mobile/app/plugin.gradle.kts': 'plugins {\n id(selectedFramework)\n}',
+            'clients/mobile/app/local.gradle.kts': 'dependencies {\n implementation(files("native-runtime.jar"))\n}',
+            'clients/mobile/gradle/libs.versions.toml': '[plugins]\nnew-framework={id="org.jetbrains.compose",version="1"}',
+            'clients/mobile/gradle/dependency/libs.versions.toml': '[libraries]\nroom={module="androidx.room:room-runtime",version="2"}',
+            'clients/mobile/app/Model.kt': 'package im\nimport androidx.room.Room\nclass Model',
+            'clients/mobile/app/Network.kt': 'package im\nimport okhttp3.OkHttpClient\nclass Network',
+            'clients/mobile/app/Bridge.kt': 'package im\nfun bridge(v: android.webkit.WebView) { v.addJavascriptInterface(Object(), "bridge") }',
+            'clients/mobile/app/Runtime.kt': 'package im\nfun load() { System.loadLibrary("customRuntime") }',
+            'clients/shared/model.kt': 'package im\nclass Model',
+            'clients/mobile/app/native.rs': 'fn main() {}',
+            'clients/mobile/build.sh': 'cd clients/mobile\nnpm install typescript',
+            'clients/mobile/gradle/wrapper/gradle-wrapper.properties': 'distributionUrl=https://example.invalid/selected-runtime.zip',
+            '.github/workflows/android.yml': 'jobs:\n  mobile:\n    steps:\n      - uses: actions/setup-node@v4\n      - run: cd clients/mobile && npm install typescript',
+            '.github/workflows/tool.yml': 'jobs:\n  mobile:\n    steps:\n      - uses: unapproved/setup-android@v1',
+            '.github/workflows/build.yml': 'jobs:\n  mobile:\n    steps:\n      - run: cd clients/mobile && ./gradlew -I select-runtime.gradle build',
+        }
+        for name, content in cases.items():
+            with self.subTest(name=name):
+                path = self.put(name, content)
+                errors = checker.check_clients(self.root)
+                self.assertTrue(errors, name)
+                self.assertTrue(any('CLIENT' in error for error in errors), errors)
+                path.unlink()
 
 if __name__ == '__main__': unittest.main()

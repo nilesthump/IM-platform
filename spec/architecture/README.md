@@ -11,4 +11,4 @@ The manifest and this index contain discovery and migration metadata only. They 
 
 Previous accepted revision: v1.1 conflict resolution under ADR-0003. The manifest separates current revision semantics from ADR-0002 historical representation-only migration. Review/CI acceptance status is recorded in the current task and evidence; historical PDF bytes remain immutable.
 
-Current client clarification candidate: v1.1 under ADR-0005; canonical bytes/hash changed, previous ADR-0003 hash retained separately. New independent Review/exact-head hosted CI pending; S2 OPEN and product coding waits.
+Current client clarification candidate: Android Kotlin/Jetpack Compose Mobile plus Web/Desktop/shared TypeScript, v1.1 under ADR-0005; canonical bytes/hash changed, previous ADR-0003 hash retained separately. New independent Review/exact-head hosted CI pending; S2 OPEN and product coding waits.

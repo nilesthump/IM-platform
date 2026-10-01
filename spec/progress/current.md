@@ -11,20 +11,20 @@ Execution Status: AUTHORITY_CLARIFICATION_REVIEW_PENDING_PRODUCT_NOT_STARTED
 
 ## Immediately Relevant Completed Work
 
-Human-approved v1.1 client clarification, ADR0005, universal selection governance and direct client/source/dependency/task/CI guards implemented in isolated H:/ica. Rollback main3f352a8 restores accepted pre-PR7 tree; PR7 is withdrawn historical deviation. S1 PASS/S2 OPEN. Product coding waits for acceptance of this prerequisite.
+Human-approved v1.1 clarification corrected before acceptance: Mobile Android Kotlin + Jetpack Compose, Web/Desktop/shared TypeScript, Desktop SQLx(SQLite), ADR0005 approval chain and direct Android Gradle/catalog/import/build/workflow/source guards in H:/ica. Rollback main3f352a8 restores accepted pre-PR7 tree; PR7 is withdrawn historical deviation. S1 PASS/S2 OPEN. Product coding waits for acceptance of this prerequisite.
 
 ## Current Blockers
 
-No implementation blocker for clarification. NEW independent Review and exact-head hosted CI pending. Later Mobile concrete framework TBD; emulator testing does not approve a framework. Desktop SQLx(SQLite) explicitly approved; no other dependency selection permitted.
+No implementation blocker for clarification. NEW independent Review and exact-head hosted CI pending. Mobile framework is explicitly Android Kotlin + Jetpack Compose; Android Studio emulator validation follows. Desktop SQLx(SQLite) explicitly approved; no other dependency selection permitted.
 
 ## Verification
 
 - Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
-  - Result: PASS42 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/implementation-local.md`
+  - Result: PASS44 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/mobile-correction-local.md`
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: Initial formatting FAIL exposed and repaired PASS; clean committed Acceptance PASS at c709c2e, final archive candidate checked after commit.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/implementation-command-history.json`
+  - Result: Correction baseline Recovery Development PASS; final clean committed Acceptance pending final commit.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/mobile-correction-command-history.json`
 
 ## Changed Files or Migrations
 
@@ -32,7 +32,7 @@ Authority/hash/ADR0005, governance/Agent/template, existing architecture checker
 
 ## Known Failures, Risks, and Assumptions
 
-Initial Coordinator recovery discovery formatting and3 old CI expectation failures repaired and preserved in evidence. Supplemental raw/normalized prompt hash assertion FAIL corrected after both hashes verified; original evidence/Recorder unchanged, correction documented.4 existing Windows real-symlink controls unavailable; portable controls pass and hosted Linux must execute actual links. Static guards require semantic independent Review of native logic/imports and each sensitive choice. Historical evidence unchanged. Recorder prospective_resume discloses incomplete earlier read-only recovery; finished Recorder PASS67; immutable archive/postfinish boundary explicit in implementation-recorder-summary.md.
+Prior implementation failures/evidence/Recorder immutable. Correction read-only startup encoding/quoting errors and unsupported Recorder event type exposed; no evidence rewritten. Mixed appended manifest whitespace repaired. Intermediate Recovery FAIL3 from evidence/checkpoint references before files existed, now repaired and final rerun required. CI30 exposes4 existing Windows real-symlink privilege skips; hosted Linux must execute actual links. Direct Android guards supplement semantic independent Review; no product or Android emulator acceptance in this authority prerequisite. Correction Recorder prospective_resume discloses pre-Recorder startup; final validation/archive boundary to be recorded in mobile-correction-recorder-summary.md.
 
 ## Next Exact Action
 
@@ -44,12 +44,12 @@ Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-client-architecture-review-candidate.md`.
+`spec/progress/checkpoints/2026-10-01-client-architecture-mobile-correction.md`.
 
 ## Uncommitted Changes / Ownership
 
-No uncommitted candidate changes after final archive commit; Implementation Agent releases sole writer to Coordinator/fresh Reviewer. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No services started.
+Sole Fix Agent owns current H:/ica edits until clean revised candidate/archive commit, then releases writer to Coordinator/fresh Reviewer. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No product services started. Coordinator owns adb tooling daemon; Fix Agent starts no services.
 
 ## Architecture Conflicts / ACP / ADR
 
-Human authorizes only client clarification ADR0005/v1.1 and guards; version remains v1.1, canonical bytes/hash changed. Mobile framework undecided; follow BLOCKED_BY_ARCHITECTURE for affected later product portions. Desktop uses approved Tauri + SQLx(SQLite) atomic transaction adapter. S2 OPEN.
+Human authorizes only client clarification ADR0005/v1.1 and guards; version remains v1.1, canonical bytes/hash changed. Mobile Android Kotlin/Compose authorized by exact supplemental Human decision; all additional undecided sensitive dependencies follow BLOCKED_BY_ARCHITECTURE. Desktop uses approved Tauri + SQLx(SQLite) atomic transaction adapter. S2 OPEN.

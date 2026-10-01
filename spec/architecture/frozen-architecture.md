@@ -449,28 +449,103 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
 - Web = React + TypeScript；仅临时在线 Memory only；无 SQLite、无聊天历史持久化、无离线历史加载；通过 HTTPS + WSS 通信，页面生命周期结束后不保证消息状态保留。
 - Desktop = Tauri + React + TypeScript；UI 最大程度复用 Web；按账号 SQLite、离线历史、optimistic send、SENDING/SENT/FAILED、ACK 回写、retry 复用 request_id、Sync 收敛。
 - Desktop 必要 Rust/native 代码仅限 `clients/desktop/src-tauri/**`，仅作为 SQLite native access、OS secure storage、必要文件系统等系统能力的 native adapter；客户端业务层、Repository API、protocol/model/plugin SDK 仍为 TypeScript，不得迁入 Rust。Desktop SQLite native boundary 使用 Tauri + SQLx(SQLite)；TypeScript 持有共享 Repository、模型和事务意图，Rust 仅提供数据库连接、查询和原子 transaction adapter。不得通过多个独立 tauri-plugin-sql execute() 调用模拟跨调用事务。SQLx 以外的 SQLite crate/plugin/library 未批准。
-- Mobile = TypeScript ecosystem，具体 framework TBD；不是 Dart/Flutter，也未批准 React Native、Expo、Capacitor、NativeScript 或其他框架。复用 shared TypeScript protocol SDK、plugin SDK、models 和尽可能共享的 data/domain logic；按账号 SQLite、离线历史、optimistic send、ACK/retry/Sync。
-- 先完成不依赖 Mobile framework 的 shared TypeScript 语义与窄 adapter interface；真实 Mobile runtime/device adapter 标记 BLOCKED_BY_ARCHITECTURE，按 §2.3 完成决定/冻结/Review/CI 后才继续。完整 Mobile acceptance 未满足时 S2 Gate OPEN。
-- `clients/shared/{protocol-sdk,plugin-sdk,ui}/` 保持 TypeScript 生态；shared models、可共享数据/domain logic、Plugin UI host/interface 同方向。保留现有目录权威，无无意义搬迁。S2 不实现 S4 WASM host、marketplace 或完整 lifecycle。
+- Mobile = Android + Kotlin + Jetpack Compose；Human 明确移除 Mobile TypeScript 技术栈，具体 framework 不再 TBD。Android Studio emulator 为真实 Android 验证环境；按账号 SQLite、离线历史、optimistic send、ACK/retry/Sync 与其他客户端相同。
+- Mobile 在 `clients/mobile/**` 使用 Kotlin 等价模型、Repository 语义、协议/插件适配与 data/domain 行为，服从同一 canonical contracts/fixtures；不要求直接复用 TypeScript SDK。优先 Android SDK 自带 SQLite 事务能力，不授权 Room、第三方 SQLite/ORM/network library 或其他架构敏感依赖。不得为共享代码自行加入 JS runtime、TS/JS bridge、codegen 或把 shared 层改写成跨端 native。完整 Mobile acceptance 未满足时 S2 Gate OPEN；Desktop host/mock 不能冒充 Android emulator acceptance。
+- `clients/shared/{protocol-sdk,plugin-sdk,ui}/` 及 Web/Desktop shared models、Repository、data/domain logic 保持 TypeScript 生态。Mobile 以同一公共契约与 fixtures 验证等价行为；不创建新公共契约。保留现有目录权威，无无意义搬迁。S2 不实现 S4 WASM host、marketplace 或完整 lifecycle。
 - Dart/Flutter 不属于当前批准 active client 技术栈；历史 PR7/Review/FAIL/Recorder/evidence 保留，但 PR7 不提供授权或新 TypeScript acceptance。
 
-机器检查读取下列已批准技术标识；标准包名仅对应上述显式栈及必要 type/build bindings，不授权额外框架、runtime、数据库驱动或原生依赖。每个架构敏感新依赖仍须独立 Review 追溯授权。Mobile 的 TBD 不是 runtime/framework 许可。
+机器检查读取下列已批准技术标识；标准包名仅对应上述显式栈及必要 type/build bindings，不授权额外框架、runtime、数据库驱动或原生依赖。每个架构敏感新依赖仍须独立 Review 追溯授权。Android SDK、Gradle、Kotlin/Compose compiler/plugin、标准 Compose UI 与 Android activity binding 是所选栈的必要工程标识，仅限 Mobile；不授权其他 Kotlin frameworks、ORM、网络或 plugin runtimes。
 
 <!-- client-technology-policy -->
 ```json
 {
   "decision": "ADR-0005-client-technology-clarification",
-  "languages": ["TypeScript", "JavaScript", "Rust"],
-  "frameworks": ["React", "Tauri"],
-  "runtimes": ["Tauri"],
-  "packages": ["typescript", "react", "react-dom", "@types/react", "@types/react-dom", "@tauri-apps/api", "@tauri-apps/cli"],
-  "native_packages": ["tauri", "tauri-build", "sqlx"],
-  "mobile_framework": "TBD",
-  "native_boundary": "clients/desktop/src-tauri/"
+  "languages": [
+    "TypeScript",
+    "JavaScript",
+    "Rust",
+    "Kotlin"
+  ],
+  "frameworks": [
+    "React",
+    "Tauri",
+    "Jetpack Compose"
+  ],
+  "runtimes": [
+    "Tauri",
+    "Android"
+  ],
+  "packages": [
+    "typescript",
+    "react",
+    "react-dom",
+    "@types/react",
+    "@types/react-dom",
+    "@tauri-apps/api",
+    "@tauri-apps/cli"
+  ],
+  "native_packages": [
+    "tauri",
+    "tauri-build",
+    "sqlx"
+  ],
+  "mobile_framework": "Jetpack Compose",
+  "native_boundary": "clients/desktop/src-tauri/",
+  "mobile_languages": [
+    "Kotlin"
+  ],
+  "mobile_runtimes": [
+    "Android"
+  ],
+  "mobile_frameworks": [
+    "Jetpack Compose"
+  ],
+  "mobile_plugins": [
+    "com.android.application",
+    "com.android.library",
+    "org.jetbrains.kotlin.android",
+    "org.jetbrains.kotlin.plugin.compose"
+  ],
+  "mobile_dependencies": [
+    "com.android.tools.build:gradle",
+    "org.jetbrains.kotlin:kotlin-gradle-plugin",
+    "org.jetbrains.kotlin:compose-compiler-gradle-plugin",
+    "org.jetbrains.kotlin:kotlin-stdlib",
+    "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+    "org.jetbrains.kotlin:kotlin-test",
+    "androidx.activity:activity-compose",
+    "androidx.compose:compose-bom",
+    "androidx.compose.runtime:runtime",
+    "androidx.compose.ui:ui",
+    "androidx.compose.ui:ui-tooling",
+    "androidx.compose.ui:ui-tooling-preview",
+    "androidx.compose.foundation:foundation",
+    "androidx.compose.animation:animation",
+    "androidx.compose.material3:material3"
+  ],
+  "mobile_tooling": [
+    "Android SDK",
+    "Android Studio",
+    "Gradle",
+    "android-actions/setup-android",
+    "gradle/actions/setup-gradle",
+    "reactivecircus/android-emulator-runner"
+  ],
+  "mobile_import_prefixes": [
+    "android.",
+    "kotlin.",
+    "java.",
+    "javax.",
+    "org.json.",
+    "org.xml.",
+    "org.w3c.",
+    "androidx.compose.",
+    "androidx.activity."
+  ]
 }
 ```
 
-JavaScript 仅为 TypeScript 生态的必要配置/构建互操作；客户端业务/API/protocol/model/plugin SDK 必须 TypeScript。Rust 仅上述 native adapter。此标识表不授权 Node/Bun/Deno 等产品 runtime，SQLite native driver 仅批准 Desktop SQLx(SQLite)。Android Studio emulator 只是测试环境，Mobile framework 仍为 TBD；不得为模拟器测试自行选择 Mobile 框架。
+JavaScript 仅为 TypeScript 生态的必要配置/构建互操作；Web/Desktop/shared 客户端业务/API/protocol/model/plugin SDK 必须 TypeScript；Mobile 的等价实现为 Kotlin。Rust 仅上述 native adapter。此标识表不授权 Node/Bun/Deno 等产品 runtime，SQLite native driver 仅批准 Desktop SQLx(SQLite)。Mobile 已批准 Android Kotlin + Jetpack Compose，Android Studio emulator 验证；Android 工程标识不是其他框架或第三方核心依赖的选型授权。
 
 <a id="section-6-2"></a>
 ### 6.2 Optimistic write 与状态机
