@@ -1,0 +1,2 @@
+Coordinator clarified exact necessary Tauri Windows/Linux build resources icons/icon.ico and icons/icon.png; actual tauri-build2.7.1/tauri-codegen2.7.1 require them even bundle.active=false. Same 32px neutral pixels, no new dependency/business scope/Human architecture decision/waiver. Evidence before resources.
+Registry sources: tauri-build/src/lib.rs Windows icon fallback; tauri-codegen/src/context.rs Unix CachedIcon fallback.

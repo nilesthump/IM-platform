@@ -213,5 +213,16 @@ class PathMatrixTests(unittest.TestCase):
             self.assertEqual(values["deploy"], "false")
 
 
+
+
+
+class ClientStoragePaths(unittest.TestCase):
+    def test_actual_storage_runner_and_deleted_fixture_select_actual_clients(self):
+        for path in ("tests/clients/sqlite/deleted-fixture.json","tools/verify_client_sqlite.py","tools/verify-client-sqlite.ps1"):
+            matrix=classify_module.classify([path])
+            for job in ("architecture","desktop","mobile","shared","compatibility"):
+                self.assertTrue(matrix[job],(path,job))
+
+
 if __name__ == "__main__":
     unittest.main()

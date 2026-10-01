@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CLIENT-SQLITE-001
 title: Authorized TypeScript Desktop and Kotlin Android SQLite materialized Repository
-status: active
+status: review
 owner: Fresh Implementation Agent (sole product writer)
 stage: S2
 gate: S2
@@ -52,6 +52,7 @@ Necessary approved Android SDK/Gradle/Kotlin/Compose compiler/UI/activity bindin
 - `clients/shared/protocol-sdk/tests/storage/**` (canonical fixture-driven storage tests).
 - `clients/desktop/package.json`, `clients/desktop/package-lock.json`, `clients/desktop/tsconfig.json`, `clients/desktop/README.md`.
 - `clients/desktop/src/storage/**` (TypeScript Tauri adapter wiring only).
+- `clients/desktop/src-tauri/icons/icon.ico`, `clients/desktop/src-tauri/icons/icon.png` (Coordinator scope clarification: required neutral 32px Windows/Linux Tauri build resources).
 - `clients/desktop/src-tauri/Cargo.toml`, `clients/desktop/src-tauri/Cargo.lock`, `clients/desktop/src-tauri/build.rs`, `clients/desktop/src-tauri/tauri.conf.json`.
 - `clients/desktop/src-tauri/src/lib.rs`, `clients/desktop/src-tauri/src/main.rs`, `clients/desktop/src-tauri/src/database.rs`, `clients/desktop/src-tauri/src/bin/storage_probe.rs`, `clients/desktop/src-tauri/tests/storage.rs` (native connection/query/atomic adapter and necessary bounded actual-SQLx test transport only; no Repository/business/schema authority in Rust).
 - `clients/mobile/settings.gradle.kts`, `clients/mobile/build.gradle.kts`, `clients/mobile/gradle.properties`, `clients/mobile/gradlew`, `clients/mobile/gradlew.bat`, `clients/mobile/gradle/wrapper/**`, `clients/mobile/README.md`.
@@ -102,6 +103,10 @@ After implementation, add exact available TS compile/test, actual SQLx adapter, 
 
 Coordinator owns only task readiness/progress/checkpoint/evidence until clean activation commit and sole-writer release; fresh Implementation Agent owns bounded source afterward. Accepted lastgood maina28752967ddd471cd281aece7ea9b343521356e8; S1PASS/S2OPEN. Original744unknownfiles and withdrawn historical task branch/worktree preserved. No product services/code started by Coordinator. Local Rust/TS/Android build tooling must be verified/provisioned explicitly by implementation; no runtime PASS presumed.
 
+# Implementation Verification / Recovery
+
+Completed actual bounded TS/native/Kotlin SQLite storage slice; see `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/implementation.md` and immutable local-command-history/raw logs. Desktop actual SQLx13cases/98assertions + real native unit PASS; Android actual emulator13cases/97assertions/build/install PASS; source-only local all0/frozen53/architecture53 PASS, CI31PASS4Windowsprivilegeskips; WSS/SyncPlugin PASS. Live build-cache source checker FAIL and wrapper download failure preserved; clean committed independent/hosted rerun required. No Task/S2 Gate acceptance claim. Last independently accepted maina287529; initialTask2338667. Own Recorder finishes/validates after candidate commit, reported separately with external trace.
+
 # Next Action
 
-Readiness baseline passed; scoped activation metadata committed before release to fresh Implementation Agent. Implement storage slice within these paths, then NEW independent Review/exactHEADCI; do not selfaccept or advance unfinished current task.
+Fresh independent Review of exact full clean committed candidate; actual selected exact-head hosted CI before administrative done. Coordinator handles push/PR authorization. Implementation Agent owns all bounded source/currentTask/evidence changes until clean commit and writer release; no unknown work overwritten. Original H:/IM-platform/historical GString FAIL/waiver preserved.

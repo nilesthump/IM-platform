@@ -1,0 +1,15 @@
+[package]
+name = "im-client-storage"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "im_client_storage"
+path = "src/lib.rs"
+
+[dependencies]
+tauri = "2"
+sqlx = { version = "0.8", default-features = false, features = ["sqlite", "runtime-tokio"] }
+
+[build-dependencies]
+tauri-build = "2"

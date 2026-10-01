@@ -37,6 +37,8 @@ def classify(paths):
             or path.startswith("tools/verify-loop1-ctrl-")
             or path.startswith("tools/verify-loop1-min-")
         )
+        if parts[:3] == ["tests", "clients", "sqlite"] or path in {"tools/verify-client-sqlite.ps1", "tools/verify_client_sqlite.py"}:
+            selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
         if parts[0] == "clients":
             selected.add("architecture")
         if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:
