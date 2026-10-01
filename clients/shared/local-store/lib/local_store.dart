@@ -43,6 +43,9 @@ CREATE UNIQUE INDEX message_conversation_sequence ON messages(conversation_id, s
  WHERE server_seq IS NOT NULL;
 CREATE TABLE conversation_cursors (
  conversation_id TEXT PRIMARY KEY, contiguous_seq INTEGER NOT NULL CHECK(contiguous_seq >= 0));
+CREATE TABLE user_events (
+ event_id TEXT PRIMARY KEY, cursor TEXT NOT NULL, kind TEXT NOT NULL,
+ subject_id TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision > 0));
 CREATE TABLE user_state (
  kind TEXT NOT NULL, subject_id TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision > 0),
  PRIMARY KEY(kind, subject_id));
@@ -309,7 +312,7 @@ ON CONFLICT(conversation_id,request_id) DO UPDATE SET
         ].contains(kind)) {
           throw FormatException('Unsupported user event');
         }
-        _id(event['eventId']);
+        final eventId = _id(event['eventId']);
         final subject = _id(event['subjectId']);
         final revision = event['revision'];
         if (revision is! int || revision < 1)
@@ -319,6 +322,27 @@ ON CONFLICT(conversation_id,request_id) DO UPDATE SET
             eventCursor.isEmpty ||
             eventCursor.length > 256)
           throw FormatException('Invalid event cursor');
+        final previous = _db.select(
+          'SELECT * FROM user_events WHERE event_id=?',
+          [eventId],
+        );
+        if (previous.isNotEmpty) {
+          final old = previous.single;
+          if (old['cursor'] != eventCursor ||
+              old['kind'] != kind ||
+              old['subject_id'] != subject ||
+              old['revision'] != revision) {
+            throw StateError('Conflicting user event');
+          }
+        } else {
+          _db.execute('INSERT INTO user_events VALUES (?,?,?,?,?)', [
+            eventId,
+            eventCursor,
+            kind,
+            subject,
+            revision,
+          ]);
+        }
         _db.execute(
           '''
 INSERT INTO user_state VALUES (?,?,?)

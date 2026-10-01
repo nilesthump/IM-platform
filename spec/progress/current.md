@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: none (first S2 task only)
 Current Task: LOOP1-CLIENT-SQLITE-001
 Current Task State: review
-Execution Status: S2_SQLITE_REVIEW_FAIL_FRESH_FIX_ASSIGNED
+Execution Status: S2_SQLITE_EVENT_IDENTITY_FIXED_NEW_REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
@@ -15,13 +15,13 @@ Bounded native SQLite storage foundation implemented in isolated task branch. Na
 
 ## Current Blockers
 
-Independent d792 Review FAIL P2: reused user eventId with conflicting payload is accepted. Fresh Fix assigned; no architecture/external blocker. Prior d792 push/PR13/13SUCCESS do not override FAIL. No later S2 task authorized.
+Independent d792 Review FAIL P2 repaired locally by fresh Fix: event identity/payload checked and persisted with state/cursor. New independent Review and exact-head hosted jobs pending; prior d792 green does not accept fix. No later S2 task authorized.
 
 ## Verification
 
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: pre-edit and final review-state recovery PASS. Native checks all exit0/PASS, no runtime skips; architecture34/frozen34/sourceall/WSS18/Sync79/CI29 PASS. CI4 Windows symlink privilege subcase skips must run on hosted Linux.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-implementation.md`
+  - Result: Fix baseline/final recovery PASS; shared33/Desktop1/Mobile1 native tests and strict checks PASS; regression9 RED before fix then GREEN. architecture34/frozen34/sourceall/WSS18/Sync79/CI29 PASS; CI4 Windows symlink privilege skips require hosted Linux.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-event-identity-fix/fix-report.md`
 
 ## Changed Files or Migrations
 
@@ -33,7 +33,7 @@ Recorder initialization association exit2, initial pub-get cwd exit1 and two fin
 
 ## Next Exact Action
 
-Fresh /root/sqlite_event_identity_fix repairs event identity within existing storage scope and commits a clean candidate; then NEW independent Reviewer and actual exact-head required hosted jobs before done. Full PR range requires13; push jobs match its actual diff. No selfacceptance/next task.
+Fresh Fix commits clean fixed candidate and releases; Coordinator delegates NEW independent Reviewer and verifies actual exact-head required hosted jobs before done. Full PR range requires13; push jobs match actual diff. No selfacceptance/next task.
 
 ## Last Known Good Commit
 
@@ -41,11 +41,11 @@ Fresh /root/sqlite_event_identity_fix repairs event identity within existing sto
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-client-sqlite-001-local-schema1.md`: local schema recovery point, independent acceptance pending.
+`spec/progress/checkpoints/2026-10-01-loop1-client-sqlite-001-event-identity-fixed.md`: local fixed schema recovery point, independent acceptance pending.
 
 ## Uncommitted Changes / Ownership
 
-Original Implementation and first Reviewer released clean d792. Coordinator owns archived FAIL/state assignment until commit; then fresh Fix sole isolated writer. Original H:/IM-platform and unknown611 files untouched; known prior records retained. No services. Package generated Dart files ignored; only source/locks/evidence staged.
+Fresh /root/sqlite_event_identity_fix owns bounded shared storage/current/task/new evidence/checkpoint until clean candidate commit, then releases. Coordinator archived FAIL at79d9a2d is preserved. Original H:/IM-platform and unknown611 files untouched; no services. Generated Dart files ignored.
 
 ## Architecture Conflicts / ACP / ADR
 

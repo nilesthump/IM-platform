@@ -85,11 +85,11 @@ Minimum pre-edit baseline already observed at accepted HEAD: Recovery Developmen
 
 # Handoff
 
-Coordinator sole writer for bounded activation until committed; then fresh s2_sqlite_preparation sole Implementation writer in isolated H:/.codex/worktrees/s2-client-sqlite/IM-platform. Original H:/IM-platform unknown untracked files untouched. Last known good commit a0f0f13759ffb2a861b08c4820a1504b76d5c08a. S1 PASS, S2 OPEN. No services/migrations/product edits yet; no architecture conflict. Independent acceptance pending. Brand and prior recovery copying is Coordinator administrative preparation only; implementation scope does not edit E2E/brand history.
+Fresh Fix writer /root/sqlite_event_identity_fix completed bounded event identity correction and local verification from79d9a2d. All changes belong to this writer until clean candidate commit, then sole writer releases to Coordinator. Original H:/IM-platform and unknown611-file snapshot untouched; historical evidence retained. Last known good accepted main a0f0f137; private schema1 remains unaccepted, no services or architecture conflict. Task remains review/S2 OPEN, independent acceptance pending. Current evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-event-identity-fix/fix-report.md.
 
 # Next Action
 
-Commit bounded activation, release sole Implementation writer with Recorder, implement storage foundation and complete local verification; then fresh independent Review and exact candidate hosted CI before done. Do not advance to another S2 task before this task is accepted.
+Commit locally verified fixed candidate and release writer, then Coordinator delegates NEW independent Reviewer of exact candidate/full accepted-main range and obtains exact-head actual required hosted jobs before done. Full PR range requires13; push jobs selected by actual diff. No selfacceptance or later S2 task.
 
 # Development implementation handoff (2026-10-01)
 
@@ -112,3 +112,9 @@ Recorder finished FAIL65events for initialization error; structural validation P
 # Independent Review FAIL and fresh Fix (2026-10-01)
 
 Exact d792 independent /root/sqlite_independent_review FAIL P2 eventId discarded in applyUserPage; canonical oracle rejects same-ID changed payload, actual repository accepted and advanced state/cursor. Full durable byte-preserved report under spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-independent-review-d792-fail/. Hosted d792 push/PR each13SUCCESS does not override FAIL. Fresh /root/sqlite_event_identity_fix now owns bounded repair after explicit release; task remains review, no selfacceptance. Minimal persistence/checking of existing user-event identity and known payload fields inside same data/cursor transaction is presently justified by concrete canonical discrepancy; identical replay, conflicts within/across pages/reopen and rollback must be verified without oracle edits. Last accepted a0f0f137; no services or architecture conflict. Next action fix/commit/release, then NEW independent Reviewer and exact-head selected hosted jobs.
+
+# Bounded event identity Fix handoff (2026-10-01)
+
+Fresh /root/sqlite_event_identity_fix from79d9a2d repaired independent d792P2 with one private schema1 user_events identity/payload table and comparison in existing atomic data/cursor transaction. No migration/version invention, pruning/framework/dependency/export/authority/fixture/workflow edits. Nine new actual SQLite regressions RED before correction and GREEN after; shared33/Desktop1/Mobile1 all native strict checks PASS. Governance/sourceall/frozen34/architecture34/CI29/WSS18/Sync79 PASS with exactly4 local Windows symlink privilege skips. Native two-open-connection and reopen tests enforce committed identity; trigger and page conflict rollback include inserted identities. Source diff whitespace checked; this writer's newline normalization fixed, historical archives unchanged.
+
+Evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-event-identity-fix/fix-report.md and command-results.json. External Recorder R-SQLITE-EVENT-FIX-20261001 marks incomplete pre-Recorder preparation. Finish/validation outcome archived separately; staging/commit follows finished trace. Last accepted main a0f0f137; task remains review/S2 OPEN. This writer owns changes until clean fixed-candidate commit then releases; NEW independent Review plus exact-head actual required hosted jobs before done. No later S2 task, service or architecture conflict.
