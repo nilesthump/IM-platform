@@ -7,50 +7,48 @@ Gate Status: OPEN
 Current Batch: client-architecture-clarification-before-S2
 Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 Current Task State: review
-Execution Status: ENTRYPOINT_RECOVERY_NOTE_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
+Execution Status: STOPPED_BY_HUMAN_AFTER_INDEPENDENT_REVIEW_FAIL
 
 ## Immediately Relevant Completed Work
 
-Human-approved v1.1 candidate retains Android Kotlin/Jetpack Compose Mobile, React/TypeScript Web, Tauri/React/TypeScript Desktop + SQLx(SQLite), equivalent Mobile contracts/fixtures and universal selection governance. Rollback main3f352a8 restores accepted pre-PR7 tree; withdrawn PR7/approval/history remain immutable. S1 PASS/S2 OPEN; product coding waits for this prerequisite acceptance.
-
-Fresh Fix repairs runtime-confirmed quoted Gradle member/pointer/interpolated selectors in existing checker and adds bounded RED/GREEN controls. No product/schema/public contract/dependency/authority changes. Earlier recovery history is preserved byte-for-byte in plugin-quoted-method-guard-fix/independent-review-proofs.zip (prior-current.md), with prior evidence directories unchanged.
+Current exact4b5d6b8 architecture candidate has Human-approved Kotlin/Compose Mobile and Tauri/SQLx Desktop clarification, governance/guards and truthful historical startup recovery labels. Independent review/testing finished; product code has not started. Human requires handoff plus next-agent text prompt and stop; no more fix/client/Web work in this session.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
-  - Result: PASS53/no skips; local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-quoted-method-guard-fix/local.md`
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+  - Result: Independent clean exact4b5 PASS; Frozen53/architecture53/sourceall0 PASS. CI30 local has4 exposed Windows1314 skips, actual hosted Linux30 no skips. Exact-head PR36875541572/push36875532891 each13 jobs/every step SUCCESS. Independent semantic Review FAIL: executable Groovy GString expression/closure applies Java while checker reports zero violations. CI green does not override FAIL.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-human-stop-handoff/README.md`
 
-Frozen/architecture53 no skips, sourceall0 violations, CI30 with4 exposed existing Windows real-symlink privilege skips, Recovery Development PASS. Clean committed Acceptance PASS at61a2ec9c7c90049f4f9c50c680226a3845dc5f81/preservation PASS5995 priorobjects/744unknownfiles/81 independenthashes; Recorder finished/validated PASS102 immutable archive/postfinish discovery follows durable spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-quoted-method-guard-fix/local.md, command-history.json, preservation.json and recorder-summary.md. RED10 on prior54ab; GREEN19 client tests; actual isolated offline Gradle8 runtime forms apply Java and now reject. Local/Recorder PASS is not acceptance.
+Stop bookkeeping initial Recovery Development FAIL5 from current schema labels/backticks is retained in Coordinator Recorder; corrected format and final local validation follow. This metadata check is not product acceptance.
 
 ## Current Blockers
 
-Independent54ab Review FAIL despite PRall13 SUCCESS and pushretry2 effective13 SUCCESS; original pushattempt1 TLS smoke/gateFAIL preserved. NEW independent Review and actual final exact-head CI required. Linux must execute real-link controls without skips. Initial sandbox/encoding/test-seam/slashy failures and ancillary runtime metadata/raw output filename loss are exposed in local.md; new reruns are distinct evidence. Prior historical authority/approval/PDF/Recorder/rawHuman12 hardbreaks and original744 unknown files preserved.
+Human stop is binding. Architecture prerequisite remains unfinished review/FAIL at4b5d6b8; CI green does not establish authority acceptance or S2 PASS. No repair or task activation until new Human authorization.
 
 ## Changed Files or Migrations
 
-Existing checker and client controls; current/task/new evidence/checkpoint only. No product/schema/public contract/authority changes.
+This stop record changes only Task/progress/checkpoint/evidence. Previous candidate scope remains architecture/governance/guards; no product/client/database schema/public contract changes. PR9 remains draft/unmerged at reviewed4b5; local stop metadata is not hosted acceptance.
 
 ## Known Failures, Risks, and Assumptions
 
-First condensed current.md failed Recovery11 format checks, retained at implementation a9ae78c then repaired to existing required headings/command/SHA/checkpoint syntax. Other initial failures and evidence limitations are preserved in local.md; Windows4 privilege skips and original rawHuman12 hardbreaks stay exposed. Local evidence is not acceptance.
+All historical Review FAIL/proof/CI/Recorder retained. Current P1 ci/check_architecture.py385-398 erases executable GString interpolation. Existing local Windows symlink skips covered by actual Linux controls. Original Human12 hardbreak whitespace notices preserved; focused/CR-aware fullrange exceptONLY exact unchanged attachment PASS. Earlier own runtime artifact loss and Coordinator ancillary errors remain disclosed in referenced evidence. Current53 tests do not cover new negative case; next authorized Fix must add it.
 
 ## Next Exact Action
 
-Finish clean candidate/Recorder/archive and release sole writer; NEW fresh independent Review finalHEAD/full3f..HEAD + clean Recovery Acceptance + actual applicable new exact-head hosted CI. No done/product activation before acceptance; S2 OPEN.
+None in this session: handoff and stop. A newly authorized Coordinator must recover this exact review task and delegate fresh bounded Fix, then NEW independent Review/exact-head CI. Do not start CLIENT-SQLITE/SEND/SYNC/WEB or select another task because active is empty. Client/Web implementation requires separate resumed Human scope.
 
 ## Last Known Good Commit
 
-Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 a0f0f13759ffb2a861b08c4820a1504b76d5c08a tree restored.
+Actual rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e` restores accepted pre-PR7a0f0f13759ffb2a861b08c4820a1504b76d5c08a tree. Reviewed unaccepted candidate4b5d6b8efa480462e5d4180e131ded9b692480ee is not last-good product authority. Local stop metadata SHA resolves through git HEAD.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-client-architecture-plugin-quoted-method-guard-fix.md`.
+`spec/progress/checkpoints/2026-10-01-client-architecture-human-stop.md` (Human stop/recovery only).
 
 ## Uncommitted Changes / Ownership
 
-Coordinator owns only the bounded startup entrypoint historical labels and recovery bookkeeping until clean commit; then sole writer releases to NEW independent Review. Quoted selector Fix released clean b0eedea; no unknown candidate changes or product edits. Original744 files remain protected; Coordinator owns adb tooling daemon.
+Coordinator owns only this stop bookkeeping/archive until clean local commit, then releases all writers. Original H:/IM-platform744 unknown files remain preserved; use H:/ica candidate for any newly authorized recovery. Independent reviewer changed no candidate. No product services or emulator started. Tooling cleanup result is in copy-and-stop-proof.json. Handoff/next-agent prompt live in OS temporary directory per handoff skill; paths are recorded in external handoff-locations.json.
 
 ## Architecture Conflicts / ACP / ADR
 
-Canonical v1.1 aa239802 and PDF546915 remain unchanged. Additional sensitive choices require architecture process; task paths/tests do not authorize them. No unresolved new selection.
+Human choices are clear: Mobile Android Kotlin/Jetpack Compose (no Mobile TS/TBD), Desktop TauriSQLx(SQLite) with TS Repository/models/transactionintent and Rust atomic DB adapter only. Candidate v1.1 canonicalaa239802/PDF546915 unchanged; ADR0005 effectiveness still requires accepted prerequisite. Current defect is checker implementation failure, not permission for new architecture. S2 OPEN.

@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 title: Human-approved v1.1 client technology clarification and selection guards
 status: review
-owner: Coordinator; fresh independent Review pending
+owner: Coordinator (stopped by Human; independent Review FAIL)
 stage: S2
 gate: S2
 ---
@@ -154,3 +154,7 @@ Quoted Fix Recorder finished/validated PASS102 manifest2e8726bdcf4fce2ebeb030f6c
 ## Coordinator startup recovery clarification (unfinished review)
 
 After sole quoted-selector Fix release at clean b0eedea, Coordinator labels the existing AGENTS/handoff remediation-era OPEN paragraphs as historical, preserving their bytes and citing final accepted E2E/S1 and PR8 restored pre-PR7 product. This bounded Task-allowed control-plane recovery note changes no Frozen Architecture hash, ADR, contract, product or acceptance rule. Paragraph preservation hashes and exposed initial prefix/line-ending/wrong-cwd failures in coordinator-entrypoint-recovery/. Current task remains review/S2 OPEN; NEW fresh independent Review covers combined final clean head/full rollback range, followed by new actual exact-head hosted CI before done/product activation. Coordinator releases writer after clean commit; last known good rollback3f.
+
+## Human stop after completed independent Review (2026-10-01)
+
+Exact4b5d6b8 fresh Review FAIL: ordinary Groovy GString expression and closure execute pluginManager.apply Java while checker reports no violation. Current local checks/actual exact-head PR36875541572 and push36875532891 all13 SUCCESS do not override semantic failure. Byte-identical final independent report/runtime/CI/Recorder packaging proof archived in 2026-10-01-human-stop-handoff/; Reviewer finishedFAIL31/validated, manifest2fee94fbd5e0e3673806955c94d934554bfc46cd44d0e3d7f13c8bf2aabaff6c. Human explicitly directs handoff/next-agent text prompt then stop; no further Fix, product implementation, done/merge or task selection in this session. Task remains uniquely review; S1 unchanged/PASS/S2 OPEN; lastgood rollback3f. Coordinator owns only stop record/archive until clean local commit, then all writers released. New authorization is required to resume fresh Fix/NEW Review/exact-head CI; client/Web work remains stopped. Local stop metadata itself is not independently accepted. Latest checkpoint2026-10-01-client-architecture-human-stop.md. Prospective Coordinator Recorder will finish CANCELLED and validate; immutable archive/postfinish boundary external, never acceptance.
