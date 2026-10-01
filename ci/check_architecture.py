@@ -325,21 +325,42 @@ def check_android(root, policy):
             if re.search(r'\b(?:addJavascriptInterface|evaluateJavascript|ReactNative|JavascriptEngine)\b|\bSystem\s*\.\s*load(?:Library)?\s*\(', code):
                 errors.append(f'CLIENT {relative}: unapproved Mobile JS/native bridge/runtime')
         if path.suffix in {'.gradle', '.kts'}:
-            for name in re.findall(r'\bid\s*(?:\(\s*)?["\']([^"\']+)["\']|\bapply\s+plugin\s*:\s*["\']([^"\']+)["\']', code):
-                plugin = next(x for x in name if x)
+            # Accept the entire selector argument, never an approved string prefix.
+            literal = r"(?:\"[\w.-]+\"|'[\w.-]+')"
+            selector = re.compile(r'\b(id|kotlin)\s*(?:\(\s*(' + literal +
+                                  r')\s*\)|[ \t]+(' + literal + r'))')
+            for declaration in re.finditer(r'\b(?:id|kotlin)\s*(?=\(|[\"\'])', code):
+                match = selector.match(code, declaration.start())
+                if not match:
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin selector')
+                    continue
+                name = (match.group(2) or match.group(3))[1:-1]
+                plugin = 'org.jetbrains.kotlin.' + name if match.group(1) == 'kotlin' else name
                 if plugin not in policy['mobile_plugins']:
                     errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {plugin}')
-            for short in re.findall(r'\bkotlin\s*\(\s*["\']([^"\']+)["\']', code):
-                if 'org.jetbrains.kotlin.' + short not in policy['mobile_plugins']:
-                    errors.append(f'CLIENT {relative}: unapproved Kotlin Gradle plugin {short}')
+            # Plugins blocks allow only complete supported declarations and their
+            # version/apply modifiers. Residual entries reject builtin shortcuts
+            # and computed selectors without maintaining a plugin-name blacklist.
+            text_literal = r"(?:\"[^\"\n]*\"|'[^'\n]*')"
+            version = r'(?:\s*(?:\.\s*)?version\s*(?:\(\s*' + text_literal + r'\s*\)|' + text_literal + r'))?'
+            apply = r'(?:\s*(?:\.\s*)?apply\s*(?:\(\s*(?:true|false)\s*\)|(?:true|false)\b))?'
+            entry = r'(?:' + selector.pattern + r'|\balias\s*\(\s*libs\.plugins\.[\w.]+\s*\))' + version + apply
+            build_code = code
+            for block in re.finditer(r'\bplugins\s*\{([^}]*)(\}|$)', code):
+                if block.group(2) != '}' or not re.fullmatch(r'(?:\s*(?:' + entry + r')\s*;?)*\s*', block.group(1)):
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugins block')
+                build_code = build_code.replace(block.group(0), '')
             for coordinate in re.findall(r'["\']([\w.\-]+:[\w.\-]+)(?::[^"\']*)?["\']', code):
                 if coordinate not in policy['mobile_dependencies']:
                     errors.append(f'CLIENT {relative}: unapproved Android Gradle dependency {coordinate}')
             # Check every declaration start, not only already-literal/resolved forms.
             for declaration in re.finditer(r'\bapply\s+plugin\s*:\s*', code):
                 expression = code[declaration.end():]
-                if not re.match(r"([\"'])([^\"']+)\1[ \t]*(?=$|[\n;}])", expression):
+                match = re.match(r"([\"'])([^\"']+)\1[ \t]*(?=$|[\n;}])", expression)
+                if not match:
                     errors.append(f'CLIENT {relative}: unresolved/dynamic Android apply plugin declaration')
+                elif match.group(2) not in policy['mobile_plugins']:
+                    errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {match.group(2)}')
             for declaration in re.finditer(r'\balias\s*\(\s*', code):
                 alias = re.match(r'libs\.plugins\.([\w.]+)\s*\)', code[declaration.end():])
                 if not alias or alias.group(1) not in catalog_plugins:
@@ -355,7 +376,7 @@ def check_android(root, policy):
                 resolved = bool(alias and (alias.group(2) in (catalog_bundles if alias.group(1) else catalog_libraries)))
                 if not (literal or internal or resolved):
                     errors.append(f'CLIENT {relative}: unresolved/dynamic Android dependency declaration {expression}')
-            if re.search(r'\b(?:id|alias)\s*\(\s*(?!["\']|libs\.plugins\.)\w|\bapply\s*(?:\(|from\s*:)|\b(?:includeBuild|useModule|usePlugin)\s*\(', code):
+            if re.search(r'\bapply\s*(?:<|\(|from\s*:)|\b(?:includeBuild|useModule|usePlugin)\s*\(', build_code):
                 errors.append(f'CLIENT {relative}: unapproved/dynamic Android Gradle plugin/build inclusion')
     # Build/install/CI commands must not restore Mobile TS or choose another stack.
     configurations = paths + list((root / '.github/workflows').glob('*'))

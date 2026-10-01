@@ -189,6 +189,54 @@ class ClientTechnologyControls(unittest.TestCase):
                 self.put('clients/mobile/build.gradle', content)
                 self.assertEqual([], checker.check_clients(self.root))
 
+    def test_android_plugin_selectors_require_complete_literal_arguments(self):
+        cases = (
+            'id("com.android.application".replace("com.android.application", "java"))',
+            'id("com.android.application" + ".unapproved")',
+            'id("com.android.${selected}")',
+            'id(selected)',
+            'id "com.android.application" + ".unapproved"',
+            'kotlin("android".replace("android", "multiplatform"))',
+            'kotlin("android" + ".unapproved")',
+            'kotlin("${selected}")',
+            'kotlin(selected)',
+        )
+        for suffix in ('.gradle', '.gradle.kts'):
+            for declaration in cases:
+                with self.subTest(suffix=suffix, declaration=declaration):
+                    self.put('clients/mobile/build' + suffix, 'plugins { ' + declaration + ' }')
+                    errors = checker.check_clients(self.root)
+                    self.assertTrue(any('plugin' in error for error in errors), errors)
+            (self.root/('clients/mobile/build' + suffix)).unlink()
+
+    def test_android_plugin_block_shortcuts_and_generic_apply_fail_closed(self):
+        # These ordinary Kotlin DSL forms apply builtin Java plugins at runtime.
+        for source in ('plugins { java }', 'plugins { application }',
+                       'plugins { `java-library` }', 'plugins { java', 'apply<JavaPlugin>()',
+                       'plugins.apply<JavaPlugin>()'):
+            with self.subTest(source=source):
+                self.put('clients/mobile/build.gradle.kts', source)
+                errors = checker.check_clients(self.root)
+                self.assertTrue(any('plugin' in error for error in errors), errors)
+
+    def test_android_complete_literal_plugin_notations_remain_approved(self):
+        self.put('clients/mobile/gradle/libs.versions.toml',
+                 '[plugins]\nandroid-application={id="com.android.application",version="8.9"}')
+        for source in (
+            'plugins { id("com.android.application") version "8.9" apply false }',
+            "plugins { id 'com.android.library' version '8.9' apply false }",
+            'plugins { kotlin("android") version "2.1" apply false }',
+            "plugins { kotlin('plugin.compose') }",
+            'plugins { id("com.android.application").version("8.9").apply(false) }',
+            'plugins { alias(libs.plugins.android.application) apply false }',
+            'plugins {\n id ( "com.android.application" )\n kotlin ( "android" )\n}',
+            'plugins { id("com.android.application"); kotlin("android") }',
+            'plugins { kotlin("android") }\nkotlin { jvmToolchain(17) }',
+        ):
+            with self.subTest(source=source):
+                self.put('clients/mobile/build.gradle.kts', source)
+                self.assertEqual([], checker.check_clients(self.root))
+
     def test_android_negative_real_gradle_catalog_import_build_workflow_controls(self):
         cases = {
             'clients/mobile/model.ts': 'export type Model = {};',

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "java-shortcut",
+    "source": "plugins { java }",
+    "errors": []
+  },
+  {
+    "name": "application-shortcut",
+    "source": "plugins { application }",
+    "errors": []
+  },
+  {
+    "name": "generic-apply",
+    "source": "apply<org.gradle.api.plugins.JavaPlugin>()",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle.kts: unresolved/dynamic Android dependency declaration .plugins.JavaPlugin>()"
+    ]
+  },
+  {
+    "name": "generic-manager",
+    "source": "plugins.apply<org.gradle.api.plugins.JavaPlugin>()",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle.kts: unresolved/dynamic Android dependency declaration .plugins.JavaPlugin>()"
+    ]
+  }
+]

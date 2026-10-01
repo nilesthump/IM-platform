@@ -1,0 +1,9 @@
+# Client architecture complete plugin selector fix recovery point
+
+Date: 2026-10-01. Task LOOP1-CLIENT-ARCH-CLARIFICATION-001 review; S1 PASS/S2 OPEN. Starting candidate8109b5ec1101efc18294618fd0a88b7499d4cccf failed fresh independent Review despite hosted36863598509 all13success. Current recovery point is final clean branch HEAD after bounded Fix/evidence/Recorder archival; exact final SHA in external postfinish.json and Coordinator discovery. Last known good accepted rollback3f352a8e465c0c4b093cca8e5f404ea587550b6e.
+
+Complete id/kotlin literal selectors, supported plugins block declarations/modifiers, typedapply rejection; concrete RED/GREEN controls. Frozen v1.1 canonicalaa239802/PDF546915 unchanged; no public contract/schema/migration/product/dependency change. Mobile Android Kotlin/JetpackCompose under same contracts/fixtures; Desktop SQLx native atomicadapter/WebDesktopsharedTS unaffected. Local Frozen49/sourceall0/CI30 PASS;4 Windows real-symlink privilege skips exposed, hosted Linux must execute. Local/Recorder PASS does not establish acceptance.
+
+Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-literal-guard-fix/local.md, command-history.json, unchanged independent Review/CI/runtime copies, preservation.json, recorder-summary.md. Recorder prospective_resume incomplete startup/errors disclosed. Full raw Human12 intentional Markdownhardbreak whitespace preserved; correction/CR-aware full exceptONLY unchangedrawattachment PASS required. Original H:/IM-platform744 unknown files, old archives/authority/PDF/history immutable. Fix sole writer released only after finalcleancommit; no productservices, Coordinator adb ownership.
+
+Next exact action: NEW independent Reviewer clean finalHEAD/fullrollbackrange plus clean Recovery Acceptance and actual exact-head hosted CI; only Coordinator may accept done afterward. S2 product work has not started.

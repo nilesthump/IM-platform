@@ -1,0 +1,1 @@
+plugins { id("com.android.application".replace("com.android.application", "java")) }

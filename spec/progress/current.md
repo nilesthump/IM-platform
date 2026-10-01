@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: client-architecture-clarification-before-S2
 Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 Current Task State: review
-Execution Status: GRADLE_PLUGIN_GUARD_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
+Execution Status: PLUGIN_LITERAL_GUARD_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
 
 ## Immediately Relevant Completed Work
 
@@ -15,7 +15,7 @@ Human-approved v1.1 clarification corrected before acceptance: Mobile Android Ko
 
 ## Current Blockers
 
-Independent Review of b941df7 FAIL: variable apply plugin and unresolved catalog alias.get bypasses. Prior hosted36861112222 all13 SUCCESS cannot accept. Narrow repair locally verified; NEW independent Review and exact-head hosted CI pending. Mobile framework is explicitly Android Kotlin + Jetpack Compose; Android Studio emulator validation follows. Desktop SQLx(SQLite) explicitly approved; no other dependency selection permitted.
+Fresh independent Review exact8109 FAIL: approved plugin literal prefix transforms into builtin java; actual Gradle runtime proves bypass despite hosted36863598509 all13 SUCCESS. Fresh bounded complete selector fix locally passes; NEW independent Review and exact-head hosted CI required before done/product. S2 OPEN; no additional dependency choice authorized.
 
 ## Verification
 
@@ -44,7 +44,7 @@ Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-client-architecture-gradle-guard-fix.md`.
+`spec/progress/checkpoints/2026-10-01-client-architecture-plugin-literal-guard-fix.md`.
 
 ## Uncommitted Changes / Ownership
 
@@ -54,8 +54,6 @@ Fix Agent owns only final archive/discovery edits until clean final candidate co
 
 Human authorizes only client clarification ADR0005/v1.1 and guards; version remains v1.1, canonical bytes/hash changed. Mobile Android Kotlin/Compose authorized by exact supplemental Human decision; all additional undecided sensitive dependencies follow BLOCKED_BY_ARCHITECTURE. Desktop uses approved Tauri + SQLx(SQLite) atomic transaction adapter. S2 OPEN.
 
-## Gradle guard correction (2026-10-01; unfinished review)
+## Complete plugin selector correction (2026-10-01; unfinished review)
 
-Fresh Fix Agent /root/gradle_plugin_guard_fix repairs independently proven Android plugin bypasses from cleanb941df7; task remains review/S2 OPEN. Existing checker + bounded regression controls only, no authority/product/contract change. Local Frozen46/sourceall0/architecture46/CI30 PASS with4 existing Windows real-symlink privilege skips; Recovery Development/clean committed Acceptance and preservation discovery in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/gradle-plugin-guard-fix/local.md and command-history.json. Initial RED3 and failed external edit-script quoting preserved; Recorder prospective_resume discloses startup. Independent FAIL report/probes byte copies in same evidence directory. PriorCI36861112222 all13success never substitutes Review. Next exact action: NEW fresh independent Review of clean finalHEAD/full rollback3f..HEAD plus actual exact-head CI before done/product. Last known good rollback3f352a8; sole Fix writer releases after archive-only finalcommit checks; no unknown candidate changes/services. Original744 files/history/approval/Recorder unchanged; Coordinator owns adb.
-
-Gradle guard Fix Recorder finished/validated PASS61 manifest4b8c3cf2dad66bf2a99e51f80f4f31c7e14b67d7f3a9a054f4ca0e8742b73781; immutable archive/limitations/postfinish boundary in gradle-plugin-guard-fix/recorder-summary.md. Clean Recovery Acceptance PASS5157b4c; final archive-onlyHEAD checks external gradle-plugin-guard-fix-20261001/postfinish.json. Sole writer released after finalcleancommit; NEW independent Review/full3f..HEAD and actual exact-head hosted CI required before done/product. Task remains review/S2 OPEN; no self-acceptance.
+Fresh Fix /root/plugin_literal_guard_fix validates complete id/kotlin selectors and supported plugin-block entries; preserves literal/catalog/version/applyfalse/Kotlin configuration. Concrete runtime proofs also confirm java shortcut/typedapply bypasses; repair rejects them. Local Frozen49/no skips, sourceall0, CI30/4 exposed existing Windows symlink privilege skips PASS. RED18/first GREEN1 repaired, prior independent FAIL/CI/runtime evidence unchanged. Recovery Development/clean committed Acceptance/scope-preservation discovery and exact command histories in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-literal-guard-fix/. Recorder R-PLUGIN-LITERAL-FIX-20261001 prospective_resume captures complete assignment/dispatch/activation; incomplete read-only startup/errors disclosed. Fix owns bounded correction until final cleancommit/release. NEW fresh independent Review finalHEAD/full3f..HEAD and actual exact-head CI remain necessary; task review/S1 PASS/S2 OPEN, last known good rollback3f352a8. Original744 files/authority/approval/previous evidence/Recorder immutable; no product/services; Coordinator adb ownership.
