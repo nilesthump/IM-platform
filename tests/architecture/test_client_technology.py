@@ -157,6 +157,38 @@ class ClientTechnologyControls(unittest.TestCase):
                 self.assertTrue(checker.client_task_violations(declarations.replace(old, new), 'TASK.md', self.root))
         self.assertTrue(checker.client_task_violations(declarations.replace('clients/mobile/', 'clients/shared/'), 'TASK.md', self.root))
 
+    def test_android_plugin_declarations_fail_closed(self):
+        cases = {
+            'variable-apply': 'def selected = "java"\napply plugin: selected',
+            'variable-apply-approved-value': 'def selected = "com.android.application"\napply plugin: selected',
+            'unresolved-get-alias': 'plugins { alias(libs.plugins.unapproved.get()) }',
+            'dynamic-alias': 'plugins { alias(libs.plugins[selected]) }',
+            'dynamic-get-alias': 'plugins { alias(selected.get()) }',
+            'wrong-catalog-alias': 'plugins { alias(libs.unapproved) }',
+        }
+        for name, content in cases.items():
+            with self.subTest(name=name):
+                self.put('clients/mobile/build.gradle.kts' if 'alias' in name else 'clients/mobile/build.gradle', content)
+                errors = checker.check_clients(self.root)
+                self.assertTrue(errors, name)
+                self.assertTrue(any('plugin' in error for error in errors), errors)
+                for suffix in ('.gradle', '.gradle.kts'):
+                    (self.root/('clients/mobile/build' + suffix)).unlink(missing_ok=True)
+
+    def test_android_literal_and_direct_catalog_plugins_remain_approved(self):
+        self.put('clients/mobile/gradle/libs.versions.toml', '[plugins]\nandroid-application={id="com.android.application",version="8.9"}')
+        cases = (
+            'apply plugin: "com.android.application"',
+            "apply plugin: 'org.jetbrains.kotlin.android'",
+            'plugins { id("com.android.application") }',
+            'plugins { id "com.android.application" }',
+            'plugins { alias(libs.plugins.android.application) }',
+        )
+        for content in cases:
+            with self.subTest(content=content):
+                self.put('clients/mobile/build.gradle', content)
+                self.assertEqual([], checker.check_clients(self.root))
+
     def test_android_negative_real_gradle_catalog_import_build_workflow_controls(self):
         cases = {
             'clients/mobile/model.ts': 'export type Model = {};',

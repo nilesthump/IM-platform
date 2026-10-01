@@ -335,9 +335,15 @@ def check_android(root, policy):
             for coordinate in re.findall(r'["\']([\w.\-]+:[\w.\-]+)(?::[^"\']*)?["\']', code):
                 if coordinate not in policy['mobile_dependencies']:
                     errors.append(f'CLIENT {relative}: unapproved Android Gradle dependency {coordinate}')
-            for alias in re.findall(r'\balias\s*\(\s*libs\.plugins\.([\w.]+)\s*\)', code):
-                if alias not in catalog_plugins:
-                    errors.append(f'CLIENT {relative}: unresolved Android plugin alias {alias}')
+            # Check every declaration start, not only already-literal/resolved forms.
+            for declaration in re.finditer(r'\bapply\s+plugin\s*:\s*', code):
+                expression = code[declaration.end():]
+                if not re.match(r"([\"'])([^\"']+)\1[ \t]*(?=$|[\n;}])", expression):
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android apply plugin declaration')
+            for declaration in re.finditer(r'\balias\s*\(\s*', code):
+                alias = re.match(r'libs\.plugins\.([\w.]+)\s*\)', code[declaration.end():])
+                if not alias or alias.group(1) not in catalog_plugins:
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin alias')
             # Every dependency call must be a literal approved coordinate, a checked
             # catalog alias, BOM platform wrapper, or an internal Android project.
             calls = re.findall(r'\b(?:implementation|api|compileOnly|runtimeOnly|classpath|kapt|ksp|annotationProcessor|\w*Implementation)\s*(?:\(\s*)?([^\n;{}]+)', code)

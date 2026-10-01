@@ -1,0 +1,886 @@
+{
+  "result": "FAIL",
+  "independence": "Fresh Review context neither implemented nor fixed candidate; no candidate writes/fixes/queue acceptance/push/merge/services.",
+  "candidate": "b941df7bcf202c4f72f0443eaf34f222b38ca3b3",
+  "range": "3f352a8e465c0c4b093cca8e5f404ea587550b6e..b941df7bcf202c4f72f0443eaf34f222b38ca3b3",
+  "checkout": "H:/icm clean detached HEAD; status_entries=0",
+  "findings": [
+    {
+      "priority": "P1",
+      "file": "ci/check_architecture.py",
+      "lines": "328-331,352-353",
+      "title": "Reject variable Groovy apply-plugin declarations",
+      "reproduction": "def selected = \"java\"\napply plugin: selected",
+      "actual": "check_clients returns [] while literal apply plugin: \"java\" is rejected",
+      "requirement": "Task acceptance requires direct Android plugin/build negative controls; check_android docstring promises unresolved/dynamic notation fails closed; canonical mobile_plugins excludes java.",
+      "repair": "Recognize apply plugin declarations in all supported forms and reject unresolved values; add direct and variable controls."
+    },
+    {
+      "priority": "P2",
+      "file": "ci/check_architecture.py",
+      "lines": "338-340,352-353",
+      "title": "Validate complete catalog plugin alias expressions",
+      "reproduction": "plugins { alias(libs.plugins.unapproved.get()) }",
+      "actual": "check_clients returns [] with no catalog or resolvable approved alias",
+      "requirement": "Task acceptance requires Android version-catalog/plugin alias guards; unresolved/dynamic plugin declarations must fail closed.",
+      "repair": "Resolve supported terminal get() aliases or reject them, and reject other unresolved alias expressions; add negative controls."
+    }
+  ],
+  "local": "Recovery Acceptance exit0; Frozen44 tests no skips exit0; current sourceall zero violations exit0; CI30 exit0 with4 exposed Windows real-symlink privilege skips. Full-range diffcheck exit1 only12 immutable original Human attachment Markdown hardbreaks with cr-at-eol; correction and fullrange excluding exact attachment exit0. Raw CRLF-unaware check also reports preserved CRLF approval attachments; not rewritten.",
+  "preservation": "Git tree-object comparison: product/contracts/Recorder/PDF/oldADRs unchanged from3f; old188 changes limited17 current authority/governance/checker/task/progress files, existing implementation approval/evidence/archive preserved. Both immutable recorder archives validate exit0 (67 and52 events).",
+  "hosted": "Independently queried PR run36861112222 exact candidate; classify architecture source_go source_java go java web desktop mobile shared compatibility deploy gate all13success; no skipped jobs. Full checker/workflow range selects all. Hosted success does not repair bypass findings or permit Task/S2 PASS.",
+  "research_limitation": "Assignment-summary-only prompt and incomplete pre-Recorder reads explicitly exposed by instrumentation_warning; research structural validation is separate from review/task acceptance.",
+  "next": "Coordinator fresh Fix Agent then NEW fresh independent Reviewer and new exact-head hosted acceptance. S2 remains OPEN; product coding stays gated.",
+  "commands_observed": [
+    {
+      "data": {
+        "capture_mode": "prospective_resume",
+        "pre_recorder_trace_complete": false,
+        "pre_recorder_work": true,
+        "prompt_id": "P-KOTLIN-REVIEW-20261001"
+      },
+      "event_hash": "a70f6f1cc63151dfd5d9071f39bf5bb9693883d8d563629191f6b1f7f4919bc6",
+      "event_type": "run_started",
+      "previous_event_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 1,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:23:24.233280Z"
+    },
+    {
+      "data": {
+        "last_known_good_commit": "3f352a8e465c0c4b093cca8e5f404ea587550b6e",
+        "latest_checkpoint": "spec/progress/checkpoints/2026-10-01-client-architecture-mobile-correction.md",
+        "path": "spec/progress/current.md",
+        "presence": "present",
+        "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+        "task_owner": "Coordinator; fresh independent Review pending",
+        "task_queue": "review",
+        "task_state": "review"
+      },
+      "event_hash": "7aec720936337126560634598cf2d8ec2c0bc1d1d4b81379578968416ce007bd",
+      "event_type": "task_state_observed",
+      "previous_event_hash": "a70f6f1cc63151dfd5d9071f39bf5bb9693883d8d563629191f6b1f7f4919bc6",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 2,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:23:24.234286Z"
+    },
+    {
+      "data": {
+        "branch": "detached",
+        "changed_paths": [],
+        "clean": true,
+        "diff_stat": [],
+        "head_sha": "b941df7bcf202c4f72f0443eaf34f222b38ca3b3",
+        "repo_identifier": "icm",
+        "status_porcelain": []
+      },
+      "event_hash": "69843bb6ff63231e72f23299f6654463d1e67fdfcf38d56e7c3b84955e244172",
+      "event_type": "git_state_observed",
+      "previous_event_hash": "7aec720936337126560634598cf2d8ec2c0bc1d1d4b81379578968416ce007bd",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 3,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:23:24.236283Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-Command",
+          "[Console]::OutputEncoding=[Text.UTF8Encoding]::new(); Get-Content -Encoding utf8 AGENTS.md,spec/governance/minimality.md,spec/governance/execution-boundaries.md,spec/governance/independent-review.md,spec/governance/technology-selection.md,spec/architecture/decisions/ADR-0005-client-technology-clarification.md; Get-Content -Encoding utf8 spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-desktop-sqlx-mobile-emulator-decision.txt,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt"
+        ],
+        "command_id": "C-13bea73a-a09b-46a7-9eb7-3103c2f0e6d2",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "998d4129b20e0785a7328a699dc4bf6dfd4deebe65bddbe5ea6dfeab8cea0103",
+      "event_type": "command_started",
+      "previous_event_hash": "69843bb6ff63231e72f23299f6654463d1e67fdfcf38d56e7c3b84955e244172",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 4,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:23:43.251642Z"
+    },
+    {
+      "data": {
+        "command_id": "C-13bea73a-a09b-46a7-9eb7-3103c2f0e6d2",
+        "duration_ms": 562.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-13bea73a-a09b-46a7-9eb7-3103c2f0e6d2.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-13bea73a-a09b-46a7-9eb7-3103c2f0e6d2.stdout.txt",
+        "stdout_sha256": "b1562d37556997f80946a9c82136b6983fea986a7c1b641187ad34ead327292d"
+      },
+      "event_hash": "6f8bba4412e024be01c80aaaa84d5cb80027eb0487012ae98b024c54fa3fac8b",
+      "event_type": "command_finished",
+      "previous_event_hash": "998d4129b20e0785a7328a699dc4bf6dfd4deebe65bddbe5ea6dfeab8cea0103",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 5,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:23:43.814554Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-Command",
+          "Get-Content spec/architecture/decisions/ADR-0001*,spec/architecture/decisions/ADR-0002*,spec/architecture/decisions/ADR-0003*,spec/architecture/decisions/ADR-0004*; git status --porcelain=v1; git diff; git log -5 --oneline; git diff --stat 3f352a8..HEAD; git diff 3f352a8..HEAD -- ci/check_architecture.py ci/classify.py .github/workflows/ci.yml"
+        ],
+        "command_id": "C-fd30d9de-5dd6-46f0-b82a-610aeb27d0c9",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "fb20152858148f08678e01e3a86b04f12bea032ac489a01e94c45739f6d8227c",
+      "event_type": "command_started",
+      "previous_event_hash": "6f8bba4412e024be01c80aaaa84d5cb80027eb0487012ae98b024c54fa3fac8b",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 6,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:24:01.486454Z"
+    },
+    {
+      "data": {
+        "command_id": "C-fd30d9de-5dd6-46f0-b82a-610aeb27d0c9",
+        "duration_ms": 766.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-fd30d9de-5dd6-46f0-b82a-610aeb27d0c9.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-fd30d9de-5dd6-46f0-b82a-610aeb27d0c9.stdout.txt",
+        "stdout_sha256": "e59a5057955e675274c3139658b29cdeeb12b10efcca0ef0386bc371184419cd"
+      },
+      "event_hash": "692e8537d8ba2432da95556ab00e9371002cbe31e484d99ef687a116a492e36a",
+      "event_type": "command_finished",
+      "previous_event_hash": "fb20152858148f08678e01e3a86b04f12bea032ac489a01e94c45739f6d8227c",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 7,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:24:02.257354Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "tools/verify-frozen-architecture.ps1"
+        ],
+        "command_id": "C-f478e32e-faf4-4890-b0e2-298faf691fdc",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "5aa76374e0c659d1f54e642423c88e780f020124f4ade334dc8e11390a602370",
+      "event_type": "command_started",
+      "previous_event_hash": "692e8537d8ba2432da95556ab00e9371002cbe31e484d99ef687a116a492e36a",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 8,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:24:10.025359Z"
+    },
+    {
+      "data": {
+        "command_id": "C-f478e32e-faf4-4890-b0e2-298faf691fdc",
+        "duration_ms": 7109.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-f478e32e-faf4-4890-b0e2-298faf691fdc.stderr.txt",
+        "stderr_sha256": "fc45523b9b4db7b5c5264097c22a7db19952c1cbb3a77cfd53a261d19afdba6c",
+        "stdout_blob": "blobs/C-f478e32e-faf4-4890-b0e2-298faf691fdc.stdout.txt",
+        "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+      },
+      "event_hash": "c75a98a9b1af4f4ca3adac56b2d862c1cb74d56df4cd596a4bf42d93c21e5dab",
+      "event_type": "command_finished",
+      "previous_event_hash": "5aa76374e0c659d1f54e642423c88e780f020124f4ade334dc8e11390a602370",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 9,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:24:17.142283Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-Command",
+          "Get-Content ci/check_architecture.py | Select-Object -Skip 245 -First 135; Get-Content tests/architecture/test_client_technology.py; Get-Content ci/classify.py,ci/check_gate.py,.github/workflows/ci.yml"
+        ],
+        "command_id": "C-28350212-dd64-4895-a5c5-988f2b71b111",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "3658b4ab37c81a71df03a456a5a67158726f7b7c293cab19577992ca970d7278",
+      "event_type": "command_started",
+      "previous_event_hash": "c75a98a9b1af4f4ca3adac56b2d862c1cb74d56df4cd596a4bf42d93c21e5dab",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 10,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:24:37.566397Z"
+    },
+    {
+      "data": {
+        "command_id": "C-28350212-dd64-4895-a5c5-988f2b71b111",
+        "duration_ms": 594.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-28350212-dd64-4895-a5c5-988f2b71b111.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-28350212-dd64-4895-a5c5-988f2b71b111.stdout.txt",
+        "stdout_sha256": "7193cfbedc9aed2f2b7c23a6db5e6b7e7f84708fffb1fc1d9174b03e44500a42"
+      },
+      "event_hash": "9da23351be60ccd5c87fa9200d5490eec306362ad0bb1d33ae6b6e0f446b4d63",
+      "event_type": "command_finished",
+      "previous_event_hash": "3658b4ab37c81a71df03a456a5a67158726f7b7c293cab19577992ca970d7278",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 11,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:24:38.160991Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "tools/verify-loop1-ctrl-002.ps1",
+          "-Mode",
+          "Acceptance"
+        ],
+        "command_id": "C-6aa703fa-3705-44e3-8870-0cd93e5a1590",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "daa8a31bc4213a8de86d136f102b16c61edc664ea520334233d07ed86cf5dd08",
+      "event_type": "command_started",
+      "previous_event_hash": "9da23351be60ccd5c87fa9200d5490eec306362ad0bb1d33ae6b6e0f446b4d63",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 12,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:05.784064Z"
+    },
+    {
+      "data": {
+        "command_id": "C-6aa703fa-3705-44e3-8870-0cd93e5a1590",
+        "duration_ms": 6203.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-6aa703fa-3705-44e3-8870-0cd93e5a1590.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-6aa703fa-3705-44e3-8870-0cd93e5a1590.stdout.txt",
+        "stdout_sha256": "751cbb832872b1f67ede1c26875424697840ae77e94a2a5a9cbcececa45422ce"
+      },
+      "event_hash": "389571a48f71eb4ba80e0e9ab42f2e7d44b629b243fa08607af9dc8017d3bf17",
+      "event_type": "command_finished",
+      "previous_event_hash": "daa8a31bc4213a8de86d136f102b16c61edc664ea520334233d07ed86cf5dd08",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 13,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:11.986264Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/ci",
+          "-v"
+        ],
+        "command_id": "C-fd31d922-5444-4002-a347-0c1d3e5985f5",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "6d1a39774d9e4fcf1c90ade6ac6d63203029c083dc6f572f2ee4cdc221b16c40",
+      "event_type": "command_started",
+      "previous_event_hash": "389571a48f71eb4ba80e0e9ab42f2e7d44b629b243fa08607af9dc8017d3bf17",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 14,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:17.565335Z"
+    },
+    {
+      "data": {
+        "command_id": "C-fd31d922-5444-4002-a347-0c1d3e5985f5",
+        "duration_ms": 2672.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-fd31d922-5444-4002-a347-0c1d3e5985f5.stderr.txt",
+        "stderr_sha256": "53bdc5b5faced79dde10f9aa3138390779044eba131df321ddfd0d4c5be914b6",
+        "stdout_blob": "blobs/C-fd31d922-5444-4002-a347-0c1d3e5985f5.stdout.txt",
+        "stdout_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52"
+      },
+      "event_hash": "3f40df4ffad8da79a6ed237561718559eefca55eaf95b4cdf95c3a8053c2c66e",
+      "event_type": "command_finished",
+      "previous_event_hash": "6d1a39774d9e4fcf1c90ade6ac6d63203029c083dc6f572f2ee4cdc221b16c40",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 15,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:20.233601Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "ci/check_architecture.py",
+          "--scope",
+          "all",
+          "--json"
+        ],
+        "command_id": "C-e8935482-f1d2-434d-a254-3d411d320fb3",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "3ea990febf2140c342908a12d3315e4ce48b4fec6fa74a4eeed3686854c3fabe",
+      "event_type": "command_started",
+      "previous_event_hash": "3f40df4ffad8da79a6ed237561718559eefca55eaf95b4cdf95c3a8053c2c66e",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 16,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:26.207498Z"
+    },
+    {
+      "data": {
+        "command_id": "C-e8935482-f1d2-434d-a254-3d411d320fb3",
+        "duration_ms": 375.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": true,
+        "stderr_blob": "blobs/C-e8935482-f1d2-434d-a254-3d411d320fb3.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-e8935482-f1d2-434d-a254-3d411d320fb3.stdout.txt",
+        "stdout_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f"
+      },
+      "event_hash": "9fb6422f541325846f34890466b47e72de9e7113a73a426bf7befb6f3a54bceb",
+      "event_type": "command_finished",
+      "previous_event_hash": "3ea990febf2140c342908a12d3315e4ce48b4fec6fa74a4eeed3686854c3fabe",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 17,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:26.607042Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/kotlin-client-architecture-review-20261001/probes.py"
+        ],
+        "command_id": "C-5fc5643c-94f0-4076-bae8-edc9d805b360",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "e9100fb43acd3ae99f760e687173eaea665e57cb899a554957222de715803bc6",
+      "event_type": "command_started",
+      "previous_event_hash": "9fb6422f541325846f34890466b47e72de9e7113a73a426bf7befb6f3a54bceb",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 18,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:55.538168Z"
+    },
+    {
+      "data": {
+        "command_id": "C-5fc5643c-94f0-4076-bae8-edc9d805b360",
+        "duration_ms": 375.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-5fc5643c-94f0-4076-bae8-edc9d805b360.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-5fc5643c-94f0-4076-bae8-edc9d805b360.stdout.txt",
+        "stdout_sha256": "a8d3c886cb0ee24d8e21e4103fa66133fb08b1f0c0516a8d87dd174a83daab95"
+      },
+      "event_hash": "f4dcca8bb638cede87c6853aeaf54996f60384b534963b64c1597493f064090e",
+      "event_type": "command_finished",
+      "previous_event_hash": "e9100fb43acd3ae99f760e687173eaea665e57cb899a554957222de715803bc6",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 19,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:25:55.910281Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-Command",
+          "git rev-parse HEAD; git diff --name-only 3f352a8..HEAD -- clients backend contracts deploy migrations database research scalable-distributed-im-architecture.pdf spec/architecture/decisions/ADR-0001* spec/architecture/decisions/ADR-0002* spec/architecture/decisions/ADR-0003* spec/architecture/decisions/ADR-0004*; git diff --check 188d24a..HEAD; git diff --check 3f352a8..HEAD -- . ':!spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-approved-request.txt'; git status --porcelain=v1; "
+        ],
+        "command_id": "C-73a12781-6aea-498d-9580-e93fb53c21e5",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "0f8924ad4d7947c78b7f350ee04a47c6a49ea361dfc086aa07ccef3c38e96633",
+      "event_type": "command_started",
+      "previous_event_hash": "f4dcca8bb638cede87c6853aeaf54996f60384b534963b64c1597493f064090e",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 20,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:30.308007Z"
+    },
+    {
+      "data": {
+        "command_id": "C-73a12781-6aea-498d-9580-e93fb53c21e5",
+        "duration_ms": 735.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-73a12781-6aea-498d-9580-e93fb53c21e5.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-73a12781-6aea-498d-9580-e93fb53c21e5.stdout.txt",
+        "stdout_sha256": "40eaa59467d39f6c4e5fe4796d88c2548ec00c2809cb4ed32a599d7934f03c2f"
+      },
+      "event_hash": "1aaa751346955b70581186ac34d7f67fec0b603b1a24b569774cfd25a409792f",
+      "event_type": "command_finished",
+      "previous_event_hash": "0f8924ad4d7947c78b7f350ee04a47c6a49ea361dfc086aa07ccef3c38e96633",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 21,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:31.041239Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "git",
+          "-c",
+          "core.whitespace=cr-at-eol",
+          "diff",
+          "--check",
+          "3f352a8..HEAD",
+          "--",
+          ".",
+          ":!spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-approved-request.txt"
+        ],
+        "command_id": "C-b0e68a56-cf96-4ea5-8564-b106a654a3d7",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "264e1f3ad011acb8d393c1e69e413d3314639a32aa46536266cbd22f9630fb65",
+      "event_type": "command_started",
+      "previous_event_hash": "1aaa751346955b70581186ac34d7f67fec0b603b1a24b569774cfd25a409792f",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 22,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:54.152660Z"
+    },
+    {
+      "data": {
+        "command_id": "C-b0e68a56-cf96-4ea5-8564-b106a654a3d7",
+        "duration_ms": 47.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-b0e68a56-cf96-4ea5-8564-b106a654a3d7.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-b0e68a56-cf96-4ea5-8564-b106a654a3d7.stdout.txt",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "event_hash": "81ba109691835f9a9a75f5bb96a1b7bea2c883dee440f55aeccfd0b506225604",
+      "event_type": "command_finished",
+      "previous_event_hash": "264e1f3ad011acb8d393c1e69e413d3314639a32aa46536266cbd22f9630fb65",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 23,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:54.201022Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "git",
+          "-c",
+          "core.whitespace=cr-at-eol",
+          "diff",
+          "--check",
+          "188d24a..HEAD"
+        ],
+        "command_id": "C-b349aaae-144c-4f33-9d13-d07514cbc6a9",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "a71eb15f5516c028add677b106228b79309bd94d3c8a4c51bcd738b2d8f0bb6d",
+      "event_type": "command_started",
+      "previous_event_hash": "81ba109691835f9a9a75f5bb96a1b7bea2c883dee440f55aeccfd0b506225604",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 24,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:54.282380Z"
+    },
+    {
+      "data": {
+        "command_id": "C-b349aaae-144c-4f33-9d13-d07514cbc6a9",
+        "duration_ms": 47.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-b349aaae-144c-4f33-9d13-d07514cbc6a9.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-b349aaae-144c-4f33-9d13-d07514cbc6a9.stdout.txt",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "event_hash": "9dd6bf2eaebcdf4c5615415784b09729389d3c10665d5610d72fc63893ebc082",
+      "event_type": "command_finished",
+      "previous_event_hash": "a71eb15f5516c028add677b106228b79309bd94d3c8a4c51bcd738b2d8f0bb6d",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 25,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:54.331104Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "gh",
+          "run",
+          "view",
+          "36861112222",
+          "--repo",
+          "nilesthump/IM-platform",
+          "--json",
+          "headSha,conclusion,status,jobs"
+        ],
+        "command_id": "C-f84d829f-b6d0-41cf-bf53-8e1e84c77a14",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "b4a8f994c29fc9339b948ed94f2e4042e4ec4b799fa32ea2508be76b9ee6f3c9",
+      "event_type": "command_started",
+      "previous_event_hash": "9dd6bf2eaebcdf4c5615415784b09729389d3c10665d5610d72fc63893ebc082",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 26,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:54.422425Z"
+    },
+    {
+      "data": {
+        "command_id": "C-f84d829f-b6d0-41cf-bf53-8e1e84c77a14",
+        "duration_ms": 1953.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-f84d829f-b6d0-41cf-bf53-8e1e84c77a14.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-f84d829f-b6d0-41cf-bf53-8e1e84c77a14.stdout.txt",
+        "stdout_sha256": "fb651962536c944a45c4f365021f95ddf5e058450429f8e59c8f41b6d551c4ae"
+      },
+      "event_hash": "58beb8e183bf44e6397ed254b21c6093be75ca8f3acbb3dd10047f6668901baf",
+      "event_type": "command_finished",
+      "previous_event_hash": "b4a8f994c29fc9339b948ed94f2e4042e4ec4b799fa32ea2508be76b9ee6f3c9",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 27,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:26:56.383656Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/kotlin-client-architecture-review-20261001/preservation.py"
+        ],
+        "command_id": "C-374a8c4e-50c7-4d9a-bc69-16c924d595d1",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "db3e6eea6c6a8a82893eb2fb127f9e43340260897fc8ff136b8d37124e7a88d8",
+      "event_type": "command_started",
+      "previous_event_hash": "58beb8e183bf44e6397ed254b21c6093be75ca8f3acbb3dd10047f6668901baf",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 28,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:27:21.330031Z"
+    },
+    {
+      "data": {
+        "command_id": "C-374a8c4e-50c7-4d9a-bc69-16c924d595d1",
+        "duration_ms": 312.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-374a8c4e-50c7-4d9a-bc69-16c924d595d1.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-374a8c4e-50c7-4d9a-bc69-16c924d595d1.stdout.txt",
+        "stdout_sha256": "7fcfcbe3a087655b40d39079f740d16072abb56815523bb317c3aae60b515761"
+      },
+      "event_hash": "e1f843e4292be9d93a95b15d47359e4c6ed46f1200d502e3109d1f71bbc3c4e3",
+      "event_type": "command_finished",
+      "previous_event_hash": "db3e6eea6c6a8a82893eb2fb127f9e43340260897fc8ff136b8d37124e7a88d8",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 29,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:27:21.636798Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "tools/research/recorder.py",
+          "validate-run",
+          "--repo",
+          "H:/icm",
+          "--research-root",
+          "H:/.codex/evidence/kotlin-client-architecture-review-20261001/archives/implementation-recorder",
+          "--run-id",
+          "R-CLIENT-ARCH-IMPLEMENTATION-20261001"
+        ],
+        "command_id": "C-67482251-d095-4c09-9b1f-3fd954f818d7",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "cc76ae6fd93e76794b8d32e7dedee60535ff9807ab33d3672227e58025475581",
+      "event_type": "command_started",
+      "previous_event_hash": "e1f843e4292be9d93a95b15d47359e4c6ed46f1200d502e3109d1f71bbc3c4e3",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 30,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:27:45.780684Z"
+    },
+    {
+      "data": {
+        "command_id": "C-67482251-d095-4c09-9b1f-3fd954f818d7",
+        "duration_ms": 78.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-67482251-d095-4c09-9b1f-3fd954f818d7.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-67482251-d095-4c09-9b1f-3fd954f818d7.stdout.txt",
+        "stdout_sha256": "507cf35297778a80e8cd7168c22ebcb55588cea3716f2aa1f7f64f410eb49228"
+      },
+      "event_hash": "e5def4c6fc46a71b828025f88a6c7e3d84f93b061ab88e8c10b66a2e1e6fb963",
+      "event_type": "command_finished",
+      "previous_event_hash": "cc76ae6fd93e76794b8d32e7dedee60535ff9807ab33d3672227e58025475581",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 31,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:27:45.861982Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "tools/research/recorder.py",
+          "validate-run",
+          "--repo",
+          "H:/icm",
+          "--research-root",
+          "H:/.codex/evidence/kotlin-client-architecture-review-20261001/archives/mobile-correction-recorder",
+          "--run-id",
+          "R-CLIENT-MOBILE-CORRECTION-20261001"
+        ],
+        "command_id": "C-90238eba-ee96-4b1b-9bf0-12061031aa81",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "ef04c49df6bf30893cf52bdb07dd73b2fd17a2911deb2c1ac6b4cfabe1ca907d",
+      "event_type": "command_started",
+      "previous_event_hash": "e5def4c6fc46a71b828025f88a6c7e3d84f93b061ab88e8c10b66a2e1e6fb963",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 32,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:27:45.950302Z"
+    },
+    {
+      "data": {
+        "command_id": "C-90238eba-ee96-4b1b-9bf0-12061031aa81",
+        "duration_ms": 78.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-90238eba-ee96-4b1b-9bf0-12061031aa81.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-90238eba-ee96-4b1b-9bf0-12061031aa81.stdout.txt",
+        "stdout_sha256": "103028baf1d22e0aca715191516919dbc9793604f692e122d90c104ae89adebe"
+      },
+      "event_hash": "980a4b3be726ba146d0202df201b3afed64978900073c26f451beb1cf08f05f0",
+      "event_type": "command_finished",
+      "previous_event_hash": "ef04c49df6bf30893cf52bdb07dd73b2fd17a2911deb2c1ac6b4cfabe1ca907d",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 33,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:27:46.034424Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/kotlin-client-architecture-review-20261001/confirm.py"
+        ],
+        "command_id": "C-a37d72b1-60c8-4d56-8013-d7329508c081",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "1b4a898ea70d8470256a1c74e1e4f9ad08d4dd3fe634da344a960d1c0d2fed12",
+      "event_type": "command_started",
+      "previous_event_hash": "980a4b3be726ba146d0202df201b3afed64978900073c26f451beb1cf08f05f0",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 34,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:28:17.049889Z"
+    },
+    {
+      "data": {
+        "command_id": "C-a37d72b1-60c8-4d56-8013-d7329508c081",
+        "duration_ms": 125.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-a37d72b1-60c8-4d56-8013-d7329508c081.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-a37d72b1-60c8-4d56-8013-d7329508c081.stdout.txt",
+        "stdout_sha256": "2b1f2f12421248ba0f70c75a914aa17fd24d03d3781100a0921e6836d8b5969d"
+      },
+      "event_hash": "45ddfe55bc825f971e76d665fa5326ad96a609ed581e94c8d66511e062d6a06d",
+      "event_type": "command_finished",
+      "previous_event_hash": "1b4a898ea70d8470256a1c74e1e4f9ad08d4dd3fe634da344a960d1c0d2fed12",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 35,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:28:17.177586Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "git",
+          "-c",
+          "core.whitespace=cr-at-eol",
+          "diff",
+          "--check",
+          "3f352a8..HEAD"
+        ],
+        "command_id": "C-69eb502f-9500-4871-86ba-e90fc981bfeb",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "dc6f012079a18cf527943adb59dacd3016559b9dd8dfcfa4aad7e3037e104155",
+      "event_type": "command_started",
+      "previous_event_hash": "45ddfe55bc825f971e76d665fa5326ad96a609ed581e94c8d66511e062d6a06d",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 36,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:28:17.254244Z"
+    },
+    {
+      "data": {
+        "command_id": "C-69eb502f-9500-4871-86ba-e90fc981bfeb",
+        "duration_ms": 47.0,
+        "exit_code": 2,
+        "result": "FAIL",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-69eb502f-9500-4871-86ba-e90fc981bfeb.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-69eb502f-9500-4871-86ba-e90fc981bfeb.stdout.txt",
+        "stdout_sha256": "3ee3312e6f55ddfc68751917c62df3e330fa45e95cdfe8ddbfc3232c9d9077e3"
+      },
+      "event_hash": "02494f1157d2fbfb4286b9a42b5ce3b2953c12959653ff6e10e37db493a0a93e",
+      "event_type": "command_finished",
+      "previous_event_hash": "dc6f012079a18cf527943adb59dacd3016559b9dd8dfcfa4aad7e3037e104155",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 37,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:28:17.303153Z"
+    },
+    {
+      "data": {
+        "summary": "Initial registered prompt is a delegated-assignment summary, not byte-complete parent payload or Human prompt; metadata full/human must not be interpreted as complete Human-prompt capture. Pre-Recorder startup reads are explicitly incomplete prospective_resume. A few ancillary read-only commands and external script creation were not individually routed through run-command; substantive tests/probes/preservation/CI were recorded."
+      },
+      "event_hash": "8a7146cf0637a1155e4c0fea9a29d12066979d9b027fb004f1a0c776bcbe29bc",
+      "event_type": "instrumentation_warning",
+      "previous_event_hash": "02494f1157d2fbfb4286b9a42b5ce3b2953c12959653ff6e10e37db493a0a93e",
+      "role": "review",
+      "run_id": "R-KOTLIN-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 38,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:28:54.324412Z"
+    }
+  ]
+}

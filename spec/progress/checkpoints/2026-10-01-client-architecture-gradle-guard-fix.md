@@ -1,0 +1,7 @@
+# Client architecture Gradle guard recovery checkpoint
+
+Stable corrective slice from cleanb941df7; final candidate is branch HEAD after archive commit. Task LOOP1-CLIENT-ARCH-CLARIFICATION-001 remains review, independent Review FAIL repaired locally but not accepted; S1 PASS/S2 OPEN. Canonical aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c / PDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 unchanged. No product/contracts/schema change; goldenfixture1.1/database0001 unchanged. Last known good accepted rollback3f352a8e465c0c4b093cca8e5f404ea587550b6e.
+
+Existing Android checker now rejects variable apply plugins and unresolved/dynamic aliases, while approved literal/direct catalog controls pass. Local Frozen46/sourceall0/architecture46/CI30 PASS, 4 exposed Windows symlink skips. Full exact commands/elapsed/results and independent FAIL copies are in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/gradle-plugin-guard-fix/. Finished Recorder archive/clean Recovery Acceptance discovery follow there. No acceptance inferred from priorCI36861112222 SUCCESS.
+
+Fresh Fix Agent owns only this correction until clean finalHEAD writer release. NEW fresh independent Reviewer and actual exact-head hosted CI required before done/product activation. Existing immutable attachments/evidence/history preserved; raw original Human Markdown12 hardbreak diff whitespace exceptions disclosed. No services started.

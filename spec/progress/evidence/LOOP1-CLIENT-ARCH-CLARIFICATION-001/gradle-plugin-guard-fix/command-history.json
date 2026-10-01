@@ -1,0 +1,243 @@
+[
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "[Console]::OutputEncoding=[Text.UTF8Encoding]::new(); Get-Content -Encoding utf8 spec/architecture/frozen-architecture.md,spec/governance/minimality.md,spec/governance/execution-boundaries.md,spec/governance/independent-review.md,spec/governance/technology-selection.md; Get-Content -Encoding utf8 spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-approved-request.txt,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-desktop-sqlx-mobile-emulator-decision.txt,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt; git status --short; git diff; git log -5 --oneline; Get-Content ci/check_architecture.py | Select-Object -Skip 245 -First 140; Get-Content tests/architecture/test_client_technology.py"
+    ],
+    "command_id": "C-59285e17-223e-48ec-898d-7211c0c24b71",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 813.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-59285e17-223e-48ec-898d-7211c0c24b71.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-59285e17-223e-48ec-898d-7211c0c24b71.stdout.txt",
+    "stdout_sha256": "7bc7132b780dc23b1a11bfca59386862bef529d4c59068db05271b08011fea09"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content ci/check_architecture.py | Select-Object -Skip 255 -First 105; Get-Content spec/governance/minimality.md,spec/governance/execution-boundaries.md,spec/governance/independent-review.md,spec/governance/technology-selection.md; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development"
+    ],
+    "command_id": "C-fd449133-0d31-4267-bbea-d192ca6b1f29",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 7188.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-fd449133-0d31-4267-bbea-d192ca6b1f29.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-fd449133-0d31-4267-bbea-d192ca6b1f29.stdout.txt",
+    "stdout_sha256": "ce46aff8d36afd46475bfc72d2c59197899daf6be926493805f349178c9380a3"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/add-controls.py"
+    ],
+    "command_id": "C-644c6723-9e7b-4d55-b101-6f381d363080",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 63.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-644c6723-9e7b-4d55-b101-6f381d363080.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-644c6723-9e7b-4d55-b101-6f381d363080.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_client_technology.py",
+      "-v"
+    ],
+    "command_id": "C-fdc208ec-1a56-40a1-89f4-a2bc948ae4ab",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 640.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-fdc208ec-1a56-40a1-89f4-a2bc948ae4ab.stderr.txt",
+    "stderr_sha256": "7f01f73447df7091a7637a0d6ba8114859b512ad2e15ce99c462f2f3d8cb19dd",
+    "stdout_blob": "blobs/C-fdc208ec-1a56-40a1-89f4-a2bc948ae4ab.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/repair.py"
+    ],
+    "command_id": "C-65e7f806-2a36-4d7e-ba56-acdcd007d5c0",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-65e7f806-2a36-4d7e-ba56-acdcd007d5c0.stderr.txt",
+    "stderr_sha256": "4fe26b5c3ea858750484241d4b7f48eae89b10e3cd11f7c5be665e3d38327776",
+    "stdout_blob": "blobs/C-65e7f806-2a36-4d7e-ba56-acdcd007d5c0.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_client_technology.py",
+      "-v"
+    ],
+    "command_id": "C-a5447811-410d-4821-9b0a-7b7303d4180e",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 562.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-a5447811-410d-4821-9b0a-7b7303d4180e.stderr.txt",
+    "stderr_sha256": "c4539e00806224cdedc1c54bd9d1f8683f51bf38e7eb3cd61c5b3ccc6b26534c",
+    "stdout_blob": "blobs/C-a5447811-410d-4821-9b0a-7b7303d4180e.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/repair-corrected.py"
+    ],
+    "command_id": "C-68e79043-58a1-4cff-b6da-6cf444e7fe39",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-68e79043-58a1-4cff-b6da-6cf444e7fe39.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-68e79043-58a1-4cff-b6da-6cf444e7fe39.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_client_technology.py",
+      "-v"
+    ],
+    "command_id": "C-17ebcdb7-d0c7-45a6-966e-55e6e90de358",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 547.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-17ebcdb7-d0c7-45a6-966e-55e6e90de358.stderr.txt",
+    "stderr_sha256": "6bbe81e6edb82aef5e79bd964dc3d57112b288e716b90dc38177f71c18ebc853",
+    "stdout_blob": "blobs/C-17ebcdb7-d0c7-45a6-966e-55e6e90de358.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "command_id": "C-5dfe3f38-ac0d-4840-acbb-45881f821814",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 6047.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-5dfe3f38-ac0d-4840-acbb-45881f821814.stderr.txt",
+    "stderr_sha256": "82c64c346deb236550ebfc9b86a60a17bacb2e5fcec9235570ef4e0d35a6cdc5",
+    "stdout_blob": "blobs/C-5dfe3f38-ac0d-4840-acbb-45881f821814.stdout.txt",
+    "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "command_id": "C-7cea8ad9-54fb-43ac-87bf-548272a5d087",
+    "cwd": ".",
+    "secret_redaction_applied": true,
+    "duration_ms": 359.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-7cea8ad9-54fb-43ac-87bf-548272a5d087.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-7cea8ad9-54fb-43ac-87bf-548272a5d087.stdout.txt",
+    "stdout_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-v"
+    ],
+    "command_id": "C-5a31a2f1-8cc5-44fd-b2ee-eb241b12ab8f",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 5609.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-5a31a2f1-8cc5-44fd-b2ee-eb241b12ab8f.stderr.txt",
+    "stderr_sha256": "5a962d140ca9becfe07f79f69f64ae040b28166948a26689aafacca54859a841",
+    "stdout_blob": "blobs/C-5a31a2f1-8cc5-44fd-b2ee-eb241b12ab8f.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/ci",
+      "-v"
+    ],
+    "command_id": "C-314791ec-9917-4c6f-bc56-1c669d276748",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 2656.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-314791ec-9917-4c6f-bc56-1c669d276748.stderr.txt",
+    "stderr_sha256": "a8a6f2b03db62dbd861daf0827b29a86fb6dcb188fb55c5129df68e61d16d2e0",
+    "stdout_blob": "blobs/C-314791ec-9917-4c6f-bc56-1c669d276748.stdout.txt",
+    "stdout_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52"
+  }
+]

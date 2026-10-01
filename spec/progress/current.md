@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: client-architecture-clarification-before-S2
 Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 Current Task State: review
-Execution Status: AUTHORITY_CLARIFICATION_REVIEW_PENDING_PRODUCT_NOT_STARTED
+Execution Status: GRADLE_PLUGIN_GUARD_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
 
 ## Immediately Relevant Completed Work
 
@@ -15,7 +15,7 @@ Human-approved v1.1 clarification corrected before acceptance: Mobile Android Ko
 
 ## Current Blockers
 
-No implementation blocker for clarification. NEW independent Review and exact-head hosted CI pending. Mobile framework is explicitly Android Kotlin + Jetpack Compose; Android Studio emulator validation follows. Desktop SQLx(SQLite) explicitly approved; no other dependency selection permitted.
+Independent Review of b941df7 FAIL: variable apply plugin and unresolved catalog alias.get bypasses. Prior hosted36861112222 all13 SUCCESS cannot accept. Narrow repair locally verified; NEW independent Review and exact-head hosted CI pending. Mobile framework is explicitly Android Kotlin + Jetpack Compose; Android Studio emulator validation follows. Desktop SQLx(SQLite) explicitly approved; no other dependency selection permitted.
 
 ## Verification
 
@@ -44,7 +44,7 @@ Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-client-architecture-mobile-correction.md`.
+`spec/progress/checkpoints/2026-10-01-client-architecture-gradle-guard-fix.md`.
 
 ## Uncommitted Changes / Ownership
 
@@ -53,3 +53,7 @@ Fix Agent owns only final archive/discovery edits until clean final candidate co
 ## Architecture Conflicts / ACP / ADR
 
 Human authorizes only client clarification ADR0005/v1.1 and guards; version remains v1.1, canonical bytes/hash changed. Mobile Android Kotlin/Compose authorized by exact supplemental Human decision; all additional undecided sensitive dependencies follow BLOCKED_BY_ARCHITECTURE. Desktop uses approved Tauri + SQLx(SQLite) atomic transaction adapter. S2 OPEN.
+
+## Gradle guard correction (2026-10-01; unfinished review)
+
+Fresh Fix Agent /root/gradle_plugin_guard_fix repairs independently proven Android plugin bypasses from cleanb941df7; task remains review/S2 OPEN. Existing checker + bounded regression controls only, no authority/product/contract change. Local Frozen46/sourceall0/architecture46/CI30 PASS with4 existing Windows real-symlink privilege skips; Recovery Development/clean committed Acceptance and preservation discovery in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/gradle-plugin-guard-fix/local.md and command-history.json. Initial RED3 and failed external edit-script quoting preserved; Recorder prospective_resume discloses startup. Independent FAIL report/probes byte copies in same evidence directory. PriorCI36861112222 all13success never substitutes Review. Next exact action: NEW fresh independent Review of clean finalHEAD/full rollback3f..HEAD plus actual exact-head CI before done/product. Last known good rollback3f352a8; sole Fix writer releases after archive-only finalcommit checks; no unknown candidate changes/services. Original744 files/history/approval/Recorder unchanged; Coordinator owns adb.
