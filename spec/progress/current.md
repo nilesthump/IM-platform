@@ -20,11 +20,11 @@ Fresh independent Review exactdbb3 FAIL: ordinary Groovy plugins.apply/pluginMan
 ## Verification
 
 - Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
-  - Result: PASS44 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/mobile-correction-local.md`
+  - Result: PASS51 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-application-guard-fix/local.md`
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: Correction Recovery Development PASS; clean committed Acceptance PASS at84a8868e9f17924e34caded18f2a1c808e60dbd6. Archive-only finalHEAD recheck is exposed outside finished trace.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/mobile-correction-command-history.json`
+  - Result: Application correction Recovery Development PASS; clean committed Acceptance PASS atdfd95ecee6687a5d11b9e5f1baf0b9aa7e2978e7. Final archive-only HEAD recheck remains exposed outside finished trace.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-application-guard-fix/command-history.json`
 
 ## Changed Files or Migrations
 
@@ -65,3 +65,5 @@ Literal selector Fix Recorder finished/validated PASS88 manifested9d59b79bcc1554
 ## Plugin application correction (2026-10-01; unfinished review)
 
 Fresh Fix /root/plugin_application_guard_fix owns bounded checker/tests/evidence/current/task/checkpoint correction until clean archive commit/release. Independent dbb3 FAIL/13 hosted SUCCESS copied unchanged to plugin-application-guard-fix/independent-review. Actual offline runtime proves command/variable/closure/methodreference application; RED8/GREEN17 controls, Frozen51/no skips/sourceall0/CI30 with4 exposed Windows1314 skips PASS. No product/authority/publiccontract/dependency changes. Local verification/recovery/preservation discovery in plugin-application-guard-fix/local.md, command-history.json and preservation.json; Recorder/archive/postfinish limitations follow recorder-summary.md. Unique current task review; S1 PASS/S2 OPEN; last known good rollback3f352a8. Next NEW fresh independent Review finalcleanHEAD/full3f..HEAD + actual new exact-head CI, no done/product until acceptance. Prior authority/approval/PDF/human12 hardbreaks/history/Recorder and original744 unknown files preserved. No services; Coordinator adb ownership.
+
+Application Fix clean Recovery/preservation PASSdfd95ec:5966 priorobjects/744 unknownfiles/54rawcopy-source hashes. Initial evidence-directory glob PermissionError and rawscript whitespaceFAIL1 preserved; identical script transported inZIP, focused/full-except-only-rawHuman CR-aware PASS; fullrangeFAIL12 original hardbreaks remains disclosed. Finished Recorder/archive discovery and postfinish boundary follow plugin-application-guard-fix/recorder-summary.md. Fix releases only after final clean archivecommit/recheck; NEW independent Review/actualexactheadCI required.
