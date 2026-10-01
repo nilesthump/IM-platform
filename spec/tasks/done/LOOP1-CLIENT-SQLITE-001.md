@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CLIENT-SQLITE-001
 title: Native client account SQLite repository and transactional convergence
-status: review
-owner: /root/sqlite_event_identity_fix
+status: done
+owner: Coordinator /root
 stage: S2
 gate: S2
 ---
@@ -85,11 +85,11 @@ Minimum pre-edit baseline already observed at accepted HEAD: Recovery Developmen
 
 # Handoff
 
-Fresh Fix writer /root/sqlite_event_identity_fix completed bounded event identity correction and local verification from79d9a2d. All changes belong to this writer until clean candidate commit, then sole writer releases to Coordinator. Original H:/IM-platform and unknown611-file snapshot untouched; historical evidence retained. Last known good accepted main a0f0f137; private schema1 remains unaccepted, no services or architecture conflict. Task remains review/S2 OPEN, independent acceptance pending. Current evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-event-identity-fix/fix-report.md.
+Bounded product accepted at8c6653d by different fresh independent Reviewer plus actual exact-head required hosted CI. Coordinator owns administrative closure only; product writer released and clean. Initial FAIL and all historical records retained. Original checkout remains accepted S1a0 until integration; no unknown work overwritten. S2 OPEN.
 
 # Next Action
 
-Commit locally verified fixed candidate and release writer, then Coordinator delegates NEW independent Reviewer of exact candidate/full accepted-main range and obtains exact-head actual required hosted jobs before done. Full PR range requires13; push jobs selected by actual diff. No selfacceptance or later S2 task.
+Obtain NEW independent Review and exact-head hosted checks of administrative closure, then present concrete PR7 for main merge approval. No later S2 task selection/implementation authorized. Durable accepted product evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-accepted-product-8c6653d/acceptance.md.
 
 # Development implementation handoff (2026-10-01)
 
@@ -118,3 +118,7 @@ Exact d792 independent /root/sqlite_independent_review FAIL P2 eventId discarded
 Fresh /root/sqlite_event_identity_fix from79d9a2d repaired independent d792P2 with one private schema1 user_events identity/payload table and comparison in existing atomic data/cursor transaction. No migration/version invention, pruning/framework/dependency/export/authority/fixture/workflow edits. Nine new actual SQLite regressions RED before correction and GREEN after; shared33/Desktop1/Mobile1 all native strict checks PASS. Governance/sourceall/frozen34/architecture34/CI29/WSS18/Sync79 PASS with exactly4 local Windows symlink privilege skips. Native two-open-connection and reopen tests enforce committed identity; trigger and page conflict rollback include inserted identities. Source diff whitespace checked; this writer's newline normalization fixed, historical archives unchanged.
 
 Evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-event-identity-fix/fix-report.md and command-results.json. External Recorder R-SQLITE-EVENT-FIX-20261001 marks incomplete pre-Recorder preparation. Finish/validation outcome archived separately; staging/commit follows finished trace. Last accepted main a0f0f137; task remains review/S2 OPEN. This writer owns changes until clean fixed-candidate commit then releases; NEW independent Review plus exact-head actual required hosted jobs before done. No later S2 task, service or architecture conflict.
+
+# Accepted bounded product and administrative closure (2026-10-01)
+
+Product8c6653d fresh independent PASS and exact hosted push36847847518/PR36847852183 PASS; accepted-product-8c6653d/acceptance.md preserves full evidence, commands, independence and original611-file preservation proof. Task done applies only to this storage foundation. Historical handoff sections describe earlier unfinished states; primary Handoff/Next Action govern resumption. S2 Gate OPEN; no device/UI or later task acceptance. Administrative final proof remains external to avoid self-referential commit churn. Coordinator owns task/current/checkpoint/evidence closure, no product changes.
