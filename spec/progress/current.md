@@ -35,7 +35,7 @@ Core message/private history/http/outbox and Gateway forwarding/subscription, si
 
 ## Known Failures, Risks, and Assumptions
 
-Setup/compile/canonical precondition/untouched GROUP fixture-oracle failures corrected and preserved in Recorder. Default Windows GBK log inspection failures corrected/disclosed. Recorder startup and limited direct reads/launcher initialization incomplete prospective trace; redaction/UI truncation disclosed. Private history is bounded gap compensation, not a new public Sync feature or TLS-entry E2E. Publication permits duplicates; only test materializer exists. Independent review/security/minimality and real hosted acceptance still pending.
+Setup/compile/canonical precondition/untouched GROUP fixture-oracle failures corrected and preserved in Recorder. Default Windows GBK log inspection failures corrected/disclosed. Recorder finished/validated121events (research-only PASS); startup and limited direct reads/launcher initialization incomplete prospective trace; redaction/UI truncation and terminal post-finish closure disclosed. Private history is bounded gap compensation, not a new public Sync feature or TLS-entry E2E. Publication permits duplicates; only test materializer exists. Independent review/security/minimality and real hosted acceptance still pending.
 
 ## Next Exact Action
 
@@ -47,12 +47,13 @@ NEW independent Review of final clean committed candidate/full branch range; ver
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-go-social-001-merged.md`
+`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-local-review.md`
 
 ## Uncommitted Changes / Ownership
 
-All bound MSG changes and this Task's Recorder/evidence owned by /root/message_implementation until candidate commit, then writer released and clean committed head required. Owned labeled PG/NATS containers/anonymous volume removed, exit0. Original H:/IM-platform and old worktrees/unknown untracked paths untouched; no other writer modified this worktree.
+Development product committed at f64ae64e6e333ee52242b7b2100c663cd1f378c2; latest checkpoint is local review recovery, not accepted Gate. All bound MSG changes and this Task's Recorder/evidence owned by /root/message_implementation until candidate commit, then writer released and clean committed head required. Owned labeled PG/NATS containers/anonymous volume removed, exit0. Original H:/IM-platform and old worktrees/unknown untracked paths untouched; no other writer modified this worktree.
 
 ## Architecture Conflicts / ACP / ADR
 
 None. Private Core-only HTTP adapters and per-user NATS locators reuse authorized boundaries with unchanged canonical payloads/bound bearer; no public contract/security rule change. Only approved Social friend403 exception remains.
+Transport closure: research/.gitattributes originally filtered36 immutable raw artifacts CRLF toLF during staging; raw working validation remained PASS. Coordinator explicitly authorized only own-run .gitattributes, after separate pre-edit path/hash diagnosis. Ordinary add retained cached filtered entries and byte assertion failed; own-run add --renormalize repaired index transport. All124 original prompt/run files now working/index byte-identical; no raw event/blob/hash mutation. Diagnosis and full audit in 2026-10-01-transport-preservation.json / 2026-10-01-transport-byte-audit.json. Initial stage mismatch and dirty Acceptance remain disclosed development failures. Finished Recorder administrative closure remains outside trace.

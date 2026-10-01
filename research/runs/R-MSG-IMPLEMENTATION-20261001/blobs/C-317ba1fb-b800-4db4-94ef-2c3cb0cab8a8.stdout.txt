@@ -1,0 +1,150 @@
+package core
+
+import (
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"io"
+	"net/http"
+	"regexp"
+	"strings"
+	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"golang.org/x/crypto/bcrypt"
+	"im-platform/backend/go/shared"
+)
+
+const accessTTL = 900
+const refreshTTL = 2592000
+
+var usernamePattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]*$`)
+
+type authService struct {
+	db    *pgxpool.Pool
+	codec *shared.Codec
+	now   func() time.Time
+}
+
+type clientInput struct {
+	ClientType      string `json:"clientType"`
+	DeviceID        string `json:"deviceId"`
+	ClientVersion   string `json:"clientVersion"`
+	ProtocolVersion string `json:"protocolVersion"`
+}
+
+type loginInput struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	clientInput
+}
+
+type registerInput struct {
+	Username    string `json:"username"`
+	Password    string `json:"password"`
+	DisplayName string `json:"displayName"`
+}
+
+type refreshInput struct {
+	clientInput
+	RefreshToken string `json:"refreshToken,omitempty"`
+}
+
+func passwordMaterial(password string) []byte {
+	h := sha256.Sum256([]byte("im-password-v1:" + password))
+	return []byte(hex.EncodeToString(h[:]))
+}
+
+func (s *authService) authenticate(ctx context.Context, token string) (claims, error) {
+	c, err := s.codec.Parse(token)
+	if err != nil {
+		return c, err
+	}
+	var sid, typ, status string
+	var epoch int64
+	var expiry time.Time
+	err = s.db.QueryRow(ctx, `SELECT session_id, client_type, session_epoch, status, expires_at FROM sessions WHERE user_id=$1 AND client_type=$2`, c.UserID, c.ClientType).Scan(&sid, &typ, &epoch, &status, &expiry)
+	if errors.Is(err, pgx.ErrNoRows) {
+		var actualType string
+		if s.db.QueryRow(ctx, `SELECT client_type FROM sessions WHERE user_id=$1 AND session_id=$2`, c.UserID, c.SessionID).Scan(&actualType) == nil && actualType != c.ClientType {
+			return c, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Access token does not match the active client session.")
+		}
+		return c, fail(401, "AUTH_SESSION_REVOKED", "Session has been revoked.")
+	}
+	if err != nil {
+		return c, err
+	}
+	if status != "ACTIVE" || !expiry.After(s.now()) {
+		return c, fail(401, "AUTH_SESSION_REVOKED", "Session has been revoked.")
+	}
+	if epoch != c.SessionEpoch {
+		return c, fail(401, "AUTH_SESSION_EPOCH_STALE", "Access token carries a stale session epoch.")
+	}
+	if sid != c.SessionID || typ != c.ClientType {
+		var actualType string
+		if s.db.QueryRow(ctx, `SELECT client_type FROM sessions WHERE user_id=$1 AND session_id=$2`, c.UserID, c.SessionID).Scan(&actualType) == nil && actualType != c.ClientType {
+			return c, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Access token does not match the active client session.")
+		}
+		return c, fail(401, "AUTH_TOKEN_INVALID", "Access token and session binding disagree.")
+	}
+	return c, nil
+}
+
+func validClient(t string) bool { return t == "WEB" || t == "DESKTOP" || t == "MOBILE" }
+func (v clientInput) valid() bool {
+	return validClient(v.ClientType) && len(v.DeviceID) > 0 && len(v.DeviceID) <= 256 && len(v.ClientVersion) > 0 && len(v.ClientVersion) <= 64
+}
+
+func decode(r *http.Request, dst any) error {
+	r.Body = http.MaxBytesReader(nil, r.Body, 65536)
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+package tests
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"im-platform/backend/go/shared"
+	"net/http/httptest"
+	"os"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+func socialDatabase(t *testing.T) (*pgxpool.Pool, *testService) {
+	t.Helper()
+	if os.Getenv("DB_TEST_ENABLE") != "1" {
+		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
+	}
+	ctx := context.Background()
+	db, err := pgxpool.New(ctx, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(db.Close)
+	if err := db.Ping(ctx); err != nil {
+		t.Fatal(err)
+	}
+	return db, newService(db, []byte("test-only-signing-key-at-least-32-bytes"))
+}
+
+func socialUser(t *testing.T, s *testService) (string, string, string) {
+	t.Helper()
+	random, _ := shared.RandomToken(8)
+	name := "social" + strings.ToLower(random[:10])
+	h := s.handler
+	registration := call(t, h, "POST", "/v1/auth/register", map[string]any{"username": name, "password": "fixture-password-not-a-real-secret", "displayName": name}, "", nil)
+	expect(t, registration, 201)
+	id := readResult(t, registration)["user"].(map[string]any)["userId"].(string)
+	login := call(t, h, "POST", "/v1/auth/login", map[string]any{"username": name, "password": "fixture-password-not-a-real-secret", "clientType": "WEB", "deviceId": "browser-1", "clientVersion": "1.0.0", "protocolVersion": "1"}, "", nil)
+	expect(t, login, 200)
+	return id, name, getToken(t, login)

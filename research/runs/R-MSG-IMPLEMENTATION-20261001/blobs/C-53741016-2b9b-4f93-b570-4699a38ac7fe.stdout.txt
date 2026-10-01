@@ -1,0 +1,47 @@
+?   	im-platform/backend/go	[no test files]
+=== RUN   TestMessageConcurrentIdentityAndSequence
+    message_test.go:107: ERROR: inconsistent types deduced for parameter $1 (SQLSTATE 42P08)
+--- FAIL: TestMessageConcurrentIdentityAndSequence (0.02s)
+=== RUN   TestMessageAuthorizationAndIndependentConversations
+    message_test.go:171: ERROR: inconsistent types deduced for parameter $1 (SQLSTATE 42P08)
+--- FAIL: TestMessageAuthorizationAndIndependentConversations (0.01s)
+=== RUN   TestMessageRollbackAndACKAfterCommit
+    message_test.go:203: ERROR: inconsistent types deduced for parameter $1 (SQLSTATE 42P08)
+--- FAIL: TestMessageRollbackAndACKAfterCommit (0.01s)
+=== RUN   TestGroup500SingleLogicalMessageAndOutbox
+    message_test.go:277: ERROR: inconsistent types deduced for parameter $1 (SQLSTATE 42P08)
+--- FAIL: TestGroup500SingleLogicalMessageAndOutbox (0.01s)
+=== RUN   TestMessageOutboxPublicationCanRepeatWithoutNewMessage
+    outbox_test.go:13: ERROR: inconsistent types deduced for parameter $1 (SQLSTATE 42P08)
+--- FAIL: TestMessageOutboxPublicationCanRepeatWithoutNewMessage (0.01s)
+=== RUN   TestClosedNATSPublicationLeavesOutboxRetryable
+    outbox_test.go:70: ERROR: inconsistent types deduced for parameter $1 (SQLSTATE 42P08)
+--- FAIL: TestClosedNATSPublicationLeavesOutboxRetryable (0.01s)
+=== RUN   TestRevocationRollback
+--- PASS: TestRevocationRollback (0.04s)
+=== RUN   TestSocialAssemblyReuseAndRollback
+--- PASS: TestSocialAssemblyReuseAndRollback (0.11s)
+=== RUN   TestAuthorizedHistoryGapPages
+    sync_test.go:12: ERROR: inconsistent types deduced for parameter $1 (SQLSTATE 42P08)
+--- FAIL: TestAuthorizedHistoryGapPages (0.01s)
+FAIL
+FAIL	im-platform/backend/go/core	0.386s
+=== RUN   TestPrivateForwardUsesBoundBearerAndCanonicalFrame
+--- PASS: TestPrivateForwardUsesBoundBearerAndCanonicalFrame (0.00s)
+=== RUN   TestLocalFanoutSelectsUserAndSuppressesOriginOnly
+--- PASS: TestLocalFanoutSelectsUserAndSuppressesOriginOnly (0.16s)
+=== RUN   TestRevocationReasonDoesNotInventBusinessCause
+--- PASS: TestRevocationReasonDoesNotInventBusinessCause (0.00s)
+=== RUN   TestPostgresRevocationReasonUsesExactCommittedIdentity
+--- PASS: TestPostgresRevocationReasonUsesExactCommittedIdentity (0.03s)
+PASS
+ok  	im-platform/backend/go/gateway	0.371s
+?   	im-platform/backend/go/plugin-host	[no test files]
+=== RUN   TestConfigReadsExternalCredentialFiles
+--- PASS: TestConfigReadsExternalCredentialFiles (0.01s)
+=== RUN   TestTokenTamperAndExpiry
+--- PASS: TestTokenTamperAndExpiry (0.00s)
+PASS
+ok  	im-platform/backend/go/shared	0.544s
+FAIL	im-platform/backend/go/tests [build failed]
+FAIL

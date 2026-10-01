@@ -1,0 +1,3 @@
+backend/go/tests/auth_test.go:154:	_ = pre.WriteJSON(frame("message.send", "80000000-0000-4000-8000-000000000001", map[string]any{"conversationId": userID, "content": map[string]string{"kind": "TEXT", "text": "x"}}))
+backend/go/tests/auth_test.go:186:	_ = conn.WriteJSON(frame("message.send", "80000000-0000-4000-8000-000000000010", map[string]any{}))
+backend/go/tests/auth_test.go:193:	if operation["type"] != "message.ack" || operation["payload"].(map[string]any)["error"].(map[string]any)["code"] != "AUTHORIZATION_DENIED" {
