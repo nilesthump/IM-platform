@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-SQLITE-001
 title: Native client account SQLite repository and transactional convergence
 status: review
-owner: /root/s2_sqlite_preparation
+owner: /root/sqlite_event_identity_fix
 stage: S2
 gate: S2
 ---
@@ -108,3 +108,7 @@ No services launched; tests close native connections and delete only their own t
 Next exact action: NEW independent clean committed Review of implementation5613aab..candidate and full accepted-main a0f0f137..candidate, actual SQLite/native/import/minimality checks; applicable exact-head hosted all13 required jobs SUCCESS before done. Mobile host tests are not device/UI acceptance. No later S2 task is authorized. Last accepted main a0f0f137; S1 PASS/S2 OPEN; no architecture conflict.
 
 Recorder finished FAIL65events for initialization error; structural validation PASS. External raw artifacts remain immutable. Post-finish ledger/outcome archival, staging/commit/status are outside the finished trace, explicitly disclosed; no post-finish event stream append.
+
+# Independent Review FAIL and fresh Fix (2026-10-01)
+
+Exact d792 independent /root/sqlite_independent_review FAIL P2 eventId discarded in applyUserPage; canonical oracle rejects same-ID changed payload, actual repository accepted and advanced state/cursor. Full durable byte-preserved report under spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-independent-review-d792-fail/. Hosted d792 push/PR each13SUCCESS does not override FAIL. Fresh /root/sqlite_event_identity_fix now owns bounded repair after explicit release; task remains review, no selfacceptance. Minimal persistence/checking of existing user-event identity and known payload fields inside same data/cursor transaction is presently justified by concrete canonical discrepancy; identical replay, conflicts within/across pages/reopen and rollback must be verified without oracle edits. Last accepted a0f0f137; no services or architecture conflict. Next action fix/commit/release, then NEW independent Reviewer and exact-head selected hosted jobs.

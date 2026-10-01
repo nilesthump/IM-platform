@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: none (first S2 task only)
 Current Task: LOOP1-CLIENT-SQLITE-001
 Current Task State: review
-Execution Status: S2_SQLITE_LOCAL_VERIFIED_INDEPENDENT_REVIEW_PENDING
+Execution Status: S2_SQLITE_REVIEW_FAIL_FRESH_FIX_ASSIGNED
 
 ## Immediately Relevant Completed Work
 
@@ -15,7 +15,7 @@ Bounded native SQLite storage foundation implemented in isolated task branch. Na
 
 ## Current Blockers
 
-No implementation blocker. Fresh independent clean-candidate Review and exact-head hosted all13 required jobs pending. No later S2 task authorized.
+Independent d792 Review FAIL P2: reused user eventId with conflicting payload is accepted. Fresh Fix assigned; no architecture/external blocker. Prior d792 push/PR13/13SUCCESS do not override FAIL. No later S2 task authorized.
 
 ## Verification
 
@@ -33,7 +33,7 @@ Recorder initialization association exit2, initial pub-get cwd exit1 and two fin
 
 ## Next Exact Action
 
-Commit clean review candidate, release sole Implementation writer; Coordinator delegates NEW independent Review of exact candidate then obtains exact-head hosted all13 required jobs before done. No self-acceptance or next-task selection.
+Fresh /root/sqlite_event_identity_fix repairs event identity within existing storage scope and commits a clean candidate; then NEW independent Reviewer and actual exact-head required hosted jobs before done. Full PR range requires13; push jobs match its actual diff. No selfacceptance/next task.
 
 ## Last Known Good Commit
 
@@ -45,8 +45,12 @@ Commit clean review candidate, release sole Implementation writer; Coordinator d
 
 ## Uncommitted Changes / Ownership
 
-Sole Implementation writer /root/s2_sqlite_preparation owns bounded isolated changes until candidate commit, then releases. Original H:/IM-platform and unknown611 files untouched; known prior records retained. No services. Package generated Dart files ignored; only source/locks/evidence staged.
+Original Implementation and first Reviewer released clean d792. Coordinator owns archived FAIL/state assignment until commit; then fresh Fix sole isolated writer. Original H:/IM-platform and unknown611 files untouched; known prior records retained. No services. Package generated Dart files ignored; only source/locks/evidence staged.
 
 ## Architecture Conflicts / ACP / ADR
 
 None. Private schema implements current storage requirements; canonical expected values/public contracts/Frozen/security/ACK unchanged.
+
+## Current Independent Review Evidence
+
+Independent d792 FAIL/report/manifest/native repro and exact hosted all-success evidence archived byte-preserved: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-independent-review-d792-fail/. Parent Coordinator initial auto-review push rejection resolved via public-origin proof, no current access blocker. Original snapshot611 observed files includes owned recovery records and historical unknown files; none changed.
