@@ -1,0 +1,7 @@
+# Finished Fix Recorder archive
+
+Run R-GRADLE-GUARD-FIX-20261001, fresh context /root/gradle_plugin_guard_fix, role fix. Full visible delegated assignment plus activation registered source delegated_assignment (not Human/system prompt), promptP-GRADLE-GUARD-FIX-20261001 SHA6b9295548fef3b3325f8de0e5507b69d6c9c5c50e5376cf47fa6fff1dd0a43f9. ParentR-CLIENT-ARCH-20261001; relatedR-KOTLIN-REVIEW-20261001. capture prospective_resume/pre_recorder_trace_complete=false exposes read-only startup and quoting failure. Ancillary external preparation/script creation unrecorded; substantive edits/commands/verifiers recorded.
+
+Finished PASS61 events; validation exit0/statusfinished; manifest4b8c3cf2dad66bf2a99e51f80f4f31c7e14b67d7f3a9a054f4ca0e8742b73781. Final trace commitfc15bc2 after corrective5157b4c. Recorder PASS is structural only; independent Review FAIL onb941 remains immutable; new Review/exact-head CI mandatory. S2 OPEN.
+
+Postfinish boundary: this byte-preserving archive, discovery summary, task/current pointers and local archive-only commit/checks happen outside finished trace. External postfinish.json records finalHEAD/status/Recovery Acceptance/scope/whitespace exits; finished raw stream never edited. Local Frozen46/architecture46/sourceall0/CI30(4 Windows symlink privilege skips), RED3 and intermediate script/diff failures exposed in local.md/command-history.json/finished archive. Required actual Linux links/new exact-head CI remain independent acceptance work.
