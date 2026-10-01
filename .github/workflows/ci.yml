@@ -226,10 +226,20 @@ jobs:
           packages: platform-tools
       - name: Enable hosted Linux KVM permissions
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-          test -r /dev/kvm && test -w /dev/kvm
+          id
+          if [[ ! -c /dev/kvm ]]; then
+            printf '%s\n' 'ERROR: /dev/kvm is missing or is not a character device.' >&2
+            exit 1
+          fi
+          stat --format='KVM before: %F %a %U:%G' /dev/kvm
+          printf '%s\n' 'Granting disposable runner user read/write access to the existing KVM device.'
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod 0600 /dev/kvm
+          stat --format='KVM after: %F %a %U:%G' /dev/kvm
+          if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+            printf '%s\n' 'ERROR: current runner user cannot read and write /dev/kvm.' >&2
+            exit 1
+          fi
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34

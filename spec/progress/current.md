@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-client-Web
 Current Task: LOOP1-CLIENT-SQLITE-001
 Current Task State: review
-Execution Status: S2_STORAGE_HOSTED_KVM_REPAIR_NEW_REVIEW_REQUIRED
+Execution Status: S2_STORAGE_KVM_DEVICE_PERMISSION_FIX4_NEW_REVIEW_REQUIRED
 
 ## Immediately Relevant Completed Work
 
@@ -49,7 +49,7 @@ Independently accepted main `a28752967ddd471cd281aece7ea9b343521356e8`. Product 
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-02-client-sqlite-fix3.md`.
+`spec/progress/checkpoints/2026-10-02-client-sqlite-fix4.md`.
 
 ## Uncommitted Changes / Ownership
 
@@ -58,3 +58,13 @@ Fix3 owns scoped CI/evidence/Task/current changes until clean release; inherited
 ## Architecture Conflicts / ACP / ADR
 
 None. Approved ADR0005 and canonical hashes unchanged. Bounded Human GString waiver stays WAIVED_BY_HUMAN; no review PASS rewrite and no technology/other acceptance exemption.
+
+## Current Fix4 authoritative recovery
+
+Exactcdb Review4FAIL/current36916339328 completedFAIL: Mobile KVM setup beforeemulator/GateFAIL,11othersSUCCESS; concrete cause unknown. Direct existingcharacterdevice runner-owner0600permissions; source/tests/verifier0diff from9a. BytepreservedReview4 and completedCI separate underfix4/.
+
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+  - Result: InitiallivecacheFAIL preserved; cleandetachedH:/if4-sqlite baselinePASS23specs/status0. Newcommittedcleanchecks follow.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/fix4/fix-report.md`
+
+Fix4 solewriter owns workflow/currentTask/current/evidence/checkpoint untilcleanrelease. Next exact action NEWReview5/currentexactHEAD13jobs/actualKVM/twoAndroidrounds, then independentadministrativeclosure/CI, authorizedPRmerge/actualmainverify/protectedoriginalsync/progress/STOP beforeSEND/SYNC/WEB. Lastgood main `a28752967ddd471cd281aece7ea9b343521356e8`. Taskreview/S1PASS/S2OPEN; Humanstop/egressauthorization/GStringWAIVED_BY_HUMAN unchanged; original744files/localonlybackup protected.
