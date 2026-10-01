@@ -46,7 +46,14 @@ Without explicit approval, an agent MUST NOT change Frozen Architecture, public 
 
 Read [execution constraints](spec/governance/execution-boundaries.md) and [the independent Review checklist](spec/governance/independent-review.md). allowed_paths never overrides or exempts architecture. Ordinary business tasks narrow paths by responsibility; one-time cross-service migration lists affected files/responsibilities, scope and exit before edits. Applicable source/dependency checks supplement behavior. Reviewer inspects actual logic and imports plus minimality; Java inherits canonical boundaries, never Go layout. Escalate conflicts before implementation; do not legalize errors after implementation.
 
+### Historical remediation checkpoint
+
 LOOP1-CI-001 is operational and done: ADR-0001 is currently expired. Verify exact hosted candidate SHA and actual required jobs; missing, failed, cancelled or anomalously skipped required jobs cannot establish PASS. Stage-three effective checkers are independently bounded accepted at2afeac8/run36726926394 (evidence003/hosted-acceptance.md); execute ci/check_architecture.py --scope all --json and tests/architecture; Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN.
+
+### Current recovery authority
+
+The final `LOOP1-E2E-001` closure records independently accepted S1 PASS in `spec/progress/evidence/LOOP1-E2E-001/2026-10-01-s2-open-record.md`. PR8 rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e` restores the accepted pre-PR7 `a0f0f13759ffb2a861b08c4820a1504b76d5c08a` product tree. The OPEN/pending and suspension statements in the historical checkpoint above describe that earlier remediation state; they do not reopen accepted S1 or authorize later implementation. `spec/progress/current.md` and its unique Current Task determine current Stage/Gate and permitted resumption, subject to accepted authority, independent Review and applicable exact-head CI.
+
 
 ## Verification, handoff, and checkpoints
 

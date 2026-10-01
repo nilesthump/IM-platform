@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: client-architecture-clarification-before-S2
 Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
 Current Task State: review
-Execution Status: QUOTED_GRADLE_SELECTOR_FIX_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
+Execution Status: ENTRYPOINT_RECOVERY_NOTE_NEW_REVIEW_PENDING_PRODUCT_NOT_STARTED
 
 ## Immediately Relevant Completed Work
 
@@ -49,7 +49,7 @@ Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 a0f0f
 
 ## Uncommitted Changes / Ownership
 
-Fresh Fix /root/plugin_quoted_method_guard_fix owns only bounded checker/tests/current/task/new evidence/checkpoint until clean final archivecommit/external checks and explicit release. Original H:/IM-platform unknown744 files unchanged; Coordinator approval/recovery/full prompt copies unchanged. No product services; Coordinator owns adb tooling daemon.
+Coordinator owns only the bounded startup entrypoint historical labels and recovery bookkeeping until clean commit; then sole writer releases to NEW independent Review. Quoted selector Fix released clean b0eedea; no unknown candidate changes or product edits. Original744 files remain protected; Coordinator owns adb tooling daemon.
 
 ## Architecture Conflicts / ACP / ADR
 
