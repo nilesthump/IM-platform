@@ -3,41 +3,41 @@
 Current Loop: Loop 1
 Current Stage: S1
 Current Gate: S1
-Gate Status: OPEN (MSG accepted; real TLS entrypoint E2E pending)
+Gate Status: OPEN (real TLS entrypoint E2E pending)
 Current Batch: LOOP1-S1
-Current Task: LOOP1-GO-MSG-001
-Current Task State: done
-Execution Status: WAITING_EXPLICIT_E2E_CI_SCOPE_APPROVAL
+Current Task: LOOP1-E2E-001
+Current Task State: active
+Execution Status: E2E_IMPLEMENTATION_AFTER_APPROVED_ACTIVATION
 
 ## Immediately Relevant Completed Work
 
-Recovered from H:/IM-platform recovery/s1-handoff-20261001 exact273afa5eb492e1550119885484a68c85f27e0171. Fresh independent /root/s1_recovery_review accepted bounded administrative33b1522..273afa5: clean detached Acceptance/frozen34/sourceall/WSS PASS,301 archived source files/605 original files byte-preserved,4341 prior tracked evidence objects unchanged. Exactpush hosted36826506799 actual13 direct jobs completed/success; independent empty-tree full-diff classification verified. No new PR virtual merge exists for this bounded candidate. Raw external120files archived byte-identically under task evidence2026-10-01-recovery-review-273afa5. Historical FAIL/partial unchanged; product183be63 acceptance remains valid. PR4 OPEN/unmerged/head33b1522; no automatic merge authorization.
+MSG unique done; acceptedproduct183be639640cf652dc7a9f18152071c617f2ceac. Administrative273 freshPASS/CI36826506799; newb51e62a529ad0f06f31828f49a77734ea2ca010c fresh /root/s1_archive_review_b51 independentPASS/cleanchecks/hosted36828991394 exact13jobs5requiredSUCCESS8correctinactiveSKIPPED. Archived report/rawbytes under MSG evidence2026-10-01-archive-review-b51. Original605 files,301priorarchive,120newarchive and4739historicalobjects intact; priorFAIL/partial retained. Human approve explicitly authorizes E2EthreeCIpaths andb51push; questionsresolved. E2E backlog->ready->active dependency-satisfied, exacttwo testfiles/threeCIpaths bound. No product/CI changes atactivation.
 
 ## Current Blockers
 
-Human explicitly authorized S1 pushes to existing https://github.com/nilesthump/IM-platform after automatic approval rejected the first push. Recovery branch273 push succeeded. E2E allowed_paths still excludes .github/workflows/ci.yml, ci/classify.py, tests/ci/test_classify.py; explicit scope authorization question remains unanswered. E2E stays uniquelybacklog. Broad completion request does not silently remove this stated approval boundary. S1 stays OPEN; no S2 work. New archival/state-record candidate after273 remains pending its own independent review/exact-head hosted CI; do not extend273 acceptance to newer commits.
+None atactivation. Actual strictTLS E2E andfresh independentReview/exactCI remainunexecuted acceptance. PR4OPEN/unmerged; noautomaticmergeauthorization. CompleteviaNEWacceptedS1PR thenmergedmainverification; noS2implementation.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
-  - Result: Coordinator localexit0 frozen34/sourceall/Development/WSS/605PASS. Independent exact273 clean Acceptance7.484s/frozen34 5.594s/sourceall .453s/WSS .172s exit0; archive301/original605/historical4341PASS; hosted36826506799 13directSUCCESS. Original dirtyunknownfiles are not an Acceptance checkout. No new live-product claim.
-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-recovery-review-273afa5/independent-review-report.md`
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: Coordinator recoveryexit0; independentexactb51 Acceptance7.344s/frozen34 5.203s/sourceall .485s/WSS .156s exit0 andbyteauditPASS, hosted36828991394 exact5requiredSUCCESS/8correctSKIPPED. Dockeractualserver29.5.2/Linux/Compose5.1.4 read-onlyavailable; notintegrationPASS. FreshImplementation must run boundlivepreedit baseline beforewrites.
+  - Evidence: `spec/progress/evidence/LOOP1-E2E-001/2026-10-01-activation-and-path-map.md`
 
 ## Changed Files or Migrations
 
-Only task/current/checkpoint/this task evidence and Coordinator ownRecorder. No product/contracts/frozen/schema/deploy/CI changes. E2E fresh Implementation read-only preparation complete, no writes/services; exact proposed files tests/e2e/go_tls_messaging.py, tests/e2e/README.md and the three pendingCIpaths. Existing deploy wiring needs no change.
+Only boundedadministrativearchive/Task/current activation. E2Eallowedtests/e2e/go_tls_messaging.py, README.md; existingCIdeploystep/classifier/tests approved. No backend/contracts/frozen/schema/deploy changes. No new migrations/services.
 
 ## Known Failures, Risks, and Assumptions
 
-Mandatory startup beforeRecorder is incomplete, prospective_resume only. Constrained-language UTF8 console setting, Python quoting, guessed/missing path reads and output truncation disclosed; supported instrumentation_warning records rejected recovery-event type. Push auto-review rejection resolved only after explicit Human remote authorization. Historical adminFAIL92events and interrupted partial runs preserved. Friend403 DEFERRED_BY_HUMAN persists solely for named fixture. E2E must verify Caddy certificate trust and hostname over real GoCompose/PG16/NATS2.10/migration0001; read-only Docker server probe was sandbox-denied, not livePASS.
+Firstapproved DGitpush hung/terminatedexit128, secondconnectionreset; bundledGit samepayload succeeded. Recorder retainsfailures; notapprovalbypass. Originalunknown605 preventcleanAcceptance claim. PreparationpreRecordertraceincomplete. Friend403 solelyDEFERRED_BY_HUMAN perADR0004. Runtimeintegration skips prohibited; localWindowsCI symlinkskip coverage requiresactualLinuxCI. ActualTLS certificateCA+hostnamenegatives required.
 
 ## Next Exact Action
 
-Obtain answer to explicit E2E CI scope question. Then independently accept latest archival/state-record candidate, bind exact approved paths, activate dependency-satisfied E2E, release sole fresh Implementation writer in isolated checkout, then fresh Review/fix cycle and exactcandidate hostedCI. Create and merge NEW complete S1 PR only after independent acceptance; leave PR4 unmerged. Verify merged main, record S1PASS/S2OPEN and stop before any S2 implementation. If yielding a handoff, first commit/synchronize/verify H:/IM-platform, preserve605files, then create systemTEMP handoff and stop.
+FreshImplementation afteractivationcommit: isolatedtaskworktree/ownRecorder/boundminimumlivebaseline, implementexacttest/CI paths, verifyactualstrictTLS+fullnormal/race/source/recovery, commitreviewcandidateandreleasewriter. NEWindependentReview/fixcycle/exactfullPRCI thenTaskdone/S1Gate evidence. Create/mergeNEWcompleteS1PR, verifyactualmain/CI, recordS2OPENandstop. PR4unchanged.
 
 ## Last Known Good Commit
 
-Administrative `273afa5eb492e1550119885484a68c85f27e0171` fresh independentPASS/hosted36826506799. Product `183be639640cf652dc7a9f18152071c617f2ceac`; actualmain `b442acd26777c481620a6bd917863cebfaf79b35` remains last known main productbaseline. Old33b separatelyaccepted; newer closure archive is not automaticallyaccepted.
+Administrative `b51e62a529ad0f06f31828f49a77734ea2ca010c` independentPASS/hosted36828991394; product `183be639640cf652dc7a9f18152071c617f2ceac`; actualmain `b442acd26777c481620a6bd917863cebfaf79b35` lastknownacceptedmain.
 
 ## Latest Checkpoint
 
@@ -45,8 +45,8 @@ Administrative `273afa5eb492e1550119885484a68c85f27e0171` fresh independentPASS/
 
 ## Uncommitted Changes / Ownership
 
-Coordinator owns only this resume's task/current/checkpoint/evidence and P-S1-RESUME-20261001-B/R-S1-RESUME-20261001-B until committed. Recorder25events finishedBLOCKED/validatePASS; subsequent closure/staging/commit/sync/TEMP handoff lie outside finished trace. Original605 unknown-owned files remain unchanged; approved22byte priorrelocation unchanged. No productwriter/service active. Review externalworktree clean and writerreleased. Do not stage unknownfiles. Finished Recorder closure/commit/sync/handoff operations must be disclosed outsidefinishedtrace. OriginalH:/IM-platform is the current writable admincheckout; no reset/clean/force/overwrite.
+Coordinator owns onlyactivation/task/current/MSGboundedarchive untilcommit. Then /root/s1_e2e_preparation soleproductwriter inisolatedtask/LOOP1-E2E-001 checkout; noCoordinator repositorywrites duringimplementation. ExternalCoordinatorRecorder H:/.codex/evidence/s1-approved-coordinator/research R-S1-APPROVE-20261001 avoidsrawhistorymutations. Original605unknownfiles preserved/unknownowned. Noactiveservices atactivation. Noreset/clean/force/overwrite.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Pending E2E path authorization is write-scope approval, not an architecture change. S1 OPEN.
+None. ExplicitCIwrite-scope approval resolved; canonicalarchitecture/contracts unchanged. S1OPEN.

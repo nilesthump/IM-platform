@@ -1,0 +1,94 @@
+diff --git a/spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-recovery-review.md b/spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-recovery-review.md
+new file mode 100644
+index 0000000..1a24ec3
+--- /dev/null
++++ b/spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-recovery-review.md
+@@ -0,0 +1,7 @@
++# MSG recovery candidate independently accepted
++
++2026-10-01. Fresh independent /root/s1_recovery_review accepts exact273afa5eb492e1550119885484a68c85f27e0171 administrative33b..273, hostedpush36826506799 all13directjobscompleted/success. Durable report/rawbytearchive: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-recovery-review-273afa5/.301originalreviewfiles/605unknownoriginalfiles/4341historicalevidenceobjects preserved. Product183be639640cf652dc7a9f18152071c617f2ceac remainsaccepted; mainb442acd26777c481620a6bd917863cebfaf79b35 is lastknownmainproductbaseline.
++
++Frozenv1.1 MarkdownSHA83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e/historicalPDF unchanged; HTTP1.0.0/WSS1.0/Sync1.0/database0001 and canonicalfixtures unchanged. No newimages/services/migrations. MSGuniquedone/E2Euniquebacklog/S1OPEN. HumanS1pushauthorizationreceived; E2EthreeCIpaths approvalpending; PR4OPENunmerged. FutureNEWacceptedS1PRmerge authorized bycompletionrequest; stopatS2OPEN, noS2implementation.
++
++Thischeckpoint is recovery, not S1GatePASS. Latest archive/state-recordcommit containingthistext needs ownindependentReview/exactheadCI; do notextend273acceptance. OriginalH:/IM-platform stayssynchronizedwithownedcommitbeforeanyTEMP handoff; unknown605filesmustremainunchanged. HistoricalFAIL/partial immutable; CoordinatorRecorder isprospective_resume/incompletepriortrace.
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 889148a..2d7140b 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -7,46 +7,46 @@ Gate Status: OPEN (MSG accepted; real TLS entrypoint E2E pending)
+ Current Batch: LOOP1-S1
+ Current Task: LOOP1-GO-MSG-001
+ Current Task State: done
+-Execution Status: HUMAN_REQUESTED_SYNC_HANDOFF_STOP
++Execution Status: WAITING_EXPLICIT_E2E_CI_SCOPE_APPROVAL
+ 
+ ## Immediately Relevant Completed Work
+ 
+-PR3 merged at actualmain b442acd26777c481620a6bd917863cebfaf79b35 / CI36813501417 SUCCESS. Product183be639640cf652dc7a9f18152071c617f2ceac independently accepted; original FAIL and repair history preserved. Administrative33b1522 local independent PASS; new direct classify110234807646 API completed/success/exact33b. Fresh /root/msg_admin_ci_confirmation independently PASS exact33b1522: PR36820491515 six selected SUCCESS, push36820486384 five selected SUCCESS,13+13 direct job APIs completed and PR merge-parent/tree binding PASS. Original pending report/FAIL92events unchanged; fresh supplement under task evidence2026-10-01-admin-closure-sync/fresh-ci-confirmation/. PR4 remains OPEN and unmerged; no merge authorization.
++Recovered from H:/IM-platform recovery/s1-handoff-20261001 exact273afa5eb492e1550119885484a68c85f27e0171. Fresh independent /root/s1_recovery_review accepted bounded administrative33b1522..273afa5: clean detached Acceptance/frozen34/sourceall/WSS PASS,301 archived source files/605 original files byte-preserved,4341 prior tracked evidence objects unchanged. Exactpush hosted36826506799 actual13 direct jobs completed/success; independent empty-tree full-diff classification verified. No new PR virtual merge exists for this bounded candidate. Raw external120files archived byte-identically under task evidence2026-10-01-recovery-review-273afa5. Historical FAIL/partial unchanged; product183be63 acceptance remains valid. PR4 OPEN/unmerged/head33b1522; no automatic merge authorization.
+ 
+ ## Current Blockers
+ 
+-E2E allowed_paths still excludes required .github/workflows/ci.yml, ci/classify.py, tests/ci/test_classify.py. Human has NOT authorized this expansion. E2E stays backlog; no S1 PASS or next-task activation. New administrative recovery/evidence commit requires fresh independent review and exact-head hosted CI before acceptance; product183 acceptance is unaffected.
++Human explicitly authorized S1 pushes to existing https://github.com/nilesthump/IM-platform after automatic approval rejected the first push. Recovery branch273 push succeeded. E2E allowed_paths still excludes .github/workflows/ci.yml, ci/classify.py, tests/ci/test_classify.py; explicit scope authorization question remains unanswered. E2E stays uniquelybacklog. Broad completion request does not silently remove this stated approval boundary. S1 stays OPEN; no S2 work. New archival/state-record candidate after273 remains pending its own independent review/exact-head hosted CI; do not extend273 acceptance to newer commits.
+ 
+ ## Verification
+ 
+ - Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
+-  - Result: local exit0 WSS/sourceall/Development recovery/frozen34 PASS. No new product changes or rerun live-product claim. Original605 unknown files byte-preserved; original tracked state clean. Own recovery formatting first failed4 then1 requirements, corrected and rerun exit0; failures retained. Startup default Python was incompatible, py unavailable, sandboxed gh read denied; corrected using bundled Python and authorized escalation. Command failures and output truncation disclosed; startup/preparation is incomplete pre-Recorder trace.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/archive-byte-manifest.json`
++  - Result: Coordinator localexit0 frozen34/sourceall/Development/WSS/605PASS. Independent exact273 clean Acceptance7.484s/frozen34 5.594s/sourceall .453s/WSS .172s exit0; archive301/original605/historical4341PASS; hosted36826506799 13directSUCCESS. Original dirtyunknownfiles are not an Acceptance checkout. No new live-product claim.
++  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-recovery-review-273afa5/independent-review-report.md`
+ 
+ ## Changed Files or Migrations
+ 
+-Task/current/checkpoint, task evidence and own Recorder only. Contracts, frozen authority, migration0001, product and CI wiring unchanged. Prior Coordinator handoff-only notes retained as original bytes under evidence/coordinator-inherited-notes/.
++Only task/current/checkpoint/this task evidence and Coordinator ownRecorder. No product/contracts/frozen/schema/deploy/CI changes. E2E fresh Implementation read-only preparation complete, no writes/services; exact proposed files tests/e2e/go_tls_messaging.py, tests/e2e/README.md and the three pendingCIpaths. Existing deploy wiring needs no change.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-Old administrative Recorder92events remains FAIL (then-incomplete hosted acceptance), structure PASS; supplemental confirmation never rewrites it. Historical FAIL/partial traces remain immutable. No full prospective startup claim. Original checkout retains unknown-owner605 files (one human-approved relocation); it is not a clean Acceptance checkout. Social friend403 DEFERRED_BY_HUMAN persists. E2E must use Go Compose/PG16/NATS2.10/migration0001/Caddy and verify TLS certificate plus hostname.
++Mandatory startup beforeRecorder is incomplete, prospective_resume only. Constrained-language UTF8 console setting, Python quoting, guessed/missing path reads and output truncation disclosed; supported instrumentation_warning records rejected recovery-event type. Push auto-review rejection resolved only after explicit Human remote authorization. Historical adminFAIL92events and interrupted partial runs preserved. Friend403 DEFERRED_BY_HUMAN persists solely for named fixture. E2E must verify Caddy certificate trust and hostname over real GoCompose/PG16/NATS2.10/migration0001; read-only Docker server probe was sandbox-denied, not livePASS.
+ 
+ ## Next Exact Action
+ 
+-Resume from H:/IM-platform using mandatory startup. Independently review the final administrative recovery candidate and verify exact-head hosted required jobs before treating that candidate as accepted. Obtain explicit E2E CI-path expansion approval before activation. PR4 merge requires separate human authorization. No S2 work. Human requested handoff and stop; do not start another task in this session.
++Obtain answer to explicit E2E CI scope question. Then independently accept latest archival/state-record candidate, bind exact approved paths, activate dependency-satisfied E2E, release sole fresh Implementation writer in isolated checkout, then fresh Review/fix cycle and exactcandidate hostedCI. Create and merge NEW complete S1 PR only after independent acceptance; leave PR4 unmerged. Verify merged main, record S1PASS/S2OPEN and stop before any S2 implementation. If yielding a handoff, first commit/synchronize/verify H:/IM-platform, preserve605files, then create systemTEMP handoff and stop.
+ 
+ ## Last Known Good Commit
+ 
+-Product `183be639640cf652dc7a9f18152071c617f2ceac`; actualmain `b442acd26777c481620a6bd917863cebfaf79b35`. Administrative `33b1522c7f315b7aeb25fc31c05756c2bc950a9c` independently accepted with exact hostedCI and fresh supplement. Latest recovery HEAD may be a newer administrative commit pending acceptance.
++Administrative `273afa5eb492e1550119885484a68c85f27e0171` fresh independentPASS/hosted36826506799. Product `183be639640cf652dc7a9f18152071c617f2ceac`; actualmain `b442acd26777c481620a6bd917863cebfaf79b35` remains last known main productbaseline. Old33b separatelyaccepted; newer closure archive is not automaticallyaccepted.
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-sync-handoff.md`
++`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-recovery-review.md`
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Coordinator owns only this task's administrative recovery/Recorder/evidence until committed; no product writer. Original H:/IM-platform branch recovery/s1-handoff-20261001 safely synchronized to administrative recovery f4275ddefcd8aa62495edcf9ea003a317c676c58;605 original files byte-preserved, tracked changes absent, current/queue consistent. The final state-record commit containing this text is synchronized before systemTEMP handoff; its exact HEAD is recorded there. Original605 unknown files remain unknown-owned and preserved; relocation explicitly approved: spec/progress/evidence/LOOP1-CI-001/review2-negative-probe.py -> spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/preserved-original/review2-negative-probe.py (22bytes SHA256d82df66ed3ab2065e785321b8b08a47fae48abbb0224011168832e9ec0534aa2). Durable original-sync-verification.json records f4275dd synchronization; final HEAD containing this confirmation is checked and recorded in systemTEMP handoff plus external final-sync-verification.json. Research46events finished/validated before final administrative closure; these final operations lie outside finished trace. No force/reset/clean/overwrite.
++Coordinator owns only this resume's task/current/checkpoint/evidence and P-S1-RESUME-20261001-B/R-S1-RESUME-20261001-B until committed. Recorder25events finishedBLOCKED/validatePASS; subsequent closure/staging/commit/sync/TEMP handoff lie outside finished trace. Original605 unknown-owned files remain unchanged; approved22byte priorrelocation unchanged. No productwriter/service active. Review externalworktree clean and writerreleased. Do not stage unknownfiles. Finished Recorder closure/commit/sync/handoff operations must be disclosed outsidefinishedtrace. OriginalH:/IM-platform is the current writable admincheckout; no reset/clean/force/overwrite.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-None; pending task write-scope approval is not an approved architecture change. S1 OPEN.
++None. Pending E2E path authorization is write-scope approval, not an architecture change. S1 OPEN.
+diff --git a/spec/tasks/done/LOOP1-GO-MSG-001.md b/spec/tasks/done/LOOP1-GO-MSG-001.md
+index d1ab862..ac7964b 100644
+--- a/spec/tasks/done/LOOP1-GO-MSG-001.md
++++ b/spec/tasks/done/LOOP1-GO-MSG-001.md
+@@ -142,3 +142,13 @@ Next exact action: handoff/stop after committed recovery sync; future agent from
+ Fresh administrative confirmation accepted exact33b1522: /root/msg_admin_ci_confirmation clean detached Acceptance6.160s/frozen34 5.334s/sourceall .361s exit0; all26 direct PR/push jobs completed, PRsix/pushfive selectedSUCCESS and otherseven/eight correctlyskipped. Originalclassify110234807646 nowcompleted/success; virtualmerge4fb552a0412d0b970f930181fed0ae299a4a92d8 exactbase/head parents and candidate tree7199bcfcb381b0747ca843b84a70427dfb405f3a equality verified. Freshreport/raw ledger/manifest/Recorder7eventsPASS/validatePASS archived byte-identically under2026-10-01-admin-closure-sync/fresh-ci-confirmation. Oldreport andFAIL92events unchanged. Own recovery-format failures4then1 corrected toDevelopmentPASS, preserved inRecorder. Newadministrative archive/recovery candidate remains pending its own freshreview/exactheadCI. No selfacceptance/merge/E2Eactivation/S1PASS.
+ 
+ Recovery archive commitf4275ddefcd8aa62495edcf9ea003a317c676c58 localcleanAcceptance exit0, stagedrawbyteauditPASS; original recovery/s1-handoff-20261001 safelyfastforwardedtof427,605originalfilesbytepreservationPASS/zero trackedmods/currentqueueconsistent, originalDevelopmentexit0. Durable original-sync-verification.json records this exactsync. Final state-recordcommit is fastforwarded beforeTEMP handoff; exactfinalHEAD/externalproof recordedthere. OwnRecorder46events finishedPASS/validatePASS beforestaging; finalclosure outsidefinishedtrace, disclosed in post-recorder-closure.md. Newadministrative commits pendingNEWindependentreview/exactheadhostedCI, no selfacceptance. Humanhandoffstop; no nexttask/merge/S1PASS. Coordinatorchanges committed; originalunknownfiles605 remainunknownowned, noactiveproductwriters/services.
++
++# S1 continuation: independently accepted recovery (2026-10-01)
++
++Human requests complete remainingS1, create/merge NEW PR beforeS2, stop atS2OPEN. PR4 remains explicitly not authorized forautomaticmerge. Explicit Human reply authorizes S1pushes to existinggithub.com/nilesthump/IM-platform; firstautomaticreview refusal resolved by thatapproval, not bypass. E2E threeCIpathquestion remainsunanswered; E2E staysbacklog/S1OPEN, noactivation/productwrites. Fresh /root/s1_e2e_preparation read-only plan complete: two tests/e2e files plus pendingthreeCIpaths; no deploy/product/contracts/migration changes required, strictpublicCaddyCA/hostnameverification and negativecontrols, existing live normal/race faultprobes remainmandatory. Preparation incompletepreRecorder disclosed.
++
++Fresh /root/s1_recovery_review independentlyPASS exact273afa5eb492e1550119885484a68c85f27e0171, bounded33b..273 administrativeonly, clean detachedworktree. Command: cleanAcceptance/frozen34/sourceall/WSS plus bytepreservation and directhostedjobs. Result: exit0 7.484s/5.594s/.453s/.172s;301archive/605original/4341historicalobjectsPASS; exactpushCI36826506799 all13directcompleted/success, independentemptytreefullclassification. PRmergebindingN/A for273, old33bbindingnotextended. Evidence: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-recovery-review-273afa5/independent-review-report.md,commands.json,byte-audit.json,hosted-direct-summary.json.120externalrawfiles archivedbyte-identically/coordinatorauditPASS; reviewerRecorder27eventsfinishedPASS/validatePASS withstartup/outputlimitations, reportpostfinishdisclosed. NoS1GatePASS.
++
++Coordinator local frozen34/sourceall/Development/WSS/original605hashPASS, trackedproductdiffzero; ownP-S1-RESUME-20261001-B/R-S1-RESUME-20261001-B prospective_resume. KnownpreRecorder UTF8console/quoting/missingpath/truncation plusunsupportedrecovery-event rejection disclosed ininstrumentation_warning. Newarchive/task/current/checkpoint/ownRecorderclosure only ownedbyCoordinator; newcommitneedsNEWindependentReview/exactheadCI beforeacceptance. Next: obtainexplicitE2ECIscopeapproval, acceptlatestadministrativecandidate, activateboundedE2E/freshwriter/freshReview/exactCI/newS1PRmerge/mainverification, stopatS2OPEN. Product183/mainb442acd unchanged; acceptedadministrative273; historicalFAIL/partial and unknownoriginal605 preserved.
++
++Coordinator Recorder25events finishedBLOCKED/validatePASS beforestaging; pendingHumanE2Escope remains truthful, researchvalidation isnotTaskPASS. Own nested.gitattributes innewprompt/run/archive only preserve rawbytes. Finalclosure/staging/commit/sync/TEMPhandoff outsidefinishedtrace. Currentformatverification initially2issues thenrepairedDevelopmentPASS; failuresretained. No newproduct/S1PASS.
