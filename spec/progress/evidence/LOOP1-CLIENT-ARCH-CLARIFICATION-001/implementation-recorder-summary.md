@@ -1,0 +1,7 @@
+# Finished implementation trace and postfinish boundary
+
+Recorder finished/validated PASS67 events at clean implementation commit c709c2e87b55717cc92a7a662949457af9aa4beb; manifest hash 6277d2e77cfd34d406d133c2ba38fe1d32b2f17040bd51ebe80d4576b7812a46. Archive implementation-recorder.zip raw SHA256d048dccf16cf1b40ea81b743ebb5c11da689e180e1c239e92fababdbde92f8c6. Copy is immutable finished external research root including linked prompt/run. Recorded failures remain. Capture prospective_resume: incomplete pre-Recorder read-only startup disclosed. Recorder PASS is research only, not Task/Gate acceptance.
+
+Clean committed `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` PASS at c709c2e with status_entries0; fresh independent Review remains mandatory. Final candidate reviewed SHA is final branch HEAD after this archive/discovery-only commit, range main3f352a8e465c0c4b093cca8e5f404ea587550b6e..HEAD.
+
+This archive generation, evidence/task/current/checkpoint discovery update, archive commit, final diff/status and clean Recovery Acceptance are explicitly outside the finished trace. They are routine evidence archival, not authority/product changes or claimed complete prospective events. Final boundary outcomes are exposed to Coordinator for independent exact-head Review/CI. No push/PR/merge. Writer released after clean final HEAD verification; no unknown uncommitted work touched.

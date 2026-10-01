@@ -23,7 +23,7 @@ No implementation blocker for clarification. NEW independent Review and exact-he
   - Result: PASS42 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/implementation-local.md`
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: Initial formatting FAIL exposed and repaired PASS; final clean Acceptance run follows committed candidate.
+  - Result: Initial formatting FAIL exposed and repaired PASS; clean committed Acceptance PASS at c709c2e, final archive candidate checked after commit.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/implementation-command-history.json`
 
 ## Changed Files or Migrations
@@ -32,7 +32,7 @@ Authority/hash/ADR0005, governance/Agent/template, existing architecture checker
 
 ## Known Failures, Risks, and Assumptions
 
-Initial Coordinator recovery discovery formatting and3 old CI expectation failures repaired and preserved in evidence. Supplemental raw/normalized prompt hash assertion FAIL corrected after both hashes verified; original evidence/Recorder unchanged, correction documented.4 existing Windows real-symlink controls unavailable; portable controls pass and hosted Linux must execute actual links. Static guards require semantic independent Review of native logic/imports and each sensitive choice. Historical evidence unchanged. Recorder prospective_resume discloses incomplete earlier read-only recovery; finish/archive boundary is explicit in implementation evidence.
+Initial Coordinator recovery discovery formatting and3 old CI expectation failures repaired and preserved in evidence. Supplemental raw/normalized prompt hash assertion FAIL corrected after both hashes verified; original evidence/Recorder unchanged, correction documented.4 existing Windows real-symlink controls unavailable; portable controls pass and hosted Linux must execute actual links. Static guards require semantic independent Review of native logic/imports and each sensitive choice. Historical evidence unchanged. Recorder prospective_resume discloses incomplete earlier read-only recovery; finished Recorder PASS67; immutable archive/postfinish boundary explicit in implementation-recorder-summary.md.
 
 ## Next Exact Action
 
@@ -48,7 +48,7 @@ Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0
 
 ## Uncommitted Changes / Ownership
 
-Fresh Implementation Agent owns isolated bounded candidate through commit, then releases sole writer to Coordinator/fresh Reviewer. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No services started.
+No uncommitted candidate changes after final archive commit; Implementation Agent releases sole writer to Coordinator/fresh Reviewer. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No services started.
 
 ## Architecture Conflicts / ACP / ADR
 
