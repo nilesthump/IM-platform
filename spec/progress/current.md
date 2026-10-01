@@ -4,28 +4,31 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: client-architecture-clarification-before-S2
-Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
-Current Task State: done
-Execution Status: ACCEPTED_PREREQUISITE_PENDING_FINAL_ADMINISTRATIVE_VERIFICATION
+Current Batch: S2-client-Web
+Current Task: LOOP1-CLIENT-SQLITE-001
+Current Task State: active
+Execution Status: S2_STORAGE_IMPLEMENTATION_HANDOFF
 
 ## Immediately Relevant Completed Work
 
-Independent Review/exact-head CI accepted architecture/control-plane e7c80c7 under scoped Human GString waiver. Task uniquely done and ADR0005 effectiveness recorded; no S2 product code. Kotlin/Compose Mobile, Tauri/SQLx Desktop TSRepository/models/transactionintent/Rustatomicadapter, memory-only React/TS Web unchanged.
+
+Architecture prerequisite fully closed: independent e7/b1 Review/CI, PR9 exactb1 merged actualmaina287529 with fresh independent actualmainReview/run36884545395 all13jobs/every stepSUCCESS. Taskarchitecture uniquelydone, originalGStringFAIL/scopedwaiver immutable. First canonicalS2storage Task activated after baseline; no productcode.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: Independent clean e7c80c7 PASS exit0/7.500s; frozen53/sourceall0/CI30 PASS.4Windows1314 subcases covered by hostedLinux30 no skips. Exactpush36881391141 selected5success/8correctinactive and PR36881397009 all13requiredjobs/every stepSUCCESS.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md`
+- Readiness Development recovery PASS (23 task specs, 7.512s), architecture all scope PASS (0 violations, 0.583s), WSS PASS (8 positive/10 negative/26 mutations, 0.280s), Sync/Plugin PASS (79 outcome artifacts/16 mutations). These are prerequisites, not client runtime acceptance.
+- Evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/readiness.md; current Coordinator Recorder retains exact commands/results.
+- Generated current.md trailing blank caused diff check failure and was corrected before activation. Historical branch collision preserved without overwrite.
 
 ## Current Blockers
 
-No nonwaived semantic blocker. Later administrative closure metadata needs NEW independent Review/exact-head hosted CI and PR9/actualmain verification before S2activation. S2GateOPEN.
+
+No architecture blocker. Storage Task active; actual approved stack tooling verification/provisioning and implementation pending. Missing localcargo/globaltsc exposed; no build/emulatoracceptance presumed. S2OPEN.
 
 ## Changed Files or Migrations
 
-OwnTask review->done/current/checkpoint/evidence and architecture index/manifest/ADR0005 acceptance discovery only. Canonical body/hash/PDF/historicalevidence/product/contracts/migrations unchanged.
+
+Own new storage Task/current/checkpoint/readiness/dependencyarchives only; no product/contracts/architecture/hash/native/schema edits yet.
 
 ## Known Failures, Risks, and Assumptions
 
@@ -33,20 +36,25 @@ GString expression/closure WAIVED_BY_HUMAN; original4b5FAIL/proof/Recorder immut
 
 ## Next Exact Action
 
-NEW fresh independent administrative Review cleanclosureHEAD/e7c80c7..HEAD; actual selectedHEADCI and fullPR13jobs before PR9merge/actualmain verification. Then materialize/select dependency-satisfied S2 SQLite/Send/Sync/Web tasks. No GStringfix.
+
+Release sole writer to fresh Implementation Agent after clean scoped activation commit. Implement within Taskpaths; NEW independent Review/actualHEADCI beforedone. No waivedGStringfix.
 
 ## Last Known Good Commit
 
-Acceptedproductrollback `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; acceptedauthority/controlplane `e7c80c726d4799ba3ddab026266be638c9e6b252`. LaterclosureHEAD pendingindependentconfirmation.
+
+Fully independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8` after PR9 exactb1merge/run36884545395; product matches acceptedrollback3f352a8. S1PASS/S2OPEN.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-client-architecture-accepted.md`.
+
+`spec/progress/checkpoints/2026-10-01-client-sqlite-readiness.md`.
 
 ## Uncommitted Changes / Ownership
 
-Coordinator solely owns closuremetadata until cleancommit/release. Reviewer no candidatewrites; originalH:/IM-platform744files unchanged, never synchronize/reset/clean. No productservices/emulatorstarted. CoordinatorRecorderR-CLIENT-RESUME-20261001 ongoingexternal; finishedReview28events archivedbyteidentically.
+
+Coordinator owns only new S2 readinessmetadata until clean activationcommit/release. Historicalwithdrawnbranch preserved; originalH:/IM-platform744files unchanged. Fresh independent reviewers released; no productservices/emulatorstarted by Coordinator. New linked Recorder R-S2-SQLITE-COORDINATOR-20261001 external; priorfinishedstreams immutable.
 
 ## Architecture Conflicts / ACP / ADR
 
-No conflict. ApprovedADR0005acceptedate7c80c7; finaladministrativeconfirmation beforeproductactivation. MobileAndroidKotlin/Compose; DesktopTauriSQLxSQLite TSRepository/models/transactionintent/Rustconnectionsqueriesatomicadapter. Multiple independent execute calls cannot simulate transactions. S1PASS/S2OPEN.
+
+None. AcceptedADR0005/currentcanonical6.1 authorize Kotlin/ComposeAndroid/sdkSQLite/emulator and TauriSQLxDesktop with TSRepository/models/transactionintent/Rustatomicadapter. New Task cannot approve other frameworks/dependencies or independentexecute pseudo-transactions. S2OPEN.
