@@ -21,7 +21,7 @@ Fresh Fix repairs runtime-confirmed quoted Gradle member/pointer/interpolated se
   - Result: PASS53/no skips; local evidence only.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-quoted-method-guard-fix/local.md`
 
-Frozen/architecture53 no skips, sourceall0 violations, CI30 with4 exposed existing Windows real-symlink privilege skips, Recovery Development PASS. Clean committed Acceptance/preservation/Recorder/archive discovery follows durable spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-quoted-method-guard-fix/local.md, command-history.json, preservation.json and recorder-summary.md. RED10 on prior54ab; GREEN19 client tests; actual isolated offline Gradle8 runtime forms apply Java and now reject. Local/Recorder PASS is not acceptance.
+Frozen/architecture53 no skips, sourceall0 violations, CI30 with4 exposed existing Windows real-symlink privilege skips, Recovery Development PASS. Clean committed Acceptance PASS at61a2ec9c7c90049f4f9c50c680226a3845dc5f81/preservation PASS5995 priorobjects/744unknownfiles/81 independenthashes; Recorder/archive discovery follows durable spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/plugin-quoted-method-guard-fix/local.md, command-history.json, preservation.json and recorder-summary.md. RED10 on prior54ab; GREEN19 client tests; actual isolated offline Gradle8 runtime forms apply Java and now reject. Local/Recorder PASS is not acceptance.
 
 ## Current Blockers
 
