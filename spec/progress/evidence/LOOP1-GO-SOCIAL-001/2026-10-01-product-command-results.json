@@ -1,0 +1,342 @@
+[
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "command_id": "C-a563c40b-876f-495e-a7cc-cb4a44313b73",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 5750.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "51a7220f54ec30801349dfc35205d7648c1d66483a26eb977ec3244a0db4ba59",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-FileHash spec/architecture/frozen-architecture.md,scalable-distributed-im-architecture.pdf; Get-Content spec/architecture/frozen-architecture.md -Encoding UTF8 | Select-Object -Skip 335 -First 80; Get-Content spec/architecture/frozen-architecture.md -Encoding UTF8 | Select-Object -Skip 575 -First 190; Get-Content spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md -Encoding UTF8; Get-Content research/prompts/P-INTEGRATION-20261001-ROOT/prompt.txt -Encoding UTF8; Get-Content contracts/websocket/sync-v1.schema.json,contracts/websocket/README.md -Encoding UTF8"
+    ],
+    "command_id": "C-2478317c-bca9-4d8d-8143-a8033dc442a9",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 640.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "46dc3ad51d5bb3a0c65e643985632d971a2c9bae23674b53460ea261f6078ec2",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "rg -n 'type fixtureNormalizer|func .*check|func newFixture|writeRevocation|FriendList|AddFriend|friendships' backend/go/tests/fixtures_test.go backend/go/core/auth.go contracts/http/auth-user-friend.openapi.json; Get-Content backend/go/tests/fixtures_test.go -Encoding UTF8; Get-Content spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-implementation-handoff.md -Encoding UTF8; git diff --name-status 279c1dc..27862b9; git log -5 --oneline"
+    ],
+    "command_id": "C-4dd745cb-704d-4668-85a3-fa096e34d219",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 765.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "b430ab0a20d81ba47f60192d6477629f1b6147c56c05e78ad7594287fc829771",
+    "stderr_sha256": "44f46d897dba7a8de0cf718b6be49f1a298d3f829878b7ffeea50ef53ac71191"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "docker run -d --name social-review-pg-20261001 --label review.owner=R-SOCIAL-PRODUCT-REVIEW-20261001 -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=social_review -p 127.0.0.1::5432 postgres:16; docker run -d --name social-review-nats-20261001 --label review.owner=R-SOCIAL-PRODUCT-REVIEW-20261001 -p 127.0.0.1::4222 nats:2.10; docker port social-review-pg-20261001 5432; docker port social-review-nats-20261001 4222"
+    ],
+    "command_id": "C-46e33e40-94d5-4fa7-bf55-fcf2699c77b4",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1781.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "6f73bd46f8d78177956578457781a131c2795592a72e64e72737416daf9d6468",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content contracts/database/migrations/0001_initial.up.sql -Raw | docker exec -i social-review-pg-20261001 psql -U postgres -d social_review -v ON_ERROR_STOP=1; rg -n 'type fixtureNormalizer|func .*check|func newFixture' backend/go/tests; Get-Content backend/go/core/auth.go -Encoding UTF8 | Select-Object -Skip 276 -First 24; Get-Content contracts/http/auth-user-friend.openapi.json -Encoding UTF8 | Select-Object -Skip 255 -First 100"
+    ],
+    "command_id": "C-74983c2c-7d55-45bd-a6a4-ae7fad885f9f",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 922.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "3480ac0da568c83ea31bc350c83b6dc03acc49e7cc360c55eb3f147b785a7dc5",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "H:/.codex/worktrees/architecture-remediation/social-product-review-20261001/live.ps1"
+    ],
+    "command_id": "C-9a13cf07-1255-47bd-a4e2-83083ffe6052",
+    "cwd": ".",
+    "secret_redaction_applied": true,
+    "duration_ms": 11203.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "86cff6ab70dbc585b79d6b31ededc0a096c6c278676990720c0b8845dfb92c3d",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content backend/go/tests/contract_fixture_test.go -Encoding UTF8 | Select-Object -First 190; Get-Content contracts/fixtures/auth-user-friend/positive.json -Encoding UTF8 | Select-Object -Skip 880 -First 130; gh run view 36810190233 --repo nilesthump/IM-platform --json headSha,event,status,conclusion,jobs,url; git diff --numstat cc49b98..27862b9; git diff cc49b98..27862b9 --check"
+    ],
+    "command_id": "C-0ec5c9ed-6348-4a1a-b080-abfd7aeea0cb",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 2500.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "3cf89f9d9985478631967df82e684d511c648da87c0ff6d08a7e8988abbef0bc",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "command_id": "C-e1f2cf1e-a1ec-4f85-9e8e-68892b3394c9",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 5266.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+    "stderr_sha256": "441a9c1e5c73b246759a07a21de4a08ac049a631ea9869135aeb78b935d10356"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "command_id": "C-bf10c4c8-8046-46b4-a0ac-90a2acc1cad0",
+    "cwd": ".",
+    "secret_redaction_applied": true,
+    "duration_ms": 359.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "de8f02cbcbeab226b17d2cdaea844098cd7dd31442385d815ed33b1102b706e7",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "H:/.codex/worktrees/architecture-remediation/social-product-review-20261001/probe.ps1"
+    ],
+    "command_id": "C-ce4020b8-111c-4173-931d-f98c06ad93ae",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 13422.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "428bff2e9d1b0deeb43f4242bb805926da13c5037beecc11e98ca576d8174847",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "H:/.codex/worktrees/architecture-remediation/social-product-review-20261001/race.ps1"
+    ],
+    "command_id": "C-264f9f13-2c94-45aa-bbc6-eaa9d373e5b2",
+    "cwd": ".",
+    "secret_redaction_applied": true,
+    "duration_ms": 35922.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "b6df914696503597eb14257d6f64f29a376a327e8e875dd8ae6c05a8a464d98c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "H:/.codex/worktrees/architecture-remediation/social-product-review-20261001/ci-proof.py"
+    ],
+    "command_id": "C-9f4b5e65-4e71-42a8-a9f7-b5db101875a2",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 6203.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "ec37bab717b1d4f086938bd96737d8e264fccc2acecd83aeab943a8abcc037e6",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content ci/classify_paths.py -Encoding UTF8 | Select-Object -Last 65; Get-Content .github/workflows/ci.yml -Encoding UTF8 | Select-Object -First 110; git rev-parse 27862b9^{tree}; git show 2a6eaa1:backend/go/social.go | Select-Object -First 90; Get-Content spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-recovery-path-map.md -Encoding UTF8"
+    ],
+    "command_id": "C-dffae102-1b02-4458-bd6d-22695b893e72",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 703.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "acb079c17c1ad78b8911febe7bb082a8149aa334110b3c6d929bc217e8e9ce09",
+    "stderr_sha256": "408bc5a6f978a997297df208210f5e2eb4760bd6deafdf1e21314415b1895b8d"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/ci",
+      "-v"
+    ],
+    "command_id": "C-e2b360a3-4f38-46d3-9f90-2f89bebddca5",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 2484.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52",
+    "stderr_sha256": "e2932d1efce14885a639bc3c98ea569e1f7f9453d1a459ef969b51eb9957cf48"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "ci/classify.py",
+      "--base",
+      "279c1dc4681683e2af3b3534a00e5222dde36be6",
+      "--head",
+      "27862b95ef6269c7c353ad8c44c32c0e322e035a"
+    ],
+    "command_id": "C-7dbd4e18-42b5-44bd-9b81-02c30e879a94",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 109.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "27262c9ed03d189f662a4b75e81bbbf71664e0eb0bae644bb4550ac07f18f302",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content spec/architecture/frozen-architecture.md -Encoding UTF8 | Select-Object -Skip 268 -First 70; rg -n 'Minimality|最小性' spec/architecture/frozen-architecture.md; Get-Content spec/architecture/decisions/ADR-0001* -Encoding UTF8 | Select-Object -First 30; git rev-parse '27862b9^{tree}'; git status --porcelain"
+    ],
+    "command_id": "C-4c447095-cd32-4a2b-9622-99e8a43e3a78",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 968.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "9685cb57c7260ad364065845997d173afc095162dae058c01b640870f5e7cf11",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "go -C backend/go build ./...; if(\\ -ne 0){exit \\}; go -C backend/go vet ./...; exit \\"
+    ],
+    "command_id": "C-0f279108-4037-472f-8729-ee232301392a",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 2063.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "eafe829ecab35a4bb2c9d1683e3abd1792fe77100a7d4935a01f3e7b1b22d0fe"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "H:/.codex/worktrees/architecture-remediation/social-product-review-20261001/build.ps1"
+    ],
+    "command_id": "C-ccbfe76e-707f-49e2-84b4-d3aca16725f3",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1828.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "cea905e7ed91ca67a65f42eaf9d0bed59d98f0152fd068482bd691ec790de175",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "H:/.codex/worktrees/architecture-remediation/social-product-review-20261001/ci-proof.py"
+    ],
+    "command_id": "C-7b5f5d6e-2043-4c9e-986d-db8d5fc9f6b6",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 5531.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "07e35882ab08073453929f52eaa8f3f39aa2b718f5b1bcbdf224ff01bcd9969e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "docker inspect social-review-pg-20261001 social-review-nats-20261001 --format '{{.Name}} {{index .Config.Labels \\",
+      "review.owner\\}}'; docker rm -fv social-review-pg-20261001 social-review-nats-20261001; git status --porcelain; git rev-parse HEAD"
+    ],
+    "command_id": "C-4de0364b-be34-4457-b2b8-34021a62cf46",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1515.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stdout_sha256": "2d5b3c6be643d8b392ef3e625df7eea104b241c7749cbeeee535650ecd4d410a",
+    "stderr_sha256": "d4f8c4a61afbdd243a7374452c8748a17b9251e13d993ee221b8006d2f2ca28a"
+  }
+]

@@ -1,0 +1,94 @@
+{
+  "recorded_at": "2026-10-01T03:40:13.665372+00:00",
+  "human_instruction": "完成这一步后打开GitHub分支保护",
+  "sequence": "after independent Social Review PASS and real CI acceptance, task done",
+  "social_product_subject": "27862b95ef6269c7c353ad8c44c32c0e322e035a",
+  "social_ci": 36810190233,
+  "endpoint": "repos/nilesthump/IM-platform/branches/main/protection",
+  "method": "PUT then independent GET readback",
+  "request": {
+    "required_status_checks": {
+      "strict": true,
+      "checks": [
+        {
+          "context": "gate",
+          "app_id": 15368
+        }
+      ]
+    },
+    "enforce_admins": true,
+    "required_pull_request_reviews": {
+      "dismiss_stale_reviews": true,
+      "require_code_owner_reviews": false,
+      "required_approving_review_count": 0,
+      "require_last_push_approval": false
+    },
+    "restrictions": null,
+    "required_linear_history": false,
+    "allow_force_pushes": false,
+    "allow_deletions": false,
+    "required_conversation_resolution": true,
+    "lock_branch": false,
+    "allow_fork_syncing": false
+  },
+  "readback": {
+    "url": "https://api.github.com/repos/nilesthump/IM-platform/branches/main/protection",
+    "required_status_checks": {
+      "url": "https://api.github.com/repos/nilesthump/IM-platform/branches/main/protection/required_status_checks",
+      "strict": true,
+      "contexts": [
+        "gate"
+      ],
+      "contexts_url": "https://api.github.com/repos/nilesthump/IM-platform/branches/main/protection/required_status_checks/contexts",
+      "checks": [
+        {
+          "context": "gate",
+          "app_id": 15368
+        }
+      ]
+    },
+    "required_pull_request_reviews": {
+      "url": "https://api.github.com/repos/nilesthump/IM-platform/branches/main/protection/required_pull_request_reviews",
+      "dismiss_stale_reviews": true,
+      "require_code_owner_reviews": false,
+      "require_last_push_approval": false,
+      "required_approving_review_count": 0
+    },
+    "required_signatures": {
+      "url": "https://api.github.com/repos/nilesthump/IM-platform/branches/main/protection/required_signatures",
+      "enabled": false
+    },
+    "enforce_admins": {
+      "url": "https://api.github.com/repos/nilesthump/IM-platform/branches/main/protection/enforce_admins",
+      "enabled": true
+    },
+    "required_linear_history": {
+      "enabled": false
+    },
+    "allow_force_pushes": {
+      "enabled": false
+    },
+    "allow_deletions": {
+      "enabled": false
+    },
+    "block_creations": {
+      "enabled": false
+    },
+    "required_conversation_resolution": {
+      "enabled": true
+    },
+    "lock_branch": {
+      "enabled": false
+    },
+    "allow_fork_syncing": {
+      "enabled": false
+    }
+  },
+  "main_sha_before": "279c1dc4681683e2af3b3534a00e5222dde36be6",
+  "main_sha_after": "279c1dc4681683e2af3b3534a00e5222dde36be6",
+  "protected": true,
+  "preference": "User authorized enabling protection; optional approval-count choice unanswered, baseline PR+CI configuration applied; no GitHub approval count imposed",
+  "gate_source": "unchanged .github/workflows/ci.yml gate requires every classified applicable job to pass; GitHub Actions app15368",
+  "social_pr": "https://github.com/nilesthump/IM-platform/pull/3",
+  "social_merged": false
+}
