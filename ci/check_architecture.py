@@ -5,6 +5,7 @@ Every Go file is parsed (not only the host build tags). Java imports and qualifi
 references are checked now; the Java job also compiles its explicit S0 transport.
 """
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -223,6 +224,160 @@ def check_java(root):
     return errors, [{k: v for k, v in u.items() if k != "code"} for u in units]
 
 
+
+def client_policy(root):
+    """Resolve hash-bound canonical policy; Task Specs cannot extend this policy."""
+    try:
+        manifest = (root / 'spec/architecture/baseline.md').read_text(encoding='utf-8')
+        fields = dict(re.findall(r'^- ([a-z_0-9]+): `([^`]+)`\s*$', manifest, re.M))
+        docpath = root / 'spec/architecture/frozen-architecture.md'
+        doc = docpath.read_text(encoding='utf-8')
+        if fields.get('repository_path') != 'spec/architecture/frozen-architecture.md' or fields.get('sha256') != hashlib.sha256(docpath.read_bytes()).hexdigest():
+            raise ValueError('canonical hash/resolver mismatch')
+        adrpath = 'spec/architecture/decisions/ADR-0005-client-technology-clarification.md'
+        if fields.get('revision_adr') != adrpath or 'Human-approved' not in (root / adrpath).read_text(encoding='utf-8'):
+            raise ValueError('approved ADR-0005 linkage missing')
+        match = re.search(r'<!-- client-technology-policy -->\s*```json\s*(.*?)\s*```', doc, re.S)
+        policy = json.loads(match.group(1)) if match else {}
+        if policy.get('decision') != 'ADR-0005-client-technology-clarification' or policy.get('mobile_framework') != 'TBD' or policy.get('native_boundary') != 'clients/desktop/src-tauri/':
+            raise ValueError('client decision/boundary missing')
+        for key in ('languages', 'frameworks', 'runtimes', 'packages', 'native_packages'):
+            if not isinstance(policy.get(key), list) or not all(isinstance(x, str) for x in policy[key]):
+                raise ValueError('invalid policy ' + key)
+        return policy, []
+    except (OSError, ValueError, AttributeError) as error:
+        return {}, ['CLIENT authority unavailable (never skipped): ' + str(error)]
+
+
+FORBIDDEN_CLIENT = re.compile(r'(?:dart-lang/setup-dart|subosito/flutter-action|\bflutter\b|\bdart\b|pubspec\.(?:yaml|lock))', re.I)
+CLIENT_SOURCE = {'.ts', '.tsx'}
+CLIENT_RESOURCES = {'.json', '.yaml', '.yml', '.toml', '.sql', '.md', '.css', '.scss', '.html', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.txt', '.lock'}
+
+
+def client_package_allowed(name, relative, policy, native=False):
+    approved = policy['native_packages'] if native else policy['packages']
+    if name not in approved:
+        return False
+    if name.startswith('@tauri-apps/') or name in policy['native_packages']:
+        return relative.startswith('clients/desktop/')
+    if name in {'react', 'react-dom', '@types/react', '@types/react-dom'}:
+        return not relative.startswith('clients/mobile/')
+    return True
+
+
+def check_clients(root):
+    policy, errors = client_policy(root)
+    if errors:
+        return errors
+    files = []
+    for directory in ('clients', '.github/workflows'):
+        if (root / directory).is_symlink():
+            errors.append(f'CLIENT {directory}: symlink boundary bypass')
+    for area in ('shared', 'web', 'desktop', 'mobile'):
+        base = root / 'clients' / area
+        if base.is_symlink():
+            errors.append(f'CLIENT {base}: symlink boundary bypass')
+            continue
+        files.extend(base.rglob('*'))
+    # Active configuration only: immutable research/evidence/history not scanned.
+    files += list((root / '.github/workflows').glob('*'))
+    files += [root / p for p in ('package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'bun.lockb', 'tsconfig.json') if (root / p).exists()]
+    for path in files:
+        relative = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            errors.append(f'CLIENT {relative}: symlink boundary bypass')
+            continue
+        if not path.is_file():
+            continue
+        client = relative.startswith('clients/')
+        native = relative.startswith(policy['native_boundary'])
+        if path.name == '.gitkeep' and not path.read_bytes().strip():
+            continue
+        suffix = path.suffix.lower()
+        config_js = suffix in {'.js', '.mjs', '.cjs'} and ('.config.' in path.name or path.name.startswith('eslint.config.'))
+        allowed = suffix in CLIENT_SOURCE | CLIENT_RESOURCES or config_js or path.name in {'.gitignore', '.npmrc', 'Dockerfile', 'Makefile'}
+        if native and (suffix in {'.rs', '.rc', '.plist', '.manifest', '.icns'} or path.name == 'Cargo.lock'):
+            allowed = True
+        if client and not allowed:
+            errors.append(f'CLIENT {relative}: unapproved source/config type; Rust only native boundary, business TypeScript')
+        if suffix in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.icns'}:
+            continue
+        try:
+            text = path.read_text(encoding='utf-8')
+        except UnicodeError:
+            errors.append(f'CLIENT {relative}: unsupported binary configuration/source')
+            continue
+        if suffix == '.dart' or path.name.lower() in {'pubspec.yaml', 'pubspec.lock', '.metadata'} or (suffix != '.md' and FORBIDDEN_CLIENT.search(text)):
+            errors.append(f'CLIENT {relative}: Dart/Flutter active source/dependency/configuration forbidden')
+        if relative.startswith('clients/web/') and re.search(r'\b(?:sqlite\w*|localStorage|indexedDB)\b', text, re.I) and suffix != '.md':
+            errors.append(f'CLIENT {relative}: Web must remain memory only / no SQLite/history persistence')
+        if path.name == 'package.json':
+            try:
+                manifest = json.loads(text)
+                for key in ('dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'):
+                    for name in manifest.get(key, {}):
+                        if not client_package_allowed(name, relative, policy):
+                            errors.append(f'CLIENT {relative}: unapproved dependency {name}; task/tests cannot authorize selection')
+            except (ValueError, AttributeError, TypeError):
+                errors.append(f'CLIENT {relative}: invalid package manifest')
+        if path.name == 'Cargo.toml':
+            # Standard-library TOML parser, no product/tooling dependency added.
+            import tomllib
+            try:
+                manifest = tomllib.loads(text)
+                tables = [manifest, manifest.get('workspace', {})] + list(manifest.get('target', {}).values())
+                for table in tables:
+                    for key in ('dependencies', 'build-dependencies', 'dev-dependencies'):
+                        for name, value in table.get(key, {}).items():
+                            package = value.get('package', name) if isinstance(value, dict) else name
+                            if not native or not client_package_allowed(package, relative, policy, native=True):
+                                errors.append(f'CLIENT {relative}: unapproved native dependency {package}; Desktop SQLite is SQLx only')
+                            if package == 'sqlx' and isinstance(value, dict) and any(x in value.get('features', []) for x in ('postgres', 'mysql', 'any')):
+                                errors.append(f'CLIENT {relative}: SQLx is approved for SQLite only')
+            except (ValueError, AttributeError, TypeError):
+                errors.append(f'CLIENT {relative}: invalid Cargo manifest')
+        if suffix in CLIENT_SOURCE or config_js:
+            imports = re.findall(r'''(?:\bfrom\s*|\bimport\s*(?:\(\s*)?|\brequire\s*\(\s*)["']([^"']+)["']''', text)
+            for dependency in imports:
+                if dependency.startswith(('.', '/')):
+                    continue
+                name = '/'.join(dependency.split('/')[:2]) if dependency.startswith('@') else dependency.split('/')[0]
+                if not client_package_allowed(name, relative, policy):
+                    errors.append(f'CLIENT {relative}: unapproved import/runtime {dependency}')
+        # Known alternate runtimes/framework install commands cannot hide in builds/CI.
+        if suffix in {'.json', '.yaml', '.yml', '.toml', '.lock', '.js', '.mjs', '.cjs'} or path.name in {'Dockerfile', 'Makefile'}:
+            if re.search(r'\b(?:expo|react-native|nativescript|capacitor|electron|svelte|vue|angular|solid-js|zustand|redux|bun|deno|rusqlite)\b', text, re.I):
+                errors.append(f'CLIENT {relative}: unapproved framework/runtime/native dependency in active configuration')
+            for match in re.finditer(r'\b(?:npm|pnpm|yarn)\s+(?:install|add)\s+([^\n;]+)', text):
+                for name in match.group(1).split():
+                    if name.startswith('-'):
+                        continue
+                    name = re.sub(r'(?<!^)@[^/]*$', '', name)
+                    if not client_package_allowed(name, relative, policy):
+                        errors.append(f'CLIENT {relative}: unapproved build-installed dependency {name}')
+    return errors
+
+
+def client_task_violations(text, path, root):
+    # Explicit positive declarations are checked regardless of allowed_paths/tests.
+    declarations = re.findall(r'(?mi)^\s*(?:[-*]\s*)?(client_(?:framework|runtime|language|dependency)):\s*`?([^`\n]+?)`?\s*$', text)
+    if not declarations:
+        return []
+    policy, errors = client_policy(root)
+    if errors:
+        return errors
+    keys = {'client_framework': 'frameworks', 'client_runtime': 'runtimes', 'client_language': 'languages', 'client_dependency': 'packages'}
+    mobile_only = 'clients/mobile/' in text and 'clients/desktop/' not in text and 'clients/web/' not in text and 'clients/shared/' not in text
+    for kind, value in declarations:
+        approved = policy[keys[kind]]
+        if kind == 'client_dependency' and 'clients/desktop/src-tauri/' in text:
+            approved = approved + policy['native_packages']
+        native_language_outside_boundary = kind == 'client_language' and value == 'Rust' and 'clients/desktop/src-tauri/' not in text
+        if value not in approved or native_language_outside_boundary or (mobile_only and kind in {'client_framework', 'client_runtime'}):
+            errors.append(f'CLIENT {path}: unapproved {kind} {value}; Task Spec cannot authorize technology')
+    return errors
+
+
 def task_paths(text):
     section = re.search(r"(?ms)^# Allowed Paths\s*\n(.*?)(?=^# |\Z)", text)
     if not section:
@@ -270,6 +425,7 @@ def check_governance(root):
     for queue in ("backlog", "ready", "active", "review"):
         for path in (root / "spec/tasks" / queue).glob("*.md"):
             text = path.read_text(encoding="utf-8")
+            errors += client_task_violations(text, path.relative_to(root), root)
             try:
                 allowed_paths = task_paths(text)
             except ValueError as error:
@@ -304,7 +460,7 @@ def check_workflow(text):
         errors.append("CI on: push/pull_request triggers required")
     if re.search(r"\b(?:paths|paths-ignore|branches|branches-ignore)\s*:", trigger_text):
         errors.append("CI on: trigger filters cannot bypass applicable checks")
-    commands = {"architecture": ["./tools/verify-frozen-architecture.ps1", "ci/check_architecture.py --scope governance", "unittest discover -s tests/architecture"],
+    commands = {"architecture": ["./tools/verify-frozen-architecture.ps1", "ci/check_architecture.py --scope governance", "unittest discover -s tests/architecture", "ci/check_architecture.py --scope clients --json"],
                 "source_go": ["ci/check_architecture.py --scope go --json"],
                 "source_java": ["ci/check_architecture.py --scope java --json"]}
     for job, required in commands.items():
@@ -332,13 +488,15 @@ def check_workflow(text):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--scope", choices=("go", "java", "governance", "all"), default="all")
+    parser.add_argument("--scope", choices=("go", "java", "governance", "clients", "all"), default="all")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     errors = []
     graphs = {}
     if args.scope in {"governance", "all"}:
         errors += check_governance(args.root)
+    if args.scope in {"clients", "all"}:
+        errors += check_clients(args.root)
     for language, checker in (("go", check_go), ("java", check_java)):
         if args.scope in {language, "all"}:
             found, graph = checker(args.root)

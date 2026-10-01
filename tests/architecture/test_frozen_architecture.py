@@ -16,6 +16,11 @@ class ArchitectureIntegrityTests(unittest.TestCase):
 
     def test_semantic_negative_controls(self):
         mutations = {
+            'unapproved technology permission': ('Agent 没有未授权技术选型权', 'Agent 可以自由选型'),
+            'missing Desktop native boundary': ('clients/desktop/src-tauri/**', 'clients/shared/native/**'),
+            'Mobile premature framework': ('Mobile = TypeScript ecosystem', 'Mobile = Flutter'),
+            'Web SQLite permission': ('无 SQLite', '允许 SQLite'),
+            'missing previous hash metadata': ('framework TBD', 'framework selected'),
             'historical reverse arrow': ('NATS --> Gateway','NATS --> PG'),
             'missing native chapter': ('## 8. 插件平台架构','## Removed'),
             'missing index entry': ('- [0. 执行摘要](#section-0)','- removed'),
@@ -49,7 +54,7 @@ class ArchitectureIntegrityTests(unittest.TestCase):
         # Minimal temporary authority copy; never mutate product or historical tree.
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
-            for name in ('spec/architecture','AGENTS.md','spec/handoff/agent-context.md','scalable-distributed-im-architecture.pdf','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md'):
+            for name in ('spec/architecture','AGENTS.md','spec/handoff/agent-context.md','scalable-distributed-im-architecture.pdf','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md'):
                 src=ROOT/name; dst=root/name; dst.parent.mkdir(parents=True,exist_ok=True)
                 if src.is_dir(): shutil.copytree(src,dst)
                 else: shutil.copyfile(src,dst)

@@ -4,49 +4,52 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: none (S1 complete; S2 not selected)
-Current Task: LOOP1-E2E-001
-Current Task State: done
-Execution Status: S2_OPEN_STOP_BOUNDARY_FINAL_RECORD_REVIEW_PENDING
+Current Batch: client-architecture-clarification-before-S2
+Current Task: LOOP1-CLIENT-ARCH-CLARIFICATION-001
+Current Task State: review
+Execution Status: AUTHORITY_CLARIFICATION_REVIEW_PENDING_PRODUCT_NOT_STARTED
 
 ## Immediately Relevant Completed Work
 
-S1 Gate PASS and all four S1 tasks uniquely done. Fresh full product review accepted `6346f39fc6786bba3cddbde7acc91bbad42446a1`; strict TLS E2E/live normal/race had zero runtime skips. Fresh administrative review accepted `cb2cf431a59e0318a1163073a1c76432135c86d9`. NEW PR5 merged, actual main `dd24a9c65a36dd775ca68ae7847c2c283b6f348f` independently verified with 13 required CI jobs SUCCESS (run36834539666), clean Recovery Acceptance/source/hash and matching accepted tree. S2 OPEN is the requested stopping boundary; no S2 task or implementation has begun. Current Task retains last completed E2E for recovery.
+Human-approved v1.1 client clarification, ADR0005, universal selection governance and direct client/source/dependency/task/CI guards implemented in isolated H:/ica. Rollback main3f352a8 restores accepted pre-PR7 tree; PR7 is withdrawn historical deviation. S1 PASS/S2 OPEN. Product coding waits for acceptance of this prerequisite.
 
 ## Current Blockers
 
-No product blocker. This final state/archive record needs its own fresh independent Review/exact CI before administrative PR merge. Known PR4 external status deviation is disclosed below; it is not reported as all-constraints PASS. Further S2 work is outside this session.
+No implementation blocker for clarification. NEW independent Review and exact-head hosted CI pending. Later Mobile concrete framework TBD; emulator testing does not approve a framework. Desktop SQLx(SQLite) explicitly approved; no other dependency selection permitted.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: Independent actual main dd24 clean checkout PASS; sourceall/authority hashes/tree binding PASS; exact main hosted36834539666 direct13requiredSUCCESS. Product review strictTLS36.156s/normal21.156s/race84.203s exit0, runtime0SKIP; architecture34/frozen34/CI29 and other required checks PASS. Final administrative record has separate pending acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-E2E-001/2026-10-01-closure-main-independent-review/postmerge/independent-main-review.md`
+- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`
+  - Result: PASS42 tests/no skips, canonical/PDF/hash/ADR verified. Sourceall PASS0 violations; CI30 PASS with4 exposed existing Windows privilege skips; local evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/implementation-local.md`
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: Initial formatting FAIL exposed and repaired PASS; final clean Acceptance run follows committed candidate.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/implementation-command-history.json`
 
 ## Changed Files or Migrations
 
-Only last-completed E2E Task/current/checkpoint and raw evidence archives for this final record. No product, deploy, contract, Frozen Architecture, migration or S2 task changes.
+Authority/hash/ADR0005, governance/Agent/template, existing architecture checker/classifier/workflow and controls; task/evidence/checkpoint only. No product/schema/contract change. Full list from candidate committed diff.
 
 ## Known Failures, Risks, and Assumptions
 
-PR4 was indirectly marked merged by GitHub at 08:09:01Z after authorized NEW PR5 merged at 08:08:59Z and included PR4 ancestry. Only PR5 was explicitly merged; no PR4 merge or auto-merge enable command was executed. The intended PR4 OPEN state was not maintained and earlier guarantees were inaccurate; user informed immediately. Initial OPEN assertion FAIL, main review Recorder finished FAIL19events and Coordinator closure Recorder finished FAIL55events remain byte-preserved. No history rewrite, reopen or rollback. Other historical implementation/reviewer/network/recording/staging failures and partial traces preserved. Named friend403 solely DEFERRED_BY_HUMAN; no messaging exemption. Four local Windows symlink subcases covered by hosted Linux with no skips.
+Initial Coordinator recovery discovery formatting and3 old CI expectation failures repaired and preserved in evidence. Supplemental raw/normalized prompt hash assertion FAIL corrected after both hashes verified; original evidence/Recorder unchanged, correction documented.4 existing Windows real-symlink controls unavailable; portable controls pass and hosted Linux must execute actual links. Static guards require semantic independent Review of native logic/imports and each sensitive choice. Historical evidence unchanged. Recorder prospective_resume discloses incomplete earlier read-only recovery; finish/archive boundary is explicit in implementation evidence.
 
 ## Next Exact Action
 
-Fresh bounded independent review of this final record, exact push/PR jobs and merge-tree binding, then merge only its new administrative PR and verify actual main. Synchronize and hash-verify H:/IM-platform and all605 original files before creating TEMP final handoff; stop. Future session must recover by AGENTS order before any authorized S2 planning; no S2 work now.
+NEW fresh independent Review of clean final committed HEAD/range from rollback base; clean Recovery Acceptance then actual applicable exact-head hosted CI; no done/product activation before acceptance.
 
 ## Last Known Good Commit
 
-Actual merged S1 main `dd24a9c65a36dd775ca68ae7847c2c283b6f348f`, independently accepted product/CI. Product `6346f39fc6786bba3cddbde7acc91bbad42446a1`; final record commit requires separate independent acceptance and actual-main confirmation.
+Rollback main `3f352a8e465c0c4b093cca8e5f404ea587550b6e`; accepted pre-PR7 `a0f0f13759ffb2a861b08c4820a1504b76d5c08a` tree restored.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-e2e-001-s2-open.md`
+`spec/progress/checkpoints/2026-10-01-client-architecture-review-candidate.md`.
 
 ## Uncommitted Changes / Ownership
 
-Coordinator owns only final administrative state/archive until commit in original H:/IM-platform. Product writers released, all owned services and volumes cleared. Original605 unknown-owned files size/hash unchanged and never staged. Fresh reviewer owns external evidence/clean review checkout; final Recorder/report evidence may remain external with TEMP final proof after acceptance. No reset/clean/force/overwrite.
+Fresh Implementation Agent owns isolated bounded candidate through commit, then releases sole writer to Coordinator/fresh Reviewer. Original H:/IM-platform unknown744 files/work preserved under external original-files-before.json. Coordinator-owned approval/recovery/full prompt copies unchanged. No services started.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Frozen/contracts/security/ACK unchanged. S1 PASS; S2 OPEN with no selected or active S2 task. PR4 status deviation retained as known FAIL.
+Human authorizes only client clarification ADR0005/v1.1 and guards; version remains v1.1, canonical bytes/hash changed. Mobile framework undecided; follow BLOCKED_BY_ARCHITECTURE for affected later product portions. Desktop uses approved Tauri + SQLx(SQLite) atomic transaction adapter. S2 OPEN.

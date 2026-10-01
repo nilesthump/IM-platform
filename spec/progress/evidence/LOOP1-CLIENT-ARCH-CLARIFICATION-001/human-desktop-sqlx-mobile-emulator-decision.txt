@@ -1,0 +1,3 @@
+Question: 后续真实客户端接入有两项尚未授权的架构选择：Desktop 通过 Tauri 访问 SQLite 的具体 crate／plugin，以及 Mobile 的具体框架与 SQLite 适配机制。请明确批准的名称和边界；若本轮仍保持 TBD，我会先完成不依赖这些选择的 TypeScript 工作，并将对应运行时部分标记为 BLOCKED_BY_ARCHITECTURE。
+
+Human answer: moblie用Android studio模拟器测试后再确认，Desktop SQLite native boundary 使用 Tauri + SQLx(SQLite)；TypeScript 持有共享 Repository、模型和事务意图，Rust 仅提供数据库连接、查询和原子 transaction adapter。不得通过多个独立 tauri-plugin-sql execute() 调用模拟跨调用事务。

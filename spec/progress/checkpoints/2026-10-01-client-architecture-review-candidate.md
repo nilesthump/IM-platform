@@ -1,0 +1,5 @@
+# Client architecture clarification review candidate
+
+Date:2026-10-01. Current task LOOP1-CLIENT-ARCH-CLARIFICATION-001 review. Stable bounded authority/guard implementation checkpoint, not Gate PASS. Last known good main3f352a8e465c0c4b093cca8e5f404ea587550b6e; candidate exact commit resolved at branch HEAD by fresh Reviewer. Contract/migration/fixture versions unchanged; product tree unchanged. Canonical v1.1 SHA256ac0421074c41589d1d409cc91729953984839aea3c05e805608fcf7677da4f68. PDF/old ADR/history preserved.
+
+Local Frozen architecture42 no skips, sourceall zero violations, CI30 with4 existing Windows real-symlink privilege skips, product/hash/diff checks PASS. Initial Recovery formatting/CI expectation failures recorded and repaired. Independent Review and real exact-head hosted required jobs pending. S1 PASS/S2 OPEN. Mobile concrete framework unresolved; Desktop SQLx(SQLite) approved with atomic transaction adapter. No product implementation. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/implementation-local.md. External linked Recorder prospective_resume discloses pre-Recorder read-only startup and postfinish archive boundary.

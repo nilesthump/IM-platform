@@ -20,9 +20,9 @@ class PathMatrixTests(unittest.TestCase):
         for path, job in (
             ("backend/go/main.go", {"go", "architecture", "source_go"}),
             ("backend/java/App.java", {"java", "architecture", "source_java"}),
-            ("clients/web/src/App.tsx", "web"),
-            ("clients/desktop/db/schema.sql", "desktop"),
-            ("clients/mobile/app.kt", "mobile"),
+            ("clients/web/src/App.tsx", {"web", "architecture"}),
+            ("clients/desktop/db/schema.sql", {"desktop", "architecture"}),
+            ("clients/mobile/app.kt", {"mobile", "architecture"}),
         ):
             with self.subTest(path=path):
                 self.assert_jobs(path, job if isinstance(job, set) else {job})
@@ -90,6 +90,14 @@ class PathMatrixTests(unittest.TestCase):
     def test_union_and_deleted_paths(self):
         result = classify_module.classify(["backend/go/old.go", "clients/web/new.ts"])
         self.assertEqual({key for key, value in result.items() if value}, {"go", "web", "architecture", "source_go"})
+
+    def test_client_changes_always_select_architecture(self):
+        for path, job in [('clients/web/view.tsx','web'), ('clients/desktop/src-tauri/main.rs','desktop'), ('clients/mobile/adapter.ts','mobile'), ('clients/shared/deleted.ts','shared')]:
+            with self.subTest(path=path):
+                selected = classify_module.classify([path])
+                self.assertTrue(selected['architecture'])
+                self.assertTrue(selected[job])
+        self.assertTrue(all(classify_module.classify(['package.json']).values()))
 
     def test_git_diff_includes_deleted_shared_file(self):
         with tempfile.TemporaryDirectory() as temp:

@@ -16,6 +16,10 @@ State one bounded outcome.
 - Resolve/hash-check spec/architecture/README.md -> baseline.md -> canonical Markdown; list exact approved ADR, domain, invariant, acceptance and contract inputs.
 - Business tasks MUST read canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/minimality.md, execution-boundaries.md and independent-review.md. Java uses these same authorities, never Go layout.
 
+# Technology Authorization
+
+- Cite the accepted canonical clause/ADR for every new sensitive language, framework, runtime and dependency. For client paths declare one exact `client_language:`, `client_framework:`, `client_runtime:` or `client_dependency:` name per line. Unapproved/TBD runtime work is BLOCKED_BY_ARCHITECTURE; this section cannot authorize itself.
+
 # Dependencies
 
 - List completed prerequisite task IDs or `none`.
@@ -60,3 +64,7 @@ State one bounded outcome.
 
 - State one exact next action.
 
+
+## Technology authorization
+
+Read `spec/governance/technology-selection.md` and canonical §2.3 / §6.1 before implementation or Review. Every new architecture-sensitive language/framework/runtime/core dependency requires traceable accepted Frozen Architecture / approved ADR authority. Missing decision: stop affected work BLOCKED_BY_ARCHITECTURE -> smallest question -> Human/Architect decision -> freeze -> fresh independent Review/applicable exact-head hosted CI -> implementation. Task text/allowed_paths/tests cannot approve selection. Reviewer FAIL on absent authority; inspect real imports/native responsibility beyond static guards. Desktop native SQLite is explicitly Tauri + SQLx(SQLite) with atomic transaction adapter; TypeScript holds Repository/models/transaction intent. No separate tauri-plugin-sql execute-call transactions. Mobile framework remains TBD; Android Studio emulator is testing only, not framework approval.

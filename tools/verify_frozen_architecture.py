@@ -86,6 +86,11 @@ def structural_errors(doc):
     need('LOOP1-CI-001' in c and '现已失效' in c, 'bootstrap expiration omitted')
     need('精确 Current Task ID' in chapter(doc, 13) and '若无 active 则选' not in chapter(doc, 13), 'current-task recovery bypass')
     need('token 严禁进入日志或 trace' in chapter(doc, 18), 'token observability prohibition missing')
+    for token in ('Agent 没有未授权技术选型权', '未禁止 ≠ 已批准', 'BLOCKED_BY_ARCHITECTURE', 'machine guard'):
+        need(token in chapter(doc, 2), 'universal technology selection rule missing: ' + token)
+    for token in ('Web = React + TypeScript', 'Desktop = Tauri + React + TypeScript', 'Mobile = TypeScript ecosystem', 'framework TBD', 'clients/desktop/src-tauri/**', 'Desktop SQLite native boundary 使用 Tauri + SQLx(SQLite)', '不得通过多个独立 tauri-plugin-sql execute() 调用模拟跨调用事务', 'Repository API', 'protocol/model/plugin SDK 仍为 TypeScript', '无 SQLite', '无离线历史加载', 'S2 Gate OPEN', '<!-- client-technology-policy -->'):
+        need(token in chapter(doc, 6), 'approved client boundary missing: ' + token)
+    need('不等于可自行选型' in chapter(doc, 11), 'backend variation bypasses selection governance')
     return errors
 
 
@@ -93,7 +98,7 @@ def verify(root, base_commit=''):
     errors = []
     manifest = (root / 'spec/architecture/baseline.md').read_text(encoding='utf-8')
     fields = dict(re.findall(r'^- ([a-z_0-9]+): `([^`]+)`\s*$', manifest, re.M))
-    expected = {'version':'v1.1', 'canonical_format':'markdown', 'repository_path':'spec/architecture/frozen-architecture.md', 'previous_canonical_format':'pdf', 'previous_repository_path':'scalable-distributed-im-architecture.pdf', 'previous_sha256':PDF_SHA, 'historical_migration_type':'representation_only', 'historical_semantic_change':'false', 'historical_migration_task_id':'LOOP1-ARCHDOC-001', 'historical_markdown_sha256':HISTORICAL_MD_SHA, 'revision_type':'conflict_resolution', 'semantic_change':'true', 'revision_task_id':'LOOP1-ARCH-REMEDIATION-001', 'revision_adr':'spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md', 'approval_source':'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md'}
+    expected = {'version':'v1.1', 'canonical_format':'markdown', 'repository_path':'spec/architecture/frozen-architecture.md', 'previous_canonical_format':'pdf', 'previous_repository_path':'scalable-distributed-im-architecture.pdf', 'previous_sha256':PDF_SHA, 'historical_migration_type':'representation_only', 'historical_semantic_change':'false', 'historical_migration_task_id':'LOOP1-ARCHDOC-001', 'historical_markdown_sha256':HISTORICAL_MD_SHA, 'previous_revision_sha256':'83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e', 'previous_revision_type':'conflict_resolution', 'previous_revision_task_id':'LOOP1-ARCH-REMEDIATION-001', 'previous_revision_adr':'spec/architecture/decisions/ADR-0003-architecture-conflict-resolution.md', 'previous_revision_approval_source':'spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md', 'revision_type':'human_approved_client_clarification', 'semantic_change':'true', 'revision_task_id':'LOOP1-CLIENT-ARCH-CLARIFICATION-001', 'revision_adr':'spec/architecture/decisions/ADR-0005-client-technology-clarification.md', 'approval_source':'spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md'}
     for key, value in expected.items():
         if fields.get(key) != value:
             errors.append(f'manifest {key} mismatch')
@@ -119,7 +124,7 @@ def verify(root, base_commit=''):
         if 'canonical Frozen Architecture Markdown' not in (root/path).read_text(encoding='utf-8'):
             errors.append(f'{path} does not route to canonical Markdown')
     index = (root/'spec/architecture/README.md').read_text(encoding='utf-8')
-    if 'historical PDF' not in index or 'ADR-0003' not in index:
+    if 'historical PDF' not in index or 'ADR-0005' not in index:
         errors.append('resolver lacks historical/current discovery metadata')
     if base_commit:
         for args in (['diff','--name-only',base_commit,'HEAD','--','contracts','backend','clients','plugins'], ['diff','--name-only','--','contracts','backend','clients','plugins'], ['diff','--cached','--name-only','--','contracts','backend','clients','plugins']):

@@ -78,6 +78,8 @@ jobs:
         run: ./tools/verify-frozen-architecture.ps1
       - name: Current governance references and task scopes
         run: python3 ci/check_architecture.py --scope governance
+      - name: Active client technology/source/dependency/configuration guard
+        run: python3 ci/check_architecture.py --scope clients --json
       - name: Checker positive and negative controls
         run: python3 -m unittest discover -s tests/architecture -v
 
