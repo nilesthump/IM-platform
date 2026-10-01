@@ -5,6 +5,7 @@ Every Go file is parsed (not only the host build tags). Java imports and qualifi
 references are checked now; the Java job also compiles its explicit S0 transport.
 """
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -223,6 +224,329 @@ def check_java(root):
     return errors, [{k: v for k, v in u.items() if k != "code"} for u in units]
 
 
+
+def client_policy(root):
+    """Resolve hash-bound canonical policy; Task Specs cannot extend this policy."""
+    try:
+        manifest = (root / 'spec/architecture/baseline.md').read_text(encoding='utf-8')
+        fields = dict(re.findall(r'^- ([a-z_0-9]+): `([^`]+)`\s*$', manifest, re.M))
+        docpath = root / 'spec/architecture/frozen-architecture.md'
+        doc = docpath.read_text(encoding='utf-8')
+        if fields.get('repository_path') != 'spec/architecture/frozen-architecture.md' or fields.get('sha256') != hashlib.sha256(docpath.read_bytes()).hexdigest():
+            raise ValueError('canonical hash/resolver mismatch')
+        adrpath = 'spec/architecture/decisions/ADR-0005-client-technology-clarification.md'
+        if fields.get('revision_adr') != adrpath or 'Human-approved' not in (root / adrpath).read_text(encoding='utf-8'):
+            raise ValueError('approved ADR-0005 linkage missing')
+        match = re.search(r'<!-- client-technology-policy -->\s*```json\s*(.*?)\s*```', doc, re.S)
+        policy = json.loads(match.group(1)) if match else {}
+        if policy.get('decision') != 'ADR-0005-client-technology-clarification' or policy.get('mobile_framework') != 'Jetpack Compose' or policy.get('native_boundary') != 'clients/desktop/src-tauri/':
+            raise ValueError('client decision/boundary missing')
+        for key in ('languages', 'frameworks', 'runtimes', 'packages', 'native_packages', 'mobile_languages', 'mobile_frameworks', 'mobile_runtimes', 'mobile_plugins', 'mobile_dependencies', 'mobile_tooling', 'mobile_import_prefixes'):
+            if not isinstance(policy.get(key), list) or not all(isinstance(x, str) for x in policy[key]):
+                raise ValueError('invalid policy ' + key)
+        return policy, []
+    except (OSError, ValueError, AttributeError) as error:
+        return {}, ['CLIENT authority unavailable (never skipped): ' + str(error)]
+
+
+FORBIDDEN_CLIENT = re.compile(r'(?:dart-lang/setup-dart|subosito/flutter-action|\bflutter\b|\bdart\b|pubspec\.(?:yaml|lock))', re.I)
+CLIENT_SOURCE = {'.ts', '.tsx'}
+CLIENT_RESOURCES = {'.json', '.yaml', '.yml', '.toml', '.sql', '.md', '.css', '.scss', '.html', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.txt', '.lock'}
+
+
+def client_package_allowed(name, relative, policy, native=False):
+    if relative.startswith('clients/mobile/'):
+        return False  # Native Android Mobile never installs/reuses JS/TS runtime packages.
+    approved = policy['native_packages'] if native else policy['packages']
+    if name not in approved:
+        return False
+    if name.startswith('@tauri-apps/') or name in policy['native_packages']:
+        return relative.startswith('clients/desktop/')
+    if name in {'react', 'react-dom', '@types/react', '@types/react-dom'}:
+        return not relative.startswith('clients/mobile/')
+    return True
+
+
+
+def uncomment_client(text):
+    # Preserve actual quoted strings; comments cannot forge dependencies/imports.
+    return re.sub(r'"""[\s\S]*?"""|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|//[^\n]*|/\*[\s\S]*?\*/',
+                  lambda m: ' ' if m.group().startswith(('//', '/*')) else m.group(), text)
+
+
+def check_android(root, policy):
+    """Bounded direct declarations, never execute Gradle to determine authority.
+
+    Unresolved/dynamic dependency/plugin notation fails closed; Review checks the
+    runtime semantics. This is a stack guard, not an Android build or acceptance.
+    """
+    errors = []
+    base = root / 'clients/mobile'
+    packages = set()
+    catalog_libraries, catalog_plugins, catalog_bundles = {}, {}, set()
+    paths = [p for p in base.rglob('*') if p.is_file() and not p.is_symlink()]
+    for path in paths:
+        if path.suffix == '.kt':
+            code = uncomment_client(path.read_text(encoding='utf-8'))
+            packages.update(re.findall(r'(?m)^\s*package\s+([\w.]+)', code))
+        if path.name != 'libs.versions.toml':
+            continue
+        import tomllib
+        try:
+            catalog = tomllib.loads(path.read_text(encoding='utf-8'))
+            for alias, value in catalog.get('libraries', {}).items():
+                coordinate = value.split(':')[:2] if isinstance(value, str) else (value.get('module', '').split(':')[:2] if 'module' in value else [value.get('group', ''), value.get('name', '')])
+                name = ':'.join(coordinate)
+                catalog_libraries[re.sub(r'[-_]', '.', alias)] = name
+                if name not in policy['mobile_dependencies']:
+                    errors.append(f'CLIENT {path.relative_to(root)}: unapproved Android catalog dependency {name}')
+            for alias, value in catalog.get('plugins', {}).items():
+                name = value.split(':')[0] if isinstance(value, str) else value.get('id', '')
+                catalog_plugins[re.sub(r'[-_]', '.', alias)] = name
+                if name not in policy['mobile_plugins']:
+                    errors.append(f'CLIENT {path.relative_to(root)}: unapproved Android catalog plugin {name}')
+            for alias, values in catalog.get('bundles', {}).items():
+                if not isinstance(values, list) or any(re.sub(r'[-_]', '.', x) not in catalog_libraries for x in values):
+                    errors.append(f'CLIENT {path.relative_to(root)}: unresolved Android catalog bundle {alias}')
+                else:
+                    catalog_bundles.add(re.sub(r'[-_]', '.', alias))
+        except (ValueError, TypeError, AttributeError):
+            errors.append(f'CLIENT {path.relative_to(root)}: invalid Android version catalog')
+    for path in paths:
+        relative = path.relative_to(root).as_posix()
+        if path.suffix not in {'.kt', '.kts', '.gradle', '.toml', '.properties', '.xml', '.sh', '.bat', '.cmd', '.yml', '.yaml', '.json'} and path.name not in {'gradlew', 'Makefile', 'Dockerfile'}:
+            continue
+        code = uncomment_client(path.read_text(encoding='utf-8'))
+        if path.suffix == '.kt':
+            for dependency in re.findall(r'(?m)^\s*import\s+([\w.*]+)', code):
+                local = any(dependency.startswith(package + '.') for package in packages)
+                if not local and not any(dependency.startswith(prefix) for prefix in policy['mobile_import_prefixes']):
+                    errors.append(f'CLIENT {relative}: unapproved Kotlin import {dependency}')
+            if re.search(r'\b(?:addJavascriptInterface|evaluateJavascript|ReactNative|JavascriptEngine)\b|\bSystem\s*\.\s*load(?:Library)?\s*\(', code):
+                errors.append(f'CLIENT {relative}: unapproved Mobile JS/native bridge/runtime')
+        if path.suffix in {'.gradle', '.kts'}:
+            # Accept the entire selector argument, never an approved string prefix.
+            literal = r"(?:\"[\w.-]+\"|'[\w.-]+')"
+            selector = re.compile(r'\b(id|kotlin)\s*(?:\(\s*(' + literal +
+                                  r')\s*\)|[ \t]+(' + literal + r'))')
+            for declaration in re.finditer(r'\b(?:id|kotlin)\s*(?=\(|[\"\'])', code):
+                match = selector.match(code, declaration.start())
+                if not match:
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin selector')
+                    continue
+                name = (match.group(2) or match.group(3))[1:-1]
+                plugin = 'org.jetbrains.kotlin.' + name if match.group(1) == 'kotlin' else name
+                if plugin not in policy['mobile_plugins']:
+                    errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {plugin}')
+            # Plugins blocks allow only complete supported declarations and their
+            # version/apply modifiers. Residual entries reject builtin shortcuts
+            # and computed selectors without maintaining a plugin-name blacklist.
+            text_literal = r"(?:\"[^\"\n]*\"|'[^'\n]*')"
+            version = r'(?:\s*(?:\.\s*)?version\s*(?:\(\s*' + text_literal + r'\s*\)|' + text_literal + r'))?'
+            apply = r'(?:\s*(?:\.\s*)?apply\s*(?:\(\s*(?:true|false)\s*\)|(?:true|false)\b))?'
+            entry = r'(?:' + selector.pattern + r'|\balias\s*\(\s*libs\.plugins\.[\w.]+\s*\))' + version + apply
+            build_code = code
+            for block in re.finditer(r'\bplugins\s*\{([^}]*)(\}|$)', code):
+                if block.group(2) != '}' or not re.fullmatch(r'(?:\s*(?:' + entry + r')\s*;?)*\s*', block.group(1)):
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugins block')
+                build_code = build_code.replace(block.group(0), '')
+            for coordinate in re.findall(r'["\']([\w.\-]+:[\w.\-]+)(?::[^"\']*)?["\']', code):
+                if coordinate not in policy['mobile_dependencies']:
+                    errors.append(f'CLIENT {relative}: unapproved Android Gradle dependency {coordinate}')
+            # Check every declaration start, not only already-literal/resolved forms.
+            for declaration in re.finditer(r'\bapply\s+plugin\s*:\s*', code):
+                expression = code[declaration.end():]
+                match = re.match(r"([\"'])([^\"']+)\1[ \t]*(?=$|[\n;}])", expression)
+                if not match:
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android apply plugin declaration')
+                elif match.group(2) not in policy['mobile_plugins']:
+                    errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {match.group(2)}')
+            for declaration in re.finditer(r'\balias\s*\(\s*', code):
+                alias = re.match(r'libs\.plugins\.([\w.]+)\s*\)', code[declaration.end():])
+                if not alias or alias.group(1) not in catalog_plugins:
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin alias')
+            # Every dependency call must be a literal approved coordinate, a checked
+            # catalog alias, BOM platform wrapper, or an internal Android project.
+            calls = re.findall(r'\b(?:implementation|api|compileOnly|runtimeOnly|classpath|kapt|ksp|annotationProcessor|\w*Implementation)\s*(?:\(\s*)?([^\n;{}]+)', code)
+            for expression in calls:
+                expression = expression.strip()
+                literal = bool(re.match(r'(?:platform\s*\(\s*|enforcedPlatform\s*\(\s*)?["\'][\w.\-]+:[\w.\-]+:[^"\']+["\']\s*\)*\s*$', expression))
+                internal = bool(re.fullmatch(r'project\s*\(\s*["\']:[\w:\-]+["\']\s*\)\s*\)*', expression))
+                alias = re.fullmatch(r'(?:platform\s*\(\s*)?libs\.(bundles\.)?([\w.]+)\s*\)*', expression)
+                resolved = bool(alias and (alias.group(2) in (catalog_bundles if alias.group(1) else catalog_libraries)))
+                if not (literal or internal or resolved):
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android dependency declaration {expression}')
+            # Consume supported direct Groovy declarations, then reject every
+            # remaining apply identifier outside strings/comments. This covers
+            # command calls, variables, closures, references and typed calls
+            # without a receiver/plugin-name blacklist or executing Gradle.
+            direct_apply = r'(?m)(?:^|[;{}])([ \t]*apply\s+plugin\s*:\s*' + text_literal + r'[ \t]*(?=$|[\n;}]))'
+            build_code = re.sub(direct_apply, lambda m: m.group(0)[:m.start(1) - m.start()], build_code)
+            quoted = r'"{3}[\s\S]*?"{3}|\x27{3}[\s\S]*?\x27{3}|"(?:\\.|[^"\\])*"|\x27(?:\\.|[^\x27\\])*\x27'
+            # Slashy literals have an unambiguous expression-start/member prefix;
+            # dollar-slashy literals have their own delimiter. Keep division as code.
+            quoted += r'|\$/[\s\S]*?/\$|(?P<slashy_prefix>(?:^|[=(\[,:.]|\.\s*&)\s*)/(?:\\.|[^/\\])*/'
+            def mask_build_literal(match):
+                # Groovy quoted members are executable selectors, including method
+                # pointers and interpolation. Ordinary entire strings remain data.
+                # Unsupported member notation must not evade plugin/dependency checks.
+                prefix = match.group('slashy_prefix') or ''
+                if re.search(r'\.\s*&?\s*$', prefix or build_code[:match.start()]):
+                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android quoted plugin/dependency/build selector')
+                return prefix + ' '
+            build_code = re.sub(quoted, mask_build_literal, build_code, flags=re.MULTILINE)
+            if re.search(r'\bapply\b|\b(?:includeBuild|useModule|usePlugin)\s*\(', build_code):
+                errors.append(f'CLIENT {relative}: unapproved/dynamic Android Gradle plugin/build inclusion')
+    # Build/install/CI commands must not restore Mobile TS or choose another stack.
+    configurations = paths + list((root / '.github/workflows').glob('*'))
+    for path in configurations:
+        if path.suffix not in {'.yml', '.yaml', '.json', '.gradle', '.kts', '.properties', '.sh', '.bat', '.cmd'} and path.name not in {'gradlew', 'Makefile', 'Dockerfile'}:
+            continue
+        code = path.read_text(encoding='utf-8')
+        relative = path.relative_to(root).as_posix()
+        # Only Mobile-relevant workflow jobs; TS Desktop/Web tooling remains valid.
+        if relative.startswith('.github/'):
+            blocks = re.findall(r'(?ms)^  [\w-]+:\n.*?(?=^  [\w-]+:\n|\Z)', code)
+            code = '\n'.join(x for x in blocks if re.search(r'\bmobile\b|clients/mobile|setup-android|android-emulator', x, re.I)) if blocks else (code if re.search(r'clients/mobile|android|compose|gradle', code, re.I) else '')
+        if re.search(r'\b(?:npm|pnpm|yarn|node|bun|deno|npx)\b|setup-node|react-native|capacitor|nativescript|\bexpo\b|\b(?:Room|ktor|retrofit|okhttp)\b|--init-script|(?:^|\s)-I\s', code, re.I):
+            errors.append(f'CLIENT {relative}: unapproved Mobile build/runtime/dependency command')
+        for action in re.findall(r'uses:\s*([\w.-]+/[\w./-]+)@', code):
+            if re.search(r'android|gradle|kotlin|compose', action, re.I) and action not in policy['mobile_tooling']:
+                errors.append(f'CLIENT {relative}: unapproved Android tooling action {action}')
+        if path.name == 'gradle-wrapper.properties':
+            for url in re.findall(r'(?m)^distributionUrl\s*=\s*(\S+)', code):
+                if not re.fullmatch(r'https\\?://services\.gradle\.org/distributions/gradle-[\w.\-]+-(?:bin|all)\.zip', url):
+                    errors.append(f'CLIENT {relative}: unapproved Gradle wrapper distribution')
+    return errors
+
+
+def check_clients(root):
+    policy, errors = client_policy(root)
+    if errors:
+        return errors
+    errors += check_android(root, policy)
+    files = []
+    for directory in ('clients', '.github/workflows'):
+        if (root / directory).is_symlink():
+            errors.append(f'CLIENT {directory}: symlink boundary bypass')
+    for area in ('shared', 'web', 'desktop', 'mobile'):
+        base = root / 'clients' / area
+        if base.is_symlink():
+            errors.append(f'CLIENT {base}: symlink boundary bypass')
+            continue
+        files.extend(base.rglob('*'))
+    # Active configuration only: immutable research/evidence/history not scanned.
+    files += list((root / '.github/workflows').glob('*'))
+    files += [root / p for p in ('package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'bun.lockb', 'tsconfig.json') if (root / p).exists()]
+    for path in files:
+        relative = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            errors.append(f'CLIENT {relative}: symlink boundary bypass')
+            continue
+        if not path.is_file():
+            continue
+        client = relative.startswith('clients/')
+        native = relative.startswith(policy['native_boundary'])
+        mobile = relative.startswith('clients/mobile/')
+        if path.name == '.gitkeep' and not path.read_bytes().strip():
+            continue
+        suffix = path.suffix.lower()
+        config_js = suffix in {'.js', '.mjs', '.cjs'} and ('.config.' in path.name or path.name.startswith('eslint.config.'))
+        allowed = suffix in CLIENT_SOURCE | CLIENT_RESOURCES or config_js or path.name in {'.gitignore', '.npmrc', 'Dockerfile', 'Makefile'}
+        if native and (suffix in {'.rs', '.rc', '.plist', '.manifest', '.icns'} or path.name == 'Cargo.lock'):
+            allowed = True
+        if mobile:
+            allowed = suffix in CLIENT_RESOURCES | {'.kt', '.xml', '.gradle', '.properties', '.sh', '.bat', '.cmd'} or path.name in {'.gitignore', 'gradlew', 'Makefile', 'Dockerfile'} or path.name in {'build.gradle.kts', 'settings.gradle.kts'}
+            if path.name == 'gradle-wrapper.jar' and relative.endswith('/gradle/wrapper/gradle-wrapper.jar'):
+                continue  # Standard Android Gradle tooling, semantic Review verifies artifact provenance.
+            if suffix == '.toml' and path.name != 'libs.versions.toml':
+                allowed = False
+            if path.name in {'package.json', 'tsconfig.json'} or suffix in {'.ts', '.tsx', '.js', '.mjs', '.cjs', '.rs'}:
+                allowed = False
+        if client and not allowed:
+            errors.append(f'CLIENT {relative}: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only')
+        if suffix in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.icns'}:
+            continue
+        try:
+            text = path.read_text(encoding='utf-8')
+        except UnicodeError:
+            errors.append(f'CLIENT {relative}: unsupported binary configuration/source')
+            continue
+        if suffix == '.dart' or path.name.lower() in {'pubspec.yaml', 'pubspec.lock', '.metadata'} or (suffix != '.md' and FORBIDDEN_CLIENT.search(text)):
+            errors.append(f'CLIENT {relative}: Dart/Flutter active source/dependency/configuration forbidden')
+        if relative.startswith('clients/web/') and re.search(r'\b(?:sqlite\w*|localStorage|indexedDB)\b', text, re.I) and suffix != '.md':
+            errors.append(f'CLIENT {relative}: Web must remain memory only / no SQLite/history persistence')
+        if path.name == 'package.json':
+            try:
+                manifest = json.loads(text)
+                for key in ('dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'):
+                    for name in manifest.get(key, {}):
+                        if not client_package_allowed(name, relative, policy):
+                            errors.append(f'CLIENT {relative}: unapproved dependency {name}; task/tests cannot authorize selection')
+            except (ValueError, AttributeError, TypeError):
+                errors.append(f'CLIENT {relative}: invalid package manifest')
+        if path.name == 'Cargo.toml':
+            # Standard-library TOML parser, no product/tooling dependency added.
+            import tomllib
+            try:
+                manifest = tomllib.loads(text)
+                tables = [manifest, manifest.get('workspace', {})] + list(manifest.get('target', {}).values())
+                for table in tables:
+                    for key in ('dependencies', 'build-dependencies', 'dev-dependencies'):
+                        for name, value in table.get(key, {}).items():
+                            package = value.get('package', name) if isinstance(value, dict) else name
+                            if not native or not client_package_allowed(package, relative, policy, native=True):
+                                errors.append(f'CLIENT {relative}: unapproved native dependency {package}; Desktop SQLite is SQLx only')
+                            if package == 'sqlx' and isinstance(value, dict) and any(x in value.get('features', []) for x in ('postgres', 'mysql', 'any')):
+                                errors.append(f'CLIENT {relative}: SQLx is approved for SQLite only')
+            except (ValueError, AttributeError, TypeError):
+                errors.append(f'CLIENT {relative}: invalid Cargo manifest')
+        if suffix in CLIENT_SOURCE or config_js:
+            imports = re.findall(r'''(?:\bfrom\s*|\bimport\s*(?:\(\s*)?|\brequire\s*\(\s*)["']([^"']+)["']''', text)
+            for dependency in imports:
+                if dependency.startswith(('.', '/')):
+                    continue
+                name = '/'.join(dependency.split('/')[:2]) if dependency.startswith('@') else dependency.split('/')[0]
+                if not client_package_allowed(name, relative, policy):
+                    errors.append(f'CLIENT {relative}: unapproved import/runtime {dependency}')
+        # Known alternate runtimes/framework install commands cannot hide in builds/CI.
+        if suffix in {'.json', '.yaml', '.yml', '.toml', '.lock', '.js', '.mjs', '.cjs'} or path.name in {'Dockerfile', 'Makefile'}:
+            if re.search(r'\b(?:expo|react-native|nativescript|capacitor|electron|svelte|vue|angular|solid-js|zustand|redux|bun|deno|rusqlite)\b', text, re.I):
+                errors.append(f'CLIENT {relative}: unapproved framework/runtime/native dependency in active configuration')
+            for match in re.finditer(r'\b(?:npm|pnpm|yarn)\s+(?:install|add)\s+([^\n;]+)', text):
+                for name in match.group(1).split():
+                    if name.startswith('-'):
+                        continue
+                    name = re.sub(r'(?<!^)@[^/]*$', '', name)
+                    if not client_package_allowed(name, relative, policy):
+                        errors.append(f'CLIENT {relative}: unapproved build-installed dependency {name}')
+    return errors
+
+
+def client_task_violations(text, path, root):
+    # Explicit positive declarations are checked regardless of allowed_paths/tests.
+    declarations = re.findall(r'(?mi)^\s*(?:[-*]\s*)?(client_(?:framework|runtime|language|dependency)):\s*`?([^`\n]+?)`?\s*$', text)
+    if not declarations:
+        return []
+    policy, errors = client_policy(root)
+    if errors:
+        return errors
+    keys = {'client_framework': 'frameworks', 'client_runtime': 'runtimes', 'client_language': 'languages', 'client_dependency': 'packages'}
+    mobile_only = 'clients/mobile/' in text and 'clients/desktop/' not in text and 'clients/web/' not in text and 'clients/shared/' not in text
+    for kind, value in declarations:
+        approved = policy[keys[kind]]
+        if mobile_only:
+            approved = policy[{'client_framework':'mobile_frameworks', 'client_runtime':'mobile_runtimes', 'client_language':'mobile_languages', 'client_dependency':'mobile_dependencies'}[kind]] + (policy['mobile_plugins'] + policy['mobile_tooling'] if kind == 'client_dependency' else [])
+        if kind == 'client_dependency' and 'clients/mobile/' in text and not mobile_only:
+            approved = approved + policy['mobile_dependencies'] + policy['mobile_plugins'] + policy['mobile_tooling']
+        if kind == 'client_dependency' and 'clients/desktop/src-tauri/' in text:
+            approved = approved + policy['native_packages']
+        native_language_outside_boundary = kind == 'client_language' and value == 'Rust' and 'clients/desktop/src-tauri/' not in text
+        if value not in approved or native_language_outside_boundary or (not 'clients/mobile/' in text and value in policy['mobile_languages'] + policy['mobile_frameworks'] + policy['mobile_runtimes']):
+            errors.append(f'CLIENT {path}: unapproved {kind} {value}; Task Spec cannot authorize technology')
+    return errors
+
+
 def task_paths(text):
     section = re.search(r"(?ms)^# Allowed Paths\s*\n(.*?)(?=^# |\Z)", text)
     if not section:
@@ -270,6 +594,7 @@ def check_governance(root):
     for queue in ("backlog", "ready", "active", "review"):
         for path in (root / "spec/tasks" / queue).glob("*.md"):
             text = path.read_text(encoding="utf-8")
+            errors += client_task_violations(text, path.relative_to(root), root)
             try:
                 allowed_paths = task_paths(text)
             except ValueError as error:
@@ -304,7 +629,7 @@ def check_workflow(text):
         errors.append("CI on: push/pull_request triggers required")
     if re.search(r"\b(?:paths|paths-ignore|branches|branches-ignore)\s*:", trigger_text):
         errors.append("CI on: trigger filters cannot bypass applicable checks")
-    commands = {"architecture": ["./tools/verify-frozen-architecture.ps1", "ci/check_architecture.py --scope governance", "unittest discover -s tests/architecture"],
+    commands = {"architecture": ["./tools/verify-frozen-architecture.ps1", "ci/check_architecture.py --scope governance", "unittest discover -s tests/architecture", "ci/check_architecture.py --scope clients --json"],
                 "source_go": ["ci/check_architecture.py --scope go --json"],
                 "source_java": ["ci/check_architecture.py --scope java --json"]}
     for job, required in commands.items():
@@ -332,13 +657,15 @@ def check_workflow(text):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--scope", choices=("go", "java", "governance", "all"), default="all")
+    parser.add_argument("--scope", choices=("go", "java", "governance", "clients", "all"), default="all")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     errors = []
     graphs = {}
     if args.scope in {"governance", "all"}:
         errors += check_governance(args.root)
+    if args.scope in {"clients", "all"}:
+        errors += check_clients(args.root)
     for language, checker in (("go", check_go), ("java", check_java)):
         if args.scope in {language, "all"}:
             found, graph = checker(args.root)

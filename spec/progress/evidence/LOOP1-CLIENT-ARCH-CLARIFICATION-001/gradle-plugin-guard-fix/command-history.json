@@ -1,0 +1,475 @@
+[
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "[Console]::OutputEncoding=[Text.UTF8Encoding]::new(); Get-Content -Encoding utf8 spec/architecture/frozen-architecture.md,spec/governance/minimality.md,spec/governance/execution-boundaries.md,spec/governance/independent-review.md,spec/governance/technology-selection.md; Get-Content -Encoding utf8 spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-approved-request.txt,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-desktop-sqlx-mobile-emulator-decision.txt,spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt; git status --short; git diff; git log -5 --oneline; Get-Content ci/check_architecture.py | Select-Object -Skip 245 -First 140; Get-Content tests/architecture/test_client_technology.py"
+    ],
+    "command_id": "C-59285e17-223e-48ec-898d-7211c0c24b71",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 813.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-59285e17-223e-48ec-898d-7211c0c24b71.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-59285e17-223e-48ec-898d-7211c0c24b71.stdout.txt",
+    "stdout_sha256": "7bc7132b780dc23b1a11bfca59386862bef529d4c59068db05271b08011fea09"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      "Get-Content ci/check_architecture.py | Select-Object -Skip 255 -First 105; Get-Content spec/governance/minimality.md,spec/governance/execution-boundaries.md,spec/governance/independent-review.md,spec/governance/technology-selection.md; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development"
+    ],
+    "command_id": "C-fd449133-0d31-4267-bbea-d192ca6b1f29",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 7188.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-fd449133-0d31-4267-bbea-d192ca6b1f29.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-fd449133-0d31-4267-bbea-d192ca6b1f29.stdout.txt",
+    "stdout_sha256": "ce46aff8d36afd46475bfc72d2c59197899daf6be926493805f349178c9380a3"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/add-controls.py"
+    ],
+    "command_id": "C-644c6723-9e7b-4d55-b101-6f381d363080",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 63.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-644c6723-9e7b-4d55-b101-6f381d363080.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-644c6723-9e7b-4d55-b101-6f381d363080.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_client_technology.py",
+      "-v"
+    ],
+    "command_id": "C-fdc208ec-1a56-40a1-89f4-a2bc948ae4ab",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 640.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-fdc208ec-1a56-40a1-89f4-a2bc948ae4ab.stderr.txt",
+    "stderr_sha256": "7f01f73447df7091a7637a0d6ba8114859b512ad2e15ce99c462f2f3d8cb19dd",
+    "stdout_blob": "blobs/C-fdc208ec-1a56-40a1-89f4-a2bc948ae4ab.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/repair.py"
+    ],
+    "command_id": "C-65e7f806-2a36-4d7e-ba56-acdcd007d5c0",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-65e7f806-2a36-4d7e-ba56-acdcd007d5c0.stderr.txt",
+    "stderr_sha256": "4fe26b5c3ea858750484241d4b7f48eae89b10e3cd11f7c5be665e3d38327776",
+    "stdout_blob": "blobs/C-65e7f806-2a36-4d7e-ba56-acdcd007d5c0.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_client_technology.py",
+      "-v"
+    ],
+    "command_id": "C-a5447811-410d-4821-9b0a-7b7303d4180e",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 562.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-a5447811-410d-4821-9b0a-7b7303d4180e.stderr.txt",
+    "stderr_sha256": "c4539e00806224cdedc1c54bd9d1f8683f51bf38e7eb3cd61c5b3ccc6b26534c",
+    "stdout_blob": "blobs/C-a5447811-410d-4821-9b0a-7b7303d4180e.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/repair-corrected.py"
+    ],
+    "command_id": "C-68e79043-58a1-4cff-b6da-6cf444e7fe39",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-68e79043-58a1-4cff-b6da-6cf444e7fe39.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-68e79043-58a1-4cff-b6da-6cf444e7fe39.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_client_technology.py",
+      "-v"
+    ],
+    "command_id": "C-17ebcdb7-d0c7-45a6-966e-55e6e90de358",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 547.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-17ebcdb7-d0c7-45a6-966e-55e6e90de358.stderr.txt",
+    "stderr_sha256": "6bbe81e6edb82aef5e79bd964dc3d57112b288e716b90dc38177f71c18ebc853",
+    "stdout_blob": "blobs/C-17ebcdb7-d0c7-45a6-966e-55e6e90de358.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "command_id": "C-5dfe3f38-ac0d-4840-acbb-45881f821814",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 6047.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-5dfe3f38-ac0d-4840-acbb-45881f821814.stderr.txt",
+    "stderr_sha256": "82c64c346deb236550ebfc9b86a60a17bacb2e5fcec9235570ef4e0d35a6cdc5",
+    "stdout_blob": "blobs/C-5dfe3f38-ac0d-4840-acbb-45881f821814.stdout.txt",
+    "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "command_id": "C-7cea8ad9-54fb-43ac-87bf-548272a5d087",
+    "cwd": ".",
+    "secret_redaction_applied": true,
+    "duration_ms": 359.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-7cea8ad9-54fb-43ac-87bf-548272a5d087.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-7cea8ad9-54fb-43ac-87bf-548272a5d087.stdout.txt",
+    "stdout_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-v"
+    ],
+    "command_id": "C-5a31a2f1-8cc5-44fd-b2ee-eb241b12ab8f",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 5609.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-5a31a2f1-8cc5-44fd-b2ee-eb241b12ab8f.stderr.txt",
+    "stderr_sha256": "5a962d140ca9becfe07f79f69f64ae040b28166948a26689aafacca54859a841",
+    "stdout_blob": "blobs/C-5a31a2f1-8cc5-44fd-b2ee-eb241b12ab8f.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/ci",
+      "-v"
+    ],
+    "command_id": "C-314791ec-9917-4c6f-bc56-1c669d276748",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 2656.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-314791ec-9917-4c6f-bc56-1c669d276748.stderr.txt",
+    "stderr_sha256": "a8a6f2b03db62dbd861daf0827b29a86fb6dcb188fb55c5129df68e61d16d2e0",
+    "stdout_blob": "blobs/C-314791ec-9917-4c6f-bc56-1c669d276748.stdout.txt",
+    "stdout_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/handoff.py"
+    ],
+    "command_id": "C-6b4e0bfb-0a04-4934-acd6-d86e153e9896",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 63.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-6b4e0bfb-0a04-4934-acd6-d86e153e9896.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-6b4e0bfb-0a04-4934-acd6-d86e153e9896.stdout.txt",
+    "stdout_sha256": "f865945ad3e8a74289e3246ce16f1fba6d9df989382c8b3a0c6196434e40e113"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Development"
+    ],
+    "command_id": "C-e6e4a4cf-c751-4df8-8155-1d7dc24ebf11",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 6343.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-e6e4a4cf-c751-4df8-8155-1d7dc24ebf11.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-e6e4a4cf-c751-4df8-8155-1d7dc24ebf11.stdout.txt",
+    "stdout_sha256": "4f481c5f3396982db77376b8f13a570005e3e854004497b00cae0b7d59fb0f47"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "command_id": "C-3eb5ea18-c82e-4d89-a768-2ca1adaf64dd",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 46.0,
+    "exit_code": 2,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-3eb5ea18-c82e-4d89-a768-2ca1adaf64dd.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-3eb5ea18-c82e-4d89-a768-2ca1adaf64dd.stdout.txt",
+    "stdout_sha256": "4102f0837e9236b8ca96dd1373ab9d0475250f534d2df4968055a85eb9ae0b35"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "H:/.codex/evidence/gradle-plugin-guard-fix-20261001/preservation.py"
+    ],
+    "command_id": "C-93287371-7e03-40fd-8fca-18199e5f053b",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 860.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-93287371-7e03-40fd-8fca-18199e5f053b.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-93287371-7e03-40fd-8fca-18199e5f053b.stdout.txt",
+    "stdout_sha256": "c87c35247df4717de56f7007d7287b0e458fb05496444c0c15e90f5c76481900"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "command_id": "C-05e4d379-600b-4762-93d7-51ed74404530",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 46.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-05e4d379-600b-4762-93d7-51ed74404530.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-05e4d379-600b-4762-93d7-51ed74404530.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--check",
+      "3f352a8..HEAD",
+      "--",
+      ".",
+      ":!spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-approved-request.txt"
+    ],
+    "command_id": "C-39f0c0a7-2c44-488f-9db2-ff8feff92597",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 46.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-39f0c0a7-2c44-488f-9db2-ff8feff92597.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-39f0c0a7-2c44-488f-9db2-ff8feff92597.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "add",
+      "ci/check_architecture.py",
+      "tests/architecture/test_client_technology.py",
+      "spec/progress/current.md",
+      "spec/tasks/review/LOOP1-CLIENT-ARCH-CLARIFICATION-001.md",
+      "spec/progress/checkpoints/2026-10-01-client-architecture-gradle-guard-fix.md",
+      "spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/gradle-plugin-guard-fix"
+    ],
+    "command_id": "C-949d372b-51e4-4c1a-870d-f497609de455",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-949d372b-51e4-4c1a-870d-f497609de455.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-949d372b-51e4-4c1a-870d-f497609de455.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "command_id": "C-a07658f4-6e2b-40cf-b6f2-aff6ff73d5ef",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 2,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-a07658f4-6e2b-40cf-b6f2-aff6ff73d5ef.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-a07658f4-6e2b-40cf-b6f2-aff6ff73d5ef.stdout.txt",
+    "stdout_sha256": "0be53e2b67659cf186cf9d88e1c98f76da7833dc8949181e6effe9e1e9f5ee5e"
+  },
+  {
+    "argv": [
+      "git",
+      "commit",
+      "-m",
+      "Reject unresolved Android apply plugins and catalog aliases"
+    ],
+    "command_id": "C-3e035418-ab8e-4a0d-ba34-80cf10cea522",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 94.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-3e035418-ab8e-4a0d-ba34-80cf10cea522.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-3e035418-ab8e-4a0d-ba34-80cf10cea522.stdout.txt",
+    "stdout_sha256": "8661b6539b898886937e1475dd2c078514b0a4979e8281312a369cdb6109d4b8"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "command_id": "C-a38e19e4-7ab5-4634-9fc0-bddc91f5d5dd",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 6297.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-a38e19e4-7ab5-4634-9fc0-bddc91f5d5dd.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-a38e19e4-7ab5-4634-9fc0-bddc91f5d5dd.stdout.txt",
+    "stdout_sha256": "0dca0d7b11d6af25b2264652e2f12eddef955bc688370d2520a983d7527cb57b"
+  },
+  {
+    "argv": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--check",
+      "b941df7..HEAD"
+    ],
+    "command_id": "C-266203a1-e65f-4e9a-b2ac-d9d6c3936da6",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 32.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-266203a1-e65f-4e9a-b2ac-d9d6c3936da6.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-266203a1-e65f-4e9a-b2ac-d9d6c3936da6.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--check",
+      "3f352a8..HEAD",
+      "--",
+      ".",
+      ":!spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-approved-request.txt"
+    ],
+    "command_id": "C-76030486-b474-4213-8a06-79385d68378d",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-76030486-b474-4213-8a06-79385d68378d.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-76030486-b474-4213-8a06-79385d68378d.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

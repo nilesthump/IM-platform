@@ -1,0 +1,53 @@
+[
+  {
+    "name": "prior-variable",
+    "source": "def selected = \"java\"\napply plugin: selected",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android apply plugin declaration"
+    ]
+  },
+  {
+    "name": "prior-alias-get",
+    "source": "plugins { alias(libs.plugins.unapproved.get()) }",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle.kts: unresolved/dynamic Android plugin alias"
+    ]
+  },
+  {
+    "name": "approved-id",
+    "source": "plugins { id(\"com.android.application\") }",
+    "errors": []
+  },
+  {
+    "name": "approved-kotlin",
+    "source": "plugins { kotlin(\"android\") }",
+    "errors": []
+  },
+  {
+    "name": "id-replace",
+    "source": "plugins { id(\"com.android.application\".replace(\"com.android.application\", \"java\")) }",
+    "errors": []
+  },
+  {
+    "name": "id-concat",
+    "source": "plugins { id(\"com.android.application\" + \".unapproved\") }",
+    "errors": []
+  },
+  {
+    "name": "kotlin-replace",
+    "source": "plugins { kotlin(\"android\".replace(\"android\", \"multiplatform\")) }",
+    "errors": []
+  },
+  {
+    "name": "kotlin-variable",
+    "source": "val selected = \"multiplatform\"\nplugins { kotlin(selected) }",
+    "errors": []
+  },
+  {
+    "name": "apply-replace",
+    "source": "apply plugin: \"com.android.application\".replace(\"com.android.application\", \"java\")",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android apply plugin declaration"
+    ]
+  }
+]

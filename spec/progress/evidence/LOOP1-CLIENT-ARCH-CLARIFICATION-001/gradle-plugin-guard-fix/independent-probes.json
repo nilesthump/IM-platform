@@ -1,0 +1,110 @@
+[
+  {
+    "name": "gradle_dynamic_add",
+    "path": "clients/mobile/app/build.gradle.kts",
+    "content": "val lib = \"com.example\" + \":unapproved:1\"\ndependencies { add(\"implementation\", lib) }",
+    "errors": [
+      "CLIENT clients/mobile/app/build.gradle.kts: unresolved/dynamic Android dependency declaration \", lib)"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "gradle_catalog_alias_get_plugin",
+    "path": "clients/mobile/build.gradle.kts",
+    "content": "plugins { alias(libs.plugins.unapproved.get()) }",
+    "errors": [],
+    "expected_rejection": true
+  },
+  {
+    "name": "gradle_variable_plugin",
+    "path": "clients/mobile/build.gradle",
+    "content": "def selected = \"com.example.unapproved\"\napply plugin: selected",
+    "errors": [],
+    "expected_rejection": true
+  },
+  {
+    "name": "kotlin_network",
+    "path": "clients/mobile/app/Net.kt",
+    "content": "package im\nimport okhttp3.OkHttpClient\n",
+    "errors": [
+      "CLIENT clients/mobile/app/Net.kt: unapproved Kotlin import okhttp3.OkHttpClient"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "kotlin_room",
+    "path": "clients/mobile/app/DB.kt",
+    "content": "package im\nimport androidx.room.Room\n",
+    "errors": [
+      "CLIENT clients/mobile/app/DB.kt: unapproved Kotlin import androidx.room.Room"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "catalog_network",
+    "path": "clients/mobile/gradle/libs.versions.toml",
+    "content": "[libraries]\nnet={module=\"com.squareup.okhttp3:okhttp\",version=\"4\"}",
+    "errors": [
+      "CLIENT clients\\mobile\\gradle\\libs.versions.toml: unapproved Android catalog dependency com.squareup.okhttp3:okhttp"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "mobile_typescript",
+    "path": "clients/mobile/app.ts",
+    "content": "export const x = 1",
+    "errors": [
+      "CLIENT clients/mobile/app.ts: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "mobile_js",
+    "path": "clients/mobile/app.js",
+    "content": "const x = 1",
+    "errors": [
+      "CLIENT clients/mobile/app.js: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "mobile_dart",
+    "path": "clients/mobile/app.dart",
+    "content": "void main() {}",
+    "errors": [
+      "CLIENT clients/mobile/app.dart: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only",
+      "CLIENT clients/mobile/app.dart: Dart/Flutter active source/dependency/configuration forbidden"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "flutter_workflow",
+    "path": ".github/workflows/mobile.yml",
+    "content": "jobs:\n  mobile:\n    steps:\n      - run: flutter build apk",
+    "errors": [
+      "CLIENT .github/workflows/mobile.yml: Dart/Flutter active source/dependency/configuration forbidden"
+    ],
+    "expected_rejection": true
+  },
+  {
+    "name": "android_positive",
+    "path": "clients/mobile/app/build.gradle.kts",
+    "content": "plugins { id(\"com.android.application\") }\ndependencies { implementation(\"androidx.compose.ui:ui:1.7\") }",
+    "errors": [],
+    "expected_rejection": false
+  },
+  {
+    "name": "compose_positive",
+    "path": "clients/mobile/app/Main.kt",
+    "content": "package im\nimport androidx.compose.runtime.Composable\nimport android.database.sqlite.SQLiteDatabase\n",
+    "errors": [],
+    "expected_rejection": false
+  },
+  {
+    "name": "desktop_positive",
+    "path": "clients/desktop/src-tauri/Cargo.toml",
+    "content": "[dependencies]\ntauri=\"2\"\nsqlx={version=\"0.8\",features=[\"sqlite\"]}",
+    "errors": [],
+    "expected_rejection": false
+  }
+]

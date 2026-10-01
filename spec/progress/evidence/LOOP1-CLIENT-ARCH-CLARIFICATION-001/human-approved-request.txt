@@ -1,0 +1,917 @@
+你是 `H:/IM-platform` 当前 Coordinator / Implementation Agent。
+
+这是一次明确的人类架构纠偏与 S2 重新实施授权。
+
+当前远程事实已经确认：
+
+- `main` 当前 HEAD：
+  `3f352a8e465c0c4b093cca8e5f404ea587550b6e`
+- PR #7 曾错误使用 Dart 实现 S2 SQLite foundation。
+- PR #8 已合并并完整回退 PR #7。
+- 当前 `main` 的 Git tree 与 PR #7 合并前一致。
+- S1 产品 Gate 已 PASS。
+- 当前状态为：
+  **S2 OPEN / S2 尚未完成**
+- PR #7 的 Dart 实现虽然曾通过其自身测试/Review，但已经被明确撤销，不再属于当前产品实现。
+- 历史 PR、FAIL、Review、Recorder、evidence 不得删除或改写。
+
+本次 Human 明确批准以下客户端技术栈，并要求将它正式冻结进架构，然后重新实施 S2。
+
+────────────────────
+一、Human-approved 客户端技术栈
+────────────────────
+
+### Web
+
+正式技术栈：
+
+- React
+- TypeScript
+
+架构约束：
+
+- 仅临时在线状态
+- Memory only
+- 不使用 SQLite
+- 不持久化聊天历史
+- 不加载离线聊天历史
+- HTTPS + WSS 与服务端通信
+- 页面生命周期结束后不保证消息状态保留
+
+### Desktop
+
+正式技术栈：
+
+- Tauri
+- React
+- TypeScript
+
+原则：
+
+- UI 与 Web 最大程度复用
+- 客户端业务逻辑、协议、模型、Plugin UI 能力保持 TypeScript 生态
+- 使用本地 SQLite
+- 支持离线历史
+- optimistic send
+- SENDING / SENT / FAILED
+- ACK 回写
+- retry 复用 request_id
+- Sync 收敛
+
+Tauri 所需 native/Rust 代码仅允许存在于明确的 native boundary，例如：
+
+`clients/desktop/src-tauri/**`
+
+Rust 可以负责：
+
+- SQLite native access
+- OS secure storage
+- 文件系统等必须的系统能力
+
+但是：
+
+**客户端业务层、Repository API、protocol/model/plugin SDK 不得迁移成 Rust。**
+
+Rust 是 native adapter，不是新的共享客户端技术栈。
+
+### Mobile
+
+正式方向：
+
+- TypeScript ecosystem
+- 不是 Dart
+- 不是 Flutter
+
+必须：
+
+- 复用公共 TypeScript protocol SDK
+- 复用公共 TypeScript plugin SDK
+- 尽可能复用共享 model/data/domain logic
+- 使用 SQLite
+- 支持离线历史、optimistic send、ACK、retry、Sync
+
+但是：
+
+**具体 Mobile framework 当前仍为 TBD。**
+
+本次授权没有批准 React Native、Expo、Capacitor、NativeScript 或其他具体框架。
+
+如果某项 Mobile runtime 实现确实必须先选择框架，应：
+
+1. 完成所有不依赖具体框架的 TypeScript shared implementation；
+2. 明确记录实际 blocker；
+3. 停止受影响实现；
+4. 将最小技术决策提交给 Architect / Human；
+5. 等 Architect 明确决定；
+6. 将该决定写入 Frozen Architecture / approved ADR；
+7. 完成独立 Review / applicable CI；
+8. 然后才允许继续实现。
+
+不得自行选择任何 Mobile framework。
+
+────────────────────
+二、强制 Agent 技术选型规约
+────────────────────
+
+这是本项目的通用 Agent Governance Rule，适用于当前任务及后续所有任务，不仅限于客户端。
+
+### 2.1 Agent 没有未授权技术选型权
+
+当实现任务涉及下列任一技术决策，而现行 Frozen Architecture、approved ADR、contracts 或明确 Human 指令没有给出唯一或足够明确的答案时：
+
+- 编程语言
+- UI framework
+- application framework
+- runtime
+- database / local database
+- ORM
+- network framework
+- IPC/RPC mechanism
+- state management framework
+- client framework
+- plugin runtime
+- serialization framework
+- message queue
+- cache
+- storage engine
+- native bridge
+- cross-platform framework
+- authentication framework
+- major infrastructure dependency
+- 会形成长期架构耦合的核心第三方库
+
+Agent **MUST NOT**：
+
+- 根据“自己熟悉”
+- 根据“机器已经安装”
+- 根据“最方便”
+- 根据“社区流行”
+- 根据“代码最少”
+- 根据“之前某个失败实现已经用了”
+- 根据“Task Spec 没明确禁止”
+- 根据“allowed_paths 允许”
+- 根据“CI 能通过”
+
+自行做出技术选型。
+
+**未禁止 ≠ 已批准。**
+
+### 2.2 技术栈不明确时的唯一合法流程
+
+发现架构级技术选择缺失时，Agent 必须：
+
+```text
+发现技术栈/框架/核心依赖未冻结
+              ↓
+停止受影响实现
+              ↓
+标记 BLOCKED_BY_ARCHITECTURE
+              ↓
+整理最小决策问题与影响范围
+              ↓
+等待 Architect / Human 明确决定
+              ↓
+写入 Frozen Architecture / approved ADR
+              ↓
+独立 Review + applicable CI
+              ↓
+架构决定正式生效
+              ↓
+恢复产品实现
+```
+
+顺序不得反转。
+
+尤其禁止：
+
+```text
+先实现
+ ↓
+跑通测试
+ ↓
+再修改 Frozen Architecture 追认
+```
+
+这是明确的治理违规。
+
+### 2.3 Architect 决策必须先落入权威层
+
+Architect / Human 给出技术决定后，Agent 不得仅把决定记录在：
+
+- chat
+- handoff
+- task notes
+- progress/current.md
+- implementation README
+- source comments
+
+然后直接实现。
+
+凡是会影响长期项目技术栈、目录边界、依赖方向或运行时模型的决定，必须先进入适当的权威层：
+
+优先：
+
+1. Frozen Architecture
+2. approved ADR / frozen decision
+3. 必要的 machine-readable architecture/source checks
+
+然后才能创建或继续实现 Task。
+
+### 2.4 Task Spec 无权自行补充架构决定
+
+Task Spec 可以：
+
+- 收窄实现范围
+- 选择已经授权的实现细节
+- 指定测试和 acceptance
+- 指定 allowed_paths
+
+Task Spec 不得自行发明新的：
+
+- 技术栈
+- framework
+- runtime
+- database
+- cross-platform strategy
+- service boundary
+- public protocol
+
+例如以下逻辑是无效的：
+
+> “Task Spec 写了 Dart，所以 Dart 已被批准。”
+
+如果 Dart 没有先被 Frozen Architecture / ADR / Human architecture decision 授权，则 Task Spec 本身就是违规的。
+
+### 2.5 Reviewer 必须检查“选型来源”
+
+所有新的 architecture-sensitive dependency / language / framework，Reviewer 必须能够回答：
+
+> “它的架构授权来自哪里？”
+
+有效答案必须指向：
+
+- Frozen Architecture 具体条款；或
+- approved ADR；或
+- Human-approved architecture clarification 已经正式固化的记录。
+
+如果只能回答：
+
+- “Agent 觉得合适”
+- “开发机已经安装”
+- “之前代码用了”
+- “package 很流行”
+- “CI PASS”
+
+则 Review 必须 FAIL。
+
+### 2.6 CI 应尽可能机器化这一规则
+
+对于已经冻结的技术栈，应该尽可能增加：
+
+- source allowlist
+- forbidden source type
+- dependency guard
+- architecture negative controls
+- path-aware CI assertions
+
+避免未来 Agent 再次静默偏离。
+
+但 CI guard 不能代替架构文档。
+
+顺序仍然是：
+
+**Human/Architect 决策 → Frozen Architecture → Machine Guard → Implementation**
+
+────────────────────
+三、公共客户端层
+────────────────────
+
+总体目标：
+
+clients/
+├── shared/
+│   ├── protocol-sdk/
+│   ├── plugin-sdk/
+│   ├── ui/
+│   └── 与客户端共享的数据/领域能力
+├── web/
+│   └── React + TypeScript
+├── desktop/
+│   ├── React + TypeScript
+│   └── src-tauri/
+└── mobile/
+    └── TypeScript-based, framework TBD
+
+仓库现有目录权威优先，不要为了匹配示意图无意义搬目录。
+
+公共方向：
+
+- protocol SDK：TypeScript
+- plugin SDK：TypeScript
+- shared models：TypeScript
+- 可共享数据/domain logic：TypeScript
+- Plugin UI host/interface：TypeScript ecosystem
+
+核心原则：
+
+> Web / Desktop / Mobile 保持 TypeScript 生态，尽量共享协议、模型、数据逻辑和 Plugin UI 能力；Desktop/Mobile 有 SQLite，Web 没有。
+
+────────────────────
+四、阶段 1：先冻结架构，禁止直接开始 S2 产品编码
+────────────────────
+
+必须先恢复仓库：
+
+1. 阅读根 `AGENTS.md`
+2. 阅读：
+   - `spec/handoff/agent-context.md`
+   - `spec/progress/current.md`
+   - 当前 task queues
+   - Frozen Architecture resolver / baseline / decisions
+3. 检查：
+   - `git status`
+   - `git diff`
+   - HEAD
+   - branch
+   - remote
+   - worktrees
+4. 确认真实 `main` 为 `3f352a8...`
+5. 确认 PR #8 已回退 PR #7。
+6. 确认当前 active product tree 不包含 PR #7 的 Dart SQLite implementation。
+
+然后创建一个最小、独立的 architecture clarification/remediation task。
+
+本阶段必须先完成并独立验收，再开始 S2。
+
+### Frozen Architecture 修改要求
+
+在当前 canonical：
+
+`spec/architecture/frozen-architecture.md`
+
+中补充明确客户端技术栈约束。
+
+必须写清：
+
+- Web = React + TypeScript
+- Desktop = Tauri + React + TypeScript
+- Mobile = TypeScript ecosystem，framework TBD
+- Shared client SDK/domain/model/plugin UI direction = TypeScript
+- Desktop native Rust 仅限 Tauri native boundary
+- Desktop/Mobile SQLite
+- Web memory-only / no SQLite
+- Dart/Flutter 不属于当前批准客户端技术栈
+- Mobile framework selection 必须遵守 §2 的 Agent 技术选型规约：
+  **停止 → Architect 决策 → 写入 Frozen Architecture/ADR → Review/CI → 实现**
+
+同时应将 §2 的通用 Agent 技术选型规约固化到适当的治理/架构文档，而不是只存在于本 prompt。
+
+### 版本要求
+
+**Frozen Architecture 版本仍保持 `v1.1`。**
+
+不要升级成 v1.2。
+
+原因：
+
+这是 Human 已经做出的客户端技术栈决定此前未被正确固化，本次属于对现行 v1.1 执行基线的明确补全/纠偏。
+
+但不得伪装成“文档没有发生改变”。
+
+必须：
+
+- 更新 canonical Markdown hash；
+- 更新 baseline manifest 中与当前 artifact hash/修订事实有关的字段；
+- 记录一次 Human-approved architecture clarification；
+- 按现有 ACP/ADR 治理要求创建适当的 decision/ADR 记录；
+- 明确说明：
+  - version remains v1.1
+  - canonical bytes/hash changed
+  - 原历史 PDF 不变
+  - PR #7 是触发此次纠偏的 implementation deviation
+  - 不得把 PR #7 的实现反向作为架构依据
+
+历史 PDF：
+
+`scalable-distributed-im-architecture.pdf`
+
+必须保持 byte-for-byte 不变。
+
+不要重写历史 ADR 或历史 evidence。
+
+────────────────────
+五、阶段 1 必须增加机器约束
+────────────────────
+
+不能只改 Markdown。
+
+需要在当前 architecture/source/CI governance 中加入客户端技术栈检查，防止相同问题再次发生。
+
+检查至少覆盖 active product paths：
+
+- `clients/shared/**`
+- `clients/web/**`
+- `clients/desktop/**`
+- `clients/mobile/**`
+- 相关 client CI configuration
+
+应检测并拒绝未经批准的：
+
+- `.dart`
+- `pubspec.yaml`
+- `pubspec.lock`
+- Flutter project files/config
+- `dart-lang/setup-dart`
+- Dart client dependencies
+- 其他明显把 active client implementation 切换到 Dart/Flutter 的内容
+
+允许：
+
+- `clients/desktop/src-tauri/**` 的必要 Rust/native 文件
+- JS/TS ecosystem 正常配置文件
+- JSON/YAML/SQL/Markdown/assets 等必要非源码文件
+
+同时增加 architecture/governance negative control：
+
+模拟 Task 或 implementation 引入一个尚未批准的新客户端 framework/runtime，应被 architecture review/check 明确拒绝，而不能因为 allowed_paths 或 tests PASS 被接受。
+
+不要对：
+
+- Git 历史
+- PR #7 历史
+- historical evidence
+- immutable Recorder archives
+
+执行删除式清理。
+
+CI guard 应检查**当前 active implementation**，不是企图抹掉历史。
+
+完成 architecture clarification 后：
+
+- 新独立 Reviewer
+- 精确候选 commit
+- applicable hosted CI
+- architecture/source negative controls
+
+全部 PASS 后才能进入下一阶段。
+
+────────────────────
+六、阶段 2：重新启动 S2
+────────────────────
+
+只有阶段 1 已正式独立验收后，才允许重新选择/激活 S2 Task。
+
+S2 仍按 Frozen Architecture 的依赖推进：
+
+1. CLIENT-SQLITE
+2. CLIENT-SEND
+3. SYNC
+4. WEB
+
+不得因为 PR #7 曾存在而跳过 CLIENT-SQLITE。
+
+PR #7：
+
+- 是 rolled-back historical attempt；
+- 不能作为当前产品 acceptance；
+- 可以阅读其业务语义测试思路作为参考；
+- 不能直接恢复 Dart implementation；
+- 不能以“之前已经 PASS”为理由宣称新的 TypeScript implementation PASS。
+
+新的 implementation 必须重新独立 Review + CI。
+
+────────────────────
+七、重新实施 CLIENT-SQLITE
+────────────────────
+
+目标语义保持不变：
+
+Desktop/Mobile：
+
+- per-account SQLite
+- `UNIQUE(conversation_id, request_id)`
+- `UNIQUE(server_message_id)` when non-null
+- `UNIQUE(conversation_id, server_seq)` when non-null
+- local send / ACK / realtime / Sync 事务 UPSERT
+- state：
+  - SENDING
+  - SENT
+  - FAILED
+- SENT 不得回退
+- matching Sync/ACK 可以将 FAILED/SENDING 收敛到 SENT
+- data + cursor/contiguous_seq 原子提交
+- account isolation
+- schema migration/version handling
+- duplicate / out-of-order / retry convergence
+
+实现必须位于 TypeScript ecosystem。
+
+### Shared
+
+优先将：
+
+- types
+- repository semantics
+- domain transitions
+- fixtures adapters
+- shared protocol/model integration
+
+放在合理的 shared TypeScript 层。
+
+不要再建立：
+
+`clients/shared/local-store` Dart package。
+
+### Desktop
+
+使用：
+
+React/TypeScript
+        ↓
+TypeScript storage/repository API
+        ↓
+Tauri command/native adapter
+        ↓
+SQLite
+
+Native boundary 可以使用：
+
+- Tauri Rust command
+- 已批准的 Tauri native mechanism
+
+如果具体 SQLite crate/plugin/library 尚未被授权，而且它会形成长期 native dependency：
+
+**不得自行选择。**
+
+应按 Agent 技术选型规约：
+
+停止受影响部分 → 请求 Architect 决策 → 固化架构/ADR → 再实现。
+
+### Mobile
+
+保持：
+
+TypeScript shared repository semantics
+        ↓
+narrow mobile SQLite adapter interface
+
+具体 runtime adapter 依赖 Mobile framework，而 framework 当前 TBD。
+
+因此：
+
+- 不得自行选框架；
+- 不得使用 Dart；
+- 不得使用 Flutter；
+- 不得默认 React Native；
+- 完成 shared TypeScript 逻辑和 framework-neutral contract；
+- 将真实 device/runtime adapter 标记为 `BLOCKED_BY_ARCHITECTURE`。
+
+然后等待 Architect 决定 Mobile framework。
+
+只有决定被写入 Frozen Architecture / ADR 并通过相应 Review 后，才允许继续该部分实现。
+
+如果因此暂时不能满足完整 S2 Mobile acceptance：
+
+**S2 Gate 保持 OPEN。**
+
+不得伪造 PASS。
+
+────────────────────
+八、CLIENT-SEND
+────────────────────
+
+TypeScript shared logic 实现：
+
+- local optimistic write
+- immutable request_id
+- SENDING
+- WSS send
+- durable ACK → SENT
+- timeout/offline → FAILED
+- Retry 使用相同 request_id
+- ACK/Sync 后 SENT 不倒退
+- 重启后 Desktop/Mobile 本地状态可恢复
+
+Desktop 可完成其已授权技术栈范围内的真实运行实现。
+
+Mobile 按已批准 framework-neutral 边界推进。
+
+如果发送/网络实现要求一个尚未冻结的 Mobile framework：
+
+按 Agent 技术选型规约停止，不得自行选型。
+
+────────────────────
+九、SYNC
+────────────────────
+
+实现现有 Frozen Architecture 双层 Sync：
+
+- user_sync_cursor：
+  - friend
+  - conversation
+  - membership
+  - plugin 等低频状态
+
+- per-conversation：
+  - server seq
+  - contiguous_seq
+
+必须覆盖：
+
+- duplicate
+- out-of-order
+- realtime 与 Sync crossing
+- gap
+- reconnect
+- FAILED/SENDING 与服务端正式消息收敛
+- transaction rollback
+- cursor 不跨 gap
+
+shared algorithm / model 应尽量保持 TypeScript。
+
+若出现任何需要新增架构级 framework/runtime/dependency 的情况，执行统一选型规约，不得自行决定。
+
+────────────────────
+十、WEB
+────────────────────
+
+Web 必须正式使用：
+
+- React
+- TypeScript
+
+并验证：
+
+- 登录
+- 好友
+- 会话
+- 实时文本
+- HTTPS
+- WSS
+- memory only
+- 无 SQLite
+- 无聊天历史数据库
+- refresh 后不保留历史消息
+- 当前好友/会话状态可以重新获取
+
+禁止为了复用 Desktop/Mobile storage 给 Web 引入 SQLite。
+
+如果 Web 实现需要额外状态框架、路由框架等，而这些选择具有长期架构影响且当前未冻结：
+
+不要自行选择。
+
+按统一 Agent 技术选型规约处理。
+
+────────────────────
+十一、关于 Plugin SDK / UI
+────────────────────
+
+S2 不提前实现完整 S4 Plugin platform。
+
+但是客户端技术基础必须保持未来可复用：
+
+- shared TypeScript protocol SDK
+- shared TypeScript plugin SDK
+- shared TypeScript UI capabilities/contracts
+
+不得：
+
+- 在 S2 实现 WASM Plugin Host
+- 实现完整 plugin marketplace
+- 提前完成 S4 lifecycle
+- 以“将来插件需要”为理由扩大 S2
+
+只保证 S2 的技术选择不会破坏未来 TypeScript client/plugin reuse。
+
+────────────────────
+十二、最后的 Dart / Flutter 清理要求
+────────────────────
+
+S2 新实现完成前，执行一次 active-tree audit。
+
+最终 active product tree 不应存在：
+
+- Dart client source
+- Flutter client source
+- Dart SQLite package
+- `pubspec.yaml`
+- `pubspec.lock`
+- Dart client CI setup
+- setup-dart
+- 因 PR #7 残留而被 active build 使用的 Dart dependency/config
+
+但是：
+
+**不要删除 Git 历史。**
+
+不要删除：
+
+- PR #7
+- PR #8
+- historical evidence
+- historical FAIL
+- independent Review archives
+- Recorder
+- immutable traces
+
+如果历史 evidence 中包含 `.dart` 文件或 Dart 文本：
+
+它们是历史记录，不是 active implementation，必须保留。
+
+不得为了让 grep 返回 0 而破坏证据。
+
+检查器必须区分：
+
+- active source
+- historical evidence/archive
+
+────────────────────
+十三、PR #7 历史状态
+────────────────────
+
+必须留下明确记录：
+
+PR #7：
+
+- 曾实现 Dart SQLite foundation；
+- 曾通过其当时的实现测试和独立 Review；
+- 后发现其技术栈选择偏离 Human-approved TypeScript client direction；
+- PR #8 已回退；
+- 因而 PR #7 不能作为当前 S2 产品实现；
+- 其业务测试经验可参考，但代码不作为当前 baseline。
+
+禁止：
+
+- 删除这一失败历史；
+- 把 PR #7 描述成“从未发生”；
+- 把曾经通过的功能测试描述成当前 TypeScript implementation 的测试证据。
+
+────────────────────
+十四、范围控制
+────────────────────
+
+本次允许：
+
+1. 冻结客户端技术栈
+2. 固化通用 Agent 技术选型规约
+3. 加入 architecture/CI enforcement
+4. 重新实施 S2
+5. 清除 active Dart/Flutter client implementation
+6. 更新必要 progress/task/checkpoint/evidence
+
+禁止：
+
+- 修改 S1 已验收后端业务语义
+- 修改 HTTP/WSS public contract，除非发现真实 blocking contradiction 并按治理升级
+- 修改 ACK 语义
+- 修改 Sync 核心不变量
+- 修改 PostgreSQL server schema 来迁就客户端
+- 提前实施 Java S3
+- 提前实施 Plugin S4
+- 提前做公网部署
+- 自行冻结 Mobile framework
+- 自行引入 Dart/Flutter
+- 自行选择任何未被授权的架构级技术栈/framework/runtime
+- 无依据扩大基础设施
+
+────────────────────
+十五、执行顺序
+────────────────────
+
+严格执行：
+
+Phase A  
+恢复 main / governance / historical PR7+PR8
+
+Phase B  
+创建并实施客户端技术栈 architecture clarification
+
+Phase C  
+将“技术栈不明确必须停止并等待 Architect”的 Agent Governance Rule 固化到权威治理/架构体系
+
+Phase D  
+新增机器检查和 negative controls
+
+Phase E  
+新独立 Review + exact-head CI
+
+只有 B-E PASS 后：
+
+Phase F  
+重新激活 S2 CLIENT-SQLITE
+
+Phase G  
+TypeScript/Tauri SQLite implementation + Review/CI
+
+Phase H  
+CLIENT-SEND
+
+Phase I  
+SYNC
+
+Phase J  
+WEB React+TypeScript
+
+Phase K  
+active tree Dart/Flutter audit
+
+Phase L  
+S2 Gate assessment
+
+不得跨过失败 Gate。
+
+任何阶段出现新的未冻结技术选型：
+
+立即进入：
+
+```text
+BLOCKED_BY_ARCHITECTURE
+        ↓
+Architect / Human decision
+        ↓
+Frozen Architecture / ADR
+        ↓
+Independent Review / CI
+        ↓
+resume implementation
+```
+
+而不是继续下一 Phase。
+
+────────────────────
+十六、Mobile framework TBD 的 Gate 纪律
+────────────────────
+
+这是明确的 architecture blocker，而不是 Agent 自由选择空间。
+
+如果完整 S2 PASS 需要真实 Mobile SQLite/device runtime，而 Mobile framework 尚未冻结：
+
+不要：
+
+- 选 Flutter
+- 选 Dart
+- 默认 React Native
+- 默认 Expo
+- 默认 Capacitor
+- 默认 NativeScript
+- 用 mock 冒充 Mobile runtime
+- 把 Desktop host test 冒充 Mobile acceptance
+
+应该：
+
+1. 完成所有 framework-neutral TypeScript 共享能力；
+2. 明确列出 Mobile 剩余 gap；
+3. 标记 `BLOCKED_BY_ARCHITECTURE`；
+4. 向 Architect / Human 提交最小技术决策输入；
+5. 停止 Mobile framework-dependent implementation；
+6. 保持 S2 OPEN；
+7. 等 Architect 作出决定；
+8. 将决定写入 Frozen Architecture / ADR；
+9. 完成 architecture Review / CI；
+10. 再恢复 Mobile runtime implementation。
+
+其他不冲突工作可以继续，不需要回滚已经正确完成的 TS work。
+
+────────────────────
+十七、最终报告
+────────────────────
+
+完成当前可完成范围后，只需给 Human 报告：
+
+1. 当前 main / candidate SHA
+2. Frozen Architecture 是否仍为 v1.1
+3. 新客户端技术栈规则具体冻结在哪里
+4. Agent 技术选型规约具体固化在哪里
+5. architecture/CI guard 是否可以阻止 Dart/Flutter 再次进入 active clients
+6. 是否存在任何新的未授权技术选型
+7. PR #7 历史如何保留
+8. CLIENT-SQLITE 新 TypeScript implementation 状态
+9. Desktop Tauri SQLite 状态
+10. Mobile 是否因 framework TBD 处于 `BLOCKED_BY_ARCHITECTURE`
+11. CLIENT-SEND / SYNC / WEB 状态
+12. applicable independent Review / hosted CI
+13. active tree 是否还存在 Dart/Flutter implementation
+14. S2 Gate 最终是 PASS 还是仍 OPEN，以及唯一真实原因
+
+不要把部分完成描述为 S2 PASS。
+
+现在开始。
+
+第一步必须是恢复：
+
+`main@3f352a8e465c0c4b093cca8e5f404ea587550b6e`
+
+并读取当前权威规范。
+
+在：
+
+1. 客户端技术栈架构澄清；
+2. Agent 技术选型规约；
+3. 相应 machine guard；
+4. 独立 Review / CI
+
+全部正式生效之前，**不得重新开始 S2 产品编码**。
+
+今后若任何技术栈不明确：
+
+**不要猜，不要选，不要先实现。停止受影响任务，等待 Architect 补充；Architect 决定必须先进入 Frozen Architecture / approved ADR，之后才允许继续实现。**

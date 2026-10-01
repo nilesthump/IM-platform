@@ -1,0 +1,64 @@
+{
+  "old-variable-apply": {
+    "source": "def selected = \"java\"\napply plugin: selected",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android apply plugin declaration"
+    ]
+  },
+  "old-get-alias": {
+    "source": "plugins { alias(libs.plugins.unapproved.get()) }",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android plugins block",
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android plugin alias"
+    ]
+  },
+  "old-literal-transform": {
+    "source": "plugins { id(\"com.android.application\".replace(\"com.android.application\", \"java\")) }",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android plugin selector",
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android plugins block"
+    ]
+  },
+  "java-shortcut": {
+    "source": "plugins { java }",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unresolved/dynamic Android plugins block"
+    ]
+  },
+  "typed-apply": {
+    "source": "apply<JavaPlugin>()",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unapproved/dynamic Android Gradle plugin/build inclusion"
+    ]
+  },
+  "groovy-plugin-container-command": {
+    "source": "plugins.apply 'java'",
+    "errors": []
+  },
+  "groovy-plugin-manager-command": {
+    "source": "pluginManager.apply 'java'",
+    "errors": []
+  },
+  "groovy-plugin-container-parentheses": {
+    "source": "plugins.apply(\"java\")",
+    "errors": [
+      "CLIENT clients/mobile/build.gradle: unapproved/dynamic Android Gradle plugin/build inclusion"
+    ]
+  },
+  "approved-id": {
+    "source": "plugins { id(\"com.android.application\") version \"8.9\" apply false }",
+    "errors": []
+  },
+  "approved-kotlin": {
+    "source": "plugins { kotlin(\"android\") }\nkotlin { jvmToolchain(17) }",
+    "errors": []
+  },
+  "approved-groovy": {
+    "source": "plugins { id 'com.android.library' version '8.9' apply false }",
+    "errors": []
+  },
+  "approved-apply": {
+    "source": "apply plugin: 'org.jetbrains.kotlin.android'",
+    "errors": []
+  }
+}

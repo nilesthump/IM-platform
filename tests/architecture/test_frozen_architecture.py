@@ -16,6 +16,11 @@ class ArchitectureIntegrityTests(unittest.TestCase):
 
     def test_semantic_negative_controls(self):
         mutations = {
+            'unapproved technology permission': ('Agent 没有未授权技术选型权', 'Agent 可以自由选型'),
+            'missing Desktop native boundary': ('clients/desktop/src-tauri/**', 'clients/shared/native/**'),
+            'Mobile premature framework': ('Mobile = Android + Kotlin + Jetpack Compose', 'Mobile = Flutter'),
+            'Web SQLite permission': ('无 SQLite', '允许 SQLite'),
+            'missing Mobile TS removal': ('移除 Mobile TypeScript 技术栈', '保留 Mobile TypeScript 技术栈'),
             'historical reverse arrow': ('NATS --> Gateway','NATS --> PG'),
             'missing native chapter': ('## 8. 插件平台架构','## Removed'),
             'missing index entry': ('- [0. 执行摘要](#section-0)','- removed'),
@@ -49,11 +54,15 @@ class ArchitectureIntegrityTests(unittest.TestCase):
         # Minimal temporary authority copy; never mutate product or historical tree.
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
-            for name in ('spec/architecture','AGENTS.md','spec/handoff/agent-context.md','scalable-distributed-im-architecture.pdf','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md'):
+            for name in ('spec/architecture','AGENTS.md','spec/handoff/agent-context.md','scalable-distributed-im-architecture.pdf','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt'):
                 src=ROOT/name; dst=root/name; dst.parent.mkdir(parents=True,exist_ok=True)
                 if src.is_dir(): shutil.copytree(src,dst)
                 else: shutil.copyfile(src,dst)
             self.assertEqual([],frozen.verify(root))
+            mobile = root/'spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt'
+            mobile_raw = mobile.read_bytes(); mobile.write_bytes(mobile_raw + b'altered approval')
+            self.assertTrue(any('Mobile Human approval' in e for e in frozen.verify(root)))
+            mobile.write_bytes(mobile_raw)
             manifest=root/'spec/architecture/baseline.md'; original=manifest.read_bytes()
             manifest.write_text(original.decode('utf-8').replace('semantic_change: `true`','semantic_change: `false`'),encoding='utf-8')
             self.assertTrue(any('semantic_change' in e for e in frozen.verify(root)))

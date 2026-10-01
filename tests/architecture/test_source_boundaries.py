@@ -234,6 +234,7 @@ class SourceTests(unittest.TestCase):
         original = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         self.assertEqual([], checker.check_workflow(original))
         for changed in (
+            original.replace("ci/check_architecture.py --scope clients --json", "echo client guard skipped"),
             original.replace("ci/check_architecture.py --scope go --json", "echo skipped"),
             original.replace("needs: [classify, architecture, source_go, source_java,", "needs: [classify, architecture, source_java,"),
             original.replace("  source_go:\n", "  source_go:\n    continue-on-error: true\n"),

@@ -1,0 +1,644 @@
+{
+  "result": "FAIL",
+  "head": "8109b5ec1101efc18294618fd0a88b7499d4cccf",
+  "independence": "Fresh /root/gradle_guard_independent_review; neither implemented nor fixed any candidate; detached clean H:/icg; no candidate modifications.",
+  "full_range": "3f352a8e465c0c4b093cca8e5f404ea587550b6e..8109b5ec1101efc18294618fd0a88b7499d4cccf",
+  "focused_range": "b941df7bcf202c4f72f0443eaf34f222b38ca3b3..8109b5ec1101efc18294618fd0a88b7499d4cccf",
+  "findings": [
+    {
+      "priority": "P1",
+      "file": "ci/check_architecture.py",
+      "lines": [
+        328,
+        333
+      ],
+      "title": "Validate the complete id/kotlin plugin selector instead of a quoted prefix",
+      "requirement": "Task acceptance requires real Gradle plugin changes/unapproved frameworks rejected; ci/architecture-checks.md explicitly states unknown/dynamic Gradle plugins fail closed; canonical2.3/6.1 approved Android/Kotlin/Compose only.",
+      "probe": "plugins { id(\"com.android.application\".replace(\"com.android.application\", \"java\")) }",
+      "actual_guard_errors": [],
+      "actual_runtime": "Gradle9.1.0 with Java25.0.2 --no-daemon --offline tasks --all exit0 BUILD SUCCESSFUL; compileJava/jar/javadoc enabled proving java plugin applied.",
+      "impact": "A concrete valid Kotlin Gradle declaration introduces an unapproved plugin while active-client technology guard and existing controls pass. id/kotlin regex captures only first literal and dynamic regex excludes quoted starts. Also kotlin(\"android\".replace(\"android\", \"multiplatform\")) returns[] (runtime not separately resolved; illustrative shared recognition defect).",
+      "next_action": "Fresh Fix Agent narrow complete selector recognition plus negative and approved positive controls; then NEW fresh independent Review and new exact-head hosted CI."
+    }
+  ],
+  "verification": {
+    "recovery_acceptance": "PASS clean HEAD/status0",
+    "frozen": "PASS46 no skips canonicalaa239802/PDF",
+    "architecture": "46 tests executed by Frozen verifier",
+    "source_all": "PASS zero violations",
+    "ci_unit": "PASS30 with4 Windows1314 actual-link privilege skips",
+    "hosted": "PR36863598509 actual exact8109 all13jobs/steps success; Linux30 actual tests no skips; checkout SHA19 occurrences. CI does not override confirmed independent FAIL.",
+    "preservation": "5848 protected base objects and5713 prior evidence/authority objects unchanged;48 changed paths within allowed scope; no product changes; archives67/52/61 validate.",
+    "whitespace": "CR-aware focusedPASS; CR-aware fullFAIL12 intentional immutable raw Human Markdown hardbreaks; full exceptONLY raw Human attachmentPASS. Ordinary nonCR-aware diff also reports immutable CRLF JSON; retain bytes."
+  },
+  "instrumentation_warning": "Read-only assignment/startup/Recorder help preceded run start, disclosed prospective_resume. Some ancillary reads and external script creation were not individually recorded; substantive checks/probes/CI/audit recorded. Initial Gradle8.9 failed on installed Java25; Gradle9.1 actual probe succeeds. First external audit selected prompt metadata as run and used default Windows decoding, producing invalid run_id/UnicodeDecodeError; original artifacts retained, corrected audit validates67/52/61. No candidate edits. Console Unicode display limitations exposed.",
+  "commands": [
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-Command",
+          "$files=@(\"spec/architecture/frozen-architecture.md\",\"spec/architecture/decisions/ADR-0005-client-technology-clarification.md\",\"spec/governance/minimality.md\",\"spec/governance/execution-boundaries.md\",\"spec/governance/independent-review.md\",\"spec/governance/technology-selection.md\",\"AGENTS.md\",\"spec/tasks/TASK_TEMPLATE.md\"); Get-FileHash spec/architecture/frozen-architecture.md -Algorithm SHA256; foreach($f in $files){ Write-Output $f; Get-Content -LiteralPath $f -Encoding utf8 }"
+        ],
+        "command_id": "C-9dc0ef75-5abc-47ef-8ae5-42331b78188c",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "15bb3ea254b7f78b409a6f4bc45ea8ffd82b5b12df47038a4ccdd959fad56289",
+      "event_type": "command_started",
+      "previous_event_hash": "9edba850c3fb5bf2512f27d9f1fe6fe0479cff756340d42c4f13bfde92f3addb",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 4,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:44:01.202131Z"
+    },
+    {
+      "data": {
+        "command_id": "C-9dc0ef75-5abc-47ef-8ae5-42331b78188c",
+        "duration_ms": 719.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-9dc0ef75-5abc-47ef-8ae5-42331b78188c.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-9dc0ef75-5abc-47ef-8ae5-42331b78188c.stdout.txt",
+        "stdout_sha256": "de73e0be6ee64aa98f64d9bb684f13aecc67bfd918825dcd930f14b64b167012"
+      },
+      "event_hash": "83b093f958f4ad226ef11d9ecc41949bdfdd577fdb09c009abbdabdfcc7a2282",
+      "event_type": "command_finished",
+      "previous_event_hash": "15bb3ea254b7f78b409a6f4bc45ea8ffd82b5b12df47038a4ccdd959fad56289",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 5,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:44:01.922302Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-Command",
+          "git status --short; git rev-parse HEAD; git diff; git log -6 --oneline; git diff --stat 3f352a8..HEAD; git diff b941df7..HEAD -- ci/check_architecture.py tests/architecture"
+        ],
+        "command_id": "C-1251ebb3-28b4-42ce-b870-7e84ae7ef90a",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "b81f9188ef01d23f316e2d4c6984d89d8a5f1bca883fbb9a189ab5f829cbb846",
+      "event_type": "command_started",
+      "previous_event_hash": "83b093f958f4ad226ef11d9ecc41949bdfdd577fdb09c009abbdabdfcc7a2282",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 6,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:44:36.873157Z"
+    },
+    {
+      "data": {
+        "command_id": "C-1251ebb3-28b4-42ce-b870-7e84ae7ef90a",
+        "duration_ms": 718.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-1251ebb3-28b4-42ce-b870-7e84ae7ef90a.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-1251ebb3-28b4-42ce-b870-7e84ae7ef90a.stdout.txt",
+        "stdout_sha256": "2d7cd907d024be4a128ec76663959f1189a673a422290c88f5ea562863c1e676"
+      },
+      "event_hash": "bfafb5b60a2edb3cbfde0d5aa8ef65b93d33b5dd31b468d6a31d9d9e863107e8",
+      "event_type": "command_finished",
+      "previous_event_hash": "b81f9188ef01d23f316e2d4c6984d89d8a5f1bca883fbb9a189ab5f829cbb846",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 7,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:44:37.590177Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "tools/verify-frozen-architecture.ps1"
+        ],
+        "command_id": "C-166203f6-f940-4781-8986-590ca6ca2d8e",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "60fbd855ebfbf3bce43dd701ecdc40158fb72983b8d0625fa3c4e77670a5fbf5",
+      "event_type": "command_started",
+      "previous_event_hash": "bfafb5b60a2edb3cbfde0d5aa8ef65b93d33b5dd31b468d6a31d9d9e863107e8",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 8,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:44:50.766589Z"
+    },
+    {
+      "data": {
+        "command_id": "C-166203f6-f940-4781-8986-590ca6ca2d8e",
+        "duration_ms": 7860.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-166203f6-f940-4781-8986-590ca6ca2d8e.stderr.txt",
+        "stderr_sha256": "acf023b6b87a8c106267b5d89610a0df79af62b2c24c8db28990e5166c171435",
+        "stdout_blob": "blobs/C-166203f6-f940-4781-8986-590ca6ca2d8e.stdout.txt",
+        "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+      },
+      "event_hash": "dd0153d1402fd8985d98cc5f74d08bd36f369994780eccd8544fc8d62c51630b",
+      "event_type": "command_finished",
+      "previous_event_hash": "60fbd855ebfbf3bce43dd701ecdc40158fb72983b8d0625fa3c4e77670a5fbf5",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 9,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:44:58.625682Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/gradle-guard-independent-review-20261001/review-probes.py"
+        ],
+        "command_id": "C-17cda5fa-302b-4df0-b003-f7a9c3c1b5ea",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "45b421fba6719d65f92c1ea8285b97b204ffa38d8dfe44bbfb0df8c92fb1b69c",
+      "event_type": "command_started",
+      "previous_event_hash": "dd0153d1402fd8985d98cc5f74d08bd36f369994780eccd8544fc8d62c51630b",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 10,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:46:02.133928Z"
+    },
+    {
+      "data": {
+        "command_id": "C-17cda5fa-302b-4df0-b003-f7a9c3c1b5ea",
+        "duration_ms": 203.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-17cda5fa-302b-4df0-b003-f7a9c3c1b5ea.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-17cda5fa-302b-4df0-b003-f7a9c3c1b5ea.stdout.txt",
+        "stdout_sha256": "e6d7f6ad46bffeae80864e27bcb5628bc394a616296aee36c0f0e6920819d610"
+      },
+      "event_hash": "2aced31504a69ea27484bf9741a77ef8b81033fe2b36b45ad34abf9718fa64e8",
+      "event_type": "command_finished",
+      "previous_event_hash": "45b421fba6719d65f92c1ea8285b97b204ffa38d8dfe44bbfb0df8c92fb1b69c",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 11,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:46:02.352569Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "H:/.codex/evidence/gradle-guard-independent-review-20261001/gradle-probe.ps1"
+        ],
+        "command_id": "C-d1fe2133-d03b-4d4c-bbb7-c7e528176d49",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "8b0c2a098c7433e4baf18ca3f8382449cbd4d3573c6cf0cdc54e5e1c2e41555b",
+      "event_type": "command_started",
+      "previous_event_hash": "2aced31504a69ea27484bf9741a77ef8b81033fe2b36b45ad34abf9718fa64e8",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 12,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:46:34.500932Z"
+    },
+    {
+      "data": {
+        "command_id": "C-d1fe2133-d03b-4d4c-bbb7-c7e528176d49",
+        "duration_ms": 10859.0,
+        "exit_code": 1,
+        "result": "FAIL",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-d1fe2133-d03b-4d4c-bbb7-c7e528176d49.stderr.txt",
+        "stderr_sha256": "d4ba0f60f9773fd81a7198d07f50f32617fc7966b66b46a88e48cde544068324",
+        "stdout_blob": "blobs/C-d1fe2133-d03b-4d4c-bbb7-c7e528176d49.stdout.txt",
+        "stdout_sha256": "08fae431ff6d4c03c966cbebd38f7bda409bc7f4f5d6a54396b9c1c8dd6abb7d"
+      },
+      "event_hash": "3f0fe546fe47306c2da3002b6a0b1ab5bb4533580c85ab5f4d40dbb5e7b9b414",
+      "event_type": "command_finished",
+      "previous_event_hash": "8b0c2a098c7433e4baf18ca3f8382449cbd4d3573c6cf0cdc54e5e1c2e41555b",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 13,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:46:45.361058Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "tools/verify-loop1-ctrl-002.ps1",
+          "-Mode",
+          "Acceptance"
+        ],
+        "command_id": "C-1aae95e0-132d-454f-888c-8691535bcae9",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "8fc960f1e582de62fd94cfbbba240c5642e05510c6076e6e1644c65d9580a342",
+      "event_type": "command_started",
+      "previous_event_hash": "3f0fe546fe47306c2da3002b6a0b1ab5bb4533580c85ab5f4d40dbb5e7b9b414",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 14,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:47:01.933061Z"
+    },
+    {
+      "data": {
+        "command_id": "C-1aae95e0-132d-454f-888c-8691535bcae9",
+        "duration_ms": 6391.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-1aae95e0-132d-454f-888c-8691535bcae9.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-1aae95e0-132d-454f-888c-8691535bcae9.stdout.txt",
+        "stdout_sha256": "751cbb832872b1f67ede1c26875424697840ae77e94a2a5a9cbcececa45422ce"
+      },
+      "event_hash": "697b07c773c6e736a31d983f7a5111497bc4edb42ade598902ddfff215ed803f",
+      "event_type": "command_finished",
+      "previous_event_hash": "8fc960f1e582de62fd94cfbbba240c5642e05510c6076e6e1644c65d9580a342",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 15,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:47:08.337853Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "H:/.codex/evidence/gradle-guard-independent-review-20261001/gradle9-probe.ps1"
+        ],
+        "command_id": "C-e44fc791-c673-4db1-a3e5-37d82d1515d0",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "d4cfbef9c1dbb77f803166f9c48a6443061ced1feb78f082b3e2b1be0b4b09b1",
+      "event_type": "command_started",
+      "previous_event_hash": "697b07c773c6e736a31d983f7a5111497bc4edb42ade598902ddfff215ed803f",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 16,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:47:31.836511Z"
+    },
+    {
+      "data": {
+        "command_id": "C-e44fc791-c673-4db1-a3e5-37d82d1515d0",
+        "duration_ms": 13375.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-e44fc791-c673-4db1-a3e5-37d82d1515d0.stderr.txt",
+        "stderr_sha256": "1f007ecac37c8806501385efccc8755c594cc9d4db1100aaa45424307b609ed7",
+        "stdout_blob": "blobs/C-e44fc791-c673-4db1-a3e5-37d82d1515d0.stdout.txt",
+        "stdout_sha256": "f7c3739efedf1b0673f64dec94ae065f7543b259d6c701a8dc5ce098fe7285c2"
+      },
+      "event_hash": "748e17410770159b66892f92794b4bbb3537fa7764dace9a4ca9f2fdc268884e",
+      "event_type": "command_finished",
+      "previous_event_hash": "d4cfbef9c1dbb77f803166f9c48a6443061ced1feb78f082b3e2b1be0b4b09b1",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 17,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:47:45.225297Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "ci/check_architecture.py",
+          "--scope",
+          "all",
+          "--json"
+        ],
+        "command_id": "C-a5d9fc13-45b5-4b20-a9fa-20893270d9f1",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "2a06d5e003a4e715a58f93f7fa8ff3e2bcf30f143680b7eb19488bd7f7c25ab6",
+      "event_type": "command_started",
+      "previous_event_hash": "748e17410770159b66892f92794b4bbb3537fa7764dace9a4ca9f2fdc268884e",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 18,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:47:59.682943Z"
+    },
+    {
+      "data": {
+        "command_id": "C-a5d9fc13-45b5-4b20-a9fa-20893270d9f1",
+        "duration_ms": 438.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": true,
+        "stderr_blob": "blobs/C-a5d9fc13-45b5-4b20-a9fa-20893270d9f1.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-a5d9fc13-45b5-4b20-a9fa-20893270d9f1.stdout.txt",
+        "stdout_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f"
+      },
+      "event_hash": "028ad42f1e067e531418ad085baec542445f3eeb915abfb1e4809f4408bbd205",
+      "event_type": "command_finished",
+      "previous_event_hash": "2a06d5e003a4e715a58f93f7fa8ff3e2bcf30f143680b7eb19488bd7f7c25ab6",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 19,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:48:00.145799Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/ci",
+          "-v"
+        ],
+        "command_id": "C-31aba814-17d9-4e7c-8b58-f842ef6a0f43",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "3466827f015f5e125f3297bca10718e65902d34b174c4795ecf3bf60fe9df4fa",
+      "event_type": "command_started",
+      "previous_event_hash": "028ad42f1e067e531418ad085baec542445f3eeb915abfb1e4809f4408bbd205",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 20,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:48:16.100931Z"
+    },
+    {
+      "data": {
+        "command_id": "C-31aba814-17d9-4e7c-8b58-f842ef6a0f43",
+        "duration_ms": 2875.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-31aba814-17d9-4e7c-8b58-f842ef6a0f43.stderr.txt",
+        "stderr_sha256": "395d3cfe9bc80416a5d80a026fd56f750f61da8f821d81d0bed5711ec3a7ce6b",
+        "stdout_blob": "blobs/C-31aba814-17d9-4e7c-8b58-f842ef6a0f43.stdout.txt",
+        "stdout_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52"
+      },
+      "event_hash": "05574f7dd13c8a2207f217cdbe2007afa40808c5c44cee49e07d4652886c1a54",
+      "event_type": "command_finished",
+      "previous_event_hash": "3466827f015f5e125f3297bca10718e65902d34b174c4795ecf3bf60fe9df4fa",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 21,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:48:18.993543Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "gh",
+          "run",
+          "view",
+          "36863598509",
+          "--repo",
+          "nilesthump/IM-platform",
+          "--json",
+          "headSha,event,status,conclusion,jobs,url"
+        ],
+        "command_id": "C-8eb07de4-99e7-4d2e-b3a2-7251dcd1874d",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "9ddb053f21bb7ddad3d7a5a038491d734aa7f095658122210cc3ecb63e006de7",
+      "event_type": "command_started",
+      "previous_event_hash": "05574f7dd13c8a2207f217cdbe2007afa40808c5c44cee49e07d4652886c1a54",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 22,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:49:10.546163Z"
+    },
+    {
+      "data": {
+        "command_id": "C-8eb07de4-99e7-4d2e-b3a2-7251dcd1874d",
+        "duration_ms": 2562.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-8eb07de4-99e7-4d2e-b3a2-7251dcd1874d.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-8eb07de4-99e7-4d2e-b3a2-7251dcd1874d.stdout.txt",
+        "stdout_sha256": "171b414c7aad0560f8f0a2898ba3bd921a351856870c7b1d758761783233dc63"
+      },
+      "event_hash": "b34832c730247b053690105b4e8b328a4d0f9f0c319829a12ec12200a0c4bfb8",
+      "event_type": "command_finished",
+      "previous_event_hash": "9ddb053f21bb7ddad3d7a5a038491d734aa7f095658122210cc3ecb63e006de7",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 23,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:49:13.112717Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/gradle-guard-independent-review-20261001/preservation-audit.py"
+        ],
+        "command_id": "C-a48719ad-87f7-4450-b00f-8f04ddca5ea3",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "05fba1d102058f2fa92f189cf2251b7a78599bc3b6621b1df39fddf0ed9e7dc8",
+      "event_type": "command_started",
+      "previous_event_hash": "b34832c730247b053690105b4e8b328a4d0f9f0c319829a12ec12200a0c4bfb8",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 24,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:49:48.499811Z"
+    },
+    {
+      "data": {
+        "command_id": "C-a48719ad-87f7-4450-b00f-8f04ddca5ea3",
+        "duration_ms": 906.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-a48719ad-87f7-4450-b00f-8f04ddca5ea3.stderr.txt",
+        "stderr_sha256": "664453d183217173a8b07c0396cfbe39f973041494325fdf2af9c1e704a62dff",
+        "stdout_blob": "blobs/C-a48719ad-87f7-4450-b00f-8f04ddca5ea3.stdout.txt",
+        "stdout_sha256": "c8b6391c66850a68774c094fc4cfd4124d1e588118b959eff3f120ca19612384"
+      },
+      "event_hash": "511760dc4d68317f774069ac5e1d2b0aea3c37ae47c7ab5309737e3d23ea6443",
+      "event_type": "command_finished",
+      "previous_event_hash": "05fba1d102058f2fa92f189cf2251b7a78599bc3b6621b1df39fddf0ed9e7dc8",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 25,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:49:49.428381Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/gradle-guard-independent-review-20261001/preservation-audit-corrected.py"
+        ],
+        "command_id": "C-f5d3d243-a772-4f48-8a31-a0060e329ee3",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "e607b5a900dfb7868dabd08386e0ce6750644a334ffbd5956d9036bfb4c6c67c",
+      "event_type": "command_started",
+      "previous_event_hash": "511760dc4d68317f774069ac5e1d2b0aea3c37ae47c7ab5309737e3d23ea6443",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 26,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:50:07.348772Z"
+    },
+    {
+      "data": {
+        "command_id": "C-f5d3d243-a772-4f48-8a31-a0060e329ee3",
+        "duration_ms": 985.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-f5d3d243-a772-4f48-8a31-a0060e329ee3.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-f5d3d243-a772-4f48-8a31-a0060e329ee3.stdout.txt",
+        "stdout_sha256": "f0ae6f5e69470e96b8fc782ab75013315e511212ee5de10560fc7b745872cf01"
+      },
+      "event_hash": "68d8ca9872cc66a71d7978ab393ebcc978593215d27dad74f014386aa3db46b5",
+      "event_type": "command_finished",
+      "previous_event_hash": "e607b5a900dfb7868dabd08386e0ce6750644a334ffbd5956d9036bfb4c6c67c",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 27,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:50:08.337207Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/gradle-guard-independent-review-20261001/actual-ci-inspection.py"
+        ],
+        "command_id": "C-43116350-8efa-41ea-a79c-34d0ac3a297c",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "4eedb2dd51529f532e6931664d3758d26c125f2802782484952fab8f83813860",
+      "event_type": "command_started",
+      "previous_event_hash": "68d8ca9872cc66a71d7978ab393ebcc978593215d27dad74f014386aa3db46b5",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 28,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:50:47.918552Z"
+    },
+    {
+      "data": {
+        "command_id": "C-43116350-8efa-41ea-a79c-34d0ac3a297c",
+        "duration_ms": 10218.0,
+        "exit_code": 0,
+        "result": "PASS",
+        "secret_redaction_applied": false,
+        "stderr_blob": "blobs/C-43116350-8efa-41ea-a79c-34d0ac3a297c.stderr.txt",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_blob": "blobs/C-43116350-8efa-41ea-a79c-34d0ac3a297c.stdout.txt",
+        "stdout_sha256": "0a0ac3ea7dc94f988f6606b5e9a7beaf109792cf5210a47c7c6722e7db5f7534"
+      },
+      "event_hash": "b2b518f91138a3a82519c1f6f3c0ca07fb11dbce7c973a5af2ea2e75438af851",
+      "event_type": "command_finished",
+      "previous_event_hash": "4eedb2dd51529f532e6931664d3758d26c125f2802782484952fab8f83813860",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 29,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:50:58.143779Z"
+    },
+    {
+      "data": {
+        "argv": [
+          "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+          "-B",
+          "H:/.codex/evidence/gradle-guard-independent-review-20261001/finalize-review.py"
+        ],
+        "command_id": "C-a2534b35-4dc5-491f-8e54-ff28b1c3f1aa",
+        "cwd": ".",
+        "secret_redaction_applied": false
+      },
+      "event_hash": "7b068b3d2e7d0fc75831c0db56b4e11f710bfc568b0154f8f355b3e474648616",
+      "event_type": "command_started",
+      "previous_event_hash": "b2b518f91138a3a82519c1f6f3c0ca07fb11dbce7c973a5af2ea2e75438af851",
+      "role": "review",
+      "run_id": "R-GRADLE-INDEPENDENT-REVIEW-20261001",
+      "schema_version": "1.0.0",
+      "seq": 30,
+      "task_id": "LOOP1-CLIENT-ARCH-CLARIFICATION-001",
+      "timestamp": "2026-10-01T12:51:56.814865Z"
+    }
+  ],
+  "ci_evidence": "actual-ci.json / actual-ci.log / actual-ci-summary.json",
+  "probe_evidence": "independent-probes.json / gradle-runtime-probe/build.gradle.kts / Recorder Gradle9 runtime output",
+  "preservation_evidence": "preservation-audit.json (initial disclosed errors), preservation-audit-corrected.json, whitespace-cr-aware.json",
+  "last_known_good": "3f352a8e465c0c4b093cca8e5f404ea587550b6e",
+  "task_state": "review; S1 PASS/S2 OPEN; no acceptance/product activation",
+  "ownership": "No candidate writes. Sole writer remains Coordinator/fresh Fix Agent after review release; external review evidence only."
+}

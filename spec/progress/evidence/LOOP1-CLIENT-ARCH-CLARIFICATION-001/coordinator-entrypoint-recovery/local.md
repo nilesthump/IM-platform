@@ -1,0 +1,3 @@
+# Coordinator entrypoint recovery note
+
+Only Task-allowed AGENTS/handoff historical labels and mutable task/current bookkeeping changed. Each original committed remediation paragraph remains byte-identical with one historical label and one current recovery note. Frozen authority/contracts/product/history/evidence unchanged. Initial broad-prefix partial write, duplicated own note, newline-format and wrong-repository Development outputs retained in Coordinator Recorder/external artifacts; none establishes acceptance. Correct explicit --repo H:/ica Development PASS6.833s/Frozen53 PASS6.314s; new final clean verification follows. NEW independent Review/new exact-head CI required; task review/S2 OPEN.

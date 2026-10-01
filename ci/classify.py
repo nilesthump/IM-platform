@@ -37,6 +37,10 @@ def classify(paths):
             or path.startswith("tools/verify-loop1-ctrl-")
             or path.startswith("tools/verify-loop1-min-")
         )
+        if parts[0] == "clients":
+            selected.add("architecture")
+        if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:
+            selected.update(JOBS)
         if governance:
             selected.update({"architecture", "source_go", "source_java"})
         shared = (
