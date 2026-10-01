@@ -1,0 +1,5 @@
+PASS TLS: trusted CA/CERT_REQUIRED/hostname HTTPS+WSS; untrusted CA and certificate name mismatch rejected
+PASS fixtures: HTTPS register/login/search/friend unique DIRECT; WSS hello/SQL durable ACK/one Outbox/NATS recipient; retry/conflict/nonmember/deferred COMMIT rollback; no duplicates/wrong recipient
+PASS revocation: replacement epoch/revoked then close/stale token reject/logout then close; no runtime skips
+DEFERRED_BY_HUMAN: friend-add-authorization-denied only (ADR-0004); not counted PASS
+PASS cleanup: inspected owned Compose containers/volumes removed
