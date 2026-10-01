@@ -16,7 +16,7 @@ Architecture prerequisite actualmaina287529 accepted; historical GString FAIL/wa
 ## Verification
 
 - Command: `python -B tools/verify_client_sqlite.py --scope desktop`
-  - Result: Corrected actual SQLx13cases/141assertions/nativeunit1PASS; stable minimumAPI34 SDKSQLite3.39.2 first-install/pm-clear13cases137assertions eachPASS via explicit Gradle8.9 fallback. Clean committed Recovery Acceptance23specs9.328s/sourceall0/architecture53/frozen53 PASS; CI31PASS4Windowsprivilegeskips; WSS and SyncPlugin PASS. Live recovery initially FAIL due formatting/ignored build trees; exacte67953a clean detached local recovery Development PASS23specs/status0 and sourceall0 PASS. Independent/hosted acceptance pending.
+  - Result: Corrected actual SQLx13cases/141assertions/nativeunit1PASS; stable minimumAPI34 SDKSQLite3.39.2 first-install/pm-clear13cases137assertions eachPASS via explicit Gradle8.9 fallback. Clean committed Recovery Acceptance23specs10.125s/sourceall0/architecture53/frozen53 PASS; CI31PASS4Windowsprivilegeskips; WSS and SyncPlugin PASS. Live recovery initially FAIL due formatting/ignored build trees; exacte67953a clean detached local recovery Development PASS23specs/status0 and sourceall0 PASS. Independent/hosted acceptance pending.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/fix2/fix-report.md`
 
 ## Current Blockers
@@ -29,7 +29,7 @@ Bounded TS shared Repository/schema/migrations/intents, TauriSQLx adapter/build 
 
 ## Known Failures, Risks, and Assumptions
 
-Historical GString FAIL/waiver never relabeled. Initial tooling/runtime failures preserved and repairs described in own evidence. Live ignored build caches cause source checker failures; source-only snapshot is local development only. Windows4symlinkskips require actual LinuxCI. Recorder incomplete initial/later uncovered setup/reads disclosed; research result not acceptance.
+Historical GString FAIL/waiver never relabeled. Initial tooling/runtime failures preserved and repairs described in own evidence. Live ignored build caches cause source checker failures; clean committed source verification passed locally; independent actual exactHEAD acceptance remains pending. Windows4symlinkskips require actual LinuxCI. Recorder incomplete initial/later uncovered setup/reads disclosed; research result not acceptance.
 
 ## Next Exact Action
 
@@ -37,7 +37,7 @@ NEW fresh independent Review of full final clean candidate; actual applicable ex
 
 ## Last Known Good Commit
 
-Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Prior product e67953a/failedReviewee82 immutable. Prior corrected product78ee723 preserved; Fix2 locally verified clean producta8c0cd0c183dae6145f60641b8273adb9f09df3a; final evidence-only candidate SHA returned by gitHEAD/Fix handoff, independent acceptance pending.
+Independently accepted actualmain `a28752967ddd471cd281aece7ea9b343521356e8`; activation base2338667. Prior product e67953a/failedReviewee82 immutable. Prior corrected product78ee723 preserved; Fix2 prior cursorproducta8c0cd0/89 evidence retained; final locally verified integer product6e62a30087ab316b784daf50dbde10eb4a0b4a03; final evidence-only candidate SHA returned by gitHEAD/Fix handoff, independent acceptance pending.
 
 ## Latest Checkpoint
 

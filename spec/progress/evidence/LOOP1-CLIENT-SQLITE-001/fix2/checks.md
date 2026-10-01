@@ -1,3 +1,7 @@
 # Clean committed local Fix2 checks
 
 Source candidate a8c0cd0c183dae6145f60641b8273adb9f09df3a in newly absent-path detached H:/if2-sqlite, clean0. Recorded via Fix2 Recorder external checks.py. Recovery Acceptance23specs9.328s PASS; allsource0violations .438s; frozen53PASS6.297s; architecture53PASS6s; CI31PASS2.828s with4Windows symlink privilege skips retained; existing WSS8positive10negative18schema26mutation and SyncPlugin79/16mutation PASS; diffcheck/status0. Exact argv/elapsed/exits clean-checks.json and persisted raw gzip logs. Clean source rerun resolves known live ignored-cache source-check failure without checker change. Current source locally verified, not independent Task/S2 acceptance. Native lock/source zero diff from6dc; cold hosted build/minimum34 clean official wrapper and real Linux skip-free checks still required.
+
+## Final integer source clean committed verification
+
+Exact product 6e62a30087ab316b784daf50dbde10eb4a0b4a03 / absent-path detachedH:/if2i-sqlite clean0. Recovery Acceptance23specs10.125s, sourceall0(.422s), frozen53(6.062s), architecture53(5.938s), CI31(3.062s4Windowsprivilegeskips), WSS/SyncPlugin/diffcheck/status0 allPASS. Newchecks justified by changed models/Repository/tests, not repeated unchanged pass. Exact integer-clean-checks.json/rawgz. ActualSQLx13/141/unit1 and minimumAPI34firstinstall+pmclear13/137each PASS. Locallyverified product; NEWfreshReview3/applicableexactHEADLinuxhostedcleanwrapper beforedone.
