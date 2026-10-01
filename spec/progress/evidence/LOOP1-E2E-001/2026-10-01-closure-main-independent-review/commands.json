@@ -1,0 +1,386 @@
+[
+  {
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-Command",
+      "Get-ChildItem spec/tasks/review,spec/tasks/active,spec/tasks/ready,spec/tasks/backlog,spec/tasks/done -Filter LOOP1-E2E-001.md | Select-Object FullName; Get-Content spec/tasks/review/LOOP1-E2E-001.md; Get-Content spec/architecture/README.md; Get-Content spec/architecture/baseline.md; Get-Content spec/governance/minimality.md; Get-Content spec/governance/execution-boundaries.md; Get-Content spec/governance/independent-review.md"
+    ],
+    "command_id": "C-d985c8ec-97a0-4820-8c51-2941feb0500d",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1688.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-d985c8ec-97a0-4820-8c51-2941feb0500d.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-d985c8ec-97a0-4820-8c51-2941feb0500d.stdout.txt",
+    "stdout_sha256": "75c1770fbd03bc92d19165cbf7f3c6c8c72cd975996a6fc6f81ee570aaf9949f"
+  },
+  {
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-Command",
+      "Get-FileHash spec/architecture/frozen-architecture.md,scalable-distributed-im-architecture.pdf -Algorithm SHA256; Get-ChildItem spec/architecture/decisions,spec/domain,spec/invariants,spec/acceptance | Select-Object FullName; rg -n '^#{1,3} ' spec/architecture/frozen-architecture.md; rg -n 'S1|LOOP1-GO|Gate' spec/batches spec/acceptance; git status --short --untracked-files=no; git diff --stat; git log -5 --oneline"
+    ],
+    "command_id": "C-d49315bd-ee6f-4bd4-8cd3-168f8d1e8f86",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1953.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-d49315bd-ee6f-4bd4-8cd3-168f8d1e8f86.stderr.txt",
+    "stderr_sha256": "f6d9edd8b4a37abcd4264f635712d34ad924946573e3b27dc4a72a0ce83b7aee",
+    "stdout_blob": "blobs/C-d49315bd-ee6f-4bd4-8cd3-168f8d1e8f86.stdout.txt",
+    "stdout_sha256": "2988c3cb4427aed5bc19bdeb5bb86b62f97260822b306bcae052c3ae419e8329"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-c",
+      "from pathlib import Path; import hashlib; p=Path(\"spec/architecture/frozen-architecture.md\"); print(hashlib.sha256(p.read_bytes()).hexdigest()); print(hashlib.sha256(Path(\"scalable-distributed-im-architecture.pdf\").read_bytes()).hexdigest()); s=p.read_text(encoding=\"utf-8\").splitlines(); print(\"\\n\".join(s[237:298]+s[611:860]+s[860:892]+s[1107:1133])); paths=list(Path(\"spec/architecture/decisions\").glob(\"*.md\"))+[Path(x) for x in [\"spec/domain/auth-user-friend.md\",\"spec/domain/messaging.md\",\"spec/invariants/auth-user-friend.md\",\"spec/invariants/messaging.md\",\"spec/acceptance/s0-auth-user-friend.md\",\"spec/acceptance/s0-messaging.md\",\"spec/batches/LOOP1-S1.md\"]]; [(print(str(x)),print(x.read_text(encoding=\"utf-8\"))) for x in paths]"
+    ],
+    "command_id": "C-60755e36-b832-410f-ab97-672f1ad3124d",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-60755e36-b832-410f-ab97-672f1ad3124d.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-60755e36-b832-410f-ab97-672f1ad3124d.stdout.txt",
+    "stdout_sha256": "ca7cd3f0734f354354fcacc4d99eaf6c3f9dfebaa26d5d78fe5876aae69978da"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-c",
+      "from pathlib import Path; p=Path(\"spec/architecture/frozen-architecture.md\"); s=p.read_text(encoding=\"utf-8\").splitlines(); print(\"\\n\".join(s[860:892]+s[1107:1133])); [(print(str(x)),print(x.read_text(encoding=\"utf-8\"))) for x in Path(\"spec/architecture/decisions\").glob(\"*.md\")]; print(\"Four task queue/status\"); ids=[\"LOOP1-GO-AUTH-001\",\"LOOP1-GO-SOCIAL-001\",\"LOOP1-GO-MSG-001\",\"LOOP1-E2E-001\"]; [(print(i,[(str(p),p.read_text(encoding=\"utf-8\").split(\"---\")[1]) for p in Path(\"spec/tasks\").glob(\"*/\"+i+\".md\")])) for i in ids]"
+    ],
+    "command_id": "C-5725ce98-621b-4c4b-8760-352976e780ee",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 47.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-5725ce98-621b-4c4b-8760-352976e780ee.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-5725ce98-621b-4c4b-8760-352976e780ee.stdout.txt",
+    "stdout_sha256": "752b2eaa84166b9164f4dabb2e4eeeb27eb874bc75826a26d3a9d2065e4bec2b"
+  },
+  {
+    "argv": [
+      "git",
+      "worktree",
+      "add",
+      "--detach",
+      "H:/.codex/worktrees/s1-closure-review",
+      "cb2cf431a59e0318a1163073a1c76432135c86d9"
+    ],
+    "command_id": "C-32ecd4ad-dd39-43ab-b36b-dafafe04518d",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1734.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-32ecd4ad-dd39-43ab-b36b-dafafe04518d.stderr.txt",
+    "stderr_sha256": "a1c546726b56df4b209451ddd2a8bf7b741c1e0511916981c998e4bc5574ed8e",
+    "stdout_blob": "blobs/C-32ecd4ad-dd39-43ab-b36b-dafafe04518d.stdout.txt",
+    "stdout_sha256": "37ee5721ab16d6979837e8542b7de95f2e6631a3837f428a23c5cca4d974dee2"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-c",
+      "from pathlib import Path; import subprocess; r=Path.cwd(); print(subprocess.check_output([\"git\",\"status\",\"--porcelain\"],text=True)); print(subprocess.check_output([\"git\",\"diff\",\"--name-status\",\"6346f39..HEAD\"],text=True)); print(subprocess.check_output([\"git\",\"diff\",\"6346f39..HEAD\",\"--\",\"spec/progress/current.md\",\"spec/tasks/done/LOOP1-E2E-001.md\",\"spec/progress/checkpoints\"],text=True)); print(\"Evidence top files\"); print(\"\\n\".join(str(p) for p in Path(\"spec/progress/evidence/LOOP1-E2E-001\").glob(\"*\")))"
+    ],
+    "command_id": "C-48ad1f35-a3f7-4a77-9b93-09e97af75dea",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 406.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-48ad1f35-a3f7-4a77-9b93-09e97af75dea.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-48ad1f35-a3f7-4a77-9b93-09e97af75dea.stdout.txt",
+    "stdout_sha256": "642bad492711031c443e4e2909a5bb244c80342514fddbc39fee6972fbdd6375"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "H:/.codex/evidence/s1-closure-review/audit.py"
+    ],
+    "command_id": "C-c0df18eb-20d2-4e8e-a84f-8f766bfc25b1",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 250.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-c0df18eb-20d2-4e8e-a84f-8f766bfc25b1.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-c0df18eb-20d2-4e8e-a84f-8f766bfc25b1.stdout.txt",
+    "stdout_sha256": "d5bfacc21d5a33918718133da1f5313497fec8e575992b9ca60fc6251017b543"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "command_id": "C-0929b850-6485-4e4e-95de-3ef372b70f79",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 7187.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-0929b850-6485-4e4e-95de-3ef372b70f79.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-0929b850-6485-4e4e-95de-3ef372b70f79.stdout.txt",
+    "stdout_sha256": "90a624c3cff18c4cdc93731024b44b4e48d500b7c7f878f980d19752aef64d3d"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "command_id": "C-949d89e2-468f-4474-ac30-0213ff5b9d73",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 5313.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-949d89e2-468f-4474-ac30-0213ff5b9d73.stderr.txt",
+    "stderr_sha256": "984eb983598e4ec71d96976083c822d3947d09419247618836681d8830657753",
+    "stdout_blob": "blobs/C-949d89e2-468f-4474-ac30-0213ff5b9d73.stdout.txt",
+    "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "command_id": "C-fa248c96-d460-42b9-97c7-110c8cf812f2",
+    "cwd": ".",
+    "secret_redaction_applied": true,
+    "duration_ms": 328.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-fa248c96-d460-42b9-97c7-110c8cf812f2.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-fa248c96-d460-42b9-97c7-110c8cf812f2.stdout.txt",
+    "stdout_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "H:/.codex/evidence/s1-closure-review/bytes.py"
+    ],
+    "command_id": "C-02f35e47-899b-4a56-a7a6-3aad27848457",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 8469.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-02f35e47-899b-4a56-a7a6-3aad27848457.stderr.txt",
+    "stderr_sha256": "7bdd87af0f0df3df3a8c7aee11069a541e69ab5b8423f644b9f81dfc3d26125a",
+    "stdout_blob": "blobs/C-02f35e47-899b-4a56-a7a6-3aad27848457.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "H:/.codex/evidence/s1-closure-review/bytes.py"
+    ],
+    "command_id": "C-94505519-1c4d-45f3-ba22-00857560098d",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 8500.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-94505519-1c4d-45f3-ba22-00857560098d.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-94505519-1c4d-45f3-ba22-00857560098d.stdout.txt",
+    "stdout_sha256": "7ae0cf75a668cfd670009601027ca7e1f323674fac93ca8bc506cd91550b0b7e"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "H:/.codex/evidence/s1-closure-review/hosted.py"
+    ],
+    "command_id": "C-855fd9c1-3829-4393-b995-88739530ba57",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 3703.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-855fd9c1-3829-4393-b995-88739530ba57.stderr.txt",
+    "stderr_sha256": "6a80ec902235f3a66e043c3fa366a2573e4caadbaad310496aebaeaa969d1647",
+    "stdout_blob": "blobs/C-855fd9c1-3829-4393-b995-88739530ba57.stdout.txt",
+    "stdout_sha256": "e00fcea5d78a2e120f360bdb4a088730ea214d9415aab8d9f0a91407908cce04"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "H:/.codex/evidence/s1-closure-review/hosted.py"
+    ],
+    "command_id": "C-7221eaab-e535-4dd1-a43c-421d5e95666d",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 10125.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-7221eaab-e535-4dd1-a43c-421d5e95666d.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-7221eaab-e535-4dd1-a43c-421d5e95666d.stdout.txt",
+    "stdout_sha256": "56c046da3a8787bde66d421525513330e314901d8bd5618e2f34993ddb76f19e"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "-c",
+      "import importlib.util,json;from pathlib import Path;s=importlib.util.spec_from_file_location(\"cl\",\"ci/classify.py\");m=importlib.util.module_from_spec(s);s.loader.exec_module(m);a={b:m.classify(m.diff_paths(b,\"HEAD\")) for b in [\"6346f39\",\"b442acd\"]};print(json.dumps(a));Path(\"H:/.codex/evidence/s1-closure-review/classifier.json\").write_text(json.dumps(a,indent=2))"
+    ],
+    "command_id": "C-cb01f01a-08be-4039-85df-e497b5525ae7",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 125.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-cb01f01a-08be-4039-85df-e497b5525ae7.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-cb01f01a-08be-4039-85df-e497b5525ae7.stdout.txt",
+    "stdout_sha256": "b0351eec1b12445a70a8bbd151e5152eaf74be2a85f7602fe6c007fe7c67e181"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--research-root",
+      "spec/progress/evidence/LOOP1-E2E-001/2026-10-01-coordinator-approval-e2e/research",
+      "--run-id",
+      "R-S1-APPROVE-20261001"
+    ],
+    "command_id": "C-ab124e7d-d7ff-4ac5-9e6d-221d568c460d",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 78.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-ab124e7d-d7ff-4ac5-9e6d-221d568c460d.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-ab124e7d-d7ff-4ac5-9e6d-221d568c460d.stdout.txt",
+    "stdout_sha256": "97c8182f87455a2a8c3e32eff835ca27449ec731a0371fe5654bcee71c72c7c3"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--research-root",
+      "spec/progress/evidence/LOOP1-E2E-001/2026-10-01-coordinator-approval-e2e/research",
+      "--run-id",
+      "R-S1-E2E-COORD-20261001"
+    ],
+    "command_id": "C-d3add693-7d90-4b38-8f4e-345d1945a8ea",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 78.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-d3add693-7d90-4b38-8f4e-345d1945a8ea.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-d3add693-7d90-4b38-8f4e-345d1945a8ea.stdout.txt",
+    "stdout_sha256": "b6f5ade4f8c1fd3d4b2c742b708a8dea4e1eae2dd009ebbadb90ae3ab35c714b"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "tools/research/recorder.py",
+      "validate-run",
+      "--research-root",
+      "spec/progress/evidence/LOOP1-E2E-001/2026-10-01-independent-review-6346/research",
+      "--run-id",
+      "R-E2E-REVIEW-6346"
+    ],
+    "command_id": "C-070c5853-1464-4394-a2c7-a314fd2f914c",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 78.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-070c5853-1464-4394-a2c7-a314fd2f914c.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-070c5853-1464-4394-a2c7-a314fd2f914c.stdout.txt",
+    "stdout_sha256": "355a8ddb36322e173d842ac4efb973adaca4c243b59d68b98d97c1d6cbdec0a8"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-X",
+      "utf8",
+      "H:/.codex/evidence/s1-closure-review/hosted.py"
+    ],
+    "command_id": "C-361bb568-9a49-492c-a480-784c6928f0ac",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 10109.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-361bb568-9a49-492c-a480-784c6928f0ac.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-361bb568-9a49-492c-a480-784c6928f0ac.stdout.txt",
+    "stdout_sha256": "622542815ffa80f8ee44156442e26683504e32481ee4764a4a79e699eac0b53d"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "command_id": "C-522dcf20-ad5c-4f51-a989-de6b92281304",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 46.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-522dcf20-ad5c-4f51-a989-de6b92281304.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-522dcf20-ad5c-4f51-a989-de6b92281304.stdout.txt",
+    "stdout_sha256": "4b007d63b44f1c60aaaae709f0e2299015e533682ae91e48d0ea6ed991a2e4f1"
+  }
+]
