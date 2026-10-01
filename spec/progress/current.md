@@ -7,17 +7,21 @@ Gate Status: OPEN (Social accepted/merged; MSG local development complete, indep
 Current Batch: LOOP1-S1
 Current Task: LOOP1-GO-MSG-001
 Current Task State: review
-Execution Status: MSG_READY_FOR_FRESH_INDEPENDENT_REVIEW
+Execution Status: MSG_INDEPENDENT_FAIL_FRESH_FIX
 
 ## Immediately Relevant Completed Work
 
-PR3 merged actual main b442acd26777c481620a6bd917863cebfaf79b35; actual-mainCI36813501417 SUCCESS. MSG activation78129e8 exact-bound; fresh Implementation Agent completed six production/six test files, local real normal/race and structural verification. No MSG/S1 PASS claimed.
+PR3 merged actual main b442acd26777c481620a6bd917863cebfaf79b35; actual-mainCI36813501417 SUCCESS. MSG activation78129e8 exact-bound; fresh Implementation Agent completed six production/six test files, local real normal/race and structural verification. Independent Review returned FAIL on f1764fd; no MSG/S1 PASS claimed.
 
 ## Current Blockers
 
-No unresolved local product failure. NEW independent Review and exact-head hosted CI remain required. Social friend403 only DEFERRED_BY_HUMAN, no messaging waiver.
+Fresh independent Review FAIL on f1764fd: rejected conflicting retry deletes original-socket marker (gateway.go265-268), and missing/null required afterSeq is accepted (sync.go13/21). New bounded Fix/new independent Review cycle in progress; green actual CI never substitutes acceptance. Friend403 exception remains unrelated. No architecture conflict.
 
 ## Verification
+
+- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
+  - Result: independent actual normal18.797s/race80.640s exit0/zero runtime skips; extra actual production-chain origin probe and missing/null history probes each exit1 and establish ReviewFAIL. Mandatory structure/byte checks and exact hostedCI pass but do not accept candidate.
+  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md`
 
 - Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
   - Result: exit0 on unique migrated disposablePG16/NATS2.10, DB_TEST_ENABLE=1; zero runtime skips. Core4.923/6.922s, blackbox17.143/76.300s; messaging/canonical/fault/Auth/Social/Session/fallback PASS locally.
@@ -39,7 +43,7 @@ Setup/compile/canonical precondition/untouched GROUP fixture-oracle failures cor
 
 ## Next Exact Action
 
-NEW independent Review of final clean committed candidate/full branch range; verify actual canonical security/transaction/routing/source/minimality and live normal/race with independent unique migrated services. Then exact-head hosted required jobs. Ordinary failures enter fresh Fix/new Review; never self-done or claim S1 Gate. Verification entrypoints: tools/verify-loop1-ctrl-002.ps1 and tools/verify-frozen-architecture.ps1.
+New /root/message_fix takes sole writer after Coordinator handoff commit, fixes only confirmed origin-marker and required-afterSeq defects with targeted regressions, then actual live normal/race/structural candidate verification. Commit development candidate/release, delegate NEW independent Review and exact hostedCI. Task remains review unfinished; no merge/MSG/S1PASS. Permanent FAIL evidence: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md.
 
 ## Last Known Good Commit
 
@@ -51,7 +55,7 @@ NEW independent Review of final clean committed candidate/full branch range; ver
 
 ## Uncommitted Changes / Ownership
 
-Development product committed at f64ae64e6e333ee52242b7b2100c663cd1f378c2; latest checkpoint is local review recovery, not accepted Gate. All bound MSG changes and this Task's Recorder/evidence owned by /root/message_implementation until candidate commit, then writer released and clean committed head required. Owned labeled PG/NATS containers/anonymous volume removed, exit0. Original H:/IM-platform and old worktrees/unknown untracked paths untouched; no other writer modified this worktree.
+Development product committed at f64ae64e6e333ee52242b7b2100c663cd1f378c2; latest checkpoint is local review recovery, not accepted Gate. Implementation/review writers released. Coordinator owns FAIL archive/current/Task handoff until commit; new /root/message_fix takes sole bounded writer after release. Candidate f176 remains permanently rejected. Owned labeled PG/NATS containers/anonymous volume removed, exit0. Original H:/IM-platform and old worktrees/unknown untracked paths untouched; no other writer modified this worktree.
 
 ## Architecture Conflicts / ACP / ADR
 

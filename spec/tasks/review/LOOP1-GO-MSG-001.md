@@ -2,7 +2,7 @@
 task_id: LOOP1-GO-MSG-001
 title: Implement Go text messaging, durable ACK, Outbox, and NATS
 status: review
-owner: Coordinator (fresh independent Review pending; implementation writer released after commit)
+owner: /root/message_fix (new Fix writer after Coordinator handoff)
 stage: S1
 gate: S1
 ---
@@ -105,3 +105,9 @@ Development product commit `f64ae64e6e333ee52242b7b2100c663cd1f378c2`; local che
 
 Recorder R-MSG-IMPLEMENTATION-20261001 finished/validated121events (research-only PASS). Exactly four local Windows symlink subcase skips; zero Go runtime skips. Final closure operations are outside finished run as disclosed. No writer/service remains after final commit.
 Transport closure: research/.gitattributes originally filtered36 immutable raw artifacts CRLF toLF during staging; raw working validation remained PASS. Coordinator explicitly authorized only own-run .gitattributes, after separate pre-edit path/hash diagnosis. Ordinary add retained cached filtered entries and byte assertion failed; own-run add --renormalize repaired index transport. All124 original prompt/run files now working/index byte-identical; no raw event/blob/hash mutation. Diagnosis and full audit in 2026-10-01-transport-preservation.json / 2026-10-01-transport-byte-audit.json. Initial stage mismatch and dirty Acceptance remain disclosed development failures. Finished Recorder administrative closure remains outside trace.
+
+# Independent FAIL and bounded fresh repair (2026-10-01)
+
+NEW /root/message_independent_review rejected clean detached candidate `f1764fd90f632878666504dded0d49c0ce1fa8fa`. Permanent evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md`. Actual Core/Gateway/WSS/PG16/NATS2.10 probe proves gateway.go265-268 deletes previous committed origin marker after conflicting retry, violating original-socket ACK-only. Actual PG Sync probe proves sync.go13/21 accepts missing/null required afterSeq. No product fix made by reviewer. Independent normal/race/structural/byte audits and exact hosted PRCI36816686898/push36816625962 passed; green CI does not override FAIL. Fresh Review Recorder65events finishedFAIL/validatePASS; old interrupted run remains historical partial, not rewritten.
+
+Coordinator archives byte-identical reviewer report/commands/probes/CI metadata/Recorder and keeps review unfinished. New /root/message_fix may repair only confirmed findings in already bound gateway/gateway.go + gateway/message_test.go and core/sync.go + core/sync_test.go, optional existing blackbox messaging test for actual regression. Preserve prior origin marker on later rejected retry; distinguish absent/null required afterSeq from valid0. No new transport/security/architecture/contracts/DB/shared/root/Auth/Social/workflows. Readonly Fix prep complete; sole writer begins only after this handoff commit. New exact-head independent Review/hostedCI required after repair; never selfaccept. Last accepted actualmain b442acd; rejected f176 remains permanent history.

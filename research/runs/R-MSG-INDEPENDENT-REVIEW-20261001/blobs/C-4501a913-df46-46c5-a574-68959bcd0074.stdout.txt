@@ -1,0 +1,607 @@
+package gateway
+
+import (
+	"encoding/json"
+	"github.com/gorilla/websocket"
+	"im-platform/backend/go/shared"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestPrivateForwardUsesBoundBearerAndCanonicalFrame(t *testing.T) {
+	id := "40000000-0000-4000-8000-000000000001"
+	conv := "30000000-0000-4000-8000-000000000001"
+	received := make(chan bool, 1)
+	core := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var e envelope
+		json.NewDecoder(r.Body).Decode(&e)
+		received <- r.URL.Path == "/__core/message" && r.Header.Get("Authorization") == "Bearer fixture-not-a-credential" && e.Type == "message.send" && e.RequestID == id
+		json.NewEncoder(w).Encode(frame("message.ack", id, map[string]any{"status": "committed", "conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "seq": 1, "createdAt": "2026-09-28T00:00:01Z"}))
+	}))
+	defer core.Close()
+	h := newHub(&validator{now: time.Now})
+	h.coreURL = core.URL
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ws, e := (&websocket.Upgrader{}).Upgrade(w, r, nil)
+		if e != nil {
+			return
+		}
+		defer ws.Close()
+		c := &connection{ws: ws, done: make(chan struct{}), token: "fixture-not-a-credential"}
+		h.forward(r.Context(), c, envelope{ProtocolVersion: "1.0", Type: "message.send", RequestID: id, Payload: json.RawMessage(`{"conversationId":"` + conv + `","content":{"kind":"TEXT","text":"hello"}}`)})
+	}))
+	defer server.Close()
+	ws, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ws.Close()
+	var ack envelope
+	if ws.ReadJSON(&ack) != nil || ack.Type != "message.ack" {
+		t.Fatal("ACK not forwarded")
+	}
+	if !<-received {
+		t.Fatal("transport changed identity/frame")
+	}
+}
+func TestLocalFanoutSelectsUserAndSuppressesOriginOnly(t *testing.T) {
+	user := "10000000-0000-4000-8000-000000000001"
+	other := "10000000-0000-4000-8000-000000000002"
+	request := "40000000-0000-4000-8000-000000000001"
+	conv := "30000000-0000-4000-8000-000000000001"
+	h := newHub(&validator{now: time.Now})
+	connections := make(chan *connection, 3)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ws, e := (&websocket.Upgrader{}).Upgrade(w, r, nil)
+		if e != nil {
+			return
+		}
+		c := &connection{ws: ws, done: make(chan struct{}), bound: &shared.Claims{UserID: user, SessionID: r.URL.Path, ExpiresAt: time.Now().Add(time.Hour).Unix()}}
+		if r.URL.Path == "/other" {
+			c.bound.UserID = other
+		}
+		if r.URL.Path == "/origin" {
+			c.origins = map[string]bool{conv + ":" + request: true}
+		}
+		h.add(c.bound.SessionID, c)
+		connections <- c
+		<-c.done
+	}))
+	defer server.Close()
+	var clients []*websocket.Conn
+	var conns []*connection
+	for _, path := range []string{"/origin", "/another", "/other"} {
+		ws, _, e := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+path, nil)
+		if e != nil {
+			t.Fatal(e)
+		}
+		clients = append(clients, ws)
+		conns = append(conns, <-connections)
+	}
+	defer func() {
+		for _, c := range conns {
+			c.close()
+		}
+		for _, c := range clients {
+			c.Close()
+		}
+	}()
+	b, _ := json.Marshal(frame("message.created", request, map[string]any{"conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "senderId": user, "seq": 1, "createdAt": "2026-09-28T00:00:01Z", "content": map[string]string{"kind": "TEXT", "text": "hello"}}))
+	h.fanout(user, b)
+	h.fanout(user, b)
+	for i := 0; i < 2; i++ {
+		clients[1].SetReadDeadline(time.Now().Add(time.Second))
+		var e envelope
+		if clients[1].ReadJSON(&e) != nil || e.Type != "message.created" {
+			t.Fatal("sender other session missing/repeated event")
+		}
+	}
+	for _, i := range []int{0, 2} {
+		clients[i].SetReadDeadline(time.Now().Add(80 * time.Millisecond))
+		var e envelope
+		if clients[i].ReadJSON(&e) == nil {
+			t.Fatal("origin/unauthorized local user received event")
+		}
+	}
+}
+package core
+
+import (
+	"context"
+	"encoding/json"
+	"github.com/nats-io/nats.go"
+	"os"
+	"testing"
+	"time"
+)
+
+func TestMessageOutboxPublicationCanRepeatWithoutNewMessage(t *testing.T) {
+	f := newMessageFixture(t, 3)
+	u := os.Getenv("NATS_URL")
+	if u == "" {
+		u = "nats://127.0.0.1:4222"
+	}
+	nc, err := nats.Connect(u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer nc.Close()
+	active, err := nc.SubscribeSync("message.created." + f.users[1])
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer active.Unsubscribe()
+	departed, err := nc.SubscribeSync("message.created." + f.users[2])
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer departed.Unsubscribe()
+	nc.Flush()
+	f.db.Exec(context.Background(), `UPDATE conversation_members SET left_at=now() WHERE conversation_id=$1 AND user_id=$2`, f.conversation, f.users[2])
+	id, _ := uuid()
+	m, err := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "delivery"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	relaySessionBatch(context.Background(), f.db, nc)
+	first, err := active.NextMsg(3 * time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var event map[string]any
+	if json.Unmarshal(first.Data, &event) != nil || event["type"] != "message.created" || event["requestId"] != id {
+		t.Fatal("not canonical created")
+	}
+	if _, err = departed.NextMsg(80 * time.Millisecond); err != nats.ErrTimeout {
+		t.Fatal("departed member received event")
+	}
+	var published bool
+	if err = f.db.QueryRow(context.Background(), `SELECT published_at IS NOT NULL FROM outbox_events WHERE message_id=$1`, m.MessageID).Scan(&published); err != nil || !published {
+		t.Fatal("publish not marked")
+	}
+	// Reproduce publish-before-mark crash: retry reuses the single durable event.
+	if _, err = f.db.Exec(context.Background(), `UPDATE outbox_events SET published_at=NULL WHERE message_id=$1`, m.MessageID); err != nil {
+		t.Fatal(err)
+	}
+	relaySessionBatch(context.Background(), f.db, nc)
+	again, err := active.NextMsg(3 * time.Second)
+	if err != nil || string(first.Data) != string(again.Data) {
+		t.Fatal("publication retry changed logical event")
+	}
+	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 1 || f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1`) != 1 {
+		t.Fatal("publication duplicated persistence")
+	}
+}
+func TestClosedNATSPublicationLeavesOutboxRetryable(t *testing.T) {
+	f := newMessageFixture(t, 2)
+	u := os.Getenv("NATS_URL")
+	if u == "" {
+		u = "nats://127.0.0.1:4222"
+	}
+	nc, err := nats.Connect(u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nc.Close()
+	id, _ := uuid()
+	_, err = f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "retry"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	relaySessionBatch(context.Background(), f.db, nc)
+	if f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1 AND published_at IS NULL`) != 1 {
+		t.Fatal("failed publisher marked outbox")
+	}
+}
+package core
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"net/http/httptest"
+	"testing"
+)
+
+func TestAuthorizedHistoryGapPages(t *testing.T) {
+	f := newMessageFixture(t, 2)
+	for i := 0; i < 3; i++ {
+		id, _ := uuid()
+		if _, err := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "history")); err != nil {
+			t.Fatal(err)
+		}
+	}
+	request, _ := uuid()
+	v := conversationRequest{SyncVersion: "1.0", Type: "sync.conversation.request", RequestID: request, ConversationID: f.conversation, AfterSeq: 0, Limit: 2}
+	call := func() *httptest.ResponseRecorder {
+		b, _ := json.Marshal(v)
+		token, _ := f.s.codec.Sign(f.claims[1])
+		r := httptest.NewRequest("POST", "/__core/history", bytes.NewReader(b))
+		r.Header.Set("Authorization", "Bearer "+token)
+		w := httptest.NewRecorder()
+		f.s.conversationHistory(w, r)
+		return w
+	}
+	w := call()
+	var page struct {
+		Messages []storedMessage `json:"messages"`
+		HasMore  bool            `json:"hasMore"`
+	}
+	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 2 || page.Messages[0].Seq != 1 || page.Messages[1].Seq != 2 || !page.HasMore {
+		t.Fatal("first gap page failed")
+	}
+	v.AfterSeq = 2
+	w = call()
+	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 1 || page.Messages[0].Seq != 3 || page.HasMore {
+		t.Fatal("terminal gap page failed")
+	}
+	f.db.Exec(context.Background(), `UPDATE conversation_members SET left_at=now() WHERE conversation_id=$1 AND user_id=$2`, f.conversation, f.users[1])
+	if call().Code != 403 {
+		t.Fatal("history leaks to nonmember")
+	}
+	v.Limit = 0
+	if call().Code != 400 {
+		t.Fatal("invalid canonical limit accepted")
+	}
+}
+package gateway
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"io"
+	"net/http"
+	"regexp"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/gorilla/websocket"
+	"im-platform/backend/go/shared"
+)
+
+type hub struct {
+	auth     *validator
+	mu       sync.Mutex
+	sessions map[string]map[*connection]bool
+	coreURL  string
+	client   *http.Client
+}
+type connection struct {
+	ws      *websocket.Conn
+	mu      sync.Mutex
+	done    chan struct{}
+	once    sync.Once
+	bound   *shared.Claims
+	token   string
+	origins map[string]bool
+}
+type envelope struct {
+	ProtocolVersion string          `json:"protocolVersion"`
+	Type            string          `json:"type"`
+	RequestID       string          `json:"requestId"`
+	Payload         json.RawMessage `json:"payload"`
+}
+
+var requestIDPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
+
+func validUUID(id string) bool { return requestIDPattern.MatchString(id) }
+
+func newHub(auth *validator) *hub {
+	return &hub{auth: auth, sessions: make(map[string]map[*connection]bool), client: &http.Client{Timeout: 10 * time.Second}}
+}
+func (c *connection) send(v any) error { c.mu.Lock(); defer c.mu.Unlock(); return c.ws.WriteJSON(v) }
+func (c *connection) close() {
+	c.once.Do(func() { close(c.done); c.mu.Lock(); _ = c.ws.Close(); c.mu.Unlock() })
+}
+func (h *hub) add(sid string, c *connection) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.sessions[sid] == nil {
+		h.sessions[sid] = make(map[*connection]bool)
+	}
+	h.sessions[sid][c] = true
+}
+func (h *hub) remove(sid string, c *connection) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	delete(h.sessions[sid], c)
+	if len(h.sessions[sid]) == 0 {
+		delete(h.sessions, sid)
+	}
+}
+func frame(typ, id string, payload any) any {
+	return map[string]any{"protocolVersion": "1.0", "type": typ, "requestId": id, "payload": payload}
+}
+func (h *hub) revoke(sid, reason string) {
+	h.mu.Lock()
+	conns := make([]*connection, 0, len(h.sessions[sid]))
+	for c := range h.sessions[sid] {
+		conns = append(conns, c)
+	}
+	delete(h.sessions, sid)
+	h.mu.Unlock()
+	for _, c := range conns {
+		id, _ := shared.UUID()
+		_ = c.send(frame("session.revoked", id, map[string]string{"sessionId": sid, "reason": reason}))
+		c.close()
+	}
+}
+
+func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
+	if len(r.URL.RawQuery) > 0 {
+		writeError(w, r, shared.Fail(400, "VALIDATION_FAILED", "Query parameters are not permitted on WebSocket upgrade."))
+		return
+	}
+	upgrader := websocket.Upgrader{}
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	c := &connection{ws: ws, done: make(chan struct{})}
+	defer c.close()
+	defer func() {
+		if c.bound != nil {
+			h.remove(c.bound.SessionID, c)
+		}
+	}()
+	ws.SetReadLimit(65536)
+	for {
+		var raw map[string]json.RawMessage
+		if err := ws.ReadJSON(&raw); err != nil {
+			return
+		}
+		if len(raw) != 4 {
+			return
+		}
+		b, _ := json.Marshal(raw)
+		var e envelope
+		if json.Unmarshal(b, &e) != nil || e.ProtocolVersion != "1.0" || !validUUID(e.RequestID) || len(e.Payload) == 0 {
+			return
+		}
+		if e.Type == "ping" || e.Type == "pong" {
+			var p map[string]any
+			if json.Unmarshal(e.Payload, &p) != nil || len(p) != 0 {
+				return
+			}
+			if e.Type == "ping" {
+				_ = c.send(frame("pong", e.RequestID, map[string]any{}))
+			}
+			continue
+		}
+		if c.bound == nil {
+			if e.Type != "auth.bind" {
+				if e.Type == "message.send" {
+					_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "AUTH_REQUIRED", "message": "Request rejected"}}))
+				}
+				return
+			}
+			var p struct {
+				AccessToken string `json:"accessToken"`
+			}
+			if json.Unmarshal(e.Payload, &p) != nil || p.AccessToken[REDACTED] "" {
+				h.reject(c, e.RequestID, "VALIDATION_FAILED", "Access token is required.")
+				return
+			}
+			var pfields map[string]any
+			_ = json.Unmarshal(e.Payload, &pfields)
+			if len(pfields) != 1 {
+				h.reject(c, e.RequestID, "VALIDATION_FAILED", "Auth binding payload is invalid.")
+				return
+			}
+			cl, err := h.auth.authenticate(r.Context(), p.AccessToken)
+			if err != nil {
+				if ae, ok := err.(shared.Error); ok {
+					h.reject(c, e.RequestID, ae.Code, ae.Message)
+				} else {
+					h.reject(c, e.RequestID, "AUTH_TOKEN_INVALID", "Access token is invalid.")
+				}
+				return
+			}
+			c.bound = &cl
+			c.token = p.AccessToken
+			h.add(cl.SessionID, c)
+			_ = c.send(frame("auth.ack", e.RequestID, map[string]any{"status": "bound", "userId": cl.UserID, "sessionId": cl.SessionID, "clientType": cl.ClientType, "sessionEpoch": cl.SessionEpoch}))
+			go h.watch(c, cl)
+			continue
+		}
+		// A bound connection uses its validated binding, token expiry and the
+		// NATS revocation registry. PostgreSQL is checked on bind/reconnect and
+		// by the existing safety watch, never in the message operation path.
+		if h.auth.now().Unix() >= c.bound.ExpiresAt {
+			h.revoke(c.bound.SessionID, "REVOKED")
+			return
+		}
+		if e.Type == "auth.bind" {
+			h.reject(c, e.RequestID, "VALIDATION_FAILED", "Connection is already bound.")
+			return
+		}
+		if e.Type == "message.send" {
+			h.forward(r.Context(), c, e)
+			continue
+		}
+		return
+	}
+}
+
+func (h *hub) reject(c *connection, id, code, message string) {
+	_ = c.send(frame("auth.ack", id, map[string]any{"status": "rejected", "error": map[string]string{"code": code, "message": "Request rejected"}}))
+}
+
+func (h *hub) watch(c *connection, cl shared.Claims) {
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-c.done:
+			return
+		case <-ticker.C:
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			_, err := h.auth.authenticate(ctx, c.token)
+			if err != nil {
+				reason := h.auth.revocationReason(ctx, cl, err)
+				cancel()
+				h.revoke(cl.SessionID, reason)
+				return
+			}
+			cancel()
+		}
+	}
+}
+
+func writeError(w http.ResponseWriter, r *http.Request, err error) {
+	e := shared.Error{Status: 500, Code: "INTERNAL_ERROR", Message: "Internal server error."}
+	if v, ok := err.(shared.Error); ok {
+		e = v
+	}
+	id, _ := shared.UUID()
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(e.Status)
+	_ = json.NewEncoder(w).Encode(map[string]any{"error": map[string]string{"code": e.Code, "message": e.Message}, "requestId": id})
+}
+
+// Forward only the canonical frame, using the validated connection's bearer.
+// There are no membership or persistence decisions in Gateway.
+func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
+	var payload struct {
+		ConversationID string `json:"conversationId"`
+	}
+	_ = json.Unmarshal(e.Payload, &payload)
+	key := strings.ToLower(payload.ConversationID) + ":" + strings.ToLower(e.RequestID)
+	c.mu.Lock()
+	if c.origins == nil {
+		c.origins = make(map[string]bool)
+	}
+	c.origins[key] = true
+	c.mu.Unlock()
+	reject := func() {
+		_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "MESSAGE_COMMIT_FAILED", "message": "Request rejected"}}))
+	}
+	b, err := json.Marshal(e)
+	if err != nil {
+		reject()
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", strings.TrimRight(h.coreURL, "/")+"/__core/message", bytes.NewReader(b))
+	if err != nil {
+		reject()
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("Content-Type", "application/json")
+	response, err := h.client.Do(req)
+	if err != nil {
+		reject()
+		return
+	}
+	defer response.Body.Close()
+	var ack envelope
+	if response.StatusCode != 200 || json.NewDecoder(io.LimitReader(response.Body, 65536)).Decode(&ack) != nil || ack.ProtocolVersion != "1.0" || ack.Type != "message.ack" || !strings.EqualFold(ack.RequestID, e.RequestID) {
+		reject()
+		return
+	}
+	var outcome struct {
+		Status string `json:"status"`
+	}
+	if json.Unmarshal(ack.Payload, &outcome) != nil {
+		reject()
+		return
+	}
+	if outcome.Status != "committed" {
+		c.mu.Lock()
+		delete(c.origins, key)
+		c.mu.Unlock()
+	}
+	_ = c.send(ack)
+}
+
+func (h *hub) fanout(user string, data []byte) {
+	if !validUUID(user) {
+		return
+	}
+	var e envelope
+	if json.Unmarshal(data, &e) != nil || e.ProtocolVersion != "1.0" || e.Type != "message.created" || !validUUID(e.RequestID) {
+		return
+	}
+	var p struct {
+		ConversationID string `json:"conversationId"`
+		MessageID      string `json:"messageId"`
+		SenderID       string `json:"senderId"`
+		Seq            int64  `json:"seq"`
+		CreatedAt      string `json:"createdAt"`
+		Content        struct {
+			Kind string `json:"kind"`
+			Text string `json:"text"`
+		} `json:"content"`
+	}
+	if json.Unmarshal(e.Payload, &p) != nil || !validUUID(p.ConversationID) || !validUUID(p.MessageID) || !validUUID(p.SenderID) || p.Seq < 1 || p.Content.Kind != "TEXT" {
+		return
+	}
+	if _, err := time.Parse(time.RFC3339Nano, p.CreatedAt); err != nil {
+		return
+	}
+	h.mu.Lock()
+	var conns []*connection
+	for _, slot := range h.sessions {
+		for c := range slot {
+			if c.bound != nil && c.bound.UserID == user {
+				conns = append(conns, c)
+			}
+		}
+	}
+	h.mu.Unlock()
+	key := strings.ToLower(p.ConversationID) + ":" + strings.ToLower(e.RequestID)
+	for _, c := range conns {
+		select {
+		case <-c.done:
+			continue
+		default:
+		}
+		if h.auth.now().Unix() >= c.bound.ExpiresAt {
+			continue
+		}
+		c.mu.Lock()
+		origin := p.SenderID == user && c.origins[key]
+		c.mu.Unlock()
+		if !origin {
+			_ = c.send(e)
+		}
+	}
+}
+# Canonical WSS v1 contract
+
+`envelope.schema.json` is the machine-verifiable wire authority. Every JSON frame has `protocolVersion`, `type`, `requestId`, and `payload`; unknown fields are rejected. A successful `message.ack` has `status: committed`, `messageId`, `seq`, and `createdAt`. The echoed `requestId` identifies the client logical send within its Conversation. `message.created` carries that same request identity for local convergence. Server-generated events use a unique event `requestId` except `message.created`, which carries the originating send request identity.
+
+TLS and WebSocket upgrade produce an unauthenticated connection. Before successful `auth.bind`, only `auth.bind`, `ping`, and `pong` are legal. The access token appears only in `auth.bind.payload`, never in the URL, logs, errors, or fan-out. The server checks signature, expiry, session ID, client type, and session epoch against authoritative session state before binding. A revoked or replaced session emits `session.revoked` and closes the connection; later sends cannot succeed. The `auth.ack` echoes the bind request identity.
+
+For `message.send`, the sender identity comes solely from the bound session. Core authorizes Conversation membership before persistence. `(senderId, conversationId, requestId)` is the server idempotency identity. A repeated send with that identity and identical content returns the original committed `messageId`, `seq`, and `createdAt`; it creates no second Message, sequence, or logical Outbox event. Reuse of the identity with different content is rejected. The same request ID in another Conversation is independent. Sequence numbers increase within each Conversation, while message IDs are globally unique.
+
+`message.ack` with `status: committed` is legal only after the Message, sequence allocation, and matching Outbox event commit atomically in PostgreSQL. A rollback or unknown commit outcome must not yield a successful ACK. A rejected send has no persisted Message or Outbox event. NATS delivery and local `message.created` fan-out can repeat; clients converge by Conversation and request/message identity, and Sync supplies eventual completeness. GROUP send persists one logical Message and one logical Outbox event regardless of member count. WSS v1's send content is `TEXT`; Plugin content requires its separate versioned contract. `message.created` is routed only to locally active, authorized Conversation members; Gateway does not decide business membership.
+
+`contracts/fixtures/websocket/` holds the deterministic shared Go/Java vectors. Run `python contracts/websocket/verify.py` to regenerate and compare them, validate the wire schema, run state assertions, and exercise negative mutations. `python contracts/websocket/verify.py --write` updates generated fixtures intentionally.
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/websocket/sync-v1.schema.json",
+  "title": "Sync v1 request and response contract",
+  "description": "User cursor carries only low-frequency friend, conversation, membership and plugin state. Message history uses a per-conversation sequence. Cursor and materialized data commit atomically on a client.",
+  "oneOf": [
+    {"$ref":"#/$defs/UserRequest"}, {"$ref":"#/$defs/UserPage"},
+    {"$ref":"#/$defs/ConversationRequest"}, {"$ref":"#/$defs/ConversationPage"}
+  ],
+  "$defs": {
+    "Id": {"type":"string","format":"uuid"},
+    "Seq": {"type":"integer","minimum":0},
+    "PositiveSeq": {"type":"integer","minimum":1},
+    "Cursor": {"type":"string","minLength":1,"maxLength":256},
+    "UserRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","cursor","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.request"},"requestId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"limit":{"type":"integer","minimum":1}}},
+    "UserEvent": {"type":"object","additionalProperties":false,"required":["eventId","cursor","kind","subjectId","revision"],"properties":{"eventId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"kind":{"enum":["friend.changed","conversation.changed","membership.changed","plugin.changed"]},"subjectId":{"$ref":"#/$defs/Id"},"revision":{"$ref":"#/$defs/PositiveSeq"}}},
+    "UserPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","events","nextCursor","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.page"},"requestId":{"$ref":"#/$defs/Id"},"events":{"type":"array","items":{"$ref":"#/$defs/UserEvent"}},"nextCursor":{"$ref":"#/$defs/Cursor"},"hasMore":{"type":"boolean"}}},
+    "ConversationRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","afterSeq","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.request"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"afterSeq":{"$ref":"#/$defs/Seq"},"limit":{"type":"integer","minimum":1}}},
+    "Message": {"type":"object","additionalProperties":false,"required":["conversationId","seq","messageId","senderId","requestId","createdAt","content"],"properties":{"conversationId":{"$ref":"#/$defs/Id"},"seq":{"$ref":"#/$defs/PositiveSeq"},"messageId":{"$ref":"#/$defs/Id"},"senderId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"},"createdAt":{"type":"string","format":"date-time"},"content":{"type":"object","additionalProperties":false,"required":["kind","text"],"properties":{"kind":{"const":"TEXT"},"text":{"type":"string","minLength":1,"maxLength":4096}}}}},
+    "ConversationPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","messages","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.page"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"messages":{"type":"array","items":{"$ref":"#/$defs/Message"}},"hasMore":{"type":"boolean"}}}
+  }
+}
