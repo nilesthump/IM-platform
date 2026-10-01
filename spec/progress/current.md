@@ -7,7 +7,7 @@ Gate Status: OPEN (remediation and integration PASS; Social acceptance unresolve
 Current Batch: LOOP1-S1
 Current Task: LOOP1-GO-SOCIAL-001
 Current Task State: backlog
-Execution Status: DEFERRED_BY_HUMAN; CONTRACT_APPLICABILITY_SYNC_PENDING; no product writer
+Execution Status: LOOP1_FRIEND403_EXCEPTION_REVIEW_PENDING; no product writer
 
 ## Immediately Relevant Completed Work
 
@@ -15,7 +15,7 @@ Remediation PR2 ordinary merged279c1dc. Fresh independent a9f1393 ReviewPASS, ac
 
 ## Current Blockers
 
-Human2026-10-01 explicitly chooses friend403 deferral beyond Loop1; later-iteration TODO FRIEND-AUTHORIZATION-403 recorded in own evidence, not implemented/tested/PASS. Automatic approval review rejected proposed OpenAPI/ADR/machine applicability edits as broader than recording authorization. Safe recording-only alternative applied; canonical machine applicability still unchanged. Explicit approval for bounded synchronization proposal required before readiness. No product writer; unique Social backlog retained.
+Latest Human explicitly approves retaining OpenAPI403 as placeholder and making friend-add-authorization-denied a Loop1 exception. ADR-0004/canonical loop1-exceptions.json/acceptance overlay propagate this stage-only scope. No unresolved403policy is required for Loop1 once independent propagation Review/CI accepts. Until then retain unique Social backlog; no product writer. FutureFRIEND-AUTHORIZATION-403 remains unimplemented, all other applicable tests required.
 
 ## Verification
 
@@ -31,17 +31,21 @@ Human2026-10-01 explicitly chooses friend403 deferral beyond Loop1; later-iterat
   - Result: Human-deferral record precommit checks exit0; Development is not acceptance. No contracts/architecture/product changed.
   - Evidence: spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-human-403-deferral.md; external R-SOCIAL-403-DEFERRAL-20261001 run history
 
+- Command: pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; bundled Python3 ci/check_architecture.py --scope governance --json; git diff --check
+  - Result: Approved exception propagation precommit checks exit0; not acceptance. New independent candidate Review/hostedCI pending; OpenAPI and golden untouched.
+  - Evidence: spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-loop1-403-exception.md; external R-SOCIAL-403-EXCEPTION-20261001 run history
+
 ## Changed Files or Migrations
 
-Current bounded record edits only own Task/current/evidence/checkpoint. No product/contracts/ADR/acceptance/DBmigration/checker/workflow/oldworktree edits. Canonicalfixture1.1/DB0001/frozenv1.1 retained.
+Bounded exception edits newADR-0004/canonicalstageprofile/acceptanceoverlay/ownTask-current-evidence-checkpoint. OpenAPI/goldenfixture/schema/frozenbody/PDF/database/product/checker/workflow unchanged. Canonicalfixture1.1/DB0001/frozenv1.1 retained.
 
 ## Known Failures, Risks, and Assumptions
 
-Prior1ccb recovery/CI FAIL preserved and repaired by freshFix/newReview. Historical/localfourWindows symlink subcases skipped; hostedLinux0skip/liveintegrations0skip. Recorderstartup/directreads incomplete, historicalUTF8/redactionlimits remain exposed. Human records403 as future deferred; canonical applicability synchronization is pending explicit approval after automatic review rejection. No Socialbusiness/fixturePASS or Taskdone.
+Prior1ccb recovery/CI FAIL preserved and repaired by freshFix/newReview. Historical/localfourWindows symlink subcases skipped; hostedLinux0skip/liveintegrations0skip. Recorderstartup/directreads incomplete, historicalUTF8/redactionlimits remain exposed. Prior refusal/deferral preserved as history. Latest Human approves stage exception; independent propagation Review/CI pending. Deferred403 never countsPASS. No Socialbusiness/Taskdone.
 
 ## Next Exact Action
 
-Obtain explicit approval for minimal public-contract/decision/acceptance applicability synchronization in2026-10-01-human-403-deferral.md, then fresh independent Review/applicableCI before readiness/activation/fresh Social implementation. User deferral intent is recorded; do not invent restricted credential or count deferred casePASS. No automatic Social merge or Message/E2E/Java/client/plugin/S2.
+Fresh independent Review and actual applicableCI of exact approved friend403 exception propagation, preserving OpenAPI/golden bytes. After accepted propagation reassess readiness then ready/active/fresh mappedSocial Implementation, independent Review/live tests/CI. No automatic Social merge or Message/E2E/Java/client/plugin/S2.
 
 ## Last Known Good Commit
 
@@ -49,12 +53,12 @@ Obtain explicit approval for minimal public-contract/decision/acceptance applica
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-go-social-001-human-deferral.md`
+`spec/progress/checkpoints/2026-10-01-loop1-go-social-001-exception.md`
 
 ## Uncommitted Changes / Ownership
 
-/root Coordinator owns only four Human-deferral record files until ordinarycommit; after clean commit no uncommitted ownership remains; no product writer. Candidate01765 committed/pushed; final metadata is separately verified. OldSocial5b35735/Auth/remediation/original worktrees preserved. Actualmainclean279c1dc. Independent reviewer released all writes; report archived. Stage004 migration scope expired; Social writes require ready/active and exact boundscope.
+/root Coordinator owns only bounded exception propagation files until ordinarycommit; after clean commit no uncommitted ownership remains; no product writer. Candidate01765 committed/pushed; final metadata is separately verified. OldSocial5b35735/Auth/remediation/original worktrees preserved. Actualmainclean279c1dc. Independent reviewer released all writes; report archived. Stage004 migration scope expired; Social writes require ready/active and exact boundscope.
 
 ## Architecture Conflicts / ACP / ADR
 
-Human approves later-iteration friend403 deferral intent. Automatic approval review rejected public OpenAPI/ADR/acceptance propagation; only narrow record applied. Existing canonical universal applicability has not been reconciled; no unapproved policy or silent waiver. Concrete pending proposal in2026-10-01-human-403-deferral.md.
+Explicit Human Loop1 exception under ADR-0004; OpenAPIplaceholder/golden403 unchanged. Prior auto-review refusal is history superseded only for this approved bounded propagation. No general security/403waiver or newpermissionmodel. Propagation Review/CI pending, not architecture-policy redesign.
