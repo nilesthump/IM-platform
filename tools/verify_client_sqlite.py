@@ -42,14 +42,28 @@ def main():
     if not serial.startswith("emulator-"): raise RuntimeError("Acceptance requires Android emulator")
     devices=subprocess.check_output([adb,"devices"],text=True)
     if serial+"\tdevice" not in devices: raise RuntimeError("Emulator unavailable or unauthorized")
+    def shell(*argv):
+        return subprocess.check_output([adb,"-s",serial,"shell",*argv],text=True,timeout=30).strip()
+    sdk=shell("getprop","ro.build.version.sdk")
+    boot=shell("getprop","sys.boot_completed"); unlocked=shell("getprop","sys.user.0.ce_available")
+    print("Actual minimum emulator SDK:",sdk,"boot:",boot,"credential-encrypted storage:",unlocked,flush=True)
+    if sdk!="34": raise RuntimeError("Declared minimum API34 must be exercised, not a newer substitute")
+    if boot!="1" or unlocked!="true": raise RuntimeError("Emulator boot/user-unlocked prerequisites not satisfied")
     run([adb,"-s",serial,"install","-r",mobile/"app/build/outputs/apk/debug/app-debug.apk"])
     run([adb,"-s",serial,"install","-r",mobile/"app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"])
     command=[adb,"-s",serial,"shell","am","instrument","-w","im.platform.client.test/im.platform.client.storage.StorageInstrumentation"]
-    print("+"," ".join(command),flush=True)
-    result=subprocess.run(command,capture_output=True,text=True,timeout=180)
-    print(result.stdout); print(result.stderr,file=sys.stderr)
-    if result.returncode or "INSTRUMENTATION_RESULT: result=PASS" not in result.stdout or "INSTRUMENTATION_CODE: -1" not in result.stdout:
-        raise RuntimeError("Real Android SQLite instrumentation failed")
+    for attempt in ("install","data-clear"):
+        if attempt=="data-clear":
+            clear=shell("pm","clear","im.platform.client")
+            print("Task application data-clear:",clear,flush=True)
+            if clear!="Success": raise RuntimeError("Task application data-clear failed")
+        print("+"," ".join(command),"phase="+attempt,flush=True)
+        result=subprocess.run(command,capture_output=True,text=True,timeout=180)
+        print(result.stdout); print(result.stderr,file=sys.stderr)
+        if result.returncode or "INSTRUMENTATION_RESULT: result=PASS" not in result.stdout or "INSTRUMENTATION_CODE: -1" not in result.stdout:
+            raise RuntimeError("Real Android SQLite instrumentation failed in "+attempt)
+        if "INSTRUMENTATION_RESULT: sdkInt=34" not in result.stdout:
+            raise RuntimeError("Instrumentation did not establish actual minimum SDK")
     print("PASS: real Android SDK SQLite fixture/migration/restart/isolation/rollback instrumentation")
 if __name__=="__main__":
     try: main()

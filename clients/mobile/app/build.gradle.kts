@@ -8,7 +8,7 @@ android {
     compileSdk = 35
     defaultConfig {
         applicationId = "im.platform.client"
-        minSdk = 26
+        minSdk = 34
         targetSdk = 35
         versionCode = 1
         versionName = "0.1"

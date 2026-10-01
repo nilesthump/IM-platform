@@ -2,7 +2,7 @@ import type { Bind, Committed, Database, LocalMessage, RealtimeMessage, ServerMe
 import { v1, v2 } from "./schema.js";
 
 function text(m: LocalMessage | RealtimeMessage): string {
-  if (m.content.kind !== "TEXT" || !m.content.text || m.content.text.length > 4096) throw new Error("Invalid text");
+  if (m.content.kind !== "TEXT" || !m.content.text || [...m.content.text].length > 4096) throw new Error("Invalid text");
   return m.content.text;
 }
 function seq(n: number): string {

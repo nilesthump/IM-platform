@@ -32,7 +32,7 @@ class Repository(context: Context, accountId: String) : Closeable {
             return rows
         }
     }
-    private fun checkText(text: String) { require(text.isNotEmpty() && text.length <= 4096) }
+    private fun checkText(text: String) { require(text.isNotEmpty() && text.codePointCount(0, text.length) <= 4096) }
     private fun execute(sql: String, args: Array<out Any?> = emptyArray()) { db.execSQL(sql,args) }
     private fun advance(c: String) {
         execute("INSERT INTO conversations(conversation_id) VALUES(?) ON CONFLICT DO NOTHING", arrayOf(c))

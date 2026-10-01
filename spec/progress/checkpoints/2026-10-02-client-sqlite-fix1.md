@@ -1,0 +1,3 @@
+# SQLite fresh fix checkpoint
+
+Task LOOP1-CLIENT-SQLITE-001 review. Accepted maina287529 lastgood; ee82 independent FAIL retained. FinalSHA returned in clean handoff/gitHEAD. S1PASS/S2OPEN. Public contracts unchanged; local schema1->2/canonical13fixtures unchanged. minAPI34 SDKSQLite3.39.2 first-install/clear each13/105PASS; TS actualSQLx13/106PASS. Local/Recorder evidence not Task acceptance. NEW independent Review+applicable real exactHEAD hosted CI before done; then authorized Coordinator PR/merge, safe original sync, progress record, STOP before SEND/SYNC/WEB per Human. Original744files/historicalGStringFAIL/waiver unchanged. Evidence fix1/fix-report.md and checks.md.

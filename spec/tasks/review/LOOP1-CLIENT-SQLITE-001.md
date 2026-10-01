@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-SQLITE-001
 title: Authorized TypeScript Desktop and Kotlin Android SQLite materialized Repository
 status: review
-owner: Fresh Implementation Agent (sole product writer)
+owner: Fresh Fix Agent (sole writer until clean release)
 stage: S2
 gate: S2
 ---
@@ -110,3 +110,9 @@ Completed actual bounded TS/native/Kotlin SQLite storage slice; see `spec/progre
 # Next Action
 
 Fresh independent Review of exact full clean committed candidate; actual selected exact-head hosted CI before administrative done. Coordinator handles push/PR authorization. Implementation Agent owns all bounded source/currentTask/evidence changes until clean commit and writer release; no unknown work overwritten. Original H:/IM-platform/historical GString FAIL/waiver preserved.
+
+# Independent FAIL / Fresh Fix / Human Stop Recovery
+
+Independent ee82 Review FAIL (minSDK26 unsupportedUPSERT and UTF16 text lengths) remains byte-preserved under fix1/independent-failed-review.zip. Fresh Fix aligns minSDK/config/CI/verifier34 and counts canonical4096codepoints with actual boundary/durable tests. ActualSQLx13cases106assertions/unit1PASS; stable minimumAPI34 SDKSQLite3.39.2 first install13cases105assertionsPASS and pm-clear13/105PASS. Command: bundledPython -B tools/verify_client_sqlite.py --scope desktop / --scope mobile --serial emulator-5584 via external fix1/tool.py actual environment. Full evidence: spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/fix1/fix-report.md and checks.md. Task remains uniquely review; NEW independent Review full finalSHA plus actual selected exactHEAD hosted CI required. Local/Recorder PASS is not Task or S2PASS. Prior FAIL/wrapper/cache/GString records preserved.
+
+Latest Human exact instruction: LOOP1-CLIENT-SQLITE-001完成后立即按顺序执行以下操作：发起pr并合并、同步H:/IM-platform、记录当前进度、中止下一步实现. Coordinator closes current Task, authorized PR/merge, safely syncs original preserving unknown files, records progress, then STOP before SEND/SYNC/WEB. This supersedes earlier next-S2 continuation. Fresh Fix owns scoped work until clean candidate/release; independently accepted lastgood maina287529. FinalSHA/finishedvalidatedRecorder returned separately, never selfaccept.

@@ -123,11 +123,35 @@ class StorageInstrumentation : Instrumentation() {
         Repository(targetContext,other).use { repo -> repo.initialize(); equal(repo.messages(c).size,0) }
         targetContext.deleteDatabase("im-$account.sqlite"); targetContext.deleteDatabase("im-$other.sqlite")
     }
+    private fun unicode() {
+        val account=UUID.randomUUID().toString()
+        val c="30000000-0000-4000-8000-000000000001"; val r="40000000-0000-4000-8000-000000000001"
+        val id="50000000-0000-4000-8000-000000000001"
+        val emoji="\uD83D\uDE00".repeat(4096)
+        var durable: List<List<String?>> = emptyList()
+        Repository(targetContext,account).use { repo ->
+            repo.initialize()
+            val local=LocalMessage(c,r,account,emoji)
+            val server=ServerMessage(c,r,account,emoji,id,1,"2026-09-28T00:00:01Z")
+            repo.localSend(local); repo.syncMessages(listOf(server))
+            equal(repo.messages(c)[0][2],emoji); durable=repo.messages(c)
+            reject { repo.localSend(local.copy(requestId="40000000-0000-4000-8000-000000000009",text=emoji+"\uD83D\uDE00")) }
+            equal(repo.messages(c),durable)
+            reject { repo.syncMessages(listOf(server.copy(requestId="40000000-0000-4000-8000-000000000009",messageId="50000000-0000-4000-8000-000000000009",seq=2,text=emoji+"\uD83D\uDE00"))) }
+            equal(repo.messages(c),durable); equal(repo.contiguous(c),1L); equal(repo.cursor(),"0")
+        }
+        Repository(targetContext,account).use { repo -> repo.initialize(); equal(repo.messages(c),durable) }
+        targetContext.deleteDatabase("im-$account.sqlite")
+    }
     override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); start() }
     override fun onStart() {
         val result=Bundle()
         try {
-            fixtures(); additional()
+            fixtures(); additional(); unicode()
+            Repository(targetContext,UUID.randomUUID().toString()).use { repo ->
+                repo.initialize(); result.putString("sqliteVersion",repo.query("SELECT sqlite_version()").single().single())
+            }
+            result.putInt("sdkInt",android.os.Build.VERSION.SDK_INT)
             result.putString("result","PASS"); result.putInt("canonicalCases",canonicalCases); result.putInt("assertions",assertions)
             result.putString("engine","actual Android SDK SQLite")
             finish(Activity.RESULT_OK,result)
