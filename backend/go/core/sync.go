@@ -10,7 +10,7 @@ type conversationRequest struct {
 	Type           string `json:"type"`
 	RequestID      string `json:"requestId"`
 	ConversationID string `json:"conversationId"`
-	AfterSeq       int64  `json:"afterSeq"`
+	AfterSeq       *int64 `json:"afterSeq"`
 	Limit          int64  `json:"limit"`
 }
 
@@ -18,7 +18,7 @@ type conversationRequest struct {
 // User Sync and client cursor/materialization are outside this task.
 func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request) {
 	var v conversationRequest
-	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
+	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq == nil || *v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
 		writeError(w, r, fail(400, "VALIDATION_FAILED", "Request body is invalid."))
 		return
 	}
@@ -44,7 +44,7 @@ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request
 		writeError(w, r, err)
 		return
 	}
-	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, v.AfterSeq, v.Limit)
+	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, *v.AfterSeq, v.Limit)
 	if err != nil {
 		writeError(w, r, err)
 		return
@@ -65,7 +65,7 @@ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request
 		writeError(w, r, err)
 		return
 	}
-	after := v.AfterSeq
+	after := *v.AfterSeq
 	if len(messages) > 0 {
 		after = messages[len(messages)-1].Seq
 	}

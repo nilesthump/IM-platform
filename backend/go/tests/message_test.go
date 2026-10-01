@@ -413,3 +413,42 @@ func TestCanonicalDuplicateOutOfOrderAndSyncRecovery(t *testing.T) {
 		})
 	}
 }
+
+func TestLiveConflictingRetryDelayedOrigin(t *testing.T) {
+	h := newMessagingHarness(t)
+	all := readFixture(t, "../../../contracts/fixtures/websocket/golden.json")
+	scenario := fixture(t, all, "conflicting-retry")
+	for _, step := range scenario.Steps {
+		h.normal.check(t, step.Out[0], h.send(t, step.In, h.sender))
+	}
+	m, o, n := h.rows(t, h.conversations[0])
+	if m != 1 || o != 1 || n != 2 {
+		t.Fatal("conflicting retry changed durable effects")
+	}
+	// Start the real dispatcher only after the rejected retry, then duplicate its
+	// original event on the same per-user NATS path. Origin remains ACK-only.
+	h.relay(t)
+	expected := fixture(t, all, "durable-send-and-created").Steps[0].Out[1]
+	h.normal.check(t, expected, readMessageFrame(t, h.receiver))
+	h.normal.check(t, expected, readMessageFrame(t, h.other))
+	var payload []byte
+	if err := h.db.QueryRow(context.Background(), `SELECT payload FROM outbox_events WHERE conversation_id=$1 AND event_type='message.created'`, h.conversations[0]).Scan(&payload); err != nil {
+		t.Fatal(err)
+	}
+	if err := h.nc.Publish("message.created."+h.users[0], payload); err != nil {
+		t.Fatal(err)
+	}
+	if err := h.nc.Flush(); err != nil {
+		t.Fatal(err)
+	}
+	h.normal.check(t, expected, readMessageFrame(t, h.other))
+	h.sender.SetReadDeadline(time.Now().Add(time.Second))
+	var got map[string]any
+	err := h.sender.ReadJSON(&got)
+	if err == nil {
+		t.Fatalf("origin received %v after rejected retry", got["type"])
+	}
+	if !strings.Contains(err.Error(), "timeout") {
+		t.Fatalf("unexpected origin failure: %v", err)
+	}
+}

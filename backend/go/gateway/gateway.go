@@ -227,6 +227,7 @@ func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
 	if c.origins == nil {
 		c.origins = make(map[string]bool)
 	}
+	previousOrigin := c.origins[key]
 	c.origins[key] = true
 	c.mu.Unlock()
 	reject := func() {
@@ -262,7 +263,8 @@ func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
 		reject()
 		return
 	}
-	if outcome.Status != "committed" {
+	// A rejected retry cannot erase an earlier committed or uncertain send.
+	if outcome.Status != "committed" && !previousOrigin {
 		c.mu.Lock()
 		delete(c.origins, key)
 		c.mu.Unlock()
