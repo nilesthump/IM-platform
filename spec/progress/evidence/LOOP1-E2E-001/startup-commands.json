@@ -1,0 +1,166 @@
+{
+  "owner": "R-E2E-IMPLEMENTATION-20261001",
+  "phase": "startup",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55651",
+    "PGUSER": "postgres",
+    "PGDATABASE": "s1_e2e_regression",
+    "NATS_URL": "nats://127.0.0.1:42651"
+  },
+  "containers": [
+    "loop1-e2e-impl-pg-20261001",
+    "loop1-e2e-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/handoff/agent-context.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.141,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/progress/current.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/tasks/active/LOOP1-E2E-001.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.109,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/architecture/README.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/architecture/baseline.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/governance/minimality.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/governance/execution-boundaries.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.11,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('spec/governance/independent-review.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.11,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import json;print(json.dumps(Path('research/README.md').read_text(encoding='utf8'),ensure_ascii=True))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "git",
+        "-c",
+        "core.excludesFile=.git/info/exclude",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.125,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "git",
+        "diff"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.109,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "git",
+        "log",
+        "-5",
+        "--oneline"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.11,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "record-event",
+        "--run-id",
+        "R-E2E-IMPLEMENTATION-20261001",
+        "--event-type",
+        "instrumentation_warning",
+        "--data-json",
+        "{\"reason\": \"Preparation and isolated-worktree creation occurred before run start; trace incomplete. Prior read-only startup command failures, quoting, wrong guessed paths and truncated/GBK output were disclosed; immutable inputs hash-confirmed and UTF8 supplemented. No product writes or services before baseline.\", \"pre_recorder_trace_complete\": false}"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.171,
+      "go_runtime_skips": 0
+    }
+  ]
+}

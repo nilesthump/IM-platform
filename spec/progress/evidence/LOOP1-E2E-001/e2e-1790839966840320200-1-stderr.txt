@@ -1,0 +1,66 @@
+Traceback (most recent call last):
+
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 384, in <module>
+
+    main()
+
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 182, in main
+
+    compose('up', '-d', '--build')
+
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 153, in compose
+
+    return docker(command + list(args))
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 149, in docker
+
+    raise RuntimeError('Docker test command failed: ' + result.stderr.decode(errors='replace'))
+
+RuntimeError: Docker test command failed: Dockerfile:8
+
+
+
+--------------------
+
+
+
+   6 |     RUN CGO_ENABLED=0 go build -o /im-go .
+
+
+
+   7 |     
+
+
+
+   8 | >>> FROM alpine:3.21
+
+
+
+   9 |     COPY --from=build /im-go /im-go
+
+
+
+  10 |     ENTRYPOINT ["/im-go"]
+
+
+
+--------------------
+
+
+
+target core-go: failed to solve: alpine:3.21: failed to resolve source metadata for docker.io/library/alpine:3.21: unexpected status from HEAD request to https://docker.1panel.live/v2/library/alpine/manifests/3.21?ns=docker.io: 403 Forbidden
+
+
+
+
+
+
+
+View build details: docker-desktop://dashboard/build/default/default/p8xi2iau3oo9phish2bwaqkzh
+
+
+
+
+

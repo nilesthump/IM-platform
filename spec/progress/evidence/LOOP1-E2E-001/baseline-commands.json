@@ -1,0 +1,177 @@
+{
+  "owner": "R-E2E-IMPLEMENTATION-20261001",
+  "phase": "baseline",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55651",
+    "PGUSER": "postgres",
+    "PGDATABASE": "s1_e2e_regression",
+    "NATS_URL": "nats://127.0.0.1:42651"
+  },
+  "containers": [
+    "loop1-e2e-impl-pg-20261001",
+    "loop1-e2e-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "contracts/websocket/verify.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.172,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.953,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.844,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-frozen-architecture.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.218,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "loop1-e2e-impl-pg-20261001",
+        "--label",
+        "im.task=LOOP1-E2E-001",
+        "--label",
+        "im.owner=R-E2E-IMPLEMENTATION-20261001",
+        "-e",
+        "POSTGRES_HOST_AUTH_METHOD=trust",
+        "-e",
+        "POSTGRES_DB=s1_e2e_regression",
+        "-p",
+        "127.0.0.1:55651:5432",
+        "postgres:16"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.625,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "run",
+        "-d",
+        "--name",
+        "loop1-e2e-impl-nats-20261001",
+        "--label",
+        "im.task=LOOP1-E2E-001",
+        "--label",
+        "im.owner=R-E2E-IMPLEMENTATION-20261001",
+        "-p",
+        "127.0.0.1:42651:4222",
+        "nats:2.10"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.5,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "exec",
+        "loop1-e2e-impl-pg-20261001",
+        "pg_isready",
+        "-U",
+        "postgres",
+        "-d",
+        "s1_e2e_regression"
+      ],
+      "exit_code": 2,
+      "elapsed_seconds": 0.391,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "exec",
+        "loop1-e2e-impl-pg-20261001",
+        "pg_isready",
+        "-U",
+        "postgres",
+        "-d",
+        "s1_e2e_regression"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.328,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-c",
+        "from pathlib import Path;import subprocess;subprocess.run(['docker','exec','-i','loop1-e2e-impl-pg-20261001','psql','-U','postgres','-d','s1_e2e_regression','-v','ON_ERROR_STOP=1'],input=Path('contracts/database/migrations/0001_initial.up.sql').read_bytes(),check=True)"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.485,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 21.859,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 85.594,
+      "go_runtime_skips": 0
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "owner": "R-E2E-IMPLEMENTATION-20261001",
+  "phase": "cleanup",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55651",
+    "PGUSER": "postgres",
+    "PGDATABASE": "s1_e2e_regression",
+    "NATS_URL": "nats://127.0.0.1:42651"
+  },
+  "containers": [
+    "loop1-e2e-impl-pg-20261001",
+    "loop1-e2e-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "loop1-e2e-impl-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.234,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "volume",
+        "inspect",
+        "ef24a639fe01dc3ab52df0a17284c2562a1cecac155a4ecb0bb9d128ec8d291b"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.235,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "ps",
+        "-aq",
+        "--no-trunc",
+        "--filter",
+        "volume=ef24a639fe01dc3ab52df0a17284c2562a1cecac155a4ecb0bb9d128ec8d291b"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.25,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-e2e-impl-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.656,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "loop1-e2e-impl-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.25,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-e2e-impl-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.594,
+      "go_runtime_skips": 0
+    }
+  ]
+}

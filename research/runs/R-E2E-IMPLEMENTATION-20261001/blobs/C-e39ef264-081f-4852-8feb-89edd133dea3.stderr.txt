@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 381, in <module>
+    main()
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 224, in main
+    original_config = json.loads(compose('exec', '-T', 'tls-go', 'wget', '-qO-', 'http://localhost:2019/config/'))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 150, in compose
+    return docker(command + list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\worktrees\s1-e2e-approved\tests\e2e\go_tls_messaging.py", line 147, in docker
+    return subprocess.run(args, env=env, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, timeout=300).stdout
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['docker', 'compose', '-f', 'H:\\.codex\\worktrees\\s1-e2e-approved\\deploy\\compose.yaml', '-p', 'im-s1-e2e-35776-1cb8c38c', '--profile', 'go', 'exec', '-T', 'tls-go', 'wget', '-qO-', 'http://localhost:2019/config/']' returned non-zero exit status 1.

@@ -1,0 +1,854 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index b556b33..08d9396 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -292,6 +292,8 @@ jobs:
+         run: ./tests/infrastructure/smoke.ps1 -Profile go
+       - name: Go Auth actual roles and TLS event smoke
+         run: python3 tests/go/live_role_smoke.py
++      - name: Go S1 strict TLS messaging E2E
++        run: python3 -B tests/e2e/go_tls_messaging.py
+       - name: Java transport smoke
+         shell: pwsh
+         run: ./tests/infrastructure/smoke.ps1 -Profile java
+diff --git a/ci/classify.py b/ci/classify.py
+index 1d5cdac..296b12a 100644
+--- a/ci/classify.py
++++ b/ci/classify.py
+@@ -47,7 +47,7 @@ def classify(paths):
+         )
+         if shared:
+             selected.update(FULL_COMPATIBILITY)
+-        elif parts[:2] == ["tests", "go"]:
++        elif parts[:2] in (["tests", "go"], ["tests", "e2e"]):
+             selected.update({"go", "deploy", "architecture", "source_go"})
+         elif parts[:2] == ["backend", "go"]:
+             selected.update({"go", "architecture", "source_go"})
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 1a851e1..149a883 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -6,8 +6,8 @@ Current Gate: S1
+ Gate Status: OPEN (real TLS entrypoint E2E pending)
+ Current Batch: LOOP1-S1
+ Current Task: LOOP1-E2E-001
+-Current Task State: active
+-Execution Status: E2E_IMPLEMENTATION_AFTER_APPROVED_ACTIVATION
++Current Task State: review
++Execution Status: E2E_DEVELOPMENT_COMPLETE_PENDING_FRESH_INDEPENDENT_REVIEW
+ 
+ ## Immediately Relevant Completed Work
+ 
+@@ -15,7 +15,7 @@ MSG unique done; acceptedproduct183be639640cf652dc7a9f18152071c617f2ceac. Admini
+ 
+ ## Current Blockers
+ 
+-None atactivation. Actual strictTLS E2E andfresh independentReview/exactCI remainunexecuted acceptance. PR4OPEN/unmerged; noautomaticmergeauthorization. CompleteviaNEWacceptedS1PR thenmergedmainverification; noS2implementation.
++Local strictTLS E2E and full live normal/race complete, developmentPASS only. NEW independent Review and exactcandidate hostedCI pending. PR4OPEN/unmerged; noautomaticmergeauthorization. CompleteviaNEWacceptedS1PR thenmergedmainverification; noS2implementation.
+ 
+ ## Verification
+ 
+@@ -33,7 +33,7 @@ Firstapproved DGitpush hung/terminatedexit128, secondconnectionreset; bundledGit
+ 
+ ## Next Exact Action
+ 
+-FreshImplementation afteractivationcommit: isolatedtaskworktree/ownRecorder/boundminimumlivebaseline, implementexacttest/CI paths, verifyactualstrictTLS+fullnormal/race/source/recovery, commitreviewcandidateandreleasewriter. NEWindependentReview/fixcycle/exactfullPRCI thenTaskdone/S1Gate evidence. Create/mergeNEWcompleteS1PR, verifyactualmain/CI, recordS2OPENandstop. PR4unchanged.
++NEW independent Review from clean exactfinalcandidate and full actualmain b442acd..HEAD. Verify strictTLS/live normalrace/source/import/minimality and exacthostedselectedjobs/newPRtreebinding; ordinaryFAIL requiresfreshFix/newReview. After independentacceptance create andmerge NEW completeS1PR, verifymain, recordS1PASS/S2OPEN andstop. No PR4automaticmerge orS2implementation. If humanhandoff firstsynchronize/verifyoriginal605 thenTEMPdocumentandstop.
+ 
+ ## Last Known Good Commit
+ 
+@@ -41,12 +41,18 @@ Administrative `b51e62a529ad0f06f31828f49a77734ea2ca010c` independentPASS/hosted
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-recovery-review.md`
++`spec/progress/checkpoints/2026-10-01-loop1-e2e-001-local-review.md`
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Coordinator owns onlyactivation/task/current/MSGboundedarchive untilcommit. Then /root/s1_e2e_preparation soleproductwriter inisolatedtask/LOOP1-E2E-001 checkout; noCoordinator repositorywrites duringimplementation. ExternalCoordinatorRecorder H:/.codex/evidence/s1-approved-coordinator/research R-S1-APPROVE-20261001 avoidsrawhistorymutations. Original605unknownfiles preserved/unknownowned. Noactiveservices atactivation. Noreset/clean/force/overwrite.
++Implementationowns onlyE2Etest/CI/Task/current/ownEvidence/ownRecorder in isolated H:/.codex/worktrees/s1-e2e-approved untilfinalcommitandrelease. All ownedCompose/PG/NATS/anonymousvolumes inspectedandremoved. Original605unknownfiles unchangedandunknownowned. CoordinatoronlyexternalRecorder/readonly duringwriterownership; aftercleanfinalcandidate CoordinatorhandlesReview/CI/newPR. No reset/clean/force/overwrite.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+ None. ExplicitCIwrite-scope approval resolved; canonicalarchitecture/contracts unchanged. S1OPEN.
++
++## E2E Development Candidate (2026-10-01)
++
++Five approved test/CI files complete at product7a980ca; no backend/deploy/contract/schema/frozen changes. Command: bundledPython -B tests/e2e/go_tls_messaging.py; live go normal/race; WSS/HTTP/sourceall/architecture/frozen/CI/build/vet/gofmt/Development recovery. Result: E2E32.547s exit0 after4 retainedFAIL; preedit21.859/85.594s and final20.281/82.250s livePASS zero runtimeSKIP; architecture34/frozen34/CI29PASS with exactly4localWindows symlinksubcaseSKIP pendingLinux. Evidence: spec/progress/evidence/LOOP1-E2E-001/2026-10-01-implementation-handoff.md and command-results JSON; ownRecorder R-E2E-IMPLEMENTATION-20261001. Real certificate name mismatch; ownedtemporaryCaddynegativeconfig restored/asserted before positivebusiness; deferredactualCOMMITrollback/noeffects; retry/membership/revocation and durableMessage/Outbox/NATS recipient verified. Namedfriend403 remainsDEFERRED_BY_HUMAN.
++
++Next exact action: NEW independent Review clean finalcandidate/fullb442acd..HEAD plus exacthostedCI/newPRtreebinding; repeatfreshFix/Review ifFAIL. No selfacceptance/taskdone/S1PASS/push/merge. Implementation solewriter releases afterfinalclosureSHA/cleanstatus; Coordinator handles review/CI/newPR and mergedmain beforeS2OPEN stop. AllownedCompose andbaselinePG/NATS/anonymousvolume inspectedandcleaned; original605files untouched. HistoricalFAIL/partial unchanged, incompletepreptrace honestlyprospective_resume; Recorder rejectedmissingresult event disclosed/corrected. Finalstage/commit/status afterRecorderfinish outsidefinishedtrace. Lastacceptedadminb51/product183/mainb442acd remainsacceptedbaseline.
+diff --git a/spec/tasks/active/LOOP1-E2E-001.md b/spec/tasks/active/LOOP1-E2E-001.md
+deleted file mode 100644
+index 4352edd..0000000
+--- a/spec/tasks/active/LOOP1-E2E-001.md
++++ /dev/null
+@@ -1,88 +0,0 @@
+----
+-task_id: LOOP1-E2E-001
+-title: Verify first Go end-to-end messaging slice
+-status: active
+-owner: /root/s1_e2e_preparation (sole Implementation writer after release)
+-stage: S1
+-gate: S1
+----
+-
+-# Goal
+-
+-Prove A can log in, search/add B, obtain the unique DIRECT Conversation, send `hello`, receive durable ACK, and B receives it in realtime through the real TLS entrypoint.
+-
+-# Inputs
+-
+-- Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus §3/§10 SRC-01 through SRC-07/§11/§12-14; approved ADRs and Minimality Contract.
+-- Canonical HTTP, WSS, Sync, error, fixture and database contracts; accepted Go Auth/Social/Message implementations.
+-
+-# Execution Constraints
+-
+-Read spec/governance/execution-boundaries.md and independent-review.md. allowed_paths never exempts ownership/import direction. Before activation bind these responsibility paths to the actual accepted stage-four layout and any presently required exact assembly file. Coordinator must amend paths before edits if actual file names differ; no duplicate alternate packages or unapproved root/shared business. Canonical fixtures remain sole expectations.
+-
+-# Dependencies
+-
+-- `LOOP1-GO-MSG-001` done; S0 Gate PASS; LOOP1-ARCH-REMEDIATION batch PASS with final source/dependency/hosted acceptance.
+-
+-# Allowed Paths
+-
+-- `tests/e2e/go_tls_messaging.py` (canonical fixture-driven real Go HTTPS/WSS entrypoint harness; standard library only)
+-- `tests/e2e/README.md` (exact run/environment/result boundaries)
+-- `.github/workflows/ci.yml` (only existing deploy-job E2E step; no product contract or new stage mechanism)
+-- `ci/classify.py` (only tests/e2e selection of existing go/deploy/architecture/source_go jobs)
+-- `tests/ci/test_classify.py` (positive/deleted E2E path selection tests)
+-- `spec/tasks/**/LOOP1-E2E-001.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-E2E-001/**`
+-- `spec/progress/checkpoints/*loop1-e2e-001*.md`
+-- `research/prompts/**` and `research/runs/**` only for this task's Recorder artifacts.
+-
+-# Acceptance
+-
+-- A-to-B `hello` succeeds through HTTPS/WSS/TLS and B receives one correct realtime Message after a durable ACK.
+-- End-to-end retries, authorization, revocation, transaction rollback, Outbox/NATS delivery, and contract outcomes preserve the S1 correctness red lines.
+-- Clean-checkout integration/E2E checks, independent review, and applicable real CI pass; S1 Gate evidence is durable and a stable checkpoint exists.
+-
+-- Applicable source/root/dependency checks pass; independent Review inspects actual behavior/responsibilities/imports/minimality. Java inherits canonical boundaries, not these Go paths.
+-
+-# Forbidden
+-
+-- Rewrite contracts, migrations, or product semantics to make E2E pass; introduce client UI, Java implementation, or future-stage infrastructure.
+-
+-# Minimality
+-
+-Exercise the accepted Go path with a direct fixture-driven harness; add only test wiring needed for actual TLS and service interaction.
+-
+-# Verification
+-
+-- Discoverable existing tools entry points: `tools/verify-loop1-ctrl-002.ps1` (Development while editing; clean committed Acceptance for independent candidate) and `tools/verify-frozen-architecture.ps1`.
+-
+-- Run Go profile Compose and E2E over real TLS plus all S1 contract/integration checks; evaluate the S1 Gate checklist on a clean integrated candidate.
+-
+-- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
+-
+-# Evidence
+-
+-- Activated after Go Message acceptance and exact administrativeb51 independent/hosted acceptance; Human approved CI path scope. See bounded readiness below.
+-
+-# Handoff
+-
+-- Coordinator owns activation governance until committed; fresh /root/s1_e2e_preparation owns only bounded test/CI implementation after explicit release in isolated worktree.
+-
+-# Next Action
+-
+-- After activation commit and explicit writer release, execute bound minimum baseline and implement real strict TLS E2E plus the approved CI wiring; then hand off to NEW independent Review and exact hosted candidate CI.
+-
+-# Approved readiness and source/path binding (2026-10-01)
+-
+-Human approve explicitly covers the three CI paths in this Task, solely E2E wiring/classification. Coordinator narrows tests/e2e to two exact files and removes speculative deploy write scope: existing Go Compose/Caddy/config suffice. This is no Frozen/public/security/ACK/schema/compatibility change. Product Auth/Social/Message accepted in this lineage; MSGuniquedone; S0/remediationPASS and latestboundedadministrativeb51 independentReview/hosted36828991394 PASS. PR4OPEN remainsunmerged; completedS1 will use NEW reviewedPR including inheritedacceptedMSG plusE2E.
+-
+-Inputs exact: spec/architecture/frozen-architecture.md currentSHA83d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e viaresolver/baseline; ADR0001expired/0002/0003/0004; canonical §§3/7/10 SRC01..07/11/12..15/AppendixA; spec/governance/{minimality,execution-boundaries,independent-review}.md; spec/domain and invariants Auth/Social/Messaging inputs; spec/acceptance/s0-auth-user-friend.md and s0-messaging.md; contracts/http/auth-user-friend.openapi.json, websocket/envelope.schema.json/sync-v1.schema.json, fixtures/{auth-user-friend,websocket}, errors/http-errors.schema.json, database/migrations/0001_initial.up.sql and accepted Go tests. Never use nonexistent s1.md/loop-1.md as authority. Friend403 solelynamedDEFERRED_BY_HUMAN, never appliesmessage-membershipdenial.
+-
+-Minimum pre-edit baseline: bundledPython -B contracts/websocket/verify.py; bundledPython -B ci/check_architecture.py --scope all --json; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; pwsh -NoProfile -File tools/verify-frozen-architecture.ps1; actual live Go normal/race on owned disposablePG16/NATS2.10 with canonical0001, DB_TEST_ENABLE=1, loopbackPGHOST/PGPORT/PGUSER/PGDATABASE, NATS_URL. Commands go -C backend/go test -count=1 -v ./... and go -C backend/go test -race -count=1 -v ./...; runtime ---SKIP is not PASS. Historical launchers hardcode oldRecorder/evidence/container identities: do not execute them; this Task may create its own bounded evidence launcher, only same current commands. cleanup verifiesownedlabels/container/volume before removing own services. ActualDocker server29.5.2 Linux/DockerDesktop/Compose5.1.4 read-onlyavailable; PG16/NATS2.10/Caddy2 imagescached. This is environmentavailability, not integrationPASS.
+-
+-Final local verification includes actual strictTLS E2E (bundledPython -B tests/e2e/go_tls_messaging.py), full Go normal/race/live fixture/fault probes, build/vet/gofmt, WSS/HTTP/architecture34/frozen/sourceall/CI path/Gate controls and Development recovery. Four localWindows symlink CI subcase skips must be disclosed and covered byexacthostedLinux; no runtimeintegration skip permitted. Independent Review replays from clean committed candidate with actualservices and validates fullPRrange responsibility/logic/imports/minimality/requiredjobs. All required exactcandidate hostedCI jobs completedSUCCESS; gate alone isnotenough. One writer; newReviewer neitherimplemented norfixed; ordinaryFAIL invokes freshFix then NEWfreshReview. No selfdone/merge/S1GatePASS.
+-
+-StrictTLS: copy only publicCaddyroot.crt fromownedCompose intoTEMP, ssl.create_default_context(cafile), CERT_REQUIRED/check_hostname true; executeuntrustedCA/wronghostnamenegatives. Register/login/search/addfriend/uniqueDIRECT/sendcanonicalhello/ACK durablerows/OutboxNATSreceiver/retry/conflict/nonmember/revocationclose/staletoken throughtrueHTTPS/WSS. Accepted Go actual deferredCOMMIT probe plusentrypointdurablerows establish ACK-aftercommit; concurrentnetwork receiver read scheduling must not be treated as a new server ordering guarantee. Existing live fault probes cover rollback/duplicate/outoforder/Sync/GROUP500; no new publichistoryroute/clientfeature ortestframework. Fixture expectations remaincanonicalonly.
+-
+-Preparation /root/s1_e2e_preparation read-only and incompletepreRecorder, nofiles/services. After activationcommit released, create isolated task/LOOP1-E2E-001 worktree, register delegatedvisibleprompt/start prospective_resume beforecommands/edits, then solewriter. All historyFAIL/partial/unknown605 files remainimmutable. Durable path/readiness: spec/progress/evidence/LOOP1-E2E-001/2026-10-01-activation-and-path-map.md. Coordinator owns onlyactivation/task/current/archive untilcommit; productwriter is released explicitlyafter. Lastacceptedadminb51/product183/mainb442acd. S1OPEN; stopgoalS2OPEN.
+diff --git a/tests/ci/test_classify.py b/tests/ci/test_classify.py
+index 61ce1b5..414e5cc 100644
+--- a/tests/ci/test_classify.py
++++ b/tests/ci/test_classify.py
+@@ -55,6 +55,38 @@ class PathMatrixTests(unittest.TestCase):
+             with self.subTest(path=path):
+                 self.assert_jobs(path, {"deploy"})
+ 
++    def test_e2e_paths_select_go_deploy_and_boundaries(self):
++        for path in ("tests/e2e/go_tls_messaging.py", "tests/e2e/README.md"):
++            with self.subTest(path=path):
++                self.assert_jobs(path, {"go", "deploy", "architecture", "source_go"})
++
++    def test_deleted_e2e_path_still_selects_live_checks(self):
++        with tempfile.TemporaryDirectory() as temp:
++            root = pathlib.Path(temp)
++            subprocess.run(["git", "init", "-q", str(root)], check=True)
++            subprocess.run(["git", "-C", str(root), "config", "user.name", "CI test"], check=True)
++            subprocess.run(["git", "-C", str(root), "config", "user.email", "ci@example.invalid"], check=True)
++            test = root / "tests/e2e/old.py"
++            test.parent.mkdir(parents=True)
++            test.write_text("pass\n", encoding="utf-8")
++            subprocess.run(["git", "-C", str(root), "add", "."], check=True)
++            subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
++            base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
++            test.unlink()
++            subprocess.run(["git", "-C", str(root), "add", "-u"], check=True)
++            subprocess.run(["git", "-C", str(root), "commit", "-qm", "delete"], check=True)
++            head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
++            previous = pathlib.Path.cwd()
++            try:
++                import os
++                os.chdir(root)
++                paths = classify_module.diff_paths(base, head)
++            finally:
++                os.chdir(previous)
++            self.assertEqual(paths, ["tests/e2e/old.py"])
++            selected = {job for job, enabled in classify_module.classify(paths).items() if enabled}
++            self.assertEqual(selected, {"go", "deploy", "architecture", "source_go"})
++
+     def test_union_and_deleted_paths(self):
+         result = classify_module.classify(["backend/go/old.go", "clients/web/new.ts"])
+         self.assertEqual({key for key, value in result.items() if value}, {"go", "web", "architecture", "source_go"})
+diff --git a/tests/e2e/README.md b/tests/e2e/README.md
+new file mode 100644
+index 0000000..19592e0
+--- /dev/null
++++ b/tests/e2e/README.md
+@@ -0,0 +1,15 @@
++# Go S1 real TLS messaging slice
++
++Run from a clean checkout with Docker Compose and Python 3.10 or newer:
++
++```text
++python3 -B tests/e2e/go_tls_messaging.py
++```
++
++The standard-library harness builds the existing Go Compose profile with PostgreSQL 16, NATS 2.10, canonical migration 0001 and Caddy. It creates a unique disposable project, temporary external configuration and a free local HTTPS port. It copies only Caddy's public local root CA to a temporary file. Both HTTPS and WSS require that CA and verify `localhost`; untrusted CA and actual certificate hostname mismatch are negative controls. Generic TLS errors do not count as hostname verification. Default Caddy rejects unknown SNI before sending a certificate, as the preserved first attempt demonstrated. For the negative handshake only, the owned Caddy admin API temporarily sets `fallback_sni=localhost`, delivering its existing certificate to `wrong.invalid`; the strict client must report a certificate hostname mismatch. The original JSON configuration is restored and checked for equality in `finally` before any positive business traffic. This temporary setup is justified by the actual negative-control gap, adds no production configuration, and copies no private key.
++
++Canonical HTTP/WSS fixtures supply input and outcome expectations. The actual entrypoint covers registration/login, exact username search, bidirectional friend/direct uniqueness, `hello`, durable ACK rows, one logical Outbox, NATS realtime delivery to B, no duplicate/outsider delivery, stable retry, content conflict, nonmember rejection, replacement/logout revocation and stale-token rejection. A narrowly scoped temporary deferred database trigger fails one real COMMIT; the TLS send must reject and leave Message, Outbox and sequence unchanged. The trigger is removed in `finally`; canonical migrations and product code are unchanged.
++
++ACK followed by an independent PostgreSQL read confirms committed rows. Reading B's socket after A's ACK does not establish a new cross-socket timing guarantee. The same candidate's existing live Go normal/race suites additionally exercise blocked actual COMMIT/ACK timing, duplicate/out-of-order events, Sync recovery and GROUP500. Run them with `DB_TEST_ENABLE=1`, a disposable migrated PostgreSQL 16 database via `PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE` and NATS 2.10 via `NATS_URL`; a runtime skip is not acceptance.
++
++The existing CI deploy job runs this harness; E2E changes select existing Go/deploy/architecture/source_go jobs, including deleted paths. No extra dependency, job or product service is introduced. Cleanup inspects exact project labels and removes only owned containers and volumes. Credentials/tokens and message bodies are never printed; generated configuration/CA files remain temporary. The named friend403 fixture remains `DEFERRED_BY_HUMAN` under ADR-0004, separately reported, never counted PASS. Java/client/plugin/capacity/full-release acceptance belongs to later stages. Local PASS requires fresh independent review and exact-head hosted CI before Task or S1 acceptance.
+diff --git a/tests/e2e/go_tls_messaging.py b/tests/e2e/go_tls_messaging.py
+new file mode 100644
+index 0000000..499a3aa
+--- /dev/null
++++ b/tests/e2e/go_tls_messaging.py
+@@ -0,0 +1,384 @@
++"""Real Go Compose HTTPS/WSS slice; only stdlib and canonical fixture oracles."""
++import base64
++import copy
++import datetime
++import hashlib
++import json
++import os
++from pathlib import Path
++import secrets
++import socket
++import ssl
++import struct
++import subprocess
++import tempfile
++import time
++import urllib.request
++import uuid
++
++ROOT = Path(__file__).resolve().parents[2]
++
++
++def require(condition, reason):
++    if not condition:
++        raise AssertionError(reason)
++
++
++def fixture(path, scenario):
++    scenarios = json.loads((ROOT / path).read_text(encoding='utf-8'))['scenarios']
++    return next(s for s in scenarios if s['id'] == scenario)
++
++
++class Oracle:
++    """Only normalize runtime UUIDs/timestamps; exact canonical shape/scalars."""
++    def __init__(self, identities=None):
++        self.ids = identities or {}
++        self.times = {}
++
++    def check(self, expected, actual):
++        if isinstance(expected, dict):
++            require(isinstance(actual, dict) and expected.keys() == actual.keys(), 'canonical object keys differ')
++            for k in expected:
++                self.check(expected[k], actual[k])
++        elif isinstance(expected, list):
++            require(isinstance(actual, list) and len(expected) == len(actual), 'canonical array differs')
++            for e, a in zip(expected, actual):
++                self.check(e, a)
++        elif isinstance(expected, str):
++            try:
++                uuid.UUID(expected)
++            except ValueError:
++                try:
++                    datetime.datetime.fromisoformat(expected.replace('Z', '+00:00'))
++                except ValueError:
++                    require(expected == actual, 'canonical string differs')
++                else:
++                    datetime.datetime.fromisoformat(actual.replace('Z', '+00:00'))
++                    require(self.times.setdefault(expected, actual) == actual, 'committed timestamp changed')
++            else:
++                uuid.UUID(actual)
++                require(self.ids.setdefault(expected, actual) == actual, 'canonical identity changed')
++        else:
++            require(type(expected) is type(actual) and expected == actual, 'canonical value differs')
++
++
++class WS:
++    def __init__(self, context, port):
++        self.s = context.wrap_socket(socket.create_connection(('localhost', port), timeout=10), server_hostname='localhost')
++        self.s.settimeout(10)
++        key = base64.b64encode(os.urandom(16)).decode()
++        self.s.sendall((f'GET /v1/ws HTTP/1.1\r\nHost: localhost:{port}\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: {key}\r\nSec-WebSocket-Version: 13\r\n\r\n').encode())
++        head = b''
++        while not head.endswith(b'\r\n\r\n'):
++            head += self.exact(1)
++            require(len(head) < 16384, 'oversized upgrade headers')
++        require(head.split(b'\r\n')[0].startswith(b'HTTP/1.1 101 '), 'WSS upgrade failed')
++        headers = dict(line.split(b':', 1) for line in head.split(b'\r\n')[1:] if b':' in line)
++        expected = base64.b64encode(hashlib.sha1((key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest())
++        require(any(k.lower() == b'sec-websocket-accept' and v.strip() == expected for k, v in headers.items()), 'WSS accept differs')
++
++    def exact(self, n):
++        out = b''
++        while len(out) < n:
++            b = self.s.recv(n - len(out))
++            if not b:
++                raise EOFError('socket closed')
++            out += b
++        return out
++
++    def send(self, frame):
++        b = json.dumps(frame).encode()
++        mask = os.urandom(4)
++        header = bytes([0x81, 0x80 | len(b)]) if len(b) < 126 else bytes([0x81, 0xfe]) + struct.pack('!H', len(b))
++        self.s.sendall(header + mask + bytes(v ^ mask[i % 4] for i, v in enumerate(b)))
++
++    def read(self):
++        a, b = self.exact(2)
++        require(a & 0x80 and not b & 0x80, 'unexpected fragmented/masked server frame')
++        n = b & 127
++        if n == 126:
++            n = struct.unpack('!H', self.exact(2))[0]
++        elif n == 127:
++            n = struct.unpack('!Q', self.exact(8))[0]
++        require(n <= 65536, 'oversized server frame')
++        payload = self.exact(n)
++        if a & 15 == 8:
++            raise EOFError('WebSocket close')
++        require(a & 15 == 1, 'unexpected server opcode')
++        return json.loads(payload)
++
++    def quiet(self):
++        self.s.settimeout(1)
++        try:
++            self.read()
++        except socket.timeout:
++            pass
++        else:
++            raise AssertionError('unexpected extra or unauthorized frame')
++        finally:
++            self.s.settimeout(10)
++
++    def closed(self):
++        try:
++            self.read()
++        except EOFError:
++            return
++        raise AssertionError('revoked socket remained open')
++
++    def close(self):
++        self.s.close()
++
++
++def frame(kind, payload):
++    return {'protocolVersion': '1.0', 'type': kind, 'requestId': str(uuid.uuid4()), 'payload': payload}
++
++
++def main():
++    project = 'im-s1-e2e-' + str(os.getpid()) + '-' + secrets.token_hex(4)
++    with socket.socket() as reservation:
++        reservation.bind(('127.0.0.1', 0))
++        port = reservation.getsockname()[1]
++    env = os.environ.copy()
++    env.update(IM_HTTPS_PORT=str(port), COMPOSE_PROGRESS='quiet')
++    command = ['docker', 'compose', '-f', str(ROOT / 'deploy/compose.yaml'), '-p', project, '--profile', 'go']
++    sockets = []
++
++    def docker(args, *, data=None):
++        result = subprocess.run(args, env=env, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=300)
++        if result.returncode:
++            raise RuntimeError('Docker test command failed: ' + result.stderr.decode(errors='replace'))
++        return result.stdout
++
++    def compose(*args):
++        return docker(command + list(args))
++
++    def sql(query):
++        return compose('exec', '-T', 'postgres', 'psql', '-U', 'im', '-d', 'im', '-v', 'ON_ERROR_STOP=1', '-Atc', query).decode().strip()
++
++    def cleanup():
++        # Inspect every actually owned resource before the bounded Compose cleanup.
++        ids = docker(['docker', 'ps', '-aq', '--filter', 'label=com.docker.compose.project=' + project]).decode().split()
++        for cid in ids:
++            obj = json.loads(docker(['docker', 'inspect', cid]))[0]
++            require(obj['Config']['Labels'].get('com.docker.compose.project') == project, 'container ownership mismatch')
++        volumes = docker(['docker', 'volume', 'ls', '-q', '--filter', 'label=com.docker.compose.project=' + project]).decode().split()
++        for name in volumes:
++            obj = json.loads(docker(['docker', 'volume', 'inspect', name]))[0]
++            require(obj['Labels'].get('com.docker.compose.project') == project, 'volume ownership mismatch')
++        compose('down', '--volumes', '--remove-orphans')
++        require(not docker(['docker', 'ps', '-aq', '--filter', 'label=com.docker.compose.project=' + project]).strip(), 'owned container remains')
++        require(not docker(['docker', 'volume', 'ls', '-q', '--filter', 'label=com.docker.compose.project=' + project]).strip(), 'owned volume remains')
++        print('PASS cleanup: inspected owned Compose containers/volumes removed', flush=True)
++
++    with tempfile.TemporaryDirectory(prefix='im-s1-e2e-') as temp:
++        config = Path(temp) / 'config'
++        config.mkdir()
++        env['IM_GO_CONFIG_DIR'] = str(config)
++        (config / 'config.json').write_bytes((ROOT / 'backend/go/config.example.json').read_bytes())
++        (config / 'pg_password').write_text('local-development-only', encoding='utf-8')
++        (config / 'jwt_key').write_text(secrets.token_urlsafe(48), encoding='utf-8')
++        try:
++            compose('config', '--quiet')
++            compose('up', '-d', '--build')
++            tls_id = compose('ps', '-q', 'tls-go').decode().strip()
++            require(bool(tls_id), 'TLS role missing')
++            ca = Path(temp) / 'root.crt'
++            # Retrieve only the generated PUBLIC root CA, never a private key.
++            for _ in range(60):
++                try:
++                    docker(['docker', 'cp', tls_id + ':/data/caddy/pki/authorities/local/root.crt', str(ca)])
++                    break
++                except RuntimeError:
++                    time.sleep(.5)
++            else:
++                raise RuntimeError('Caddy public root CA unavailable')
++            context = ssl.create_default_context(cafile=str(ca))
++            require(context.check_hostname and context.verify_mode == ssl.CERT_REQUIRED, 'TLS verification disabled')
++
++            def call(method, path, body=None, token=None):
++                headers = {'Content-Type': 'application/json'}
++                if token:
++                    headers['Authorization'] = 'Bearer ' + token
++                data = None if body is None else json.dumps(body).encode()
++                request = urllib.request.Request(f'https://localhost:{port}' + path, data=data, headers=headers, method=method)
++                with urllib.request.urlopen(request, context=context, timeout=10) as response:
++                    return response.status, json.loads(response.read() or b'{}')
++
++            for _ in range(60):
++                try:
++                    with urllib.request.urlopen(f'https://localhost:{port}/__infra/health', context=context, timeout=2) as response:
++                        require(response.read().strip() == b'profile=go role=gateway', 'wrong HTTPS role')
++                    break
++                except OSError:
++                    time.sleep(.5)
++            else:
++                raise RuntimeError('verified TLS Gateway unavailable')
++            # Exact negative controls: generic TLS failures cannot prove name checking.
++            try:
++                with socket.create_connection(('localhost', port), timeout=5) as raw:
++                    ssl.create_default_context().wrap_socket(raw, server_hostname='localhost')
++            except ssl.SSLCertVerificationError as error:
++                require(error.verify_code not in (62, 64), 'untrusted-CA probe failed for wrong reason')
++            else:
++                raise AssertionError('untrusted local CA accepted')
++            # Default Caddy rejects unknown SNI before serving a certificate.
++            # Temporarily serve its existing localhost certificate for this negative
++            # handshake, then restore the exact original policy before business E2E.
++            original_config = json.loads(compose('exec', '-T', 'tls-go', 'wget', '-qO-', 'http://127.0.0.1:2019/config/'))
++            negative_config = copy.deepcopy(original_config)
++            servers = negative_config['apps']['http']['servers']
++            tls_servers = [server for server in servers.values() if ':443' in server['listen']]
++            require(len(tls_servers) == 1, 'unexpected TLS server configuration')
++            policies = tls_servers[0].setdefault('tls_connection_policies', [{}])
++            require(len(policies) == 1, 'unexpected TLS connection policies')
++            policies[0]['fallback_sni'] = 'localhost'
++
++            def load_caddy(configuration):
++                docker(command + ['exec', '-T', 'tls-go', 'wget', '-qO-', '--header=Content-Type: application/json', '--post-file=/dev/stdin', 'http://127.0.0.1:2019/load'], data=json.dumps(configuration).encode())
++
++            try:
++                load_caddy(negative_config)
++                try:
++                    with socket.create_connection(('localhost', port), timeout=5) as raw:
++                        with context.wrap_socket(raw, server_hostname='wrong.invalid'):
++                            pass
++                except ssl.SSLCertVerificationError as error:
++                    require(error.verify_code in (62, 64), 'hostname probe failed for another certificate reason')
++                else:
++                    raise AssertionError('wrong certificate hostname accepted')
++            finally:
++                load_caddy(original_config)
++                restored = json.loads(compose('exec', '-T', 'tls-go', 'wget', '-qO-', 'http://127.0.0.1:2019/config/'))
++                require(restored == original_config, 'original Caddy configuration not restored')
++            print('PASS TLS: trusted CA/CERT_REQUIRED/hostname HTTPS+WSS; untrusted CA and certificate name mismatch rejected', flush=True)
++            require(sql('SELECT version FROM schema_migrations') == '0001_initial', 'canonical migration missing')
++            for role in ['core', 'gateway', 'plugin-host']:
++                require(compose('exec', '-T', role + '-go', 'wget', '-qO-', 'http://localhost:8080/__infra/health').strip() == f'profile=go role={role}'.encode(), 'real role missing')
++
++            http_fixture = 'contracts/fixtures/auth-user-friend/positive.json'
++            registration = fixture(http_fixture, 'registration-and-authorized-user-search')['steps'][0]
++            login_input = fixture(http_fixture, 'same-slot-login-replaces-only-that-slot')['steps'][0]['request']['body']
++            users, tokens, names, logins = [], [], [], []
++            for index in range(3):
++                body = copy.deepcopy(registration['request']['body'])
++                body['username'] = 'e2e' + secrets.token_hex(8)
++                names.append(body['username'])
++                status, registered = call('POST', '/v1/auth/register', body)
++                require(status == registration['expected']['status'], 'registration status differs')
++                expected = copy.deepcopy(registration['expected']['body'])
++                expected['user']['username'] = body['username']
++                Oracle().check(expected, registered)
++                users.append(registered['user']['userId'])
++                body = copy.deepcopy(login_input)
++                body['username'] = names[-1]
++                body['password'] = registration['request']['body']['password']
++                status, login = call('POST', '/v1/auth/login', body)
++                require(status == 200 and login['session']['userId'] == users[-1], 'login failed')
++                tokens.append(login['tokens']['accessToken'])
++                logins.append(login)
++            status, found = call('GET', '/v1/users/search?username=' + names[1].upper(), token=tokens[0])
++            require(status == 200 and len(found['users']) == 1 and found['users'][0]['userId'] == users[1], 'exact normalized search failed')
++            friend_steps = fixture(http_fixture, 'friend-add-normalizes-and-reuses-direct')['steps']
++            status, first = call('PUT', '/v1/friends/' + users[1], token=tokens[0])
++            require(status == friend_steps[0]['expected']['status'], 'first friendship failed')
++            low, high = sorted(users[:2])
++            friend_oracle = Oracle({'10000000-0000-4000-8000-000000000001': low, '20000000-0000-4000-8000-000000000002': high})
++            expected = copy.deepcopy(friend_steps[0]['expected']['body'])
++            # Membership is a set; canonical fixture order is normalized pair order.
++            first['memberUserIds'].sort()
++            friend_oracle.check(expected, first)
++            conv = first['directConversationId']
++            status, reverse = call('PUT', '/v1/friends/' + users[0], token=tokens[1])
++            require(status == friend_steps[1]['expected']['status'], 'reverse friendship failed')
++            reverse['memberUserIds'].sort()
++            friend_oracle.check(friend_steps[1]['expected']['body'], reverse)
++            for index in [0, 1]:
++                status, friends = call('GET', '/v1/friends', token=tokens[index])
++                require(status == 200 and len(friends['friends']) == 1 and friends['friends'][0]['directConversationId'] == conv, 'friend list differs')
++            require(sql(f"SELECT count(*) FROM friendships WHERE user_low_id='{low}' AND user_high_id='{high}'") == '1', 'duplicate friendship')
++            require(sql(f"SELECT count(*) FROM conversations WHERE kind='DIRECT' AND direct_user_low_id='{low}' AND direct_user_high_id='{high}'") == '1', 'duplicate DIRECT')
++            require(sql(f"SELECT count(*) FROM conversation_members WHERE conversation_id='{conv}' AND left_at IS NULL") == '2', 'DIRECT members differ')
++
++            def bind(token):
++                ws = WS(context, port)
++                sockets.append(ws)
++                request = frame('auth.bind', {'accessToken': token})
++                ws.send(request)
++                ack = ws.read()
++                require(ack['type'] == 'auth.ack' and ack['requestId'] == request['requestId'], 'bind identity differs')
++                return ws, ack
++
++            sender, bound = bind(tokens[0]); require(bound['payload']['status'] == 'bound', 'A not bound')
++            receiver, bound = bind(tokens[1]); require(bound['payload']['status'] == 'bound', 'B not bound')
++            outsider, bound = bind(tokens[2]); require(bound['payload']['status'] == 'bound', 'C not bound')
++            wss_fixture = 'contracts/fixtures/websocket/golden.json'
++            durable = fixture(wss_fixture, 'durable-send-and-created')['steps'][0]
++            oracle = Oracle({'30000000-0000-4000-8000-000000000001': conv, '10000000-0000-4000-8000-000000000001': users[0]})
++            send = copy.deepcopy(durable['in']); send['payload']['conversationId'] = conv
++            sender.send(send)
++            ack = sender.read()
++            oracle.check(durable['out'][0], ack)
++
++            def durable_rows():
++                return sql(f"SELECT json_build_object('messages',(SELECT count(*) FROM messages WHERE conversation_id='{conv}'),'outbox',(SELECT count(*) FROM outbox_events WHERE conversation_id='{conv}' AND event_type='message.created'),'nextSeq',(SELECT next_seq FROM conversations WHERE conversation_id='{conv}'))")
++
++            require(json.loads(durable_rows()) == {'messages': 1, 'outbox': 1, 'nextSeq': 2}, 'ACK not backed by durable atomic rows')
++            mid = ack['payload']['messageId']
++            require(sql(f"SELECT count(*) FROM messages m JOIN outbox_events o ON o.message_id=m.server_message_id AND o.conversation_id=m.conversation_id WHERE m.server_message_id='{mid}' AND m.sender_id='{users[0]}' AND m.request_id='{send['requestId']}' AND m.seq=1 AND m.text_body='hello' AND o.event_type='message.created'") == '1', 'durable message/Outbox identity differs')
++            oracle.check(durable['out'][1], receiver.read())
++            receiver.quiet(); outsider.quiet(); sender.quiet()
++            # Do not impose cross-socket read ordering as new ACK semantics.
++            require(sql(f"SELECT count(*) FROM outbox_events WHERE message_id='{mid}' AND published_at IS NOT NULL AND attempts>=1") == '1', 'NATS publication not recorded')
++            sender.send(send)
++            oracle.check(fixture(wss_fixture, 'idempotent-retry')['steps'][1]['out'][0], sender.read())
++            conflict = copy.deepcopy(fixture(wss_fixture, 'conflicting-retry')['steps'][1]['in'])
++            conflict['payload']['conversationId'] = conv
++            sender.send(conflict)
++            oracle.check(fixture(wss_fixture, 'conflicting-retry')['steps'][1]['out'][0], sender.read())
++            rejected = copy.deepcopy(fixture(wss_fixture, 'non-member-send')['steps'][0]['in'])
++            rejected['requestId'] = str(uuid.uuid4()); rejected['payload']['conversationId'] = conv
++            outsider.send(rejected)
++            expected = copy.deepcopy(fixture(wss_fixture, 'non-member-send')['steps'][0]['out'][0]); expected['requestId'] = rejected['requestId']
++            Oracle().check(expected, outsider.read())
++            require(json.loads(durable_rows()) == {'messages': 1, 'outbox': 1, 'nextSeq': 2}, 'retry/conflict/nonmember changed durable rows')
++
++            # Minimal actual COMMIT fault: scoped to this test send in disposable DB.
++            failed = copy.deepcopy(fixture(wss_fixture, 'rollback-before-ack')['steps'][0]['in'])
++            failed['requestId'] = str(uuid.uuid4()); failed['payload']['conversationId'] = conv
++            name = 'e2e_commit_' + secrets.token_hex(8)
++            sql(f"CREATE FUNCTION {name}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.event_type='message.created' AND NEW.conversation_id='{conv}'::uuid AND NEW.payload->>'requestId'='{failed['requestId']}' THEN RAISE EXCEPTION 'E2E deferred commit rollback'; END IF; RETURN NEW; END $$; CREATE CONSTRAINT TRIGGER {name} AFTER INSERT ON outbox_events DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION {name}()")
++            try:
++                sender.send(failed)
++                expected = copy.deepcopy(fixture(wss_fixture, 'rollback-before-ack')['steps'][0]['out'][0]); expected['requestId'] = failed['requestId']
++                Oracle().check(expected, sender.read())
++                require(json.loads(durable_rows()) == {'messages': 1, 'outbox': 1, 'nextSeq': 2}, 'rollback persisted effects or sequence gap')
++                require(sql(f"SELECT count(*) FROM messages WHERE conversation_id='{conv}' AND request_id='{failed['requestId']}'") == '0', 'failed Message persisted')
++                receiver.quiet(); outsider.quiet(); sender.quiet()
++            finally:
++                sql(f'DROP TRIGGER {name} ON outbox_events; DROP FUNCTION {name}()')
++            print('PASS fixtures: HTTPS register/login/search/friend unique DIRECT; WSS hello/SQL durable ACK/one Outbox/NATS recipient; retry/conflict/nonmember/deferred COMMIT rollback; no duplicates/wrong recipient', flush=True)
++
++            body = copy.deepcopy(login_input); body['username'] = names[0]; body['password'] = registration['request']['body']['password']
++            _, replacement = call('POST', '/v1/auth/login', body)
++            require(replacement['session']['sessionEpoch'] == logins[0]['session']['sessionEpoch'] + 1, 'replacement epoch not advanced')
++            event = sender.read()
++            require(event['type'] == 'session.revoked' and event['payload'] == {'sessionId': logins[0]['session']['sessionId'], 'reason': 'REPLACED'}, 'replacement revocation differs')
++            sender.closed()
++            stale, ack = bind(tokens[0]); require(ack['payload']['status'] == 'rejected', 'old token rebound')
++            stale.close()
++            current, ack = bind(replacement['tokens']['accessToken']); require(ack['payload']['status'] == 'bound', 'replacement not bound')
++            require(call('POST', '/v1/auth/logout', token=replacement['tokens']['accessToken'])[0] == 204, 'logout failed')
++            event = current.read()
++            require(event['type'] == 'session.revoked' and event['payload'] == {'sessionId': replacement['session']['sessionId'], 'reason': 'LOGOUT'}, 'logout revocation differs')
++            current.closed()
++            require(json.loads(durable_rows()) == {'messages': 1, 'outbox': 1, 'nextSeq': 2}, 'revocation changed messaging rows')
++            print('PASS revocation: replacement epoch/revoked then close/stale token reject/logout then close; no runtime skips', flush=True)
++            print('DEFERRED_BY_HUMAN: friend-add-authorization-denied only (ADR-0004); not counted PASS', flush=True)
++        finally:
++            for ws in sockets:
++                ws.close()
++            cleanup()
++
++
++if __name__ == '__main__':
++    main()
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-E2E-IMPLEMENTATION-20261001/.gitattributes
+# ?? research/prompts/P-E2E-IMPLEMENTATION-20261001/metadata.json
+# ?? research/prompts/P-E2E-IMPLEMENTATION-20261001/prompt.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/.gitattributes
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-009dbe95-3e84-4e00-8da7-95e757f5558b.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-009dbe95-3e84-4e00-8da7-95e757f5558b.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-049b2549-6090-41b4-af2c-0168d87bb7be.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-049b2549-6090-41b4-af2c-0168d87bb7be.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-09e1c17f-13b0-4d2d-ba01-84b17a961bab.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-09e1c17f-13b0-4d2d-ba01-84b17a961bab.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-0a1f7daa-2f5a-4a73-932d-9d486cb459ed.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-0a1f7daa-2f5a-4a73-932d-9d486cb459ed.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-0def54da-19ae-4e77-b683-5f863acddf9a.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-0def54da-19ae-4e77-b683-5f863acddf9a.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-10b3f6a1-5a2f-41e2-adb1-5aeb6f6e4cc6.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-10b3f6a1-5a2f-41e2-adb1-5aeb6f6e4cc6.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-1854265b-3263-4c8b-9678-d40153c4efa5.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-1854265b-3263-4c8b-9678-d40153c4efa5.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-25100ca0-dcaa-44ed-826c-d5e4adc4c90d.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-25100ca0-dcaa-44ed-826c-d5e4adc4c90d.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-352ac042-07df-421c-8fdf-d2229b405ca4.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-352ac042-07df-421c-8fdf-d2229b405ca4.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-3989b7bf-1a48-49a1-88e0-25b5ae12deff.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-3989b7bf-1a48-49a1-88e0-25b5ae12deff.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-3ab6226a-a388-4db1-89fd-c0ea9c24c084.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-3ab6226a-a388-4db1-89fd-c0ea9c24c084.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-3ec87f17-1784-4bc0-b5aa-16cd44b7e467.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-3ec87f17-1784-4bc0-b5aa-16cd44b7e467.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-469e3987-851e-4bec-aa74-f65cc062ee1e.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-469e3987-851e-4bec-aa74-f65cc062ee1e.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-470606cb-d1ba-4c5d-96cf-c247ea3065b3.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-470606cb-d1ba-4c5d-96cf-c247ea3065b3.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-47febb40-5248-4a53-9927-18578dba1d19.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-47febb40-5248-4a53-9927-18578dba1d19.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-481a1388-e574-40aa-b854-708d285fa70e.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-481a1388-e574-40aa-b854-708d285fa70e.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-4dc44bd5-f8cb-4ddc-93ea-3534ad1ac515.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-4dc44bd5-f8cb-4ddc-93ea-3534ad1ac515.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-55dc341a-9897-4004-b100-6546ca54e9df.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-55dc341a-9897-4004-b100-6546ca54e9df.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-62870232-a778-4af5-a88b-fa09fabe7ca0.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-62870232-a778-4af5-a88b-fa09fabe7ca0.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-63bb24b3-1cbd-482c-ae16-c37f812782d4.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-63bb24b3-1cbd-482c-ae16-c37f812782d4.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-66765a7b-34e9-4b66-9783-54d29c57a7ab.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-66765a7b-34e9-4b66-9783-54d29c57a7ab.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7a7a358e-d969-4428-b956-61c68175fd2e.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7a7a358e-d969-4428-b956-61c68175fd2e.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7bd7c197-6c74-409a-b685-0652f45ea921.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7bd7c197-6c74-409a-b685-0652f45ea921.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7c2a100b-a87b-4c53-8259-5d7537b60ff0.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7c2a100b-a87b-4c53-8259-5d7537b60ff0.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7e94ba6c-45b9-4179-ae38-a9a1f0fc0188.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-7e94ba6c-45b9-4179-ae38-a9a1f0fc0188.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-80fd3ed7-380d-4acf-b68a-a04f525e7741.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-80fd3ed7-380d-4acf-b68a-a04f525e7741.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-87f9d45c-c7e8-447e-b25c-117754f0f61a.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-87f9d45c-c7e8-447e-b25c-117754f0f61a.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-885354d4-084d-49cd-80f2-6c98e03ef1f5.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-885354d4-084d-49cd-80f2-6c98e03ef1f5.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-8931c305-e443-4292-8cc2-49dab3cd55eb.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-8931c305-e443-4292-8cc2-49dab3cd55eb.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-8bdbca0a-62a6-4c76-9c65-586aa91f5d6c.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-8bdbca0a-62a6-4c76-9c65-586aa91f5d6c.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-9ada48c5-ba41-4156-90ad-ce716a3cb887.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-9ada48c5-ba41-4156-90ad-ce716a3cb887.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a206b1b4-d980-4c22-89fa-a41217521491.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a206b1b4-d980-4c22-89fa-a41217521491.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a392a4aa-94eb-498b-805c-b3c18114dc27.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a392a4aa-94eb-498b-805c-b3c18114dc27.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a645c2d1-12cc-4089-9682-d618cd42dac4.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a645c2d1-12cc-4089-9682-d618cd42dac4.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a9271868-a763-485f-a558-53107a5b90bd.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-a9271868-a763-485f-a558-53107a5b90bd.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-aa4d0047-3548-4140-9d0d-533791d68fd1.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-aa4d0047-3548-4140-9d0d-533791d68fd1.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-ae29b7b6-a3fb-49c2-af93-68182ed08784.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-ae29b7b6-a3fb-49c2-af93-68182ed08784.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-af6f254d-ad4a-4794-9349-3b2e269fd9ee.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-af6f254d-ad4a-4794-9349-3b2e269fd9ee.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-b25b00c2-46ae-497f-9bd6-0a5b695257fc.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-b25b00c2-46ae-497f-9bd6-0a5b695257fc.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-baa4b57e-3c2b-482d-a4b4-0a26fb14108b.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-baa4b57e-3c2b-482d-a4b4-0a26fb14108b.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-bb5dfb8d-fded-4900-98f2-2c2d2a57df61.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-bb5dfb8d-fded-4900-98f2-2c2d2a57df61.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-bd21e350-be8f-4da8-856c-480a221c09ba.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-bd21e350-be8f-4da8-856c-480a221c09ba.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-cd19f4b2-254c-49b7-835d-a00ac6c29008.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-cd19f4b2-254c-49b7-835d-a00ac6c29008.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d2459c30-db2e-41dd-92e5-54511afc4fcb.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d2459c30-db2e-41dd-92e5-54511afc4fcb.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d3a22d76-f41d-4615-b531-8d66d308a2da.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d3a22d76-f41d-4615-b531-8d66d308a2da.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d4907fc4-3aaf-488e-8bd1-46cf0142aa92.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d4907fc4-3aaf-488e-8bd1-46cf0142aa92.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d78ca049-ce27-4634-8b14-dbb0dd80c6e0.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-d78ca049-ce27-4634-8b14-dbb0dd80c6e0.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-e39ef264-081f-4852-8feb-89edd133dea3.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-e39ef264-081f-4852-8feb-89edd133dea3.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-e48ffd71-7f9f-4c16-b5b5-8e9054752475.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-e48ffd71-7f9f-4c16-b5b5-8e9054752475.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-e6ab6e36-618d-4ffc-8f16-c1295561db7a.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-e6ab6e36-618d-4ffc-8f16-c1295561db7a.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-edf6e18e-a7c0-4321-aede-dc5b1a0c41e4.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-edf6e18e-a7c0-4321-aede-dc5b1a0c41e4.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-fd3611a0-8817-4455-8892-5cbc282b5156.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-fd3611a0-8817-4455-8892-5cbc282b5156.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-ff1cae06-4821-45a4-a773-96f2e189f5cb.stderr.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/blobs/C-ff1cae06-4821-45a4-a773-96f2e189f5cb.stdout.txt
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/events.jsonl
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/initial_state.json
+# ?? research/runs/R-E2E-IMPLEMENTATION-20261001/metadata.json
+# ?? spec/progress/checkpoints/2026-10-01-loop1-e2e-001-local-review.md
+# ?? spec/progress/evidence/LOOP1-E2E-001/.gitattributes
+# ?? spec/progress/evidence/LOOP1-E2E-001/2026-10-01-implementation-command-results.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/2026-10-01-implementation-handoff.md
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-10-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-10-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-11-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-11-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-2-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-2-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-3-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-3-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-4-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-4-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-5-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-5-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-6-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-6-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-7-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-7-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-8-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-8-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-9-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-9-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/baseline-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-10-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-10-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-2-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-2-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-3-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-3-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-4-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-4-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-5-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-5-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-6-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-6-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-7-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-7-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-8-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-8-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-9-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-9-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-2-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-2-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-3-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-3-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-4-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-4-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-5-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-5-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-6-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-6-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/delegated-visible-prompt.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839854826450300-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839854826450300-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839854826450300-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839909067826800-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839909067826800-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839909067826800-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839966840320200-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839966840320200-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790839966840320200-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790840019365053100-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790840019365053100-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-1790840019365053100-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/e2e-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/final-1790840062629615500-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/final-1790840062629615500-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/final-1790840062629615500-2-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/final-1790840062629615500-2-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/final-1790840062629615500-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-1-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-1-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-10-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-10-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-11-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-11-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-12-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-12-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-13-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-13-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-2-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-2-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-3-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-3-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-4-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-4-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-5-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-5-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-6-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-6-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-7-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-7-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-8-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-8-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-9-stderr.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-9-stdout.txt
+# ?? spec/progress/evidence/LOOP1-E2E-001/startup-commands.json
+# ?? spec/progress/evidence/LOOP1-E2E-001/verification.py
+# ?? spec/tasks/review/LOOP1-E2E-001.md
