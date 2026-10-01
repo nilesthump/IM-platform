@@ -4,49 +4,49 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: none (S1 complete; S2 not selected)
-Current Task: LOOP1-E2E-001
-Current Task State: done
-Execution Status: S2_OPEN_STOP_BOUNDARY_FINAL_RECORD_REVIEW_PENDING
+Current Batch: none (first S2 task only)
+Current Task: LOOP1-CLIENT-SQLITE-001
+Current Task State: active
+Execution Status: S2_AUTHORIZED_SQLITE_ACTIVE
 
 ## Immediately Relevant Completed Work
 
-S1 Gate PASS and all four S1 tasks uniquely done. Fresh full product review accepted `6346f39fc6786bba3cddbde7acc91bbad42446a1`; strict TLS E2E/live normal/race had zero runtime skips. Fresh administrative review accepted `cb2cf431a59e0318a1163073a1c76432135c86d9`. NEW PR5 merged, actual main `dd24a9c65a36dd775ca68ae7847c2c283b6f348f` independently verified with 13 required CI jobs SUCCESS (run36834539666), clean Recovery Acceptance/source/hash and matching accepted tree. S2 OPEN is the requested stopping boundary; no S2 task or implementation has begun. Current Task retains last completed E2E for recovery.
+Human approve supersedes the prior S2 stopping boundary for selection/implementation of the first ready S2 task. S1/E2E uniquely done, final actual main a0f0f137 independently accepted; original recovery/brand input preserved byte-for-byte. Storage task readiness binds native Dart SQLite and two native consumers; no implementation yet.
 
 ## Current Blockers
 
-No product blocker. This final state/archive record needs its own fresh independent Review/exact CI before administrative PR merge. Known PR4 external status deviation is disclosed below; it is not reported as all-constraints PASS. Further S2 work is outside this session.
+None at task readiness. Independent Review and exact-head hosted CI are pending after implementation. No later S2 task authorized by this first-task scope; S2 full Gate not claimed.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: Independent actual main dd24 clean checkout PASS; sourceall/authority hashes/tree binding PASS; exact main hosted36834539666 direct13requiredSUCCESS. Product review strictTLS36.156s/normal21.156s/race84.203s exit0, runtime0SKIP; architecture34/frozen34/CI29 and other required checks PASS. Final administrative record has separate pending acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-E2E-001/2026-10-01-closure-main-independent-review/postmerge/independent-main-review.md`
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: baseline all exit0/PASS, architecture34, WSS18 scenarios and Sync79 vectors; Dart3.12.2. Local readiness only, not new Task/Gate acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SQLITE-001/2026-10-01-activation.md`
 
 ## Changed Files or Migrations
 
-Only last-completed E2E Task/current/checkpoint and raw evidence archives for this final record. No product, deploy, contract, Frozen Architecture, migration or S2 task changes.
+Coordinator task/current/readiness/evidence records, plus byte-preserved prior E2E recovery/brand records copied from original directory. No native/client implementation or migrations yet. See task for exact prospective allowed paths.
 
 ## Known Failures, Risks, and Assumptions
 
-PR4 was indirectly marked merged by GitHub at 08:09:01Z after authorized NEW PR5 merged at 08:08:59Z and included PR4 ancestry. Only PR5 was explicitly merged; no PR4 merge or auto-merge enable command was executed. The intended PR4 OPEN state was not maintained and earlier guarantees were inaccurate; user informed immediately. Initial OPEN assertion FAIL, main review Recorder finished FAIL19events and Coordinator closure Recorder finished FAIL55events remain byte-preserved. No history rewrite, reopen or rollback. Other historical implementation/reviewer/network/recording/staging failures and partial traces preserved. Named friend403 solely DEFERRED_BY_HUMAN; no messaging exemption. Four local Windows symlink subcases covered by hosted Linux with no skips.
+Historical PR4 desired OPEN constraint FAIL, friend403 sole DEFERRED_BY_HUMAN and previous Recorder FAIL/partial evidence retained. Native package runtime and exact CI remain unexecuted pending implementation. Initial schema only; no fabricated old mobile client/device acceptance. Preparation constrained-language/optional absent-path read failures recorded in activation.md; no hidden product failure.
 
 ## Next Exact Action
 
-Fresh bounded independent review of this final record, exact push/PR jobs and merge-tree binding, then merge only its new administrative PR and verify actual main. Synchronize and hash-verify H:/IM-platform and all605 original files before creating TEMP final handoff; stop. Future session must recover by AGENTS order before any authorized S2 planning; no S2 work now.
+Activation readiness Development PASS; task branch and sole owner bound. Release fresh Implementation Agent after activation commit. After implementation use fresh independent Review and exact hosted CI before done. No self-acceptance or next-task selection.
 
 ## Last Known Good Commit
 
-Actual merged S1 main `dd24a9c65a36dd775ca68ae7847c2c283b6f348f`, independently accepted product/CI. Product `6346f39fc6786bba3cddbde7acc91bbad42446a1`; final record commit requires separate independent acceptance and actual-main confirmation.
+`a0f0f13759ffb2a861b08c4820a1504b76d5c08a`: independently accepted final S1 administrative actual main and unchanged accepted S1 product.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-01-loop1-e2e-001-s2-open.md`
+`spec/progress/checkpoints/2026-10-01-loop1-e2e-001-s2-open.md` (historical S2 OPEN stopping boundary superseded only by current explicit authorization).
 
 ## Uncommitted Changes / Ownership
 
-Coordinator owns only final administrative state/archive until commit in original H:/IM-platform. Product writers released, all owned services and volumes cleared. Original605 unknown-owned files size/hash unchanged and never staged. Fresh reviewer owns external evidence/clean review checkout; final Recorder/report evidence may remain external with TEMP final proof after acceptance. No reset/clean/force/overwrite.
+Coordinator owns isolated activation/current/evidence and byte-preserved copies of known prior recovery/brand records until commit; fresh Implementation writer only after explicit release. Original605 unknown-owned files untouched; original H:/IM-platform recovery/brand/resume records preserved. No services or other product writer.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Frozen/contracts/security/ACK unchanged. S1 PASS; S2 OPEN with no selected or active S2 task. PR4 status deviation retained as known FAIL.
+None. Frozen/public/server/security/ACK unchanged. Private native local schema is implementation detail; behavioral expected values remain canonical contracts.
