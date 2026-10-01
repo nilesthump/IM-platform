@@ -1,0 +1,675 @@
+{
+  "development_product_commit": "7a980cac3f3c129c78bfe65fc974ce6839091cb9",
+  "branch": "task/LOOP1-E2E-001",
+  "activation_base": "0d4df7aa8a39426976a44ff0c42c94befe2e0b2e",
+  "full_s1_base": "b442acd26777c481620a6bd917863cebfaf79b35",
+  "commands": [
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/baseline-commands.json",
+      "phase": "baseline",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "contracts/websocket/verify.py"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.172,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "ci/check_architecture.py",
+            "--scope",
+            "all",
+            "--json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 1.953,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "tools/verify-loop1-ctrl-002.ps1",
+            "-Mode",
+            "Development"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.844,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "tools/verify-frozen-architecture.ps1"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.218,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            "loop1-e2e-impl-pg-20261001",
+            "--label",
+            "im.task=LOOP1-E2E-001",
+            "--label",
+            "im.owner=R-E2E-IMPLEMENTATION-20261001",
+            "-e",
+            "POSTGRES_HOST_AUTH_METHOD=trust",
+            "-e",
+            "POSTGRES_DB=s1_e2e_regression",
+            "-p",
+            "127.0.0.1:55651:5432",
+            "postgres:16"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.625,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            "loop1-e2e-impl-nats-20261001",
+            "--label",
+            "im.task=LOOP1-E2E-001",
+            "--label",
+            "im.owner=R-E2E-IMPLEMENTATION-20261001",
+            "-p",
+            "127.0.0.1:42651:4222",
+            "nats:2.10"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.5,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "exec",
+            "loop1-e2e-impl-pg-20261001",
+            "pg_isready",
+            "-U",
+            "postgres",
+            "-d",
+            "s1_e2e_regression"
+          ],
+          "exit_code": 2,
+          "elapsed_seconds": 0.391,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "exec",
+            "loop1-e2e-impl-pg-20261001",
+            "pg_isready",
+            "-U",
+            "postgres",
+            "-d",
+            "s1_e2e_regression"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.328,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import subprocess;subprocess.run(['docker','exec','-i','loop1-e2e-impl-pg-20261001','psql','-U','postgres','-d','s1_e2e_regression','-v','ON_ERROR_STOP=1'],input=Path('contracts/database/migrations/0001_initial.up.sql').read_bytes(),check=True)"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.485,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 21.859,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-race",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 85.594,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/checks-1790839737217749900-commands.json",
+      "phase": "checks",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "contracts/websocket/verify.py"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.172,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "ci/check_architecture.py",
+            "--scope",
+            "all",
+            "--json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.719,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "tools/verify-loop1-ctrl-002.ps1",
+            "-Mode",
+            "Development"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 6.406,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "tools/verify-frozen-architecture.ps1"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.531,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "build",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 1.047,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "vet",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.984,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "contracts/http/verify-auth-user-friend.ps1"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 6.688,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/architecture",
+            "-v"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.281,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/ci",
+            "-v"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 3.266,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "gofmt",
+            "-l",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\main.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\auth.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\http.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\message.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\message_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\outbox.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\outbox_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\rollback_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\social.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\social_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\sync.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\core\\sync_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\gateway\\gateway.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\gateway\\http.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\gateway\\message_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\gateway\\session.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\gateway\\session_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\plugin-host\\http.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\shared\\config.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\shared\\config_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\shared\\infra.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\shared\\security.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\shared\\security_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\tests\\auth_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\tests\\contract_fixture_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\tests\\message_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\tests\\revocation_fallback_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\tests\\runtime_test.go",
+            "H:\\.codex\\worktrees\\s1-e2e-approved\\backend\\go\\tests\\social_test.go"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.187,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/cleanup-1790840247398974500-commands.json",
+      "phase": "cleanup",
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "inspect",
+            "loop1-e2e-impl-pg-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.234,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "volume",
+            "inspect",
+            "ef24a639fe01dc3ab52df0a17284c2562a1cecac155a4ecb0bb9d128ec8d291b"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.235,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "ps",
+            "-aq",
+            "--no-trunc",
+            "--filter",
+            "volume=ef24a639fe01dc3ab52df0a17284c2562a1cecac155a4ecb0bb9d128ec8d291b"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.25,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "rm",
+            "-fv",
+            "loop1-e2e-impl-pg-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.656,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "inspect",
+            "loop1-e2e-impl-nats-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.25,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "rm",
+            "-fv",
+            "loop1-e2e-impl-nats-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.594,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/e2e-1790839854826450300-commands.json",
+      "phase": "e2e",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "tests/e2e/go_tls_messaging.py"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 17.812,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/e2e-1790839909067826800-commands.json",
+      "phase": "e2e",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "tests/e2e/go_tls_messaging.py"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 19.219,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/e2e-1790839966840320200-commands.json",
+      "phase": "e2e",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "tests/e2e/go_tls_messaging.py"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 34.797,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/e2e-1790840019365053100-commands.json",
+      "phase": "e2e",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "tests/e2e/go_tls_messaging.py"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 32.547,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/e2e-commands.json",
+      "phase": "e2e",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "tests/e2e/go_tls_messaging.py"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 27.032,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/final-1790840062629615500-commands.json",
+      "phase": "final",
+      "commands": [
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 20.281,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-race",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 82.25,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    {
+      "path": "spec/progress/evidence/LOOP1-E2E-001/startup-commands.json",
+      "phase": "startup",
+      "commands": [
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/handoff/agent-context.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.141,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/progress/current.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.125,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/tasks/active/LOOP1-E2E-001.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.109,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/architecture/README.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.125,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/architecture/baseline.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.125,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/governance/minimality.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.125,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/governance/execution-boundaries.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.11,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('spec/governance/independent-review.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.11,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "from pathlib import Path;import json;print(json.dumps(Path('research/README.md').read_text(encoding='utf8'),ensure_ascii=True))"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.125,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "git",
+            "-c",
+            "core.excludesFile=.git/info/exclude",
+            "status",
+            "--short"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.125,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "git",
+            "diff"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.109,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "git",
+            "log",
+            "-5",
+            "--oneline"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.11,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "tools/research/recorder.py",
+            "record-event",
+            "--run-id",
+            "R-E2E-IMPLEMENTATION-20261001",
+            "--event-type",
+            "instrumentation_warning",
+            "--data-json",
+            "{\"reason\": \"Preparation and isolated-worktree creation occurred before run start; trace incomplete. Prior read-only startup command failures, quoting, wrong guessed paths and truncated/GBK output were disclosed; immutable inputs hash-confirmed and UTF8 supplemented. No product writes or services before baseline.\", \"pre_recorder_trace_complete\": false}"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.171,
+          "go_runtime_skips": 0
+        }
+      ]
+    }
+  ],
+  "go_runtime_skips": 0,
+  "ci_windows_symlink_subcase_skips": 4,
+  "e2e_failures_preserved": 4,
+  "friend403": "DEFERRED_BY_HUMAN",
+  "acceptance": "PENDING_NEW_INDEPENDENT_REVIEW_AND_EXACT_HOSTED_CI"
+}

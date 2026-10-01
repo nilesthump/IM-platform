@@ -17,6 +17,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
 	"im-platform/backend/go/core"
+	"im-platform/backend/go/gateway"
 	"im-platform/backend/go/shared"
 )
 
@@ -78,7 +79,12 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := newService(db, []byte("test-only-signing-key-at-least-32-bytes"))
-	h := newGateway(t, s.db, s.codec.Key)
+	coreServer := httptest.NewServer(s.handler)
+	defer coreServer.Close()
+	h, err := gateway.NewHandler(s.db, s.codec.Key, testNATS(t), coreServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
 	natsURL := os.Getenv("NATS_URL")
 	if natsURL == "" {
 		natsURL = "nats://127.0.0.1:4222"
@@ -190,7 +196,7 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
 	if err != nil {
 		t.Fatalf("bound operation blocked by PostgreSQL: %v", err)
 	}
-	if operation["type"] != "message.ack" || operation["payload"].(map[string]any)["error"].(map[string]any)["code"] != "AUTHORIZATION_DENIED" {
+	if operation["type"] != "message.ack" || operation["payload"].(map[string]any)["error"].(map[string]any)["code"] != "VALIDATION_FAILED" {
 		t.Fatalf("bound operation response: %v", operation)
 	}
 	_ = conn.SetReadDeadline(time.Time{})

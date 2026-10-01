@@ -1,0 +1,125 @@
+{
+  "owner": "R-MSG-REREVIEW-20261001",
+  "phase": "probes",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55642",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_rereview",
+    "NATS_URL": "nats://127.0.0.1:42642"
+  },
+  "commands": [
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-overlay",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\evidence\\reviewer-live-overlay.go.json",
+        "-count=1",
+        "-v",
+        "./tests",
+        "-run",
+        "TestReviewerLiveConflictRetryMustNotEraseOrigin|TestLiveConflictingRetryDelayedOrigin"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.688,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-overlay",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\evidence\\reviewer-live-overlay.go.json",
+        "-race",
+        "-count=1",
+        "-v",
+        "./tests",
+        "-run",
+        "TestReviewerLiveConflictRetryMustNotEraseOrigin|TestLiveConflictingRetryDelayedOrigin"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 11.187,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-overlay",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\evidence\\reviewer-message-overlay.go.json",
+        "-count=1",
+        "-v",
+        "./gateway",
+        "-run",
+        "TestReviewer"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.344,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-overlay",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\evidence\\reviewer-message-overlay.go.json",
+        "-race",
+        "-count=1",
+        "-v",
+        "./gateway",
+        "-run",
+        "TestReviewer"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.297,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-overlay",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\evidence\\reviewer-sync-overlay.json",
+        "-count=1",
+        "-v",
+        "./core",
+        "-run",
+        "TestReviewerRequiredAfterSeqNegativesAndZero|TestHistoryRequiresPresentIntegerAfterSeq"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.344,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-overlay",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\evidence\\reviewer-sync-overlay.json",
+        "-race",
+        "-count=1",
+        "-v",
+        "./core",
+        "-run",
+        "TestReviewerRequiredAfterSeqNegativesAndZero|TestHistoryRequiresPresentIntegerAfterSeq"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.172,
+      "go_skips": 0
+    }
+  ]
+}

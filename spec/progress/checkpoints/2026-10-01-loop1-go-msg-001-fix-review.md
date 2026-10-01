@@ -1,0 +1,3 @@
+# MSG repair development recovery
+
+Date2026-10-01. Product `0a13b119e0e4c8788c5b264571df35df76ad94cb` task/LOOP1-GO-MSG-001; final closure may change head for recovery/evidence, independently review exact finalhead. Rejected f1764fd/archive84b7a63 immutable. ContractWSS1.0/Sync1.0/database0001 unchanged; no fixture/migration change. Local full normal/race/targeted/structuralPASS; zero Go runtime skips/four Windows CI symlink subcase skips. Owned services removed. Recorderprospective_resume incomplete preparation trace; researchPASS never acceptance. Taskreview/S1OPEN. Next NEW independent Review then exact-head hostedCI. Lastacceptedmain b442acd/CI36813501417.

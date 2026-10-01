@@ -1,0 +1,520 @@
+{
+  "owner": "/root/message_fix",
+  "product_commit": "0a13b119e0e4c8788c5b264571df35df76ad94cb",
+  "archive_base": "84b7a63",
+  "branch": "task/LOOP1-GO-MSG-001",
+  "result": "LOCAL_DEVELOPMENT_PASS_NOT_ACCEPTANCE",
+  "phases": {
+    "setup": {
+      "owner": "R-MSG-FIX-20261001",
+      "phase": "setup",
+      "enable": {
+        "DB_TEST_ENABLE": "1",
+        "PGHOST": "127.0.0.1",
+        "PGPORT": "55634",
+        "PGUSER": "postgres",
+        "PGDATABASE": "msg_fix_test",
+        "NATS_URL": "nats://127.0.0.1:42634"
+      },
+      "containers": [
+        "loop1-msg-fix-pg-20261001",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            "loop1-msg-fix-pg-20261001",
+            "--label",
+            "im.task=LOOP1-GO-MSG-001",
+            "--label",
+            "im.owner=message_fix",
+            "-e",
+            "POSTGRES_HOST_AUTH_METHOD=trust",
+            "-e",
+            "POSTGRES_DB=msg_fix_test",
+            "-p",
+            "127.0.0.1:55634:5432",
+            "postgres:16"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.515,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            "loop1-msg-fix-nats-20261001",
+            "--label",
+            "im.task=LOOP1-GO-MSG-001",
+            "--label",
+            "im.owner=message_fix",
+            "-p",
+            "127.0.0.1:42634:4222",
+            "nats:2.10"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.547,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "import subprocess,time; name='loop1-msg-fix-pg-20261001'; ready=False\nfor _ in range(60):\n if subprocess.run(['docker','exec',name,'pg_isready','-U','postgres','-d','msg_fix_test'],capture_output=True).returncode==0: ready=True;break\n time.sleep(.5)\nassert ready,'PG readiness failed'"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 1.188,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-c",
+            "import subprocess,pathlib;subprocess.run(['docker','exec','-i','loop1-msg-fix-pg-20261001','psql','-U','postgres','-d','msg_fix_test','-v','ON_ERROR_STOP=1'],input=pathlib.Path('contracts/database/migrations/0001_initial.up.sql').read_bytes(),check=True)"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.515,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 18.235,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-race",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 79.328,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "contracts/websocket/verify.py"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.156,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "ci/check_architecture.py",
+            "--scope",
+            "all",
+            "--json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.609,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "tools/verify-loop1-ctrl-002.ps1",
+            "-Mode",
+            "Development"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 6.375,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    "red": {
+      "owner": "R-MSG-FIX-20261001",
+      "phase": "red",
+      "enable": {
+        "DB_TEST_ENABLE": "1",
+        "PGHOST": "127.0.0.1",
+        "PGPORT": "55634",
+        "PGUSER": "postgres",
+        "PGDATABASE": "msg_fix_test",
+        "NATS_URL": "nats://127.0.0.1:42634"
+      },
+      "containers": [
+        "loop1-msg-fix-pg-20261001",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./gateway",
+            "-run",
+            "TestRejectedRetryPreservesCommittedOrigin"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 1.328,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./core",
+            "-run",
+            "TestHistoryRequiresPresentIntegerAfterSeq"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 1.313,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./tests",
+            "-run",
+            "TestLiveConflictingRetryDelayedOrigin"
+          ],
+          "exit_code": 1,
+          "elapsed_seconds": 2.25,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    "green": {
+      "owner": "R-MSG-FIX-20261001",
+      "phase": "green",
+      "enable": {
+        "DB_TEST_ENABLE": "1",
+        "PGHOST": "127.0.0.1",
+        "PGPORT": "55634",
+        "PGUSER": "postgres",
+        "PGDATABASE": "msg_fix_test",
+        "NATS_URL": "nats://127.0.0.1:42634"
+      },
+      "containers": [
+        "loop1-msg-fix-pg-20261001",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./gateway",
+            "-run",
+            "TestRejectedRetryPreservesCommittedOrigin"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 1.25,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./core",
+            "-run",
+            "TestHistoryRequiresPresentIntegerAfterSeq"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 1.281,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./tests",
+            "-run",
+            "TestLiveConflictingRetryDelayedOrigin"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 3.235,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    "final": {
+      "owner": "R-MSG-FIX-20261001",
+      "phase": "final",
+      "enable": {
+        "DB_TEST_ENABLE": "1",
+        "PGHOST": "127.0.0.1",
+        "PGPORT": "55634",
+        "PGUSER": "postgres",
+        "PGDATABASE": "msg_fix_test",
+        "NATS_URL": "nats://127.0.0.1:42634"
+      },
+      "containers": [
+        "loop1-msg-fix-pg-20261001",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 20.188,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "test",
+            "-race",
+            "-count=1",
+            "-v",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 82.094,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    "checks": {
+      "owner": "R-MSG-FIX-20261001",
+      "phase": "checks",
+      "enable": {
+        "DB_TEST_ENABLE": "1",
+        "PGHOST": "127.0.0.1",
+        "PGPORT": "55634",
+        "PGUSER": "postgres",
+        "PGDATABASE": "msg_fix_test",
+        "NATS_URL": "nats://127.0.0.1:42634"
+      },
+      "containers": [
+        "loop1-msg-fix-pg-20261001",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "build",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.86,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "go",
+            "-C",
+            "backend/go",
+            "vet",
+            "./..."
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.64,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "contracts/websocket/verify.py"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.156,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "ci/check_architecture.py",
+            "--scope",
+            "all",
+            "--json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.547,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/architecture",
+            "-v"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.125,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/ci",
+            "-v"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 2.563,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "tools/verify-frozen-architecture.ps1"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.422,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "tools/verify-loop1-ctrl-002.ps1",
+            "-Mode",
+            "Development"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.797,
+          "go_runtime_skips": 0
+        }
+      ]
+    },
+    "cleanup": {
+      "owner": "R-MSG-FIX-20261001",
+      "phase": "cleanup",
+      "enable": {
+        "DB_TEST_ENABLE": "1",
+        "PGHOST": "127.0.0.1",
+        "PGPORT": "55634",
+        "PGUSER": "postgres",
+        "PGDATABASE": "msg_fix_test",
+        "NATS_URL": "nats://127.0.0.1:42634"
+      },
+      "containers": [
+        "loop1-msg-fix-pg-20261001",
+        "loop1-msg-fix-nats-20261001"
+      ],
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "inspect",
+            "--format",
+            "{{index .Config.Labels \"im.owner\"}}",
+            "loop1-msg-fix-pg-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.234,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "rm",
+            "-fv",
+            "loop1-msg-fix-pg-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.704,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "inspect",
+            "--format",
+            "{{index .Config.Labels \"im.owner\"}}",
+            "loop1-msg-fix-nats-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.265,
+          "go_runtime_skips": 0
+        },
+        {
+          "argv": [
+            "docker",
+            "rm",
+            "-fv",
+            "loop1-msg-fix-nats-20261001"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.594,
+          "go_runtime_skips": 0
+        }
+      ]
+    }
+  },
+  "known_skips": "Exactly four Windows symlink CI subcases WinError1314; zero Go runtime skips",
+  "next": "NEW independent Review and exact-head hostedCI"
+}

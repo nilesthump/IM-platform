@@ -55,6 +55,38 @@ class PathMatrixTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assert_jobs(path, {"deploy"})
 
+    def test_e2e_paths_select_go_deploy_and_boundaries(self):
+        for path in ("tests/e2e/go_tls_messaging.py", "tests/e2e/README.md"):
+            with self.subTest(path=path):
+                self.assert_jobs(path, {"go", "deploy", "architecture", "source_go"})
+
+    def test_deleted_e2e_path_still_selects_live_checks(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = pathlib.Path(temp)
+            subprocess.run(["git", "init", "-q", str(root)], check=True)
+            subprocess.run(["git", "-C", str(root), "config", "user.name", "CI test"], check=True)
+            subprocess.run(["git", "-C", str(root), "config", "user.email", "ci@example.invalid"], check=True)
+            test = root / "tests/e2e/old.py"
+            test.parent.mkdir(parents=True)
+            test.write_text("pass\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
+            base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+            test.unlink()
+            subprocess.run(["git", "-C", str(root), "add", "-u"], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-qm", "delete"], check=True)
+            head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+            previous = pathlib.Path.cwd()
+            try:
+                import os
+                os.chdir(root)
+                paths = classify_module.diff_paths(base, head)
+            finally:
+                os.chdir(previous)
+            self.assertEqual(paths, ["tests/e2e/old.py"])
+            selected = {job for job, enabled in classify_module.classify(paths).items() if enabled}
+            self.assertEqual(selected, {"go", "deploy", "architecture", "source_go"})
+
     def test_union_and_deleted_paths(self):
         result = classify_module.classify(["backend/go/old.go", "clients/web/new.ts"])
         self.assertEqual({key for key, value in result.items() if value}, {"go", "web", "architecture", "source_go"})

@@ -1,0 +1,61 @@
+{
+  "owner": "R-MSG-IMPLEMENTATION-20261001",
+  "phase": "final",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55631",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_test",
+    "NATS_URL": "nats://127.0.0.1:42631"
+  },
+  "containers": [
+    "loop1-msg-impl-pg-20261001",
+    "loop1-msg-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 18.422,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 81.063,
+      "skips": 0
+    }
+  ]
+}

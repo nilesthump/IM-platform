@@ -1,0 +1,47 @@
+{
+  "owner": "R-MSG-FIX-20261001",
+  "phase": "final",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55634",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_fix_test",
+    "NATS_URL": "nats://127.0.0.1:42634"
+  },
+  "containers": [
+    "loop1-msg-fix-pg-20261001",
+    "loop1-msg-fix-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 20.188,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 82.094,
+      "go_runtime_skips": 0
+    }
+  ]
+}

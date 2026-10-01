@@ -1,0 +1,1561 @@
+diff --git a/backend/go/core/http.go b/backend/go/core/http.go
+index be840e2..f4e7c00 100644
+--- a/backend/go/core/http.go
++++ b/backend/go/core/http.go
+@@ -11,5 +11,7 @@ func NewHandler(db *pgxpool.Pool, key []byte) http.Handler {
+ 	s := &authService{db: db, codec: &shared.Codec{Key: key, Now: time.Now}, now: time.Now}
+ 	m := shared.InfraMux("core")
+ 	m.Handle("/v1/", s.handler())
++	m.HandleFunc("POST /__core/message", s.sendMessage)
++	m.HandleFunc("POST /__core/history", s.conversationHistory)
+ 	return m
+ }
+diff --git a/backend/go/core/message.go b/backend/go/core/message.go
+new file mode 100644
+index 0000000..b9e7f60
+--- /dev/null
++++ b/backend/go/core/message.go
+@@ -0,0 +1,169 @@
++package core
++
++import (
++	"context"
++	"encoding/json"
++	"errors"
++	"net/http"
++	"strings"
++	"time"
++	"unicode/utf8"
++
++	"github.com/jackc/pgx/v5"
++)
++
++type textContent struct {
++	Kind string `json:"kind"`
++	Text string `json:"text"`
++}
++type sendFrame struct {
++	ProtocolVersion string `json:"protocolVersion"`
++	Type            string `json:"type"`
++	RequestID       string `json:"requestId"`
++	Payload         struct {
++		ConversationID string      `json:"conversationId"`
++		Content        textContent `json:"content"`
++	} `json:"payload"`
++}
++type storedMessage struct {
++	ConversationID string      `json:"conversationId"`
++	Seq            int64       `json:"seq"`
++	MessageID      string      `json:"messageId"`
++	SenderID       string      `json:"senderId"`
++	RequestID      string      `json:"requestId"`
++	CreatedAt      time.Time   `json:"createdAt"`
++	Content        textContent `json:"content"`
++}
++
++func messageFrame(kind, id string, payload any) any {
++	return map[string]any{"protocolVersion": "1.0", "type": kind, "requestId": id, "payload": payload}
++}
++func rejectedMessage(id, code string) any {
++	return messageFrame("message.ack", id, map[string]any{"status": "rejected", "error": map[string]string{"code": code, "message": "Request rejected"}})
++}
++func committedMessage(m storedMessage) any {
++	return messageFrame("message.ack", m.RequestID, map[string]any{"status": "committed", "conversationId": m.ConversationID, "messageId": m.MessageID, "seq": m.Seq, "createdAt": m.CreatedAt})
++}
++func createdMessage(m storedMessage) any {
++	return messageFrame("message.created", m.RequestID, map[string]any{"conversationId": m.ConversationID, "messageId": m.MessageID, "senderId": m.SenderID, "seq": m.Seq, "createdAt": m.CreatedAt, "content": m.Content})
++}
++func (v sendFrame) valid() bool {
++	n := utf8.RuneCountInString(v.Payload.Content.Text)
++	return v.ProtocolVersion == "1.0" && v.Type == "message.send" && socialUUIDPattern.MatchString(v.RequestID) && socialUUIDPattern.MatchString(v.Payload.ConversationID) && v.Payload.Content.Kind == "TEXT" && n >= 1 && n <= 4096
++}
++
++// This private adapter reuses the canonical frame and bound bearer. It is never
++// registered under the Gateway's public /v1 reverse proxy.
++func (s *authService) sendMessage(w http.ResponseWriter, r *http.Request) {
++	var v sendFrame
++	if decode(r, &v) != nil || !v.valid() || r.URL.RawQuery != "" {
++		writeJSON(w, 200, rejectedMessage(v.RequestID, "VALIDATION_FAILED"))
++		return
++	}
++	token, err := bearer(r)
++	if err != nil {
++		writeJSON(w, 200, rejectedMessage(v.RequestID, "AUTH_REQUIRED"))
++		return
++	}
++	c, err := s.codec.Parse(token)
++	if err != nil {
++		writeJSON(w, 200, rejectedMessage(v.RequestID, "AUTH_SESSION_REVOKED"))
++		return
++	}
++	m, err := s.commitMessage(r.Context(), c, v)
++	if err != nil {
++		code := "MESSAGE_COMMIT_FAILED"
++		var e apiError
++		if errors.As(err, &e) {
++			code = e.Code
++		}
++		writeJSON(w, 200, rejectedMessage(v.RequestID, code))
++		return
++	}
++	m.RequestID = v.RequestID // ACK echoes the request spelling; storage identity is UUID-normalized.
++	writeJSON(w, 200, committedMessage(m))
++}
++
++func (s *authService) authorizeMessage(ctx context.Context, tx pgx.Tx, c claims, conversation string) error {
++	// Holding the slot shared lock until commit serializes against logout and
++	// replacement login, without giving Gateway ownership of Session writes.
++	var sid, status string
++	var epoch int64
++	var expiry time.Time
++	err := tx.QueryRow(ctx, `SELECT session_id,session_epoch,status,expires_at FROM sessions WHERE user_id=$1 AND client_type=$2 FOR SHARE`, c.UserID, c.ClientType).Scan(&sid, &epoch, &status, &expiry)
++	if errors.Is(err, pgx.ErrNoRows) {
++		return fail(401, "AUTH_SESSION_REVOKED", "Request rejected")
++	}
++	if err != nil {
++		return err
++	}
++	if status != "ACTIVE" || sid != c.SessionID || epoch != c.SessionEpoch || !expiry.After(s.now()) || c.ExpiresAt <= s.now().Unix() {
++		return fail(401, "AUTH_SESSION_REVOKED", "Request rejected")
++	}
++	var member string
++	err = tx.QueryRow(ctx, `SELECT user_id FROM conversation_members WHERE conversation_id=$1 AND user_id=$2 AND left_at IS NULL FOR SHARE`, conversation, c.UserID).Scan(&member)
++	if errors.Is(err, pgx.ErrNoRows) {
++		return fail(403, "AUTHORIZATION_DENIED", "Request rejected")
++	}
++	return err
++}
++
++func (s *authService) commitMessage(ctx context.Context, c claims, v sendFrame) (m storedMessage, err error) {
++	tx, err := s.db.Begin(ctx)
++	if err != nil {
++		return m, err
++	}
++	defer tx.Rollback(ctx)
++	conversation := strings.ToLower(v.Payload.ConversationID)
++	request := strings.ToLower(v.RequestID)
++	if err = s.authorizeMessage(ctx, tx, c, conversation); err != nil {
++		return m, err
++	}
++	var next int64
++	if err = tx.QueryRow(ctx, `SELECT next_seq FROM conversations WHERE conversation_id=$1 FOR UPDATE`, conversation).Scan(&next); err != nil {
++		return m, err
++	}
++	m.ConversationID = conversation
++	m.RequestID = request
++	m.Content.Kind = "TEXT"
++	err = tx.QueryRow(ctx, `SELECT server_message_id,sender_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND request_id=$2`, conversation, request).Scan(&m.MessageID, &m.SenderID, &m.Seq, &m.CreatedAt, &m.Content.Text)
++	if err == nil {
++		if m.SenderID != c.UserID || m.Content.Text != v.Payload.Content.Text {
++			return m, fail(409, "MESSAGE_REQUEST_CONFLICT", "Request rejected")
++		}
++		err = tx.Commit(ctx)
++		return m, err
++	}
++	if !errors.Is(err, pgx.ErrNoRows) {
++		return m, err
++	}
++	m.MessageID, err = uuid()
++	if err != nil {
++		return m, err
++	}
++	m.SenderID = c.UserID
++	m.Seq = next
++	m.Content = v.Payload.Content
++	_, err = tx.Exec(ctx, `UPDATE conversations SET next_seq=next_seq+1 WHERE conversation_id=$1`, conversation)
++	if err != nil {
++		return m, err
++	}
++	err = tx.QueryRow(ctx, `INSERT INTO messages(server_message_id,conversation_id,sender_id,request_id,seq,kind,text_body) VALUES($1,$2,$3,$4,$5,'TEXT',$6) RETURNING created_at`, m.MessageID, conversation, c.UserID, request, next, m.Content.Text).Scan(&m.CreatedAt)
++	if err != nil {
++		return m, err
++	}
++	payload, err := json.Marshal(createdMessage(m))
++	if err != nil {
++		return m, err
++	}
++	event, err := uuid()
++	if err != nil {
++		return m, err
++	}
++	_, err = tx.Exec(ctx, `INSERT INTO outbox_events(event_id,aggregate_type,aggregate_id,event_type,conversation_id,message_id,payload) VALUES($1,'message',$2,'message.created',$3,$2,$4)`, event, m.MessageID, conversation, payload)
++	if err != nil {
++		return m, err
++	}
++	err = tx.Commit(ctx)
++	return m, err
++}
+diff --git a/backend/go/core/message_test.go b/backend/go/core/message_test.go
+new file mode 100644
+index 0000000..ebd64d2
+--- /dev/null
++++ b/backend/go/core/message_test.go
+@@ -0,0 +1,285 @@
++package core
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"fmt"
++	"github.com/jackc/pgx/v5/pgxpool"
++	"im-platform/backend/go/shared"
++	"net/http/httptest"
++	"os"
++	"reflect"
++	"sync"
++	"testing"
++	"time"
++)
++
++type messageFixture struct {
++	s            *authService
++	db           *pgxpool.Pool
++	users        []string
++	claims       []claims
++	conversation string
++}
++
++func newMessageFixture(t *testing.T, members int) *messageFixture {
++	t.Helper()
++	if os.Getenv("DB_TEST_ENABLE") != "1" {
++		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
++	}
++	ctx := context.Background()
++	db, err := pgxpool.New(ctx, "")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err = db.Ping(ctx); err != nil {
++		t.Fatal(err)
++	}
++	f := &messageFixture{db: db, s: &authService{db: db, codec: &shared.Codec{Key: []byte("test-only-signing-key-at-least-32-bytes"), Now: time.Now}, now: time.Now}}
++	t.Cleanup(func() { db.Close() })
++	for i := 0; i < members; i++ {
++		id, _ := uuid()
++		f.users = append(f.users, id)
++		if _, err = db.Exec(ctx, `INSERT INTO users(user_id,username,display_name,password_hash) VALUES($1::uuid,$1::text,'Message test','test-only')`, id); err != nil {
++			t.Fatal(err)
++		}
++		sid, epoch, _, _, err := f.s.newSession(ctx, id, clientInput{ClientType: "WEB", DeviceID: "msg-test"})
++		if err != nil {
++			t.Fatal(err)
++		}
++		f.claims = append(f.claims, claims{UserID: id, SessionID: sid, SessionEpoch: epoch, ClientType: "WEB", IssuedAt: time.Now().Unix(), ExpiresAt: time.Now().Add(time.Hour).Unix()})
++	}
++	f.conversation, _ = uuid()
++	req, _ := uuid()
++	if _, err = db.Exec(ctx, `INSERT INTO conversations(conversation_id,kind,created_by,group_create_request_id) VALUES($1,'GROUP',$2,$3)`, f.conversation, f.users[0], req); err != nil {
++		t.Fatal(err)
++	}
++	for _, id := range f.users {
++		if _, err = db.Exec(ctx, `INSERT INTO conversation_members(conversation_id,user_id,role) VALUES($1,$2,'MEMBER')`, f.conversation, id); err != nil {
++			t.Fatal(err)
++		}
++	}
++	t.Cleanup(func() {
++		db.Exec(ctx, `DELETE FROM outbox_events WHERE conversation_id=$1`, f.conversation)
++		db.Exec(ctx, `DELETE FROM messages WHERE conversation_id=$1`, f.conversation)
++		db.Exec(ctx, `DELETE FROM conversation_members WHERE conversation_id=$1`, f.conversation)
++		db.Exec(ctx, `DELETE FROM conversations WHERE conversation_id=$1`, f.conversation)
++		for _, id := range f.users {
++			db.Exec(ctx, `DELETE FROM sessions WHERE user_id=$1`, id)
++			db.Exec(ctx, `DELETE FROM users WHERE user_id=$1`, id)
++		}
++	})
++	return f
++}
++func (f *messageFixture) send(request, text string) sendFrame {
++	v := sendFrame{ProtocolVersion: "1.0", Type: "message.send", RequestID: request}
++	v.Payload.ConversationID = f.conversation
++	v.Payload.Content = textContent{Kind: "TEXT", Text: text}
++	return v
++}
++func (f *messageFixture) count(t *testing.T, query string) int {
++	t.Helper()
++	var n int
++	if err := f.db.QueryRow(context.Background(), query, f.conversation).Scan(&n); err != nil {
++		t.Fatal(err)
++	}
++	return n
++}
++func (f *messageFixture) adapter(t *testing.T, c claims, v sendFrame) map[string]any {
++	t.Helper()
++	b, _ := json.Marshal(v)
++	token, err := f.s.codec.Sign(c)
++	if err != nil {
++		t.Fatal(err)
++	}
++	r := httptest.NewRequest("POST", "/__core/message", bytes.NewReader(b))
++	r.Header.Set("Authorization", "Bearer "+token)
++	w := httptest.NewRecorder()
++	f.s.sendMessage(w, r)
++	var out map[string]any
++	if json.Unmarshal(w.Body.Bytes(), &out) != nil {
++		t.Fatal("invalid ack")
++	}
++	return out
++}
++func TestMessageConcurrentIdentityAndSequence(t *testing.T) {
++	f := newMessageFixture(t, 2)
++	id, _ := uuid()
++	v := f.send(id, "hello")
++	var wg sync.WaitGroup
++	results := make(chan storedMessage, 16)
++	failures := make(chan error, 16)
++	for i := 0; i < 16; i++ {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			m, e := f.s.commitMessage(context.Background(), f.claims[0], v)
++			if e != nil {
++				failures <- e
++			}
++			results <- m
++		}()
++	}
++	wg.Wait()
++	close(results)
++	close(failures)
++	for e := range failures {
++		t.Fatal(e)
++	}
++	var original storedMessage
++	for m := range results {
++		if original.MessageID == "" {
++			original = m
++		}
++		if !reflect.DeepEqual(m, original) {
++			t.Fatal("retry identity changed")
++		}
++	}
++	for _, q := range []string{`SELECT count(*) FROM messages WHERE conversation_id=$1`, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1 AND event_type='message.created'`} {
++		if f.count(t, q) != 1 {
++			t.Fatal("duplicate logical record")
++		}
++	}
++	for i := 0; i < 12; i++ {
++		id, _ := uuid()
++		wg.Add(1)
++		go func(id string) {
++			defer wg.Done()
++			_, e := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "next"))
++			if e != nil {
++				t.Error(e)
++			}
++		}(id)
++	}
++	wg.Wait()
++	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 13 || f.count(t, `SELECT max(seq)::int FROM messages WHERE conversation_id=$1`) != 13 || f.count(t, `SELECT next_seq::int FROM conversations WHERE conversation_id=$1`) != 14 {
++		t.Fatal("sequence gap")
++	}
++	for _, c := range []claims{f.claims[0], f.claims[1]} {
++		conflict := v
++		if c.UserID == f.claims[0].UserID {
++			conflict.Payload.Content.Text = "different"
++		}
++		ack := f.adapter(t, c, conflict)
++		if ack["payload"].(map[string]any)["error"].(map[string]any)["code"] != "MESSAGE_REQUEST_CONFLICT" {
++			t.Fatal("content/sender identity conflict accepted")
++		}
++	}
++}
++func TestMessageAuthorizationAndIndependentConversations(t *testing.T) {
++	f := newMessageFixture(t, 2)
++	id, _ := uuid()
++	v := f.send(id, "hello")
++	m, err := f.s.commitMessage(context.Background(), f.claims[0], v)
++	if err != nil {
++		t.Fatal(err)
++	}
++	other := newMessageFixture(t, 2)
++	second, err := other.s.commitMessage(context.Background(), other.claims[0], other.send(id, "hello"))
++	if err != nil || second.MessageID == m.MessageID || second.Seq != 1 {
++		t.Fatal("Conversation independence failed")
++	}
++	if _, err = f.db.Exec(context.Background(), `UPDATE conversation_members SET left_at=now() WHERE conversation_id=$1 AND user_id=$2`, f.conversation, f.users[1]); err != nil {
++		t.Fatal(err)
++	}
++	fresh, _ := uuid()
++	ack := f.adapter(t, f.claims[1], f.send(fresh, "denied"))
++	if ack["payload"].(map[string]any)["error"].(map[string]any)["code"] != "AUTHORIZATION_DENIED" {
++		t.Fatal("nonmember accepted")
++	}
++	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 1 || f.count(t, `SELECT next_seq::int FROM conversations WHERE conversation_id=$1`) != 2 {
++		t.Fatal("denial persisted")
++	}
++	if _, err = f.db.Exec(context.Background(), `UPDATE sessions SET status='REVOKED',refresh_token_hash=NULL WHERE user_id=$1`, f.users[0]); err != nil {
++		t.Fatal(err)
++	}
++	ack = f.adapter(t, f.claims[0], f.send(fresh, "revoked"))
++	if ack["payload"].(map[string]any)["error"].(map[string]any)["code"] != "AUTH_SESSION_REVOKED" {
++		t.Fatal("revoked Session accepted")
++	}
++}
++func TestMessageRollbackAndACKAfterCommit(t *testing.T) {
++	f := newMessageFixture(t, 2)
++	ctx := context.Background()
++	id, _ := uuid()
++	name := "msgprobe" + fmt.Sprint(time.Now().UnixNano())
++	lockKey := int64(77461001)
++	// A deferred constraint trigger pauses the actual COMMIT, not a mock hook.
++	sql := fmt.Sprintf(`CREATE FUNCTION %s() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.conversation_id='%s'::uuid THEN PERFORM pg_advisory_xact_lock(%d); END IF; RETURN NEW; END $$; CREATE CONSTRAINT TRIGGER %s AFTER INSERT ON outbox_events DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION %s()`, name, f.conversation, lockKey, name, name)
++	if _, err := f.db.Exec(ctx, sql); err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() {
++		f.db.Exec(ctx, fmt.Sprintf(`DROP TRIGGER IF EXISTS %s ON outbox_events; DROP FUNCTION IF EXISTS %s()`, name, name))
++	})
++	guard, err := f.db.Acquire(ctx)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer guard.Release()
++	if _, err = guard.Exec(ctx, `SELECT pg_advisory_lock($1)`, lockKey); err != nil {
++		t.Fatal(err)
++	}
++	defer guard.Exec(ctx, `SELECT pg_advisory_unlock($1)`, lockKey)
++	ack := make(chan map[string]any, 1)
++	go func() { ack <- f.adapter(t, f.claims[0], f.send(id, "hello")) }()
++	deadline := time.Now().Add(5 * time.Second)
++	waiting := false
++	for time.Now().Before(deadline) {
++		var n int
++		err = f.db.QueryRow(ctx, `SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() AND wait_event='advisory'`).Scan(&n)
++		if err != nil {
++			t.Fatal(err)
++		}
++		if n > 0 {
++			waiting = true
++			break
++		}
++		time.Sleep(10 * time.Millisecond)
++	}
++	if !waiting {
++		t.Fatal("COMMIT did not reach deferred probe")
++	}
++	select {
++	case <-ack:
++		t.Fatal("ACK before durable commit")
++	default:
++	}
++	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 0 || f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1`) != 0 {
++		t.Fatal("uncommitted data visible")
++	}
++	guard.Exec(ctx, `SELECT pg_advisory_unlock($1)`, lockKey)
++	select {
++	case result := <-ack:
++		if result["payload"].(map[string]any)["status"] != "committed" {
++			t.Fatal("commit rejected")
++		}
++	case <-time.After(5 * time.Second):
++		t.Fatal("commit stuck")
++	}
++	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 1 || f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1`) != 1 {
++		t.Fatal("ACK without records")
++	}
++	if _, err = f.db.Exec(ctx, fmt.Sprintf(`CREATE OR REPLACE FUNCTION %s() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.conversation_id='%s'::uuid THEN RAISE EXCEPTION 'injected rollback'; END IF; RETURN NEW; END $$`, name, f.conversation)); err != nil {
++		t.Fatal(err)
++	}
++	retry, _ := uuid()
++	result := f.adapter(t, f.claims[0], f.send(retry, "rollback"))
++	if result["payload"].(map[string]any)["status"] != "rejected" {
++		t.Fatal("rollback yielded success ACK")
++	}
++	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 1 || f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1`) != 1 || f.count(t, `SELECT next_seq::int FROM conversations WHERE conversation_id=$1`) != 2 {
++		t.Fatal("rollback left effects or gap")
++	}
++}
++func TestGroup500SingleLogicalMessageAndOutbox(t *testing.T) {
++	f := newMessageFixture(t, 500)
++	id, _ := uuid()
++	if _, err := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "group")); err != nil {
++		t.Fatal(err)
++	}
++	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 1 || f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1`) != 1 {
++		t.Fatal("GROUP persisted per member")
++	}
++}
+diff --git a/backend/go/core/outbox.go b/backend/go/core/outbox.go
+index de0f93d..0f80d23 100644
+--- a/backend/go/core/outbox.go
++++ b/backend/go/core/outbox.go
+@@ -8,7 +8,7 @@ import (
+ 	"github.com/nats-io/nats.go"
+ )
+ 
+-// Session revocations are stored in the same transaction as the Session change.
++// Session and message events are stored in the same transaction as their writes.
+ // Publishing can repeat after a crash; the gateway handles duplicate events.
+ func RelaySessionRevocations(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
+ 	ticker := time.NewTicker(500 * time.Millisecond)
+@@ -31,18 +31,20 @@ func relaySessionBatch(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
+ 		return
+ 	}
+ 	defer tx.Rollback(ctx)
+-	rows, err := tx.Query(ctx, `SELECT event_id,payload FROM outbox_events WHERE event_type='session.revoked' AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED`)
++	rows, err := tx.Query(ctx, `SELECT event_id,event_type,payload,conversation_id FROM outbox_events WHERE event_type IN ('session.revoked','message.created') AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED`)
+ 	if err != nil {
+ 		return
+ 	}
+ 	type event struct {
+-		id      string
+-		payload []byte
++		id           string
++		payload      []byte
++		kind         string
++		conversation *string
+ 	}
+ 	var events []event
+ 	for rows.Next() {
+ 		var e event
+-		if rows.Scan(&e.id, &e.payload) != nil {
++		if rows.Scan(&e.id, &e.kind, &e.payload, &e.conversation) != nil {
+ 			rows.Close()
+ 			return
+ 		}
+@@ -54,8 +56,36 @@ func relaySessionBatch(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
+ 		return
+ 	}
+ 	for _, e := range events {
+-		if nc.Publish("session.revoked", e.payload) != nil {
+-			return
++		if e.kind == "session.revoked" {
++			if nc.Publish("session.revoked", e.payload) != nil {
++				return
++			}
++		} else {
++			// Core owns recipient membership. Subjects are private routing
++			// locators; every payload remains the canonical created frame.
++			members, err := tx.Query(ctx, `SELECT user_id FROM conversation_members WHERE conversation_id=$1 AND left_at IS NULL`, e.conversation)
++			if err != nil {
++				return
++			}
++			var users []string
++			for members.Next() {
++				var user string
++				if members.Scan(&user) != nil {
++					members.Close()
++					return
++				}
++				users = append(users, user)
++			}
++			err = members.Err()
++			members.Close()
++			if err != nil {
++				return
++			}
++			for _, user := range users {
++				if nc.Publish("message.created."+user, e.payload) != nil {
++					return
++				}
++			}
+ 		}
+ 	}
+ 	if len(events) > 0 {
+diff --git a/backend/go/core/outbox_test.go b/backend/go/core/outbox_test.go
+new file mode 100644
+index 0000000..c981c7e
+--- /dev/null
++++ b/backend/go/core/outbox_test.go
+@@ -0,0 +1,89 @@
++package core
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/nats-io/nats.go"
++	"os"
++	"testing"
++	"time"
++)
++
++func TestMessageOutboxPublicationCanRepeatWithoutNewMessage(t *testing.T) {
++	f := newMessageFixture(t, 3)
++	u := os.Getenv("NATS_URL")
++	if u == "" {
++		u = "nats://127.0.0.1:4222"
++	}
++	nc, err := nats.Connect(u)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer nc.Close()
++	active, err := nc.SubscribeSync("message.created." + f.users[1])
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer active.Unsubscribe()
++	departed, err := nc.SubscribeSync("message.created." + f.users[2])
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer departed.Unsubscribe()
++	nc.Flush()
++	f.db.Exec(context.Background(), `UPDATE conversation_members SET left_at=now() WHERE conversation_id=$1 AND user_id=$2`, f.conversation, f.users[2])
++	id, _ := uuid()
++	m, err := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "delivery"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	relaySessionBatch(context.Background(), f.db, nc)
++	first, err := active.NextMsg(3 * time.Second)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var event map[string]any
++	if json.Unmarshal(first.Data, &event) != nil || event["type"] != "message.created" || event["requestId"] != id {
++		t.Fatal("not canonical created")
++	}
++	if _, err = departed.NextMsg(80 * time.Millisecond); err != nats.ErrTimeout {
++		t.Fatal("departed member received event")
++	}
++	var published bool
++	if err = f.db.QueryRow(context.Background(), `SELECT published_at IS NOT NULL FROM outbox_events WHERE message_id=$1`, m.MessageID).Scan(&published); err != nil || !published {
++		t.Fatal("publish not marked")
++	}
++	// Reproduce publish-before-mark crash: retry reuses the single durable event.
++	if _, err = f.db.Exec(context.Background(), `UPDATE outbox_events SET published_at=NULL WHERE message_id=$1`, m.MessageID); err != nil {
++		t.Fatal(err)
++	}
++	relaySessionBatch(context.Background(), f.db, nc)
++	again, err := active.NextMsg(3 * time.Second)
++	if err != nil || string(first.Data) != string(again.Data) {
++		t.Fatal("publication retry changed logical event")
++	}
++	if f.count(t, `SELECT count(*) FROM messages WHERE conversation_id=$1`) != 1 || f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1`) != 1 {
++		t.Fatal("publication duplicated persistence")
++	}
++}
++func TestClosedNATSPublicationLeavesOutboxRetryable(t *testing.T) {
++	f := newMessageFixture(t, 2)
++	u := os.Getenv("NATS_URL")
++	if u == "" {
++		u = "nats://127.0.0.1:4222"
++	}
++	nc, err := nats.Connect(u)
++	if err != nil {
++		t.Fatal(err)
++	}
++	nc.Close()
++	id, _ := uuid()
++	_, err = f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "retry"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	relaySessionBatch(context.Background(), f.db, nc)
++	if f.count(t, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1 AND published_at IS NULL`) != 1 {
++		t.Fatal("failed publisher marked outbox")
++	}
++}
+diff --git a/backend/go/core/sync.go b/backend/go/core/sync.go
+new file mode 100644
+index 0000000..128e072
+--- /dev/null
++++ b/backend/go/core/sync.go
+@@ -0,0 +1,82 @@
++package core
++
++import (
++	"net/http"
++	"strings"
++)
++
++type conversationRequest struct {
++	SyncVersion    string `json:"syncVersion"`
++	Type           string `json:"type"`
++	RequestID      string `json:"requestId"`
++	ConversationID string `json:"conversationId"`
++	AfterSeq       int64  `json:"afterSeq"`
++	Limit          int64  `json:"limit"`
++}
++
++// Only the existing canonical per-Conversation gap shape is served privately.
++// User Sync and client cursor/materialization are outside this task.
++func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request) {
++	var v conversationRequest
++	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
++		writeError(w, r, fail(400, "VALIDATION_FAILED", "Request body is invalid."))
++		return
++	}
++	token, err := bearer(r)
++	if err != nil {
++		writeError(w, r, fail(401, "AUTH_REQUIRED", "Authentication is required."))
++		return
++	}
++	c, err := s.codec.Parse(token)
++	if err != nil {
++		writeError(w, r, fail(401, "AUTH_SESSION_REVOKED", "Request rejected"))
++		return
++	}
++	ctx := r.Context()
++	tx, err := s.db.Begin(ctx)
++	if err != nil {
++		writeError(w, r, err)
++		return
++	}
++	defer tx.Rollback(ctx)
++	conversation := strings.ToLower(v.ConversationID)
++	if err = s.authorizeMessage(ctx, tx, c, conversation); err != nil {
++		writeError(w, r, err)
++		return
++	}
++	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, v.AfterSeq, v.Limit)
++	if err != nil {
++		writeError(w, r, err)
++		return
++	}
++	messages := make([]storedMessage, 0)
++	for rows.Next() {
++		m := storedMessage{ConversationID: conversation, Content: textContent{Kind: "TEXT"}}
++		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.RequestID, &m.Seq, &m.CreatedAt, &m.Content.Text); err != nil {
++			rows.Close()
++			writeError(w, r, err)
++			return
++		}
++		messages = append(messages, m)
++	}
++	err = rows.Err()
++	rows.Close()
++	if err != nil {
++		writeError(w, r, err)
++		return
++	}
++	after := v.AfterSeq
++	if len(messages) > 0 {
++		after = messages[len(messages)-1].Seq
++	}
++	var more bool
++	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT')`, conversation, after).Scan(&more); err != nil {
++		writeError(w, r, err)
++		return
++	}
++	if err = tx.Commit(ctx); err != nil {
++		writeError(w, r, err)
++		return
++	}
++	writeJSON(w, 200, map[string]any{"syncVersion": "1.0", "type": "sync.conversation.page", "requestId": v.RequestID, "conversationId": conversation, "messages": messages, "hasMore": more})
++}
+diff --git a/backend/go/core/sync_test.go b/backend/go/core/sync_test.go
+new file mode 100644
+index 0000000..4a5cb1c
+--- /dev/null
++++ b/backend/go/core/sync_test.go
+@@ -0,0 +1,51 @@
++package core
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"net/http/httptest"
++	"testing"
++)
++
++func TestAuthorizedHistoryGapPages(t *testing.T) {
++	f := newMessageFixture(t, 2)
++	for i := 0; i < 3; i++ {
++		id, _ := uuid()
++		if _, err := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "history")); err != nil {
++			t.Fatal(err)
++		}
++	}
++	request, _ := uuid()
++	v := conversationRequest{SyncVersion: "1.0", Type: "sync.conversation.request", RequestID: request, ConversationID: f.conversation, AfterSeq: 0, Limit: 2}
++	call := func() *httptest.ResponseRecorder {
++		b, _ := json.Marshal(v)
++		token, _ := f.s.codec.Sign(f.claims[1])
++		r := httptest.NewRequest("POST", "/__core/history", bytes.NewReader(b))
++		r.Header.Set("Authorization", "Bearer "+token)
++		w := httptest.NewRecorder()
++		f.s.conversationHistory(w, r)
++		return w
++	}
++	w := call()
++	var page struct {
++		Messages []storedMessage `json:"messages"`
++		HasMore  bool            `json:"hasMore"`
++	}
++	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 2 || page.Messages[0].Seq != 1 || page.Messages[1].Seq != 2 || !page.HasMore {
++		t.Fatal("first gap page failed")
++	}
++	v.AfterSeq = 2
++	w = call()
++	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 1 || page.Messages[0].Seq != 3 || page.HasMore {
++		t.Fatal("terminal gap page failed")
++	}
++	f.db.Exec(context.Background(), `UPDATE conversation_members SET left_at=now() WHERE conversation_id=$1 AND user_id=$2`, f.conversation, f.users[1])
++	if call().Code != 403 {
++		t.Fatal("history leaks to nonmember")
++	}
++	v.Limit = 0
++	if call().Code != 400 {
++		t.Fatal("invalid canonical limit accepted")
++	}
++}
+diff --git a/backend/go/gateway/gateway.go b/backend/go/gateway/gateway.go
+index 8e14ba0..9f19835 100644
+--- a/backend/go/gateway/gateway.go
++++ b/backend/go/gateway/gateway.go
+@@ -1,10 +1,13 @@
+ package gateway
+ 
+ import (
++	"bytes"
+ 	"context"
+ 	"encoding/json"
++	"io"
+ 	"net/http"
+ 	"regexp"
++	"strings"
+ 	"sync"
+ 	"time"
+ 
+@@ -16,14 +19,17 @@ type hub struct {
+ 	auth     *validator
+ 	mu       sync.Mutex
+ 	sessions map[string]map[*connection]bool
++	coreURL  string
++	client   *http.Client
+ }
+ type connection struct {
+-	ws    *websocket.Conn
+-	mu    sync.Mutex
+-	done  chan struct{}
+-	once  sync.Once
+-	bound *shared.Claims
+-	token string
++	ws      *websocket.Conn
++	mu      sync.Mutex
++	done    chan struct{}
++	once    sync.Once
++	bound   *shared.Claims
++	token   string
++	origins map[string]bool
+ }
+ type envelope struct {
+ 	ProtocolVersion string          `json:"protocolVersion"`
+@@ -37,7 +43,7 @@ var requestIDPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-
+ func validUUID(id string) bool { return requestIDPattern.MatchString(id) }
+ 
+ func newHub(auth *validator) *hub {
+-	return &hub{auth: auth, sessions: make(map[string]map[*connection]bool)}
++	return &hub{auth: auth, sessions: make(map[string]map[*connection]bool), client: &http.Client{Timeout: 10 * time.Second}}
+ }
+ func (c *connection) send(v any) error { c.mu.Lock(); defer c.mu.Unlock(); return c.ws.WriteJSON(v) }
+ func (c *connection) close() {
+@@ -166,7 +172,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
+ 			return
+ 		}
+ 		if e.Type == "message.send" {
+-			_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "AUTHORIZATION_DENIED", "message": "Request rejected"}}))
++			h.forward(r.Context(), c, e)
+ 			continue
+ 		}
+ 		return
+@@ -208,3 +214,112 @@ func writeError(w http.ResponseWriter, r *http.Request, err error) {
+ 	w.WriteHeader(e.Status)
+ 	_ = json.NewEncoder(w).Encode(map[string]any{"error": map[string]string{"code": e.Code, "message": e.Message}, "requestId": id})
+ }
++
++// Forward only the canonical frame, using the validated connection's bearer.
++// There are no membership or persistence decisions in Gateway.
++func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
++	var payload struct {
++		ConversationID string `json:"conversationId"`
++	}
++	_ = json.Unmarshal(e.Payload, &payload)
++	key := strings.ToLower(payload.ConversationID) + ":" + strings.ToLower(e.RequestID)
++	c.mu.Lock()
++	if c.origins == nil {
++		c.origins = make(map[string]bool)
++	}
++	c.origins[key] = true
++	c.mu.Unlock()
++	reject := func() {
++		_ = c.send(frame("message.ack", e.RequestID, map[string]any{"status": "rejected", "error": map[string]string{"code": "MESSAGE_COMMIT_FAILED", "message": "Request rejected"}}))
++	}
++	b, err := json.Marshal(e)
++	if err != nil {
++		reject()
++		return
++	}
++	req, err := http.NewRequestWithContext(ctx, "POST", strings.TrimRight(h.coreURL, "/")+"/__core/message", bytes.NewReader(b))
++	if err != nil {
++		reject()
++		return
++	}
++	req.Header.Set("Authorization", "Bearer "+c.token)
++	req.Header.Set("Content-Type", "application/json")
++	response, err := h.client.Do(req)
++	if err != nil {
++		reject()
++		return
++	}
++	defer response.Body.Close()
++	var ack envelope
++	if response.StatusCode != 200 || json.NewDecoder(io.LimitReader(response.Body, 65536)).Decode(&ack) != nil || ack.ProtocolVersion != "1.0" || ack.Type != "message.ack" || !strings.EqualFold(ack.RequestID, e.RequestID) {
++		reject()
++		return
++	}
++	var outcome struct {
++		Status string `json:"status"`
++	}
++	if json.Unmarshal(ack.Payload, &outcome) != nil {
++		reject()
++		return
++	}
++	if outcome.Status != "committed" {
++		c.mu.Lock()
++		delete(c.origins, key)
++		c.mu.Unlock()
++	}
++	_ = c.send(ack)
++}
++
++func (h *hub) fanout(user string, data []byte) {
++	if !validUUID(user) {
++		return
++	}
++	var e envelope
++	if json.Unmarshal(data, &e) != nil || e.ProtocolVersion != "1.0" || e.Type != "message.created" || !validUUID(e.RequestID) {
++		return
++	}
++	var p struct {
++		ConversationID string `json:"conversationId"`
++		MessageID      string `json:"messageId"`
++		SenderID       string `json:"senderId"`
++		Seq            int64  `json:"seq"`
++		CreatedAt      string `json:"createdAt"`
++		Content        struct {
++			Kind string `json:"kind"`
++			Text string `json:"text"`
++		} `json:"content"`
++	}
++	if json.Unmarshal(e.Payload, &p) != nil || !validUUID(p.ConversationID) || !validUUID(p.MessageID) || !validUUID(p.SenderID) || p.Seq < 1 || p.Content.Kind != "TEXT" {
++		return
++	}
++	if _, err := time.Parse(time.RFC3339Nano, p.CreatedAt); err != nil {
++		return
++	}
++	h.mu.Lock()
++	var conns []*connection
++	for _, slot := range h.sessions {
++		for c := range slot {
++			if c.bound != nil && c.bound.UserID == user {
++				conns = append(conns, c)
++			}
++		}
++	}
++	h.mu.Unlock()
++	key := strings.ToLower(p.ConversationID) + ":" + strings.ToLower(e.RequestID)
++	for _, c := range conns {
++		select {
++		case <-c.done:
++			continue
++		default:
++		}
++		if h.auth.now().Unix() >= c.bound.ExpiresAt {
++			continue
++		}
++		c.mu.Lock()
++		origin := p.SenderID == user && c.origins[key]
++		c.mu.Unlock()
++		if !origin {
++			_ = c.send(e)
++		}
++	}
++}
+diff --git a/backend/go/gateway/http.go b/backend/go/gateway/http.go
+index 8eeabaa..1239cdd 100644
+--- a/backend/go/gateway/http.go
++++ b/backend/go/gateway/http.go
+@@ -16,6 +16,7 @@ import (
+ 
+ func NewHandler(db *pgxpool.Pool, key []byte, nc *nats.Conn, coreURL string) (http.Handler, error) {
+ 	h := newHub(&validator{db: db, codec: &shared.Codec{Key: key, Now: time.Now}, now: time.Now})
++	h.coreURL = coreURL
+ 	if nc != nil {
+ 		if _, err := nc.Subscribe("session.revoked", func(m *nats.Msg) {
+ 			var v struct {
+@@ -28,6 +29,9 @@ func NewHandler(db *pgxpool.Pool, key []byte, nc *nats.Conn, coreURL string) (ht
+ 		}); err != nil {
+ 			return nil, err
+ 		}
++		if _, err := nc.Subscribe("message.created.*", func(m *nats.Msg) { h.fanout(strings.TrimPrefix(m.Subject, "message.created."), m.Data) }); err != nil {
++			return nil, err
++		}
+ 		if err := nc.Flush(); err != nil {
+ 			return nil, err
+ 		}
+diff --git a/backend/go/gateway/message_test.go b/backend/go/gateway/message_test.go
+new file mode 100644
+index 0000000..e37d2ed
+--- /dev/null
++++ b/backend/go/gateway/message_test.go
+@@ -0,0 +1,109 @@
++package gateway
++
++import (
++	"encoding/json"
++	"github.com/gorilla/websocket"
++	"im-platform/backend/go/shared"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++	"time"
++)
++
++func TestPrivateForwardUsesBoundBearerAndCanonicalFrame(t *testing.T) {
++	id := "40000000-0000-4000-8000-000000000001"
++	conv := "30000000-0000-4000-8000-000000000001"
++	received := make(chan bool, 1)
++	core := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		var e envelope
++		json.NewDecoder(r.Body).Decode(&e)
++		received <- r.URL.Path == "/__core/message" && r.Header.Get("Authorization") == "Bearer fixture-not-a-credential" && e.Type == "message.send" && e.RequestID == id
++		json.NewEncoder(w).Encode(frame("message.ack", id, map[string]any{"status": "committed", "conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "seq": 1, "createdAt": "2026-09-28T00:00:01Z"}))
++	}))
++	defer core.Close()
++	h := newHub(&validator{now: time.Now})
++	h.coreURL = core.URL
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		ws, e := (&websocket.Upgrader{}).Upgrade(w, r, nil)
++		if e != nil {
++			return
++		}
++		defer ws.Close()
++		c := &connection{ws: ws, done: make(chan struct{}), token: "fixture-not-a-credential"}
++		h.forward(r.Context(), c, envelope{ProtocolVersion: "1.0", Type: "message.send", RequestID: id, Payload: json.RawMessage(`{"conversationId":"` + conv + `","content":{"kind":"TEXT","text":"hello"}}`)})
++	}))
++	defer server.Close()
++	ws, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http"), nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer ws.Close()
++	var ack envelope
++	if ws.ReadJSON(&ack) != nil || ack.Type != "message.ack" {
++		t.Fatal("ACK not forwarded")
++	}
++	if !<-received {
++		t.Fatal("transport changed identity/frame")
++	}
++}
++func TestLocalFanoutSelectsUserAndSuppressesOriginOnly(t *testing.T) {
++	user := "10000000-0000-4000-8000-000000000001"
++	other := "10000000-0000-4000-8000-000000000002"
++	request := "40000000-0000-4000-8000-000000000001"
++	conv := "30000000-0000-4000-8000-000000000001"
++	h := newHub(&validator{now: time.Now})
++	connections := make(chan *connection, 3)
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		ws, e := (&websocket.Upgrader{}).Upgrade(w, r, nil)
++		if e != nil {
++			return
++		}
++		c := &connection{ws: ws, done: make(chan struct{}), bound: &shared.Claims{UserID: user, SessionID: r.URL.Path, ExpiresAt: time.Now().Add(time.Hour).Unix()}}
++		if r.URL.Path == "/other" {
++			c.bound.UserID = other
++		}
++		if r.URL.Path == "/origin" {
++			c.origins = map[string]bool{conv + ":" + request: true}
++		}
++		h.add(c.bound.SessionID, c)
++		connections <- c
++		<-c.done
++	}))
++	defer server.Close()
++	var clients []*websocket.Conn
++	var conns []*connection
++	for _, path := range []string{"/origin", "/another", "/other"} {
++		ws, _, e := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+path, nil)
++		if e != nil {
++			t.Fatal(e)
++		}
++		clients = append(clients, ws)
++		conns = append(conns, <-connections)
++	}
++	defer func() {
++		for _, c := range conns {
++			c.close()
++		}
++		for _, c := range clients {
++			c.Close()
++		}
++	}()
++	b, _ := json.Marshal(frame("message.created", request, map[string]any{"conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "senderId": user, "seq": 1, "createdAt": "2026-09-28T00:00:01Z", "content": map[string]string{"kind": "TEXT", "text": "hello"}}))
++	h.fanout(user, b)
++	h.fanout(user, b)
++	for i := 0; i < 2; i++ {
++		clients[1].SetReadDeadline(time.Now().Add(time.Second))
++		var e envelope
++		if clients[1].ReadJSON(&e) != nil || e.Type != "message.created" {
++			t.Fatal("sender other session missing/repeated event")
++		}
++	}
++	for _, i := range []int{0, 2} {
++		clients[i].SetReadDeadline(time.Now().Add(80 * time.Millisecond))
++		var e envelope
++		if clients[i].ReadJSON(&e) == nil {
++			t.Fatal("origin/unauthorized local user received event")
++		}
++	}
++}
+diff --git a/backend/go/tests/auth_test.go b/backend/go/tests/auth_test.go
+index 9a6f1ab..8d955a1 100644
+--- a/backend/go/tests/auth_test.go
++++ b/backend/go/tests/auth_test.go
+@@ -17,6 +17,7 @@ import (
+ 	"github.com/jackc/pgx/v5/pgxpool"
+ 	"github.com/nats-io/nats.go"
+ 	"im-platform/backend/go/core"
++	"im-platform/backend/go/gateway"
+ 	"im-platform/backend/go/shared"
+ )
+ 
+@@ -78,7 +79,12 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
+ 		t.Fatal(err)
+ 	}
+ 	s := newService(db, []byte("test-only-signing-key-at-least-32-bytes"))
+-	h := newGateway(t, s.db, s.codec.Key)
++	coreServer := httptest.NewServer(s.handler)
++	defer coreServer.Close()
++	h, err := gateway.NewHandler(s.db, s.codec.Key, testNATS(t), coreServer.URL)
++	if err != nil {
++		t.Fatal(err)
++	}
+ 	natsURL := os.Getenv("NATS_URL")
+ 	if natsURL == "" {
+ 		natsURL = "nats://127.0.0.1:4222"
+@@ -190,7 +196,7 @@ func TestPostgresAuthSessionAndWSS(t *testing.T) {
+ 	if err != nil {
+ 		t.Fatalf("bound operation blocked by PostgreSQL: %v", err)
+ 	}
+-	if operation["type"] != "message.ack" || operation["payload"].(map[string]any)["error"].(map[string]any)["code"] != "AUTHORIZATION_DENIED" {
++	if operation["type"] != "message.ack" || operation["payload"].(map[string]any)["error"].(map[string]any)["code"] != "VALIDATION_FAILED" {
+ 		t.Fatalf("bound operation response: %v", operation)
+ 	}
+ 	_ = conn.SetReadDeadline(time.Time{})
+diff --git a/backend/go/tests/message_test.go b/backend/go/tests/message_test.go
+new file mode 100644
+index 0000000..3cdbbef
+--- /dev/null
++++ b/backend/go/tests/message_test.go
+@@ -0,0 +1,415 @@
++package tests
++
++import (
++	"context"
++	"encoding/json"
++	"fmt"
++	"github.com/gorilla/websocket"
++	"github.com/jackc/pgx/v5/pgxpool"
++	"github.com/nats-io/nats.go"
++	"im-platform/backend/go/core"
++	"im-platform/backend/go/gateway"
++	"im-platform/backend/go/shared"
++	"net/http/httptest"
++	"os"
++	"reflect"
++	"strings"
++	"testing"
++	"time"
++)
++
++type messagingHarness struct {
++	db                                *pgxpool.Pool
++	service                           *testService
++	nc                                *nats.Conn
++	users                             []string
++	conversations                     []string
++	tokens                            []string
++	sender, receiver, other, outsider *websocket.Conn
++	normal                            *messageNormalizer
++}
++type messageNormalizer struct {
++	ids   map[string]string
++	times map[string]string
++}
++
++func (n *messageNormalizer) check(t *testing.T, want, got any) {
++	t.Helper()
++	switch expected := want.(type) {
++	case map[string]any:
++		actual, ok := got.(map[string]any)
++		if !ok || len(actual) != len(expected) {
++			t.Fatalf("canonical object shape differs: expected keys %v, actual keys %v", reflect.ValueOf(expected).MapKeys(), reflect.ValueOf(got))
++		}
++		for k, v := range expected {
++			n.check(t, v, actual[k])
++		}
++	case []any:
++		actual, ok := got.([]any)
++		if !ok || len(actual) != len(expected) {
++			t.Fatal("canonical array differs")
++		}
++		for i, v := range expected {
++			n.check(t, v, actual[i])
++		}
++	case string:
++		actual, ok := got.(string)
++		if !ok {
++			t.Fatal("canonical string type differs")
++		}
++		if validUUID(expected) {
++			if !validUUID(actual) {
++				t.Fatal("invalid runtime UUID")
++			}
++			if prior, exists := n.ids[expected]; exists && prior != actual {
++				t.Fatal("canonical identity changed")
++			}
++			n.ids[expected] = actual
++		} else if _, err := time.Parse(time.RFC3339Nano, expected); err == nil {
++			if _, err = time.Parse(time.RFC3339Nano, actual); err != nil {
++				t.Fatal("invalid runtime time")
++			}
++			if prior, exists := n.times[expected]; exists && prior != actual {
++				t.Fatal("committed timestamp changed")
++			}
++			n.times[expected] = actual
++		} else if expected != actual {
++			t.Fatalf("canonical scalar differs %q vs %q", expected, actual)
++		}
++	default:
++		if !reflect.DeepEqual(want, got) {
++			t.Fatalf("canonical value differs %v vs %v", want, got)
++		}
++	}
++}
++func newMessagingHarness(t *testing.T) *messagingHarness {
++	t.Helper()
++	if os.Getenv("DB_TEST_ENABLE") != "1" {
++		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL/NATS")
++	}
++	db, err := pgxpool.New(context.Background(), "")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err = db.Ping(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(db.Close)
++	h := &messagingHarness{db: db, service: newService(db, []byte("test-only-signing-key-at-least-32-bytes")), nc: testNATS(t), normal: &messageNormalizer{ids: map[string]string{}, times: map[string]string{}}}
++	for i := 0; i < 3; i++ {
++		id, _ := shared.UUID()
++		username := "msg" + strings.ReplaceAll(id, "-", "")
++		r := call(t, h.service.handler, "POST", "/v1/auth/register", map[string]any{"username": username, "password": "fixture-password-not-a-real-secret", "displayName": "Message Fixture"}, "", nil)
++		expect(t, r, 201)
++		h.users = append(h.users, readResult(t, r)["user"].(map[string]any)["userId"].(string))
++		login := call(t, h.service.handler, "POST", "/v1/auth/login", map[string]any{"username": username, "password": "fixture-password-not-a-real-secret", "clientType": "WEB", "deviceId": "msg-web", "clientVersion": "1.0.0", "protocolVersion": "1"}, "", nil)
++		expect(t, login, 200)
++		h.tokens = append(h.tokens, getToken(t, login))
++		if i == 0 {
++			desktop := call(t, h.service.handler, "POST", "/v1/auth/login", map[string]any{"username": username, "password": "fixture-password-not-a-real-secret", "clientType": "DESKTOP", "deviceId": "msg-desktop", "clientVersion": "1.0.0", "protocolVersion": "1"}, "", nil)
++			expect(t, desktop, 200)
++			h.tokens = append(h.tokens, getToken(t, desktop))
++		}
++	}
++	// tokens: A WEB, A DESKTOP, B WEB, C WEB.
++	friend := call(t, h.service.handler, "PUT", "/v1/friends/"+h.users[1], nil, h.tokens[0], nil)
++	expect(t, friend, 201)
++	conversation := readResult(t, friend)["directConversationId"].(string)
++	h.conversations = append(h.conversations, conversation)
++	h.normal.ids["30000000-0000-4000-8000-000000000001"] = conversation
++	h.normal.ids["10000000-0000-4000-8000-000000000001"] = h.users[0]
++	coreServer := httptest.NewServer(h.service.handler)
++	t.Cleanup(coreServer.Close)
++	handler, err := gateway.NewHandler(db, h.service.codec.Key, h.nc, coreServer.URL)
++	if err != nil {
++		t.Fatal(err)
++	}
++	server := httptest.NewServer(handler)
++	t.Cleanup(server.Close)
++	bind := func(token string) *websocket.Conn {
++		c := openFixtureSocket(t, "ws"+strings.TrimPrefix(server.URL, "http")+"/v1/ws")
++		t.Cleanup(func() { c.Close() })
++		id, _ := shared.UUID()
++		if c.WriteJSON(frame("auth.bind", id, map[string]string{"accessToken": token})) != nil {
++			t.Fatal("bind write")
++		}
++		v := readMessageFrame(t, c)
++		if v["payload"].(map[string]any)["status"] != "bound" {
++			t.Fatal("bind rejected")
++		}
++		return c
++	}
++	h.sender = bind(h.tokens[0])
++	h.other = bind(h.tokens[1])
++	h.receiver = bind(h.tokens[2])
++	h.outsider = bind(h.tokens[3])
++	t.Cleanup(func() {
++		ctx := context.Background()
++		for _, conv := range h.conversations {
++			db.Exec(ctx, `DELETE FROM outbox_events WHERE conversation_id=$1`, conv)
++			db.Exec(ctx, `DELETE FROM messages WHERE conversation_id=$1`, conv)
++			db.Exec(ctx, `DELETE FROM friendships WHERE direct_conversation_id=$1`, conv)
++			db.Exec(ctx, `DELETE FROM conversation_members WHERE conversation_id=$1`, conv)
++			db.Exec(ctx, `DELETE FROM conversations WHERE conversation_id=$1`, conv)
++		}
++		for _, user := range h.users {
++			db.Exec(ctx, `DELETE FROM outbox_events WHERE aggregate_id=$1 OR aggregate_id IN (SELECT session_id FROM sessions WHERE user_id=$1)`, user)
++			db.Exec(ctx, `DELETE FROM user_sync_events WHERE user_id=$1`, user)
++			db.Exec(ctx, `DELETE FROM sessions WHERE user_id=$1`, user)
++			db.Exec(ctx, `DELETE FROM users WHERE user_id=$1`, user)
++		}
++	})
++	return h
++}
++func readMessageFrame(t *testing.T, c *websocket.Conn) map[string]any {
++	t.Helper()
++	c.SetReadDeadline(time.Now().Add(5 * time.Second))
++	var v map[string]any
++	if err := c.ReadJSON(&v); err != nil {
++		t.Fatal(err)
++	}
++	return v
++}
++func cloneFrame(v map[string]any) map[string]any {
++	b, _ := json.Marshal(v)
++	var result map[string]any
++	json.Unmarshal(b, &result)
++	return result
++}
++func (h *messagingHarness) input(v map[string]any) map[string]any {
++	out := cloneFrame(v)
++	p := out["payload"].(map[string]any)
++	if id, ok := p["conversationId"].(string); ok {
++		if actual, exists := h.normal.ids[id]; exists {
++			p["conversationId"] = actual
++		}
++	}
++	return out
++}
++func (h *messagingHarness) send(t *testing.T, v map[string]any, c *websocket.Conn) map[string]any {
++	t.Helper()
++	if err := c.WriteJSON(h.input(v)); err != nil {
++		t.Fatal(err)
++	}
++	return readMessageFrame(t, c)
++}
++func (h *messagingHarness) rows(t *testing.T, conversation string) (messages, outbox, next int) {
++	t.Helper()
++	ctx := context.Background()
++	if err := h.db.QueryRow(ctx, `SELECT count(*) FROM messages WHERE conversation_id=$1`, conversation).Scan(&messages); err != nil {
++		t.Fatal(err)
++	}
++	if err := h.db.QueryRow(ctx, `SELECT count(*) FROM outbox_events WHERE conversation_id=$1 AND event_type='message.created'`, conversation).Scan(&outbox); err != nil {
++		t.Fatal(err)
++	}
++	if err := h.db.QueryRow(ctx, `SELECT next_seq FROM conversations WHERE conversation_id=$1`, conversation).Scan(&next); err != nil {
++		t.Fatal(err)
++	}
++	return
++}
++func (h *messagingHarness) relay(t *testing.T) {
++	t.Helper()
++	ctx, cancel := context.WithCancel(context.Background())
++	done := make(chan struct{})
++	go func() { defer close(done); core.RelaySessionRevocations(ctx, h.db, h.nc) }()
++	t.Cleanup(func() { cancel(); <-done })
++}
++func (h *messagingHarness) group(t *testing.T, count int) string {
++	t.Helper()
++	ctx := context.Background()
++	conv, _ := shared.UUID()
++	request, _ := shared.UUID()
++	if _, err := h.db.Exec(ctx, `INSERT INTO conversations(conversation_id,kind,created_by,group_create_request_id) VALUES($1,'GROUP',$2,$3)`, conv, h.users[0], request); err != nil {
++		t.Fatal(err)
++	}
++	h.conversations = append(h.conversations, conv)
++	for i := 0; i < count; i++ {
++		var user string
++		if i < 2 {
++			user = h.users[i]
++		} else {
++			user, _ = shared.UUID()
++			if _, err := h.db.Exec(ctx, `INSERT INTO users(user_id,username,display_name,password_hash) VALUES($1::uuid,$1::text,'Group fixture','test-only')`, user); err != nil {
++				t.Fatal(err)
++			}
++			h.users = append(h.users, user)
++		}
++		if _, err := h.db.Exec(ctx, `INSERT INTO conversation_members(conversation_id,user_id,role) VALUES($1,$2,'MEMBER')`, conv, user); err != nil {
++			t.Fatal(err)
++		}
++	}
++	return conv
++}
++func TestCanonicalLiveMessageSendFixtures(t *testing.T) {
++	all := readFixture(t, "../../../contracts/fixtures/websocket/golden.json")
++	for _, id := range []string{"durable-send-and-created", "idempotent-retry", "same-request-different-conversation", "group-single-message", "non-member-send", "conflicting-retry", "rollback-before-ack"} {
++		t.Run(id, func(t *testing.T) {
++			h := newMessagingHarness(t)
++			scenario := fixture(t, all, id)
++			if id == "same-request-different-conversation" {
++				h.normal.ids["30000000-0000-4000-8000-000000000002"] = h.group(t, 2)
++			}
++			if id == "group-single-message" {
++				h.normal.ids["30000000-0000-4000-8000-000000000001"] = h.group(t, 500)
++			}
++			if id == "rollback-before-ack" {
++				conv := h.conversations[0]
++				name := "fixtureprobe" + fmt.Sprint(time.Now().UnixNano())
++				q := fmt.Sprintf(`CREATE FUNCTION %s() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.conversation_id='%s'::uuid THEN RAISE EXCEPTION 'injected rollback'; END IF; RETURN NEW; END $$; CREATE TRIGGER %s BEFORE INSERT ON outbox_events FOR EACH ROW EXECUTE FUNCTION %s()`, name, conv, name, name)
++				if _, err := h.db.Exec(context.Background(), q); err != nil {
++					t.Fatal(err)
++				}
++				t.Cleanup(func() {
++					h.db.Exec(context.Background(), fmt.Sprintf(`DROP TRIGGER IF EXISTS %s ON outbox_events;DROP FUNCTION IF EXISTS %s()`, name, name))
++				})
++			}
++			socket := h.sender
++			if id == "non-member-send" {
++				socket = h.outsider
++			}
++			for _, step := range scenario.Steps {
++				ack := h.send(t, step.In, socket)
++				h.normal.check(t, step.Out[0], ack)
++				if id == "durable-send-and-created" {
++					m, o, n := h.rows(t, h.conversations[0])
++					if m != 1 || o != 1 || n != 2 {
++						t.Fatal("ACK before durable rows")
++					}
++					h.relay(t)
++					h.normal.check(t, step.Out[1], readMessageFrame(t, h.receiver))
++					h.normal.check(t, step.Out[1], readMessageFrame(t, h.other))
++					for _, c := range []*websocket.Conn{h.sender, h.outsider} {
++						ping, _ := shared.UUID()
++						c.WriteJSON(frame("ping", ping, map[string]any{}))
++						if readMessageFrame(t, c)["type"] != "pong" {
++							t.Fatal("origin/wrong Conversation event")
++						}
++					}
++				}
++			}
++			for _, conv := range h.conversations {
++				m, o, _ := h.rows(t, conv)
++				want := 1
++				if id == "group-single-message" && conv == h.conversations[0] {
++					want = 0
++				}
++				if id == "non-member-send" || id == "rollback-before-ack" {
++					want = 0
++				}
++				if m != want || o != want {
++					t.Fatalf("fixture %s logical effects %d/%d want %d", id, m, o, want)
++				}
++			}
++		})
++	}
++}
++func TestCanonicalDuplicateOutOfOrderAndSyncRecovery(t *testing.T) {
++	all := readFixture(t, "../../../contracts/fixtures/websocket/golden.json")
++	for _, id := range []string{"duplicate-fanout", "out-of-order-fanout", "wrong-conversation-fanout"} {
++		t.Run(id, func(t *testing.T) {
++			h := newMessagingHarness(t)
++			scenario := fixture(t, all, id)
++			if scenario.ID != id {
++				t.Fatal("canonical scenario unavailable")
++			}
++			if id == "wrong-conversation-fanout" {
++				conv := h.group(t, 2)
++				h.normal.ids["30000000-0000-4000-8000-000000000002"] = conv
++				if _, err := h.db.Exec(context.Background(), `DELETE FROM conversation_members WHERE conversation_id=$1 AND user_id=$2`, conv, h.users[1]); err != nil {
++					t.Fatal(err)
++				}
++				if _, err := h.db.Exec(context.Background(), `INSERT INTO conversation_members(conversation_id,user_id,role) VALUES($1,$2,'MEMBER')`, conv, h.users[2]); err != nil {
++					t.Fatal(err)
++				}
++				input := cloneFrame(fixture(t, all, "durable-send-and-created").Steps[0].In)
++				input["requestId"] = scenario.Steps[0].In["requestId"]
++				input["payload"].(map[string]any)["conversationId"] = conv
++				h.send(t, input, h.sender)
++				h.relay(t)
++				h.normal.check(t, scenario.Steps[0].In, readMessageFrame(t, h.outsider))
++				h.normal.check(t, scenario.Steps[0].In, readMessageFrame(t, h.other))
++				ping, _ := shared.UUID()
++				h.receiver.WriteJSON(frame("ping", ping, map[string]any{}))
++				if readMessageFrame(t, h.receiver)["type"] != "pong" {
++					t.Fatal("wrong Conversation delivered to nonmember")
++				}
++				m, o, _ := h.rows(t, conv)
++				if m != 1 || o != 1 {
++					t.Fatal("wrong Conversation fixture persistence")
++				}
++				return
++			}
++			send := fixture(t, all, "durable-send-and-created").Steps[0].In
++			first := h.send(t, send, h.sender)
++			h.normal.check(t, fixture(t, all, "durable-send-and-created").Steps[0].Out[0], first)
++			var payload []byte
++			if err := h.db.QueryRow(context.Background(), `SELECT payload FROM outbox_events WHERE conversation_id=$1 AND event_type='message.created'`, h.conversations[0]).Scan(&payload); err != nil {
++				t.Fatal(err)
++			}
++			events := [][]byte{payload}
++			if id == "out-of-order-fanout" {
++				second := cloneFrame(send)
++				second["requestId"] = "40000000-0000-4000-8000-000000000002"
++				second["payload"].(map[string]any)["content"] = scenario.Steps[0].In["payload"].(map[string]any)["content"]
++				h.send(t, second, h.sender)
++				var b []byte
++				if err := h.db.QueryRow(context.Background(), `SELECT payload FROM outbox_events WHERE conversation_id=$1 AND event_type='message.created' ORDER BY created_at DESC LIMIT 1`, h.conversations[0]).Scan(&b); err != nil {
++					t.Fatal(err)
++				}
++				events = [][]byte{b, payload}
++			}
++			if id == "duplicate-fanout" {
++				events = [][]byte{payload, payload}
++			}
++			materialized := map[string]bool{}
++			sequences := map[int]bool{}
++			expectedFrames := []map[string]any{}
++			for _, step := range scenario.Steps {
++				expectedFrames = append(expectedFrames, step.Out...)
++			}
++			for eventIndex, data := range events {
++				h.nc.Publish("message.created."+h.users[1], data)
++				h.nc.Flush()
++				actual := readMessageFrame(t, h.receiver)
++				h.normal.check(t, expectedFrames[eventIndex], actual)
++				p := actual["payload"].(map[string]any)
++				materialized[p["conversationId"].(string)+":"+actual["requestId"].(string)] = true
++				sequences[int(p["seq"].(float64))] = true
++			}
++			want := 1
++			if id == "out-of-order-fanout" {
++				want = 2
++			}
++			if len(materialized) != want {
++				t.Fatal("duplicate logical materialization")
++			}
++			// A committed next Message is deliberately never published; canonical
++			// ConversationRequest/Page fills that real delivery gap without NATS.
++			missed := cloneFrame(send)
++			request, _ := shared.UUID()
++			missed["requestId"] = request
++			missed["payload"].(map[string]any)["content"].(map[string]any)["text"] = "missed"
++			h.send(t, missed, h.sender)
++			historyReq, _ := shared.UUID()
++			w := call(t, h.service.handler, "POST", "/__core/history", map[string]any{"syncVersion": "1.0", "type": "sync.conversation.request", "requestId": historyReq, "conversationId": h.conversations[0], "afterSeq": 0, "limit": 10}, h.tokens[2], nil)
++			expect(t, w, 200)
++			page := readResult(t, w)
++			if page["syncVersion"] != "1.0" || page["type"] != "sync.conversation.page" || page["conversationId"] != h.conversations[0] || page["requestId"] != historyReq || page["hasMore"] != false {
++				t.Fatal("canonical history envelope")
++			}
++			messages := page["messages"].([]any)
++			for i, v := range messages {
++				m := v.(map[string]any)
++				if len(m) != 7 || int(m["seq"].(float64)) != i+1 {
++					t.Fatal("history shape/order gap")
++				}
++				materialized[m["conversationId"].(string)+":"+m["requestId"].(string)] = true
++			}
++			if len(messages) != want+1 || len(materialized) != want+1 {
++				t.Fatal("Sync failed to close missed gap")
++			}
++			denied := call(t, h.service.handler, "POST", "/__core/history", map[string]any{"syncVersion": "1.0", "type": "sync.conversation.request", "requestId": historyReq, "conversationId": h.conversations[0], "afterSeq": 0, "limit": 10}, h.tokens[3], nil)
++			expect(t, denied, 403)
++		})
++	}
++}

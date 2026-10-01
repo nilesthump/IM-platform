@@ -1,0 +1,5 @@
+# Social actual-main merge recovery point
+
+2026-10-01. Actual main b442acd26777c481620a6bd917863cebfaf79b35; PR3 merged from final headfbf8759 on explicit Human authorization. Independent product27862b95 PASS and exact final-head PRCI36811766142 SUCCESS; actual-main pushCI36813501417 SUCCESS,12 selected successes/deploy inactive. Product/contracts/checkers/workflow/frozen body unchanged from accepted product. Evidence2026-10-01-human-authorized-merge.md under LOOP1-GO-SOCIAL-001.
+
+Canonical Frozen v1.1 SHA25683d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e; database0001 unchanged. HTTP1.0.0, AUF fixture1.1, WSS/Sync1.0 unchanged. No new migration/image/release claim. Social done; S1 OPEN. Only friend403 deferred under approved ADR-0004, no messaging authorization exemption. Original stale Contract checkout/five prior untracked paths untouched. Next: resolve exact MSG inputs/path binding, then dependency-driven activation or smallest documented architecture blocker. No new product files yet.

@@ -1,0 +1,63 @@
+你将接续 IM-platform 的 S1 工作。请先按 AGENTS.md 的强制启动顺序恢复状态，再继续执行。用户要求：以后执行 handoff 前，必须先同步 H:/IM-platform，再生成交接文档并停止。
+
+实际工作目录：\
+H:/.codex/worktrees/social-merge-continue/IM-platform
+
+当前分支：\
+task/LOOP1-GO-MSG-001
+
+当前提交：\
+33b1522c7f315b7aeb25fc31c05756c2bc950a9c
+
+先读取：\
+spec/handoff/agent-context.md\
+spec/progress/current.md\
+精确 Current Task 对应的 Task Spec\
+Task 引用的架构、契约、领域、约束及验收资料\
+然后检查 git status、diff、近期提交，并运行最小基线验证。
+
+当前工作树有两份 Coordinator 所有的未提交交接备注：\
+spec/progress/current.md\
+spec/tasks/done/LOOP1-GO-MSG-001.md\
+先检查内容并妥善纳入恢复记录，不要丢弃或覆盖。
+
+已完成事项：\
+PR3 已合并：https://github.com/nilesthump/IM-platform/pull/3\
+实际 main 提交为 b442acd26777c481620a6bd917863cebfaf79b35，合并后 CI36813501417 成功。
+
+LOOP1-GO-MSG-001 唯一位于 done。产品候选 183be639640cf652dc7a9f18152071c617f2ceac 已通过 fresh 独立审查及 CI36819292528、36819288126。原审查 FAIL 和修复证据必须保留。
+
+PR4 仍未合并：\
+https://github.com/nilesthump/IM-platform/pull/4\
+本 prompt 不授权自动合并 PR4。
+
+最新行政审查：\
+候选 33b1522 的本地检查 PASS，完整线上验收仍 PENDING。PR36820491515 整体显示 SUCCESS，但 classify 作业110234807646的直接 API 当时仍返回 in_progress/conclusion:null。其他必需作业及 push36820486384 成功。\
+先重新核实直接 API、精确提交与实际作业结论，不能仅凭整体绿灯认定完整 PASS。
+
+行政审查报告及完整证据：\
+H:/.codex/worktrees/msg-closure-review-20261001/evidence/2026-10-01-independent-administrative-review-report.md
+
+这些外部证据尚未导入仓库。按 Task 允许路径归档，保持原始字节和 Recorder 完整性。该审查 Recorder 已完成92事件，结果 FAIL 表示线上验收未完成，结构验证 PASS；不得改写成 PASS。
+
+S1 Gate 仍 OPEN。LOOP1-E2E-001 仍在 backlog，未激活。真实 TLS E2E 测试需要复用 Go Compose、PostgreSQL16、NATS2.10、migration0001 和 Caddy，验证证书及 hostname，不能关闭 TLS 验证。
+
+E2E 尚有范围授权问题：\
+现有 allowed_paths 不包含必要的 CI 接线。最小额外路径是：\
+.github/workflows/ci.yml\
+ci/classify.py\
+tests/ci/test_classify.py
+
+需要明确添加 E2E 调用及路径分类。此前的授权问题未获用户答复，不得视为批准。授权前不要扩展范围、激活 E2E 或声明 S1 PASS。
+
+执行时遵守单写者规则。实现、修复和独立审查使用 fresh agent；不得自审验收。真实 CI 是独立验收裁判。冻结架构、公共契约、ACK、安全边界和数据库契约不得擅改。保留历史 FAIL、partial Recorder 和未知所有权文件。
+
+执行 handoff 前，必须同步 H:/IM-platform：
+
+1. 先核实原目录的分支、提交、已跟踪修改和未跟踪文件所有权，并更新远端引用。
+2. 将本轮已完成且已提交的工作及恢复资料同步到 H:/IM-platform，使下一位 agent 可直接从该目录恢复。明确记录同步后的分支和提交。
+3. 保留原目录所有未知或其他 agent 的未提交文件；不得使用 reset --hard、clean、强制覆盖或删除来完成同步。
+4. 如同步遇到冲突，先完成可安全执行的部分，明确记录未同步内容及原因；需要破坏性处理时取得用户授权，不得谎称同步完成。
+5. 验证 H:/IM-platform 的实际状态、Task 队列和 current.md 一致，再生成 handoff。不要只更新隔离工作树就结束交接。
+
+最后更新 Task Spec、current.md、必要证据与检查点，记录验证结果、准确下一步、最后已知良好提交和未提交变更所有权。将完整 handoff 保存到系统临时目录，返回纯文本接续 prompt，并停止，不再启动下一项任务。

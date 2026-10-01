@@ -1,0 +1,119 @@
+{
+  "owner": "R-MSG-FIX-20261001",
+  "phase": "checks",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55634",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_fix_test",
+    "NATS_URL": "nats://127.0.0.1:42634"
+  },
+  "containers": [
+    "loop1-msg-fix-pg-20261001",
+    "loop1-msg-fix-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.86,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.64,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "contracts/websocket/verify.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.156,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.547,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.125,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.563,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-frozen-architecture.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.422,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.797,
+      "go_runtime_skips": 0
+    }
+  ]
+}

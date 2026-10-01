@@ -1,0 +1,232 @@
+[
+    {
+        "Id": "a63daed284bb5161581f752057120f1d51fb9441317da836a952eaa58af913c8",
+        "Created": "2026-10-01T07:45:48.605559277Z",
+        "Path": "docker-entrypoint.sh",
+        "Args": [
+            "nats-server",
+            "--config",
+            "/etc/nats/nats-server.conf"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 17617,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-10-01T07:45:48.695146403Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:b83efabe3e7def1e0a4a31ec6e078999bb17c80363f881df35edc70fcb6bb927",
+        "ResolvConfPath": "/var/lib/docker/containers/a63daed284bb5161581f752057120f1d51fb9441317da836a952eaa58af913c8/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/a63daed284bb5161581f752057120f1d51fb9441317da836a952eaa58af913c8/hostname",
+        "HostsPath": "/var/lib/docker/containers/a63daed284bb5161581f752057120f1d51fb9441317da836a952eaa58af913c8/hosts",
+        "LogPath": "/var/lib/docker/containers/a63daed284bb5161581f752057120f1d51fb9441317da836a952eaa58af913c8/a63daed284bb5161581f752057120f1d51fb9441317da836a952eaa58af913c8-json.log",
+        "Name": "/loop1-e2e-review-nats-6346",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "bridge",
+            "PortBindings": {
+                "4222/tcp": [
+                    {
+                        "HostIp": "127.0.0.1",
+                        "HostPort": "42661"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "a63daed284bb",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "4222/tcp": {},
+                "6222/tcp": {},
+                "8222/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NATS_SERVER=2.10.29"
+            ],
+            "Cmd": [
+                "nats-server",
+                "--config",
+                "/etc/nats/nats-server.conf"
+            ],
+            "Image": "nats:2.10-alpine",
+            "Volumes": null,
+            "WorkingDir": "/",
+            "Entrypoint": [
+                "docker-entrypoint.sh"
+            ],
+            "Labels": {
+                "im.owner": "R-E2E-REVIEW-6346",
+                "im.task": "LOOP1-E2E-001"
+            },
+            "StopTimeout": 1
+        },
+        "NetworkSettings": {
+            "SandboxID": "500190368ffdc9d38d86cdd0aabc61f626a0b34d6f948faafe8ba0abc4401b2a",
+            "SandboxKey": "/var/run/docker/netns/500190368ffd",
+            "Ports": {
+                "4222/tcp": [
+                    {
+                        "HostIp": "127.0.0.1",
+                        "HostPort": "42661"
+                    }
+                ]
+            },
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "e618717202dd3f35526550a45e5f0af25c49ab65f6fdb8a54cb35a234388e897",
+                    "EndpointID": "6e430904c53a6dbfcb6b05d869305c59c229986f438b9f90def213b230378a6a",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.3",
+                    "MacAddress": "5e:3c:9e:a8:9f:8b",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:7e2f895a12d5bc4586191452f5dd20968e8c800d53622073a2730c38d6b0eccb",
+            "size": 1729,
+            "annotations": {
+                "com.docker.official-images.bashbrew.arch": "amd64",
+                "org.opencontainers.image.base.digest": "sha256:e0baf8c394150ac5a14925e179100519f5e37c53547f647acbd9f8eb3e5c4528",
+                "org.opencontainers.image.base.name": "alpine:3.22",
+                "org.opencontainers.image.created": "2026-01-28T02:19:32Z",
+                "org.opencontainers.image.revision": "4ca878fe674ab167c067c326960baca5396005ee",
+                "org.opencontainers.image.source": "https://github.com/nats-io/nats-docker.git#4ca878fe674ab167c067c326960baca5396005ee:2.10.x/alpine3.22",
+                "org.opencontainers.image.url": "https://hub.docker.com/_/nats",
+                "org.opencontainers.image.version": "2.10.29-alpine3.22"
+            },
+            "platform": {
+                "architecture": "amd64",
+                "os": "linux"
+            }
+        }
+    }
+]

@@ -114,3 +114,7 @@ Only friend-add-authorization-denied remains DEFERRED_BY_HUMAN, future FRIEND-AU
 # Human-authorized main branch protection
 
 After Social independent acceptance/task done, GitHub main protection enabled and verified by GET readback. Require PR and strict gate from GitHub Actions app15368, enforce administrators, forbid force push/deletion, resolve conversations. No GitHub approval count imposed under baseline configuration; independent repository Review remains mandatory. Main279c1dc unchanged; Social DraftPR3 unmerged. Evidence: 2026-10-01-main-branch-protection.json. Final action: finite closure CI and human handoff, no next product selection.
+
+# Human-authorized merge and continuation (2026-10-01)
+
+PR3 merged at exact accepted headfbf8759 into actualmain b442acd26777c481620a6bd917863cebfaf79b35; human instruction 合并pr，阅读AGENTS.md并继续 supersedes prior draft/no-continuation handoff. Final-head PR CI36811766142 SUCCESS/twelve selected jobs. Merge evidence: 2026-10-01-human-authorized-merge.md. MainCI36813501417 must pass before next dependency-satisfied MSG activation. No active Social product writer, old unknown work preserved; S1 OPEN and restricted friend403 deferred only.

@@ -1,0 +1,78 @@
+{
+  "owner": "R-MSG-IMPLEMENTATION-20261001",
+  "phase": "cleanup",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55631",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_test",
+    "NATS_URL": "nats://127.0.0.1:42631"
+  },
+  "containers": [
+    "loop1-msg-impl-pg-20261001",
+    "loop1-msg-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "--format",
+        "{{index .Config.Labels \"im.task\"}}",
+        "loop1-msg-impl-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.171,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-msg-impl-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.75,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "--format",
+        "{{index .Config.Labels \"im.task\"}}",
+        "loop1-msg-impl-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.157,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-msg-impl-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.64,
+      "skips": 0
+    }
+  ]
+}

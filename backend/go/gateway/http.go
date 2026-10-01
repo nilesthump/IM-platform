@@ -16,6 +16,7 @@ import (
 
 func NewHandler(db *pgxpool.Pool, key []byte, nc *nats.Conn, coreURL string) (http.Handler, error) {
 	h := newHub(&validator{db: db, codec: &shared.Codec{Key: key, Now: time.Now}, now: time.Now})
+	h.coreURL = coreURL
 	if nc != nil {
 		if _, err := nc.Subscribe("session.revoked", func(m *nats.Msg) {
 			var v struct {
@@ -26,6 +27,9 @@ func NewHandler(db *pgxpool.Pool, key []byte, nc *nats.Conn, coreURL string) (ht
 				h.revoke(v.SessionID, v.Reason)
 			}
 		}); err != nil {
+			return nil, err
+		}
+		if _, err := nc.Subscribe("message.created.*", func(m *nats.Msg) { h.fanout(strings.TrimPrefix(m.Subject, "message.created."), m.Data) }); err != nil {
 			return nil, err
 		}
 		if err := nc.Flush(); err != nil {

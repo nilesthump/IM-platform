@@ -1,0 +1,175 @@
+{
+  "owner": "R-MSG-IMPLEMENTATION-20261001",
+  "phase": "checks",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55631",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_test",
+    "NATS_URL": "nats://127.0.0.1:42631"
+  },
+  "containers": [
+    "loop1-msg-impl-pg-20261001",
+    "loop1-msg-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "go",
+        "-C",
+        "backend/go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.14,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "go",
+        "-C",
+        "backend/go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.735,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "contracts/websocket/verify.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.156,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.578,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.047,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.484,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-frozen-architecture.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.391,
+      "skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "run-command",
+        "--run-id",
+        "R-MSG-IMPLEMENTATION-20261001",
+        "--",
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.687,
+      "skips": 0
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+# Go S1 real TLS messaging slice
+
+Run from a clean checkout with Docker Compose and Python 3.10 or newer:
+
+```text
+python3 -B tests/e2e/go_tls_messaging.py
+```
+
+The standard-library harness builds the existing Go Compose profile with PostgreSQL 16, NATS 2.10, canonical migration 0001 and Caddy. It creates a unique disposable project, temporary external configuration and a free local HTTPS port. It copies only Caddy's public local root CA to a temporary file. Both HTTPS and WSS require that CA and verify `localhost`; untrusted CA and actual certificate hostname mismatch are negative controls. Generic TLS errors do not count as hostname verification. Default Caddy rejects unknown SNI before sending a certificate, as the preserved first attempt demonstrated. For the negative handshake only, the owned Caddy admin API temporarily sets `fallback_sni=localhost`, delivering its existing certificate to `wrong.invalid`; the strict client must report a certificate hostname mismatch. The original JSON configuration is restored and checked for equality in `finally` before any positive business traffic. This temporary setup is justified by the actual negative-control gap, adds no production configuration, and copies no private key.
+
+Canonical HTTP/WSS fixtures supply input and outcome expectations. The actual entrypoint covers registration/login, exact username search, bidirectional friend/direct uniqueness, `hello`, durable ACK rows, one logical Outbox, NATS realtime delivery to B, no duplicate/outsider delivery, stable retry, content conflict, nonmember rejection, replacement/logout revocation and stale-token rejection. A narrowly scoped temporary deferred database trigger fails one real COMMIT; the TLS send must reject and leave Message, Outbox and sequence unchanged. The trigger is removed in `finally`; canonical migrations and product code are unchanged.
+
+ACK followed by an independent PostgreSQL read confirms committed rows. Reading B's socket after A's ACK does not establish a new cross-socket timing guarantee. The same candidate's existing live Go normal/race suites additionally exercise blocked actual COMMIT/ACK timing, duplicate/out-of-order events, Sync recovery and GROUP500. Run them with `DB_TEST_ENABLE=1`, a disposable migrated PostgreSQL 16 database via `PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE` and NATS 2.10 via `NATS_URL`; a runtime skip is not acceptance.
+
+The existing CI deploy job runs this harness; E2E changes select existing Go/deploy/architecture/source_go jobs, including deleted paths. No extra dependency, job or product service is introduced. Cleanup inspects exact project labels and removes only owned containers and volumes. Credentials/tokens and message bodies are never printed; generated configuration/CA files remain temporary. The named friend403 fixture remains `DEFERRED_BY_HUMAN` under ADR-0004, separately reported, never counted PASS. Java/client/plugin/capacity/full-release acceptance belongs to later stages. Local PASS requires fresh independent review and exact-head hosted CI before Task or S1 acceptance.

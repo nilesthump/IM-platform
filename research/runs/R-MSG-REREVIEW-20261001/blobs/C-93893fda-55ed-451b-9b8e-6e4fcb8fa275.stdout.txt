@@ -1,0 +1,303 @@
+diff --git a/backend/go/core/sync.go b/backend/go/core/sync.go
+index 128e072..eec3f1f 100644
+--- a/backend/go/core/sync.go
++++ b/backend/go/core/sync.go
+@@ -10,7 +10,7 @@ type conversationRequest struct {
+ 	Type           string `json:"type"`
+ 	RequestID      string `json:"requestId"`
+ 	ConversationID string `json:"conversationId"`
+-	AfterSeq       int64  `json:"afterSeq"`
++	AfterSeq       *int64 `json:"afterSeq"`
+ 	Limit          int64  `json:"limit"`
+ }
+ 
+@@ -18,7 +18,7 @@ type conversationRequest struct {
+ // User Sync and client cursor/materialization are outside this task.
+ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request) {
+ 	var v conversationRequest
+-	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
++	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq == nil || *v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
+ 		writeError(w, r, fail(400, "VALIDATION_FAILED", "Request body is invalid."))
+ 		return
+ 	}
+@@ -44,7 +44,7 @@ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request
+ 		writeError(w, r, err)
+ 		return
+ 	}
+-	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, v.AfterSeq, v.Limit)
++	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, *v.AfterSeq, v.Limit)
+ 	if err != nil {
+ 		writeError(w, r, err)
+ 		return
+@@ -65,7 +65,7 @@ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request
+ 		writeError(w, r, err)
+ 		return
+ 	}
+-	after := v.AfterSeq
++	after := *v.AfterSeq
+ 	if len(messages) > 0 {
+ 		after = messages[len(messages)-1].Seq
+ 	}
+diff --git a/backend/go/core/sync_test.go b/backend/go/core/sync_test.go
+index 4a5cb1c..f41215f 100644
+--- a/backend/go/core/sync_test.go
++++ b/backend/go/core/sync_test.go
+@@ -17,7 +17,8 @@ func TestAuthorizedHistoryGapPages(t *testing.T) {
+ 		}
+ 	}
+ 	request, _ := uuid()
+-	v := conversationRequest{SyncVersion: "1.0", Type: "sync.conversation.request", RequestID: request, ConversationID: f.conversation, AfterSeq: 0, Limit: 2}
++	afterSeq := int64(0)
++	v := conversationRequest{SyncVersion: "1.0", Type: "sync.conversation.request", RequestID: request, ConversationID: f.conversation, AfterSeq: &afterSeq, Limit: 2}
+ 	call := func() *httptest.ResponseRecorder {
+ 		b, _ := json.Marshal(v)
+ 		token, _ := f.s.codec.Sign(f.claims[1])
+@@ -35,7 +36,7 @@ func TestAuthorizedHistoryGapPages(t *testing.T) {
+ 	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 2 || page.Messages[0].Seq != 1 || page.Messages[1].Seq != 2 || !page.HasMore {
+ 		t.Fatal("first gap page failed")
+ 	}
+-	v.AfterSeq = 2
++	afterSeq = 2
+ 	w = call()
+ 	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 1 || page.Messages[0].Seq != 3 || page.HasMore {
+ 		t.Fatal("terminal gap page failed")
+@@ -49,3 +50,57 @@ func TestAuthorizedHistoryGapPages(t *testing.T) {
+ 		t.Fatal("invalid canonical limit accepted")
+ 	}
+ }
++
++func TestHistoryRequiresPresentIntegerAfterSeq(t *testing.T) {
++	f := newMessageFixture(t, 2)
++	id, _ := uuid()
++	if _, err := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "history")); err != nil {
++		t.Fatal(err)
++	}
++	request, _ := uuid()
++	token, _ := f.s.codec.Sign(f.claims[1])
++	for _, tc := range []struct {
++		name    string
++		value   any
++		present bool
++		status  int
++		count   int
++	}{
++		{"missing", nil, false, 400, 0}, {"null", nil, true, 400, 0}, {"negative", -1, true, 400, 0}, {"string", "0", true, 400, 0}, {"fraction", 0.5, true, 400, 0}, {"zero", 0, true, 200, 1}, {"positive", 1, true, 200, 0},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			body := map[string]any{"syncVersion": "1.0", "type": "sync.conversation.request", "requestId": request, "conversationId": f.conversation, "limit": 2}
++			if tc.present {
++				body["afterSeq"] = tc.value
++			}
++			b, err := json.Marshal(body)
++			if err != nil {
++				t.Fatal(err)
++			}
++			r := httptest.NewRequest("POST", "/__core/history", bytes.NewReader(b))
++			r.Header.Set("Authorization", "Bearer "+token)
++			w := httptest.NewRecorder()
++			f.s.conversationHistory(w, r)
++			if w.Code != tc.status {
++				t.Fatalf("HTTP %d, want %d", w.Code, tc.status)
++			}
++			if tc.status == 400 {
++				var v struct {
++					Error struct {
++						Code string `json:"code"`
++					} `json:"error"`
++				}
++				if json.Unmarshal(w.Body.Bytes(), &v) != nil || v.Error.Code != "VALIDATION_FAILED" {
++					t.Fatal("invalid request not rejected canonically")
++				}
++			} else {
++				var v struct {
++					Messages []storedMessage `json:"messages"`
++				}
++				if json.Unmarshal(w.Body.Bytes(), &v) != nil || len(v.Messages) != tc.count {
++					t.Fatal("valid cursor history differs")
++				}
++			}
++		})
++	}
++}
+diff --git a/backend/go/gateway/gateway.go b/backend/go/gateway/gateway.go
+index 9f19835..85d5bf0 100644
+--- a/backend/go/gateway/gateway.go
++++ b/backend/go/gateway/gateway.go
+@@ -227,6 +227,7 @@ func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
+ 	if c.origins == nil {
+ 		c.origins = make(map[string]bool)
+ 	}
++	previousOrigin := c.origins[key]
+ 	c.origins[key] = true
+ 	c.mu.Unlock()
+ 	reject := func() {
+@@ -262,7 +263,8 @@ func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
+ 		reject()
+ 		return
+ 	}
+-	if outcome.Status != "committed" {
++	// A rejected retry cannot erase an earlier committed or uncertain send.
++	if outcome.Status != "committed" && !previousOrigin {
+ 		c.mu.Lock()
+ 		delete(c.origins, key)
+ 		c.mu.Unlock()
+diff --git a/backend/go/gateway/message_test.go b/backend/go/gateway/message_test.go
+index e37d2ed..b61c425 100644
+--- a/backend/go/gateway/message_test.go
++++ b/backend/go/gateway/message_test.go
+@@ -107,3 +107,108 @@ func TestLocalFanoutSelectsUserAndSuppressesOriginOnly(t *testing.T) {
+ 		}
+ 	}
+ }
++
++func TestRejectedRetryPreservesCommittedOrigin(t *testing.T) {
++	user := "10000000-0000-4000-8000-000000000001"
++	request := "40000000-0000-4000-8000-000000000001"
++	conv := "30000000-0000-4000-8000-000000000001"
++	core := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		var e envelope
++		if json.NewDecoder(r.Body).Decode(&e) != nil {
++			t.Error("decode send")
++			return
++		}
++		var p struct {
++			Content struct {
++				Text string `json:"text"`
++			} `json:"content"`
++		}
++		json.Unmarshal(e.Payload, &p)
++		payload := map[string]any{"status": "committed", "conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "seq": 1, "createdAt": "2026-09-28T00:00:01Z"}
++		if p.Content.Text == "conflict" {
++			payload = map[string]any{"status": "rejected", "error": map[string]string{"code": "MESSAGE_REQUEST_CONFLICT", "message": "Request rejected"}}
++		}
++		json.NewEncoder(w).Encode(frame("message.ack", request, payload))
++	}))
++	defer core.Close()
++	h := newHub(&validator{now: time.Now})
++	h.coreURL = core.URL
++	connections := make(chan *connection, 2)
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		ws, err := (&websocket.Upgrader{}).Upgrade(w, r, nil)
++		if err != nil {
++			return
++		}
++		c := &connection{ws: ws, done: make(chan struct{}), bound: &shared.Claims{UserID: user, SessionID: r.URL.Path, ExpiresAt: time.Now().Add(time.Hour).Unix()}}
++		h.add(c.bound.SessionID, c)
++		connections <- c
++		if r.URL.Path == "/origin" {
++			for i := 0; i < 2; i++ {
++				var e envelope
++				if ws.ReadJSON(&e) != nil {
++					return
++				}
++				h.forward(r.Context(), c, e)
++			}
++		}
++		<-c.done
++	}))
++	defer server.Close()
++	var clients []*websocket.Conn
++	var conns []*connection
++	for _, path := range []string{"/origin", "/other"} {
++		ws, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+path, nil)
++		if err != nil {
++			t.Fatal(err)
++		}
++		clients = append(clients, ws)
++		conns = append(conns, <-connections)
++	}
++	defer func() {
++		for _, c := range conns {
++			c.close()
++		}
++		for _, c := range clients {
++			c.Close()
++		}
++	}()
++	for i, text := range []string{"hello", "conflict"} {
++		if err := clients[0].WriteJSON(frame("message.send", request, map[string]any{"conversationId": conv, "content": map[string]string{"kind": "TEXT", "text": text}})); err != nil {
++			t.Fatal(err)
++		}
++		clients[0].SetReadDeadline(time.Now().Add(time.Second))
++		var ack struct {
++			Payload struct {
++				Status string `json:"status"`
++			} `json:"payload"`
++		}
++		if clients[0].ReadJSON(&ack) != nil {
++			t.Fatal("ACK missing")
++		}
++		want := "committed"
++		if i == 1 {
++			want = "rejected"
++		}
++		if ack.Payload.Status != want {
++			t.Fatal("unexpected ACK")
++		}
++	}
++	b, _ := json.Marshal(frame("message.created", request, map[string]any{"conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "senderId": user, "seq": 1, "createdAt": "2026-09-28T00:00:01Z", "content": map[string]string{"kind": "TEXT", "text": "hello"}}))
++	for i := 0; i < 2; i++ {
++		h.fanout(user, b)
++		clients[1].SetReadDeadline(time.Now().Add(time.Second))
++		var e envelope
++		if clients[1].ReadJSON(&e) != nil || e.Type != "message.created" {
++			t.Fatal("other session missing event")
++		}
++	}
++	clients[0].SetReadDeadline(time.Now().Add(100 * time.Millisecond))
++	var e envelope
++	err := clients[0].ReadJSON(&e)
++	if err == nil {
++		t.Fatal("rejected retry erased original suppression")
++	}
++	if !strings.Contains(err.Error(), "timeout") {
++		t.Fatal(err)
++	}
++}
+diff --git a/backend/go/tests/message_test.go b/backend/go/tests/message_test.go
+index 3cdbbef..5aa0eee 100644
+--- a/backend/go/tests/message_test.go
++++ b/backend/go/tests/message_test.go
+@@ -413,3 +413,42 @@ func TestCanonicalDuplicateOutOfOrderAndSyncRecovery(t *testing.T) {
+ 		})
+ 	}
+ }
++
++func TestLiveConflictingRetryDelayedOrigin(t *testing.T) {
++	h := newMessagingHarness(t)
++	all := readFixture(t, "../../../contracts/fixtures/websocket/golden.json")
++	scenario := fixture(t, all, "conflicting-retry")
++	for _, step := range scenario.Steps {
++		h.normal.check(t, step.Out[0], h.send(t, step.In, h.sender))
++	}
++	m, o, n := h.rows(t, h.conversations[0])
++	if m != 1 || o != 1 || n != 2 {
++		t.Fatal("conflicting retry changed durable effects")
++	}
++	// Start the real dispatcher only after the rejected retry, then duplicate its
++	// original event on the same per-user NATS path. Origin remains ACK-only.
++	h.relay(t)
++	expected := fixture(t, all, "durable-send-and-created").Steps[0].Out[1]
++	h.normal.check(t, expected, readMessageFrame(t, h.receiver))
++	h.normal.check(t, expected, readMessageFrame(t, h.other))
++	var payload []byte
++	if err := h.db.QueryRow(context.Background(), `SELECT payload FROM outbox_events WHERE conversation_id=$1 AND event_type='message.created'`, h.conversations[0]).Scan(&payload); err != nil {
++		t.Fatal(err)
++	}
++	if err := h.nc.Publish("message.created."+h.users[0], payload); err != nil {
++		t.Fatal(err)
++	}
++	if err := h.nc.Flush(); err != nil {
++		t.Fatal(err)
++	}
++	h.normal.check(t, expected, readMessageFrame(t, h.other))
++	h.sender.SetReadDeadline(time.Now().Add(time.Second))
++	var got map[string]any
++	err := h.sender.ReadJSON(&got)
++	if err == nil {
++		t.Fatalf("origin received %v after rejected retry", got["type"])
++	}
++	if !strings.Contains(err.Error(), "timeout") {
++		t.Fatalf("unexpected origin failure: %v", err)
++	}
++}

@@ -1,0 +1,770 @@
+diff --git a/backend/go/core/sync.go b/backend/go/core/sync.go
+index 128e072..eec3f1f 100644
+--- a/backend/go/core/sync.go
++++ b/backend/go/core/sync.go
+@@ -10,7 +10,7 @@ type conversationRequest struct {
+ 	Type           string `json:"type"`
+ 	RequestID      string `json:"requestId"`
+ 	ConversationID string `json:"conversationId"`
+-	AfterSeq       int64  `json:"afterSeq"`
++	AfterSeq       *int64 `json:"afterSeq"`
+ 	Limit          int64  `json:"limit"`
+ }
+ 
+@@ -18,7 +18,7 @@ type conversationRequest struct {
+ // User Sync and client cursor/materialization are outside this task.
+ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request) {
+ 	var v conversationRequest
+-	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
++	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq == nil || *v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
+ 		writeError(w, r, fail(400, "VALIDATION_FAILED", "Request body is invalid."))
+ 		return
+ 	}
+@@ -44,7 +44,7 @@ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request
+ 		writeError(w, r, err)
+ 		return
+ 	}
+-	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, v.AfterSeq, v.Limit)
++	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, *v.AfterSeq, v.Limit)
+ 	if err != nil {
+ 		writeError(w, r, err)
+ 		return
+@@ -65,7 +65,7 @@ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request
+ 		writeError(w, r, err)
+ 		return
+ 	}
+-	after := v.AfterSeq
++	after := *v.AfterSeq
+ 	if len(messages) > 0 {
+ 		after = messages[len(messages)-1].Seq
+ 	}
+diff --git a/backend/go/core/sync_test.go b/backend/go/core/sync_test.go
+index 4a5cb1c..f41215f 100644
+--- a/backend/go/core/sync_test.go
++++ b/backend/go/core/sync_test.go
+@@ -17,7 +17,8 @@ func TestAuthorizedHistoryGapPages(t *testing.T) {
+ 		}
+ 	}
+ 	request, _ := uuid()
+-	v := conversationRequest{SyncVersion: "1.0", Type: "sync.conversation.request", RequestID: request, ConversationID: f.conversation, AfterSeq: 0, Limit: 2}
++	afterSeq := int64(0)
++	v := conversationRequest{SyncVersion: "1.0", Type: "sync.conversation.request", RequestID: request, ConversationID: f.conversation, AfterSeq: &afterSeq, Limit: 2}
+ 	call := func() *httptest.ResponseRecorder {
+ 		b, _ := json.Marshal(v)
+ 		token, _ := f.s.codec.Sign(f.claims[1])
+@@ -35,7 +36,7 @@ func TestAuthorizedHistoryGapPages(t *testing.T) {
+ 	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 2 || page.Messages[0].Seq != 1 || page.Messages[1].Seq != 2 || !page.HasMore {
+ 		t.Fatal("first gap page failed")
+ 	}
+-	v.AfterSeq = 2
++	afterSeq = 2
+ 	w = call()
+ 	if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &page) != nil || len(page.Messages) != 1 || page.Messages[0].Seq != 3 || page.HasMore {
+ 		t.Fatal("terminal gap page failed")
+@@ -49,3 +50,57 @@ func TestAuthorizedHistoryGapPages(t *testing.T) {
+ 		t.Fatal("invalid canonical limit accepted")
+ 	}
+ }
++
++func TestHistoryRequiresPresentIntegerAfterSeq(t *testing.T) {
++	f := newMessageFixture(t, 2)
++	id, _ := uuid()
++	if _, err := f.s.commitMessage(context.Background(), f.claims[0], f.send(id, "history")); err != nil {
++		t.Fatal(err)
++	}
++	request, _ := uuid()
++	token, _ := f.s.codec.Sign(f.claims[1])
++	for _, tc := range []struct {
++		name    string
++		value   any
++		present bool
++		status  int
++		count   int
++	}{
++		{"missing", nil, false, 400, 0}, {"null", nil, true, 400, 0}, {"negative", -1, true, 400, 0}, {"string", "0", true, 400, 0}, {"fraction", 0.5, true, 400, 0}, {"zero", 0, true, 200, 1}, {"positive", 1, true, 200, 0},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			body := map[string]any{"syncVersion": "1.0", "type": "sync.conversation.request", "requestId": request, "conversationId": f.conversation, "limit": 2}
++			if tc.present {
++				body["afterSeq"] = tc.value
++			}
++			b, err := json.Marshal(body)
++			if err != nil {
++				t.Fatal(err)
++			}
++			r := httptest.NewRequest("POST", "/__core/history", bytes.NewReader(b))
++			r.Header.Set("Authorization", "Bearer "+token)
++			w := httptest.NewRecorder()
++			f.s.conversationHistory(w, r)
++			if w.Code != tc.status {
++				t.Fatalf("HTTP %d, want %d", w.Code, tc.status)
++			}
++			if tc.status == 400 {
++				var v struct {
++					Error struct {
++						Code string `json:"code"`
++					} `json:"error"`
++				}
++				if json.Unmarshal(w.Body.Bytes(), &v) != nil || v.Error.Code != "VALIDATION_FAILED" {
++					t.Fatal("invalid request not rejected canonically")
++				}
++			} else {
++				var v struct {
++					Messages []storedMessage `json:"messages"`
++				}
++				if json.Unmarshal(w.Body.Bytes(), &v) != nil || len(v.Messages) != tc.count {
++					t.Fatal("valid cursor history differs")
++				}
++			}
++		})
++	}
++}
+diff --git a/backend/go/gateway/gateway.go b/backend/go/gateway/gateway.go
+index 9f19835..85d5bf0 100644
+--- a/backend/go/gateway/gateway.go
++++ b/backend/go/gateway/gateway.go
+@@ -227,6 +227,7 @@ func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
+ 	if c.origins == nil {
+ 		c.origins = make(map[string]bool)
+ 	}
++	previousOrigin := c.origins[key]
+ 	c.origins[key] = true
+ 	c.mu.Unlock()
+ 	reject := func() {
+@@ -262,7 +263,8 @@ func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
+ 		reject()
+ 		return
+ 	}
+-	if outcome.Status != "committed" {
++	// A rejected retry cannot erase an earlier committed or uncertain send.
++	if outcome.Status != "committed" && !previousOrigin {
+ 		c.mu.Lock()
+ 		delete(c.origins, key)
+ 		c.mu.Unlock()
+diff --git a/backend/go/gateway/message_test.go b/backend/go/gateway/message_test.go
+index e37d2ed..b61c425 100644
+--- a/backend/go/gateway/message_test.go
++++ b/backend/go/gateway/message_test.go
+@@ -107,3 +107,108 @@ func TestLocalFanoutSelectsUserAndSuppressesOriginOnly(t *testing.T) {
+ 		}
+ 	}
+ }
++
++func TestRejectedRetryPreservesCommittedOrigin(t *testing.T) {
++	user := "10000000-0000-4000-8000-000000000001"
++	request := "40000000-0000-4000-8000-000000000001"
++	conv := "30000000-0000-4000-8000-000000000001"
++	core := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		var e envelope
++		if json.NewDecoder(r.Body).Decode(&e) != nil {
++			t.Error("decode send")
++			return
++		}
++		var p struct {
++			Content struct {
++				Text string `json:"text"`
++			} `json:"content"`
++		}
++		json.Unmarshal(e.Payload, &p)
++		payload := map[string]any{"status": "committed", "conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "seq": 1, "createdAt": "2026-09-28T00:00:01Z"}
++		if p.Content.Text == "conflict" {
++			payload = map[string]any{"status": "rejected", "error": map[string]string{"code": "MESSAGE_REQUEST_CONFLICT", "message": "Request rejected"}}
++		}
++		json.NewEncoder(w).Encode(frame("message.ack", request, payload))
++	}))
++	defer core.Close()
++	h := newHub(&validator{now: time.Now})
++	h.coreURL = core.URL
++	connections := make(chan *connection, 2)
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		ws, err := (&websocket.Upgrader{}).Upgrade(w, r, nil)
++		if err != nil {
++			return
++		}
++		c := &connection{ws: ws, done: make(chan struct{}), bound: &shared.Claims{UserID: user, SessionID: r.URL.Path, ExpiresAt: time.Now().Add(time.Hour).Unix()}}
++		h.add(c.bound.SessionID, c)
++		connections <- c
++		if r.URL.Path == "/origin" {
++			for i := 0; i < 2; i++ {
++				var e envelope
++				if ws.ReadJSON(&e) != nil {
++					return
++				}
++				h.forward(r.Context(), c, e)
++			}
++		}
++		<-c.done
++	}))
++	defer server.Close()
++	var clients []*websocket.Conn
++	var conns []*connection
++	for _, path := range []string{"/origin", "/other"} {
++		ws, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+path, nil)
++		if err != nil {
++			t.Fatal(err)
++		}
++		clients = append(clients, ws)
++		conns = append(conns, <-connections)
++	}
++	defer func() {
++		for _, c := range conns {
++			c.close()
++		}
++		for _, c := range clients {
++			c.Close()
++		}
++	}()
++	for i, text := range []string{"hello", "conflict"} {
++		if err := clients[0].WriteJSON(frame("message.send", request, map[string]any{"conversationId": conv, "content": map[string]string{"kind": "TEXT", "text": text}})); err != nil {
++			t.Fatal(err)
++		}
++		clients[0].SetReadDeadline(time.Now().Add(time.Second))
++		var ack struct {
++			Payload struct {
++				Status string `json:"status"`
++			} `json:"payload"`
++		}
++		if clients[0].ReadJSON(&ack) != nil {
++			t.Fatal("ACK missing")
++		}
++		want := "committed"
++		if i == 1 {
++			want = "rejected"
++		}
++		if ack.Payload.Status != want {
++			t.Fatal("unexpected ACK")
++		}
++	}
++	b, _ := json.Marshal(frame("message.created", request, map[string]any{"conversationId": conv, "messageId": "50000000-0000-4000-8000-000000000001", "senderId": user, "seq": 1, "createdAt": "2026-09-28T00:00:01Z", "content": map[string]string{"kind": "TEXT", "text": "hello"}}))
++	for i := 0; i < 2; i++ {
++		h.fanout(user, b)
++		clients[1].SetReadDeadline(time.Now().Add(time.Second))
++		var e envelope
++		if clients[1].ReadJSON(&e) != nil || e.Type != "message.created" {
++			t.Fatal("other session missing event")
++		}
++	}
++	clients[0].SetReadDeadline(time.Now().Add(100 * time.Millisecond))
++	var e envelope
++	err := clients[0].ReadJSON(&e)
++	if err == nil {
++		t.Fatal("rejected retry erased original suppression")
++	}
++	if !strings.Contains(err.Error(), "timeout") {
++		t.Fatal(err)
++	}
++}
+diff --git a/backend/go/tests/message_test.go b/backend/go/tests/message_test.go
+index 3cdbbef..5aa0eee 100644
+--- a/backend/go/tests/message_test.go
++++ b/backend/go/tests/message_test.go
+@@ -413,3 +413,42 @@ func TestCanonicalDuplicateOutOfOrderAndSyncRecovery(t *testing.T) {
+ 		})
+ 	}
+ }
++
++func TestLiveConflictingRetryDelayedOrigin(t *testing.T) {
++	h := newMessagingHarness(t)
++	all := readFixture(t, "../../../contracts/fixtures/websocket/golden.json")
++	scenario := fixture(t, all, "conflicting-retry")
++	for _, step := range scenario.Steps {
++		h.normal.check(t, step.Out[0], h.send(t, step.In, h.sender))
++	}
++	m, o, n := h.rows(t, h.conversations[0])
++	if m != 1 || o != 1 || n != 2 {
++		t.Fatal("conflicting retry changed durable effects")
++	}
++	// Start the real dispatcher only after the rejected retry, then duplicate its
++	// original event on the same per-user NATS path. Origin remains ACK-only.
++	h.relay(t)
++	expected := fixture(t, all, "durable-send-and-created").Steps[0].Out[1]
++	h.normal.check(t, expected, readMessageFrame(t, h.receiver))
++	h.normal.check(t, expected, readMessageFrame(t, h.other))
++	var payload []byte
++	if err := h.db.QueryRow(context.Background(), `SELECT payload FROM outbox_events WHERE conversation_id=$1 AND event_type='message.created'`, h.conversations[0]).Scan(&payload); err != nil {
++		t.Fatal(err)
++	}
++	if err := h.nc.Publish("message.created."+h.users[0], payload); err != nil {
++		t.Fatal(err)
++	}
++	if err := h.nc.Flush(); err != nil {
++		t.Fatal(err)
++	}
++	h.normal.check(t, expected, readMessageFrame(t, h.other))
++	h.sender.SetReadDeadline(time.Now().Add(time.Second))
++	var got map[string]any
++	err := h.sender.ReadJSON(&got)
++	if err == nil {
++		t.Fatalf("origin received %v after rejected retry", got["type"])
++	}
++	if !strings.Contains(err.Error(), "timeout") {
++		t.Fatalf("unexpected origin failure: %v", err)
++	}
++}
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 339a646..6c7f282 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -1,63 +1,52 @@
+-# Current Execution State
+-
+-Current Loop: Loop 1
+-Current Stage: S1
+-Current Gate: S1
+-Gate Status: OPEN (Social accepted/merged; MSG local development complete, independent acceptance pending)
+-Current Batch: LOOP1-S1
+-Current Task: LOOP1-GO-MSG-001
+-Current Task State: review
+-Execution Status: MSG_INDEPENDENT_FAIL_FRESH_FIX
+-
+-## Immediately Relevant Completed Work
+-
+-PR3 merged actual main b442acd26777c481620a6bd917863cebfaf79b35; actual-mainCI36813501417 SUCCESS. MSG activation78129e8 exact-bound; fresh Implementation Agent completed six production/six test files, local real normal/race and structural verification. Independent Review returned FAIL on f1764fd; no MSG/S1 PASS claimed.
+-
+-## Current Blockers
+-
+-Fresh independent Review FAIL on f1764fd: rejected conflicting retry deletes original-socket marker (gateway.go265-268), and missing/null required afterSeq is accepted (sync.go13/21). New bounded Fix/new independent Review cycle in progress; green actual CI never substitutes acceptance. Friend403 exception remains unrelated. No architecture conflict.
+-
+-## Verification
+-
+-- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
+-  - Result: independent actual normal18.797s/race80.640s exit0/zero runtime skips; extra actual production-chain origin probe and missing/null history probes each exit1 and establish ReviewFAIL. Mandatory structure/byte checks and exact hostedCI pass but do not accept candidate.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md`
+-
+-- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
+-  - Result: exit0 on unique migrated disposablePG16/NATS2.10, DB_TEST_ENABLE=1; zero runtime skips. Core4.923/6.922s, blackbox17.143/76.300s; messaging/canonical/fault/Auth/Social/Session/fallback PASS locally.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-command-results.json`
+-- Command: `python -B contracts/websocket/verify.py; python -B ci/check_architecture.py --scope all --json; python -B -m unittest discover -s tests/architecture -v; python -B -m unittest discover -s tests/ci -v`
+-  - Result: exit0; WSS8positive/10negative/18schema+26behavior controls, sourceall/no violations, architecture34, CI27 with exactly four Windows symlink-creation subcase skips (WinError1314). Local checks never replace hostedLinux CI.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-handoff.md`
+-- Command: `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1; pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development; go -C backend/go build ./...; go -C backend/go vet ./...`
+-  - Result: exit0; frozen34/no skips, Development recovery PASS, build/vet/recursive formatting clean. Clean committed Acceptance still belongs to independent candidate review/CI.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-checks-commands.json`
+-
+-## Changed Files or Migrations
+-
+-Core message/private history/http/outbox and Gateway forwarding/subscription, six matching tests. Narrow preauthorized stale malformed Auth test oracle uses canonical VALIDATION_FAILED/live local Core; original Session-lock invariant retained. DB0001/frozen/contracts/profile/ADR/workflows/shared/root assembly unchanged.
+-
+-## Known Failures, Risks, and Assumptions
+-
+-Setup/compile/canonical precondition/untouched GROUP fixture-oracle failures corrected and preserved in Recorder. Default Windows GBK log inspection failures corrected/disclosed. Recorder finished/validated121events (research-only PASS); startup and limited direct reads/launcher initialization incomplete prospective trace; redaction/UI truncation and terminal post-finish closure disclosed. Private history is bounded gap compensation, not a new public Sync feature or TLS-entry E2E. Publication permits duplicates; only test materializer exists. Independent review/security/minimality and real hosted acceptance still pending.
+-
+-## Next Exact Action
+-
+-New /root/message_fix takes sole writer after Coordinator handoff commit, fixes only confirmed origin-marker and required-afterSeq defects with targeted regressions, then actual live normal/race/structural candidate verification. Commit development candidate/release, delegate NEW independent Review and exact hostedCI. Task remains review unfinished; no merge/MSG/S1PASS. Permanent FAIL evidence: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md.
+-
+-## Last Known Good Commit
+-
+-`b442acd26777c481620a6bd917863cebfaf79b35` (accepted actualmain, CI36813501417); activation78129e8 is control-plane input binding, not MSG acceptance.
+-
+-## Latest Checkpoint
+-
+-`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-local-review.md`
+-
+-## Uncommitted Changes / Ownership
+-
+-Development product committed at f64ae64e6e333ee52242b7b2100c663cd1f378c2; latest checkpoint is local review recovery, not accepted Gate. Implementation/review writers released. Coordinator owns FAIL archive/current/Task handoff until commit; new /root/message_fix takes sole bounded writer after release. Candidate f176 remains permanently rejected. Owned labeled PG/NATS containers/anonymous volume removed, exit0. Original H:/IM-platform and old worktrees/unknown untracked paths untouched; no other writer modified this worktree.
+-
+-## Architecture Conflicts / ACP / ADR
+-
+-None. Private Core-only HTTP adapters and per-user NATS locators reuse authorized boundaries with unchanged canonical payloads/bound bearer; no public contract/security rule change. Only approved Social friend403 exception remains.
+-Transport closure: research/.gitattributes originally filtered36 immutable raw artifacts CRLF toLF during staging; raw working validation remained PASS. Coordinator explicitly authorized only own-run .gitattributes, after separate pre-edit path/hash diagnosis. Ordinary add retained cached filtered entries and byte assertion failed; own-run add --renormalize repaired index transport. All124 original prompt/run files now working/index byte-identical; no raw event/blob/hash mutation. Diagnosis and full audit in 2026-10-01-transport-preservation.json / 2026-10-01-transport-byte-audit.json. Initial stage mismatch and dirty Acceptance remain disclosed development failures. Finished Recorder administrative closure remains outside trace.
++# Current Execution State
++
++Current Loop: Loop 1
++Current Stage: S1
++Current Gate: S1
++Gate Status: OPEN (Social accepted/merged; MSG repair development complete, independent acceptance pending)
++Current Batch: LOOP1-S1
++Current Task: LOOP1-GO-MSG-001
++Current Task State: review
++Execution Status: MSG_FIXED_READY_FOR_NEW_INDEPENDENT_REVIEW
++
++## Immediately Relevant Completed Work
++
++Accepted PR3 actualmain b442acd/CI36813501417. Independent Review rejected MSGf1764fd; immutable FAILarchive84b7a63. Fresh Fix product `0a13b119e0e4c8788c5b264571df35df76ad94cb` preserves earlier origin marker across rejected retry and rejects missing/null required afterSeq. Three targeted tests REDthenGREEN, actual Core/Gateway/WSS/PG/NATS included. No MSG/S1PASS.
++
++## Current Blockers
++
++NEW independent Review and new exact-head hostedCI required. Prior f176greenCI never overrides FAIL. No known remaining local failure/architecture conflict. Social friend403 only DEFERRED_BY_HUMAN, unrelated to messaging.
++
++## Verification
++
++- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
++  - Result: final local exit0 on owned migrated PG16/NATS2.10 DB_TEST_ENABLE1, zero runtime skips. New targeted gateway/core/actualblackbox regressions each REDexit1 thenGREENexit0. WSS/sourceall/architecture34/frozen34/CI27/build/vet/recursivegofmt/Development checks local exit0; exactly four Windows symlink CI subcase skips WinError1314. Post-handoff recovery check initially failed missing structured Command/Result/Evidence fields; corrected and rerun. Local checks never acceptance; hostedLinux required.
++  - Evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-command-results.json`
++
++## Changed Files or Migrations
++
++Product gateway/gateway.go/core/sync.go and tests gateway/message_test.go/core/sync_test.go/tests/message_test.go only. No schema/migration/contracts/architecture/security-boundary/shared/root/Auth/Social/dependency/workflow change. Prior implementation and immutableFAIL evidence preserved.
++
++## Known Failures, Risks, and Assumptions
++
++Origin markers remain connection-lifetime preserving earlier committed/uncertain identity. History only private canonical bounded Conversation gap pages; TLS-entry E2E remains next task. Recorder sourceagent/prospective_resume R-MSG-FIX-20261001 exposes incomplete preparation/bootstrap/direct-inspection trace and failed handoff syntax attempt (nofiles changed). Main edits/checks routed; REDfailures preserved, UItruncation/redaction disclosed. Own prompt/run -text beforeoutputs. Final validation/staging/commit outside finishedtrace. Pre-existing interrupted Recorder remains partial untouched. Independent acceptancepending.
++
++## Next Exact Action
++
++NEW independent Review exact clean finalhead/fullbranch b442acd..finalHead with newunique migratedservices actual normal/race/regressions/source/security/minimality, then real exact-head hostedCI beforetaskdone. Ordinary failure freshFix/newReview. Do not merge/claim S1PASS yet.
++
++## Last Known Good Commit
++
++`b442acd26777c481620a6bd917863cebfaf79b35` acceptedactualmain/CI36813501417. Product `0a13b119e0e4c8788c5b264571df35df76ad94cb` is developmentcandidate, notacceptedbaseline.
++
++## Latest Checkpoint
++
++`spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-fix-review.md`
++
++## Uncommitted Changes / Ownership
++
++/root/message_fix owns this Taskfix Recorder/evidence/recovery until clean finalcandidatecommit then writerreleasedtoCoordinator. Product committed `0a13b119e0e4c8788c5b264571df35df76ad94cb`. Owned message_fix-labeled PG/NATS/anonymousvolume removedexit0. Original H:/IM-platform and unrelatedworktrees/services untouched.
++
++## Architecture Conflicts / ACP / ADR
++
++None. Frozenhash/contracts/publicwire/ACK/security/database0001 unchanged; MSGreview/S1OPEN.
+diff --git a/spec/tasks/review/LOOP1-GO-MSG-001.md b/spec/tasks/review/LOOP1-GO-MSG-001.md
+index d092673..41c8aeb 100644
+--- a/spec/tasks/review/LOOP1-GO-MSG-001.md
++++ b/spec/tasks/review/LOOP1-GO-MSG-001.md
+@@ -1,113 +1,119 @@
+----
+-task_id: LOOP1-GO-MSG-001
+-title: Implement Go text messaging, durable ACK, Outbox, and NATS
+-status: review
+-owner: /root/message_fix (new Fix writer after Coordinator handoff)
+-stage: S1
+-gate: S1
+----
+-
+-# Goal
+-
+-Implement one logical text Message per authorized send with Conversation sequence, durable ACK, idempotent retry, Outbox dispatch, and realtime NATS delivery.
+-
+-# Inputs
+-
+-- Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus §3/§10 SRC-01 through SRC-07/§11/§12-14; approved ADRs and Minimality Contract.
+-- `spec/domain/messaging.md`, `spec/invariants/messaging.md`, `spec/acceptance/s0-messaging.md`.
+-- Canonical WSS/error/fixture, Sync and database contracts in `contracts/`.
+-
+-# Execution Constraints
+-
+-Read spec/governance/execution-boundaries.md and independent-review.md. allowed_paths never exempts ownership/import direction. Before activation bind these responsibility paths to the actual accepted stage-four layout and any presently required exact assembly file. Coordinator must amend paths before edits if actual file names differ; no duplicate alternate packages or unapproved root/shared business. Canonical fixtures remain sole expectations.
+-
+-# Dependencies
+-
+-- `LOOP1-GO-SOCIAL-001` done; S0 Gate PASS; LOOP1-ARCH-REMEDIATION batch PASS with final source/dependency/hosted acceptance.
+-
+-# Allowed Paths
+-
+-- `backend/go/core/message.go` (private canonical text write transaction/internal send adapter)
+-- `backend/go/core/message_test.go` (atomicity/idempotency/ACK/authorization fault tests)
+-- `backend/go/core/http.go` (only existing Core assembly/private adapter registration)
+-- `backend/go/core/outbox.go` (message-created dispatch, existing Session behavior preserved)
+-- `backend/go/core/outbox_test.go` (actual publication/retry/marking tests)
+-- `backend/go/core/sync.go` (only canonical ConversationRequest/Page gap compensation, no full client/user-sync feature)
+-- `backend/go/core/sync_test.go` (history authorization/order/page tests)
+-- `backend/go/gateway/gateway.go` (canonical WSS forwarding/local bound fan-out only)
+-- `backend/go/gateway/http.go` (existing transport/subscription assembly only)
+-- `backend/go/gateway/message_test.go` (transport/duplicate/wrong-Conversation local delivery tests)
+-- `backend/go/tests/auth_test.go` (only existing malformed message probe setup/comment/oracle; canonical VALIDATION_FAILED, live local Core URL; preserve all Auth assertions)
+-- `backend/go/tests/message_test.go` (blackbox canonical/live combined tests using existing helpers)
+-- `backend/go/main.go` (only dispatcher startup assembly if a name change is necessary)
+-- `spec/tasks/**/LOOP1-GO-MSG-001.md`
+-- `spec/progress/current.md`
+-- `spec/progress/evidence/LOOP1-GO-MSG-001/**`
+-- `spec/progress/checkpoints/*loop1-go-msg-001*.md`
+-- `research/prompts/**` and `research/runs/**` only for this task's Recorder artifacts.
+-
+-Coordinator prospectively binds exact existing flat stage-four service layout before any product write on 2026-10-01. This is ordinary feature scope under canonical SRC-01..07, not language-wide migration or architecture exemption. No shared/Auth/Social/schema/workflow edits authorized. Existing Gateway-to-Core HTTP and Core/NATS/Gateway event boundaries may use private Core-only adapter locators carrying unchanged canonical send/ACK/history shapes and bound bearer; per-user NATS subjects carry unchanged canonical message.created. No new public /v1 endpoint/frame field or direct cross-service import. Core retains credential/membership/routing decisions and durable commit; Gateway only forwards and fans out to local bound connections. Concrete mapping/readiness: 2026-10-01-activation-and-path-map.md under Task evidence.
+-
+-# Acceptance
+-
+-- Non-member sends reject before persistence. Sequence allocation, Message and one logical Outbox event commit atomically; success ACK follows durable commit only.
+-- Retry with the same sender, Conversation and request identity returns the same logical Message and sequence; distinct Conversations remain independent.
+-- Dispatcher/NATS duplication cannot create duplicate logical Messages or client materialization; Sync closes missed-delivery gaps. One GROUP send stays one Message and Outbox event.
+-- Canonical fixtures, fault-injection integration tests, independent review, and applicable real CI pass.
+-
+-- Applicable source/root/dependency checks pass; independent Review inspects actual behavior/responsibilities/imports/minimality. Java inherits canonical boundaries, not these Go paths.
+-
+-# Forbidden
+-
+-- Weaken ACK/idempotency/order/authorization rules, make NATS the source of truth, change contracts/migrations, or implement clients/Java/future-stage mechanisms.
+-
+-# Minimality
+-
+-Use the existing PostgreSQL transaction and Outbox/NATS skeleton directly; add no speculative broker or ordering layer.
+-
+-# Verification
+-
+-- Discoverable entry points: `tools/verify-loop1-ctrl-002.ps1` and `tools/verify-frozen-architecture.ps1`.
+-
+-- During edits run `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`; clean committed independent candidate runs Acceptance. Run `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`.
+-
+-- Run WSS fixtures and Go messaging integration tests for rollback, ACK timing, duplicate retry/delivery, sequence and wrong-Conversation rejection; run recovery and architecture checks.
+-
+-- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
+-
+-# Evidence
+-
+-- Activated backlog -> ready -> active on 2026-10-01 after independently accepted Social actual-main merge b442acd and hostedCI36813501417 SUCCESS. Readiness/path evidence: 2026-10-01-activation-and-path-map.md.
+-
+-# Handoff
+-
+-- Fresh /root/message_implementation completed read-only input/path planning. Coordinator release grants sole writer ownership of this Task only after activation commit. No product files changed at activation.
+-
+-# Next Action
+-
+-- Implementation Agent: read active task/current, register delegated visible prompt and start prospective Recorder before work; run minimum baseline, then implement bounded message transaction/dispatch/forwarding/gap checks. Commit development candidate and handoff to NEW independent Review plus exact hosted CI. Never self-accept or claim S1 Gate PASS.
+-
+-# Bound verification and recovery (2026-10-01)
+-
+-Minimum pre-edit baseline: `python -B contracts/websocket/verify.py`, `python -B ci/check_architecture.py --scope all --json`, Development recovery, existing live normal/race Go suites on unique migrated disposable PostgreSQL16/NATS2.10 with DB_TEST_ENABLE=1. Record actual enable variables/services/skips; environment skips are not live PASS. Frozen verifier/source tests/CI controls plus recursive gofmt/build/vet and normal/race remain applicable before handoff. Clean committed Acceptance only; NEW independent Review then applicable real exact-head hosted CI before done. Last known good actualmain b442acd26777c481620a6bd917863cebfaf79b35/CI36813501417. No known product baseline failure; Social friend403 DEFERRED_BY_HUMAN never applies to message membership. Governance activation owned by Coordinator until commit; product writes owned solely by fresh Implementation Agent after release.
+-
+-# Prospective regression-scope binding
+-
+-Coordinator authorizes exact tests/auth_test.go before edit: prior payload={} blanket AUTHORIZATION_DENIED stub oracle conflicts with canonical MessageSend required content/Conversation shape. Change only local live Core assembly and malformed-frame VALIDATION_FAILED expectation; retain Gateway no-per-message Session-query check, all valid authentication/membership denials. No runtime_test.go or contract change.
+-
+-# Development candidate handoff (2026-10-01)
+-
+-Six bound product files and six matching test files complete; main/shared/Auth/Social/contracts/schema/workflows untouched. Local migrated disposablePG16/NATS2.10 pre-edit baseline and final normal/race PASS with zero runtime skips. Canonical sends/duplication/order/wrongConversation/private gap, true PostgreSQL COMMIT fault probes, membership/content/cross-sender conflicts, GROUP500 and existing Auth/Social/Session/WSS/fallback regression executed. Build/vet/gofmt/sourceall/WSS/architecture34/frozen34/CI27/Development recovery PASS; exactly four Windows symlink-creation subcase skips (WinError1314) disclosed in implementation handoff, hostedLinux checks still required. This is local development evidence only. Recorder prospective_resume with startup/UTF8/redaction/truncation limitations exposed; finish/validate before candidate handoff. Failed attempts preserved, not overwritten into PASS.
+-
+-Durable commands/hashes/results: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-command-results.json; behavior/limits/ownership: 2026-10-01-implementation-handoff.md. Owned disposable services/volume removed after label verification; no product writer remains after candidate commit. Active->review, never self-done. Last known accepted main b442acd26777c481620a6bd917863cebfaf79b35/CI36813501417; next exact action NEW independent Review and exact hosted candidate CI/full PR range. S1 remains OPEN.
+-
+-Development product commit `f64ae64e6e333ee52242b7b2100c663cd1f378c2`; local checkpoint `spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-local-review.md`. Final evidence/Recorder closure commit may change head without product bytes; independent review must use actual final candidate. CRLF staged-evidence whitespace check failed and was repaired only for own non-Recorder summaries/launcher; registered prompt/Recorder raw bytes preserved, standard Git cr-at-eol recognition used for preserved inputs. No verifier or repo config changed.
+-
+-Recorder R-MSG-IMPLEMENTATION-20261001 finished/validated121events (research-only PASS). Exactly four local Windows symlink subcase skips; zero Go runtime skips. Final closure operations are outside finished run as disclosed. No writer/service remains after final commit.
+-Transport closure: research/.gitattributes originally filtered36 immutable raw artifacts CRLF toLF during staging; raw working validation remained PASS. Coordinator explicitly authorized only own-run .gitattributes, after separate pre-edit path/hash diagnosis. Ordinary add retained cached filtered entries and byte assertion failed; own-run add --renormalize repaired index transport. All124 original prompt/run files now working/index byte-identical; no raw event/blob/hash mutation. Diagnosis and full audit in 2026-10-01-transport-preservation.json / 2026-10-01-transport-byte-audit.json. Initial stage mismatch and dirty Acceptance remain disclosed development failures. Finished Recorder administrative closure remains outside trace.
+-
+-# Independent FAIL and bounded fresh repair (2026-10-01)
+-
+-NEW /root/message_independent_review rejected clean detached candidate `f1764fd90f632878666504dded0d49c0ce1fa8fa`. Permanent evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md`. Actual Core/Gateway/WSS/PG16/NATS2.10 probe proves gateway.go265-268 deletes previous committed origin marker after conflicting retry, violating original-socket ACK-only. Actual PG Sync probe proves sync.go13/21 accepts missing/null required afterSeq. No product fix made by reviewer. Independent normal/race/structural/byte audits and exact hosted PRCI36816686898/push36816625962 passed; green CI does not override FAIL. Fresh Review Recorder65events finishedFAIL/validatePASS; old interrupted run remains historical partial, not rewritten.
+-
+-Coordinator archives byte-identical reviewer report/commands/probes/CI metadata/Recorder and keeps review unfinished. New /root/message_fix may repair only confirmed findings in already bound gateway/gateway.go + gateway/message_test.go and core/sync.go + core/sync_test.go, optional existing blackbox messaging test for actual regression. Preserve prior origin marker on later rejected retry; distinguish absent/null required afterSeq from valid0. No new transport/security/architecture/contracts/DB/shared/root/Auth/Social/workflows. Readonly Fix prep complete; sole writer begins only after this handoff commit. New exact-head independent Review/hostedCI required after repair; never selfaccept. Last accepted actualmain b442acd; rejected f176 remains permanent history.
++---
++task_id: LOOP1-GO-MSG-001
++title: Implement Go text messaging, durable ACK, Outbox, and NATS
++status: review
++owner: /root/message_fix (new Fix writer after Coordinator handoff)
++stage: S1
++gate: S1
++---
++
++# Goal
++
++Implement one logical text Message per authorized send with Conversation sequence, durable ACK, idempotent retry, Outbox dispatch, and realtime NATS delivery.
++
++# Inputs
++
++- Current Frozen Architecture resolved/hash-checked through spec/architecture/README.md and baseline.md, applicable existing behavioral chapters plus §3/§10 SRC-01 through SRC-07/§11/§12-14; approved ADRs and Minimality Contract.
++- `spec/domain/messaging.md`, `spec/invariants/messaging.md`, `spec/acceptance/s0-messaging.md`.
++- Canonical WSS/error/fixture, Sync and database contracts in `contracts/`.
++
++# Execution Constraints
++
++Read spec/governance/execution-boundaries.md and independent-review.md. allowed_paths never exempts ownership/import direction. Before activation bind these responsibility paths to the actual accepted stage-four layout and any presently required exact assembly file. Coordinator must amend paths before edits if actual file names differ; no duplicate alternate packages or unapproved root/shared business. Canonical fixtures remain sole expectations.
++
++# Dependencies
++
++- `LOOP1-GO-SOCIAL-001` done; S0 Gate PASS; LOOP1-ARCH-REMEDIATION batch PASS with final source/dependency/hosted acceptance.
++
++# Allowed Paths
++
++- `backend/go/core/message.go` (private canonical text write transaction/internal send adapter)
++- `backend/go/core/message_test.go` (atomicity/idempotency/ACK/authorization fault tests)
++- `backend/go/core/http.go` (only existing Core assembly/private adapter registration)
++- `backend/go/core/outbox.go` (message-created dispatch, existing Session behavior preserved)
++- `backend/go/core/outbox_test.go` (actual publication/retry/marking tests)
++- `backend/go/core/sync.go` (only canonical ConversationRequest/Page gap compensation, no full client/user-sync feature)
++- `backend/go/core/sync_test.go` (history authorization/order/page tests)
++- `backend/go/gateway/gateway.go` (canonical WSS forwarding/local bound fan-out only)
++- `backend/go/gateway/http.go` (existing transport/subscription assembly only)
++- `backend/go/gateway/message_test.go` (transport/duplicate/wrong-Conversation local delivery tests)
++- `backend/go/tests/auth_test.go` (only existing malformed message probe setup/comment/oracle; canonical VALIDATION_FAILED, live local Core URL; preserve all Auth assertions)
++- `backend/go/tests/message_test.go` (blackbox canonical/live combined tests using existing helpers)
++- `backend/go/main.go` (only dispatcher startup assembly if a name change is necessary)
++- `spec/tasks/**/LOOP1-GO-MSG-001.md`
++- `spec/progress/current.md`
++- `spec/progress/evidence/LOOP1-GO-MSG-001/**`
++- `spec/progress/checkpoints/*loop1-go-msg-001*.md`
++- `research/prompts/**` and `research/runs/**` only for this task's Recorder artifacts.
++
++Coordinator prospectively binds exact existing flat stage-four service layout before any product write on 2026-10-01. This is ordinary feature scope under canonical SRC-01..07, not language-wide migration or architecture exemption. No shared/Auth/Social/schema/workflow edits authorized. Existing Gateway-to-Core HTTP and Core/NATS/Gateway event boundaries may use private Core-only adapter locators carrying unchanged canonical send/ACK/history shapes and bound bearer; per-user NATS subjects carry unchanged canonical message.created. No new public /v1 endpoint/frame field or direct cross-service import. Core retains credential/membership/routing decisions and durable commit; Gateway only forwards and fans out to local bound connections. Concrete mapping/readiness: 2026-10-01-activation-and-path-map.md under Task evidence.
++
++# Acceptance
++
++- Non-member sends reject before persistence. Sequence allocation, Message and one logical Outbox event commit atomically; success ACK follows durable commit only.
++- Retry with the same sender, Conversation and request identity returns the same logical Message and sequence; distinct Conversations remain independent.
++- Dispatcher/NATS duplication cannot create duplicate logical Messages or client materialization; Sync closes missed-delivery gaps. One GROUP send stays one Message and Outbox event.
++- Canonical fixtures, fault-injection integration tests, independent review, and applicable real CI pass.
++
++- Applicable source/root/dependency checks pass; independent Review inspects actual behavior/responsibilities/imports/minimality. Java inherits canonical boundaries, not these Go paths.
++
++# Forbidden
++
++- Weaken ACK/idempotency/order/authorization rules, make NATS the source of truth, change contracts/migrations, or implement clients/Java/future-stage mechanisms.
++
++# Minimality
++
++Use the existing PostgreSQL transaction and Outbox/NATS skeleton directly; add no speculative broker or ordering layer.
++
++# Verification
++
++- Discoverable entry points: `tools/verify-loop1-ctrl-002.ps1` and `tools/verify-frozen-architecture.ps1`.
++
++- During edits run `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`; clean committed independent candidate runs Acceptance. Run `pwsh -NoProfile -File tools/verify-frozen-architecture.ps1`.
++
++- Run WSS fixtures and Go messaging integration tests for rollback, ACK timing, duplicate retry/delivery, sequence and wrong-Conversation rejection; run recovery and architecture checks.
++
++- Before activation bind exact accepted stage-three checker commands and stage-four live regression evidence; record actual integration enable conditions/services/skips. Planned tools or skipped integration are not PASS.
++
++# Evidence
++
++- Activated backlog -> ready -> active on 2026-10-01 after independently accepted Social actual-main merge b442acd and hostedCI36813501417 SUCCESS. Readiness/path evidence: 2026-10-01-activation-and-path-map.md.
++
++# Handoff
++
++- Fresh /root/message_implementation completed read-only input/path planning. Coordinator release grants sole writer ownership of this Task only after activation commit. No product files changed at activation.
++
++# Next Action
++
++- Implementation Agent: read active task/current, register delegated visible prompt and start prospective Recorder before work; run minimum baseline, then implement bounded message transaction/dispatch/forwarding/gap checks. Commit development candidate and handoff to NEW independent Review plus exact hosted CI. Never self-accept or claim S1 Gate PASS.
++
++# Bound verification and recovery (2026-10-01)
++
++Minimum pre-edit baseline: `python -B contracts/websocket/verify.py`, `python -B ci/check_architecture.py --scope all --json`, Development recovery, existing live normal/race Go suites on unique migrated disposable PostgreSQL16/NATS2.10 with DB_TEST_ENABLE=1. Record actual enable variables/services/skips; environment skips are not live PASS. Frozen verifier/source tests/CI controls plus recursive gofmt/build/vet and normal/race remain applicable before handoff. Clean committed Acceptance only; NEW independent Review then applicable real exact-head hosted CI before done. Last known good actualmain b442acd26777c481620a6bd917863cebfaf79b35/CI36813501417. No known product baseline failure; Social friend403 DEFERRED_BY_HUMAN never applies to message membership. Governance activation owned by Coordinator until commit; product writes owned solely by fresh Implementation Agent after release.
++
++# Prospective regression-scope binding
++
++Coordinator authorizes exact tests/auth_test.go before edit: prior payload={} blanket AUTHORIZATION_DENIED stub oracle conflicts with canonical MessageSend required content/Conversation shape. Change only local live Core assembly and malformed-frame VALIDATION_FAILED expectation; retain Gateway no-per-message Session-query check, all valid authentication/membership denials. No runtime_test.go or contract change.
++
++# Development candidate handoff (2026-10-01)
++
++Six bound product files and six matching test files complete; main/shared/Auth/Social/contracts/schema/workflows untouched. Local migrated disposablePG16/NATS2.10 pre-edit baseline and final normal/race PASS with zero runtime skips. Canonical sends/duplication/order/wrongConversation/private gap, true PostgreSQL COMMIT fault probes, membership/content/cross-sender conflicts, GROUP500 and existing Auth/Social/Session/WSS/fallback regression executed. Build/vet/gofmt/sourceall/WSS/architecture34/frozen34/CI27/Development recovery PASS; exactly four Windows symlink-creation subcase skips (WinError1314) disclosed in implementation handoff, hostedLinux checks still required. This is local development evidence only. Recorder prospective_resume with startup/UTF8/redaction/truncation limitations exposed; finish/validate before candidate handoff. Failed attempts preserved, not overwritten into PASS.
++
++Durable commands/hashes/results: spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-command-results.json; behavior/limits/ownership: 2026-10-01-implementation-handoff.md. Owned disposable services/volume removed after label verification; no product writer remains after candidate commit. Active->review, never self-done. Last known accepted main b442acd26777c481620a6bd917863cebfaf79b35/CI36813501417; next exact action NEW independent Review and exact hosted candidate CI/full PR range. S1 remains OPEN.
++
++Development product commit `f64ae64e6e333ee52242b7b2100c663cd1f378c2`; local checkpoint `spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-local-review.md`. Final evidence/Recorder closure commit may change head without product bytes; independent review must use actual final candidate. CRLF staged-evidence whitespace check failed and was repaired only for own non-Recorder summaries/launcher; registered prompt/Recorder raw bytes preserved, standard Git cr-at-eol recognition used for preserved inputs. No verifier or repo config changed.
++
++Recorder R-MSG-IMPLEMENTATION-20261001 finished/validated121events (research-only PASS). Exactly four local Windows symlink subcase skips; zero Go runtime skips. Final closure operations are outside finished run as disclosed. No writer/service remains after final commit.
++Transport closure: research/.gitattributes originally filtered36 immutable raw artifacts CRLF toLF during staging; raw working validation remained PASS. Coordinator explicitly authorized only own-run .gitattributes, after separate pre-edit path/hash diagnosis. Ordinary add retained cached filtered entries and byte assertion failed; own-run add --renormalize repaired index transport. All124 original prompt/run files now working/index byte-identical; no raw event/blob/hash mutation. Diagnosis and full audit in 2026-10-01-transport-preservation.json / 2026-10-01-transport-byte-audit.json. Initial stage mismatch and dirty Acceptance remain disclosed development failures. Finished Recorder administrative closure remains outside trace.
++
++# Independent FAIL and bounded fresh repair (2026-10-01)
++
++NEW /root/message_independent_review rejected clean detached candidate `f1764fd90f632878666504dded0d49c0ce1fa8fa`. Permanent evidence: `spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-f1764fd/2026-10-01-independent-review-report.md`. Actual Core/Gateway/WSS/PG16/NATS2.10 probe proves gateway.go265-268 deletes previous committed origin marker after conflicting retry, violating original-socket ACK-only. Actual PG Sync probe proves sync.go13/21 accepts missing/null required afterSeq. No product fix made by reviewer. Independent normal/race/structural/byte audits and exact hosted PRCI36816686898/push36816625962 passed; green CI does not override FAIL. Fresh Review Recorder65events finishedFAIL/validatePASS; old interrupted run remains historical partial, not rewritten.
++
++Coordinator archives byte-identical reviewer report/commands/probes/CI metadata/Recorder and keeps review unfinished. New /root/message_fix may repair only confirmed findings in already bound gateway/gateway.go + gateway/message_test.go and core/sync.go + core/sync_test.go, optional existing blackbox messaging test for actual regression. Preserve prior origin marker on later rejected retry; distinguish absent/null required afterSeq from valid0. No new transport/security/architecture/contracts/DB/shared/root/Auth/Social/workflows. Readonly Fix prep complete; sole writer begins only after this handoff commit. New exact-head independent Review/hostedCI required after repair; never selfaccept. Last accepted actualmain b442acd; rejected f176 remains permanent history.
++
++# Bounded fresh Fix development handoff (2026-10-01)
++
++Fresh /root/message_fix repaired confirmed origin-marker deletion and missing/null required afterSeq only, product `0a13b119e0e4c8788c5b264571df35df76ad94cb`. Five bound files:two product/three tests. Actual production-chain delayed/duplicate conflict regression and local marker/required-field tests REDexit1 before repair then GREENexit0. Full live normal/race zero runtime skips; WSS/sourceall/architecture34/frozen34/CI27/build/vet/gofmt/Development localPASS; exactly four Windows CI symlink subcase skips disclosed. Exact command/results:2026-10-01-fix-command-results.json; limits/ownership:2026-10-01-fix-handoff.md. Own labeled PG16/NATS2.10/anonymousvolume cleanedexit0. Immutable FAIL archive unchanged. Recorder R-MSG-FIX-20261001 prospective_resume with incomplete preparation trace; finish/validate/byteaudit before clean finalclosure. Next NEW independent Review clean exactfinalhead/fullbranch plus hostedCI; reviewunfinished, never selfaccept/done/merge/S1PASS. Lastacceptedmain b442acd/CI36813501417. Coordinator owns after writerrelease.
++
++Post-handoff recovery format check exit1 corrected to required Command/Result/Evidence fields. Subsequent default GBK read failed on Task existing UTF8; restored prior immutable Task text from84b7a63 before appending only own handoff with explicitUTF8. No raw evidence or product changed; failed commands preserved.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-MSG-FIX-20261001/.gitattributes
+# ?? research/prompts/P-MSG-FIX-20261001/metadata.json
+# ?? research/prompts/P-MSG-FIX-20261001/prompt.txt
+# ?? research/runs/R-MSG-FIX-20261001/.gitattributes
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-0a1354a0-d360-4597-8534-95192ab07690.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-0a1354a0-d360-4597-8534-95192ab07690.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-0bc362df-075a-421c-8433-84dc5445b79c.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-0bc362df-075a-421c-8433-84dc5445b79c.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-12da47cf-8828-48ce-9409-a8ca055bed56.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-12da47cf-8828-48ce-9409-a8ca055bed56.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-1c12c2ee-6f8f-42cb-8c7c-99bd36c079e9.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-1c12c2ee-6f8f-42cb-8c7c-99bd36c079e9.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-20309982-c8b6-4d61-a99a-ce706c046349.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-20309982-c8b6-4d61-a99a-ce706c046349.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-2484225c-2c2e-4da7-b3b9-1dfb09f54669.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-2484225c-2c2e-4da7-b3b9-1dfb09f54669.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-2c611cf7-ca25-4b94-9f23-f5eed8d07eac.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-2c611cf7-ca25-4b94-9f23-f5eed8d07eac.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-2de6836a-05af-4a8a-8333-de18b0c0c766.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-2de6836a-05af-4a8a-8333-de18b0c0c766.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-319711a3-f7cc-4062-aa4c-737056f65c8d.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-319711a3-f7cc-4062-aa4c-737056f65c8d.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-348314bd-f6ec-4594-bd49-7f723a6d35da.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-348314bd-f6ec-4594-bd49-7f723a6d35da.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-35848c78-9001-437f-ac9a-763fa52c76d2.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-35848c78-9001-437f-ac9a-763fa52c76d2.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-38d75191-c596-4cfb-9d86-e3bdb118a42c.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-38d75191-c596-4cfb-9d86-e3bdb118a42c.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-3cb81f6c-f55a-4820-8271-8dfb766e1061.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-3cb81f6c-f55a-4820-8271-8dfb766e1061.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-472ec3e7-301c-4c2f-b060-75b551ca1fd8.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-472ec3e7-301c-4c2f-b060-75b551ca1fd8.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-4d3f4c24-ffc2-4c72-98b1-6baa9f10ea07.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-4d3f4c24-ffc2-4c72-98b1-6baa9f10ea07.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-4f3a374b-387b-4066-9564-2a064c581cb7.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-4f3a374b-387b-4066-9564-2a064c581cb7.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-558e3407-9eb5-4b1c-ae10-50ba56874746.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-558e3407-9eb5-4b1c-ae10-50ba56874746.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-55ae54c5-b2df-43e5-b82d-83d2029545bb.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-55ae54c5-b2df-43e5-b82d-83d2029545bb.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-55baa23f-02c9-4b75-863d-2329a691ee78.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-55baa23f-02c9-4b75-863d-2329a691ee78.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-5ce64769-bd28-4c1d-bace-3a517cef6f7a.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-5ce64769-bd28-4c1d-bace-3a517cef6f7a.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-6074ee99-e20c-48d0-bd61-6144938ec651.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-6074ee99-e20c-48d0-bd61-6144938ec651.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-62b2de77-ec56-4334-bb9d-5a3f024e3023.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-62b2de77-ec56-4334-bb9d-5a3f024e3023.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-66af117c-ffbd-4184-83f2-26296b6d91cd.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-66af117c-ffbd-4184-83f2-26296b6d91cd.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-670ff15a-3a11-4b09-a53e-da4211ef3301.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-670ff15a-3a11-4b09-a53e-da4211ef3301.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-73f5d28f-b1fb-438a-95a3-5ce679415d45.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-73f5d28f-b1fb-438a-95a3-5ce679415d45.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-77a1c43e-d094-4f92-888f-5d8d65c1d498.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-77a1c43e-d094-4f92-888f-5d8d65c1d498.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-873153e8-722c-4bec-bb81-194f6ac15241.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-873153e8-722c-4bec-bb81-194f6ac15241.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-8a64c591-bc03-4a53-bf70-4318e13c9e2c.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-8a64c591-bc03-4a53-bf70-4318e13c9e2c.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-8ba4e862-5b47-4e08-9bcb-7a456d9e91b9.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-8ba4e862-5b47-4e08-9bcb-7a456d9e91b9.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-8e848a45-09fc-45b9-806b-44ad7c5aa5ee.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-8e848a45-09fc-45b9-806b-44ad7c5aa5ee.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-a4b12096-1fea-4edc-961a-4ae115f7dd1d.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-a4b12096-1fea-4edc-961a-4ae115f7dd1d.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-b1d28992-6536-4d1e-a28f-95ab880ca5da.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-b1d28992-6536-4d1e-a28f-95ab880ca5da.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-b28a62b2-0537-40f8-8312-855d177e86ff.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-b28a62b2-0537-40f8-8312-855d177e86ff.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-b617bc06-c46c-4b3d-9f3f-2f2696fb64b9.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-b617bc06-c46c-4b3d-9f3f-2f2696fb64b9.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-ba310b65-1449-4bae-8d1d-d7da4bbdbb0a.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-ba310b65-1449-4bae-8d1d-d7da4bbdbb0a.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-c198e217-fdb4-45e3-9529-907010df02b9.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-c198e217-fdb4-45e3-9529-907010df02b9.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-ca34131a-9908-4b2f-849e-1545e1dc8166.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-ca34131a-9908-4b2f-849e-1545e1dc8166.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-ceadbf4d-2bac-4f52-ac34-207ce25f0f6b.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-ceadbf4d-2bac-4f52-ac34-207ce25f0f6b.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-d292f789-183d-407b-9261-9ed356383c09.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-d292f789-183d-407b-9261-9ed356383c09.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-e115a77e-56b7-42a0-8f51-fa6a02fb254a.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-e115a77e-56b7-42a0-8f51-fa6a02fb254a.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-e844568b-871b-4e40-bfd0-59aaf7dcfec5.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-e844568b-871b-4e40-bfd0-59aaf7dcfec5.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-eccc34c0-790a-4fa3-af3d-1f795a23d187.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-eccc34c0-790a-4fa3-af3d-1f795a23d187.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-f42c9d19-1b4f-42e4-bb84-998aded2c320.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-f42c9d19-1b4f-42e4-bb84-998aded2c320.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-f712b907-3c1e-4a0c-8a1b-c9fcb2ffd776.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-f712b907-3c1e-4a0c-8a1b-c9fcb2ffd776.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-f83a33f2-973b-4eb7-a260-4691b813b2e3.stderr.txt
+# ?? research/runs/R-MSG-FIX-20261001/blobs/C-f83a33f2-973b-4eb7-a260-4691b813b2e3.stdout.txt
+# ?? research/runs/R-MSG-FIX-20261001/events.jsonl
+# ?? research/runs/R-MSG-FIX-20261001/initial_state.json
+# ?? research/runs/R-MSG-FIX-20261001/metadata.json
+# ?? spec/progress/checkpoints/2026-10-01-loop1-go-msg-001-fix-review.md
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-checks-commands.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-cleanup-commands.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-command-results.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-final-commands.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-green-commands.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-handoff.md
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-red-commands.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-fix-setup-commands.json
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/delegated-fix-prompt.txt
+# ?? spec/progress/evidence/LOOP1-GO-MSG-001/fix_verification.py

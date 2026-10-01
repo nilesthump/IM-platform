@@ -1,0 +1,159 @@
+?   	im-platform/backend/go	[no test files]
+=== RUN   TestMessageConcurrentIdentityAndSequence
+--- PASS: TestMessageConcurrentIdentityAndSequence (0.26s)
+=== RUN   TestMessageAuthorizationAndIndependentConversations
+--- PASS: TestMessageAuthorizationAndIndependentConversations (0.12s)
+=== RUN   TestMessageRollbackAndACKAfterCommit
+--- PASS: TestMessageRollbackAndACKAfterCommit (0.11s)
+=== RUN   TestGroup500SingleLogicalMessageAndOutbox
+--- PASS: TestGroup500SingleLogicalMessageAndOutbox (4.44s)
+=== RUN   TestMessageOutboxPublicationCanRepeatWithoutNewMessage
+--- PASS: TestMessageOutboxPublicationCanRepeatWithoutNewMessage (0.17s)
+=== RUN   TestClosedNATSPublicationLeavesOutboxRetryable
+--- PASS: TestClosedNATSPublicationLeavesOutboxRetryable (0.06s)
+=== RUN   TestRevocationRollback
+--- PASS: TestRevocationRollback (0.03s)
+=== RUN   TestSocialAssemblyReuseAndRollback
+--- PASS: TestSocialAssemblyReuseAndRollback (0.10s)
+=== RUN   TestAuthorizedHistoryGapPages
+--- PASS: TestAuthorizedHistoryGapPages (0.08s)
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq/missing
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq/null
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq/negative
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq/string
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq/fraction
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq/zero
+=== RUN   TestHistoryRequiresPresentIntegerAfterSeq/positive
+--- PASS: TestHistoryRequiresPresentIntegerAfterSeq (0.07s)
+    --- PASS: TestHistoryRequiresPresentIntegerAfterSeq/missing (0.00s)
+    --- PASS: TestHistoryRequiresPresentIntegerAfterSeq/null (0.00s)
+    --- PASS: TestHistoryRequiresPresentIntegerAfterSeq/negative (0.00s)
+    --- PASS: TestHistoryRequiresPresentIntegerAfterSeq/string (0.00s)
+    --- PASS: TestHistoryRequiresPresentIntegerAfterSeq/fraction (0.00s)
+    --- PASS: TestHistoryRequiresPresentIntegerAfterSeq/zero (0.01s)
+    --- PASS: TestHistoryRequiresPresentIntegerAfterSeq/positive (0.01s)
+PASS
+ok  	im-platform/backend/go/core	7.449s
+=== RUN   TestPrivateForwardUsesBoundBearerAndCanonicalFrame
+--- PASS: TestPrivateForwardUsesBoundBearerAndCanonicalFrame (0.01s)
+=== RUN   TestLocalFanoutSelectsUserAndSuppressesOriginOnly
+--- PASS: TestLocalFanoutSelectsUserAndSuppressesOriginOnly (0.17s)
+=== RUN   TestRejectedRetryPreservesCommittedOrigin
+--- PASS: TestRejectedRetryPreservesCommittedOrigin (0.11s)
+=== RUN   TestRevocationReasonDoesNotInventBusinessCause
+--- PASS: TestRevocationReasonDoesNotInventBusinessCause (0.00s)
+=== RUN   TestPostgresRevocationReasonUsesExactCommittedIdentity
+--- PASS: TestPostgresRevocationReasonUsesExactCommittedIdentity (0.03s)
+PASS
+ok  	im-platform/backend/go/gateway	2.564s
+?   	im-platform/backend/go/plugin-host	[no test files]
+=== RUN   TestConfigReadsExternalCredentialFiles
+--- PASS: TestConfigReadsExternalCredentialFiles (0.01s)
+=== RUN   TestTokenTamperAndExpiry
+--- PASS: TestTokenTamperAndExpiry (0.00s)
+PASS
+ok  	im-platform/backend/go/shared	1.427s
+=== RUN   TestPostgresAuthSessionAndWSS
+--- PASS: TestPostgresAuthSessionAndWSS (4.29s)
+=== RUN   TestCanonicalAuthHTTPFixtures
+=== RUN   TestCanonicalAuthHTTPFixtures/invalid-credentials
+=== RUN   TestCanonicalAuthHTTPFixtures/token-in-query-rejected
+=== RUN   TestCanonicalAuthHTTPFixtures/invalid-client-type
+=== RUN   TestCanonicalAuthHTTPFixtures/refresh-client-type-mismatch
+=== RUN   TestCanonicalAuthHTTPFixtures/unsupported-protocol-version
+=== RUN   TestCanonicalAuthHTTPFixtures/authorization-binding-mismatch
+=== RUN   TestCanonicalAuthHTTPFixtures/invalid-access-token
+=== RUN   TestCanonicalAuthHTTPFixtures/expired-access-token
+=== RUN   TestCanonicalAuthHTTPFixtures/username-already-exists
+=== RUN   TestCanonicalAuthHTTPFixtures/web-refresh-missing-cookie
+=== RUN   TestCanonicalAuthHTTPFixtures/native-refresh-missing-token
+=== RUN   TestCanonicalAuthHTTPFixtures/stale-session-epoch-rejected
+=== RUN   TestCanonicalAuthHTTPFixtures/revoked-refresh-token-rejected
+--- PASS: TestCanonicalAuthHTTPFixtures (6.80s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/invalid-credentials (0.49s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/token-in-query-rejected (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/invalid-client-type (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/refresh-client-type-mismatch (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/unsupported-protocol-version (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/authorization-binding-mismatch (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/invalid-access-token (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/expired-access-token (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/username-already-exists (0.70s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/web-refresh-missing-cookie (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/native-refresh-missing-token (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/stale-session-epoch-rejected (0.00s)
+    --- PASS: TestCanonicalAuthHTTPFixtures/revoked-refresh-token-rejected (0.00s)
+=== RUN   TestCanonicalWSSPrebindFixturesAndMalformedRequestID
+=== RUN   TestCanonicalWSSPrebindFixturesAndMalformedRequestID/ping-before-bind
+=== RUN   TestCanonicalWSSPrebindFixturesAndMalformedRequestID/unauthenticated-send
+=== RUN   TestCanonicalWSSPrebindFixturesAndMalformedRequestID/invalid-signature-bind
+=== RUN   TestCanonicalWSSPrebindFixturesAndMalformedRequestID/expired-token-bind
+=== RUN   TestCanonicalWSSPrebindFixturesAndMalformedRequestID/malformed-requestId-ping
+=== RUN   TestCanonicalWSSPrebindFixturesAndMalformedRequestID/malformed-requestId-auth.bind
+--- PASS: TestCanonicalWSSPrebindFixturesAndMalformedRequestID (0.01s)
+    --- PASS: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/ping-before-bind (0.00s)
+    --- PASS: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/unauthenticated-send (0.00s)
+    --- PASS: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/invalid-signature-bind (0.00s)
+    --- PASS: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/expired-token-bind (0.00s)
+    --- PASS: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/malformed-requestId-ping (0.00s)
+    --- PASS: TestCanonicalWSSPrebindFixturesAndMalformedRequestID/malformed-requestId-auth.bind (0.00s)
+=== RUN   TestCanonicalWSSAuthSessionFixtures
+--- PASS: TestCanonicalWSSAuthSessionFixtures (1.56s)
+=== RUN   TestCanonicalLiveMessageSendFixtures
+=== RUN   TestCanonicalLiveMessageSendFixtures/durable-send-and-created
+=== RUN   TestCanonicalLiveMessageSendFixtures/idempotent-retry
+=== RUN   TestCanonicalLiveMessageSendFixtures/same-request-different-conversation
+=== RUN   TestCanonicalLiveMessageSendFixtures/group-single-message
+=== RUN   TestCanonicalLiveMessageSendFixtures/non-member-send
+=== RUN   TestCanonicalLiveMessageSendFixtures/conflicting-retry
+=== RUN   TestCanonicalLiveMessageSendFixtures/rollback-before-ack
+--- PASS: TestCanonicalLiveMessageSendFixtures (28.98s)
+    --- PASS: TestCanonicalLiveMessageSendFixtures/durable-send-and-created (4.20s)
+    --- PASS: TestCanonicalLiveMessageSendFixtures/idempotent-retry (3.73s)
+    --- PASS: TestCanonicalLiveMessageSendFixtures/same-request-different-conversation (3.76s)
+    --- PASS: TestCanonicalLiveMessageSendFixtures/group-single-message (6.34s)
+    --- PASS: TestCanonicalLiveMessageSendFixtures/non-member-send (3.63s)
+    --- PASS: TestCanonicalLiveMessageSendFixtures/conflicting-retry (3.62s)
+    --- PASS: TestCanonicalLiveMessageSendFixtures/rollback-before-ack (3.69s)
+=== RUN   TestCanonicalDuplicateOutOfOrderAndSyncRecovery
+=== RUN   TestCanonicalDuplicateOutOfOrderAndSyncRecovery/duplicate-fanout
+=== RUN   TestCanonicalDuplicateOutOfOrderAndSyncRecovery/out-of-order-fanout
+=== RUN   TestCanonicalDuplicateOutOfOrderAndSyncRecovery/wrong-conversation-fanout
+--- PASS: TestCanonicalDuplicateOutOfOrderAndSyncRecovery (11.71s)
+    --- PASS: TestCanonicalDuplicateOutOfOrderAndSyncRecovery/duplicate-fanout (3.72s)
+    --- PASS: TestCanonicalDuplicateOutOfOrderAndSyncRecovery/out-of-order-fanout (3.72s)
+    --- PASS: TestCanonicalDuplicateOutOfOrderAndSyncRecovery/wrong-conversation-fanout (4.26s)
+=== RUN   TestLiveConflictingRetryDelayedOrigin
+--- PASS: TestLiveConflictingRetryDelayedOrigin (5.15s)
+=== RUN   TestPostgresRevocationFallbackWithoutNATS
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/REPLACED
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/LOGOUT
+=== RUN   TestPostgresRevocationFallbackWithoutNATS/REPLACED_THEN_LOGOUT
+--- PASS: TestPostgresRevocationFallbackWithoutNATS (6.11s)
+    --- PASS: TestPostgresRevocationFallbackWithoutNATS/REPLACED (2.04s)
+    --- PASS: TestPostgresRevocationFallbackWithoutNATS/LOGOUT (2.04s)
+    --- PASS: TestPostgresRevocationFallbackWithoutNATS/REPLACED_THEN_LOGOUT (2.02s)
+=== RUN   TestPostgresFallbackExpiryAndDatabaseFailureClose
+=== RUN   TestPostgresFallbackExpiryAndDatabaseFailureClose/expiry
+=== RUN   TestPostgresFallbackExpiryAndDatabaseFailureClose/database
+--- PASS: TestPostgresFallbackExpiryAndDatabaseFailureClose (5.06s)
+    --- PASS: TestPostgresFallbackExpiryAndDatabaseFailureClose/expiry (3.03s)
+    --- PASS: TestPostgresFallbackExpiryAndDatabaseFailureClose/database (2.03s)
+=== RUN   TestCanonicalSocialFixturesAndAtomicity
+=== RUN   TestCanonicalSocialFixturesAndAtomicity/missing-authentication
+=== RUN   TestCanonicalSocialFixturesAndAtomicity/friend-target-not-found
+=== RUN   TestCanonicalSocialFixturesAndAtomicity/friend-self-rejected
+--- PASS: TestCanonicalSocialFixturesAndAtomicity (2.13s)
+    --- PASS: TestCanonicalSocialFixturesAndAtomicity/missing-authentication (0.00s)
+    --- PASS: TestCanonicalSocialFixturesAndAtomicity/friend-target-not-found (0.00s)
+    --- PASS: TestCanonicalSocialFixturesAndAtomicity/friend-self-rejected (0.00s)
+=== RUN   TestConcurrentReverseFriendAdd
+--- PASS: TestConcurrentReverseFriendAdd (2.10s)
+=== RUN   TestSocialLoop1Applicability
+    social_test.go:209: DISPOSITION friend-add-authorization-denied DEFERRED_BY_HUMAN; runtime not executed; does not count as canonical PASS
+--- PASS: TestSocialLoop1Applicability (0.00s)
+=== RUN   TestSocialMutationRechecksSessionAfterUserLock
+--- PASS: TestSocialMutationRechecksSessionAfterUserLock (2.06s)
+PASS
+ok  	im-platform/backend/go/tests	78.299s

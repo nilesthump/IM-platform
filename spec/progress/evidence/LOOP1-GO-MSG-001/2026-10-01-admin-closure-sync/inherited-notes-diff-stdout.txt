@@ -1,0 +1,35 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 9fe2da1..b607d49 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -7,7 +7,7 @@ Gate Status: OPEN (MSG independently accepted; TLS entrypoint E2E pending)
+ Current Batch: LOOP1-S1
+ Current Task: LOOP1-GO-MSG-001
+ Current Task State: done
+-Execution Status: MSG_ACCEPTED_ADMINISTRATIVE_CLOSURE
++Execution Status: HANDOFF_STOPPED_BY_HUMAN_AFTER_REVIEW
+ 
+ ## Immediately Relevant Completed Work
+ 
+@@ -50,3 +50,9 @@ Coordinator owns MSG administrative closure only until clean commit; all impleme
+ ## Architecture Conflicts / ACP / ADR
+ 
+ None. S1 OPEN.
++
++## Human-requested stop after review (2026-10-01)
++
++Human explicitly requested review completion followed by immediate handoff and stop. Fresh /root/message_closure_review completed clean detached33b1522c7f315b7aeb25fc31c05756c2bc950a9c administrative local PASS, hosted acceptance PENDING: PR36820491515 selected classify110234807646 direct API in_progress/conclusionnull despite aggregateSUCCESS. Other selected PR jobs and push36820486384 SUCCESS. Product183 acceptance remains valid; S1 OPEN. External immutable report: H:/.codex/worktrees/msg-closure-review-20261001/evidence/2026-10-01-independent-administrative-review-report.md. Own Recorder92events finishedFAIL due incomplete hosted acceptance, structurePASS; writerreleased. No next-task activation.
++
++Next exact action after human resumes: read startup in order; inspect Coordinator-owned uncommitted handoff-only task/current changes; requery classify direct API and exact closure CI, archive external reviewer evidence with byte preservation. E2E remains backlog: required CI hook/classifier paths are outside its allowed_paths. Pending scope question was NOT answered; do not infer authorization. Preserve original checkout/unrelated evidence. Last committed source33b1522; Coordinator owns ONLY uncommitted handoff notes. These final handoff-only edits occur outside finished Coordinator trace and must not be represented as complete prospective research. No product changes.
+diff --git a/spec/tasks/done/LOOP1-GO-MSG-001.md b/spec/tasks/done/LOOP1-GO-MSG-001.md
+index 8cab621..16b3b3b 100644
+--- a/spec/tasks/done/LOOP1-GO-MSG-001.md
++++ b/spec/tasks/done/LOOP1-GO-MSG-001.md
+@@ -123,3 +123,7 @@ Final fix Recorder finished/validated97events (research-only PASS). Post-finish
+ # Independent acceptance closure (2026-10-01)
+ 
+ Fresh /root/message_rereview independently PASS on exact clean `183be639640cf652dc7a9f18152071c617f2ceac`, full b442acd..183be63. Durable report/commands/clean-state/probes/CI/tree-binding under spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-independent-review-183be63/. Actual PG16/NATS2.10 full normal20.735s/race82.797s exit0, zero runtime skips; original two failure probes and expanded required-cursor cases PASS. Hosted PR36819292528/push36819288126 selected six jobs SUCCESS; PR virtual merge parents and tree equality verified. Four local Windows symlink subcase skips covered by actual Linux checks. All225 tracked prior raw artifacts exact; prior FAIL and interrupted historical Recorder preserved. Reviewer services/volume cleaned, writer released. Task acceptance PASS; S1 OPEN pending LOOP1-E2E-001 real TLS entrypoint. No product changes during closure. Next exact action independently verify administrative closure and hosted final head, then resolve dependency-satisfied E2E task. Accepted product candidate183be63; accepted actualmain remains b442acd until merge. Coordinator owns only evidence/recovery closure.
++
++# Human-requested review handoff and stop (2026-10-01)
++
++Fresh administrative Review /root/message_closure_review exact clean33b1522c7f315b7aeb25fc31c05756c2bc950a9c local PASS, hosted closure PENDING: PR36820491515 classify110234807646 direct API in_progress/conclusionnull despite overallSUCCESS. Remaining selected jobs and push36820486384 SUCCESS. Product183 independent acceptance remains valid. Report external H:/.codex/worktrees/msg-closure-review-20261001/evidence/2026-10-01-independent-administrative-review-report.md; Recorder92events honestFAIL/structuralPASS, reviewerreleased. User explicitly requests immediatehandoffstop; no E2E activation/merge/S1PASS. Coordinator owns only uncommitted handoffnotes in this Task/current, outside finished trace. Nextagent rechecks exactCI/directjob, archives report/raw evidence, then awaits explicit E2E CI-path authorization beforeactivation. Source commit33b1522, acceptedproduct183, acceptedmainb442acd. All services cleaned; unrelated source preserved.

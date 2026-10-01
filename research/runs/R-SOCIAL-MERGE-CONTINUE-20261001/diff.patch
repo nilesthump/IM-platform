@@ -1,0 +1,124 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 31af253..b9123c1 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -1,62 +1,56 @@
+ # Current Execution State
+ 
+ Current Loop: Loop 1
+-Current Stage: S1 Social recovery
++Current Stage: S1
+ Current Gate: S1
+-Gate Status: OPEN (Social Task PASS; complete S1 Gate not claimed)
++Gate Status: OPEN (Social Task accepted/merged; complete S1 Gate not claimed)
+ Current Batch: LOOP1-S1
+ Current Task: LOOP1-GO-SOCIAL-001
+ Current Task State: done
+-Execution Status: SOCIAL_ACCEPTED_FINITE_CLOSURE
++Execution Status: SOCIAL_MERGED_CONTINUATION_READINESS
+ 
+ ## Immediately Relevant Completed Work
+ 
+-Remediation PR2 merged to actual main279c1dc; actual main CI36764254107 all13SUCCESS. Social product27862b95 independently accepted by fresh reviewer and full PR CI36810190233. Draft PR3 open/unmerged. OpenAPI friend403 placeholder retained; single Loop1 case deferred/notPASS.
++Human explicitly requested PR merge and continuation. PR3 merged at accepted final headfbf8759 into actual main b442acd26777c481620a6bd917863cebfaf79b35. Fresh independent Social product review27862b95 remains PASS; final-head PRCI36811766142 and actual-mainCI36813501417 completed SUCCESS,12 selected jobs/deploy inactive. Protected product/authority/checker/workflow blobs unchanged.
+ 
+ ## Current Blockers
+ 
+-None for accepted Social Task. Future FRIEND-AUTHORIZATION-403 remains DEFERRED_BY_HUMAN and unimplemented. S1 OPEN; no subsequent product task selected.
++No Social merge blocker. Next MSG input/precise-path readiness is under read-only fresh Implementation Agent inspection; no activation or product edits yet. Friend403 remains single DEFERRED_BY_HUMAN future item, never messaging authorization exemption.
+ 
+ ## Verification
+ 
+-- Command: `go -C backend/go test -count=1 -v ./...; go -C backend/go test -race -count=1 -v ./...`
+-  - Result: independent DB_TEST_ENABLE=1/migrated disposablePG16/NATS2.10, exit0, zero runtime skips; deterministic legal logout probe3 race repetitions PASS.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-product-review-report.md`; 2026-10-01-product-command-results.json
+-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance; frozen verifier; sourceall; CI controls; recursive gofmt/build/vet`
+-  - Result: clean committed candidate, exit0; frozen34/no skips, CI27/four disclosed Windows symlink subcase skips, hostedLinux checks accepted.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-product-review-report.md`
+-- Command: `gh run view 36810190233 --json headSha,event,status,conclusion,jobs; actual checkout logs and GitHub commit/tree API`
+-  - Result: exact product subject27862b95/base279c1dc,12selectedSUCCESS/deployinactive; syntheticmergef9bd4b0 tree equals candidate.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-product-hosted-ci-proof.json`
+-
+-- Command: `gh api --method PUT repos/nilesthump/IM-platform/branches/main/protection --input main-protection-request.json; gh api repos/nilesthump/IM-platform/branches/main/protection`
+-  - Result: exit0; GET readback verified PR/gate/app15368/strict/admins/no force/no delete/conversations; main SHA unchanged.
+-  - Evidence: `spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-main-branch-protection.json`
++- Clean isolated PRheadfbf8759 recovery Acceptance: exit0; no status entries.
++- Frozen architecture verifier: exit0,34 tests, no skips.
++- gh pr merge3 --merge --match-head-commit fbf87598362f5f3abd2f23c7bbcb3935956326f0: exit0; live view confirms MERGED/b442acd.
++- gh run view36813501417: exact actual-main push b442acd, completed SUCCESS; all12selected jobs SUCCESS/deploy inactive.
++- git diff27862b95 b442acd -- backend contracts ci .github/workflows spec/architecture/frozen-architecture.md: exit0/empty.
++- git diff --check: exit0.
++Durable exact commands/Recorder IDs and limits: spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-human-authorized-merge.md. Recorder is not product acceptance.
+ 
+ ## Changed Files or Migrations
+ 
+-Four accepted Core/test product files; bounded approved ADR-0004/applicability/acceptance overlay and own recovery evidence. DB0001, OpenAPI/golden, frozen v1.1, checkers/workflows and shared/Gateway/Auth remain unchanged.
++Only Social merge/recovery/evidence/checkpoint and task-linked Recorder additions. No product/contract/schema/architecture change. Database0001 unchanged.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-First implementation launcher malformed/skipped integration and is excluded; corrected live normal/race zero skips. Reviewer launch/sandbox/cleanup-inspection failures corrected and recorded. Recorder incomplete startup/directwrites/redaction/truncation disclosed; not complete prospective trace. Only friend403 deferred, no general security waiver. No Social production/load or complete S1 PASS.
++Ready connector permission denied; authenticated CLI succeeded under existing branch protection. Original startup Recorder pipe/base64/UTF8 failures preserved and exposed; corrected original run validates22events, failed empty-prompt run validates4events. Worktree run is prospective_resume/incomplete prior trace; pre-start reads/connector calls disclosed. No universal Recorder trace completeness claimed. Actual main CI success does not close S1 without MSG/E2E.
+ 
+ ## Next Exact Action
+ 
+-Main protection enabled and read back: PR required, strict GitHub Actions gate, admins enforced, no force-push/deletion, conversations resolved. Return Draft PR3 to Human; final closure CI is independently visible on PR3 and never substitutes a different product subject. No automatic merge or Message/E2E/Java/client/plugin/S2.
++Resolve LOOP1-GO-MSG-001 dependencies and current canonical contracts, bind actual service responsibility files before edits, then promote backlog->ready->active if inputs satisfied. If missing authority prevents compliant implementation, record smallest BLOCKED_BY_ARCHITECTURE question; do not invent contracts or cross-service imports.
+ 
+ ## Last Known Good Commit
+ 
+-`279c1dc4681683e2af3b3534a00e5222dde36be6` accepted actualmain. 27862b95ef6269c7c353ad8c44c32c0e322e035a accepted Social product subject; final closure SHA may differ with unchanged protected product/authority/checker blobs.
++b442acd26777c481620a6bd917863cebfaf79b35 (accepted actualmain merge, CI36813501417); independently reviewed Social product27862b95.
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-10-01-loop1-go-social-001-accepted.md`
++spec/progress/checkpoints/2026-10-01-loop1-go-social-001-merged.md
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-No product writer remains; Coordinator owns finite recovery closure until final commit, after which clean committed state is required. All implementation/reviewer writers released. OldSocial/Auth/remediation/original worktrees and five unknown original untracked paths preserved; only reviewer-owned disposable services removed.
++Coordinator owns only Social merge recovery and Recorder in H:/.codex/worktrees/social-merge-continue/IM-platform until checkpoint commit. Fresh /root/message_implementation is read-only and owns no writes yet. Original H:/IM-platform stale Contract branch, five pre-existing unknown/other-agent paths and prior worktrees untouched; this Coordinator's original startup Recorder artifacts remain uncommitted there, separately disclosed and not imported.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-No open conflict for Loop1 Social. Accepted ADR-0004/profile retains OpenAPI/golden403; only friend case deferred/notPASS. Social Task PASS does not close S1 Gate.
++No new decision or waiver. Messaging readiness inspection pending; only approved friend403 exception remains.
+diff --git a/spec/tasks/done/LOOP1-GO-SOCIAL-001.md b/spec/tasks/done/LOOP1-GO-SOCIAL-001.md
+index bf307ec..138c607 100644
+--- a/spec/tasks/done/LOOP1-GO-SOCIAL-001.md
++++ b/spec/tasks/done/LOOP1-GO-SOCIAL-001.md
+@@ -114,3 +114,7 @@ Only friend-add-authorization-denied remains DEFERRED_BY_HUMAN, future FRIEND-AU
+ # Human-authorized main branch protection
+ 
+ After Social independent acceptance/task done, GitHub main protection enabled and verified by GET readback. Require PR and strict gate from GitHub Actions app15368, enforce administrators, forbid force push/deletion, resolve conversations. No GitHub approval count imposed under baseline configuration; independent repository Review remains mandatory. Main279c1dc unchanged; Social DraftPR3 unmerged. Evidence: 2026-10-01-main-branch-protection.json. Final action: finite closure CI and human handoff, no next product selection.
++
++# Human-authorized merge and continuation (2026-10-01)
++
++PR3 merged at exact accepted headfbf8759 into actualmain b442acd26777c481620a6bd917863cebfaf79b35; human instruction 合并pr，阅读AGENTS.md并继续 supersedes prior draft/no-continuation handoff. Final-head PR CI36811766142 SUCCESS/twelve selected jobs. Merge evidence: 2026-10-01-human-authorized-merge.md. MainCI36813501417 must pass before next dependency-satisfied MSG activation. No active Social product writer, old unknown work preserved; S1 OPEN and restricted friend403 deferred only.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-SOCIAL-MERGE-CONTINUE-20261001/metadata.json
+# ?? research/prompts/P-SOCIAL-MERGE-CONTINUE-20261001/prompt.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/.gitattributes
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-10ade741-7207-4cf6-b79e-1ff336f6f3e4.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-10ade741-7207-4cf6-b79e-1ff336f6f3e4.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-1eb053ab-f5c4-4f60-bb08-4b6c9d13fcca.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-1eb053ab-f5c4-4f60-bb08-4b6c9d13fcca.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-2fe2d2bb-1623-4cb6-b438-c48f3709f301.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-2fe2d2bb-1623-4cb6-b438-c48f3709f301.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-39ff82cc-bf08-4e6b-a528-200e082d987e.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-39ff82cc-bf08-4e6b-a528-200e082d987e.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-90010000-a873-4ca7-8097-54ef1548de82.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-90010000-a873-4ca7-8097-54ef1548de82.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-960c9f76-5a08-491b-a8ce-825a59119d55.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-960c9f76-5a08-491b-a8ce-825a59119d55.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-a251be63-8f6d-4635-b200-5d0fd5559bb1.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-a251be63-8f6d-4635-b200-5d0fd5559bb1.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-fd2a0d50-d3e4-49a2-8444-9be6d2a1c20c.stderr.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/blobs/C-fd2a0d50-d3e4-49a2-8444-9be6d2a1c20c.stdout.txt
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/events.jsonl
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/initial_state.json
+# ?? research/runs/R-SOCIAL-MERGE-CONTINUE-20261001/metadata.json
+# ?? spec/progress/checkpoints/2026-10-01-loop1-go-social-001-merged.md
+# ?? spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-human-authorized-merge.md

@@ -1,0 +1,43 @@
+ backend/go/core/http.go                            |    2 +
+ backend/go/core/message.go                         |  169 +++
+ backend/go/core/message_test.go                    |  285 +++++
+ backend/go/core/outbox.go                          |   44 +-
+ backend/go/core/outbox_test.go                     |   89 ++
+ backend/go/core/sync.go                            |   82 ++
+ backend/go/core/sync_test.go                       |   51 +
+ backend/go/gateway/gateway.go                      |  131 +-
+ backend/go/gateway/http.go                         |    4 +
+ backend/go/gateway/message_test.go                 |  109 ++
+ backend/go/tests/auth_test.go                      |   10 +-
+ backend/go/tests/message_test.go                   |  415 ++++++
+ spec/progress/current.md                           |   46 +-
+ .../2026-10-01-auth-regression-scope.md            |    1 +
+ .../2026-10-01-baseline-commands.json              |  151 +++
+ .../2026-10-01-checks-commands.json                |  175 +++
+ .../2026-10-01-cleanup-commands.json               |   78 ++
+ .../2026-10-01-final-commands.json                 |   61 +
+ .../2026-10-01-implementation-command-results.json | 1339 ++++++++++++++++++++
+ .../2026-10-01-implementation-handoff.md           |   26 +
+ .../delegated-implementation-prompt.txt            |    1 +
+ .../evidence/LOOP1-GO-MSG-001/live_verification.py |   45 +
+ spec/tasks/{active => review}/LOOP1-GO-MSG-001.md  |   15 +-
+ 23 files changed, 3284 insertions(+), 45 deletions(-)
+[task/LOOP1-GO-MSG-001 f64ae64] Implement durable Core text messages and Gateway realtime delivery
+ 23 files changed, 3284 insertions(+), 45 deletions(-)
+ create mode 100644 backend/go/core/message.go
+ create mode 100644 backend/go/core/message_test.go
+ create mode 100644 backend/go/core/outbox_test.go
+ create mode 100644 backend/go/core/sync.go
+ create mode 100644 backend/go/core/sync_test.go
+ create mode 100644 backend/go/gateway/message_test.go
+ create mode 100644 backend/go/tests/message_test.go
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-auth-regression-scope.md
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-baseline-commands.json
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-checks-commands.json
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-cleanup-commands.json
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-final-commands.json
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-command-results.json
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-implementation-handoff.md
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/delegated-implementation-prompt.txt
+ create mode 100644 spec/progress/evidence/LOOP1-GO-MSG-001/live_verification.py
+ rename spec/tasks/{active => review}/LOOP1-GO-MSG-001.md (76%)

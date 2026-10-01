@@ -1,0 +1,129 @@
+{
+  "owner": "R-MSG-REREVIEW-20261001",
+  "phase": "checks",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55642",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_rereview",
+    "NATS_URL": "nats://127.0.0.1:42642"
+  },
+  "commands": [
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.172,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.859,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.625,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.641,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/verify-frozen-architecture.ps1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.578,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-B",
+        "tools/research/recorder.py",
+        "validate-repository",
+        "--allow-partial"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.578,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "gofmt",
+        "-l",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\main.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\auth.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\http.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\message.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\message_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\outbox.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\outbox_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\rollback_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\social.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\social_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\sync.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\core\\sync_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\gateway\\gateway.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\gateway\\http.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\gateway\\message_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\gateway\\session.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\gateway\\session_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\plugin-host\\http.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\shared\\config.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\shared\\config_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\shared\\infra.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\shared\\security.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\shared\\security_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\tests\\auth_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\tests\\contract_fixture_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\tests\\message_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\tests\\revocation_fallback_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\tests\\runtime_test.go",
+        "H:\\.codex\\worktrees\\msg-rereview-20261001\\IM-platform\\backend\\go\\tests\\social_test.go"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.141,
+      "go_skips": 0
+    }
+  ]
+}

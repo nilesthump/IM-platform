@@ -1,0 +1,56 @@
+{
+  "owner": "R-MSG-REREVIEW-20261001",
+  "phase": "cleanup",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55642",
+    "PGUSER": "postgres",
+    "PGDATABASE": "msg_rereview",
+    "NATS_URL": "nats://127.0.0.1:42642"
+  },
+  "commands": [
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "loop1-msg-rereview-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.25,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-msg-rereview-pg-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.734,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "inspect",
+        "loop1-msg-rereview-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.25,
+      "go_skips": 0
+    },
+    {
+      "argv": [
+        "docker",
+        "rm",
+        "-fv",
+        "loop1-msg-rereview-nats-20261001"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.625,
+      "go_skips": 0
+    }
+  ]
+}

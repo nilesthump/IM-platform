@@ -1,0 +1,618 @@
+<a id="section-3"></a>
+## 3. 系统总体架构与部署单元
+
+```mermaid
+flowchart LR
+  Web["Web<br/>临时内存态"]
+  Desktop["Desktop<br/>SQLite"]
+  Mobile["Mobile<br/>SQLite"]
+  UI["Plugin UI Host<br/>声明式 UI + Render Bundle"]
+  Gateway["TLS Proxy / Gateway<br/>HTTPS + WSS"]
+  Core["Core 模块化单体<br/>Auth / IM / Sync"]
+  Plugin["Plugin Host<br/>WASM Sandbox"]
+  PG["PostgreSQL<br/>事实来源 + Outbox"]
+  NATS["NATS<br/>实时事件总线"]
+  Web --> Gateway
+  Desktop --> Gateway
+  Mobile --> Gateway
+  UI --> Gateway
+  Gateway --> Core
+  Core --> Plugin
+  Core --> PG
+  Core --> NATS
+  NATS --> Gateway
+```
+
+> 图 3-1 逻辑组件图。
+
+> 实时路径为 Core 的 Outbox dispatcher → NATS → Gateway；PostgreSQL 写入由 Core 事务负责。历史 PDF 的 NATS → PostgreSQL 箭头只保留在历史来源中，不代表现行运行依赖。
+
+<a id="section-3-1"></a>
+### 3.1 三个物理部署单元
+
+| 部署单元 | 职责 | 明确不负责 |
+| --- | --- | --- |
+| gateway | TLS 之后的 WSS 生命周期、auth.bind、session/cache 校验、connection registry、协议路由、local fan-out、heartbeat/限流 | 好友/群成员规则、消息持久化、插件业务逻辑 |
+| core | Auth、Session、User、Friendship、Conversation、Message、Sync、Outbox；模块化单体 | 不可信插件执行；大量 socket 连接状态 |
+| plugin-host | WASM runtime、事件分派、经授权的 Query/Action Host bridge、资源限制、熔断、编译缓存 | 不可信 WASM 直接访问数据库/文件/任意网络；绕过 Core 业务授权；成为 IM 主链单点 |
+
+<a id="section-3-2"></a>
+### 3.2 运行 profile
+
+```text
+docker compose --profile go up
+# gateway-go + core-go + plugin-host-go adapter + shared PostgreSQL/NATS/TLS
+docker compose --profile java up
+# gateway-java + core-java + plugin-host adapter + same canonical schema/contracts
+```
+
+profile 的目标是行为可替换；服务内部源码结构可以不同，但 §3 职责、§10 服务源码归属和依赖方向共同约束两个后端。Go 与 Java 可使用各自惯用的框架和组织方式，但必须共享：公共契约、数据库迁移语义、错误码、测试向量、插件 API、Release Manifest 格式。
+
+<a id="section-3-3"></a>
+### 3.3 Loop 1 单机部署
+
+| 层 | Loop 1 单机部署规则 |
+| --- | --- |
+| 入口 | TLS reverse proxy 暴露 HTTPS/WSS；部署 smoke、E2E、容量与发布验收流量经过真实入口。单元和隔离集成测试可直接访问被测组件，但不得替代入口验收 |
+| 服务 | 仅启动一个后端 profile；gateway/core/plugin-host 为可独立启动的部署角色。可复用一个构建制品按角色启动；不强制三个 module 或三个 binary，禁止把源码职责混为一个业务包 |
+| 数据 | PostgreSQL 单实例；所有 migration 有 forward/rollback 规则 |
+| 事件 | Core NATS，默认非事实来源；Outbox dispatcher 可重放 |
+| 存储 | 3TB 是机器容量约束，不代表测试必须填满；记录实际占用与增长 |
+
+
+<a id="section-10"></a>
+## 10. Monorepo 与规范控制面
+
+```text
+/
+├── spec/
+│ ├── architecture/
+│ │ ├── README.md + baseline.md # resolver 与完整性元数据
+│ │ ├── frozen-architecture.md # 唯一现行正文
+│ │ └── decisions/ # ADR + frozen decisions
+│ ├── domain/ # auth/user/friend/conversation/message/sync/plugin
+│ ├── invariants/ # 跨语言不可变量
+│ ├── acceptance/ # loop-1.md + stage gates
+│ ├── progress/
+│ │ ├── current.md
+│ │ └── checkpoints/
+│ ├── handoff/agent-context.md
+│ └── tasks/{backlog,ready,active,review,done}/
+├── contracts/
+│ ├── http/
+│ ├── websocket/
+│ ├── errors/
+│ ├── database/
+│ ├── plugin-api/
+│ └── fixtures/ # golden vectors / old clients / plugins
+├── backend/
+│ ├── go/{gateway,core,plugin-host,tests,shared}/
+│ └── java/{gateway,core,plugin-host,tests,shared}/
+├── clients/
+│ ├── shared/{protocol-sdk,plugin-sdk,ui}/
+│ ├── web/
+│ ├── desktop/
+│ └── mobile/
+├── plugins/fixtures/{echo,poll}/
+├── tests/{contract,integration,e2e,compatibility,load}/
+├── deploy/{compose,proxy,observability}/
+├── ci/
+└── tools/
+```
+
+### 服务源码与依赖规则（Go / Java 共同适用）
+
+- **SRC-01**：`backend/<language>/gateway/**` 只实现 §3.1 Gateway；`core/**` 拥有 Auth/Session 写事务、User/Friend/Conversation/Message/Sync/Outbox；`plugin-host/**` 拥有受控插件执行与代理。业务源码 MUST 位于对应服务范围，不能放在语言根目录或未批准的 `internal/**` 业务目录。
+- **SRC-02**：语言根目录只白名单允许入口装配（Go `main.go`、Java `Main.java`）、模块/依赖/构建文件（Go `go.mod`/`go.sum`，Java `pom.xml` 或 Gradle 配置）、Dockerfile、README.md、config.example.json 及根入口测试（Go `main_test.go`、Java `MainTest.java`）。入口只能读取配置、选择角色、连接依赖、启动/关闭对应服务；不得实现路由业务、Auth 服务或 Session 写逻辑。根测试仅验证装配，服务测试与职责同迁或置于 `tests/**`；不能以测试文件名藏业务实现。新增根源码例外必须先明确批准、列入检查器白名单并限定用途。
+- **SRC-03**：`shared/**` 可承载配置读取、日志、连接建立、通用编解码、密码学/令牌原语和由 canonical contracts 约束的传输数据类型。共享包 MUST NOT 承载完整 Auth 服务、注册/登录/刷新/退出流程、Session 写事务、业务仓储、权限/成员决策、Outbox 业务编排，亦不得反向依赖任何服务包。Gateway 的只读权威 Session 校验归 Gateway；Core 保有写事务。共享不是绕过职责的后门。
+- **SRC-04**：服务可依赖共享支持与本服务内部包；任何服务 MUST NOT 直接 import/依赖另一服务内部实现。服务间通过现有授权的 HTTP/WSS/事件/受控 Host bridge 边界协作；不因源码整改新增 RPC、公共契约、module 或基础设施。根装配可依赖各服务的最小启动接口，测试可跨服务作黑盒组合验证，均不得成为运行期业务反向依赖。
+- **SRC-05**：Go 与 Java 可使用不同的服务内部包/模块/线程组织；共同职责、物理角色和上述源码边界不可被“行为等价”豁免。不强制三 module、三 binary 或多层架构。Reviewer 检查实际职责和 import 图，不只看文件名或目录存在。
+- **SRC-06**：S0 历史占位白名单为 Go `backend/go/main.go` 与 Java `backend/java/InfraPlaceholder.java` 的非业务启动/健康/transport echo 骨架；清单不允许其承载业务。按后端分别退出：该后端第一次业务实现开始即移除业务路径的占位豁免；另一后端仍按明确占位清单验证，不能永久跳过结构规则。新规则暴露的旧实现偏离必须在迁移任务消除，不能 grandfather。单次跨服务迁移需 Task Spec 明确列出迁移文件/职责、范围和退出条件。
+- **SRC-07**：Task `allowed_paths` 仅限定可修改范围，不是架构豁免。普通业务任务按服务职责收窄；结构/依赖检查和行为测试共同验收。规范冲突必须在实现前升级，禁止事后修改架构追认错误布局。
+
+<a id="section-10-1"></a>
+### 10.1 spec/ 各目录的职责
+
+| 路径 | 回答的问题 | 禁止内容 |
+| --- | --- | --- |
+| architecture/decisions | 为什么这样设计，哪些已经冻结？ | 临时实现笔记 |
+| domain | 业务对象与行为是什么？ | 某语言的类结构 |
+| invariants | 无论实现如何都必须成立什么？ | 性能猜测 |
+| acceptance | 怎样判定阶段/Loop 通过？ | 不可验证的“基本完成” |
+| progress/current.md | 现在整体在哪里？最后已验证状态是什么？ | 任务细节堆积 |
+| checkpoints | 稳定里程碑的可恢复快照是什么？ | 每次小编辑日志 |
+| handoff/agent-context.md | 新 Agent 先知道什么？ | 重复全部文档 |
+| tasks | 下一件可执行工作是什么？允许修改哪里？ | 架构自由发挥 |
+
+<a id="section-11"></a>
+## 11. 公共契约与双后端实现
+
+<a id="section-11-1"></a>
+### 11.1 唯一权威
+
+Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户端 SDK。契约包含 OpenAPI/HTTP、WSS envelope 与消息类型、错误码、协议版本与 capabilities、数据库 schema/migrations、Plugin API、Golden Test Vectors。实现代码不得成为反向权威。
+
+<a id="section-11-2"></a>
+### 11.2 等价而非同构
+
+| 必须相同 | 允许不同 |
+| --- | --- |
+| HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、插件权限、数据库结果；§3/§10 服务职责、源码归属和依赖方向 | 服务内部框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部接口 |
+| Release Manifest、健康检查、metrics 标签、日志关联字段 | 内部模块名称与代码风格 |
+
+<a id="section-11-3"></a>
+### 11.3 Golden Contract Tests
+
+```text
+同一 fixture 输入 -> Go profile -> 规范化结果 A
+同一 fixture 输入 -> Java profile -> 规范化结果 B
+断言 A == Canonical Expected && B == Canonical Expected
+必须覆盖：auth/session、friend/direct uniqueness、group idempotency、message ACK/outbox、retry、sync gap、plugin permissions、errors/version negotiation
+```
+
+<a id="section-11-4"></a>
+### 11.4 数据库迁移
+
+两套后端共享数据库语义，但单次部署只运行一个 profile。migration 由独立迁移组件执行，不允许应用实例竞争执行。所有兼容窗口内的服务与客户端 fixture 必须通过 migration 测试。破坏性 schema 变更采用 expand -> migrate/backfill-> switch -> contract，多版本共存期间禁止先删旧字段。
+
+<a id="section-12"></a>
+## 12. AI Development Loop
+
+```mermaid
+flowchart LR
+  Context["读取上下文"] --> Repo["恢复真实任务状态"] --> Plan["PLAN"] --> Implement["新 Implementation Agent"] --> Test["本地验证 + 候选提交"] --> Review["新独立 Review Agent"]
+  Review -->|"FAIL"| Failure["新 Fix Agent；授权范围内修复"]
+  Failure --> Test
+  Review -->|"PASS"| CI["适用真实 CI；核对 head SHA 与必跑作业"]
+  CI -->|"FAIL"| Failure
+  CI -->|"PASS"| Complete["接受任务；更新队列/证据/current/checkpoint"]
+  Complete --> Handoff["HANDOFF / 下一依赖满足任务"]
+```
+
+> 实现/修复与接受候选的 Review 必须是真实不同的新上下文；同一上下文改角色名不是独立审查。单写者；普通失败进入修复与新的独立 Review 循环。验收依据是权威规范、契约、候选 diff、结构/依赖/最小性检查及真实测试结果。
+>
+> 图 12-1 Agent 工作流。开发自动化和 CI/CD 是两个独立系统。
+
+<a id="section-12-1"></a>
+### 12.1 Task Spec 模板
+
+```text
+task_id: LOOP1-MSG-003
+goal: implement WSS text message sending
+inputs:
+ - spec/architecture/README.md # resolve §3/§10/§11 + Minimality Contract
+ - spec/domain/messaging.md
+ - spec/invariants/messaging.md
+ - contracts/websocket/
+allowed_paths:
+ - backend/go/core/message/**
+ - backend/go/core/outbox/**
+ - backend/go/tests/**
+acceptance:
+ - applicable source ownership and dependency checks pass
+ - contract tests pass
+ - retry is idempotent
+ - ACK only after durable commit
+forbidden:
+ - change public contract
+ - change DB contract without migration
+ - modify Java implementation
+```
+
+<a id="section-12-2"></a>
+### 12.2 状态队列
+
+backlog -> ready -> active -> review -> done
+
+- 进入 ready: inputs 完整、依赖完成、验收可执行
+- 进入 active: 分配唯一 owner/agent、建立 task branch
+- 进入 review: 实现完成 + 本地最小验证 + handoff 完整
+- 进入 done: 对精确候选的适用真实 CI PASS + 新独立 review 接受 + progress 更新；Task PASS 不等于整个 Stage Gate PASS。ADR-0001 临时 bootstrap 机制仅在 LOOP1-CI-001 operational 且 done 前有效，现已失效，不得恢复为绕过方式。
+
+<a id="section-12-3"></a>
+### 12.3 Git 工作模式
+
+采用 main + task/，不引入复杂 GitFlow。每个任务独立分支、最小提交、CI、Review 后合并。Agent 不得长期堆积跨任务改动，也不得为了让 CI 变绿而修改无关测试或公共契约。
+
+<a id="section-13"></a>
+## 13. Agent 启动与交接协议
+
+<a id="section-13-1"></a>
+### 13.1 强制读取顺序
+
+| 顺序 | 必须读取 | 退出条件 |
+| --- | --- | --- |
+| 1 | spec/handoff/agent-context.md | 理解项目边界、frozen decisions 与工作方式 |
+| 2 | spec/progress/current.md | 知道当前 Stage、Gate、最后已验证commit、blockers |
+| 3 | 按 current.md 的精确 Current Task ID 查找 backlog/ready/active/review/done，必须唯一且 status 匹配 | review 继续独立审查/修复；active 继续实现；ready 验依赖后激活；backlog 保持阻塞；仅当前 done 且无未完当前任务才按依赖选下一任务，禁止 active 为空就跳任务 |
+| 4 | resolver/hash、现行冻结正文适用 §3/§10/§11、批准 ADR、Minimality 及任务引用的 domain/invariants/acceptance/contracts | 能复述职责、源码/依赖边界、不可变量、输入输出与验收 |
+| 5 | git status、当前 diff、最近提交 | 识别用户/前 Agent 未完成改动，不覆盖 |
+| 6 | 最小基线验证 | 确认仓库状态可继续；失败则记录而非盲改 |
+| 7 | PLAN -> IMPLEMENT -> TEST -> REVIEW | 仅在授权路径与任务范围内工作 |
+
+<a id="section-13-2"></a>
+### 13.2 Handoff 必填项
+
+- Current task / stage / gate
+- Completed work
+- Files and migrations changed
+- Tests: command + result + evidence location
+- Known failures / risks / assumptions
+- Next exact action
+- Last known good commit
+- Uncommitted changes and ownership
+- Architecture conflicts or ACP/ADR required
+
+<a id="section-13-3"></a>
+### 13.3 Checkpoint 规则
+
+稳定 Gate、重要纵向链路、schema/contract 版本切换或可恢复发布点必须生成 checkpoint。checkpoint 记录 commit、contract version、migration level、image digests、fixture versions、通过的 Gate 与已知限制。current.md 始终指向最新 checkpoint，而不是复制其全部内容。
+
+#### 崩溃恢复目标
+
+新的 Agent 不扫描整个仓库重新猜架构。它通过 agent-context -> current -> 精确 Current Task 的真实队列状态 -> referenced specs/contracts -> git status/diff/commits 在一个可控上下文中恢复工作。
+
+<a id="section-14"></a>
+## 14. CI/CD 独立校验架构
+
+```mermaid
+flowchart LR
+  Diff["Diff 分类"]
+  Diff --> GoPath["backend/go/**"]
+  Diff --> JavaPath["backend/java/**"]
+  Diff --> Shared["contracts/** / DB / shared SDK"]
+  Diff --> Rules["architecture / Agent / task template / acceptance / checker"]
+  Rules --> Structure["规范 + 源码归属 + 依赖 + 触发负例"]
+  GoCI --> Structure
+  JavaCI --> Structure
+  Structure --> Gate
+  GoPath --> GoCI["Go CI<br/>unit + integration<br/>contract"]
+  JavaPath --> JavaCI["Java CI<br/>unit + integration<br/>contract"]
+  Shared --> Matrix["全平台兼容矩阵<br/>Go + Java + clients<br/>plugin + migration"]
+  Matrix --> Artifacts["可重复制品<br/>镜像 / 客户端"]
+  Matrix --> Smoke["Staging Smoke"]
+  Artifacts --> Smoke
+  Smoke --> Gate["Release Gate<br/>manifest + rollback"]
+```
+
+> Agent 负责提出变更；CI 独立验证事实。Agent 无权自行宣布 Gate 通过。
+>
+> 图 14-1 Path-aware CI DAG。分类分支相互独立；公共契约/schema/shared SDK 变更按表触发兼容矩阵，规范与检查器变更必须触发适用架构检查。部署/发布节点表示相应阶段要求，不把未来发布能力冒充当前 skeleton。
+
+<a id="section-14-1"></a>
+### 14.1 路径感知规则
+
+| 变更路径 | 必跑作业 |
+| --- | --- |
+| backend/go/** | Go lint/unit/integration/contract；不默认跑 Java |
+| backend/java/** | Java lint/unit/integration/contract；不默认跑 Go |
+| clients/web/** | Web unit/build/protocol/plugin UI tests |
+| clients/desktop/** 或 clients/mobile/** | 对应客户端 + SQLite migration + protocol tests |
+| contracts/**、数据库迁移、shared protocol/plugin SDK | Go + Java + Web + Desktop + Mobile + old client fixtures + plugin fixtures + migration compatibility |
+| deploy/**、ci/**、.github/workflows/** | 按当前阶段执行 compose/manifest/security/smoke/rollback validation，并验证分类与 Gate |
+| spec/architecture/**、Agent 入口、handoff、活动任务/模板/batch、acceptance、架构检查器与测试 | baseline/resolver/ADR 一致性、活动引用、源码归属、Go/Java 适用阶段依赖检查、触发与正负控制；Markdown-only 不能全部跳过 |
+
+<a id="section-14-2"></a>
+### 14.2 流水线层次
+
+static/lint -> unit -> contract -> integration -> compatibility -> build
+-> immutable artifacts -> SBOM/signature -> staging deploy -> smoke/E2E
+-> release gate -> canary/controlled rollout -> observe -> complete or rollback
+
+<a id="section-14-3"></a>
+### 14.3 兼容矩阵
+
+完整兼容阶段的最低矩阵包含 Client Protocol v1、v2、HEAD；在相应协议与客户端版本尚未定义的早期阶段，只能明确报告现有契约向量/占位检查，不能虚构 v2 或声称已通过完整矩阵；后续阶段不得永久豁免。Go/Java profile；Echo/Poll 插件 fixture；SQLite old schema fixtures。服务端只维护一个当前实现版本与有限兼容窗口。latest/recommended/min_supported 必须在 Release Manifest 中显式声明，客户端版本号与 protocol_version 不绑定。
+
+<a id="section-14-4"></a>
+### 14.4 CI 与 Agent 的信任边界
+
+Agent 可运行本地测试并提交证据，但 Gate 只能由隔离 Runner 从干净 checkout 重建后判定。核对精确 head SHA、要求运行的作业及实际结果；必跑作业缺失、异常 skip、失败或取消均不满足 Gate。测试环境未启用导致的 skip 不是集成 PASS；旧提交的绿色不覆盖新增要求。历史 ADR-0001 的适用及失效条件见 §12.2。任何需要跳过测试、重录 golden fixture、降低阈值或更改验收项的动作都视为架构/验收变更，必须单独审批。
+
+
+# ADR-0001: Temporary S0 Bootstrap Acceptance Before CI Availability
+
+Status: Approved
+
+Date: 2026-09-19
+
+Approved by: Architect through the 2026-09-19 batch-orchestration instruction
+
+## Context
+
+`LOOP1-CI-001` is itself an S0 task. Requiring the final real CI implementation before every earlier bootstrap task can enter `done` creates a circular dependency.
+
+## Decision
+
+Before `LOOP1-CI-001` is operational and `done`, a bootstrap or control-plane task may temporarily satisfy the independent acceptance role through all of the following:
+
+- a fresh independent Review Agent, with no self-review;
+- a clean committed checkout or isolated Git worktree;
+- deterministic verification;
+- durable repository evidence under `spec/progress/evidence/<TASK_ID>/`.
+
+The evidence must record the reviewed commit SHA, clean-state method and result, repository branch, reviewed diff range, exact commands, exit codes, elapsed times, PASS/FAIL result, evidence path, git status, and reviewer independence.
+
+This mechanism does not bypass Task acceptance or Stage Gate requirements, authorize hidden skips, or weaken security, compatibility, contracts, or architecture invariants. It does not modify the Frozen business architecture.
+
+## Expiration
+
+This exception expires automatically when `LOOP1-CI-001` becomes `done` and operational. After expiration, the real CI mechanism is mandatory for every applicable task-to-`done` transition and this mechanism is not an alternative bypass.
+
+# ADR-0002: Frozen Architecture canonical Markdown representation
+
+Status: Architect-approved for representation-only migration; effective only after independently accepted merge and post-merge verification on `main`.
+
+Date: 2026-09-24
+
+Approved by: Human Architect's explicit `Frozen Architecture Canonical-Source Migration` instruction, registered as Recorder prompt `P-f0a652e5-89aa-4cad-84f2-578b28973d40`.
+
+## Context and motivation
+
+The v1.0 Frozen Architecture is currently the immutable repository PDF `scalable-distributed-im-architecture.pdf`, verified by SHA-256 `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`. Its section 2.1 requires Architect approval before changing frozen authority. Repository-native Markdown improves diffability, reviewability, Agent access, and deterministic text validation.
+
+## Decision
+
+Once this migration task passes fresh independent review, acceptance closure, merge to `main`, and post-merge verification, `spec/architecture/frozen-architecture.md` becomes the single active canonical Frozen Architecture source. Its own actual SHA-256, recorded in `spec/architecture/baseline.md`, becomes the frozen hash target. The former PDF remains at its original path, byte-for-byte unchanged, as an immutable pre-migration historical snapshot. Its original SHA-256 remains in the baseline manifest as provenance, never as the Markdown hash.
+
+This decision changes canonical representation, authority routing, and hash target only. It does not approve any Product Architecture semantic, contract, invariant, ACK, compatibility, security, or implementation change. The future Markdown file remains frozen: subsequent edits still require the existing Architecture Change Proposal/ADR and Architect approval process.
+
+## Impact, compatibility, migration, and rollback
+
+- All future Agent recovery resolves the Markdown from the architecture index and verifies its hash; the PDF is read only for historical provenance or visual comparison.
+- Existing historical checkpoints, evidence, and Recorder traces retain their at-the-time PDF facts unchanged.
+- Product contracts and implementations remain unchanged. No data, wire, or client migration is required.
+- Before the effective point, the PDF remains active authority. If candidate verification or independent review fails, leave `main` unchanged and repair the candidate. If a post-merge defect is found, restore the last accepted authority through an Architect-approved corrective ADR and independently reviewed commit; do not alter the PDF bytes or rewrite history.
+
+## Effective point
+
+The effective commit and UTC time are recorded only after accepted merge and post-merge PASS in the migration manifest/checkpoint. This ADR does not retroactively change prior authority.
+
+# ADR-0003: Whole-document architecture conflict resolution and executable service boundaries
+
+Status: Human-approved bounded conflict resolution; canonical revision and downstream product remediation independently accepted; administrative candidate independently accepted; final state-record confirmation follows current.md.
+Date: 2026-09-30
+Approval source: spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md; visible Human four-stage instruction and registered prompt P-ddf5a00c-27a1-412c-ad9b-2305e1aad734 (delegation plus exact approval excerpt, not complete Human prompt).
+
+## Motivation and authority
+
+Frozen v1.0 §3 assigns Gateway/Core/plugin-host responsibilities while §12 exemplifies root internal business packages and §11 allows unspecified internal variation. The historical Markdown migration retained diagram arrows and workflow expressions that conflict with operative invariants and current approved governance. Audit coverage and individual determinate resolutions are in the task conflict ledger. This approval is NOT approval for arbitrary product redesign or any changed public contract, database, ACK/Sync, compatibility or security boundary.
+
+## Decision
+
+Revise the current canonical body to v1.1, not merely append this ADR. §§3/10/11/12 now enforce shared service ownership and dependency direction across Go/Java with language-specific internal structures. Root assembly/build/testing exceptions and minimal shared support are explicit; complete Auth/session-write business cannot be shared into Gateway. No three-module/three-binary/multi-layer requirement is created. S0 exceptions are per backend and expire at first business implementation.
+
+Correct diagrams and examples to existing current semantics: Core persistence and membership decisions, Outbox-to-NATS-to-Gateway, post-commit Gateway ACK forwarding, single logical message-created Outbox, effective Session slots, separate plugin artifact/instance states. Clarify native SQLite versus Web, token prohibition, current-versus-future stage scope, precise current-task recovery, fresh independent Review/fix loops, real CI head/job acceptance and stage-appropriate checks. Concrete wire/schema authority remains contracts/.
+
+## Normative effect and baseline
+
+semantic_change=true: source-boundary and governance ambiguity is tightened into executable rules. Existing product invariants are restated without changing their meaning. The v1.0 PDF-to-Markdown migration remains historical representation_only/semantic_change=false under ADR-0002. Its PDF and historical Markdown hashes remain recorded separately from the actual current Markdown SHA. Historical ADRs, reviews, checkpoints and Recorder evidence are never rewritten.
+
+## Migration and validation
+
+Four sequential tasks repair authority, execution constraints, effective checkers/CI, then Go implementation. Stage-one verifier preserves hash checks and replaces historical arrow/figure/format counts with section-bound graph/structure checks and negative controls. Stage three supplies product ownership/import/trigger tests; until stage four repairs old Go violations those are expected failures, never a permanent exception or product PASS. Java remains stage-appropriate and its future business boundaries are tested with fixtures.
+
+Each bounded stage needs new independent Review and applicable CI. Final batch acceptance requires final candidate exact-head hosted CI, all applicable live regressions, no unresolved blocker and recovery checkpoint. Historical Auth acceptance remains valid for its old requirements. Rollback of this candidate is a new corrective commit/approved decision; do not rewrite historical source/evidence or discard Auth implementation. No data migration or public-wire migration is needed.
+
+## Actual bounded acceptance point
+
+Fresh stage-one Review accepted a09f4fbb1dc497c46c8dc0b8901b0417c534fb2d. Hosted run 36714913796 accepted exact head 3e6e89fa2b378f1fcb4c944466fef2e3bc905379, all ten jobs successful; evidence spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/hosted-acceptance.md and task001 done. This discovery update preserves decision/approval/history. Stages002-004 and product/batch/S1 acceptance remain outstanding.
+
+## Current completion discovery (2026-10-01)
+
+The preceding bounded acceptance paragraph records the stage-one historical point, not current pending work. Tasks001-003 are done; Task004 remainsreview with accepted product candidate d0ae52f5615320790ae7039cb48831873de6f486 / hosted36744072690 with fresh independent revocation Review. See evidence004/final-hosted-acceptance.md and conflict-closure-supplement.md. This administrative candidate requires new independent Review and exact-head hosted verification before final batch closure. Canonical v1.1 semantics/hash/approval, historical migrations and PDF remain unchanged; S1 product Gate OPEN.
+
+### Accepted administrative closure discovery (2026-10-01)
+
+Four tasks done after NEW independent CLI Review exactf4fdd82f8f3179034fb74700c1b4e9aa43e4637e and hosted36749210695 SUCCESS (five required successes/eight inactive skips), plus product d0ae52f independent Review/hosted36744072690 SUCCESS. The final state-record commit requires NEW independent Review and exact-head hosted confirmation before final delivery, captured externally at H:/.codex/worktrees/architecture-remediation/final-acceptance-research/final-acceptance-summary.json. S1 product Gate OPEN; no downstream business activated. Earlier bounded/product checkpoint text remains historical. This is discovery only; approved decisions, source, hash and migration history are unchanged.
+
+# ADR-0004: Loop1 exception for restricted-principal friend403
+
+Status: Human-approved decision; bounded propagation independently accepted at f8d1a287a295ff9f882843f2191cf8c220efeff2 / hostedCI36807927903 (12success, deploypathinactive).
+Date:2026-10-01
+Approval: exact visible Human instructions "明确loop1不实现403，记录为后续迭代待实现内容" and "保留openapi占位，记为loop1特例".
+Evidence:spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-loop1-403-exception.md.
+PromptP-SOCIAL-403-EXCEPTION-20261001 SHA2566276f3c9d5f2c48a864821755b5f9e2015f3eeb00ed1c845ea3676e91c6ef077.
+
+## Decision
+
+Retain byte-for-byte the OpenAPI PUT /v1/friends/{friendUserId}403AUTHORIZATION_DENIED placeholder and canonical negative fixture friend-add-authorization-denied. Loop1 does not implement this restricted-principal friend authorization403 scenario. It is the single approved exception to Loop1 runtime fixture requirements and must be reported DEFERRED_BY_HUMAN, not PASS, not silently omitted and not a runtime environment skip.
+
+contracts/fixtures/auth-user-friend/loop1-exceptions.json is the machine-readable authority for this stage applicability exception. All other applicable fixture cases remain required under their backend/task stage. Later-iteration TODO FRIEND-AUTHORIZATION-403 remains not implemented/tested/done; activation of a named later iteration must explicitly retire this Loop1-only exception and provide approved credential issuance, permission/ownership semantics and executable denied setup.
+
+## Boundaries and rationale
+
+The independent clean-context report2026-10-01-independent-context-review.md found no approved executable insufficient-scope token or friend-owner authorization model. Human chooses a stage exception rather than inventing a permission system for Loop1. This ADR changes only acceptance applicability, not wire/schema behavior or security mechanism.
+
+Preserve authentication401, self-friend422, other-domain membership/plugin authorization, six-claim JWT and PostgreSQL Session validation. Preserve immediate bidirectional friendship, unique normalized pair/DIRECT and atomic memberships/Sync/Outbox. No fake authorization hook, new scope/DBrole or response reinterpretation is permitted. Do not treat this as a general exemption from every403 or security check.
+
+## Acceptance and compatibility
+
+The future403 response/error/no-effects expectation remains intact for Go/Java. OpenAPI is retained as a placeholder, not evidence of currently supported restricted-principal authorization. Report required-case results and the single deferred case separately. Required-case acceptance may pass without executing this approved deferred case, but a universal all-fixtures-executed statement is false. No SocialTaskPASS or S1GatePASS follows from this decision.
+
+Frozen v1.1 Markdown/manifest/PDF, historical ADRs, goldenfixture1.1/database0001, OpenAPI/error schemas and historical evidence remain immutable. Independent Review and applicable realCI verify exact bounded propagation before Social readiness.
+
+## Bounded acceptance discovery
+
+Fresh independent /root/loop1_exception_review accepted exactf8d1a28 with cleancheckout and exactCI36807927903. Shared report and separate source/archivehashes:spec/progress/evidence/LOOP1-GO-SOCIAL-001/2026-10-01-exception-independent-review.md and exception-transport.json. This discovery binds the prior reviewed decision bytes, not Socialbusiness or S1PASS.
+
+spec/domain/messaging.md # Messaging Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-002`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| MSG-D-001 | A client request identity MUST be unique within a Conversation and is the identity reused by retry and local convergence. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-D-002 | The server idempotency identity MUST include sender, Conversation, and client request identity; the server message identity MUST be globally unique. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-003 | Conversation sequence numbers MUST be unique and monotonically increasing within each Conversation. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-004 | Message send MUST authorize the sender as a Conversation member before persistence. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-D-005 | Sequence allocation, Message persistence, and the matching Outbox event MUST commit atomically; a successful ACK MUST mean that durable commit has completed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message, Outbox). |
+| MSG-D-006 | Outbox delivery and NATS delivery MAY repeat or be briefly missed; consumers MUST be idempotent and Sync MUST provide eventual completeness. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-D-007 | Gateway MUST fan out only to locally active connections and MUST NOT own friendship, membership, persistence, or plugin business rules. | Architecture Baseline v1.0, chapters 2 (F-05) and 5.2. |
+| MSG-D-008 | A GROUP send MUST create one logical Message and one Outbox event; it MUST NOT create one persistent message record per member. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-D-009 | Loop 1 MUST NOT treat NATS JetStream as the message source of truth. | Architecture Baseline v1.0, chapters 2 (F-03) and 5.2. |
+
+spec/invariants/messaging.md # Messaging Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| MSG-I-001 | Repeating a send with the same server idempotency identity MUST converge on the same logical Message and MUST NOT allocate another Conversation sequence. | Architecture Baseline v1.0, chapters 4.4 and 5.1. |
+| MSG-I-002 | A successful message ACK MUST NOT be observable before the Message and matching Outbox event are durably committed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-I-003 | Every committed logical Message MUST have exactly one logical Outbox event, even when publication delivery is retried. | Architecture Baseline v1.0, chapters 4 (Figure 4-1), 5.1, and 5.2. |
+| MSG-I-004 | No recipient MUST receive a Message for the wrong Conversation, and no permanent sequence gap may remain after Sync convergence. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-I-005 | Duplicate NATS delivery MUST NOT create a duplicate logical Message or duplicate client materialization. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-I-006 | A send by a non-member MUST be rejected before persistence and before a success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-I-007 | GROUP fan-out MUST remain an online delivery concern and MUST NOT alter the single-Message, single-Outbox persistence outcome. | Architecture Baseline v1.0, chapter 5.3. |
+
+spec/acceptance/s0-messaging.md # S0 Messaging Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| MSG-A-001 | Given an authorized member send, the runner MUST withhold success ACK until a fault-injection probe confirms durable Message and Outbox commit; rollback before commit MUST produce no success ACK. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-A-002 | Given repeated sends with the same sender, Conversation, and client request identity, the runner MUST assert one logical Message, one Conversation sequence, and a stable successful outcome. | Architecture Baseline v1.0, chapters 4.4, 5.1, and 11.3. |
+| MSG-A-003 | Given the same client request identity in different Conversations, the runner MUST treat each Conversation-scoped request independently while preserving globally unique server Message identity. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-A-004 | Given a sender who is not a Conversation member, the negative fixture MUST assert rejection, no Message, no Outbox event, and no success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-A-005 | Given duplicate and out-of-order NATS delivery, the runner MUST assert idempotent consumer behavior, no duplicate logical Message, and eventual completeness through Sync. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-A-006 | Given a GROUP send, the runner MUST assert one logical Message and one Outbox event regardless of member count, with local online fan-out treated separately from persistence. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-A-007 | Correctness fixtures MUST assert zero lost committed Messages, zero duplicate logical Messages, zero wrong-Conversation deliveries, zero permanent sequence gaps, and zero ACK-before-commit cases. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-A-008 | Both backend profiles MUST consume identical fixtures and normalize to the same ACK, idempotency, authorization, ordering, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical §3/§10 SRC-01 through SRC-07/§11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+
+contracts/websocket/README.md # Canonical WSS v1 contract
+
+`envelope.schema.json` is the machine-verifiable wire authority. Every JSON frame has `protocolVersion`, `type`, `requestId`, and `payload`; unknown fields are rejected. A successful `message.ack` has `status: committed`, `messageId`, `seq`, and `createdAt`. The echoed `requestId` identifies the client logical send within its Conversation. `message.created` carries that same request identity for local convergence. Server-generated events use a unique event `requestId` except `message.created`, which carries the originating send request identity.
+
+TLS and WebSocket upgrade produce an unauthenticated connection. Before successful `auth.bind`, only `auth.bind`, `ping`, and `pong` are legal. The access token appears only in `auth.bind.payload`, never in the URL, logs, errors, or fan-out. The server checks signature, expiry, session ID, client type, and session epoch against authoritative session state before binding. A revoked or replaced session emits `session.revoked` and closes the connection; later sends cannot succeed. The `auth.ack` echoes the bind request identity.
+
+For `message.send`, the sender identity comes solely from the bound session. Core authorizes Conversation membership before persistence. `(senderId, conversationId, requestId)` is the server idempotency identity. A repeated send with that identity and identical content returns the original committed `messageId`, `seq`, and `createdAt`; it creates no second Message, sequence, or logical Outbox event. Reuse of the identity with different content is rejected. The same request ID in another Conversation is independent. Sequence numbers increase within each Conversation, while message IDs are globally unique.
+
+`message.ack` with `status: committed` is legal only after the Message, sequence allocation, and matching Outbox event commit atomically in PostgreSQL. A rollback or unknown commit outcome must not yield a successful ACK. A rejected send has no persisted Message or Outbox event. NATS delivery and local `message.created` fan-out can repeat; clients converge by Conversation and request/message identity, and Sync supplies eventual completeness. GROUP send persists one logical Message and one logical Outbox event regardless of member count. WSS v1's send content is `TEXT`; Plugin content requires its separate versioned contract. `message.created` is routed only to locally active, authorized Conversation members; Gateway does not decide business membership.
+
+`contracts/fixtures/websocket/` holds the deterministic shared Go/Java vectors. Run `python contracts/websocket/verify.py` to regenerate and compare them, validate the wire schema, run state assertions, and exercise negative mutations. `python contracts/websocket/verify.py --write` updates generated fixtures intentionally.
+
+contracts/websocket/envelope.schema.json {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/websocket/envelope.schema.json",
+  "title": "WSS protocol v1 envelope",
+  "description": "TLS and WebSocket upgrade precede auth.bind. Access tokens are carried only in auth.bind payload, never a URL. Success message.ack is emitted only after atomic durable Message and Outbox commit. A retry under sender/conversation/requestId returns the same messageId, seq and createdAt.",
+  "oneOf": [
+    { "$ref": "#/$defs/AuthBind" },
+    { "$ref": "#/$defs/AuthAck" },
+    { "$ref": "#/$defs/MessageSend" },
+    { "$ref": "#/$defs/MessageAck" },
+    { "$ref": "#/$defs/MessageCreated" },
+    { "$ref": "#/$defs/SessionRevoked" },
+    { "$ref": "#/$defs/Ping" },
+    { "$ref": "#/$defs/Pong" }
+  ],
+  "$defs": {
+    "Id": { "type": "string", "format": "uuid" },
+    "Timestamp": { "type": "string", "format": "date-time" },
+    "Base": {
+      "type": "object",
+      "required": ["protocolVersion", "type", "requestId", "payload"],
+      "properties": {
+        "protocolVersion": { "const": "1.0" },
+        "type": { "type": "string" },
+        "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object" }
+      }
+    },
+    "Error": {
+      "type": "object", "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "enum": ["VALIDATION_FAILED", "AUTH_REQUIRED", "AUTH_TOKEN_INVALID", "AUTH_TOKEN_EXPIRED", "AUTH_SESSION_REVOKED", "AUTH_SESSION_EPOCH_STALE", "AUTH_CLIENT_TYPE_MISMATCH", "AUTHORIZATION_DENIED", "PROTOCOL_VERSION_UNSUPPORTED", "MESSAGE_REQUEST_CONFLICT", "MESSAGE_COMMIT_FAILED"] },
+        "message": { "type": "string", "minLength": 1 }
+      },
+      "description": "Must not include credentials, tokens or message content."
+    },
+    "AuthError": { "allOf": [{ "$ref": "#/$defs/Error" }, { "type": "object", "required": ["code"], "properties": { "code": { "enum": ["VALIDATION_FAILED", "AUTH_TOKEN_INVALID", "AUTH_TOKEN_EXPIRED", "AUTH_SESSION_REVOKED", "AUTH_SESSION_EPOCH_STALE", "AUTH_CLIENT_TYPE_MISMATCH", "PROTOCOL_VERSION_UNSUPPORTED"] } } }] },
+    "MessageError": { "allOf": [{ "$ref": "#/$defs/Error" }, { "type": "object", "required": ["code"], "properties": { "code": { "enum": ["VALIDATION_FAILED", "AUTH_REQUIRED", "AUTH_SESSION_REVOKED", "AUTHORIZATION_DENIED", "MESSAGE_REQUEST_CONFLICT", "MESSAGE_COMMIT_FAILED"] } } }] },
+    "AuthBind": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "auth.bind" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["accessToken"], "properties": { "accessToken": { "type": "string", "minLength": 1 } } }
+      }}]
+    },
+    "AuthAck": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "auth.ack" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "oneOf": [
+          { "type": "object", "additionalProperties": false, "required": ["status", "userId", "sessionId", "clientType", "sessionEpoch"], "properties": { "status": { "const": "bound" }, "userId": { "$ref": "#/$defs/Id" }, "sessionId": { "$ref": "#/$defs/Id" }, "clientType": { "enum": ["WEB", "DESKTOP", "MOBILE"] }, "sessionEpoch": { "type": "integer", "minimum": 1 } } },
+          { "type": "object", "additionalProperties": false, "required": ["status", "error"], "properties": { "status": { "const": "rejected" }, "error": { "$ref": "#/$defs/AuthError" } } }
+        ] }
+      }}]
+    },
+    "TextContent": { "type": "object", "additionalProperties": false, "required": ["kind", "text"], "properties": { "kind": { "const": "TEXT" }, "text": { "type": "string", "minLength": 1, "maxLength": 4096 } } },
+    "MessageSend": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "message.send" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["conversationId", "content"], "properties": { "conversationId": { "$ref": "#/$defs/Id" }, "content": { "$ref": "#/$defs/TextContent" } } }
+      }}]
+    },
+    "Committed": { "type": "object", "additionalProperties": false, "required": ["status", "conversationId", "messageId", "seq", "createdAt"], "properties": { "status": { "const": "committed" }, "conversationId": { "$ref": "#/$defs/Id" }, "messageId": { "$ref": "#/$defs/Id" }, "seq": { "type": "integer", "minimum": 1 }, "createdAt": { "$ref": "#/$defs/Timestamp" } } },
+    "MessageAck": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "message.ack" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "oneOf": [ { "$ref": "#/$defs/Committed" }, { "type": "object", "additionalProperties": false, "required": ["status", "error"], "properties": { "status": { "const": "rejected" }, "error": { "$ref": "#/$defs/MessageError" } } } ] }
+      }}]
+    },
+    "MessageCreated": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "message.created" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["conversationId", "messageId", "senderId", "seq", "createdAt", "content"], "properties": { "conversationId": { "$ref": "#/$defs/Id" }, "messageId": { "$ref": "#/$defs/Id" }, "senderId": { "$ref": "#/$defs/Id" }, "seq": { "type": "integer", "minimum": 1 }, "createdAt": { "$ref": "#/$defs/Timestamp" }, "content": { "$ref": "#/$defs/TextContent" } } }
+      }}]
+    },
+    "SessionRevoked": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "session.revoked" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["sessionId", "reason"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "reason": { "enum": ["LOGOUT", "REPLACED", "REVOKED"] } } }
+      }}]
+    },
+    "Ping": { "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": { "protocolVersion": { "const": "1.0" }, "type": { "const": "ping" }, "requestId": { "$ref": "#/$defs/Id" }, "payload": { "type": "object", "maxProperties": 0 } } }] },
+    "Pong": { "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": { "protocolVersion": { "const": "1.0" }, "type": { "const": "pong" }, "requestId": { "$ref": "#/$defs/Id" }, "payload": { "type": "object", "maxProperties": 0 } } }] }
+  }
+}
+
+contracts/database/README.md # Canonical PostgreSQL schema
+
+`migrations/0001_initial.up.sql` is the shared schema for Go and Java profiles.
+Run the migration before application startup, using a normal PostgreSQL `psql`
+client and libpq connection settings (`PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE`,
+and secure credential handling outside the command line):
+
+```text
+python3 contracts/database/migrate.py status
+python3 contracts/database/migrate.py up
+python3 contracts/database/migrate.py down --allow-data-loss
+```
+
+The runner applies each SQL file and its checksum ledger entry in one transaction
+under a PostgreSQL advisory transaction lock. Applied SQL is immutable. The down
+migration drops all product tables and requires explicit data-loss acknowledgement;
+release rollback still requires a backup and compatibility assessment.
+
+`sessions` is one row per `(user_id, client_type)` slot. A replacement login must
+rotate `session_id`, increment `session_epoch`, and revoke the old session in one
+transaction. The server must validate both session ID and epoch against PostgreSQL.
+The database constraints reject duplicate normalized friendship and DIRECT pairs,
+request IDs and sequence numbers within a Conversation, and duplicate logical
+`message.created` outbox events. Message authorization, sequence allocation,
+matching Outbox insertion, friend/direct/membership/sync transaction assembly, and
+post-commit ACK remain application transaction obligations. A unique constraint
+alone cannot prove those multi-row operations occurred atomically.
+
+With a disposable PostgreSQL database configured through libpq variables, run
+`python3 -m unittest discover -s tests/database -v`. The integration test uses
+an isolated temporary schema and exercises forward, uniqueness, and rollback.
+

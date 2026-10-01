@@ -8,7 +8,7 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-// Session revocations are stored in the same transaction as the Session change.
+// Session and message events are stored in the same transaction as their writes.
 // Publishing can repeat after a crash; the gateway handles duplicate events.
 func RelaySessionRevocations(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
 	ticker := time.NewTicker(500 * time.Millisecond)
@@ -31,18 +31,20 @@ func relaySessionBatch(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
 		return
 	}
 	defer tx.Rollback(ctx)
-	rows, err := tx.Query(ctx, `SELECT event_id,payload FROM outbox_events WHERE event_type='session.revoked' AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED`)
+	rows, err := tx.Query(ctx, `SELECT event_id,event_type,payload,conversation_id FROM outbox_events WHERE event_type IN ('session.revoked','message.created') AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED`)
 	if err != nil {
 		return
 	}
 	type event struct {
-		id      string
-		payload []byte
+		id           string
+		payload      []byte
+		kind         string
+		conversation *string
 	}
 	var events []event
 	for rows.Next() {
 		var e event
-		if rows.Scan(&e.id, &e.payload) != nil {
+		if rows.Scan(&e.id, &e.kind, &e.payload, &e.conversation) != nil {
 			rows.Close()
 			return
 		}
@@ -54,8 +56,36 @@ func relaySessionBatch(ctx context.Context, db *pgxpool.Pool, nc *nats.Conn) {
 		return
 	}
 	for _, e := range events {
-		if nc.Publish("session.revoked", e.payload) != nil {
-			return
+		if e.kind == "session.revoked" {
+			if nc.Publish("session.revoked", e.payload) != nil {
+				return
+			}
+		} else {
+			// Core owns recipient membership. Subjects are private routing
+			// locators; every payload remains the canonical created frame.
+			members, err := tx.Query(ctx, `SELECT user_id FROM conversation_members WHERE conversation_id=$1 AND left_at IS NULL`, e.conversation)
+			if err != nil {
+				return
+			}
+			var users []string
+			for members.Next() {
+				var user string
+				if members.Scan(&user) != nil {
+					members.Close()
+					return
+				}
+				users = append(users, user)
+			}
+			err = members.Err()
+			members.Close()
+			if err != nil {
+				return
+			}
+			for _, user := range users {
+				if nc.Publish("message.created."+user, e.payload) != nil {
+					return
+				}
+			}
 		}
 	}
 	if len(events) > 0 {

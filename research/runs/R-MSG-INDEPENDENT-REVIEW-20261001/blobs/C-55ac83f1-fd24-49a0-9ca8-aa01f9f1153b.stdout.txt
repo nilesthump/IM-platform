@@ -1,0 +1,33 @@
+backend/go/gateway/gateway.go:266: 		c.mu.Lock()
+backend/go/gateway/gateway.go:267: 		delete(c.origins, key)
+backend/go/gateway/gateway.go:268: 		c.mu.Unlock()
+backend/go/gateway/gateway.go:269: 	}
+backend/go/gateway/gateway.go:270: 	_ = c.send(ack)
+backend/go/gateway/gateway.go:271: }
+backend/go/gateway/gateway.go:272: 
+backend/go/gateway/gateway.go:273: func (h *hub) fanout(user string, data []byte) {
+backend/go/gateway/gateway.go:274: 	if !validUUID(user) {
+backend/go/gateway/gateway.go:275: 		return
+backend/go/gateway/gateway.go:276: 	}
+backend/go/gateway/gateway.go:277: 	var e envelope
+backend/go/gateway/gateway.go:278: 	if json.Unmarshal(data, &e) != nil || e.ProtocolVersion != "1.0" || e.Type != "message.created" || !validUUID(e.RequestID) {
+backend/go/gateway/gateway.go:279: 		return
+backend/go/core/sync.go:8: type conversationRequest struct {
+backend/go/core/sync.go:9: 	SyncVersion    string `json:"syncVersion"`
+backend/go/core/sync.go:10: 	Type           string `json:"type"`
+backend/go/core/sync.go:11: 	RequestID      string `json:"requestId"`
+backend/go/core/sync.go:12: 	ConversationID string `json:"conversationId"`
+backend/go/core/sync.go:13: 	AfterSeq       int64  `json:"afterSeq"`
+backend/go/core/sync.go:14: 	Limit          int64  `json:"limit"`
+backend/go/core/sync.go:15: }
+backend/go/core/sync.go:16: 
+backend/go/core/sync.go:17: // Only the existing canonical per-Conversation gap shape is served privately.
+backend/go/core/sync.go:18: // User Sync and client cursor/materialization are outside this task.
+backend/go/core/sync.go:19: func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request) {
+backend/go/core/sync.go:20: 	var v conversationRequest
+backend/go/core/sync.go:21: 	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
+backend/go/core/sync.go:22: 		writeError(w, r, fail(400, "VALIDATION_FAILED", "Request body is invalid."))
+backend/go/core/sync.go:23: 		return
+backend/go/core/sync.go:24: 	}
+backend/go/core/sync.go:25: 	token, err := bearer(r)
+report staged; clean candidate; findings2

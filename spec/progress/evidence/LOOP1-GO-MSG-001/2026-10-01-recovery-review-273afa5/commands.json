@@ -1,0 +1,446 @@
+[
+  {
+    "name": "clean-initial",
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.10899999999674037
+  },
+  {
+    "name": "head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.03200000000651926
+  },
+  {
+    "name": "prompt",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "register-prompt",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--task-id",
+      "LOOP1-GO-MSG-001",
+      "--file",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\prompt.txt",
+      "--source",
+      "delegated_visible",
+      "--prompt-id",
+      "P-S1-RECOVERY-REVIEW-20261001-B"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.09299999999348074
+  },
+  {
+    "name": "start",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "start-run",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--task-id",
+      "LOOP1-GO-MSG-001",
+      "--role",
+      "review",
+      "--capture-mode",
+      "prospective_resume",
+      "--pre-recorder-work",
+      "--prompt-id",
+      "P-S1-RECOVERY-REVIEW-20261001-B",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--experiment-group",
+      "full_governance",
+      "--fresh-context",
+      "true"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.3130000000091968
+  },
+  {
+    "name": "authority-inputs",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\read-inputs.py"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.06300000000919681
+  },
+  {
+    "name": "acceptance",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 7.48399999999674
+  },
+  {
+    "name": "frozen",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 5.5939999999973224
+  },
+  {
+    "name": "sourceall",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.45300000000861473
+  },
+  {
+    "name": "wss",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "contracts/websocket/verify.py"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.17199999999138527
+  },
+  {
+    "name": "diff-scope",
+    "argv": [
+      "git",
+      "diff",
+      "--name-status",
+      "33b1522..273afa5"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.031000000002677552
+  },
+  {
+    "name": "recovery-diff",
+    "argv": [
+      "git",
+      "diff",
+      "33b1522..273afa5",
+      "--",
+      "spec/progress/current.md",
+      "spec/tasks/done/LOOP1-GO-MSG-001.md",
+      "spec/progress/checkpoints"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.031000000002677552
+  },
+  {
+    "name": "archive-manifest",
+    "argv": [
+      "git",
+      "show",
+      "HEAD:spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/archive-byte-manifest.json"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.03199999999196734
+  },
+  {
+    "name": "original-manifest",
+    "argv": [
+      "git",
+      "show",
+      "HEAD:spec/progress/evidence/LOOP1-GO-MSG-001/2026-10-01-admin-closure-sync/original-sync-verification.json"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.01600000000325963
+  },
+  {
+    "name": "byte-audit",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\audit.py"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 257.51600000000326
+  },
+  {
+    "name": "sync-recorder",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "validate-run",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--run-id",
+      "R-MSG-SYNC-HANDOFF-20261001"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.15600000000267755
+  },
+  {
+    "name": "old-fail-recorder",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "validate-run",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\spec\\progress\\evidence\\LOOP1-GO-MSG-001\\2026-10-01-admin-closure-sync\\raw-admin-review\\research",
+      "--run-id",
+      "R-MSG-CLOSURE-REVIEW-20261001"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.15600000000267755
+  },
+  {
+    "name": "gh-run-current",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "gh",
+      "api",
+      "repos/nilesthump/IM-platform/actions/runs/36826506799"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.875
+  },
+  {
+    "name": "gh-jobs-current",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "gh",
+      "api",
+      "repos/nilesthump/IM-platform/actions/runs/36826506799/jobs?per_page=100"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 1.187999999994645
+  },
+  {
+    "name": "classification-full",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "ci/classify.py",
+      "--base",
+      "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+      "--head",
+      "273afa5eb492e1550119885484a68c85f27e0171"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.26600000000325963
+  },
+  {
+    "name": "clean-final",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "run-command",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--",
+      "git",
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.14100000000325963
+  },
+  {
+    "name": "review-event",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "record-event",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--event-type",
+      "review_finished",
+      "--data-json",
+      "{\"result\": \"PASS\", \"candidate\": \"273afa5eb492e1550119885484a68c85f27e0171\", \"scope\": \"33b1522..273afa5 administrative only\", \"independence\": \"fresh /root/s1_recovery_review neither implemented nor fixed candidate\", \"byte_audit\": \"301 original/source/archive exact;605 unknown originals exact;4341 prior historical tracked artifacts identical;400changed paths authorized\", \"hosted\": \"push36826506799 exact273;13 direct actualjobs completed/success\", \"PR_merge_binding\": \"N/A no recovery PR; historical33b binding applies only33b\", \"S1\": \"OPEN\", \"pre_recorder\": \"incomplete startup; initial oversized output truncated, restricted Console.OutputEncoding failure, Python -c quoting SyntaxError; authority UTF8 corrected preserving previous lossy output\", \"prompt_capture\": \"registered public delegated scope summary; complete original delegation not claimed\", \"research\": \"old92FAIL structurally valid and preserved; sync46 finished structuralPASS; Recorder PASS does not imply task/stagePASS\"}"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.07799999999406282
+  },
+  {
+    "name": "finish",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "finish-run",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B",
+      "--result",
+      "PASS"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.34300000000803266
+  },
+  {
+    "name": "validate",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b\\tools\\research\\recorder.py",
+      "validate-run",
+      "--repo",
+      "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+      "--research-root",
+      "H:\\.codex\\evidence\\s1-recovery-review-20261001-b\\research",
+      "--run-id",
+      "R-S1-RECOVERY-REVIEW-20261001-B"
+    ],
+    "cwd": "H:\\.codex\\worktrees\\s1-recovery-review-20261001-b",
+    "exit": 0,
+    "elapsed": 0.07899999999790452
+  }
+]

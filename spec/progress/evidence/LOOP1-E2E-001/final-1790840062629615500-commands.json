@@ -1,0 +1,47 @@
+{
+  "owner": "R-E2E-IMPLEMENTATION-20261001",
+  "phase": "final",
+  "enable": {
+    "DB_TEST_ENABLE": "1",
+    "PGHOST": "127.0.0.1",
+    "PGPORT": "55651",
+    "PGUSER": "postgres",
+    "PGDATABASE": "s1_e2e_regression",
+    "NATS_URL": "nats://127.0.0.1:42651"
+  },
+  "containers": [
+    "loop1-e2e-impl-pg-20261001",
+    "loop1-e2e-impl-nats-20261001"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 20.281,
+      "go_runtime_skips": 0
+    },
+    {
+      "argv": [
+        "go",
+        "-C",
+        "backend/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-v",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 82.25,
+      "go_runtime_skips": 0
+    }
+  ]
+}
