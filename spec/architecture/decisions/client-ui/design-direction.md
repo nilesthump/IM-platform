@@ -1,32 +1,32 @@
-# Client Design Direction
+# 客户端设计方向
 
-Status: Human-approved initial direction; candidate pending independent acceptance. Subordinate to canonical v1.1 §6.5 / ADR-0006; no pixel design or component code.
+状态：Human 已批准初始方向；候选文档仍待独立验收。本文件从属于规范架构 v1.1 §6.5 / ADR-0006；不包含像素级设计或组件代码。
 
 ## Adaptive Glass Workspace
 
-构界 IM+ / PlugWorldIM combines concise communication, comfortable productivity and modular extensibility. Design emphasis: 50% Future AI Communication / 30% Productivity Tool / 20% Developer Extensibility. AI-native describes the visual direction; S2 AI is only a construction placeholder. Avoid information piling, complex dashboards, excessive Cyber/HUD style and visuals added merely to demonstrate technology.
+「构界 IM+ / PlugWorldIM」结合简洁通信、舒适生产力和模块化扩展。设计重点为未来 AI 通信 50%、生产力工具 30%、开发者扩展性 20%。AI-native 表示视觉方向；S2 的 AI 仅为施工占位。避免信息堆叠、复杂 Dashboard、过度 Cyber/HUD 风格，以及仅为展示技术而增加的视觉元素。
 
-Minimal Glassmorphism uses translucent surfaces, subtle borders, blur and layered depth to make hierarchy legible. Glass expresses hierarchy rather than decoration. No heavy glow, neon, particles or complex 3D. The base must remain readable over changing backgrounds; foreground contrast and focus/selection/error affordances cannot depend solely on transparency or hue. If blur/transparency is unsuitable for platform performance or readability, use a restrained opaque surface preserving the same hierarchy; no new rendering library is implied.
+Minimal Glassmorphism 通过半透明表面、细微边框、模糊和层次深度表达清晰层级。玻璃用于表达层级，不用于装饰。不采用重度发光、霓虹、粒子特效或复杂 3D。背景变化时仍须保持可读性；前景对比、焦点/选中/错误提示不能仅依赖透明度或色相。平台性能或可读性不适合模糊/透明时，使用克制的不透明表面保持同一层级；这不授权新的渲染库。
 
-## Themes
+## 主题
 
-| Theme | Position | Color direction |
+| 主题 | 定位 | 色彩方向 |
 | --- | --- | --- |
-| Cold AI | AI / Technology / Intelligence | Cool blue, purple gradient, dark glass |
-| Warm Creative | Social / Creative / Human | Warm gradient, soft glass, approachable tone |
+| Cold AI | AI / 科技 / 智能 | 冷蓝、紫色渐变、深色玻璃 |
+| Warm Creative | 社交 / 创意 / 人文 | 暖色渐变、柔和玻璃、亲和感 |
 
-Both themes MUST keep the same Logo, brand elements, layout, interaction meanings and component semantics. Theme switching changes Color tokens only, including background/surface/foreground/border/accent/gradient/selection/status colors; it cannot change type, spacing, blur, navigation or behavior. No additional light/dark theme matrix is implied. Transparent-surface hierarchy must remain consistent between the themes.
+两个主题必须保留同一 Logo、品牌元素、布局、交互含义和组件语义。主题切换仅改变 Color Token，包括背景、表面、前景、边框、强调、渐变、选中和状态色；不得改变字体、间距、模糊、导航或行为。本方向不增加额外明暗主题矩阵。两主题中的透明表面层级必须一致。
 
-## Design Token principles
+## Design Token 原则
 
-Use semantic names with one responsibility, shared meanings across platforms and native representation per platform. Color tokens express surfaces/text/borders/accent/status; Typography tokens express font family/size/line-height; Spacing tokens express density/spacing. Fixed typography/spacing/color values, pixel layout, fonts, scales and generation/build tooling are outside this initial direction. Later GUI tasks choose concrete values within the accepted direction, with screenshot evidence and Architect approval; introducing sensitive dependencies still follows §2.3.
+使用单一职责的语义名称；各端共享含义，采用各端原生表示。Color Token 表达表面/文字/边框/强调/状态；Typography Token 表达字体族/字号/行高；Spacing Token 表达密度/间距。固定字体、间距、颜色值、像素布局、字体资源、尺度及生成/构建工具不属于本次初始方向。后续 GUI 任务在已接受方向内确定具体值，并提供截图证据与 Architect 批准；敏感依赖仍遵循 §2.3。
 
-Two theme presets vary only colors. User appearance preferences may independently adjust Typography and Spacing locally within validated supported ranges. This distinction must hold after restart and theme switching: theme changes do not reset user type/density, and user settings do not alter component meaning. No cloud synchronization, plugin styling control, arbitrary CSS/script injection or downloaded font system is authorized. Web appearance preferences must stay separate from its memory-only chat state; the storage mechanism needs a later bounded choice. Desktop/Mobile preferences must not modify Repository message/schema/transaction semantics.
+两个主题预设仅改变颜色。用户外观偏好可在验证支持的范围内独立调整本地 Typography 和 Spacing。重启或切换主题后仍须保持这一分工：主题切换不重置用户字体/密度，用户设置不改变组件含义。不授权云同步、插件样式控制、任意 CSS/脚本注入或下载字体系统。Web 外观偏好必须与仅内存聊天状态分离；具体存储机制需后续限定决策。Desktop/Mobile 偏好不得改变 Repository 消息、schema 或事务语义。
 
-## Configuration and interaction guardrails
+## 配置与交互约束
 
-The host client controls theme, typography and spacing. Plugins cannot modify primary navigation, brand core or base UI semantics. Larger type/spacing must preserve readable content, usable input, reachable navigation and meaningful empty/loading/error/sync states on each platform. Keyboard focus and accessible labels must be available where applicable; color is not the only message-delivery indicator. These are future GUI review obligations, not authorization for a named accessibility/component library.
+主题、字体与间距由宿主客户端控制。插件不得修改一级导航、品牌核心或基础 UI 语义。各端采用较大字体/间距后，仍须保证内容可读、输入可用、导航可达，以及空/加载/错误/同步状态含义清晰。适用场景中必须提供键盘焦点和无障碍标签；消息投递状态不得仅靠颜色区分。这些是未来 GUI Review 义务，不是对某个无障碍库或组件库的授权。
 
-## Per-platform expression
+## 各端表达
 
-Web favors compact online communication. Desktop favors comfortable repeated use with richer workspace layout and native capability surfaces. Mobile favors touch-readable Compose presentation and emulator-verified behavior. Share semantic design direction and token meanings, not full visual components or forced pixel-identical layouts. Logo creation and pixel-perfect screens are not this task's deliverables.
+Web 面向紧凑的在线通信。Desktop 面向舒适的反复使用、更丰富的工作区布局和原生能力展示。Mobile 面向触控可读的 Compose 展示，并通过模拟器验证行为。共享设计语义与 Token 含义，不共享完整视觉组件，也不强制像素一致布局。Logo 制作和像素级页面不属于本任务交付物。

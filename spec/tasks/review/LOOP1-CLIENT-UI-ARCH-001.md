@@ -39,7 +39,9 @@ Existing accepted canonical §6.1 / ADR-0005 retains React/TypeScript Web; Tauri
 - `spec/architecture/decisions/ADR-0006-client-ui-architecture.md`.
 - `spec/architecture/decisions/client-ui/architecture.md`, `spec/architecture/decisions/client-ui/design-direction.md`.
 - `spec/acceptance/client-gui.md`.
+- `spec/progress/checkpoints/2026-10-03-client-ui-architecture-accepted.md` (only after actual accepted freeze; not created by this fix).
 - `spec/progress/current.md`, `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/**`.
+- Local `.git-ui-chinese-research/**` (fresh Chinese Fix Agent Recorder only, never product authority).
 - Local `.git-ui-architecture-research/**` for Recorder artifacts only, never product authority.
 
 # Acceptance
@@ -75,3 +77,9 @@ Fresh independent clean-candidate Review -> applicable exact-head hosted CI -> a
 ## Candidate handoff
 
 Three documents, ADR-0006, canonical v1.1 UI amendment/hash and Settings-directory worktree allocation supplement complete. Frozen integrity/source all/architecture unit/diff checks PASS; recovery Development recheck PASS24 after disclosed initial metadata FAIL. Evidence candidate-checks.json and recovery-recheck.json; Windows GBK Recorder output failure retained. No source/contracts/PDF changes. Candidate not accepted; S1 PASS/S2 OPEN. Root writer released after commit for fresh Review. Current changes are task-owned only.
+
+## 中文修订与 Review 修复交接（2026-10-03）
+
+Fresh Fix Agent /root/ui_arch_chinese_fix 将 ADR-0006、UI architecture、design-direction、client-gui 四份新交付文档全部正文改为中文；同步翻译索引/清单最新 UI 候选段落。规范正文与 a234bc06 候选哈希不变。旧 Review 发现 BASE..HEAD diff whitespace FAIL；原始字节以 gzip 与 SHA 清单保留，文本副本明确标注 LF 规范化。历史提交、根 Agent Recorder、原始失败结论未覆盖。新证据位于 chinese-revision/。仍为 review，待新独立 Review、精确 HEAD 托管 CI、受保护集成/main 同步；不声明最终接受。最后已知良好 main9c0eba89219b3fab73fe9258a7cfc59831c499dc，S1 PASS/S2 OPEN。本修订仅由 fresh Fix Agent 写入；root 的本地 Recorder 未跟踪目录归 root 所有。
+
+中文修订本地验证：frozen integrity/source all/53 architecture tests/完整 BASE 至工作区 diff check/recovery Development 均 PASS；精确命令、退出码、时长见 chinese-revision/checks.json。待提交后还须精确 BASE..HEAD 检查与新的独立验收。

@@ -1,58 +1,58 @@
-# Client UI Architecture
+# 客户端 UI 架构
 
-Status: Human-approved direction; candidate pending fresh independent Review / exact-head hosted CI / integrated-main verification. Canonical v1.1 §6.5 and ADR-0006 govern this subordinate design document. No product implementation is authorized by this candidate alone.
+状态：Human 已批准设计方向；候选文档仍待新的独立 Review、精确 HEAD 的托管 CI 和集成后主仓库验证。本从属设计文档受规范架构 v1.1 §6.5 和 ADR-0006 约束。候选文档本身不授权产品实现。
 
-## Product and information architecture
+## 产品与信息架构
 
-构界 IM+ / PlugWorldIM uses Adaptive Glass Workspace. The visual emphasis is 50% Future AI Communication, 30% Productivity Tool, 20% Developer Extensibility; these are design priorities, never feature or capacity claims.
+产品名为「构界 IM+ / PlugWorldIM」，采用 Adaptive Glass Workspace。视觉重点为未来 AI 通信 50%、生产力工具 30%、开发者扩展性 20%。这些比例表达设计优先级，不承诺功能或容量。
 
-| Primary destination | Responsibility | Boundary |
+| 一级入口 | 职责 | 边界 |
 | --- | --- | --- |
-| Chat | Conversation List, Conversation View, messages | Friend management belongs to Friends |
-| Friends | User search, friend relationships, add friend | Server authority decides friendship/direct uniqueness |
-| AI | Future entry, illustration, construction notice | Placeholder only; no AI chat, Agent, RAG, tool calling, API or fake data |
-| Plugin | Installed Plugins, Plugin Status, Plugin Entry | Personal capability panel; no store, Marketplace or S2 installation/runtime |
+| Chat | 会话列表、会话视图、消息 | 好友管理归 Friends |
+| Friends | 用户搜索、好友关系、添加好友 | 好友关系和唯一私聊由服务端权威判定 |
+| AI | 未来入口、插图、施工提示 | 仅占位；不实现 AI 聊天、Agent、RAG、工具调用、API 或虚假数据 |
+| Plugin | 已安装插件、插件状态、插件入口 | 个人能力面板；不是商店或 Marketplace，不实现 S2 安装系统或运行时 |
 
-Application Shell owns primary navigation, account context and destination selection. Only client-owned code may later add Settings/Profile after task authorization. Plugins cannot add primary destinations or control the Shell, theme brand or base UI semantics. Nested plugin entry remains inside the host-owned Plugin destination and requires available authorized capability; absent capability displays an honest unavailable state, never a fake installed inventory or working action.
+Application Shell 负责一级导航、账号上下文和入口选择。后续任务授权后，仅客户端自有代码可增加 Settings/Profile 等入口。插件不得增加一级导航，不得控制 Shell、主题品牌或基础 UI 语义。插件的下级入口仍位于宿主控制的 Plugin 页面内，且必须具有可用的已授权能力；能力不存在时，应如实展示不可用状态，不得伪造已安装清单或可执行操作。
 
-## Data ownership and flow
+## 数据归属与流向
 
-UI renders view state and emits user intent. Screen state/hooks/ViewModel translate intent to existing Repository/protocol operations and expose loading/empty/error/auth-expired/connection/sync state. Repository owns materialized data and transactional convergence; protocol adapters own canonical HTTP/WSS serialization and transport behavior. UI must not open SQLite, advance cursors, fabricate ACK, write message state independently or decide membership/permissions. Backend ownership remains Core/Gateway/Plugin Host under §3 and SRC-01..07.
+UI 渲染视图状态并发出用户意图。页面状态、hooks 或 ViewModel 将意图转换为既有 Repository/协议操作，并提供加载、空、错误、认证过期、连接和同步状态。Repository 负责物化数据与事务收敛；协议适配器负责规范 HTTP/WSS 的序列化和传输行为。UI 不得直接打开 SQLite、推进游标、伪造 ACK、独立写入消息状态，或判定成员身份与权限。后端职责仍遵循 §3 和 SRC-01 至 SRC-07 的 Core/Gateway/Plugin Host 边界。
 
-Desktop/Mobile send intent -> approved send orchestration -> persist SENDING through Repository -> transmit -> durable server ACK -> Repository UPSERT -> observed UI state. This task specifies direction and does not implement orchestration. Retry reuses request_id; FAILED means unconfirmed attempt; matching realtime/Sync may converge to SENT; SENT never regresses. Data/cursor updates are atomic, user cursor excludes messages, contiguous_seq never crosses a gap. Offline history is the account-scoped local view, followed by background Sync; switching account must stop old observations and display no previous-account data.
+Desktop/Mobile 的发送方向为：用户意图 → 已批准的发送编排 → Repository 持久化 SENDING → 传输 → 服务端 durable commit 后的 ACK → Repository UPSERT → UI 观察状态。本任务只规定方向，不实现发送编排。重试复用 request_id；FAILED 只表示该次尝试尚未确认成功；匹配的实时事件或 Sync 可收敛为 SENT；SENT 不得回退。数据和游标更新必须原子提交；用户游标不包含消息；contiguous_seq 不得越过缺口。离线历史来自按账号隔离的本地视图，随后后台 Sync；切换账号必须停止旧账号观察，且不得显示前一账号数据。
 
-Web uses in-memory Repository state only; no chat database, persisted history, offline history or page-lifecycle durability promise. Offline/error views must describe actual connection state. Local appearance preferences contain no messages, tokens or business data and do not create chat persistence authority.
+Web 仅使用内存 Repository 状态，不建立聊天数据库，不持久化历史，不承诺离线历史或跨页面生命周期的数据保留。离线和错误视图必须表达真实连接状态。本地外观偏好不得包含消息、令牌或业务数据，也不构成聊天持久化授权。
 
 ## Web
 
-React + TypeScript for concise, efficient online communication. Shell/routing handles destination selection; screen/custom business components handle presentation; custom hooks/data layer connect Repository/protocol operations; state is useState/useReducer/Context/custom hooks. Local screen state stays local; Context carries only genuinely shared current responsibility. No speculative generic event bus/store/controller hierarchy.
+采用 React + TypeScript，定位为简洁、高效的在线通信。Shell/路由负责入口选择；页面和自定义业务组件负责展示；自定义 hooks/数据层连接 Repository 与协议操作。状态管理采用 useState/useReducer/Context/custom hooks。页面局部状态留在本页面；Context 只承载当前确实需要共享的职责。不得为假设需求增加通用事件总线、store 或 controller 层级。
 
-Router is a responsibility, not authorization for a named third-party router. No Zustand/Redux/MobX, data framework or full business UI framework. Icons/accessibility/utilities may be considered only through dependency governance; the category alone does not approve a concrete library.
+路由是职责描述，不是对某个第三方路由库的授权。不选择 Zustand/Redux/MobX、数据框架或整套业务 UI 框架。图标、无障碍和工具类基础库仍需遵循依赖治理；类别名称不能批准具体库。
 
 ## Desktop
 
-Tauri + React + TypeScript, independent UI for comfortable, frequent productivity use; richer layout/interactions and native capability presentation follow later bounded tasks. This supersedes the former §6.1 instruction to maximize Web UI reuse. Share protocol/model/Repository behavior, suitable platform-neutral hooks, design tokens and UI semantics; do not share complete React visual components such as Button, MessageBubble or ChatWindow. Avoid duplicating protocol/domain logic or importing Desktop native hooks into Web.
+采用 Tauri + React + TypeScript，使用独立 UI，面向舒适、高频的生产力场景。更丰富的布局、交互和原生能力展示由后续限定任务实施。本决策替代原 §6.1「最大程度复用 Web UI」要求。共享协议、模型、Repository 行为、适合跨平台的 hooks、Design Token 和 UI 语义；不得共享 Button、MessageBubble、ChatWindow 等完整 React 视觉组件。不得重复协议/领域逻辑，也不得将 Desktop 原生 hooks 引入 Web。
 
-TypeScript owns Repository/models/transaction intent; SQLx Rust native adapter remains limited to connections/queries/one atomic transaction. OS notifications/tray/secure storage use authorized native boundaries and later tasks; this design does not add a library or feature implementation.
+TypeScript 负责 Repository、模型和事务意图；SQLx Rust 原生适配器仍限于连接、查询和单次原子事务。系统通知、托盘和安全存储须遵循已授权的原生边界及后续任务；本设计不增加库或功能实现。
 
 ## Mobile
 
-Android Kotlin + Jetpack Compose. UI emits intent to ViewModel; ViewModel invokes Repository and exposes StateFlow; Compose observes that state with lifecycle-aware collection. StateFlow is observable state, not a transport or storage layer. Repository delegates to SDK SQLite and authorized protocol adapters. Jetpack Navigation Compose owns host navigation; ViewModel/StateFlow/Navigation choices are explicit Human decisions recorded in canonical §6.5 / ADR-0006, not a Task Spec selection.
+采用 Android Kotlin + Jetpack Compose。UI 向 ViewModel 发出意图；ViewModel 调用 Repository 并通过 StateFlow 暴露状态；Compose 按生命周期收集该状态。StateFlow 是可观察状态，不是传输或存储层。Repository 委托给 SDK SQLite 和已授权协议适配器。Jetpack Navigation Compose 负责宿主导航。ViewModel/StateFlow/Navigation 是明确的 Human 决策，记录于规范 §6.5 / ADR-0006，而非由 Task Spec 自行选型。
 
-Real Android Studio emulator validation is required. Kotlin models/Repository/protocol/plugin adapters implement equivalent behavior under the same canonical contracts/fixtures; TypeScript SDK/hook/component reuse is not required. No Room/ORM, arbitrary network library, JS bridge/runtime/codegen or shared native rewrite.
+必须在真实 Android Studio 模拟器中验证。Kotlin 模型、Repository、协议和插件适配器依据相同规范契约与 fixtures 实现等价行为；不要求复用 TypeScript SDK、hooks 或组件。不得引入 Room/ORM、任意网络库、JS bridge/runtime/codegen 或共享原生重写。
 
-## Shared UI boundary
+## 共享 UI 边界
 
-Share design specification, token meanings and UI behavioral semantics. Web/Desktop share TypeScript protocol-sdk/plugin-sdk/models and eligible hooks; Mobile implements equivalent Kotlin behavior using identical contracts/fixtures. No three-platform visual component library. UI contracts here mean presentation obligations, never a new machine-verifiable wire/API/schema authority; those remain exclusively contracts/.
+共享设计规范、Token 含义和 UI 行为语义。Web/Desktop 共享 TypeScript protocol-sdk/plugin-sdk/models 和适用 hooks；Mobile 根据同一契约与 fixtures 实现等价 Kotlin 行为。不建立三端视觉组件库。本文件中的 UI contract 指展示义务，不建立新的机器可验证 wire/API/schema 权威；该权威仍唯一归属 contracts/。
 
-## Plugin and AI boundaries
+## Plugin 与 AI 边界
 
-S2 reserves host-owned Plugin/AI entries only. No renderer, UI-code download/execution, remote component injection, plugin installation, dynamic loading or runtime. Declarative poll descriptions illustrate future design, not a new schema/API or S2 implementation. S4 retains §8.2 reviewed Custom Render Bundle plus declarative UI, package/signature/hash/schema/compatibility/permission/resource/CSP/entry validation, sandbox iframe/isolated WebView and whitelist Bridge. No relaxation of token/SQLite/host-resource protections or canonical plugin fixtures. AI remains placeholder until separate explicit API/contracts/architecture decisions and acceptance.
+S2 仅预留宿主控制的 Plugin/AI 入口。不实现 renderer、UI 代码下载或执行、远程组件注入、插件安装、动态加载或运行时。声明式投票描述仅用于说明未来设计，不定义新 schema/API，也不是 S2 实现。S4 保留 §8.2 经审查的 Custom Render Bundle 和声明式 UI，以及包/签名/哈希/schema/兼容性/权限/资源/CSP/入口校验、sandbox iframe/隔离 WebView 和白名单 Bridge。不得放宽令牌、SQLite、宿主敏感资源保护或规范插件 fixtures。AI 在单独明确 API、契约、架构决策并完成验收前始终为占位。
 
-## Future GUI API coverage
+## 后续 GUI 的 API 覆盖
 
-Auth login, web/native refresh, logout and expired-session handling; current user information; user search and add friend; conversation list/open; message send/receive/state; Sync state. Resolve operations from contracts/http/auth-user-friend.openapi.json and canonical WSS envelope/sync schemas. Conversation/message/sync are not invented HTTP routes: current accepted protocol contracts decide transport and field shape. No changes to OpenAPI/backend are authorized. Other existing operations or future functionality require their own bounded task. Plugin/AI placeholders cannot imply missing backend capability exists.
+覆盖认证登录、Web/原生 refresh、logout、会话过期处理；当前用户信息；用户搜索和添加好友；会话列表/打开；消息发送/接收/状态；Sync 状态。操作必须从 contracts/http/auth-user-friend.openapi.json 和规范 WSS envelope/sync schema 解析。不得自行发明会话/消息/Sync HTTP 路由；已接受的协议契约决定传输方式与字段结构。本任务不授权修改 OpenAPI 或后端。其他既有操作或未来能力需另行限定任务。Plugin/AI 占位不得暗示缺失的后端能力已经存在。
 
-## Delivery boundary
+## 交付边界
 
-No pages, components, UI interaction implementation, pixel design or runtime is delivered here. Future GUI tasks must cite the independently accepted canonical/ADR and spec/acceptance/client-gui.md; architecture freeze, GUI Task PASS and S2 Gate PASS are separate outcomes.
+本任务不交付页面、组件、UI 交互实现、像素级设计或运行时。后续 GUI 任务必须引用独立验收后的规范架构/ADR 和 spec/acceptance/client-gui.md。架构冻结、GUI Task PASS 与 S2 Gate PASS 是三个不同结果。

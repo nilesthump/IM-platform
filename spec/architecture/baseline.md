@@ -49,7 +49,7 @@ Candidate188d24a5a53abaa136aa939fded5968dd5fe728f was never accepted. New Human 
 
 Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 under scoped Human GString waiver; original4b5 Review FAIL immutable. Exactpush36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS. Canonicalaa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c/PDF546915 unchanged. ADR0005 effective at accepted prerequisite. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md. Earlier pending paragraphs are historical; later administrative closure needs NEW independent Review/exactHEADCI before S2activation. No product/contract change; S1PASS/S2OPEN.
 
-## Current UI amendment candidate (2026-10-03)
+## 当前 UI 修订候选（2026-10-03）
 
 - ui_revision_type: `human_approved_client_ui_architecture`
 - ui_semantic_change: `true`
@@ -59,4 +59,4 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 
 - ui_supplement_source: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/human-supplement.txt`
 - ui_previous_sha256: `aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c`
 
-The base revision fields above preserve ADR-0005 technology provenance. The latest UI amendment is ADR-0006; current canonical hash is a234bc06e33fd0ae08efd944331930320b8cf1d58800fa4e66886452d8084237. v1.1 remains unchanged; historical PDF and all previous accepted lineage remain immutable. This is a Human-approved candidate, NOT yet effective: fresh independent Review, exact-head hosted CI, integration/actual-main verification and protected synchronization are pending. S1 PASS/S2 OPEN; no GUI/product activation.
+以上基础修订字段保留 ADR-0005 的技术来源。最新 UI 修订为 ADR-0006；当前规范哈希为 a234bc06e33fd0ae08efd944331930320b8cf1d58800fa4e66886452d8084237。v1.1 保持不变；历史 PDF 和此前已接受谱系保持不可变。这是 Human 批准的候选，尚未生效：仍待新的独立 Review、精确 HEAD 托管 CI、集成/实际 main 验证与受保护同步。S1 PASS/S2 OPEN；不激活 GUI 或产品任务。
