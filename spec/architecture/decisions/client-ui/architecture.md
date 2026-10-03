@@ -1,6 +1,6 @@
 # 客户端 UI 架构
 
-状态：Human 已批准设计方向；候选文档仍待新的独立 Review、精确 HEAD 的托管 CI 和集成后主仓库验证。本从属设计文档受规范架构 v1.1 §6.5 和 ADR-0006 约束。候选文档本身不授权产品实现。
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
 
 ## 产品与信息架构
 
