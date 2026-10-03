@@ -2,10 +2,10 @@
 
 - baseline_title: 面向十万级在线连接的可扩展分布式即时通信平台
 - version: `v1.1`
-- status: accepted Human-approved client clarification at e7c80c7; final administrative confirmation pending
+- status: Human-approved MVP planning candidate; prior UI freeze accepted; new independent acceptance pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `a234bc06e33fd0ae08efd944331930320b8cf1d58800fa4e66886452d8084237`
+- sha256: `16e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -64,3 +64,14 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 
 ## UI 冻结验收发现（2026-10-03）
 
 上述候选说明保留为历史过程。ADR-0006 / UI 规范内容已在候选 33cc754、PR12 实际 main 4f18d222 独立 Review 与精确 HEAD CI 接受，并已同步主仓库；当前规范哈希不变。完整证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。收尾记录仍在 review，S1 PASS / S2 OPEN，不启动后续产品任务。
+
+## 当前 MVP 规划修订（2026-10-03）
+
+- planning_revision_type: `human_approved_client_mvp_task_planning`
+- planning_semantic_change: `true`
+- planning_revision_task_id: `LOOP1-CLIENT-UI-ARCH-001`
+- planning_revision_adr: `spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md`
+- planning_approval_source: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/human-request.txt`
+- planning_previous_sha256: `a234bc06e33fd0ae08efd944331930320b8cf1d58800fa4e66886452d8084237`
+
+当前 sha256 指向本轮规范字节；保留 v1.1，历史 ADR-0005/0006 与既有 revision 字段仅为谱系，不是本轮验收。仅新增 CLIENT-GUI 产品 ID、复用既有任务 acceptance。新的独立 Review、exact-head hosted CI、protected integration/actual main 与受保护同步前不生效，不实施 SEND。历史 PDF 原字节、PR7/PR8/FAIL/Recorder evidence 不变。

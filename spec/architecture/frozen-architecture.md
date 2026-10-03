@@ -1022,7 +1022,7 @@ This loop is milestone-gated, not calendar-gated. A stage MAY begin immediately 
 | --- | --- | --- | --- |
 | S0 控制面 | W1 | Monorepo、spec/contracts/tasks/progress、CI skeleton、Compose、PostgreSQL/NATS/TLS；冻结 HTTP/WSS/Error/Session/Message/Sync/Plugin API v1 | 新 Agent 仅靠控制面可定位项目、状态、下一任务；契约 lint 与 skeleton CI PASS |
 | S1 Go 纵向链路 | W2-3 | 注册/登录、WSS、搜索、好友、唯一私聊、文本发送、ACK、持久化、Outbox、NATS | A 搜索/添加 B 后发 hello，B 实时收到；contract/integration PASS |
-| S2 客户端与Sync | W4-5 | Desktop/Mobile SQLite、optimistic write、retry、双层 cursor、离线恢复；Web 最简实时态 | ACK 丢失重试不重复；离线 101..500 完整恢复；FAILED 可被 Sync 收敛为 SENT |
+| S2 客户端与Sync | W4-5 | Desktop/Mobile SQLite、optimistic/retry/Sync 和完整 Loop1 GUI；Web memory-only 完整 GUI | ACK 丢失/离线 gap/重复乱序 PASS；GUI/Web 完整截图 Architect Approval、独立 Review、精确 HEAD CI 与 main 验证 |
 | S3 Java 等价 | W6-7 | Auth/Session/User/Friend/Conversation/Message/Sync/Outbox/NATS | 两 profile 同一 Golden Tests PASS；客户端零改动切换 |
 | S4 插件平台 | W8-9 | Registry、Manifest、Permission、WASM、UI Host、Render Bundle、生命周期、Echo/Poll | 两个 fixture 在三端与双后端兼容；sandbox/权限负例 PASS |
 | S5 工程硬化 | W10 | path-aware CI、compatibility matrix、migration/plugin tests、Release Manifest、rollback/security | Compatibility CI 可复现；无硬编码跳过；回滚演练 PASS |
@@ -1172,29 +1172,44 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 | LOOP1-GO-MSG-001 | Go 文本消息 + seq +outbox | S1 | durable ACK、idempotency、dispatcher、NATS | ACK 丢失重试不重复；接收端实时收到 |
 | LOOP1-E2E-001 | 首条纵向 E2E | S1 | A 登录搜索添加 B 并发送 hello | 从 TLS 入口运行；证据归档 |
 | LOOP1-CLIENT-SQLITE-001 | SQLite schema 与 repository | S2 | UNIQUE(conversation_id, request_id)、UPSERT、migration fixture | 四条入口均幂等收敛 |
+| LOOP1-CLIENT-UI-ARCH-001 | 客户端 UI 架构冻结 | S2 | 三端职责、Adaptive Glass Workspace、截图驱动 Architect Review | 独立 Review/CI 与 main 核验后冻结；不代替 GUI 实现 |
 | LOOP1-CLIENT-SEND-001 | Optimistic send 状态机 | S2 | SENDING/SENT/FAILED/retry | SENT 不倒退；retry 复用request_id |
 | LOOP1-SYNC-001 | 双层离线同步 | S2 | user cursor + per-conversation contiguous_seq | 乱序/重复/交叉实时流无gap |
-| LOOP1-WEB-001 | Web 临时客户端 | S2 | 登录/好友/会话/实时文本 memory only | 刷新不保留历史；当前状态可重新获取 |
+| LOOP1-CLIENT-GUI-001 | Desktop/Mobile 完整 Loop1 GUI | S2 | Login/session、Chat、Friends、AI Placeholder、Plugin capability/unavailable、Settings/Profile、双主题/本地字体间距、Offline History、SENDING/SENT/FAILED/retry、Sync/reconnect、Desktop notification/tray/shortcut、Android emulator | CLIENT-UI-ARCH 与 spec/acceptance/client-gui.md；真实截图/Architect Review/修复重拍/Approval，再独立 Review、精确 HEAD CI、protected main 核验 |
+| LOOP1-WEB-001 | Web 完整 Loop1 GUI | S2 | React + TypeScript；memory only；Chat/Friends/AI Placeholder/Plugin/Settings/Profile、双主题和本地字体/间距 | 无 SQLite/离线历史；遵守 CLIENT-UI-ARCH、client-gui 截图验收和独立 Review/精确 HEAD CI/main 核验 |
+
+### S2 最小任务依赖与执行顺序（Human-approved ADR-0007）
+
+LOOP1-CLIENT-SQLITE-001（已接受） → LOOP1-CLIENT-UI-ARCH-001（UI 冻结已接受，当前规划补充另行验收） → LOOP1-CLIENT-SEND-001 → LOOP1-SYNC-001 → LOOP1-CLIENT-GUI-001 → LOOP1-WEB-001 → S2 Gate。
+
+该补充只新增一个产品 UI ID LOOP1-CLIENT-GUI-001。Desktop/Mobile GUI 独立边界包含上述完整界面及既有发送/同步编排的可观察状态，不重新实现 SQLite、发送或 Sync 领域逻辑。GUI 明确依赖 SQLITE、UI-ARCH、SEND、SYNC 四个已接受任务；Web 完整 GUI 使用原 LOOP1-WEB-001 且在 GUI 后执行。各任务在真实队列中唯一存在，依赖未接受不得激活；本轮 Human endpoint 为 SEND done，后续任务保持 backlog。
+
+GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成真实运行截图 → Architect Review → 修复 → 重新截图 → Architect Approval → fresh independent Review → exact-head applicable hosted CI → protected integration/actual-main verification。S2 不实现 AI API/chat/Agent/RAG、Plugin runtime、Marketplace、S4 renderer 或新公共 API；Web 始终 React/TypeScript memory only、no SQLite、no offline history。偏好仅存外观设置，不授权聊天持久化；未冻结具体存储机制按 §2.3 先决策后实现。
 
 <a id="section-20"></a>
 ## 20. 后续任务队列与依赖
 
 | Task ID | 依赖 | 目标 | Gate |
 | --- | --- | --- | --- |
+| LOOP1-CLIENT-UI-ARCH-001 | LOOP1-CLIENT-SQLITE-001 | UI architecture 冻结与当前 MVP 规划补充验收 | S2 |
+| LOOP1-CLIENT-SEND-001 | LOOP1-CLIENT-SQLITE-001 + LOOP1-CLIENT-UI-ARCH-001 | Desktop/Mobile 发送编排；Repository 先持久化再 WSS，ACK/realtime/Sync 收敛、FAILED/retry 同 ID | S2 |
+| LOOP1-SYNC-001 | LOOP1-CLIENT-SEND-001 | 双层 Sync 编排及断线重连；保留领域职责 | S2 |
+| LOOP1-CLIENT-GUI-001 | LOOP1-CLIENT-SQLITE-001 + LOOP1-CLIENT-UI-ARCH-001 + LOOP1-CLIENT-SEND-001 + LOOP1-SYNC-001 | Desktop/Mobile 完整 GUI；CLIENT-UI-ARCH、client-gui 截图/Architect/独立 Review/CI/main 验收 | S2 |
+| LOOP1-WEB-001 | LOOP1-CLIENT-GUI-001 | Web 完整 Loop1 GUI；React/TypeScript memory only，无 SQLite/离线历史，同一截图验收 | S2 |
 | LOOP1-JAVA-AUTH-001 | S2 PASS + Auth contracts | Java/Spring Auth/Session 等价实现 | S3 |
 | LOOP1-JAVA-IM-001 | Java Auth + IM contracts | Friend/Conversation/Message/Sync/Outbox/NATS | S3 |
-| LOOP1-PARITY-001 | Go + Java core | Golden Contract parity + client profile switch | S3 |
+| LOOP1-PARITY-001 | Go + Java core + S2 PASS | Golden parity；同一客户端制品/代码无需业务修改切换 Go/Java profile，GUI 不改写协议，两 profile 当前关键纵向流程通过 | S3 |
 | LOOP1-PLUGIN-REG-001 | Plugin API v1 | Registry、immutable artifact、validation | S4 |
 | LOOP1-PLUGIN-WASM-001 | Registry | WASM host、permissions、limits、circuit breaker | S4 |
-| LOOP1-PLUGIN-UI-001 | Registry + client hosts | Declarative UI + Custom Render Bundle review/sandbox | S4 |
+| LOOP1-PLUGIN-UI-001 | Registry + client hosts | Declarative UI/Render Bundle review/sandbox；遵守 CLIENT-UI-ARCH，禁止控制一级导航；真实宿主 UI 证据，显著视觉变化按 client-gui Architect 截图验收 | S4 |
 | LOOP1-PLUGIN-LIFE-001 | WASM/UI | install/enable/disable/uninstall/upgrade/rollback | S4 |
-| LOOP1-PLUGIN-FIX-001 | Plugin runtime | Echo/Poll fixtures on all clients/profiles | S4 |
-| LOOP1-COMPAT-001 | S4 PASS | old clients + plugin + SQLite migration matrix | S5 |
-| LOOP1-RELEASE-001 | compat CI | manifest、signing、staging、rollback rehearsal | S5 |
+| LOOP1-PLUGIN-FIX-001 | Plugin runtime | Echo/Poll 在 Web/Desktop/Mobile 真实宿主 UI 与两 profile 验证；真实运行证据及适用 Architect 截图批准 | S4 |
+| LOOP1-COMPAT-001 | S4 PASS | Web/Desktop/Android 与 old-client 兼容矩阵、SQLite migration、UI/theme/local preference 与 Plugin UI compatibility | S5 |
+| LOOP1-RELEASE-001 | compat CI | Desktop/Android 实际制品、Web 制品、manifest/hash/signing、install/upgrade/rollback smoke 和 staging rehearsal | S5 |
 | LOOP1-LOAD-001 | S5 PASS | Go load generator + scenarios + evidence format | S6 |
 | LOOP1-LOAD-GO-001 | load harness | Go 500->5000 benchmark/soak | S6 |
 | LOOP1-LOAD-JAVA-001 | load harness | Java 500->5000 benchmark/soak | S6 |
-| LOOP1-RC-001 | all gates | bug fix、final 5k、release candidate、architecture snapshot | Loop 1 |
+| LOOP1-RC-001 | all gates | 三端最终可运行制品、关键 GUI smoke；相对最近 Architect-approved 截图集有实质视觉变化则重拍并批准；最终 5k/RC/rollback/architecture snapshot，容量负载由 harness 承担，不把 GUI 自动化放入 5000 WSS 热路径 | Loop 1 |
 
 <a id="section-20-1"></a>
 ### 20.1 依赖纪律
@@ -1251,7 +1266,7 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 | --- | --- |
 | S0 | spec/contracts/tasks/progress 完整；CI/Compose/TLS/PostgreSQL/NATS skeleton；Agent dry-run 可恢复；无重复权威 |
 | S1 | Go Auth -> Friend -> Direct -> Message 全链；durable ACK/outbox/NATS；contract/integration/E2E PASS |
-| S2 | Desktop/Mobile SQLite/optimistic/sync；Web memory only；ACK 丢失/离线 gap/乱序重复 PASS |
+| S2 | SQLITE/UI-ARCH/SEND/SYNC/CLIENT-GUI/WEB 全部接受；Desktop/Mobile 完整 Loop1 GUI，Web memory only/no SQLite/no offline history；client-gui 真实截图/Architect Approval、fresh independent Review、精确 HEAD CI/main 验证；ACK 丢失/离线 gap/乱序重复 PASS |
 | S3 | Java 核心等价；Go/Java Golden Tests；客户端零修改 profile switch |
 | S4 | Registry/WASM/UI/Render Bundle/lifecycle；Echo/Poll；权限与 sandbox 负例 |
 | S5 | Path-aware CI、全平台 compatibility、migration、manifest、security、rollback rehearsal |

@@ -31,3 +31,9 @@ Architect Review 记录精确候选 SHA、截图清单/哈希、PASS/FAIL 决策
 ## 证据与闭环
 
 在 spec/progress/evidence/<GUI_TASK_ID>/ 下保存截图清单、原始图片、Architect 决策、修复迭代、独立 Review 与托管验收。Task handoff 记录命令、退出码/时长、已知失败和最后已知良好 SHA；current.md 只链接简洁恢复状态与最新稳定 checkpoint。视觉证据须绑定到集成后的产品树，声明完成前须记录任务分支/提交/同步结果/主仓库 SHA。不接受 Photoshop 或生成图片作为运行证明，不以截图替代 CI，不因单个 GUI Task 推进 Stage。
+
+## MVP 任务归属（ADR-0007 规划候选）
+
+新增且唯一产品 UI ID 为 LOOP1-CLIENT-GUI-001（Desktop/Mobile）；Web 完整 Loop1 GUI 使用既有 LOOP1-WEB-001。两者均覆盖 Login/session、Chat、Friends、AI Placeholder、Plugin capability/unavailable、Settings/Profile、Cold AI/Warm Creative、本地字体/间距与真实发送/重连状态。Desktop/Mobile 还覆盖 Offline History、Sync，Desktop 真实通知/托盘/快捷键，Mobile Android Studio emulator；Web 无 SQLite/离线历史，不持久化聊天。
+
+S3 PARITY、S4 PLUGIN-UI/FIX、S5 COMPAT/RELEASE、S6 RC 在各自既有 acceptance 承接适用 GUI 要求，规则见 canonical §20；不新增 GUI E2E/parity/plugin/release/soak Task。实质视觉变化须针对最近 Architect-approved set 重新截图批准；容量测试由 load harness 承担，GUI 自动化不进入 5000 WSS 热路径。本段随 ADR-0007 独立接受后生效；既有截图与架构验收要求不降低。

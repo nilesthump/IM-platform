@@ -1,89 +1,94 @@
 ---
 task_id: LOOP1-CLIENT-UI-ARCH-001
-title: Client UI architecture, design direction and screenshot acceptance freeze
+title: Human-approved MVP client GUI task planning supplement
 status: review
-owner: Architecture Agent /root
+owner: Coordinator /root
 stage: S2
 gate: S2
 ---
 
 # Goal
 
-Freeze the Human-requested client UI architecture, information architecture, initial design-system direction and GUI acceptance protocol. Documentation only; no GUI or S2 product implementation.
+复用已接受 UI 架构任务，执行 Human 2026-10-03 明确批准的最小规划补充。此前 UI 冻结已接受于 main59dcf34；本次补充未接受，不启动 SEND 或 GUI。仅新增一个产品 Task ID LOOP1-CLIENT-GUI-001；Web 和 S3～S6 复用既有规划 ID。
 
 # Inputs
 
-- `spec/architecture/README.md` -> `spec/architecture/baseline.md` -> `spec/architecture/frozen-architecture.md`; accepted input SHA256 aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c and immutable PDF 546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510. Canonical §2.1/2.3/3/6/7/8/10 SRC-01 through SRC-07/11/12-14/15/20/21.
-- Approved ADR-0001 (expired), ADR-0002/0003/0004/0005; older authority/evidence remains immutable.
-- `spec/governance/minimality.md`, `spec/governance/execution-boundaries.md`, `spec/governance/independent-review.md`, `spec/governance/technology-selection.md`.
-- `spec/domain/messaging.md`, `spec/invariants/messaging.md`, `spec/domain/sync-plugin.md`, `spec/invariants/sync-plugin.md`, `spec/acceptance/s0-messaging.md`, `spec/acceptance/s0-sync-plugin.md`.
-- `contracts/http/auth-user-friend.openapi.json`, `contracts/websocket/`, `contracts/plugin-api/`, canonical fixtures. Public contracts remain unchanged and sole machine authority.
-- Human task and supplemental worktree/S2-only plugin decisions preserved in this task evidence directory.
+- `spec/architecture/README.md` -> `spec/architecture/baseline.md` -> `spec/architecture/frozen-architecture.md`; input a234bc06e33fd0ae08efd944331930320b8cf1d58800fa4e66886452d8084237，历史 PDF546915 不变。读取 §2/§3/§6/§10 SRC-01 through SRC-07/§11/§12-15/§19-21/附录 A。
+- `spec/architecture/decisions/ADR-0006-client-ui-architecture.md`、`spec/architecture/decisions/client-ui/architecture.md`、`spec/architecture/decisions/client-ui/design-direction.md`、`spec/acceptance/client-gui.md`。
+- `spec/governance/minimality.md`、`spec/governance/execution-boundaries.md`、`spec/governance/independent-review.md`、`spec/governance/technology-selection.md`。
+- `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/human-request.txt`。
+- `spec/domain/messaging.md`、`spec/invariants/messaging.md`、`spec/domain/sync-plugin.md`、`spec/invariants/sync-plugin.md`。契约只引用，不修改。
 
 # Technology Authorization
 
-Existing accepted canonical §6.1 / ADR-0005 retains React/TypeScript Web; Tauri/React/TypeScript Desktop and SQLx atomic native adapter; Android Kotlin/Compose/SDK SQLite Mobile. Human prompt explicitly specifies React built-in state, independent Desktop UI, Mobile ViewModel/StateFlow/Jetpack Navigation Compose. Record these in ADR-0006 and canonical candidate before any future implementation. No additional named icon/accessibility/utility library or Web router/data library is selected. Generic library categories are not blanket dependency authorization.
+仅规划；沿用已接受 §6.1/6.5、ADR-0005/0006；不增加敏感技术依赖。
 
 # Dependencies
 
 - LOOP1-CLIENT-ARCH-CLARIFICATION-001 done.
-- LOOP1-CLIENT-SQLITE-001 done: accepted PR10/main23a03bb and later documentation-only PR11/main9c0eba8; original recovery metadata remains unmodified.
-- LOOP1-CI-001 and LOOP1-RESEARCH-001 done; S1 PASS / S2 OPEN.
-- Later Human instruction explicitly resumes only this architecture task after earlier STOP.
+- LOOP1-CLIENT-SQLITE-001 done.
+- LOOP1-CI-001 done; LOOP1-RESEARCH-001 done.
+- UI 架构及收尾已接受 main59dcf34；本轮 Human 重新授权限定规划修订。
 
 # Allowed Paths
 
-- `AGENTS.md` (explicit Human worktree allocation supplement only).
-- `spec/tasks/{active,review,done}/LOOP1-CLIENT-UI-ARCH-001.md` (exactly one queue).
-- `spec/architecture/frozen-architecture.md`, `spec/architecture/baseline.md`, `spec/architecture/README.md` (explicit Human UI decision, v1.1/hash/lineage only).
-- `spec/architecture/decisions/ADR-0006-client-ui-architecture.md`.
-- `spec/architecture/decisions/client-ui/architecture.md`, `spec/architecture/decisions/client-ui/design-direction.md`.
-- `spec/acceptance/client-gui.md`.
-- `spec/progress/checkpoints/2026-10-03-client-ui-architecture-accepted.md` (only after actual accepted freeze; not created by this fix).
-- `spec/progress/current.md`, `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/**`.
-- Local `.git-ui-chinese-research/**` (fresh Chinese Fix Agent Recorder only, never product authority).
-- Local `.git-ui-architecture-research/**` for Recorder artifacts only, never product authority.
+- `spec/tasks/active/LOOP1-CLIENT-UI-ARCH-001.md`
+- `spec/tasks/review/LOOP1-CLIENT-UI-ARCH-001.md`
+- `spec/tasks/done/LOOP1-CLIENT-UI-ARCH-001.md`
+- `spec/tasks/backlog/LOOP1-CLIENT-GUI-001.md`
+- `spec/tasks/backlog/LOOP1-CLIENT-SEND-001.md`
+- `spec/tasks/backlog/LOOP1-SYNC-001.md`
+- `spec/tasks/backlog/LOOP1-WEB-001.md`
+- `spec/architecture/frozen-architecture.md`
+- `spec/architecture/baseline.md`
+- `spec/architecture/README.md`
+- `spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md`
+- `spec/acceptance/client-gui.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/**`
+- `spec/progress/checkpoints/2026-10-03-client-mvp-planning-accepted.md`
+- `.git-mvp-research/**`
 
 # Acceptance
 
-All three documents cover the visible Human requirements with truthful S2/S4 scope and source ownership. Canonical candidate/ADR resolve Desktop reuse and plugin boundaries; v1.1 and historical PDF/PR7/PR8 preserved. Unique current task, allowed_paths, unchanged product/contracts verified. Fresh independent clean committed candidate Review and exact-head hosted required jobs PASS are mandatory before freeze effectiveness, done, merge/integration and final synchronized-main verification. Screenshots/Architect approval supplement CI for future GUI tasks.
+§19/§20/S2 Gate 与队列一致；GUI 四项依赖完整、Web 在 GUI 后；S3 parity、S4 plugin UI/fixtures、S5 compat/release、S6 RC 的 GUI 要求并入原 ID。仅新增一个产品 UI ID。v1.1 不变、更新真实 hash/revision lineage；PDF/历史证据不变，无产品/契约变化。clean candidate、完整性/architecture/task-dependency/negative controls、fresh independent Review、精确 HEAD hosted CI、protected integration、实际 main 与受保护同步均必需。之后才激活 SEND；不激活 SYNC/GUI/Web。
 
 # Forbidden
 
-No UI pages, component library, state library, Plugin runtime/renderer/install/Marketplace, AI API/features/fake data, backend, public contracts or S2 source edits. No next SEND/SYNC/WEB activation. No historical authority/evidence rewriting, no self-acceptance.
+产品源码/后端/契约/schema/PDF/历史证据修改；GUI/SEND 提前实现；新 Web/parity/plugin/release/soak UI Task；自我验收；降低检查器或门禁。
 
 # Minimality
 
-Three bounded documents and one ADR/canonical clarification. No component code, token generator, new tooling or speculative framework. Token categories are design semantics, not wire contracts. Screenshot evidence reuses task evidence and existing independent review/CI process.
+复用 UI-ARCH 承载文档补充；最小 ADR-0007 记录新批准与 revision，ADR-0006 历史不变。四份 S2 队列规格实例化既有 SEND/SYNC/WEB 规划与唯一新增 GUI；后续要求直接进入既有规划表。
 
 # Verification
 
-- Minimum baseline: Python 3 `ci/check_architecture.py --scope all --json` (PASS, zero violations).
-- `tools/verify_frozen_architecture.py`, `python -B -m unittest discover -s tests/architecture`, `python -B ci/check_architecture.py --scope all --json`, `git diff --check`; exact command/result/time in evidence/Recorder.
-- Recovery verifier `tools/verify-loop1-ctrl-002.ps1 -Mode Development` locally; Acceptance on clean committed candidate by independent reviewer and actual hosted CI. Development is not acceptance.
+- Minimum baseline: python -B ci/check_architecture.py --scope all --json PASS after sandbox temp permission failure.
+- `tools/verify_frozen_architecture.py` --base-commit 59dcf34e4538d2f35ccafde8104e860f8cf5cd7a.
+- python -B -m unittest discover -s tests/architecture; python -B ci/check_architecture.py --scope all --json; git diff --check.
+- `tools/verify-loop1-ctrl-002.ps1` -Mode Development; clean independent candidate Acceptance.
+- Evidence-local planning checker validates dependency queues and injects extra UI ID/missing dependency as negative controls.
 
 # Evidence
 
-`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/`; Recorder R-CLIENT-UI-ARCH-20261003, capture_mode prospective_resume; pre-Recorder read-only startup is incomplete and cannot be represented as a complete prospective trace.
+`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/`; Recorder assigned Git metadata/mvp-planning-research R-CLIENT-MVP-20261003 prospective_resume，此前只读痕迹不完整。
 
 # Handoff
 
-Task branch `task/LOOP1-CLIENT-UI-ARCH-001`; assigned worktree `H:/.codex/worktrees/client-ui-architecture/IM-platform`, actual root matched. Parent accepted main9c0eba89219b3fab73fe9258a7cfc59831c499dc. All new task writes owned by /root; original tracked/untracked recovery work not copied or changed. No product/schema migration; pending independent Review/CI/main sync, S2 OPEN.
+Assigned H:/.codex/worktrees/client-mvp-planning/IM-platform 根已验证。branch task/LOOP1-CLIENT-MVP-PLAN-20261003，last good59dcf34e4538d2f35ccafde8104e860f8cf5cd7a。仅 /root 拥有本轮 scoped writes；主仓库 SQLite/E2E/研究及旧收尾记录原位不变。初次 shell encoding/Python27/range quoting 失败已暴露；架构基线首次 Go temp access FAIL，获准环境重跑 PASS。无未解决架构冲突；S1 PASS/S2 OPEN。
 
 # Next Action
 
-Fresh independent clean-candidate Review -> applicable exact-head hosted CI -> accepted integration and protected main synchronization. No next GUI/product implementation.
+完成限定规划候选并提交，委派新独立 Review；exact-head hosted CI、protected integration/main sync 接受后继续 SEND。
 
-## Candidate handoff
+## 本地候选交接
 
-Three documents, ADR-0006, canonical v1.1 UI amendment/hash and Settings-directory worktree allocation supplement complete. Frozen integrity/source all/architecture unit/diff checks PASS; recovery Development recheck PASS24 after disclosed initial metadata FAIL. Evidence candidate-checks.json and recovery-recheck.json; Windows GBK Recorder output failure retained. No source/contracts/PDF changes. Candidate not accepted; S1 PASS/S2 OPEN. Root writer released after commit for fresh Review. Current changes are task-owned only.
+Frozen hash/PDF/source all/53 architecture tests、规划正例与三项负例、diff check/Recovery Development 全部 PASS；checks.json 记录命令/退出码/时长。规范候选 hash16e9c7b4、v1.1；仅 docs，无产品/contract/PDF 更改。等待 fresh independent Review/精确 HEAD CI/protected main sync；SEND 未激活。Recorder 仅原字节移到 assigned Git metadata，relocation manifest hashes 等同；不修改证据。
 
-## 中文修订与 Review 修复交接（2026-10-03）
+## Fresh whitespace fix / independent review FAIL
 
-Fresh Fix Agent /root/ui_arch_chinese_fix 将 ADR-0006、UI architecture、design-direction、client-gui 四份新交付文档全部正文改为中文；同步翻译索引/清单最新 UI 候选段落。规范正文与 a234bc06 候选哈希不变。旧 Review 发现 BASE..HEAD diff whitespace FAIL；原始字节以 gzip 与 SHA 清单保留，文本副本明确标注 LF 规范化。历史提交、根 Agent Recorder、原始失败结论未覆盖。新证据位于 chinese-revision/。仍为 review，待新独立 Review、精确 HEAD 托管 CI、受保护集成/main 同步；不声明最终接受。最后已知良好 main9c0eba89219b3fab73fe9258a7cfc59831c499dc，S1 PASS/S2 OPEN。本修订仅由 fresh Fix Agent 写入；root 的本地 Recorder 未跟踪目录归 root 所有。
+Independent Review of 6e9f7327c6cf301a3841bcc49244b70974e82a06 failed full BASE..HEAD diff --check (exit2); earlier diff PASS covered working diff only. Fresh fixer /root/mvp_whitespace_fix owns scoped repair writes in assigned worktree on task/LOOP1-CLIENT-MVP-PLAN-20261003. Original approval/log Git blob and checkout bytes, failed review and Recorder are preserved with hashes under mvp-planning/whitespace-fix/. LF copies explicitly change bytes; original checks.json bytes are gzip-preserved; its LF reading copy retains all result values; history/Recorder remain unchanged. Fixed-base full-range verification replaces limited working-diff check; separate rechecks preserve old results. Task stays review, S1 PASS/S2 OPEN. Next: clean fix commit -> NEW fresh independent Review -> exact-head hosted CI -> protected integration/actual-main synchronization; no SEND before acceptance. Last accepted main remains 59dcf34e4538d2f35ccafde8104e860f8cf5cd7a.
 
-中文修订本地验证：frozen integrity/source all/53 architecture tests/完整 BASE 至工作区 diff check/recovery Development 均 PASS；精确命令、退出码、时长见 chinese-revision/checks.json。待提交后还须精确 BASE..HEAD 检查与新的独立验收。
+First repair verification found additional CRLF in checks.json, pr-body.md and recorder-relocation.json. Exact originals were preserved before LF-only normalization; first FAIL attempt is retained in whitespace-fix/rechecks-attempt1.zip. No old result/command/duration/relocation fact changed.
 
-## 架构内容已接受，收尾 review
-
-候选33cc754及PR12/main4f18d222已由两个新鲜独立 Review 接受、精确 hosted CI通过并同步到 H:/IM-platform。当前 Last Known Good Commit：`4f18d222c75bb03166b2b5ead84b9999150a300c`。证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。任务保留 review，下一步为本收尾记录的独立 Review、精确 HEAD CI、主仓库同步；禁止后续 GUI 激活。原始主仓库既有文件已受保护，收尾改动仅归 /root 所有。
+Local repair verification (not independent acceptance): frozen --base-commit PASS 0.188s; source all PASS 0.515s; 53 architecture tests PASS 6.032s; planning with3 negative controls PASS 0.171s; fixed-base full working diff PASS0.047s; Recovery Development PASS6.719s. Exact argv/exit/duration: whitespace-fix/rechecks-attempt2/checks.json. All original/archive/normalized hashes verified. Pending clean fix commit, complete staged and committed range checks, clean Recovery Acceptance, then NEW fresh independent Review/exact-head CI and main synchronization. No sync or completion claimed.

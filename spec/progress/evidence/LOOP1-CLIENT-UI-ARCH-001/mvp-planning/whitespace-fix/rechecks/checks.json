@@ -1,0 +1,89 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "tools/verify_frozen_architecture.py",
+      "--base-commit",
+      "59dcf34e4538d2f35ccafde8104e860f8cf5cd7a"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.188,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/whitespace-fix/rechecks/check-0.txt"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.406,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/whitespace-fix/rechecks/check-1.txt"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 6.156,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/whitespace-fix/rechecks/check-2.txt"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/verify_planning.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.172,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/whitespace-fix/rechecks/check-3.txt"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "59dcf34e4538d2f35ccafde8104e860f8cf5cd7a"
+    ],
+    "exit_code": 2,
+    "elapsed_seconds": 0.063,
+    "result": "FAIL",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/whitespace-fix/rechecks/check-4.txt"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Development"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.109,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/whitespace-fix/rechecks/check-5.txt"
+  }
+]

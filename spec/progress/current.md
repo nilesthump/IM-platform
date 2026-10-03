@@ -4,74 +4,57 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: S2-client-UI-architecture
+Current Batch: S2-MVP-planning-then-SEND
 Current Task: LOOP1-CLIENT-UI-ARCH-001
 Current Task State: review
-Execution Status: UI_ARCHITECTURE_ACCEPTED_CLOSURE_REVIEW
+Execution Status: MVP_PLANNING_CANDIDATE_REVIEW
 
 ## Immediately Relevant Completed Work
 
-S1 PASS retained. SQLite PR10/main23a03bb independently accepted; AGENTS PR11 integrated main9c0eba89219b3fab73fe9258a7cfc59831c499dc. Later Human explicitly authorizes UI architecture documentation and autonomous Settings-directory worktree allocation. Assigned root verified; new task registered with narrow documentation paths. No GUI or later product task activated.
+S1 PASS；SQLite/UI 架构已接受 main59dcf34。Human 授权最小规划补充、接受后 SEND；不实现 GUI。
 
 ## Current Blockers
 
-None for drafting. Candidate freeze needs independent Review, exact-head hosted CI and protected main synchronization. S4 Render Bundle preserved by explicit Human answer; no architecture conflict remains on that point.
+补充待 independent Review/exact-head CI/integration/main sync；此前不得实施 SEND。
 
 ## Verification
 
-- Command: `python -B tools/verify_frozen_architecture.py --base-commit 9c0eba89219b3fab73fe9258a7cfc59831c499dc`
-  - Result: Local PASS; v1.1/hash/PDF/structure/product zero diff; NOT acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/candidate-checks.json`
 - Command: `python -B ci/check_architecture.py --scope all --json`
-  - Result: Local PASS/zero violations; architecture unit tests and diff check also PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/candidate-checks.json`
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: Recheck local PASS/24 task specs after retained initial FAIL; NON-ACCEPTANCE Development only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/recovery-recheck.json`
+  - Result: 本地 frozen/PDF、source all、53 架构测试、依赖/三项负例、diff/Recovery Development 全部 PASS；不是独立验收。
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/checks.json`
 
 ## Changed Files or Migrations
 
-Task-owned documentation/AGENTS only; no product, backend, public contract, schema or migration changes.
+限定 architecture/task/acceptance/progress 文档；无产品/契约/schema/migration 修改。
 
 ## Known Failures, Risks, and Assumptions
 
-Recorder begins prospective_resume after incomplete read-only startup. First local multi-check command failed on Windows GBK encoding; raw Recorder failure is retained, UTF-8 retry used. Initial recovery metadata FAIL retained and repaired without checker weakening. Original main recovery/current/SQLite/E2E dirty files remain owned by prior writers and untouched. Historical GString FAIL/waiver remains unchanged. No S2 Gate PASS.
+Recorder prospective_resume；前置只读痕迹不完整。Python27/encoding/quoting/sandbox temp 失败已暴露。前轮 done 为已接受后本地记录，提交仍 review；本次复用原 ID，不伪造验收。
 
 ## Next Exact Action
 
-Fresh independent Review of committed documentation candidate; applicable exact-head hosted CI -> accepted integration/actual-main verification -> protected main synchronization. No GUI/product activation.
+限定规划 -> fresh Review -> exact-head CI -> protected integration/main sync -> SEND；不启动 SYNC/GUI/Web。
 
 ## Last Known Good Commit
 
-`9c0eba89219b3fab73fe9258a7cfc59831c499dc` (accepted documentation-integrated main).
+`59dcf34e4538d2f35ccafde8104e860f8cf5cd7a`。
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-02-client-sqlite-accepted-storage.md` retained; no new stable freeze yet.
+`spec/progress/checkpoints/2026-10-03-client-ui-architecture-accepted.md`；无新 accepted checkpoint。
 
 ## Uncommitted Changes / Ownership
 
-/root owns this task's changes in assigned worktree only. Original main unknown/foreign changes preserved; research artifacts local only.
+/root 拥有 assigned H:/.codex/worktrees/client-mvp-planning/IM-platform 本轮 scoped docs；branch task/LOOP1-CLIENT-MVP-PLAN-20261003。原主仓库未知工作/研究/前轮本地记录不变。
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0006 candidate records Human UI decision and S2-only plugin prohibition. Future product implementation waits for independently accepted freeze. Missing named library decisions remain blocked under §2.3.
+最小 ADR-0007 记录批准；保持 v1.1/PDF/ADR-0006，待独立接受，无产品提前实施授权。
 
-## 中文修订候选交接（2026-10-03）
+## Fresh whitespace fix / independent review FAIL
 
-Human 要求「架构文档用中文编写」。Fresh Fix Agent /root/ui_arch_chinese_fix 已翻译四份新文档和最新索引/清单段落，规范正文/候选哈希保持不变。旧 Review 的 BASE..HEAD whitespace FAIL 如实保留，原始字节 gzip 归档并用清单标明原始与 LF 规范化哈希。证据：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/chinese-revision/。本轮 Recorder 使用独立 .git-ui-chinese-research；root Recorder 不变。下一步：新独立 Review → 精确 HEAD 托管 CI → 受保护集成/main 同步与实际 SHA 验证。任务 review；未完成同步；S1 PASS/S2 OPEN。
+Independent Review of 6e9f7327c6cf301a3841bcc49244b70974e82a06 failed full BASE..HEAD diff --check (exit2); earlier diff PASS covered working diff only. Fresh fixer /root/mvp_whitespace_fix owns scoped repair writes in assigned worktree on task/LOOP1-CLIENT-MVP-PLAN-20261003. Original approval/log Git blob and checkout bytes, failed review and Recorder are preserved with hashes under mvp-planning/whitespace-fix/. LF copies explicitly change bytes; original checks.json bytes are gzip-preserved; its LF reading copy retains all result values; history/Recorder remain unchanged. Fixed-base full-range verification replaces limited working-diff check; separate rechecks preserve old results. Task stays review, S1 PASS/S2 OPEN. Next: clean fix commit -> NEW fresh independent Review -> exact-head hosted CI -> protected integration/actual-main synchronization; no SEND before acceptance. Last accepted main remains 59dcf34e4538d2f35ccafde8104e860f8cf5cd7a.
 
-中文修订本地验证：frozen integrity/source all/53 architecture tests/完整 BASE 至工作区 diff check/recovery Development 均 PASS；精确命令、退出码、时长见 chinese-revision/checks.json。待提交后还须精确 BASE..HEAD 检查与新的独立验收。
+First repair verification found additional CRLF in checks.json, pr-body.md and recorder-relocation.json. Exact originals were preserved before LF-only normalization; first FAIL attempt is retained in whitespace-fix/rechecks-attempt1.zip. No old result/command/duration/relocation fact changed.
 
-## 最新恢复状态（2026-10-03）
-
-架构内容已在33cc754/PR12/main4f18d222独立 Review、精确 hosted CI及受保护主仓库同步通过。先前 pending 段落是历史过程；当前 Task 仍为 review，收尾记录需新的独立 Review/CI/同步。无产品改动或 GUI 激活。
-
-- Command: `git -C H:/IM-platform rev-parse HEAD`
-  - Result: 同步 PASS，`4f18d222c75bb03166b2b5ead84b9999150a300c`；772 个既有文件受保护。
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/synchronization.json`
-- Last Known Good Commit: `4f18d222c75bb03166b2b5ead84b9999150a300c`。
-- Latest Checkpoint: `spec/progress/checkpoints/2026-10-03-client-ui-architecture-accepted.md`。
-- Next Exact Action: 收尾记录独立 Review -> 精确 HEAD CI -> 受保护主仓库同步 -> 验收后关闭任务。
-- Ownership: /root 仅拥有本任务收尾文档；原主仓库两份 done 任务及769个未跟踪文件为既有未知工作，不改变；旧 current 备份仅本地。
-- Known failures: 初次 Review 换行 FAIL 已修复并保留；Recorder 重复 prompt 启动失败已纠正；自动审批拒绝提前 done，操作未执行。S1 PASS/S2 OPEN。
+Local repair verification (not independent acceptance): frozen --base-commit PASS 0.188s; source all PASS 0.515s; 53 architecture tests PASS 6.032s; planning with3 negative controls PASS 0.171s; fixed-base full working diff PASS0.047s; Recovery Development PASS6.719s. Exact argv/exit/duration: whitespace-fix/rechecks-attempt2/checks.json. All original/archive/normalized hashes verified. Pending clean fix commit, complete staged and committed range checks, clean Recovery Acceptance, then NEW fresh independent Review/exact-head CI and main synchronization. No sync or completion claimed.

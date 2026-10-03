@@ -24,3 +24,7 @@ ADR-0006 记录 Human 明确的客户端 UI、设计与截图验收决定，以�
 ## UI 冻结验收发现（2026-10-03）
 
 上述候选说明保留为历史过程。ADR-0006 / UI 规范内容已在候选 33cc754、PR12 实际 main 4f18d222 独立 Review 与精确 HEAD CI 接受，并已同步主仓库；当前规范哈希不变。完整证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。收尾记录仍在 review，S1 PASS / S2 OPEN，不启动后续产品任务。
+
+## 当前 MVP 任务规划补充
+
+通过 baseline.md 的 planning_revision_adr/approval_source/previous_sha256 解析 ADR-0007 与本轮 Human 请求。当前 canonical hash 记录规划候选，v1.1 不变；ADR-0006 已接受 UI 内容保持权威。仅新增 LOOP1-CLIENT-GUI-001，原 WEB 和 S3～S6 承接 GUI acceptance。待新的独立 Review、精确 HEAD hosted CI 与 protected integration/实际 main 同步接受后生效；此前不得实施 SEND。
