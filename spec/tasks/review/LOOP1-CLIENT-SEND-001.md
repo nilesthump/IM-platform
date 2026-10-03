@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CLIENT-SEND-001
 title: Desktop/Mobile optimistic send orchestration
-status: active
+status: review
 owner: fresh Implementation Agent
 stage: S2
 gate: S2
@@ -101,3 +101,15 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 覆盖事务提交前不传输；可观察SENDING；offline/timeout/拒绝FAILED；same immutable ID retry/restart；lateACK/realtime/Sync收敛；SENT终态；账号隔离/会话撤销/旧连接事件；持久化失败不发布SENT；严格wire/malformed/错误会话；seq>2^53精确；完整git BASE10b77b2..HEAD diffcheck。真实Android runtime不可跳过。Scope解释仅限当前需求，不授权GUI/SYNCrunner/Web/newHTTP。
 已接受UIARCH最终交接metadata（done/review队列移动与mvp-planning/closure/final证据）由Coordinator在SEND激活前生成，candidate审查分别按UIARCH与SEND的authoritative allowed_paths核验。SEND实现者不得修改它们。
 Last accepted main10b77b22386234c98409ca41b3622ad6d25f3884；assigned root H:/.codex/worktrees/client-mvp-planning/IM-platform；main781未知工作原字节保护不动。
+
+# Implementation Review Handoff (2026-10-03)
+
+Status: review. Sole fresh implementer owns this candidate; it is not accepted or done. Assigned root H:/.codex/worktrees/client-mvp-planning/IM-platform; branch task/LOOP1-CLIENT-SEND-001; base8b33571990241f91a676e15069b07b065697317a. Accepted actual main10b77b22386234c98409ca41b3622ad6d25f3884 remains last known good. Main synchronization PENDING. No push/PR/integration/main writes.
+
+Desktop application/account factory and Android ViewModel/StateFlow/account factory implement persistent send, same-ID retry/restart, strict canonical WSS, durable ACK/materialization and original-ID message.created convergence through existing Repo. No existing Repo/native/schema/backend/contracts or frozen decisions changed. No GUI/Web/Sync fetch runner. Standard TLS/WSS Android code uses platform trust and hostname verification; only approved lifecycle/coroutines packages added. The SEND runner uses an explicit Gradle property, retaining original storage runner.
+
+Actual local commands: `tools/verify_client_send.py` --scope desktop PASS; --scope mobile --serial emulator-5590 PASS40 assertions API34, including waiting beyond active timer after Repository close with observable storage error and no crash. Shared behavior executed within Desktop PASS (strict mutations and canonical golden outputs). `tools/verify_client_sqlite.py` --scope desktop PASS13cases/141assertions and --scope mobile --serial emulator-5590 PASS13cases/137assertions install/data-clear. Real-Go smoke tests/clients/send/go_smoke.py PASS current Desktop application+SQLx -> verified Go WSS -> exact PostgreSQL Message/Outbox rows. Controlled TLS fixtures are separately identified and do not prove PostgreSQL durability. Sourceall/architecture53 and CI33 tests passed; four pre-existing Windows symlink-privilege skips are explicitly unexecuted, hosted Linux required.
+
+Evidence: spec/progress/evidence/LOOP1-CLIENT-SEND-001/implementation/verification.md, commands.json, outputs/*.gz, android-artifacts.json. Research root H:/IM-platform/.git/worktrees/IM-platform4/send-implementation-research run R-CLIENT-SEND-IMPLEMENTATION-20261003; prospective_resume explicitly marks incomplete earlier read-only startup. Final immutable finish/validate follows clean commit. Historical failures preserved, including actual Manifest registration, Gradle/cwd/cache, fixture races and async timer issue. Reviewer must inspect final async liveness test and latest PASS separately from earlier FAIL logs.
+
+Next exact action: Coordinator delegates fresh independent Review of actual clean committed candidate and full10b77b2..HEAD scope (root-owned activation/UIARCH metadata separately identified). On FAIL fresh Fix then new Review. On PASS actual exact-head hosted required CI/SEND/Go E2E, protected integration/actual-main independent verification and protected synchronization back to H:/IM-platform; only then done. Stop at accepted SEND endpoint; SYNC/GUI/WEB remain backlog. Main unknown781bytes/old private3metadata backups untouched. Final candidate SHA supplied by implementation handoff and immutable Recorder final_state; no self-review acceptance.

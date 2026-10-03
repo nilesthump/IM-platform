@@ -45,6 +45,33 @@ class PathMatrixTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assert_jobs(path, classify_module.FULL_COMPATIBILITY)
 
+    def test_send_verification_paths_select_actual_runtimes(self):
+        expected={"architecture", "desktop", "mobile", "shared", "compatibility"}
+        for path in ("tools/verify_client_send.py", "tests/clients/send/desktop.mjs", "tests/clients/send/tls_fixture.py"):
+            self.assert_jobs(path,expected)
+
+    def test_deleted_send_fixture_still_runs_actual_checks(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=pathlib.Path(temp)
+            subprocess.run(["git","init","-q",str(root)],check=True)
+            subprocess.run(["git","-C",str(root),"config","user.name","CI test"],check=True)
+            subprocess.run(["git","-C",str(root),"config","user.email","ci@example.invalid"],check=True)
+            fixture=root/"tests/clients/send/tls_fixture.py"
+            fixture.parent.mkdir(parents=True);fixture.write_bytes(b"pass\n")
+            subprocess.run(["git","-C",str(root),"add","."],check=True)
+            subprocess.run(["git","-C",str(root),"commit","-qm","base"],check=True)
+            base=subprocess.check_output(["git","-C",str(root),"rev-parse","HEAD"],text=True).strip()
+            fixture.unlink();subprocess.run(["git","-C",str(root),"add","-u"],check=True)
+            subprocess.run(["git","-C",str(root),"commit","-qm","delete"],check=True)
+            previous=pathlib.Path.cwd()
+            try:
+                import os
+                os.chdir(root);paths=classify_module.diff_paths(base,"HEAD")
+            finally:
+                os.chdir(previous)
+            self.assertEqual(paths,["tests/clients/send/tls_fixture.py"])
+            self.assert_jobs(paths[0],{"architecture","desktop","mobile","shared","compatibility"})
+
     def test_ci_changes_run_all_jobs(self):
         for path in ("ci/classify.py", "ci/check_s0_boundary.py", ".github/workflows/ci.yml", "tests/ci/test_classify.py"):
             with self.subTest(path=path):
