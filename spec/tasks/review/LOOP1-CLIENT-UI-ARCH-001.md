@@ -84,3 +84,11 @@ Assigned H:/.codex/worktrees/client-mvp-planning/IM-platform 根已验证。bran
 ## 本地候选交接
 
 Frozen hash/PDF/source all/53 architecture tests、规划正例与三项负例、diff check/Recovery Development 全部 PASS；checks.json 记录命令/退出码/时长。规范候选 hash16e9c7b4、v1.1；仅 docs，无产品/contract/PDF 更改。等待 fresh independent Review/精确 HEAD CI/protected main sync；SEND 未激活。Recorder 仅原字节移到 assigned Git metadata，relocation manifest hashes 等同；不修改证据。
+
+## Fresh whitespace fix / independent review FAIL
+
+Independent Review of 6e9f7327c6cf301a3841bcc49244b70974e82a06 failed full BASE..HEAD diff --check (exit2); earlier diff PASS covered working diff only. Fresh fixer /root/mvp_whitespace_fix owns scoped repair writes in assigned worktree on task/LOOP1-CLIENT-MVP-PLAN-20261003. Original approval/log Git blob and checkout bytes, failed review and Recorder are preserved with hashes under mvp-planning/whitespace-fix/. LF copies explicitly change bytes; original checks.json bytes are gzip-preserved; its LF reading copy retains all result values; history/Recorder remain unchanged. Fixed-base full-range verification replaces limited working-diff check; separate rechecks preserve old results. Task stays review, S1 PASS/S2 OPEN. Next: clean fix commit -> NEW fresh independent Review -> exact-head hosted CI -> protected integration/actual-main synchronization; no SEND before acceptance. Last accepted main remains 59dcf34e4538d2f35ccafde8104e860f8cf5cd7a.
+
+First repair verification found additional CRLF in checks.json, pr-body.md and recorder-relocation.json. Exact originals were preserved before LF-only normalization; first FAIL attempt is retained in whitespace-fix/rechecks-attempt1.zip. No old result/command/duration/relocation fact changed.
+
+Local repair verification (not independent acceptance): frozen --base-commit PASS 0.188s; source all PASS 0.515s; 53 architecture tests PASS 6.032s; planning with3 negative controls PASS 0.171s; fixed-base full working diff PASS0.047s; Recovery Development PASS6.719s. Exact argv/exit/duration: whitespace-fix/rechecks-attempt2/checks.json. All original/archive/normalized hashes verified. Pending clean fix commit, complete staged and committed range checks, clean Recovery Acceptance, then NEW fresh independent Review/exact-head CI and main synchronization. No sync or completion claimed.

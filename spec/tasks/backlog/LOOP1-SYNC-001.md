@@ -31,7 +31,7 @@ client_runtime: Android
 
 # Dependencies
 
-- LOOP1-CLIENT-SEND-001 (必须独立接受并 done). 
+- LOOP1-CLIENT-SEND-001 (必须独立接受并 done).
 
 - ADR-0007 本轮规划须独立 Review/精确 HEAD CI/集成 main 同步接受才可激活。依赖未满足保持 backlog；GUI/Web 在本轮 Human endpoint 之后，无本轮激活授权。
 

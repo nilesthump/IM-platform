@@ -38,7 +38,7 @@ def main():
     errors=check(doc,specs)
     if errors: raise SystemExit('FAIL: '+str(errors))
     assert check(doc+'\n| LOOP1-CLIENT-SOAK-UI-001 | redundant |',specs),'extra UI ID accepted'
-    broken=dict(specs);broken['LOOP1-CLIENT-GUI-001']=broken['LOOP1-CLIENT-GUI-001'].replace('- LOOP1-SYNC-001 (必须独立接受并 done). ','')
+    broken=dict(specs);broken['LOOP1-CLIENT-GUI-001']=broken['LOOP1-CLIENT-GUI-001'].replace('- LOOP1-SYNC-001 (必须独立接受并 done).','')
     assert check(doc,broken),'missing GUI dependency accepted'
     assert check(doc.replace('| LOOP1-WEB-001 | LOOP1-CLIENT-GUI-001 |','| LOOP1-WEB-001 | LOOP1-CLIENT-SEND-001 |'),specs),'wrong canonical Web dependency accepted'
     print('PASS: sole new GUI ID, canonical/queue dependency equality and uniqueness; 3 negative controls rejected')
