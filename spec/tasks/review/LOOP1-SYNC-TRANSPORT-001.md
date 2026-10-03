@@ -63,7 +63,7 @@ Two HTTPS POST operations reuse existing shapes/errors/Bearer and generic Gatewa
 # Verification
 
 Minimum baseline: python -B ci/check_architecture.py --scope all --json; python -B tools/verify_frozen_architecture.py (both recorded PASS).
-Candidate: python -B tools/verify_sync_transport.py; python -B -m unittest discover -s tests/contract -p test_sync_transport.py; architecture tests and existing HTTP/WSS/Sync/plugin checks; applicable hosted jobs mandatory.
+Candidate entry points: `tools/verify_sync_transport.py`; `tools/verify-loop1-ctrl-002.ps1` (Acceptance requires clean committed checkout). Commands: python -B tools/verify_sync_transport.py; python -B -m unittest discover -s tests/contract -p test_sync_transport.py; architecture tests and existing HTTP/WSS/Sync/plugin checks; applicable hosted jobs mandatory.
 
 # Handoff
 
@@ -80,3 +80,11 @@ Fresh independent Review PASS for clean57404dcc, full range a0304fc..57404dcc. R
 # Human 分页修正与发布恢复
 
 Human 已明确授权推送既定分支到 GitHub/PR/CI及接受后保护合并同步，原发布阻断是历史。min(limit,100) 保持单页 cap；事务提交后持续分页至 terminal，无固定总条数/页数截断。canonical/ADR/contract binding及13文档mutation控制一致；四个JSON shapes不变。新修正待 fresh independent Review/精确 HEAD hosted CI/主仓库同步；不得沿用此前候选PASS关闭任务。writer /root/sync_paging_revision，lastgood main a0304fc，无 main/Go/client 写入；最新请求/恢复事实与验证在 paging-revision/。
+
+# Evidence
+
+`spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/recovery-fix/failure-and-repair.md` records failed exact 8c672a2 hosted runs/reproduced recovery failure. Immutable imported provider/log and fresh independent FAIL/Recorder are hash-manifested. Earlier verification-history.md and independent-review-57404dcc/ remain historical bounded evidence; revised candidate requires NEW independent Review/exact-head hosted acceptance.
+
+# Next Action
+
+Fresh fixer /root/sync_recovery_fix repairs existing records, commits on task/LOOP1-SYNC-001, runs tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance from clean commit and releases writer. NEW Reviewer reviews committed full candidate; Coordinator then exact-head full hosted CI, protected integration/actual-main Review-CI and preservation-verified main synchronization. Accepted a0304fcc7be18b87f5986d014849d6b48b96a071 unchanged. Human publication authorization supersedes historical hold; Go still awaits accepted prerequisite and later concrete consent. SYNC backlog/S2 OPEN; no product writes.

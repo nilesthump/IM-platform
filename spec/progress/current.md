@@ -19,7 +19,12 @@ LOOP1-SYNC-001 remains unique backlog BLOCKED_BY_ARCHITECTURE awaiting accepted 
 
 ## Verification
 
-Recorded minimum baseline architecture all + frozen integrity PASS. Candidate contract/ref/official OAI lint/4 negative-test groups/53 architecture tests and unchanged HTTP/WSS/SyncPlugin regressions PASS; durable spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/. Recorder prospective_resume exposes read-only startup gap and interpreter/encoding/quoting failures. Local/Recorder PASS does not establish task/Gate PASS.
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+  - Result: FAIL at clean 8c672a22c5fb9fd640791117c919e1b5a1b8bf69, eight metadata issues reproduced; repair verification awaits clean commit.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/recovery-fix/failure-and-repair.md`
+- Command: `python -B tools/verify_frozen_architecture.py`
+  - Result: PASS baseline; canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 preserved. Local/Recorder PASS is not Task/Gate PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/handoff.md`
 
 ## Changed Files or Migrations
 
@@ -27,23 +32,23 @@ Bounded Sync OpenAPI, external-ref guards, ADR-0008/canonical §11.5/hash discov
 
 ## Known Failures, Risks, and Assumptions
 
-Go runtime/client SYNC absent. Independent clean candidate Review PASS at57404dcc; hosted/integration/main acceptance pending. Push rejected by auto-review pending specific Human publication consent. Go proposal awaits Human consent after prerequisite acceptance. Unknown main work preserved.
+Exact 8c672a22c5fb9fd640791117c919e1b5a1b8bf69 PR37121215717/push37121195918 recovery classify FAIL; gate failed, eleven other jobs skipped, no acceptance. Fresh independent paging Review FAIL on eight recovery-record format omissions. Human explicitly authorized publication; former auto-review hold historical. Go/client SYNC absent; required prerequisite acceptance and later Go consent remain. Unknown main work preserved.
 
 ## Next Exact Action
 
-Local fresh independent Review PASS at57404dcc, archived in evidence. Review administrative increment, request explicit authorization to publish this prerequisite branch to https://github.com/nilesthump/IM-platform.git, then final full13-job exact-head hosted CI/protected integration/main synchronization. Show Go plan and obtain separate Human consent before product writes. Do not mark SYNC done or advance GUI/Web.
+Commit only recovery metadata/evidence repair, run existing recovery entry from clean committed candidate, then NEW fresh independent Review/full required exact-head hosted CI. Protected integration, actual-main Review/CI and preservation-verified main synchronization follow acceptance. Show Go plan after prerequisite acceptance before product writes. No SYNC done/GUI/Web advancement.
 
 ## Last Known Good Commit
 
-a0304fcc7be18b87f5986d014849d6b48b96a071 (accepted SEND administrative actual-main).
+`a0304fcc7be18b87f5986d014849d6b48b96a071` (accepted SEND administrative actual-main).
 
 ## Latest Checkpoint
 
-spec/progress/checkpoints/2026-10-03-loop1-client-send-001-accepted.md remains latest accepted stable product recovery.
+`spec/progress/checkpoints/2026-10-03-loop1-client-send-001-accepted.md` remains latest accepted stable product recovery.
 
 ## Uncommitted Changes / Ownership
 
-Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch task/LOOP1-SYNC-001. Original candidate writer released clean57404dcc. Coordinator /root owns only Task/current/review archive/blocker administrative increment; root research sealed20BLOCKED input owned/authorized by Coordinator and preserved. No unknown main writes. Main stays a0304fc;781 unrelated entries preserved. Administrative commit SHA supplied after commit; see evidence/LOOP1-SYNC-TRANSPORT-001/external-publication-blocker.md.
+Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch task/LOOP1-SYNC-001, clean initial 8c672a22c5fb9fd640791117c919e1b5a1b8bf69. Sole writer /root/sync_recovery_fix owns only Task/current and new recovery-fix evidence; sealed prior bytes immutable. Commit SHA/post-commit verification supplied in fresh handoff. No main writes; accepted a0304fc and 781 unrelated entries protected. Coordinator publishes after NEW independent Review.
 
 ## Architecture Conflicts / ACP / ADR
 
@@ -51,4 +56,4 @@ Human authorized public Sync binding freeze via ADR-0008 candidate; absence of r
 
 ## 最新 Human 修正与恢复（2026-10-03）
 
-发布授权已收到，原 auto-review hold 为历史。当前新 writer /root/sync_paging_revision 只澄清持续分页到最新、单页 min(limit,100) 保持，未写 Go/client 产品。旧独立 Review 不覆盖新候选；下一步 fresh Review → 全13必跑精确 HEAD hosted CI → protected integration/actual-main 验证 → 主仓库同步。Go 同意时序保留，SYNC backlog/S2 OPEN；最后良好 main a0304fc。本次证据 paging-revision/；Recorder 启动前只读恢复及后续 authority 阅读 gap 如实披露，无完整 trace 声称。
+发布授权已收到，原 auto-review hold 为历史。此前 writer /root/sync_paging_revision 已澄清持续分页到最新、单页 min(limit,100) 保持，未写 Go/client 产品。旧独立 Review 不覆盖新候选；下一步 fresh Review → 全13必跑精确 HEAD hosted CI → protected integration/actual-main 验证 → 主仓库同步。Go 同意时序保留，SYNC backlog/S2 OPEN；最后良好 main a0304fc。本次证据 paging-revision/；Recorder 启动前只读恢复及后续 authority 阅读 gap 如实披露，无完整 trace 声称。
