@@ -82,7 +82,7 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 
 # Next Action
 
-等待依赖与规划独立接受；本轮仅 SEND 允许随后激活，SYNC/GUI/WEB 保持 backlog。
+Public Sync transport prerequisite now accepted/synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a. Await separate Human consent for concrete Go proposal and accepted actual Go User/Conversation Sync runtime; then reassess inputs and activate this existing SYNC task. Human endpoint remains SYNC done then stop; GUI/Web not selected.
 
 # Authorized SYNC recovery and authority blocker (2026-10-03)
 
@@ -100,3 +100,7 @@ Evidence: spec/progress/evidence/LOOP1-SYNC-001/implementation/authority-blocker
 # Human-authorized prerequisite (2026-10-03)
 
 Human authorizes minimal public Sync architecture/contract prerequisite LOOP1-SYNC-TRANSPORT-001. This is current active task; SYNC remains backlog BLOCKED_BY_ARCHITECTURE awaiting accepted binding and actual accepted Go service inputs. Go product implementation requires prerequisite independent Review/CI acceptance and Human consent to concrete plan beforehand. GUI/Web not authorized. No change to SYNC product allowed_paths/acceptance.
+
+# Accepted transport prerequisite and remaining runtime input
+
+LOOP1-SYNC-TRANSPORT-001 is independently accepted and synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a, evidence acceptance/acceptance.md under that task. Earlier BLOCKED_BY_ARCHITECTURE/public-binding statements are historical: binding gap resolved by ADR0008 and existing four-shape HTTP contract; current execution BLOCKED_BY_RUNTIME_INPUT, unique backlog retained. No accepted live User Sync endpoint exists. Go needs separate Human plan consent and narrow task approval/independent runtime Review-CI-main sync before client activation. Single-page min(limit,100); continuously commit/apply pages through terminal latest committed read without fixed total cutoff. SYNC acceptance and allowed product paths unchanged. Known good accepted freeze c2ff050; no client products implemented.

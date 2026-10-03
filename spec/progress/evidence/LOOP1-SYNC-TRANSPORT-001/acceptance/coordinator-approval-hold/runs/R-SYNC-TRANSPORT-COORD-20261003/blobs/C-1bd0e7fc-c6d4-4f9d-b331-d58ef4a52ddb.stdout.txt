@@ -1,0 +1,37 @@
+1:import subprocess,pathlib,json,hashlib,gzip,sys
+2:main=pathlib.Path('H:/IM-platform');meta=main/'.git/worktrees/IM-platform4'
+3:old,expected,candidate,receipt_name=sys.argv[1:]
+4:assert all(len(x)==40 and all(c in '0123456789abcdef' for c in x) for x in (old,expected,candidate))
+5:assert receipt_name.startswith('send-') and receipt_name.endswith('-main-sync-receipt.json') and '/' not in receipt_name and '\\' not in receipt_name
+6:def git(*a): return subprocess.check_output(['git','-C',str(main),*a],stderr=subprocess.PIPE).decode('utf-8').strip()
+7:assert pathlib.Path(git('rev-parse','--show-toplevel')).resolve()==main.resolve()
+8:assert git('rev-parse','HEAD')==old and git('rev-parse','origin/main')==expected
+9:assert git('branch','--show-current')=='recovery/s1-handoff-20261001'
+10:original=json.loads((meta/'main-sync-preflight.json').read_bytes())['entries']
+11:owned={'spec/progress/current.md','spec/tasks/review/LOOP1-CLIENT-UI-ARCH-001.md','spec/tasks/done/LOOP1-CLIENT-UI-ARCH-001.md'}
+12:protected={k:v for k,v in original.items() if k not in owned};assert len(protected)==781
+13:private_manifest=json.loads((meta/'mvp-main-sync-protection/private-manifest.json').read_bytes())
+14:def verify():
+15: for name,fact in protected.items():
+16:  p=main/name
+17:  if fact.get('absent'):assert not p.exists(),name
+18:  else:assert hashlib.sha256(p.read_bytes()).hexdigest()==fact['sha256'],name
+19: for name,fact in private_manifest.items():
+20:  if fact.get('absent'):continue
+21:  assert hashlib.sha256(gzip.decompress(pathlib.Path(fact['gzip']).read_bytes())).hexdigest()==fact['sha256']
+22:verify()
+23:changed=set(git('diff','--name-only',old,expected).splitlines())
+24:assert not changed.intersection(protected),'unknown work overlap'
+25:assert all(subprocess.check_output(['git','-C',str(main),'diff','--name-only','HEAD','--',p]).strip()==b'' for p in changed)
+26:receipt_path=meta/receipt_name;assert not receipt_path.exists()
+27:subprocess.run(['git','-C',str(main),'merge','--ff-only',expected],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+28:assert git('rev-parse','HEAD')==expected
+29:verify()
+30:for p in changed:
+31: try:blob=subprocess.check_output(['git','-C',str(main),'show',expected+':'+p],stderr=subprocess.PIPE)
+32: except subprocess.CalledProcessError:assert not (main/p).exists();continue
+33: assert (main/p).read_bytes()==blob,p
+34:assert git('branch','--show-current')=='recovery/s1-handoff-20261001'
+35:receipt={'result':'PASS','task_branch':'task/LOOP1-CLIENT-SEND-001','candidate':candidate,'main_sha':expected,'previous_main_sha':old,'changed_paths_exact_committed_bytes':len(changed),'protected_unrelated_entries_unchanged':781,'owned_prior_metadata_preserved':3,'private_gzip_originals_hash_verified':True,'local_branch_preserved':'recovery/s1-handoff-20261001','private_originals':'LOCALONLY, original backup immutable','actual_main_tree':git('rev-parse','HEAD^{tree}')}
+36:receipt_path.write_bytes((json.dumps(receipt,indent=2)+'\n').encode('utf-8'))
+37:print(json.dumps(receipt))

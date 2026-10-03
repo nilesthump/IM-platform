@@ -1,6 +1,6 @@
 # Go Sync 入口实现方案（待 Human 同意，非实现授权）
 
-状态：PROPOSAL_AWAITING_HUMAN_CONSENT_AFTER_PREREQUISITE_ACCEPTANCE。ADR-0008/公开契约须先独立 Review、精确候选/actual-main CI、受保护集成并同步主仓库；此后向 Human 展示本方案，取得同意再创建产品范围。当前没有 Go 产品修改。
+状态：PROPOSAL_AWAITING_HUMAN_IMPLEMENTATION_CONSENT。ADR-0008/公开契约须先独立 Review、精确候选/actual-main CI、受保护集成并同步主仓库；此后向 Human 展示本方案，取得同意再创建产品范围。当前没有 Go 产品修改。
 
 ## 最小范围与职责
 
@@ -35,3 +35,7 @@ fresh independent Review → exact-head hosted applicable jobs → protected int
 100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
 
 真实 PostgreSQL + Go/Gateway/TLS 验收必须为 user 与 conversation 各准备超过100项的已提交数据，逐页拉到 terminal，断言每页不超过 min(limit,100)、完整总数、身份去重与最后 cursor/seq；证明未在第一页或固定总页数处截断，并验证 terminal 后新提交由再次同步获取。离线向量只判定契约预期，不证明数据库查询、事务或运行入口正确；后续 Desktop/Mobile SYNC 再证明本地事务成功后分页推进。
+
+## 前置接受发现
+
+前置已独立接受并同步 main c2ff0502fdad80f463abe038a960ca1b798e6d7a; 详见 acceptance/acceptance.md。 当前 Go 实施仍待 Human 同意。

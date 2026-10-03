@@ -92,3 +92,7 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 
 Candidate only: fresh independent Review, exact-head hosted CI, protected integration/actual-main verification and main synchronization pending. Go product implementation additionally awaits Human consent to concrete plan after prerequisite acceptance. Existing wire shapes/PDF/prior accepted history unchanged; S2 OPEN.
 
 分页修正候选：Human 保持 min(limit,100) 单页 cap，要求持续分页直到 terminal；批准见 paging-revision/human-authorization.txt。此前457c405b79ca068af2b398b9fbe49859810c455359b01dbfdb2d4c6d72a9d966为已审未 hosted 接受候选，保留谱系；新 SHA 须独立接受。
+
+## Sync transport 接受发现 (2026-10-03)
+
+ADR-0008 / 公开 HTTPS Sync 绑定 已在 candidate b8200783ea3eadc1ed4e4050238f051a7ab708b3 / PR18 actual main c2ff0502fdad80f463abe038a960ca1b798e6d7a 通过 fresh independent Review 与 精确 HEAD CI 接受，并同步 H:/IM-platform。 canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 / v1.1 / 历史 PDF 不变。 证据：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/acceptance/acceptance.md。 此前 pending 段落为历史过程。 Go 产品仍待 方案展示后 Human 同意；SYNC backlog/S2 OPEN。 本收尾记录另待独立 Review/CI/同步。

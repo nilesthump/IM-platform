@@ -1,0 +1,261 @@
+ .github/workflows/ci.yml                           |    4 +
+ contracts/http/sync.openapi.json                   |  287 ++
+ spec/architecture/README.md                        |    4 +
+ spec/architecture/baseline.md                      |   15 +-
+ .../decisions/ADR-0008-sync-https-transport.md     |   31 +
+ spec/architecture/frozen-architecture.md           |   14 +
+ spec/progress/current.md                           |   45 +-
+ .../P-SYNC-IMPLEMENTATION-20261003/metadata.json   |   13 +
+ .../P-SYNC-IMPLEMENTATION-20261003/prompt.txt      |    1 +
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    3 +
+ ...0c854a25-4a44-48e0-8168-6fb80dac33af.stderr.txt |    1 +
+ ...0c854a25-4a44-48e0-8168-6fb80dac33af.stdout.txt |  141 +
+ ...5fbc4255-754d-441e-b961-dd6ff1af711f.stderr.txt |    0
+ ...5fbc4255-754d-441e-b961-dd6ff1af711f.stdout.txt |    1 +
+ ...80939d3e-9152-405f-abdf-758ed145573d.stderr.txt |    0
+ ...80939d3e-9152-405f-abdf-758ed145573d.stdout.txt |  468 ++++
+ ...9ad448a2-960f-4d5c-b787-7978ed017779.stderr.txt |    0
+ ...9ad448a2-960f-4d5c-b787-7978ed017779.stdout.txt |    1 +
+ ...baed6ac2-e12b-4ca5-a931-e960e2aefd6f.stderr.txt |    0
+ ...baed6ac2-e12b-4ca5-a931-e960e2aefd6f.stdout.txt |   24 +
+ .../runs/R-SYNC-IMPLEMENTATION-20261003/diff.patch |  135 +
+ .../R-SYNC-IMPLEMENTATION-20261003/events.jsonl    |   16 +
+ .../final_state.json                               |  372 +++
+ .../initial_state.json                             |  336 +++
+ .../R-SYNC-IMPLEMENTATION-20261003/metadata.json   |   32 +
+ .../R-SYNC-IMPLEMENTATION-20261003/summary.json    |   10 +
+ .../implementation/authority-blocker.md            |   27 +
+ .../prompts/P-SYNC-RESUME-20261003/metadata.json   |   13 +
+ .../prompts/P-SYNC-RESUME-20261003/prompt.txt      |    1 +
+ ...31b59ec7-60c2-41a5-ac95-45793ff06e87.stderr.txt |    0
+ ...31b59ec7-60c2-41a5-ac95-45793ff06e87.stdout.txt |  183 ++
+ ...56c712df-a873-408b-b60d-9783afa4c038.stderr.txt |    0
+ ...56c712df-a873-408b-b60d-9783afa4c038.stdout.txt |    1 +
+ ...a3581c26-3f5f-422d-9652-67c930c0b3fb.stderr.txt |    0
+ ...a3581c26-3f5f-422d-9652-67c930c0b3fb.stdout.txt |    1 +
+ ...ac5b9fe0-edd3-4e49-8307-06f4c603fbf0.stderr.txt |    0
+ ...ac5b9fe0-edd3-4e49-8307-06f4c603fbf0.stdout.txt |    1 +
+ ...bf8085dd-e0cf-47cb-a588-b8cdc342e901.stderr.txt |    0
+ ...bf8085dd-e0cf-47cb-a588-b8cdc342e901.stdout.txt |    1 +
+ ...fa570a6c-b69f-4b9b-bf34-727968dcae25.stderr.txt |    0
+ ...fa570a6c-b69f-4b9b-bf34-727968dcae25.stdout.txt |    1 +
+ .../runs/R-SYNC-RESUME-20261003/diff.patch         | 1829 +++++++++++++
+ .../runs/R-SYNC-RESUME-20261003/events.jsonl       |   20 +
+ .../runs/R-SYNC-RESUME-20261003/final_state.json   |  328 +++
+ .../runs/R-SYNC-RESUME-20261003/initial_state.json |  298 ++
+ .../runs/R-SYNC-RESUME-20261003/metadata.json      |   32 +
+ .../runs/R-SYNC-RESUME-20261003/summary.json       |   10 +
+ .../external-publication-blocker.md                |   11 +
+ .../go-implementation-proposal.md                  |   37 +
+ .../human-authorization.txt                        |    6 +
+ .../implementation-handoff.md                      |   29 +
+ .../independent_probe.py                           |   16 +
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ ...0e26c13f-fae8-4db8-8871-34a0c03f4633.stderr.txt |    0
+ ...0e26c13f-fae8-4db8-8871-34a0c03f4633.stdout.txt |    1 +
+ ...1296b063-67b5-45d6-90e8-f409def291e4.stderr.txt |    0
+ ...1296b063-67b5-45d6-90e8-f409def291e4.stdout.txt |    0
+ ...1abca076-37ed-4eed-99aa-cfd450b77c9a.stderr.txt |    5 +
+ ...1abca076-37ed-4eed-99aa-cfd450b77c9a.stdout.txt |    0
+ ...4b25bb8f-0ffa-4699-bae6-cbcce153cdd0.stderr.txt |    0
+ ...4b25bb8f-0ffa-4699-bae6-cbcce153cdd0.stdout.txt |    1 +
+ ...4ecd6df2-5058-424c-9745-cf1f0b27fb33.stderr.txt |    0
+ ...4ecd6df2-5058-424c-9745-cf1f0b27fb33.stdout.txt |    1 +
+ ...63d98804-f82b-4bc5-a0a2-75784b528864.stderr.txt |    0
+ ...63d98804-f82b-4bc5-a0a2-75784b528864.stdout.txt |    0
+ ...77f98739-b069-4f79-b061-34142e04807e.stderr.txt |    0
+ ...77f98739-b069-4f79-b061-34142e04807e.stdout.txt |    1 +
+ ...836a9a13-f09e-4c32-904e-cfd098164d99.stderr.txt |    0
+ ...836a9a13-f09e-4c32-904e-cfd098164d99.stdout.txt |    1 +
+ ...aae8efbe-1782-4f0f-ac50-710fe55aca08.stderr.txt |    5 +
+ ...aae8efbe-1782-4f0f-ac50-710fe55aca08.stdout.txt |    0
+ ...c0d2d105-3cca-4007-97f9-526c116ffa2a.stderr.txt |    0
+ ...c0d2d105-3cca-4007-97f9-526c116ffa2a.stdout.txt |    1 +
+ ...cba057eb-9318-41fc-a561-fd3a918b8015.stderr.txt |    0
+ ...cba057eb-9318-41fc-a561-fd3a918b8015.stdout.txt |    1 +
+ ...ccf4b9bf-7bd8-4c00-8fa6-dcf5e6e8a162.stderr.txt |    0
+ ...ccf4b9bf-7bd8-4c00-8fa6-dcf5e6e8a162.stdout.txt |    1 +
+ ...d069ca2f-11d9-423d-917b-489319903385.stderr.txt |    0
+ ...d069ca2f-11d9-423d-917b-489319903385.stdout.txt |    1 +
+ ...fdf8f272-93a8-4694-b5f7-993f4e84d3b1.stderr.txt |    0
+ ...fdf8f272-93a8-4694-b5f7-993f4e84d3b1.stdout.txt |    1 +
+ ...fe69fae2-86a5-45fe-8f88-c4abdea21cd6.stderr.txt |    0
+ ...fe69fae2-86a5-45fe-8f88-c4abdea21cd6.stdout.txt |    1 +
+ .../diff.patch                                     |    0
+ .../events.jsonl                                   |   35 +
+ .../final_state.json                               |  300 ++
+ .../initial_state.json                             |  300 ++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ .../independent-review-57404dcc/review.md          |   32 +
+ .../independent-review-archive.json                |   46 +
+ .../paging-revision/handoff.md                     |   13 +
+ .../paging-revision/human-authorization.txt        |    4 +
+ .../prompts/P-SYNC-PAGING-20261003/metadata.json   |   13 +
+ .../prompts/P-SYNC-PAGING-20261003/prompt.txt      |    2 +
+ ...16b17afe-f3bb-4caf-8c7b-da6bf5b5dc4f.stderr.txt |    0
+ ...16b17afe-f3bb-4caf-8c7b-da6bf5b5dc4f.stdout.txt |    1 +
+ ...6cb0d969-9b44-4935-ad4d-1b6ac1c24bdd.stderr.txt |    0
+ ...6cb0d969-9b44-4935-ad4d-1b6ac1c24bdd.stdout.txt |    1 +
+ ...8b5d233e-96c3-4b27-bea4-cbf9524b5352.stderr.txt |    5 +
+ ...8b5d233e-96c3-4b27-bea4-cbf9524b5352.stdout.txt |    0
+ ...db35a34d-4a22-4003-a1dc-e747f9f082d5.stderr.txt |    0
+ ...db35a34d-4a22-4003-a1dc-e747f9f082d5.stdout.txt |    1 +
+ ...e4450445-1681-4667-8dc9-84d4f5509103.stderr.txt |    0
+ ...e4450445-1681-4667-8dc9-84d4f5509103.stdout.txt |    1 +
+ ...ecf75946-e790-459b-8b8f-f7f7621a7697.stderr.txt |    0
+ ...ecf75946-e790-459b-8b8f-f7f7621a7697.stdout.txt |    1 +
+ ...f19ada17-0e57-47d0-ae1b-c2341d4c6fb6.stderr.txt |    0
+ ...f19ada17-0e57-47d0-ae1b-c2341d4c6fb6.stdout.txt |    1 +
+ ...f2303073-8dfb-4fd7-8e1a-7277addd57eb.stderr.txt |    0
+ ...f2303073-8dfb-4fd7-8e1a-7277addd57eb.stdout.txt |    1 +
+ ...f6425a4c-ea80-4991-a769-32ea163a20c0.stderr.txt |    5 +
+ ...f6425a4c-ea80-4991-a769-32ea163a20c0.stdout.txt |    0
+ .../runs/R-SYNC-PAGING-20261003/diff.patch         |  160 ++
+ .../runs/R-SYNC-PAGING-20261003/events.jsonl       |   24 +
+ .../runs/R-SYNC-PAGING-20261003/final_state.json   |  381 +++
+ .../runs/R-SYNC-PAGING-20261003/initial_state.json |  306 +++
+ .../runs/R-SYNC-PAGING-20261003/metadata.json      |   32 +
+ .../runs/R-SYNC-PAGING-20261003/summary.json       |   10 +
+ .../recovery-fix/failure-and-repair.md             |   13 +
+ .../recovery-fix/handoff.md                        |    7 +
+ .../hosted-failure-8c672a2/37121195918-failed.log  |   72 +
+ .../37121195918-provider.json                      |    1 +
+ .../hosted-failure-8c672a2/37121215717-failed.log  |   72 +
+ .../37121215717-provider.json                      |    1 +
+ .../recovery-fix/import-manifest.json              |  207 ++
+ .../P-SYNC-PAGING-REVIEW-20261003/metadata.json    |   13 +
+ .../P-SYNC-PAGING-REVIEW-20261003/prompt.txt       |    1 +
+ .../independent-fail-8c672a2/review.md             |   25 +
+ ...00d2e658-1107-4245-9d86-360adbed7a47.stderr.txt |    0
+ ...00d2e658-1107-4245-9d86-360adbed7a47.stdout.txt |    1 +
+ ...3085c988-efed-4ac2-a3d5-16926684bb4c.stderr.txt |    0
+ ...3085c988-efed-4ac2-a3d5-16926684bb4c.stdout.txt |    1 +
+ ...3e9e9ff6-6e4e-4844-aae9-6b8d90e05dae.stderr.txt |    0
+ ...3e9e9ff6-6e4e-4844-aae9-6b8d90e05dae.stdout.txt |    1 +
+ ...3e9fd6ae-f698-45ac-959d-50bdd53b7f04.stderr.txt |    0
+ ...3e9fd6ae-f698-45ac-959d-50bdd53b7f04.stdout.txt |    1 +
+ ...45b2b10d-0972-43dd-b7f1-b946d6d9e0c7.stderr.txt |    0
+ ...45b2b10d-0972-43dd-b7f1-b946d6d9e0c7.stdout.txt |    0
+ ...4c730074-87ec-46d7-854d-f84274efb6c4.stderr.txt |    0
+ ...4c730074-87ec-46d7-854d-f84274efb6c4.stdout.txt |   72 +
+ ...57edbf20-9f79-484f-a4ff-64e25b2d572d.stderr.txt |    0
+ ...57edbf20-9f79-484f-a4ff-64e25b2d572d.stdout.txt | 1041 +++++++
+ ...7391347a-7103-4a97-92f5-6ccab33c50cd.stderr.txt |    5 +
+ ...7391347a-7103-4a97-92f5-6ccab33c50cd.stdout.txt |    0
+ ...8337138b-76d8-402a-9651-29231e07976d.stderr.txt |    0
+ ...8337138b-76d8-402a-9651-29231e07976d.stdout.txt |    1 +
+ ...870b536c-80bd-4d4f-b85c-71ce9956234b.stderr.txt |    5 +
+ ...870b536c-80bd-4d4f-b85c-71ce9956234b.stdout.txt |    0
+ ...9a9adc14-4c33-464a-8c7c-7f22def977ae.stderr.txt |    0
+ ...9a9adc14-4c33-464a-8c7c-7f22def977ae.stdout.txt |    5 +
+ ...ba663833-5328-462c-aae7-54218ae6089b.stderr.txt |    0
+ ...ba663833-5328-462c-aae7-54218ae6089b.stdout.txt |  105 +
+ ...ee584cee-d697-4052-b817-3970c23cd139.stderr.txt |    1 +
+ ...ee584cee-d697-4052-b817-3970c23cd139.stdout.txt |    1 +
+ ...fb0a53d8-a4bf-4fa4-8bb3-047ac0fca16c.stderr.txt |    0
+ ...fb0a53d8-a4bf-4fa4-8bb3-047ac0fca16c.stdout.txt |   29 +
+ .../runs/R-SYNC-PAGING-REVIEW-20261003/diff.patch  |    0
+ .../R-SYNC-PAGING-REVIEW-20261003/events.jsonl     |   33 +
+ .../R-SYNC-PAGING-REVIEW-20261003/final_state.json |  300 ++
+ .../initial_state.json                             |  300 ++
+ .../R-SYNC-PAGING-REVIEW-20261003/metadata.json    |   32 +
+ .../R-SYNC-PAGING-REVIEW-20261003/summary.json     |   10 +
+ .../recovery-fix/research-import-manifest.json     |  202 ++
+ .../P-SYNC-RECOVERY-FIX-20261003/metadata.json     |   13 +
+ .../P-SYNC-RECOVERY-FIX-20261003/prompt.txt        |    1 +
+ ...07dfe398-ed42-4537-abb2-1f2ee622c718.stderr.txt |    3 +
+ ...07dfe398-ed42-4537-abb2-1f2ee622c718.stdout.txt |    0
+ ...0ebc3f55-983f-449f-b9bb-89eb35fce9ea.stderr.txt |    0
+ ...0ebc3f55-983f-449f-b9bb-89eb35fce9ea.stdout.txt |    0
+ ...2d355087-e892-4527-a976-385f4e6fc3eb.stderr.txt |    8 +
+ ...2d355087-e892-4527-a976-385f4e6fc3eb.stdout.txt |  310 +++
+ ...33d595b9-2736-4f4b-b3d6-432d863985cb.stderr.txt |    0
+ ...33d595b9-2736-4f4b-b3d6-432d863985cb.stdout.txt |   42 +
+ ...36ae5232-d03a-437d-a228-84b66c58c936.stderr.txt |    0
+ ...36ae5232-d03a-437d-a228-84b66c58c936.stdout.txt |    1 +
+ ...5da951b7-b0a4-40cc-92e7-951bcc90caa8.stderr.txt |    0
+ ...5da951b7-b0a4-40cc-92e7-951bcc90caa8.stdout.txt |    9 +
+ ...6367a221-a906-44ce-af73-32dd5bd58a27.stderr.txt |    5 +
+ ...6367a221-a906-44ce-af73-32dd5bd58a27.stdout.txt |    0
+ ...644c92bd-1714-4cb7-b801-06bd6b8b1d46.stderr.txt |    0
+ ...644c92bd-1714-4cb7-b801-06bd6b8b1d46.stdout.txt |    0
+ ...651712a8-6b4d-4b5a-a8a7-2a8d109c74e2.stderr.txt |    0
+ ...651712a8-6b4d-4b5a-a8a7-2a8d109c74e2.stdout.txt |    1 +
+ ...73ed9e40-6f3f-4e15-b830-8fe3409bdb87.stderr.txt |    0
+ ...73ed9e40-6f3f-4e15-b830-8fe3409bdb87.stdout.txt |    1 +
+ ...816a826e-02a8-4016-ac1d-32417988538e.stderr.txt |    0
+ ...816a826e-02a8-4016-ac1d-32417988538e.stdout.txt |    1 +
+ ...ada1d826-3753-4dc1-a4be-6644199ef6fb.stderr.txt |    0
+ ...ada1d826-3753-4dc1-a4be-6644199ef6fb.stdout.txt |   45 +
+ ...aefa9c61-8b23-466c-b482-f5df5765e0eb.stderr.txt |    0
+ ...aefa9c61-8b23-466c-b482-f5df5765e0eb.stdout.txt |    1 +
+ ...c9e38840-1f7c-49b4-bc06-ffb594c0ff0c.stderr.txt |    0
+ ...c9e38840-1f7c-49b4-bc06-ffb594c0ff0c.stdout.txt |    0
+ ...ced3a636-d72d-4186-971e-580ff8a140d0.stderr.txt |    0
+ ...ced3a636-d72d-4186-971e-580ff8a140d0.stdout.txt |    1 +
+ ...d3dbc3fb-c662-4919-a414-9471e48a57b6.stderr.txt |    0
+ ...d3dbc3fb-c662-4919-a414-9471e48a57b6.stdout.txt |    2 +
+ .../runs/R-SYNC-RECOVERY-FIX-20261003/diff.patch   | 2867 ++++++++++++++++++++
+ .../runs/R-SYNC-RECOVERY-FIX-20261003/events.jsonl |   36 +
+ .../R-SYNC-RECOVERY-FIX-20261003/final_state.json  |  312 +++
+ .../initial_state.json                             |  300 ++
+ .../R-SYNC-RECOVERY-FIX-20261003/metadata.json     |   32 +
+ .../runs/R-SYNC-RECOVERY-FIX-20261003/summary.json |   10 +
+ .../recovery-fix/verification-history.md           |   20 +
+ .../P-SYNC-TRANSPORT-20261003/metadata.json        |   13 +
+ .../prompts/P-SYNC-TRANSPORT-20261003/prompt.txt   |    1 +
+ ...0f0e3dbe-c189-44e8-8957-1aab5e157b35.stderr.txt |    5 +
+ ...0f0e3dbe-c189-44e8-8957-1aab5e157b35.stdout.txt |    0
+ ...10ce5d69-d03c-4522-9be7-6326329cd513.stderr.txt |    5 +
+ ...10ce5d69-d03c-4522-9be7-6326329cd513.stdout.txt |    0
+ ...14c36375-e5e8-4488-8d4b-b5c39ddcafa7.stderr.txt |    5 +
+ ...14c36375-e5e8-4488-8d4b-b5c39ddcafa7.stdout.txt |    0
+ ...2e30696d-08a8-4852-9a98-ab1f95077606.stderr.txt |    5 +
+ ...2e30696d-08a8-4852-9a98-ab1f95077606.stdout.txt |    0
+ ...328e8210-c027-4ee0-ba5c-f2edb117a882.stderr.txt |    0
+ ...328e8210-c027-4ee0-ba5c-f2edb117a882.stdout.txt |    0
+ ...36bff3c3-725e-4804-b28a-e316e1ad2970.stderr.txt |    0
+ ...36bff3c3-725e-4804-b28a-e316e1ad2970.stdout.txt |    1 +
+ ...472c0e29-3930-475e-807e-57a7d230aff6.stderr.txt |    0
+ ...472c0e29-3930-475e-807e-57a7d230aff6.stdout.txt |    1 +
+ ...4b16273d-6116-44fe-b6d2-08b02a25b1f6.stderr.txt |    0
+ ...4b16273d-6116-44fe-b6d2-08b02a25b1f6.stdout.txt |    1 +
+ ...526820db-34ec-4af6-911c-5261c3fb7c91.stderr.txt |    0
+ ...526820db-34ec-4af6-911c-5261c3fb7c91.stdout.txt |    1 +
+ ...5a3c83fc-ae99-4b66-b4aa-0ed6ee84a9dd.stderr.txt |    0
+ ...5a3c83fc-ae99-4b66-b4aa-0ed6ee84a9dd.stdout.txt |    0
+ ...5d4aa70e-ba70-4ff3-a1a2-5386e2782c6c.stderr.txt |   22 +
+ ...5d4aa70e-ba70-4ff3-a1a2-5386e2782c6c.stdout.txt |    0
+ ...6daaedae-4649-4140-b654-c337affdb98f.stderr.txt |    0
+ ...6daaedae-4649-4140-b654-c337affdb98f.stdout.txt |    1 +
+ ...6f106dec-3aec-4854-b984-c52728eb5b6c.stderr.txt |    0
+ ...6f106dec-3aec-4854-b984-c52728eb5b6c.stdout.txt |    1 +
+ ...959958f7-33e8-4c93-8a08-dc1e492104ee.stderr.txt |    0
+ ...959958f7-33e8-4c93-8a08-dc1e492104ee.stdout.txt |    1 +
+ ...b7f5b89f-b881-44dd-abcc-f0475d2231c8.stderr.txt |    0
+ ...b7f5b89f-b881-44dd-abcc-f0475d2231c8.stdout.txt |    1 +
+ ...bad62218-035c-4c1f-b9ec-ca1cdcfdba74.stderr.txt |    5 +
+ ...bad62218-035c-4c1f-b9ec-ca1cdcfdba74.stdout.txt |    0
+ ...bbc1e173-7182-4fbe-9402-fca8a5ab2da4.stderr.txt |    0
+ ...bbc1e173-7182-4fbe-9402-fca8a5ab2da4.stdout.txt |    1 +
+ ...c4539fee-5cb1-4e30-a0aa-3ef6d59995df.stderr.txt |    0
+ ...c4539fee-5cb1-4e30-a0aa-3ef6d59995df.stdout.txt |    1 +
+ ...e4711082-9e92-4b94-b9bc-425523669bd7.stderr.txt |    0
+ ...e4711082-9e92-4b94-b9bc-425523669bd7.stdout.txt |    1 +
+ ...ea5a963d-e89c-41a5-aa0c-b7b4829be552.stderr.txt |    0
+ ...ea5a963d-e89c-41a5-aa0c-b7b4829be552.stdout.txt |    1 +
+ .../runs/R-SYNC-TRANSPORT-20261003/diff.patch      |  240 ++
+ .../runs/R-SYNC-TRANSPORT-20261003/events.jsonl    |   45 +
+ .../R-SYNC-TRANSPORT-20261003/final_state.json     |  462 ++++
+ .../R-SYNC-TRANSPORT-20261003/initial_state.json   |  334 +++
+ .../runs/R-SYNC-TRANSPORT-20261003/metadata.json   |   32 +
+ .../runs/R-SYNC-TRANSPORT-20261003/summary.json    |   10 +
+ .../verification-history.md                        |   24 +
+ spec/tasks/backlog/LOOP1-SYNC-001.md               |   17 +
+ spec/tasks/review/LOOP1-SYNC-TRANSPORT-001.md      |   94 +
+ tests/contract/test_sync_transport.py              |   90 +
+ tools/verify_sync_transport.py                     |  115 +
+ 260 files changed, 14656 insertions(+), 23 deletions(-)
