@@ -2,7 +2,7 @@
 
 - baseline_title: 面向十万级在线连接的可扩展分布式即时通信平台
 - version: `v1.1`
-- status: Human-approved MVP planning candidate; prior UI freeze accepted; new independent acceptance pending
+- status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
 - sha256: `16e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c`
@@ -75,3 +75,7 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 
 - planning_previous_sha256: `a234bc06e33fd0ae08efd944331930320b8cf1d58800fa4e66886452d8084237`
 
 当前 sha256 指向本轮规范字节；保留 v1.1，历史 ADR-0005/0006 与既有 revision 字段仅为谱系，不是本轮验收。仅新增 CLIENT-GUI 产品 ID、复用既有任务 acceptance。新的独立 Review、exact-head hosted CI、protected integration/actual main 与受保护同步前不生效，不实施 SEND。历史 PDF 原字节、PR7/PR8/FAIL/Recorder evidence 不变。
+
+## MVP 规划接受发现（2026-10-03）
+
+上述planning候选段落保留为历史。ADR-0007当前规范16e9c7b4已在candidate7466ce7、PR14实际main b60f116a14f9265031bff255db500f3414f2a357通过fresh independent Review、精确候选与actualmain hosted CI，并受保护同步H:/IM-platform。完整证据：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/closure/acceptance.md。v1.1/hash/PDF不变；本收尾候选另待新Review/CI/集成。本轮后续仅SEND；S1PASS/S2OPEN。

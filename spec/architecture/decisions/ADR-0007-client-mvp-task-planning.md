@@ -1,6 +1,6 @@
 # ADR-0007：客户端 MVP 任务规划补充
 
-状态：Human-approved 候选，尚待新的独立 Review、精确 HEAD hosted CI、受保护集成与 actual-main 同步；不能据候选实施 SEND。
+状态：规划核心已独立接受于 candidate7466ce7/PR14/actualmain b60f116a14f9265031bff255db500f3414f2a357，并保护同步 H:/IM-platform；证据 mvp-planning/closure/acceptance.md。本状态发现仅行政收尾，仍待新独立 Review/精确 CI/集成；之后立即执行本轮 SEND。
 日期：2026-10-03
 批准来源：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/human-request.txt
 
@@ -21,3 +21,7 @@ semantic_change=true（任务规划与 Gate obligations）；v1.1 不变。规�
 ## 最小性与回滚
 
 复用 UI-ARCH 行政任务，产品只新增 GUI ID；其余队列实例化已有规划 ID，不生成未来 S3～S6 新任务层。生效前修复候选；生效后纠正通过新 Human 决定与独立验收，不重写历史。无产品/数据回滚。
+
+## 接受发现
+
+原文候选效力说明为历史流程。当前canonical16e9c7b4通过fresh candidate/actualmain Review与精确hosted5jobs/every stepPASS，v1.1/PDF不变；本段不修改规范职责/边界，S1PASS/S2OPEN。
