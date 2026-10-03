@@ -29,3 +29,9 @@
 真实 PostgreSQL + Go Core/Gateway + TLS入口（当前既有部署/harness），不是 offline oracle/profile结果文件。测试有效多页/空页/retry/限额/大整数/关联；缺失、无效、过期、撤销、旧epoch和client mismatch；跨用户cursor/伪造/无权限会话；被阻塞写者和并发commit不得丢低频事件；无gap消息页、readonly/无新Outbox；service/source/import/minimality和旧Auth/social/message/ACK回归。每项绑定实际candidate/environment/output，不制造结果。
 
 fresh independent Review → exact-head hosted applicable jobs → protected integration/actual-main Review和CI → H:/IM-platform同步与SHA记录。Go前置实际服务接受后才评估 LOOP1-SYNC-001 的依赖/输入并恢复Desktop/Mobile双层同步；完成SYNC同样需要独立Review/CI/真实客户端运行和主仓库同步。最终在SYNC完成后停止，GUI/Web不继续；Go任务PASS并不等于SYNC/S2 PASS。
+
+## Human 分页修正与真实验收要求
+
+100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
+
+真实 PostgreSQL + Go/Gateway/TLS 验收必须为 user 与 conversation 各准备超过100项的已提交数据，逐页拉到 terminal，断言每页不超过 min(limit,100)、完整总数、身份去重与最后 cursor/seq；证明未在第一页或固定总页数处截断，并验证 terminal 后新提交由再次同步获取。离线向量只判定契约预期，不证明数据库查询、事务或运行入口正确；后续 Desktop/Mobile SYNC 再证明本地事务成功后分页推进。

@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-SYNC-only
 Current Task: LOOP1-SYNC-TRANSPORT-001
 Current Task State: review
-Execution Status: BLOCKED_EXTERNAL_ACCESS
+Execution Status: REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
@@ -48,3 +48,7 @@ Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch
 ## Architecture Conflicts / ACP / ADR
 
 Human authorized public Sync binding freeze via ADR-0008 candidate; absence of runtime remains SYNC blocker. No Go implementation before later Human plan consent.
+
+## 最新 Human 修正与恢复（2026-10-03）
+
+发布授权已收到，原 auto-review hold 为历史。当前新 writer /root/sync_paging_revision 只澄清持续分页到最新、单页 min(limit,100) 保持，未写 Go/client 产品。旧独立 Review 不覆盖新候选；下一步 fresh Review → 全13必跑精确 HEAD hosted CI → protected integration/actual-main 验证 → 主仓库同步。Go 同意时序保留，SYNC backlog/S2 OPEN；最后良好 main a0304fc。本次证据 paging-revision/；Recorder 启动前只读恢复及后续 authority 阅读 gap 如实披露，无完整 trace 声称。

@@ -21,6 +21,8 @@ class SyncTransportTests(unittest.TestCase):
             lambda d: d["servers"].__setitem__(0, {"url": "http://api.example.invalid"}),
             lambda d: d.__setitem__("security", []),
             lambda d: d["x-sync-binding"].__setitem__("effectiveLimitCap", 0),
+            lambda d: d["x-sync-binding"].__setitem__("pagination", "stop-after-100-total"),
+            lambda d: d["x-sync-binding"].__setitem__("completion", "future-writes-already-synced"),
             lambda d: d["x-sync-binding"].__setitem__("cursorOwnership", "global"),
             lambda d: d["x-sync-binding"].__setitem__("correlation", "random"),
             lambda d: d["paths"]["/v1/sync/user"]["post"].__setitem__("security", []),

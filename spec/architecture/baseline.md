@@ -5,7 +5,7 @@
 - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `457c405b79ca068af2b398b9fbe49859810c455359b01dbfdb2d4c6d72a9d966`
+- sha256: `ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -90,3 +90,5 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 
 - sync_previous_sha256: `16e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c`
 
 Candidate only: fresh independent Review, exact-head hosted CI, protected integration/actual-main verification and main synchronization pending. Go product implementation additionally awaits Human consent to concrete plan after prerequisite acceptance. Existing wire shapes/PDF/prior accepted history unchanged; S2 OPEN.
+
+分页修正候选：Human 保持 min(limit,100) 单页 cap，要求持续分页直到 terminal；批准见 paging-revision/human-authorization.txt。此前457c405b79ca068af2b398b9fbe49859810c455359b01dbfdb2d4c6d72a9d966为已审未 hosted 接受候选，保留谱系；新 SHA 须独立接受。

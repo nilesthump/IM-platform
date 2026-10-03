@@ -23,3 +23,9 @@ SYNC 的四种现有 JSON 形状已有 contracts/websocket/sync-v1.schema.json�
 新增传输操作，不改现有四形状、Auth API、WSS/ACK、数据库/迁移、存储、客户端技术政策或安全边界。旧 schema/oracle 离线向量保持原样且仍有效；opaque token 的具体编码是后续 Core 边界实现细节，不能反向定义契约。冻结正文增加 §11.5（绑定），baseline 保存旧 canonical hash16e9c7b4 与批准来源。历史 PDF/ADR/失败/Recorder 不改。
 
 候选未接受前不得作为 Go/client 产品实现授权；接受后依然必须先向 Human 展示 Go 实现方案并取得同意。规则接受不代表实际 Sync 服务存在，不解除 SYNC backlog 的 runtime 输入阻塞。新任务只有这一个当前已证明必要的前置，不实例化未来产品/UI 层。撤销未接受候选即可回滚；生效后的调整走新决定与独立接受，不重写历史。
+
+## Human 分页修正（2026-10-03）
+
+100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
+
+新增批准来源：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/human-authorization.txt。只冻结持续分页语义与后续验收要求，当前不实现客户端循环。旧候选 Review 不覆盖修正后 SHA；仍待新独立 Review/精确 HEAD CI/集成同步。

@@ -76,3 +76,7 @@ Local final binding/ref/official OAI lint PASS; 4 Sync test groups and 53 archit
 # Independent Review and external publication hold
 
 Fresh independent Review PASS for clean57404dcc, full range a0304fc..57404dcc. Report/35-event sealed validated Recorder archived byte-exact in independent-review-57404dcc/. Architecture/contract/regression checks PASS; commands/results in report. No hosted CI/integration/main sync. Auto-review rejected GitHub publication pending explicit Human authorization of this prerequisite branch to https://github.com/nilesthump/IM-platform.git. Execution BLOCKED_EXTERNAL_ACCESS; state review, no Task/Gate PASS. Next: review this administrative increment, specific publication consent, final full13-job exact-head CI/protected integration/actual-main audit-CI/main sync, then show Go proposal for separate consent. Last accepted main a0304fc unchanged; Coordinator owns administrative increment. No product writes/SYNC advancement. See external-publication-blocker.md.
+
+# Human 分页修正与发布恢复
+
+Human 已明确授权推送既定分支到 GitHub/PR/CI及接受后保护合并同步，原发布阻断是历史。min(limit,100) 保持单页 cap；事务提交后持续分页至 terminal，无固定总条数/页数截断。canonical/ADR/contract binding及13文档mutation控制一致；四个JSON shapes不变。新修正待 fresh independent Review/精确 HEAD hosted CI/主仓库同步；不得沿用此前候选PASS关闭任务。writer /root/sync_paging_revision，lastgood main a0304fc，无 main/Go/client 写入；最新请求/恢复事实与验证在 paging-revision/。

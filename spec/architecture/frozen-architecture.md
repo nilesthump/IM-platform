@@ -851,6 +851,8 @@ Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户�
 
 用户初值 cursor 为 0，后续 opaque cursor 绑定认证用户、可跨其 Session 重放；客户端不解析/排序。仅 friend/conversation/membership/plugin metadata；消息仍使用会话 seq。内部 cursor_id 可在响应投影为 external event.cursor/nextCursor，既有 producer payload/schema 不改。任意正整数 limit 仍合法，effectiveLimit=min(limit,100)，先精确取 cap 再有界转换。空页 terminal（user 保持输入 cursor）；非空 user nextCursor=末事件 cursor 且前进；hasMore 要求非空进展且存在额外已提交合格项，不能跳过并发晚提交。会话消息从 afterSeq+1 有序连续；客户端仅跨无 gap 前缀推进 contiguous_seq，数据/cursor 同事务不变。
 
+100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
+
 成功/可解码有效 requestId 的 canonical error 与 body UUID 关联；不可关联格式错误用 server UUID。具体认证、字段、错误码/状态、资源界限和关联行为以 contracts/ 为准，不从实现推导。无效/外账号 cursor 400 VALIDATION_FAILED，不存在/非成员会话403 AUTHORIZATION_DENIED。未列入错误目录的服务器/传输失败不得冒充成功页或推进 cursor。查询参数禁止，入口 HTTPS、日志/错误无凭据，响应 no-store。
 
 批准来源与兼容/迁移见 ADR-0008。此绑定仅经 fresh independent Review、精确候选 hosted CI、protected integration/actual-main 与主仓库同步后生效；接受后仍须展示具体 Go 入口实现方案并取得 Human 同意才可写 Go 产品代码。SYNC 仍须真实服务与客户端独立接受；本前置不等于 Task SYNC/S2 Gate PASS。
