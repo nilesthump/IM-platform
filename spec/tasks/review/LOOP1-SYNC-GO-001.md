@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-SYNC-GO-001
 title: Go Core public Sync runtime prerequisite
-status: active
+status: review
 owner: /root/sync_go_implementation
 stage: S2
 gate: S2
@@ -29,13 +29,15 @@ Canonical sections 3/7/10 and accepted ADR-0008 authorize existing Go Core + Pos
 # Dependencies
 
 - LOOP1-SYNC-TRANSPORT-001: done, product b820078/c2ff050 independently accepted; administrative3588/actualmain4d5fe1235e4f01111d78cc67b2880b52cac072f2 independently accepted and preservation-verified synchronized.
-- LOOP1-SEND-001: independently accepted main a0304fcc7be18b87f5986d014849d6b48b96a071.
+- LOOP1-CLIENT-SEND-001: independently accepted main a0304fcc7be18b87f5986d014849d6b48b96a071.
 - Explicit Human implementation consent after prerequisite acceptance/displayed proposal: received. No remaining Go consent hold.
 
 # Allowed Paths
 
+These allowed_paths are a hard write boundary under canonical SRC-07.
+
 - backend/go/core/sync.go
-- backend/go/core/auth.go (only two route registrations; existing Auth semantics unchanged)
+- backend/go/core/auth.go (two registrations plus exact two POST-path delegation before legacy generic query interceptor for canonical Sync UUID correlation; existing Auth semantics unchanged)
 - backend/go/core/sync_test.go
 - backend/go/core/sync_http_test.go
 - backend/go/tests/sync_test.go
@@ -86,8 +88,10 @@ Activation baseline: accepted4d5fe1235e4f01111d78cc67b2880b52cac072f2; assigned 
 
 # Handoff
 
-Active implementation not yet begun. Coordinator owns task/current/consent activation; sole writer transfers to /root/sync_go_implementation after activation commit. Last known good actual main4d5fe1235e4f01111d78cc67b2880b52cac072f2, no migrations. SYNC remains backlog on actual runtime input; S1 PASS/S2 OPEN. Existing main781unknown entries preserved. Every failure/risk and exact verification/evidence/commit/synchronization fact must be recorded before handoff.
+Implementation local PASS, not acceptance. Two public Core Sync routes, readonly PG pages, account cursor, authoritative post-wait Session/membership checks and bounded streaming arbitrary JSON integers implemented. Existing contracts/schema/producers/private history/Gateway unchanged. Final enabled Go build/vet/test/race PASS; actual strict TLS Compose Sync PASS208metadata/205durableMessages plus206thpostterminalcommit and literal>64KiB numeric tokens. Frozen/architecture53/HTTP/WSS/SyncPlugin/SyncBinding checks PASS. Known failures and original logs retained in implementation/handoff.md and sealed Recorder. Clean candidate Acceptance is recorded by Git-private final observer after commit; no independent acceptance claimed.
+
+Last known good main4d5fe1235e4f01111d78cc67b2880b52cac072f2. Assigned task/LOOP1-SYNC-001, no migrations; task-owned implementation/metadata only. Main781unknownentries untouched. S1PASS/S2OPEN; clientSYNC remainsbacklog on independently accepted runtime.
 
 # Next Action
 
-Fresh Implementation Agent reads mandatory startup and complete inputs, verifies assigned root, registers Human/delegation prompt and starts Recorder, implements/test-proves minimal Go runtime within allowed paths, commits clean review candidate and hands sole writer back. Coordinator delegates a fresh independent Review, repairs through fresh Fix/new Review as necessary, obtains exact hosted acceptance/integration/synchronization, then resumes dependency-satisfied client SYNC and stops after its full acceptance.
+Coordinator delegates a NEW independent Review on clean committed candidate, publishes exact candidate CI, repairs via fresh Fix/new Review if necessary, then protectedintegration/actual-main audit/CI and preservation-verified mainsync. Only after accepted Go runtime activate dependency-satisfied existing Desktop/MobileSYNC; complete thenstop.

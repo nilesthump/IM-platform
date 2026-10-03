@@ -6,8 +6,8 @@ Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-SYNC-only
 Current Task: LOOP1-SYNC-GO-001
-Current Task State: active
-Execution Status: IMPLEMENTING_GO_SYNC_PREREQUISITE
+Current Task State: review
+Execution Status: WAITING_INDEPENDENT_GO_SYNC_REVIEW
 
 ## Immediately Relevant Completed Work
 
@@ -29,17 +29,24 @@ No Go implementation-consent blocker remains. LOOP1-SYNC-001 remains unique back
   - Result: Actualmain4d5fe exact applicable administrative CI PASS; independently verified, not Go runtime acceptance.
   - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
 
+- Command: `go test -race -count=1 ./...`
+  - Result: Local PASS enabled migrated PostgreSQL16/NATS, final Core11.217s/tests79.662s; Go build/vet/test PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
+- Command: `python -B tools/verify_sync_runtime.py`
+  - Result: Local PASS actual strict TLS Gateway/Core/PG208metadata/205durableMessages, postterminal206thcommit, >64KiB numericdomain; no hosted acceptance claimed.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
+
 ## Changed Files or Migrations
 
-New narrow Go runtime task/consent/current activation only. Sole implementation writer will add Core Sync handlers/route registration and necessary tests/real TLS proof. No schema/migration/contract/frozen change authorized.
+Two Core public Sync handlers, bounded exact numeric decoding and account cursors; six auth assembly lines, new real PG tests, bounded strict TLS verifier and two-line existing deploy CI hook. No schema/migration/contract/frozen/producer changes.
 
 ## Known Failures, Risks, and Assumptions
 
-No Go implementation or live Sync result yet. Historical transport failure evidence retained. Windows long-path Git revision:path synchronization verifier failure after successful FF was exposed and corrected by separate object-ID byte verifier; original781status/mode/size/hash unchanged. Research startup/read-only gaps disclosed; trace not claimed complete.
+Go local runtime and final enabled build/vet/test/race PASS; strict TLS real deployment208metadata/205durableMessages plus postterminalcommit and >64KiB numeric proof PASS. Fresh independent Review/hostedCI/integration/main synchronization pending; local evidence is not acceptance. Historical transport and implementation failure evidence retained. Windows long-path Git revision:path synchronization verifier failure after successful FF was exposed and corrected by separate object-ID byte verifier; original781status/mode/size/hash unchanged. Research startup/read-only gaps disclosed; trace not claimed complete.
 
 ## Next Exact Action
 
-Fresh Implementation Agent follows mandatory startup, verifies assigned root, implements and proves Go Sync runtime, commits clean review candidate. Fresh independent Review/exact-head hosted CI/protected integration/actual-main verification and main sync precede runtime acceptance. Then resume Desktop/Mobile SYNC and stop after completion.
+Fresh independent Reviewer examines clean committed Go candidate; exact hosted CI/protectedintegration/actual-main audit and mainsync precede runtime acceptance. Implementation released sole writer after commit. Then reassess and activate Desktop/MobileSYNC, complete and stop.
 
 ## Last Known Good Commit
 
@@ -51,7 +58,7 @@ Fresh Implementation Agent follows mandatory startup, verifies assigned root, im
 
 ## Uncommitted Changes / Ownership
 
-Assigned root H:/.codex/worktrees/sync-resume/IM-platform; branch task/LOOP1-SYNC-001. Coordinator /root owns activation metadata until its commit, then sole writer /root/sync_go_implementation. Main H:/IM-platform original781entries retained and recovery/s1-handoff-20261001 preserved.
+Assigned root H:/.codex/worktrees/sync-resume/IM-platform; branch task/LOOP1-SYNC-001. Implementation /root/sync_go_implementation owns all current task changes until clean REVIEW commit, then releases sole writer to Coordinator /root. Main H:/IM-platform original781entries retained and recovery/s1-handoff-20261001 preserved.
 
 ## Architecture Conflicts / ACP / ADR
 

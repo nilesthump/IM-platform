@@ -1,0 +1,772 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index b180950..4184bd6 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -355,6 +355,8 @@ jobs:
+         run: ./tests/infrastructure/smoke.ps1 -Profile go
+       - name: Go Auth actual roles and TLS event smoke
+         run: python3 tests/go/live_role_smoke.py
++      - name: Go public Sync strict TLS runtime
++        run: python3 -B tools/verify_sync_runtime.py
+       - name: Go S1 strict TLS messaging E2E
+         run: python3 -B tests/e2e/go_tls_messaging.py
+       - name: Java transport smoke
+diff --git a/backend/go/core/auth.go b/backend/go/core/auth.go
+index 1b820c4..0f2414e 100644
+--- a/backend/go/core/auth.go
++++ b/backend/go/core/auth.go
+@@ -132,6 +132,8 @@ func writeError(w http.ResponseWriter, r *http.Request, err error) {
+ 
+ func (s *authService) handler() http.Handler {
+ 	m := http.NewServeMux()
++	m.HandleFunc("POST /v1/sync/user", s.syncUser)
++	m.HandleFunc("POST /v1/sync/conversation", s.syncConversation)
+ 	m.HandleFunc("POST /v1/auth/register", s.register)
+ 	m.HandleFunc("POST /v1/auth/login", s.login)
+ 	m.HandleFunc("POST /v1/auth/refresh/web", s.refreshWeb)
+@@ -142,6 +144,10 @@ func (s *authService) handler() http.Handler {
+ 	m.HandleFunc("GET /v1/friends", s.listFriends)
+ 	m.HandleFunc("PUT /v1/friends/{friendUserId}", s.addFriend)
+ 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		if r.Method == "POST" && (r.URL.Path == "/v1/sync/user" || r.URL.Path == "/v1/sync/conversation") {
++			m.ServeHTTP(w, r)
++			return
++		}
+ 		for key := range r.URL.Query() {
+ 			lower := strings.ToLower(key)
+ 			if strings.Contains(lower, "token") || strings.Contains(lower, "password") || strings.Contains(lower, "secret") || lower == "authorization" || lower == "cookie" {
+diff --git a/backend/go/core/sync.go b/backend/go/core/sync.go
+index eec3f1f..0bbd456 100644
+--- a/backend/go/core/sync.go
++++ b/backend/go/core/sync.go
+@@ -1,10 +1,367 @@
+ package core
+ 
+ import (
++	"bufio"
++	"bytes"
++	"context"
++	"crypto/hmac"
++	"crypto/sha256"
++	"encoding/base64"
++	"encoding/binary"
++	"encoding/json"
++	"errors"
++	"io"
++	"math"
+ 	"net/http"
++	"regexp"
++	"strconv"
+ 	"strings"
++	"time"
++
++	"github.com/jackc/pgx/v5"
+ )
+ 
++var syncNumber = regexp.MustCompile(`^(-?)([0-9]+)(?:\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?$`)
++
++// JSON integer means mathematical integrality, including decimal/exponent forms.
++// Saturate only after proving integrality; memory is bounded by the input, not exponent.
++func syncInteger(raw json.RawMessage, cap int64) (int64, bool) {
++	m := syncNumber.FindStringSubmatch(string(raw))
++	if m == nil {
++		return 0, false
++	}
++	digits := strings.TrimLeft(m[2]+m[3], "0")
++	if digits == "" {
++		return 0, true
++	}
++	if m[1] == "-" {
++		return 0, false
++	}
++	exponent := int64(0)
++	if m[4] != "" {
++		value, e := strconv.ParseInt(m[4], 10, 64)
++		if e != nil {
++			if strings.HasPrefix(m[4], "-") {
++				return 0, false
++			}
++			return cap, true
++		}
++		exponent = value
++	}
++	fraction := int64(len(m[3]))
++	// An exponent too negative cannot turn nonzero finite input into an integer.
++	if exponent < -int64(len(digits)) {
++		return 0, false
++	}
++	if exponent < fraction {
++		remove := fraction - exponent
++		if remove > int64(len(digits)) {
++			return 0, false
++		}
++		tail := digits[len(digits)-int(remove):]
++		if strings.Trim(tail, "0") != "" {
++			return 0, false
++		}
++		digits = digits[:len(digits)-int(remove)]
++		exponent = fraction
++	}
++	zeros := exponent - fraction
++	capText := strconv.FormatInt(cap, 10)
++	if zeros > int64(len(capText)) || int64(len(digits))+zeros > int64(len(capText)) {
++		return cap, true
++	}
++	digits += strings.Repeat("0", int(zeros))
++	if len(digits) == len(capText) && digits > capText {
++		return cap, true
++	}
++	value, e := strconv.ParseInt(digits, 10, 64)
++	return value, e == nil
++}
++
++func syncFailure(w http.ResponseWriter, id string, err error) {
++	var e apiError
++	if !errors.As(err, &e) {
++		http.Error(w, "Sync unavailable", http.StatusServiceUnavailable)
++		return
++	}
++	writeJSON(w, e.Status, map[string]any{"error": map[string]string{"code": e.Code, "message": e.Message}, "requestId": id})
++}
++
++func (s *authService) syncInput(w http.ResponseWriter, r *http.Request, conversation bool) (map[string]json.RawMessage, string, string, claims, bool) {
++	w.Header().Set("Cache-Control", "no-store")
++	id, _ := uuid()
++	body, err := syncJSON(r.Body)
++	var fields map[string]json.RawMessage
++	if err == nil {
++		err = json.Unmarshal(body, &fields)
++	}
++	var decoded string
++	if err == nil && json.Unmarshal(fields["requestId"], &decoded) == nil && socialUUIDPattern.MatchString(decoded) {
++		id = decoded
++	}
++	reject := func(e error) (map[string]json.RawMessage, string, string, claims, bool) {
++		syncFailure(w, id, e)
++		return nil, id, "", claims{}, false
++	}
++	if r.URL.RawQuery != "" || r.URL.ForceQuery || err != nil || fields == nil || !socialUUIDPattern.MatchString(decoded) {
++		return reject(fail(400, "VALIDATION_FAILED", "Request body or query is invalid."))
++	}
++	token, err := bearer(r)
++	if err != nil {
++		return reject(err)
++	}
++	c, err := s.authenticate(r.Context(), token)
++	if err != nil {
++		return reject(err)
++	}
++	var version string
++	if string(fields["syncVersion"]) == "null" || json.Unmarshal(fields["syncVersion"], &version) != nil {
++		return reject(fail(400, "VALIDATION_FAILED", "Sync version is invalid."))
++	}
++	if version != "1.0" {
++		return reject(fail(426, "PROTOCOL_VERSION_UNSUPPORTED", "Sync version is unsupported."))
++	}
++	expected := map[string]bool{"syncVersion": true, "type": true, "requestId": true, "limit": true}
++	kind := "sync.user.request"
++	if conversation {
++		expected["conversationId"] = true
++		expected["afterSeq"] = true
++		kind = "sync.conversation.request"
++	} else {
++		expected["cursor"] = true
++	}
++	if len(fields) != len(expected) {
++		return reject(fail(400, "VALIDATION_FAILED", "Sync fields are invalid."))
++	}
++	for key := range fields {
++		if !expected[key] {
++			return reject(fail(400, "VALIDATION_FAILED", "Sync fields are invalid."))
++		}
++	}
++	var typ string
++	if json.Unmarshal(fields["type"], &typ) != nil || typ != kind {
++		return reject(fail(400, "VALIDATION_FAILED", "Sync type is invalid."))
++	}
++	return fields, id, token, c, true
++}
++
++func (s *authService) syncCursor(user string, position int64) string {
++	payload := make([]byte, 8)
++	binary.BigEndian.PutUint64(payload, uint64(position))
++	mac := hmac.New(sha256.New, s.codec.Key)
++	mac.Write([]byte("im-sync-user-cursor-v1\x00" + strings.ToLower(user) + "\x00"))
++	mac.Write(payload)
++	return base64.RawURLEncoding.EncodeToString(append(payload, mac.Sum(nil)...))
++}
++
++func (s *authService) syncPosition(user, cursor string) (int64, bool) {
++	if cursor == "0" {
++		return 0, true
++	}
++	b, err := base64.RawURLEncoding.DecodeString(cursor)
++	if err != nil || len(b) != 40 {
++		return 0, false
++	}
++	position := binary.BigEndian.Uint64(b[:8])
++	if position == 0 || position > math.MaxInt64 {
++		return 0, false
++	}
++	canonical := s.syncCursor(user, int64(position))
++	return int64(position), hmac.Equal([]byte(cursor), []byte(canonical))
++}
++
++type syncUserEvent struct {
++	EventID   string      `json:"eventId"`
++	Cursor    string      `json:"cursor"`
++	Kind      string      `json:"kind"`
++	SubjectID string      `json:"subjectId"`
++	Revision  json.Number `json:"revision"`
++}
++
++func (s *authService) syncUser(w http.ResponseWriter, r *http.Request) {
++	fields, id, token, c, ok := s.syncInput(w, r, false)
++	if !ok {
++		return
++	}
++	reject := func(err error) { syncFailure(w, id, err) }
++	var cursor string
++	limit, ok := syncInteger(fields["limit"], 100)
++	if !ok || limit == 0 || json.Unmarshal(fields["cursor"], &cursor) != nil || len(cursor) == 0 || len(cursor) > 256 {
++		reject(fail(400, "VALIDATION_FAILED", "Sync cursor or limit is invalid."))
++		return
++	}
++	after, ok := s.syncPosition(c.UserID, cursor)
++	if !ok {
++		reject(fail(400, "VALIDATION_FAILED", "Sync cursor is invalid."))
++		return
++	}
++	ctx := r.Context()
++	tx, err := s.db.Begin(ctx)
++	if err != nil {
++		reject(err)
++		return
++	}
++	defer tx.Rollback(ctx)
++	var locked string
++	// Social producers lock the same user before allocating IDs. Waiting here,
++	// then reading at READ COMMITTED, includes every earlier allocated eligible ID.
++	if err = tx.QueryRow(ctx, `SELECT u.user_id FROM users u WHERE u.user_id=$1 FOR SHARE`, c.UserID).Scan(&locked); err != nil {
++		reject(err)
++		return
++	}
++	if err = tx.QueryRow(ctx, `SELECT session_id FROM sessions WHERE user_id=$1 AND client_type=$2 FOR SHARE`, c.UserID, c.ClientType).Scan(&locked); err != nil && !errors.Is(err, pgx.ErrNoRows) {
++		reject(err)
++		return
++	}
++	// Reparse token and recheck exact canonical auth failures after blocking locks.
++	if _, err = s.syncAuthenticate(ctx, tx, token); err != nil {
++		reject(err)
++		return
++	}
++	if after != 0 {
++		var exists bool
++		err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM user_sync_events WHERE user_id=$1 AND cursor_id=$2 AND event_type IN ('friend.changed','conversation.changed','membership.changed','plugin.changed'))`, c.UserID, after).Scan(&exists)
++		if err != nil {
++			reject(err)
++			return
++		}
++		if !exists {
++			reject(fail(400, "VALIDATION_FAILED", "Sync cursor is invalid."))
++			return
++		}
++	}
++	rows, err := tx.Query(ctx, `SELECT cursor_id,event_type,payload FROM user_sync_events WHERE user_id=$1 AND cursor_id>$2 AND event_type IN ('friend.changed','conversation.changed','membership.changed','plugin.changed') ORDER BY cursor_id LIMIT $3`, c.UserID, after, limit+1)
++	if err != nil {
++		reject(err)
++		return
++	}
++	events := make([]syncUserEvent, 0)
++	for rows.Next() {
++		var position int64
++		var payload []byte
++		var kind string
++		if err = rows.Scan(&position, &kind, &payload); err != nil {
++			break
++		}
++		var event syncUserEvent
++		d := json.NewDecoder(bytes.NewReader(payload))
++		d.UseNumber()
++		if err = d.Decode(&event); err != nil {
++			break
++		}
++		revision, valid := syncInteger(json.RawMessage(event.Revision), 1)
++		if !valid || revision == 0 || !socialUUIDPattern.MatchString(event.EventID) || !socialUUIDPattern.MatchString(event.SubjectID) || event.Kind != kind {
++			err = errors.New("invalid authoritative metadata")
++			break
++		}
++		event.Cursor = s.syncCursor(c.UserID, position)
++		events = append(events, event)
++	}
++	if err == nil {
++		err = rows.Err()
++	}
++	rows.Close()
++	if err != nil {
++		reject(err)
++		return
++	}
++	if err = tx.Commit(ctx); err != nil {
++		reject(err)
++		return
++	}
++	more := len(events) > int(limit)
++	if more {
++		events = events[:limit]
++	}
++	next := cursor
++	if len(events) > 0 {
++		next = events[len(events)-1].Cursor
++	}
++	writeJSON(w, 200, map[string]any{"syncVersion": "1.0", "type": "sync.user.page", "requestId": id, "events": events, "nextCursor": next, "hasMore": more})
++}
++
++func (s *authService) syncConversation(w http.ResponseWriter, r *http.Request) {
++	fields, id, token, c, ok := s.syncInput(w, r, true)
++	if !ok {
++		return
++	}
++	reject := func(err error) { syncFailure(w, id, err) }
++	limit, ok := syncInteger(fields["limit"], 100)
++	after, valid := syncInteger(fields["afterSeq"], math.MaxInt64)
++	var conversation string
++	if !ok || limit == 0 || !valid || json.Unmarshal(fields["conversationId"], &conversation) != nil || !socialUUIDPattern.MatchString(conversation) {
++		reject(fail(400, "VALIDATION_FAILED", "Sync fields are invalid."))
++		return
++	}
++	conversation = strings.ToLower(conversation)
++	ctx := r.Context()
++	tx, err := s.db.Begin(ctx)
++	if err != nil {
++		reject(err)
++		return
++	}
++	defer tx.Rollback(ctx)
++	var locked string
++	if err = tx.QueryRow(ctx, `SELECT session_id FROM sessions WHERE user_id=$1 AND client_type=$2 FOR SHARE`, c.UserID, c.ClientType).Scan(&locked); err != nil && !errors.Is(err, pgx.ErrNoRows) {
++		reject(err)
++		return
++	}
++	if _, err = s.syncAuthenticate(ctx, tx, token); err != nil {
++		reject(err)
++		return
++	}
++	err = tx.QueryRow(ctx, `SELECT user_id FROM conversation_members WHERE conversation_id=$1 AND user_id=$2 AND left_at IS NULL FOR SHARE`, conversation, c.UserID).Scan(&locked)
++	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
++		reject(err)
++		return
++	}
++	if _, authErr := s.syncAuthenticate(ctx, tx, token); authErr != nil {
++		reject(authErr)
++		return
++	}
++	if errors.Is(err, pgx.ErrNoRows) {
++		reject(fail(403, "AUTHORIZATION_DENIED", "Conversation access is denied."))
++		return
++	}
++	rows, err := tx.Query(ctx, `SELECT conversation_id,seq,server_message_id,sender_id,request_id,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 ORDER BY seq LIMIT $3`, conversation, after, limit+1)
++	if err != nil {
++		reject(err)
++		return
++	}
++	messages := make([]storedMessage, 0)
++	previous := after
++	for rows.Next() {
++		var m storedMessage
++		m.Content.Kind = "TEXT"
++		if err = rows.Scan(&m.ConversationID, &m.Seq, &m.MessageID, &m.SenderID, &m.RequestID, &m.CreatedAt, &m.Content.Text); err != nil {
++			break
++		}
++		if previous == math.MaxInt64 || m.Seq != previous+1 {
++			err = errors.New("noncontiguous authoritative message history")
++			break
++		}
++		previous = m.Seq
++		messages = append(messages, m)
++	}
++	if err == nil {
++		err = rows.Err()
++	}
++	rows.Close()
++	if err != nil {
++		reject(err)
++		return
++	}
++	if err = tx.Commit(ctx); err != nil {
++		reject(err)
++		return
++	}
++	more := len(messages) > int(limit)
++	if more {
++		messages = messages[:limit]
++	}
++	writeJSON(w, 200, map[string]any{"syncVersion": "1.0", "type": "sync.conversation.page", "requestId": id, "conversationId": conversation, "messages": messages, "hasMore": more})
++}
++
+ type conversationRequest struct {
+ 	SyncVersion    string `json:"syncVersion"`
+ 	Type           string `json:"type"`
+@@ -80,3 +437,205 @@ func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request
+ 	}
+ 	writeJSON(w, 200, map[string]any{"syncVersion": "1.0", "type": "sync.conversation.page", "requestId": v.RequestID, "conversationId": conversation, "messages": messages, "hasMore": more})
+ }
++
++// Validate within the held transaction: never wait for another pool connection
++// while holding locks/connection needed by other concurrent Sync readers.
++func (s *authService) syncAuthenticate(ctx context.Context, tx pgx.Tx, token string) (claims, error) {
++	c, err := s.codec.Parse(token)
++	if err != nil {
++		return c, err
++	}
++	var sid, typ, status string
++	var epoch int64
++	var expiry time.Time
++	err = tx.QueryRow(ctx, `SELECT session_id, client_type, session_epoch, status, expires_at FROM sessions WHERE user_id=$1 AND client_type=$2`, c.UserID, c.ClientType).Scan(&sid, &typ, &epoch, &status, &expiry)
++	if errors.Is(err, pgx.ErrNoRows) {
++		var actualType string
++		if tx.QueryRow(ctx, `SELECT client_type FROM sessions WHERE user_id=$1 AND session_id=$2`, c.UserID, c.SessionID).Scan(&actualType) == nil && actualType != c.ClientType {
++			return c, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Access token does not match the active client session.")
++		}
++		return c, fail(401, "AUTH_SESSION_REVOKED", "Session has been revoked.")
++	}
++	if err != nil {
++		return c, err
++	}
++	if status != "ACTIVE" || !expiry.After(s.now()) {
++		return c, fail(401, "AUTH_SESSION_REVOKED", "Session has been revoked.")
++	}
++	if epoch != c.SessionEpoch {
++		return c, fail(401, "AUTH_SESSION_EPOCH_STALE", "Access token carries a stale session epoch.")
++	}
++	if sid != c.SessionID || typ != c.ClientType {
++		var actualType string
++		if tx.QueryRow(ctx, `SELECT client_type FROM sessions WHERE user_id=$1 AND session_id=$2`, c.UserID, c.SessionID).Scan(&actualType) == nil && actualType != c.ClientType {
++			return c, fail(401, "AUTH_CLIENT_TYPE_MISMATCH", "Access token does not match the active client session.")
++		}
++		return c, fail(401, "AUTH_TOKEN_INVALID", "Access token and session binding disagree.")
++	}
++	return c, nil
++}
++
++// Only Sync integer fields require unbounded numeric magnitude. Normalize their
++// JSON numeric tokens before buffering: the buffer and coefficient/exponent
++// state stay bounded even for a valid coefficient larger than 64 KiB.
++// Strings and original JSON grammar remain unchanged; strict body validation
++// still follows authentication. No general JSON/value framework is introduced.
++func syncJSON(input io.Reader) ([]byte, error) {
++	reader := bufio.NewReader(input)
++	result := make([]byte, 0, 512)
++	inString, escaped := false, false
++	for {
++		b, err := reader.ReadByte()
++		if err == io.EOF {
++			return result, nil
++		}
++		if err != nil {
++			return nil, err
++		}
++		if inString {
++			result = append(result, b)
++			if escaped {
++				escaped = false
++			} else if b == '\\' {
++				escaped = true
++			} else if b == '"' {
++				inString = false
++			}
++		} else if b == ' ' || b == '\n' || b == '\r' || b == '\t' {
++			// Keep a separator: removing it could legalize malformed "1 2" as 12.
++			if len(result) == 0 || result[len(result)-1] != ' ' {
++				result = append(result, ' ')
++			}
++		} else if b == '-' || (b >= '0' && b <= '9') {
++			if err = reader.UnreadByte(); err != nil {
++				return nil, err
++			}
++			number, err := syncJSONNumber(reader)
++			if err != nil {
++				return nil, err
++			}
++			result = append(result, number...)
++		} else {
++			result = append(result, b)
++			if b == '"' {
++				inString = true
++			}
++		}
++		if len(result) > 65536 {
++			return nil, errors.New("Sync nonnumeric JSON exceeds bounded buffer")
++		}
++	}
++}
++
++func syncJSONNumber(reader *bufio.Reader) (string, error) {
++	bad := errors.New("invalid JSON number")
++	peek := func() byte {
++		b, err := reader.Peek(1)
++		if err != nil {
++			return 0
++		}
++		return b[0]
++	}
++	take := func() byte { b, _ := reader.ReadByte(); return b }
++	digit := func(b byte) bool { return b >= '0' && b <= '9' }
++	negative := false
++	if peek() == '-' {
++		take()
++		negative = true
++	}
++	if !digit(peek()) {
++		return "", bad
++	}
++	prefix := make([]byte, 0, 19)
++	var digits, fraction, trailing int64
++	coefficient := func(b byte, decimal bool) {
++		if decimal {
++			fraction++
++		}
++		if digits == 0 && b == '0' {
++			return
++		}
++		digits++
++		if len(prefix) < 19 {
++			prefix = append(prefix, b)
++		}
++		if b == '0' {
++			trailing++
++		} else {
++			trailing = 0
++		}
++	}
++	first := take()
++	coefficient(first, false)
++	if first == '0' && digit(peek()) {
++		return "", bad
++	}
++	if first != '0' {
++		for digit(peek()) {
++			coefficient(take(), false)
++		}
++	}
++	if peek() == '.' {
++		take()
++		if !digit(peek()) {
++			return "", bad
++		}
++		for digit(peek()) {
++			coefficient(take(), true)
++		}
++	}
++	var exponent int64
++	expNegative := false
++	if peek() == 'e' || peek() == 'E' {
++		take()
++		if peek() == '-' || peek() == '+' {
++			expNegative = take() == '-'
++		}
++		if !digit(peek()) {
++			return "", bad
++		}
++		for digit(peek()) {
++			d := int64(take() - '0')
++			if exponent > (math.MaxInt64-d)/10 {
++				exponent = math.MaxInt64
++			} else {
++				exponent = exponent*10 + d
++			}
++		}
++	}
++	switch peek() {
++	case 0, ',', ']', '}', ' ', '\n', '\r', '\t':
++	default:
++		return "", bad
++	}
++	if digits == 0 {
++		return "0", nil
++	}
++	if negative {
++		return "-1", nil
++	}
++	var remove, add int64
++	if expNegative {
++		if exponent > trailing || fraction > trailing-exponent {
++			return "0.5", nil
++		}
++		remove = fraction + exponent
++	} else if exponent >= fraction {
++		add = exponent - fraction
++	} else {
++		remove = fraction - exponent
++		if remove > trailing {
++			return "0.5", nil
++		}
++	}
++	remaining := digits - remove
++	if remaining > 19 || add > 19 || remaining+add > 19 {
++		return strconv.FormatInt(math.MaxInt64, 10), nil
++	}
++	value := string(prefix[:int(remaining)]) + strings.Repeat("0", int(add))
++	maximum := strconv.FormatInt(math.MaxInt64, 10)
++	if len(value) == 19 && value > maximum {
++		return maximum, nil
++	}
++	return value, nil
++}
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 04292d4..00ee153 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -6,8 +6,8 @@ Current Gate: S2
+ Gate Status: OPEN
+ Current Batch: S2-SYNC-only
+ Current Task: LOOP1-SYNC-GO-001
+-Current Task State: active
+-Execution Status: IMPLEMENTING_GO_SYNC_PREREQUISITE
++Current Task State: review
++Execution Status: WAITING_INDEPENDENT_GO_SYNC_REVIEW
+ 
+ ## Immediately Relevant Completed Work
+ 
+@@ -29,17 +29,24 @@ No Go implementation-consent blocker remains. LOOP1-SYNC-001 remains unique back
+   - Result: Actualmain4d5fe exact applicable administrative CI PASS; independently verified, not Go runtime acceptance.
+   - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
+ 
++- Command: `go test -race -count=1 ./...`
++  - Result: Local PASS enabled migrated PostgreSQL16/NATS, final Core11.217s/tests79.662s; Go build/vet/test PASS.
++  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
++- Command: `python -B tools/verify_sync_runtime.py`
++  - Result: Local PASS actual strict TLS Gateway/Core/PG208metadata/205durableMessages, postterminal206thcommit, >64KiB numericdomain; no hosted acceptance claimed.
++  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
++
+ ## Changed Files or Migrations
+ 
+-New narrow Go runtime task/consent/current activation only. Sole implementation writer will add Core Sync handlers/route registration and necessary tests/real TLS proof. No schema/migration/contract/frozen change authorized.
++Two Core public Sync handlers, bounded exact numeric decoding and account cursors; six auth assembly lines, new real PG tests, bounded strict TLS verifier and two-line existing deploy CI hook. No schema/migration/contract/frozen/producer changes.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-No Go implementation or live Sync result yet. Historical transport failure evidence retained. Windows long-path Git revision:path synchronization verifier failure after successful FF was exposed and corrected by separate object-ID byte verifier; original781status/mode/size/hash unchanged. Research startup/read-only gaps disclosed; trace not claimed complete.
++Go local runtime and final enabled build/vet/test/race PASS; strict TLS real deployment208metadata/205durableMessages plus postterminalcommit and >64KiB numeric proof PASS. Fresh independent Review/hostedCI/integration/main synchronization pending; local evidence is not acceptance. Historical transport and implementation failure evidence retained. Windows long-path Git revision:path synchronization verifier failure after successful FF was exposed and corrected by separate object-ID byte verifier; original781status/mode/size/hash unchanged. Research startup/read-only gaps disclosed; trace not claimed complete.
+ 
+ ## Next Exact Action
+ 
+-Fresh Implementation Agent follows mandatory startup, verifies assigned root, implements and proves Go Sync runtime, commits clean review candidate. Fresh independent Review/exact-head hosted CI/protected integration/actual-main verification and main sync precede runtime acceptance. Then resume Desktop/Mobile SYNC and stop after completion.
++Fresh independent Reviewer examines clean committed Go candidate; exact hosted CI/protectedintegration/actual-main audit and mainsync precede runtime acceptance. Implementation released sole writer after commit. Then reassess and activate Desktop/MobileSYNC, complete and stop.
+ 
+ ## Last Known Good Commit
+ 
+@@ -51,7 +58,7 @@ Fresh Implementation Agent follows mandatory startup, verifies assigned root, im
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Assigned root H:/.codex/worktrees/sync-resume/IM-platform; branch task/LOOP1-SYNC-001. Coordinator /root owns activation metadata until its commit, then sole writer /root/sync_go_implementation. Main H:/IM-platform original781entries retained and recovery/s1-handoff-20261001 preserved.
++Assigned root H:/.codex/worktrees/sync-resume/IM-platform; branch task/LOOP1-SYNC-001. Implementation /root/sync_go_implementation owns all current task changes until clean REVIEW commit, then releases sole writer to Coordinator /root. Main H:/IM-platform original781entries retained and recovery/s1-handoff-20261001 preserved.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/tasks/active/LOOP1-SYNC-GO-001.md b/spec/tasks/active/LOOP1-SYNC-GO-001.md
+deleted file mode 100644
+index 57021ff..0000000
+--- a/spec/tasks/active/LOOP1-SYNC-GO-001.md
++++ /dev/null
+@@ -1,93 +0,0 @@
+----
+-task_id: LOOP1-SYNC-GO-001
+-title: Go Core public Sync runtime prerequisite
+-status: active
+-owner: /root/sync_go_implementation
+-stage: S2
+-gate: S2
+----
+-
+-# Goal
+-
+-Implement the two accepted public HTTPS Sync pull operations in Go Core, backed by real authoritative PostgreSQL reads, so the existing Desktop/Mobile SYNC task can consume an independently accepted runtime input. Human separately consented to the displayed Go proposal on 2026-10-03 with the exact reply "同意". This is a current proven prerequisite, not future-stage task selection. Final batch endpoint remains LOOP1-SYNC-001 complete then stop.
+-
+-# Inputs
+-
+-- spec/architecture/README.md -> baseline.md -> frozen-architecture.md, SHA ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03; canonical sections 2.3,3,6.1,7,10 SRC-01..SRC-07,11.
+-- Approved ADR-0005-client-technology-clarification.md, ADR-0006-client-ui-architecture.md, ADR-0007-client-mvp-task-planning.md, ADR-0008-sync-https-transport.md in spec/architecture/decisions/.
+-- spec/governance/minimality.md, execution-boundaries.md, independent-review.md, technology-selection.md.
+-- spec/domain/messaging.md, sync-plugin.md, auth-user-friend.md; spec/invariants/messaging.md, sync-plugin.md, auth-user-friend.md.
+-- spec/acceptance/s0-sync-plugin.md and s0-auth-user-friend.md; relevant Sync/Auth sections only, not plugin implementation.
+-- contracts/http/sync.openapi.json, auth-user-friend.openapi.json; contracts/websocket/sync-v1.schema.json, envelope.schema.json; contracts/errors/http-errors.schema.json; contracts/database/README.md, migrate.py and migrations/0001_initial.up.sql / 0001_initial.down.sql.
+-- spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md and acceptance/acceptance.md.
+-- spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md.
+-
+-# Technology Authorization
+-
+-Canonical sections 3/7/10 and accepted ADR-0008 authorize existing Go Core + PostgreSQL, existing pgx and existing crypto/token support. Use Go/Python standard libraries and existing approved infrastructure/test dependencies only. No new framework, library, service, DB object, signing key source/config or runtime. Gateway existing /v1/ proxy requires no product change. Core owns auth/session authorization and Sync queries.
+-
+-# Dependencies
+-
+-- LOOP1-SYNC-TRANSPORT-001: done, product b820078/c2ff050 independently accepted; administrative3588/actualmain4d5fe1235e4f01111d78cc67b2880b52cac072f2 independently accepted and preservation-verified synchronized.
+-- LOOP1-SEND-001: independently accepted main a0304fcc7be18b87f5986d014849d6b48b96a071.
+-- Explicit Human implementation consent after prerequisite acceptance/displayed proposal: received. No remaining Go consent hold.
+-
+-# Allowed Paths
+-
+-- backend/go/core/sync.go
+-- backend/go/core/auth.go (only two route registrations; existing Auth semantics unchanged)
+-- backend/go/core/sync_test.go
+-- backend/go/core/sync_http_test.go
+-- backend/go/tests/sync_test.go
+-- backend/go/tests/sync_tls_test.go
+-- tools/verify_sync_runtime.py (bounded real entrypoint acceptance, reusing existing deployment harness where suitable)
+-- .github/workflows/ci.yml (only necessary explicit Sync runtime verification in existing Go/deploy jobs)
+-- spec/tasks/active/LOOP1-SYNC-GO-001.md
+-- spec/tasks/review/LOOP1-SYNC-GO-001.md
+-- spec/tasks/done/LOOP1-SYNC-GO-001.md
+-- spec/tasks/backlog/LOOP1-SYNC-001.md (runtime prerequisite recovery facts only; no activation before accepted runtime)
+-- spec/progress/current.md
+-- spec/progress/evidence/LOOP1-SYNC-GO-001/**
+-- spec/progress/checkpoints/*sync-go*.md
+-
+-Coordinator alone creates this task/current/evidence activation before delegating the sole writer. Every writer verifies exact assigned Git root H:/.codex/worktrees/sync-resume/IM-platform. Preserve H:/IM-platform unknown work. No blanket backend paths; actual producer/auth inspection outside write scope is read-only. No new worktree/clone needed.
+-
+-# Acceptance
+-
+-- Both two canonical HTTPS operations actually work through TLS proxy -> Gateway -> Core; auth derived solely from Bearer and authoritative Session checked per request including after blocking authorization locks.
+-- Exact existing four shapes, UUID correlation/error precedence, strict fields/types, no query parameters, canonical error/status codes, no credentials in logs/errors and no-store. Unexpected infrastructure failure non-2xx, never successful page.
+-- Any positive integer limit accepted exactly and capped min(limit,100) before conversion. Any nonnegative integer afterSeq accepted exactly; above committed head empty terminal. No integer overflow/loss.
+-- User initial0; opaque account-bound stable cursor reusable across same account Sessions, no expiry; invalid/fabricated/foreign/unknown positions rejected400. Four existing metadata kinds only, never Message/session.revoked. Empty retains input cursor; nonempty nextCursor last event token; additional committed eligible item determines hasMore.
+-- Existing producer paths audited for shared user-row serialization before ID allocation; read uses matching locks to ensure stable committed prefix. Real PostgreSQL blocked writers/concurrent commits prove no missed late lower IDs. No producer/schema rewrite.
+-- Current membership authorization each Conversation request; nonexistent/nonmember identical403. Single consistent query returns seq afterSeq+1 gap-free committed Messages plus correct hasMore. Read-only, no Message/Outbox/ACK writes.
+-- Real runtime fixtures for each stream >100 items page until terminal, per-page cap, complete total, dedupe and final position; terminal-after-new-commit subsequent pull observes new write. Replays, huge exact integers, auth/session negative cases, forged/foreign cursor, member isolation and old regressions actually executed.
+-- Fresh independent Review of clean committed candidate including logic/imports/minimality; exact-head applicable hosted CI with actual enabled PG/race/runtime checks, protected integration, independent actual-main audit/CI and preservation-verified H:/IM-platform synchronization. Local/Recorder PASS is not acceptance and runtime task acceptance is not SYNC/S2 PASS.
+-
+-# Forbidden
+-
+-No contracts/frozen/ADR changes, database/schema/migration/producer writes, shared codec/config rewrite, Gateway business, client/UI/Web/plugin product work, new sensitive dependency, ACK/security/compatibility change, key-expiry/retention/reset/future infrastructure. Existing private history endpoint consumers remain unchanged. Genuine architecture conflict stops affected work rather than being legalized by task scope.
+-
+-# Minimality
+-
+-Direct Core handlers and narrow Sync decoding/cursor projection/read queries. Reuse existing token key with domain-separated standard HMAC/base64url cursor; no new cryptographic authority/config. Shared user-row serialization is justified by approved stable committed-prefix requirement and observed BIGSERIAL allocation before commit; verify all producers and live concurrency before claiming safety. Avoid generic protocol/validation/query frameworks. Existing Go tests/harness and existing CI jobs supply acceptance; bounded extra runtime verifier only for real deployed TLS proof missing from existing tests.
+-
+-# Verification
+-
+-Minimum baseline: `tools/verify_frozen_architecture.py` and `ci/check_architecture.py` --scope all --json (Coordinator recorded PASS at accepted4d5fe before task activation).
+-Go checks from backend/go: gofmt, go build ./..., go vet ./..., go test -count=1 ./..., go test -race -count=1 ./... with DB_TEST_ENABLE=1, actual canonical migrated PostgreSQL and NATS_URL for relevant old tests; record environment presence/services, do not count unset-variable skips.
+-Bounded entrypoints: `tools/verify_sync_runtime.py` (if needed) and existing `tools/verify-loop1-ctrl-002.ps1` -Mode Acceptance, clean committed checkout.
+-Frozen verification, architecture --scope all and tests/architecture; existing contracts HTTP/WSS/Sync/plugin checks, Sync binding tests and Auth/social/message/ACK regressions.
+-Existing go hosted job already builds/vets/tests/races with real PostgreSQL16+NATS; deployment acceptance must use existing real Go roles/TLS proxy and strict CA verification. CI hook cannot simulate results or silently skip a necessary case.
+-Applicable exact candidate/actual-main hosted job set independently derived from unchanged classifier, actual selected job/step conclusions inspected.
+-
+-# Evidence
+-
+-Activation baseline: accepted4d5fe1235e4f01111d78cc67b2880b52cac072f2; assigned clean task/LOOP1-SYNC-001. Human consent and administrative closure references in human-consent.md. All new run history under this evidence root or Git-private Recorder root, sealed old evidence immutable.
+-
+-# Handoff
+-
+-Active implementation not yet begun. Coordinator owns task/current/consent activation; sole writer transfers to /root/sync_go_implementation after activation commit. Last known good actual main4d5fe1235e4f01111d78cc67b2880b52cac072f2, no migrations. SYNC remains backlog on actual runtime input; S1 PASS/S2 OPEN. Existing main781unknown entries preserved. Every failure/risk and exact verification/evidence/commit/synchronization fact must be recorded before handoff.
+-
+-# Next Action
+-
+-Fresh Implementation Agent reads mandatory startup and complete inputs, verifies assigned root, registers Human/delegation prompt and starts Recorder, implements/test-proves minimal Go runtime within allowed paths, commits clean review candidate and hands sole writer back. Coordinator delegates a fresh independent Review, repairs through fresh Fix/new Review as necessary, obtains exact hosted acceptance/integration/synchronization, then resumes dependency-satisfied client SYNC and stops after its full acceptance.
+
+# Untracked paths observed; content intentionally not captured
+# ?? backend/go/core/sync_http_test.go
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md
+# ?? spec/tasks/review/LOOP1-SYNC-GO-001.md
+# ?? tools/verify_sync_runtime.py
