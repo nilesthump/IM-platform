@@ -1,0 +1,404 @@
+compatibility	Set up job	﻿2026-10-03T16:24:24.8545455Z Current runner version: '2.337.0'
+compatibility	Set up job	2026-10-03T16:24:24.8565809Z ##[group]Runner Image Provisioner
+compatibility	Set up job	2026-10-03T16:24:24.8566570Z Hosted Compute Agent
+compatibility	Set up job	2026-10-03T16:24:24.8567160Z Version: 20260901.588
+compatibility	Set up job	2026-10-03T16:24:24.8567820Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+compatibility	Set up job	2026-10-03T16:24:24.8568466Z Build Date: 2026-09-01T19:56:44Z
+compatibility	Set up job	2026-10-03T16:24:24.8569042Z Worker ID: {218a5066-126e-45f8-b71e-0c4089c37fb3}
+compatibility	Set up job	2026-10-03T16:24:24.8569661Z Azure Region: westus3
+compatibility	Set up job	2026-10-03T16:24:24.8570183Z ##[endgroup]
+compatibility	Set up job	2026-10-03T16:24:24.8571325Z ##[group]Operating System
+compatibility	Set up job	2026-10-03T16:24:24.8571834Z Ubuntu
+compatibility	Set up job	2026-10-03T16:24:24.8572343Z 24.04.5
+compatibility	Set up job	2026-10-03T16:24:24.8572847Z LTS
+compatibility	Set up job	2026-10-03T16:24:24.8573320Z ##[endgroup]
+compatibility	Set up job	2026-10-03T16:24:24.8573790Z ##[group]Runner Image
+compatibility	Set up job	2026-10-03T16:24:24.8574271Z Image: ubuntu-24.04
+compatibility	Set up job	2026-10-03T16:24:24.8574800Z Version: 20260927.320.1
+compatibility	Set up job	2026-10-03T16:24:24.8575695Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+compatibility	Set up job	2026-10-03T16:24:24.8577115Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+compatibility	Set up job	2026-10-03T16:24:24.8578199Z ##[endgroup]
+compatibility	Set up job	2026-10-03T16:24:24.8579216Z ##[group]GITHUB_TOKEN Permissions
+compatibility	Set up job	2026-10-03T16:24:24.8580667Z Contents: read
+compatibility	Set up job	2026-10-03T16:24:24.8581261Z Metadata: read
+compatibility	Set up job	2026-10-03T16:24:24.8581729Z ##[endgroup]
+compatibility	Set up job	2026-10-03T16:24:24.8583415Z Secret source: Actions
+compatibility	Set up job	2026-10-03T16:24:24.8584261Z Cache mode: write
+compatibility	Set up job	2026-10-03T16:24:24.8584846Z Prepare workflow directory
+compatibility	Set up job	2026-10-03T16:24:24.8964095Z Prepare all required actions
+compatibility	Set up job	2026-10-03T16:24:24.9001907Z Getting action download info
+compatibility	Set up job	2026-10-03T16:24:25.4753368Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+compatibility	Set up job	2026-10-03T16:24:26.0307372Z Complete job name: compatibility
+compatibility	Initialize containers	﻿2026-10-03T16:24:26.0753658Z ##[group]Checking docker version
+compatibility	Initialize containers	2026-10-03T16:24:26.0764672Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+compatibility	Initialize containers	2026-10-03T16:24:26.1336176Z '1.48'
+compatibility	Initialize containers	2026-10-03T16:24:26.1345404Z Docker daemon API version: '1.48'
+compatibility	Initialize containers	2026-10-03T16:24:26.1346693Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+compatibility	Initialize containers	2026-10-03T16:24:26.1479813Z '1.48'
+compatibility	Initialize containers	2026-10-03T16:24:26.1491271Z Docker client API version: '1.48'
+compatibility	Initialize containers	2026-10-03T16:24:26.1496165Z ##[endgroup]
+compatibility	Initialize containers	2026-10-03T16:24:26.1498960Z ##[group]Clean up resources from previous jobs
+compatibility	Initialize containers	2026-10-03T16:24:26.1504162Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=24f69c"
+compatibility	Initialize containers	2026-10-03T16:24:26.1622089Z ##[command]/usr/bin/docker network prune --force --filter "label=24f69c"
+compatibility	Initialize containers	2026-10-03T16:24:26.1731641Z ##[endgroup]
+compatibility	Initialize containers	2026-10-03T16:24:26.1732480Z ##[group]Create local container network
+compatibility	Initialize containers	2026-10-03T16:24:26.1741547Z ##[command]/usr/bin/docker network create --label 24f69c github_network_f2083e1e391c44839defc836b8c1d0f5
+compatibility	Initialize containers	2026-10-03T16:24:26.2260446Z 0224d055cee1788c81cc32fb44d91774b671a5b968c203b71967ae50985781e8
+compatibility	Initialize containers	2026-10-03T16:24:26.2279443Z ##[endgroup]
+compatibility	Initialize containers	2026-10-03T16:24:26.2301193Z ##[group]Starting postgres service container
+compatibility	Initialize containers	2026-10-03T16:24:26.2319823Z ##[command]/usr/bin/docker pull postgres:16
+compatibility	Initialize containers	2026-10-03T16:24:27.0861279Z 16: Pulling from library/postgres
+compatibility	Initialize containers	2026-10-03T16:24:27.4241353Z 6b37362b3da7: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4242042Z b1fdda8975a0: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4242676Z 106e7e3cf19a: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4243142Z ba0e979d0818: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4243557Z ad29720ebbb9: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4243965Z 3a749597affc: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4244359Z 483fb6941c15: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4244786Z 359ae0fc975d: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4245199Z 56d4d190ef07: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4245641Z 74156cf9f063: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4246041Z f7c7d4dd80ba: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4246433Z 749acf6dc637: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4246846Z 4d848243a73e: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4247122Z 6ad4758748c1: Pulling fs layer
+compatibility	Initialize containers	2026-10-03T16:24:27.4247584Z 56d4d190ef07: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4248120Z ba0e979d0818: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4248363Z 74156cf9f063: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4248611Z f7c7d4dd80ba: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4248848Z ad29720ebbb9: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4249084Z 483fb6941c15: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4249344Z 3a749597affc: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4249587Z 359ae0fc975d: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4249827Z 749acf6dc637: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.4250126Z 4d848243a73e: Waiting
+compatibility	Initialize containers	2026-10-03T16:24:27.6121519Z b1fdda8975a0: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:27.6122030Z b1fdda8975a0: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:27.6356122Z 106e7e3cf19a: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:27.6357194Z 106e7e3cf19a: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:27.6969662Z 6b37362b3da7: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:27.6970579Z 6b37362b3da7: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:27.7965037Z ba0e979d0818: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:27.7967625Z ba0e979d0818: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:27.8318733Z ad29720ebbb9: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:27.8733909Z 3a749597affc: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:27.8734926Z 3a749597affc: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:27.9730841Z 483fb6941c15: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.0006493Z 359ae0fc975d: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.1487132Z 74156cf9f063: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:28.1492713Z 74156cf9f063: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.1719345Z f7c7d4dd80ba: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:28.1720269Z f7c7d4dd80ba: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.3270938Z 749acf6dc637: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:28.3271913Z 749acf6dc637: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.3565207Z 4d848243a73e: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:28.3565976Z 4d848243a73e: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.3637811Z 56d4d190ef07: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:28.3638336Z 56d4d190ef07: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.5086393Z 6ad4758748c1: Verifying Checksum
+compatibility	Initialize containers	2026-10-03T16:24:28.5086954Z 6ad4758748c1: Download complete
+compatibility	Initialize containers	2026-10-03T16:24:28.6621669Z 6b37362b3da7: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:36.0842326Z b1fdda8975a0: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:36.4584374Z 106e7e3cf19a: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:36.7213766Z ba0e979d0818: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:37.3516522Z ad29720ebbb9: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:37.4319853Z 3a749597affc: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:37.4389577Z 483fb6941c15: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:37.4508437Z 359ae0fc975d: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:41.0146816Z 56d4d190ef07: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:41.0236913Z 74156cf9f063: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:41.0358082Z f7c7d4dd80ba: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:41.0448555Z 749acf6dc637: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:41.0510899Z 4d848243a73e: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:41.0886797Z 6ad4758748c1: Pull complete
+compatibility	Initialize containers	2026-10-03T16:24:41.0921156Z Digest: sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+compatibility	Initialize containers	2026-10-03T16:24:41.0932204Z Status: Downloaded newer image for postgres:16
+compatibility	Initialize containers	2026-10-03T16:24:41.0941474Z docker.io/library/postgres:16
+compatibility	Initialize containers	2026-10-03T16:24:41.1001112Z ##[command]/usr/bin/docker create --name 7f31c54638b9453682f177cdafce11b2_postgres16_5d6ddb --label 24f69c --network github_network_f2083e1e391c44839defc836b8c1d0f5 --network-alias postgres -p 5432:5432 --health-cmd "pg_isready -U postgres -d im_ci" --health-interval 10s --health-timeout 5s --health-retries 5 -e "POSTGRES_PASSWORD=ci-only-password" -e "POSTGRES_DB=im_ci" -e GITHUB_ACTIONS=true -e CI=true postgres:16
+compatibility	Initialize containers	2026-10-03T16:24:41.1193426Z 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:41.1211485Z ##[command]/usr/bin/docker start 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:41.5244554Z 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:41.5279626Z ##[command]/usr/bin/docker ps --all --filter id=4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+compatibility	Initialize containers	2026-10-03T16:24:41.5382664Z 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5 Up Less than a second (health: starting)
+compatibility	Initialize containers	2026-10-03T16:24:41.5410733Z ##[command]/usr/bin/docker port 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:41.5525028Z 5432/tcp -> 0.0.0.0:5432
+compatibility	Initialize containers	2026-10-03T16:24:41.5528075Z 5432/tcp -> [::]:5432
+compatibility	Initialize containers	2026-10-03T16:24:41.5587576Z ##[endgroup]
+compatibility	Initialize containers	2026-10-03T16:24:41.5596136Z ##[group]Waiting for all services to be ready
+compatibility	Initialize containers	2026-10-03T16:24:41.5610196Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:41.5745051Z starting
+compatibility	Initialize containers	2026-10-03T16:24:41.5763317Z postgres service is starting, waiting 2 seconds before checking again.
+compatibility	Initialize containers	2026-10-03T16:24:43.5765261Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:43.5867848Z starting
+compatibility	Initialize containers	2026-10-03T16:24:43.5877770Z postgres service is starting, waiting 4 seconds before checking again.
+compatibility	Initialize containers	2026-10-03T16:24:47.9006658Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:47.9112320Z starting
+compatibility	Initialize containers	2026-10-03T16:24:47.9121906Z postgres service is starting, waiting 7 seconds before checking again.
+compatibility	Initialize containers	2026-10-03T16:24:55.7741073Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Initialize containers	2026-10-03T16:24:55.7846402Z healthy
+compatibility	Initialize containers	2026-10-03T16:24:55.7859237Z postgres service is healthy.
+compatibility	Initialize containers	2026-10-03T16:24:55.7859837Z ##[endgroup]
+compatibility	Run actions/checkout@v4	﻿2026-10-03T16:24:55.8078970Z ##[group]Run actions/checkout@v4
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8079371Z with:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8079573Z   repository: nilesthump/IM-platform
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8081578Z   token: ***
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8081764Z   ssh-strict: true
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8081940Z   ssh-user: git
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8082140Z   persist-credentials: true
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8082338Z   clean: true
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8082520Z   sparse-checkout-cone-mode: true
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8082735Z   fetch-depth: 1
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8082914Z   fetch-tags: false
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8083095Z   show-progress: true
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8083285Z   lfs: false
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8083444Z   submodules: false
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8083619Z   set-safe-directory: true
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8083827Z   allow-unsafe-pr-checkout: false
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8084150Z env:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8084311Z   PGHOST: localhost
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8084480Z   PGPORT: 5432
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8084645Z   PGUSER: postgres
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8084828Z   PGPASSWORD: ci-only-password
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8085070Z   PGDATABASE: im_ci
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8085249Z   PYTHONDONTWRITEBYTECODE: 1
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8085444Z   DB_TEST_ENABLE: 1
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8085608Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8859168Z Syncing repository: nilesthump/IM-platform
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8860615Z ##[group]Getting Git version info
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8860956Z Working directory is '/home/runner/work/IM-platform/IM-platform'
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.8861423Z [command]/usr/bin/git version
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9423681Z git version 2.55.0
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9514614Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9539504Z Temporarily overriding HOME='/home/runner/work/_temp/912b626f-fcbf-4bac-bd9e-a53a81be2937' before making global git config changes
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9540678Z Adding repository directory to the temporary git global config as a safe directory
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9541768Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/IM-platform/IM-platform
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9542963Z Deleting the contents of '/home/runner/work/IM-platform/IM-platform'
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9543615Z ##[group]Initializing the repository
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:55.9544103Z [command]/usr/bin/git init /home/runner/work/IM-platform/IM-platform
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1607258Z hint: Using 'master' as the name for the initial branch. This default branch name
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1608365Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1609064Z hint: to use in all of your new repositories, which will suppress this warning,
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1609554Z hint: call:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1609802Z hint:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1610136Z hint: 	git config --global init.defaultBranch <name>
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1610535Z hint:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1610911Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1611518Z hint: 'development'. The just-created branch can be renamed via this command:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1611982Z hint:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1612218Z hint: 	git branch -m <name>
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1612522Z hint:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1612943Z hint: Disable this message with "git config set advice.defaultBranchName false"
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1613611Z Initialized empty Git repository in /home/runner/work/IM-platform/IM-platform/.git/
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1619688Z [command]/usr/bin/git remote add origin https://github.com/nilesthump/IM-platform
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1662794Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1663206Z ##[group]Disabling automatic garbage collection
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1665824Z [command]/usr/bin/git config --local gc.auto 0
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1693366Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1693806Z ##[group]Setting up auth
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1698799Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.1726519Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.3953075Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.3984390Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.4173975Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.4204253Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.4393607Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.5929924Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.5930338Z ##[group]Fetching the repository
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:56.5941751Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2351a2931f10dc423cf215fbad3a4e1f0b142495:refs/remotes/origin/main
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5373688Z From https://github.com/nilesthump/IM-platform
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5374143Z  * [new ref]         2351a2931f10dc423cf215fbad3a4e1f0b142495 -> origin/main
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5377721Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5378398Z ##[group]Determining the checkout info
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5388702Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5389044Z [command]/usr/bin/git sparse-checkout disable
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5431330Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5465961Z ##[group]Checking out the ref
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:58.5469373Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:59.0271348Z Switched to a new branch 'main'
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:59.0273787Z branch 'main' set up to track 'origin/main'.
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:59.0298311Z ##[endgroup]
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:59.0339204Z [command]/usr/bin/git log -1 --format=%H
+compatibility	Run actions/checkout@v4	2026-10-03T16:24:59.0362969Z 2351a2931f10dc423cf215fbad3a4e1f0b142495
+compatibility	Install PostgreSQL client	﻿2026-10-03T16:24:59.0533946Z ##[group]Run sudo apt-get update -qq
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0534268Z ^[[36;1msudo apt-get update -qq^[[0m
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0534565Z ^[[36;1msudo apt-get install -y postgresql-client^[[0m
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0706178Z shell: /usr/bin/bash -e {0}
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0706596Z env:
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0706776Z   PGHOST: localhost
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0706962Z   PGPORT: 5432
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0707132Z   PGUSER: postgres
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0707332Z   PGPASSWORD: ci-only-password
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0707750Z   PGDATABASE: im_ci
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0707935Z   PYTHONDONTWRITEBYTECODE: 1
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0708137Z   DB_TEST_ENABLE: 1
+compatibility	Install PostgreSQL client	2026-10-03T16:24:59.0708313Z ##[endgroup]
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.0770491Z Reading package lists...
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.2328236Z Building dependency tree...
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.2334345Z Reading state information...
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.3694661Z The following NEW packages will be installed:
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.3695212Z   postgresql-client
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.3838222Z 0 upgraded, 1 newly installed, 0 to remove and 25 not upgraded.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.3838827Z Need to get 11.6 kB of archives.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.3839258Z After this operation, 17.4 kB of additional disk space will be used.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.3839670Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.4657074Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-client all 16+257build1.1 [11.6 kB]
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.6987109Z Fetched 11.6 kB in 0s (128 kB/s)
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8319871Z Selecting previously unselected package postgresql-client.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8510203Z (Reading database ... 
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8510568Z (Reading database ... 5%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8510788Z (Reading database ... 10%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8511099Z (Reading database ... 15%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8511294Z (Reading database ... 20%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8511866Z (Reading database ... 25%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8512053Z (Reading database ... 30%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8512261Z (Reading database ... 35%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8512531Z (Reading database ... 40%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8512719Z (Reading database ... 45%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8512909Z (Reading database ... 50%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:08.8551175Z (Reading database ... 55%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:09.1352521Z (Reading database ... 60%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:09.3796837Z (Reading database ... 65%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:09.6767356Z (Reading database ... 70%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:09.9288206Z (Reading database ... 75%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.1142809Z (Reading database ... 80%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.2251489Z (Reading database ... 85%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.4419356Z (Reading database ... 90%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.5930158Z (Reading database ... 95%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.5930494Z (Reading database ... 100%
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.5930784Z (Reading database ... 202296 files and directories currently installed.)
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.5970217Z Preparing to unpack .../postgresql-client_16+257build1.1_all.deb ...
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.6248575Z Unpacking postgresql-client (16+257build1.1) ...
+compatibility	Install PostgreSQL client	2026-10-03T16:25:10.6989980Z Setting up postgresql-client (16+257build1.1) ...
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3932460Z 
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3933065Z Running kernel seems to be up-to-date.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3933390Z 
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3933515Z No services need to be restarted.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3933746Z 
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3933869Z No containers need to be restarted.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3934075Z 
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3934233Z No user sessions are running outdated binaries.
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3934476Z 
+compatibility	Install PostgreSQL client	2026-10-03T16:25:11.3934697Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+compatibility	Shared fixture compatibility and migration	﻿2026-10-03T16:25:12.2338050Z ##[group]Run python3 contracts/websocket/verify.py
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2338424Z ^[[36;1mpython3 contracts/websocket/verify.py^[[0m
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2338697Z ^[[36;1mpython3 contracts/plugin-api/verify.py^[[0m
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2339007Z ^[[36;1mpython3 -m unittest discover -s tests/database -v^[[0m
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2394180Z shell: /usr/bin/bash -e {0}
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2394403Z env:
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2394573Z   PGHOST: localhost
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2394767Z   PGPORT: 5432
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2394939Z   PGUSER: postgres
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2395126Z   PGPASSWORD: ci-only-password
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2395333Z   PGDATABASE: im_ci
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2395681Z   PYTHONDONTWRITEBYTECODE: 1
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2395879Z   DB_TEST_ENABLE: 1
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2396050Z ##[endgroup]
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.2951952Z PASS WSS v1: 8 positive, 10 negative shared Go/Java scenarios; 18 schema and 26 behavior mutations rejected
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:12.3362634Z PASS: Sync/Plugin v1 schemas, 79 distinct Go/Java outcome artifacts (22 positive, 57 negative), SP-A-001..013, 16 mutation controls
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5185975Z test_forward_uniqueness_and_rollback (test_migrations.PostgreSQLMigrationTests.test_forward_uniqueness_and_rollback) ... ok
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5918502Z test_down_requires_explicit_data_loss_acknowledgement (test_migrations.StaticSchemaTests.test_down_requires_explicit_data_loss_acknowledgement) ... ok
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5923254Z test_single_ordered_reversible_migration_and_runner (test_migrations.StaticSchemaTests.test_single_ordered_reversible_migration_and_runner) ... ok
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5923966Z 
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5924169Z ----------------------------------------------------------------------
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5924620Z Ran 3 tests in 1.213s
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5924796Z 
+compatibility	Shared fixture compatibility and migration	2026-10-03T16:25:13.5924892Z OK
+compatibility	Current client source and remaining Web skeleton boundary	﻿2026-10-03T16:25:13.6031041Z ##[group]Run python3 ci/check_s0_boundary.py web
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6031543Z ^[[36;1mpython3 ci/check_s0_boundary.py web^[[0m
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6032026Z ^[[36;1mpython3 ci/check_architecture.py --scope clients --json^[[0m
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6087627Z shell: /usr/bin/bash -e {0}
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6087848Z env:
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6088020Z   PGHOST: localhost
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6088204Z   PGPORT: 5432
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6088379Z   PGUSER: postgres
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6088564Z   PGPASSWORD: ci-only-password
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6088776Z   PGDATABASE: im_ci
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6088958Z   PYTHONDONTWRITEBYTECODE: 1
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6089160Z   DB_TEST_ENABLE: 1
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.6089329Z ##[endgroup]
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.8446350Z {
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.8446649Z   "result": "PASS",
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.8446859Z   "scope": "clients",
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.8447077Z   "violations": [],
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.8447253Z   "graphs": {}
+compatibility	Current client source and remaining Web skeleton boundary	2026-10-03T16:25:13.8447555Z }
+compatibility	Post Run actions/checkout@v4	﻿2026-10-03T16:25:13.8603046Z Post job cleanup.
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9277758Z [command]/usr/bin/git version
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9313765Z git version 2.55.0
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9342180Z Temporarily overriding HOME='/home/runner/work/_temp/3752af0f-16ad-4d15-bf56-3e26e3149e2d' before making global git config changes
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9343241Z Adding repository directory to the temporary git global config as a safe directory
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9345762Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/IM-platform/IM-platform
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9379425Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9407930Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9632215Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9658075Z http.https://github.com/.extraheader
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9663747Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9700286Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9930267Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+compatibility	Post Run actions/checkout@v4	2026-10-03T16:25:13.9965019Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+compatibility	Stop containers	﻿2026-10-03T16:25:14.0287007Z Print service container logs: 7f31c54638b9453682f177cdafce11b2_postgres16_5d6ddb
+compatibility	Stop containers	2026-10-03T16:25:14.0291213Z ##[command]/usr/bin/docker logs --details 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Stop containers	2026-10-03T16:25:14.0398628Z  The files belonging to this database system will be owned by user "postgres".
+compatibility	Stop containers	2026-10-03T16:25:14.0400307Z  initdb: warning: enabling "trust" authentication for local connections
+compatibility	Stop containers	2026-10-03T16:25:14.0400990Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+compatibility	Stop containers	2026-10-03T16:25:14.0401751Z  2026-10-03 16:24:42.738 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+compatibility	Stop containers	2026-10-03T16:25:14.0402333Z  2026-10-03 16:24:42.739 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+compatibility	Stop containers	2026-10-03T16:25:14.0402699Z  2026-10-03 16:24:42.739 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+compatibility	Stop containers	2026-10-03T16:25:14.0403161Z  2026-10-03 16:24:42.739 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+compatibility	Stop containers	2026-10-03T16:25:14.0403611Z  2026-10-03 16:24:42.742 UTC [66] LOG:  database system was shut down at 2026-10-03 16:24:42 UTC
+compatibility	Stop containers	2026-10-03T16:25:14.0404022Z  2026-10-03 16:24:42.745 UTC [1] LOG:  database system is ready to accept connections
+compatibility	Stop containers	2026-10-03T16:25:14.0404348Z  This user must also own the server process.
+compatibility	Stop containers	2026-10-03T16:25:14.0404569Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0404796Z  The database cluster will be initialized with locale "en_US.utf8".
+compatibility	Stop containers	2026-10-03T16:25:14.0405144Z  The default database encoding has accordingly been set to "UTF8".
+compatibility	Stop containers	2026-10-03T16:25:14.0405477Z  The default text search configuration will be set to "english".
+compatibility	Stop containers	2026-10-03T16:25:14.0405737Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0405906Z  Data page checksums are disabled.
+compatibility	Stop containers	2026-10-03T16:25:14.0406119Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0406358Z  fixing permissions on existing directory /var/lib/postgresql/data ... ok
+compatibility	Stop containers	2026-10-03T16:25:14.0406664Z  creating subdirectories ... ok
+compatibility	Stop containers	2026-10-03T16:25:14.0406918Z  selecting dynamic shared memory implementation ... posix
+compatibility	Stop containers	2026-10-03T16:25:14.0407200Z  selecting default max_connections ... 100
+compatibility	Stop containers	2026-10-03T16:25:14.0407597Z  selecting default shared_buffers ... 128MB
+compatibility	Stop containers	2026-10-03T16:25:14.0407972Z  selecting default time zone ... Etc/UTC
+compatibility	Stop containers	2026-10-03T16:25:14.0408316Z  creating configuration files ... ok
+compatibility	Stop containers	2026-10-03T16:25:14.0408652Z  running bootstrap script ... ok
+compatibility	Stop containers	2026-10-03T16:25:14.0408896Z  performing post-bootstrap initialization ... ok
+compatibility	Stop containers	2026-10-03T16:25:14.0409146Z  syncing data to disk ... ok
+compatibility	Stop containers	2026-10-03T16:25:14.0409340Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0409491Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0409676Z  Success. You can now start the database server using:
+compatibility	Stop containers	2026-10-03T16:25:14.0409921Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0410121Z      pg_ctl -D /var/lib/postgresql/data -l logfile start
+compatibility	Stop containers	2026-10-03T16:25:14.0426562Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0427241Z  waiting for server to start....2026-10-03 16:24:42.326 UTC [50] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+compatibility	Stop containers	2026-10-03T16:25:14.0428394Z  2026-10-03 16:24:42.327 UTC [50] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+compatibility	Stop containers	2026-10-03T16:25:14.0428855Z  2026-10-03 16:24:42.329 UTC [53] LOG:  database system was shut down at 2026-10-03 16:24:41 UTC
+compatibility	Stop containers	2026-10-03T16:25:14.0429253Z  2026-10-03 16:24:42.332 UTC [50] LOG:  database system is ready to accept connections
+compatibility	Stop containers	2026-10-03T16:25:14.0429555Z   done
+compatibility	Stop containers	2026-10-03T16:25:14.0429716Z  server started
+compatibility	Stop containers	2026-10-03T16:25:14.0429886Z  CREATE DATABASE
+compatibility	Stop containers	2026-10-03T16:25:14.0430054Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0430204Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0430463Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+compatibility	Stop containers	2026-10-03T16:25:14.0430768Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0431065Z  waiting for server to shut down...2026-10-03 16:24:42.505 UTC [50] LOG:  received fast shutdown request
+compatibility	Stop containers	2026-10-03T16:25:14.0431468Z  .2026-10-03 16:24:42.506 UTC [50] LOG:  aborting any active transactions
+compatibility	Stop containers	2026-10-03T16:25:14.0432135Z  2026-10-03 16:24:42.508 UTC [50] LOG:  background worker "logical replication launcher" (PID 56) exited with exit code 1
+compatibility	Stop containers	2026-10-03T16:25:14.0432658Z  2026-10-03 16:24:42.508 UTC [51] LOG:  shutting down
+compatibility	Stop containers	2026-10-03T16:25:14.0432974Z  2026-10-03 16:24:42.508 UTC [51] LOG:  checkpoint starting: shutdown immediate
+compatibility	Stop containers	2026-10-03T16:25:14.0433808Z  2026-10-03 16:24:42.623 UTC [51] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.077 s, sync=0.037 s, total=0.115 s; sync files=301, longest=0.035 s, average=0.001 s; distance=4273 kB, estimate=4273 kB; lsn=0/191F0E8, redo lsn=0/191F0E8
+compatibility	Stop containers	2026-10-03T16:25:14.0434595Z  2026-10-03 16:24:42.629 UTC [50] LOG:  database system is shut down
+compatibility	Stop containers	2026-10-03T16:25:14.0434865Z   done
+compatibility	Stop containers	2026-10-03T16:25:14.0435044Z  server stopped
+compatibility	Stop containers	2026-10-03T16:25:14.0435270Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0435473Z  PostgreSQL init process complete; ready for start up.
+compatibility	Stop containers	2026-10-03T16:25:14.0435722Z  
+compatibility	Stop containers	2026-10-03T16:25:14.0440455Z Stop and remove container: 7f31c54638b9453682f177cdafce11b2_postgres16_5d6ddb
+compatibility	Stop containers	2026-10-03T16:25:14.0443997Z ##[command]/usr/bin/docker rm --force 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Stop containers	2026-10-03T16:25:16.4549001Z 4a041423576f5af1cee74031a984d098bea44123ad2627bea34a25f5da5cf4f5
+compatibility	Stop containers	2026-10-03T16:25:16.4573658Z Remove container network: github_network_f2083e1e391c44839defc836b8c1d0f5
+compatibility	Stop containers	2026-10-03T16:25:16.4576946Z ##[command]/usr/bin/docker network rm github_network_f2083e1e391c44839defc836b8c1d0f5
+compatibility	Stop containers	2026-10-03T16:25:16.6399544Z github_network_f2083e1e391c44839defc836b8c1d0f5
+compatibility	Complete job	﻿2026-10-03T16:25:16.6460578Z Cleaning up orphan processes
+compatibility	Complete job	2026-10-03T16:25:16.6738236Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

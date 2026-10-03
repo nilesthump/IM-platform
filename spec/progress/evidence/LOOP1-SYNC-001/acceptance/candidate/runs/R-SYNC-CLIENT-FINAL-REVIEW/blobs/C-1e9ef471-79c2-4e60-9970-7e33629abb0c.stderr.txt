@@ -1,0 +1,11 @@
+fatal: failed to stat '8bcc7321bba05a70404d1e16bbd2fa0465da696f:spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-00dd4347-d1d8-4887-9ba8-230f6613b86a.stderr.txt': Filename too long
+Traceback (most recent call last):
+  File "H:\IM-platform\.git\worktrees\IM-platform5\sync-client-final-review\archive.py", line 9, in <module>
+    blob=subprocess.check_output(['git','show',head+':'+p]);assert len(blob)==f['size'] and hashlib.sha256(blob).hexdigest()==f['sha256'],p
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '8bcc7321bba05a70404d1e16bbd2fa0465da696f:spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-00dd4347-d1d8-4887-9ba8-230f6613b86a.stderr.txt']' returned non-zero exit status 128.

@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-SYNC-001
 title: Desktop/Mobile two-level sync orchestration
-status: review
-owner: /root/sync_client_fix
+status: done
+owner: /root/sync_client_closure_writer
 stage: S2
 gate: S2
 ---
@@ -94,7 +94,7 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 
 # Next Action
 
-Fresh independent Review of clean committed client implementation; then applicable exact-head hosted CI, protected integration/actual-main audit and safe main sync. Stop after SYNC complete; GUI/Web not selected.
+Product accepted and synchronized2351a293; fresh administrative Review/exact-head CI/protected integration/actual-main audit/main synchronization then STOP_AT_AUTHORIZED_SYNC_ENDPOINT. GUI/Web and next Task not selected.
 
 # Authorized SYNC recovery and authority blocker (2026-10-03)
 
@@ -156,3 +156,11 @@ Candidate ccd780bd independently FAIL: Sync kind/code and legacy WSS error.code/
 # Fresh Fix local verification handoff
 
 Five strictly typed enum guards and174 malformed-value/29 legal-value controls repair both reproduced P2. Red original actual compiled run failed; repaired shared Sync, old SEND golden/numbers/bound and Desktop TS compile PASS. Architecture53 controls initially generated-only FAIL, own4dirs368files preserved byte-exact privately, rerunPASS. Legacy Windows PowerShell Get-FileHash unavailable corrected to bundled7; original failures retained. Final frozen/source/recovery/clean committed Acceptance recorded in client-fix/local-verification.md and own sealed Recorder/observer handoff. Review queue/status unique; fresh Fix cannot accept its own work. NEW independent Review full base0fe4fccc..newcandidate + exact-head CI then protected integration/actual-main audit/main sync required. Main untouched/unknown781 preserved; no GUI/Web. Writer releases after clean committed handoff identity in private final-handoff.json.
+
+# Accepted product / administrative closure (2026-10-04)
+
+Status done refers to independently accepted/synchronized product, not self-acceptance of this administrative record. Earlier blocked/active/review/pending statements historical. NEW independent /root/sync_client_final_review accepts full repaired candidate8bcc7321bba05a70404d1e16bbd2fa0465da696f; same-role NEWactual-main audit fresh_context=false accepts protected PR22 main2351a2931f10dc423cf215fbad3a4e1f0b142495, exact parents/fulltree1e40eb8a9a28ec4ba0524c825e7d4a1b186a238b equalcandidate. PR37135499332/actual37136692034 each13jobs109stepsSUCCESS; push37135496287 has12executed94steps/deploy correctinactive. Safe main356noRenamepaths exactbytes/original781status-mode-size-SHA/recoverybranch preserved.
+
+Durable spec/progress/evidence/LOOP1-SYNC-001/acceptance/acceptance.md includes originals64+35event sealedreviewstreams/reports/providers/selectors/all logs/archive-manifest/mainreceipt. ActualDesktopSQLx+controlledHTTPS/WSS and realGoTLS/PG208metadata205messages plus206th; Mobile actualAPI34native62Sync controls controlledcanonicalHTTPS/WSS, noMobile-to-Go claim. Allsource53/frozen/cleanAcceptancePASS. OldenumFAIL/freshFix174malformed29legal/NEWReview and all originalfailure/tracegaps unchanged. No schema/native/backend/contracts/dependency/GUI/Web changes. S1PASS/S2OPEN/ADR0004deferred.
+
+Execution WAITING_SYNC_ADMINISTRATIVE_ACCEPTANCE: fresh independent Review/exact-head hosted CI/protected integration/NEWactual-main audit/safe main synchronization for this record, then STOP_AT_AUTHORIZED_SYNC_ENDPOINT; no next Task. Lastknown2351a2931f10dc423cf215fbad3a4e1f0b142495; checkpoint spec/progress/checkpoints/2026-10-04-loop1-sync-001-accepted.md. Sole /root/sync_client_closure_writer owns administrativeallowedpaths only; no mainwrites/unknown781preserved. Own verification/archive/commit identity in finalhandoff; Recorder does not establish acceptance.

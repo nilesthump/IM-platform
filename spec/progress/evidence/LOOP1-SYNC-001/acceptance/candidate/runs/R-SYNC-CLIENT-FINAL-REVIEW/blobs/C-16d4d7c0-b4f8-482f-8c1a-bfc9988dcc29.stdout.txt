@@ -1,0 +1,581 @@
+canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03
+FILE spec/domain/messaging.md 
+ # Messaging Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-002`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| MSG-D-001 | A client request identity MUST be unique within a Conversation and is the identity reused by retry and local convergence. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-D-002 | The server idempotency identity MUST include sender, Conversation, and client request identity; the server message identity MUST be globally unique. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-003 | Conversation sequence numbers MUST be unique and monotonically increasing within each Conversation. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-004 | Message send MUST authorize the sender as a Conversation member before persistence. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-D-005 | Sequence allocation, Message persistence, and the matching Outbox event MUST commit atomically; a successful ACK MUST mean that durable commit has completed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message, Outbox). |
+| MSG-D-006 | Outbox delivery and NATS delivery MAY repeat or be briefly missed; consumers MUST be idempotent and Sync MUST provide eventual completeness. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-D-007 | Gateway MUST fan out only to locally active connections and MUST NOT own friendship, membership, persistence, or plugin business rules. | Architecture Baseline v1.0, chapters 2 (F-05) and 5.2. |
+| MSG-D-008 | A GROUP send MUST create one logical Message and one Outbox event; it MUST NOT create one persistent message record per member. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-D-009 | Loop 1 MUST NOT treat NATS JetStream as the message source of truth. | Architecture Baseline v1.0, chapters 2 (F-03) and 5.2. |
+
+FILE spec/invariants/messaging.md 
+ # Messaging Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| MSG-I-001 | Repeating a send with the same server idempotency identity MUST converge on the same logical Message and MUST NOT allocate another Conversation sequence. | Architecture Baseline v1.0, chapters 4.4 and 5.1. |
+| MSG-I-002 | A successful message ACK MUST NOT be observable before the Message and matching Outbox event are durably committed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-I-003 | Every committed logical Message MUST have exactly one logical Outbox event, even when publication delivery is retried. | Architecture Baseline v1.0, chapters 4 (Figure 4-1), 5.1, and 5.2. |
+| MSG-I-004 | No recipient MUST receive a Message for the wrong Conversation, and no permanent sequence gap may remain after Sync convergence. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-I-005 | Duplicate NATS delivery MUST NOT create a duplicate logical Message or duplicate client materialization. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-I-006 | A send by a non-member MUST be rejected before persistence and before a success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-I-007 | GROUP fan-out MUST remain an online delivery concern and MUST NOT alter the single-Message, single-Outbox persistence outcome. | Architecture Baseline v1.0, chapter 5.3. |
+
+FILE spec/domain/sync-plugin.md 
+ # Sync and Plugin Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-003`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| SP-D-001 | Web MUST remain memory-only and MUST NOT claim offline history; Desktop and Mobile MUST use per-account local materialized views and render local state before background Sync. | Architecture Baseline v1.0, chapters 2 (F-07) and 6.1, and appendix B (Web). |
+| SP-D-002 | A local optimistic send MUST create one client request identity, persist SENDING before transmission, converge to SENT after ACK, and reuse the same request identity when retrying FAILED. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-D-003 | SENT MUST be terminal and MUST NOT regress to FAILED; FAILED means only that the current attempt lacks success confirmation. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-D-004 | User Sync cursor MUST cover only low-frequency user-level state; message state MUST use per-Conversation sequence and contiguous sequence tracking. | Architecture Baseline v1.0, chapters 2 (F-06) and 6.4, and appendix B (Sync). |
+| SP-D-005 | Sync MUST advance a per-Conversation contiguous sequence only across a gap-free prefix; duplicate and out-of-order input MUST converge without skipping a gap. | Architecture Baseline v1.0, chapter 6.4 and appendix B (Sync). |
+| SP-D-006 | All local send, ACK, realtime, and Sync write paths MUST converge through transactional upsert; data and cursor advancement MUST commit together. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-D-007 | Plugin API v1 MUST expose Events, Queries, Actions, and UI Host surfaces, each constrained by declared capability and permission. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-D-008 | Queries MUST be read-only, paginated, and limited; each Action MUST be re-authorized, idempotent, and audited; plugins MUST NOT call Core internals or databases directly. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-D-009 | A custom renderer MUST pass package hash, signature, manifest-schema, API-compatibility, permission, resource-size, CSP, and entry-point checks before loading, and MUST run in the stated UI sandbox. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-D-010 | A plugin artifact identified by plugin and version MUST be immutable; backend and renderer MUST remain version-bound, and history MUST retain the renderer needed by referenced messages plus fallback text. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-D-011 | WASM execution MUST default-deny database, server-file, arbitrary-network, and other-plugin-memory access and MUST enforce CPU/time, memory, concurrency, storage, and network limits. | Architecture Baseline v1.0, chapter 8.3 and appendix B (Plugin). |
+| SP-D-012 | Plugin artifact lifecycle and Conversation-scoped instance lifecycle MUST remain distinct; upgrade MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed, and MUST roll back on failure. | Architecture Baseline v1.0, chapters 9.1 and 9.2. |
+| SP-D-013 | DISABLE MUST preserve data, UNINSTALL MUST default to RETAINED, and PURGE MUST require an explicit irreversible operation with elevated permission, audit, and a confirmed retention policy. | Architecture Baseline v1.0, chapter 9.3. |
+
+FILE spec/invariants/sync-plugin.md 
+ # Sync and Plugin Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| SP-I-001 | Duplicate or out-of-order Sync input MUST be idempotent, and contiguous sequence MUST NOT advance across a missing sequence. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-I-002 | When Sync observes a server Message matching a locally FAILED send identity, it MUST converge that local item to SENT rather than create another item. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-I-003 | Local materialized data and its corresponding cursor or contiguous-sequence advance MUST commit atomically. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-I-004 | User-level cursor input MUST NOT contain Message events. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-I-005 | Plugin capability or permission denial MUST prevent the Event subscription, Query, Action, or UI behavior without granting an alternate direct access path. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-I-006 | Query operations MUST NOT mutate state; each Action MUST be re-authorized at execution, MUST be idempotent, and MUST be auditable. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-I-007 | A changed package, backend, or renderer hash under an existing plugin version MUST be rejected. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-I-008 | WASM and custom-renderer execution MUST remain sandboxed with least privilege and MUST NOT directly reach host-sensitive resources. | Architecture Baseline v1.0, chapters 8.2 and 8.3, and appendix B (Plugin). |
+| SP-I-009 | Upgrade MUST NOT split backend and renderer versions and MUST leave the previous version serviceable until atomic switch; any failed step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-I-010 | DISABLE and UNINSTALL MUST NOT purge retained data; PURGE MUST NOT occur implicitly. | Architecture Baseline v1.0, chapter 9.3. |
+
+FILE spec/architecture/decisions/client-ui/architecture.md 
+ # 客户端 UI 架构
+
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
+
+## 产品与信息架构
+
+产品名为「构界 IM+ / PlugWorldIM」，采用 Adaptive Glass Workspace。视觉重点为未来 AI 通信 50%、生产力工具 30%、开发者扩展性 20%。这些比例表达设计优先级，不承诺功能或容量。
+
+| 一级入口 | 职责 | 边界 |
+| --- | --- | --- |
+| Chat | 会话列表、会话视图、消息 | 好友管理归 Friends |
+| Friends | 用户搜索、好友关系、添加好友 | 好友关系和唯一私聊由服务端权威判定 |
+| AI | 未来入口、插图、施工提示 | 仅占位；不实现 AI 聊天、Agent、RAG、工具调用、API 或虚假数据 |
+| Plugin | 已安装插件、插件状态、插件入口 | 个人能力面板；不是商店或 Marketplace，不实现 S2 安装系统或运行时 |
+
+Application Shell 负责一级导航、账号上下文和入口选择。后续任务授权后，仅客户端自有代码可增加 Settings/Profile 等入口。插件不得增加一级导航，不得控制 Shell、主题品牌或基础 UI 语义。插件的下级入口仍位于宿主控制的 Plugin 页面内，且必须具有可用的已授权能力；能力不存在时，应如实展示不可用状态，不得伪造已安装清单或可执行操作。
+
+## 数据归属与流向
+
+UI 渲染视图状态并发出用户意图。页面状态、hooks 或 ViewModel 将意图转换为既有 Repository/协议操作，并提供加载、空、错误、认证过期、连接和同步状态。Repository 负责物化数据与事务收敛；协议适配器负责规范 HTTP/WSS 的序列化和传输行为。UI 不得直接打开 SQLite、推进游标、伪造 ACK、独立写入消息状态，或判定成员身份与权限。后端职责仍遵循 §3 和 SRC-01 至 SRC-07 的 Core/Gateway/Plugin Host 边界。
+
+Desktop/Mobile 的发送方向为：用户意图 → 已批准的发送编排 → Repository 持久化 SENDING → 传输 → 服务端 durable commit 后的 ACK → Repository UPSERT → UI 观察状态。本任务只规定方向，不实现发送编排。重试复用 request_id；FAILED 只表示该次尝试尚未确认成功；匹配的实时事件或 Sync 可收敛为 SENT；SENT 不得回退。数据和游标更新必须原子提交；用户游标不包含消息；contiguous_seq 不得越过缺口。离线历史来自按账号隔离的本地视图，随后后台 Sync；切换账号必须停止旧账号观察，且不得显示前一账号数据。
+
+Web 仅使用内存 Repository 状态，不建立聊天数据库，不持久化历史，不承诺离线历史或跨页面生命周期的数据保留。离线和错误视图必须表达真实连接状态。本地外观偏好不得包含消息、令牌或业务数据，也不构成聊天持久化授权。
+
+## Web
+
+采用 React + TypeScript，定位为简洁、高效的在线通信。Shell/路由负责入口选择；页面和自定义业务组件负责展示；自定义 hooks/数据层连接 Repository 与协议操作。状态管理采用 useState/useReducer/Context/custom hooks。页面局部状态留在本页面；Context 只承载当前确实需要共享的职责。不得为假设需求增加通用事件总线、store 或 controller 层级。
+
+路由是职责描述，不是对某个第三方路由库的授权。不选择 Zustand/Redux/MobX、数据框架或整套业务 UI 框架。图标、无障碍和工具类基础库仍需遵循依赖治理；类别名称不能批准具体库。
+
+## Desktop
+
+采用 Tauri + React + TypeScript，使用独立 UI，面向舒适、高频的生产力场景。更丰富的布局、交互和原生能力展示由后续限定任务实施。本决策替代原 §6.1「最大程度复用 Web UI」要求。共享协议、模型、Repository 行为、适合跨平台的 hooks、Design Token 和 UI 语义；不得共享 Button、MessageBubble、ChatWindow 等完整 React 视觉组件。不得重复协议/领域逻辑，也不得将 Desktop 原生 hooks 引入 Web。
+
+TypeScript 负责 Repository、模型和事务意图；SQLx Rust 原生适配器仍限于连接、查询和单次原子事务。系统通知、托盘和安全存储须遵循已授权的原生边界及后续任务；本设计不增加库或功能实现。
+
+## Mobile
+
+采用 Android Kotlin + Jetpack Compose。UI 向 ViewModel 发出意图；ViewModel 调用 Repository 并通过 StateFlow 暴露状态；Compose 按生命周期收集该状态。StateFlow 是可观察状态，不是传输或存储层。Repository 委托给 SDK SQLite 和已授权协议适配器。Jetpack Navigation Compose 负责宿主导航。ViewModel/StateFlow/Navigation 是明确的 Human 决策，记录于规范 §6.5 / ADR-0006，而非由 Task Spec 自行选型。
+
+必须在真实 Android Studio 模拟器中验证。Kotlin 模型、Repository、协议和插件适配器依据相同规范契约与 fixtures 实现等价行为；不要求复用 TypeScript SDK、hooks 或组件。不得引入 Room/ORM、任意网络库、JS bridge/runtime/codegen 或共享原生重写。
+
+## 共享 UI 边界
+
+共享设计规范、Token 含义和 UI 行为语义。Web/Desktop 共享 TypeScript protocol-sdk/plugin-sdk/models 和适用 hooks；Mobile 根据同一契约与 fixtures 实现等价 Kotlin 行为。不建立三端视觉组件库。本文件中的 UI contract 指展示义务，不建立新的机器可验证 wire/API/schema 权威；该权威仍唯一归属 contracts/。
+
+## Plugin 与 AI 边界
+
+S2 仅预留宿主控制的 Plugin/AI 入口。不实现 renderer、UI 代码下载或执行、远程组件注入、插件安装、动态加载或运行时。声明式投票描述仅用于说明未来设计，不定义新 schema/API，也不是 S2 实现。S4 保留 §8.2 经审查的 Custom Render Bundle 和声明式 UI，以及包/签名/哈希/schema/兼容性/权限/资源/CSP/入口校验、sandbox iframe/隔离 WebView 和白名单 Bridge。不得放宽令牌、SQLite、宿主敏感资源保护或规范插件 fixtures。AI 在单独明确 API、契约、架构决策并完成验收前始终为占位。
+
+## 后续 GUI 的 API 覆盖
+
+覆盖认证登录、Web/原生 refresh、logout、会话过期处理；当前用户信息；用户搜索和添加好友；会话列表/打开；消息发送/接收/状态；Sync 状态。操作必须从 contracts/http/auth-user-friend.openapi.json 和规范 WSS envelope/sync schema 解析。不得自行发明会话/消息/Sync HTTP 路由；已接受的协议契约决定传输方式与字段结构。本任务不授权修改 OpenAPI 或后端。其他既有操作或未来能力需另行限定任务。Plugin/AI 占位不得暗示缺失的后端能力已经存在。
+
+## 交付边界
+
+本任务不交付页面、组件、UI 交互实现、像素级设计或运行时。后续 GUI 任务必须引用独立验收后的规范架构/ADR 和 spec/acceptance/client-gui.md。架构冻结、GUI Task PASS 与 S2 Gate PASS 是三个不同结果。
+
+FILE spec/architecture/decisions/client-ui/design-direction.md 
+ # 客户端设计方向
+
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
+
+## Adaptive Glass Workspace
+
+「构界 IM+ / PlugWorldIM」结合简洁通信、舒适生产力和模块化扩展。设计重点为未来 AI 通信 50%、生产力工具 30%、开发者扩展性 20%。AI-native 表示视觉方向；S2 的 AI 仅为施工占位。避免信息堆叠、复杂 Dashboard、过度 Cyber/HUD 风格，以及仅为展示技术而增加的视觉元素。
+
+Minimal Glassmorphism 通过半透明表面、细微边框、模糊和层次深度表达清晰层级。玻璃用于表达层级，不用于装饰。不采用重度发光、霓虹、粒子特效或复杂 3D。背景变化时仍须保持可读性；前景对比、焦点/选中/错误提示不能仅依赖透明度或色相。平台性能或可读性不适合模糊/透明时，使用克制的不透明表面保持同一层级；这不授权新的渲染库。
+
+## 主题
+
+| 主题 | 定位 | 色彩方向 |
+| --- | --- | --- |
+| Cold AI | AI / 科技 / 智能 | 冷蓝、紫色渐变、深色玻璃 |
+| Warm Creative | 社交 / 创意 / 人文 | 暖色渐变、柔和玻璃、亲和感 |
+
+两个主题必须保留同一 Logo、品牌元素、布局、交互含义和组件语义。主题切换仅改变 Color Token，包括背景、表面、前景、边框、强调、渐变、选中和状态色；不得改变字体、间距、模糊、导航或行为。本方向不增加额外明暗主题矩阵。两主题中的透明表面层级必须一致。
+
+## Design Token 原则
+
+使用单一职责的语义名称；各端共享含义，采用各端原生表示。Color Token 表达表面/文字/边框/强调/状态；Typography Token 表达字体族/字号/行高；Spacing Token 表达密度/间距。固定字体、间距、颜色值、像素布局、字体资源、尺度及生成/构建工具不属于本次初始方向。后续 GUI 任务在已接受方向内确定具体值，并提供截图证据与 Architect 批准；敏感依赖仍遵循 §2.3。
+
+两个主题预设仅改变颜色。用户外观偏好可在验证支持的范围内独立调整本地 Typography 和 Spacing。重启或切换主题后仍须保持这一分工：主题切换不重置用户字体/密度，用户设置不改变组件含义。不授权云同步、插件样式控制、任意 CSS/脚本注入或下载字体系统。Web 外观偏好必须与仅内存聊天状态分离；具体存储机制需后续限定决策。Desktop/Mobile 偏好不得改变 Repository 消息、schema 或事务语义。
+
+## 配置与交互约束
+
+主题、字体与间距由宿主客户端控制。插件不得修改一级导航、品牌核心或基础 UI 语义。各端采用较大字体/间距后，仍须保证内容可读、输入可用、导航可达，以及空/加载/错误/同步状态含义清晰。适用场景中必须提供键盘焦点和无障碍标签；消息投递状态不得仅靠颜色区分。这些是未来 GUI Review 义务，不是对某个无障碍库或组件库的授权。
+
+## 各端表达
+
+Web 面向紧凑的在线通信。Desktop 面向舒适的反复使用、更丰富的工作区布局和原生能力展示。Mobile 面向触控可读的 Compose 展示，并通过模拟器验证行为。共享设计语义与 Token 含义，不共享完整视觉组件，也不强制像素一致布局。Logo 制作和像素级页面不属于本任务交付物。
+
+FILE spec/acceptance/client-gui.md 
+ # GUI 验收规范
+
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
+
+## 必需验收链
+
+GUI 实现 → 真实运行截图 → Architect Review → 限定范围修复 → 新截图 → Architect Approval → 新的独立候选 Review 与适用的精确 HEAD 托管 CI → 受保护的集成/主仓库验证 → GUI Task PASS。各项审查可共享证据，但不能取消彼此独立的义务。Architect 批准展示效果；独立 Review 审查实现、权威和最小性；CI 判定适用的可执行检查。任何单项都不能建立 S2 Gate PASS。仓库规定的完整验收与集成完成前，不得进入 done。
+
+截图是 Task 验收要求，不是可选设计反馈。每个 GUI Task 必须在实现前声明入口/运行环境矩阵和证据路径。必须捕获真实客户端运行画面，不接受 mockup 或编辑过的图片。记录 Task ID、候选 SHA、源代码/构建来源、平台/运行环境版本、不含秘密的账号/测试 fixture 标识、页面/状态、视口/窗口/设备尺寸、主题和字体/间距设置、精确复现步骤，以及图片文件名/哈希。图片不得包含真实凭据、令牌展示或私人用户数据；使用受控 fixtures。
+
+## 最低覆盖矩阵
+
+| 客户端 | 必需运行证据 |
+| --- | --- |
+| Web | 真实浏览器中的登录、Chat、Friends、AI 占位、Plugin 页面 |
+| Desktop | 真实 Tauri 客户端中的主窗口、Chat、Friends、离线历史、通知/托盘、主题 |
+| Mobile | 真实 Android Studio 模拟器中的登录、Chat、Friends、离线历史、Sync 状态、主题 |
+
+Cold AI 和 Warm Creative 都必须展示一致的布局/语义；布局受影响时，覆盖支持的字体/间距极值。跨端共有入口须展示各端实际宿主布局。Desktop 通知/托盘证据须包含真实原生表面和复现步骤，仅画在应用内不能替代。Mobile 证据须标明模拟器/设备/API；宿主测试或 mock 页面不能替代。
+
+每个范围内页面须覆盖有意义且相关的加载、空、错误和成功状态。认证须覆盖 refresh/logout/session-expired，且不暴露凭据。Chat 须展示真实 SENDING/SENT/FAILED、重试身份和收敛行为，并由可执行协议/存储证据支持；截图本身不能证明 durable ACK、去重或原子性。离线/Sync 须覆盖受控断开/重连；Web 不得宣称持久化或离线历史。主题/偏好须在允许的本地生命周期内保留，不得暗示业务数据持久化。
+
+若某个限定 GUI Task 未实现全部矩阵界面，必须在激活前于 Task Spec 明确该切片和剩余任务。缺失证据不得计作整个客户端验收。Plugin/AI 能力不可用时，截图须如实展示预留入口、占位或不可用状态。不得伪造可工作的控件或 AI/插件数据。
+
+## Architect 决策与修复循环
+
+Architect Review 记录精确候选 SHA、截图清单/哈希、PASS/FAIL 决策、具体逐页面问题、所检查的信息层级/导航/可读性/主题/配置规则，以及审查者身份。FAIL 时保持任务未完成，在 allowed_paths 内修复并重新截图。既有截图与问题记录保持不可变；批准必须标明最新被接受的截图集和构建。后续视觉、状态或代码变更影响已批准证据时，必须重新捕获并再次批准。未受影响的旧图可以附哈希和理由引用，但不得重新标为新截图。
+
+新的独立 Reviewer 检查实际 Repository/协议/状态/原生职责、源码导入、最小性、公共契约和安全边界。所有新增敏感依赖必须可追溯至已接受的规范架构/ADR；截图质量不能使框架或契约变更合法化。适用 CI 必须对应精确被审查候选 SHA 和正确的必需任务；缺失、失败、取消或异常跳过的任务不能建立 PASS。
+
+## 证据与闭环
+
+在 spec/progress/evidence/<GUI_TASK_ID>/ 下保存截图清单、原始图片、Architect 决策、修复迭代、独立 Review 与托管验收。Task handoff 记录命令、退出码/时长、已知失败和最后已知良好 SHA；current.md 只链接简洁恢复状态与最新稳定 checkpoint。视觉证据须绑定到集成后的产品树，声明完成前须记录任务分支/提交/同步结果/主仓库 SHA。不接受 Photoshop 或生成图片作为运行证明，不以截图替代 CI，不因单个 GUI Task 推进 Stage。
+
+## MVP 任务归属（ADR-0007 规划候选）
+
+新增且唯一产品 UI ID 为 LOOP1-CLIENT-GUI-001（Desktop/Mobile）；Web 完整 Loop1 GUI 使用既有 LOOP1-WEB-001。两者均覆盖 Login/session、Chat、Friends、AI Placeholder、Plugin capability/unavailable、Settings/Profile、Cold AI/Warm Creative、本地字体/间距与真实发送/重连状态。Desktop/Mobile 还覆盖 Offline History、Sync，Desktop 真实通知/托盘/快捷键，Mobile Android Studio emulator；Web 无 SQLite/离线历史，不持久化聊天。
+
+S3 PARITY、S4 PLUGIN-UI/FIX、S5 COMPAT/RELEASE、S6 RC 在各自既有 acceptance 承接适用 GUI 要求，规则见 canonical §20；不新增 GUI E2E/parity/plugin/release/soak Task。实质视觉变化须针对最近 Architect-approved set 重新截图批准；容量测试由 load harness 承担，GUI 自动化不进入 5000 WSS 热路径。本段随 ADR-0007 独立接受后生效；既有截图与架构验收要求不降低。
+
+FILE contracts/http/sync.openapi.json 
+ {
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IM Sync HTTPS API",
+    "version": "1.0.0",
+    "description": "Canonical pull transport for existing Sync v1 shapes; HTTPS only. WSS realtime and ACK are unchanged. Both operations accept exactly one required JSON body and no query parameters. Authentication credentials are accepted only through Authorization Bearer, never query/body/cookie; each request validates token and authoritative Session ID, epoch, client type, revocation and expiry. Core derives user identity from credentials. Success and canonical errors echo the decoded valid UUID body requestId; otherwise a fresh server UUID is used, no alternate header correlation. Sync version other than 1.0 returns 426 PROTOCOL_VERSION_UNSUPPORTED; other malformed inputs return 400 VALIDATION_FAILED. Precedence: reject query parameters or uncorrelatable malformed JSON, authenticate, then validate version/body/cursor/membership. All positive integer limit values remain valid; page length <= min(limit,100), calculate cap exactly before bounded conversion. Read at most effectiveLimit+1 eligible items; hasMore is true iff an additional committed eligible item exists, requiring nonempty progress. Empty page is terminal; User nextCursor equals input cursor. Nonempty User nextCursor equals last event cursor, differs from input; events have distinct IDs/cursors in source order and form a stable committed prefix so concurrent late commits cannot be skipped. Initial User cursor is literal 0; subsequent event/next cursors are opaque server-issued tokens bound to the authenticated user, replayable across that user's Sessions. Invalid, fabricated or other-user cursors return 400 VALIDATION_FAILED; clients never parse/order cursors. Conversation messages strictly ascend from afterSeq+1 with no gap, identify the requested Conversation, and the next request uses last returned seq. afterSeq beyond current committed head yields empty terminal page. Valid user cursors remain usable for current Loop 1 (no cursor expiry/retention/reset protocol). Servers may project internal cursor_id to opaque external event.cursor without changing existing wire shapes or persistent producer payloads. Only catalogued canonical errors use ErrorResponse. Unexpected server/unavailable transport failures are non-2xx transport failures without any successful page or cursor advancement; no uncatalogued code/envelope is introduced. Responses contain no credentials and use no-store; retrieval is read-only and retry can observe newly committed data. afterSeq accepts all nonnegative JSON integers exactly, including values beyond storage signed64 range; after authorization, values beyond storage head return empty terminal page without lossy conversion."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.invalid"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/sync/user": {
+      "post": {
+        "operationId": "pullUserSync",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Pull only authenticated user's low-frequency events after an opaque cursor. No Message or Session event. Core validates cursor ownership and durable committed prefix.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../websocket/sync-v1.schema.json#/$defs/UserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Correlated Sync page; never an ACK or write effect",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../websocket/sync-v1.schema.json#/$defs/UserPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or user cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authoritative authentication failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Unsupported syncVersion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sync/conversation": {
+      "post": {
+        "operationId": "pullConversationSync",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Pull committed messages after afterSeq for a currently authorized Conversation member; absent and foreign Conversation both return 403. Each page is ordered and gap-free.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../websocket/sync-v1.schema.json#/$defs/ConversationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Correlated Sync page; never an ACK or write effect",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../websocket/sync-v1.schema.json#/$defs/ConversationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or user cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authoritative authentication failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Conversation access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTHORIZATION_DENIED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Unsupported syncVersion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "$ref": "./auth-user-friend.openapi.json#/components/securitySchemes/bearerAuth"
+      }
+    }
+  },
+  "x-sync-binding": {
+    "initialCursor": "0",
+    "cursorOwnership": "authenticated-user",
+    "cursorComparison": "opaque-equality-only",
+    "effectiveLimitCap": 100,
+    "limitPolicy": "accept-all-positive-integers-cap-before-conversion",
+    "authentication": "authoritative-session-each-request",
+    "authorization": "core-user-scope-and-conversation-membership",
+    "correlation": "decoded-valid-body-requestId-echo-else-server-uuid",
+    "emptyUserPage": "retain-request-cursor-hasMore-false",
+    "userOrder": "stable-committed-prefix",
+    "userNextCursor": "last-event-cursor",
+    "conversationOrder": "ascending-gap-free-afterSeq",
+    "hasMore": "additional-committed-item-exists",
+    "failure": "non-2xx-never-a-sync-page",
+    "queryParameters": "none",
+    "runtimeAcceptance": "deferred-until-human-approved-Go-plan",
+    "afterSeqPolicy": "accept-all-nonnegative-integers-above-storage-head-empty",
+    "pagination": "commit-page-then-continue-hasMore-to-terminal-without-fixed-total-cap",
+    "completion": "latest-committed-visible-at-terminal-read-not-future-writes"
+  }
+}
+
+FILE contracts/errors/http-errors.schema.json 
+ {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/errors/http-errors.schema.json",
+  "title": "Canonical HTTP error contract",
+  "$defs": {
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "VALIDATION_FAILED",
+        "AUTH_REQUIRED",
+        "AUTH_INVALID_CREDENTIALS",
+        "AUTH_TOKEN_INVALID",
+        "AUTH_TOKEN_EXPIRED",
+        "AUTH_SESSION_REVOKED",
+        "AUTH_SESSION_EPOCH_STALE",
+        "AUTH_CLIENT_TYPE_MISMATCH",
+        "AUTH_REFRESH_REVOKED",
+        "AUTHORIZATION_DENIED",
+        "PROTOCOL_VERSION_UNSUPPORTED",
+        "USERNAME_ALREADY_EXISTS",
+        "USER_NOT_FOUND",
+        "FRIEND_SELF_NOT_ALLOWED",
+        "FRIENDSHIP_STATE_CONFLICT"
+      ]
+    },
+    "FieldViolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "reason"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error", "requestId"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "$ref": "#/$defs/ErrorCode" },
+            "message": { "type": "string", "minLength": 1 },
+            "violations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/FieldViolation" }
+            }
+          }
+        },
+        "requestId": { "type": "string", "minLength": 1 }
+      },
+      "description": "Messages and violations must never contain passwords, access tokens, refresh tokens, cookies, or other authentication material."
+    }
+  },
+  "$ref": "#/$defs/ErrorResponse"
+}
+
+FILE contracts/websocket/sync-v1.schema.json 
+ {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/websocket/sync-v1.schema.json",
+  "title": "Sync v1 request and response contract",
+  "description": "User cursor carries only low-frequency friend, conversation, membership and plugin state. Message history uses a per-conversation sequence. Cursor and materialized data commit atomically on a client.",
+  "oneOf": [
+    {"$ref":"#/$defs/UserRequest"}, {"$ref":"#/$defs/UserPage"},
+    {"$ref":"#/$defs/ConversationRequest"}, {"$ref":"#/$defs/ConversationPage"}
+  ],
+  "$defs": {
+    "Id": {"type":"string","format":"uuid"},
+    "Seq": {"type":"integer","minimum":0},
+    "PositiveSeq": {"type":"integer","minimum":1},
+    "Cursor": {"type":"string","minLength":1,"maxLength":256},
+    "UserRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","cursor","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.request"},"requestId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"limit":{"type":"integer","minimum":1}}},
+    "UserEvent": {"type":"object","additionalProperties":false,"required":["eventId","cursor","kind","subjectId","revision"],"properties":{"eventId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"kind":{"enum":["friend.changed","conversation.changed","membership.changed","plugin.changed"]},"subjectId":{"$ref":"#/$defs/Id"},"revision":{"$ref":"#/$defs/PositiveSeq"}}},
+    "UserPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","events","nextCursor","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.page"},"requestId":{"$ref":"#/$defs/Id"},"events":{"type":"array","items":{"$ref":"#/$defs/UserEvent"}},"nextCursor":{"$ref":"#/$defs/Cursor"},"hasMore":{"type":"boolean"}}},
+    "ConversationRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","afterSeq","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.request"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"afterSeq":{"$ref":"#/$defs/Seq"},"limit":{"type":"integer","minimum":1}}},
+    "Message": {"type":"object","additionalProperties":false,"required":["conversationId","seq","messageId","senderId","requestId","createdAt","content"],"properties":{"conversationId":{"$ref":"#/$defs/Id"},"seq":{"$ref":"#/$defs/PositiveSeq"},"messageId":{"$ref":"#/$defs/Id"},"senderId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"},"createdAt":{"type":"string","format":"date-time"},"content":{"type":"object","additionalProperties":false,"required":["kind","text"],"properties":{"kind":{"const":"TEXT"},"text":{"type":"string","minLength":1,"maxLength":4096}}}}},
+    "ConversationPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","messages","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.page"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"messages":{"type":"array","items":{"$ref":"#/$defs/Message"}},"hasMore":{"type":"boolean"}}}
+  }
+}
+

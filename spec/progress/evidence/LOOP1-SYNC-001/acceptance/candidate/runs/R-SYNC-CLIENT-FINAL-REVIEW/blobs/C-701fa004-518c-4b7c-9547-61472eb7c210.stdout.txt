@@ -1,0 +1,333 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 4184bd6..3482525 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -210,6 +210,8 @@ jobs:
+         run: |
+           python3 -B tools/verify_client_sqlite.py --scope desktop
+           python3 -B tools/verify_client_send.py --scope desktop
++          python3 -B tools/verify_client_sync.py --scope desktop
++          python3 -B tests/clients/sync/go_smoke.py --probe "$CARGO_TARGET_DIR/debug/storage_probe"
+ 
+   mobile:
+     needs: classify
+@@ -253,6 +255,7 @@ jobs:
+           script: |
+             python3 -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554
+             python3 -B tools/verify_client_send.py --scope mobile --serial emulator-5554
++            python3 -B tools/verify_client_sync.py --scope mobile --serial emulator-5554
+ 
+   shared:
+     needs: classify
+@@ -271,6 +274,7 @@ jobs:
+         run: |
+           python3 -B tools/verify_client_sqlite.py --scope shared
+           python3 -B tools/verify_client_send.py --scope shared
++          python3 -B tools/verify_client_sync.py --scope shared
+       - name: HTTP, WSS, Sync and Plugin contracts
+         shell: pwsh
+         run: |
+@@ -355,6 +359,11 @@ jobs:
+         run: ./tests/infrastructure/smoke.ps1 -Profile go
+       - name: Go Auth actual roles and TLS event smoke
+         run: python3 tests/go/live_role_smoke.py
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22'
++      - name: Current shared Sync client actual Go TLS runtime
++        run: python3 -B tests/clients/sync/go_smoke.py
+       - name: Go public Sync strict TLS runtime
+         run: python3 -B tools/verify_sync_runtime.py
+       - name: Go S1 strict TLS messaging E2E
+diff --git a/clients/desktop/src/application/send.ts b/clients/desktop/src/application/send.ts
+index f89cf3d..47f589d 100644
+--- a/clients/desktop/src/application/send.ts
++++ b/clients/desktop/src/application/send.ts
+@@ -1,12 +1,11 @@
+ import { Repository } from "../../../shared/protocol-sdk/src/storage/repository.js";
+-import type { LocalMessage, ServerMessage, Committed } from "../../../shared/protocol-sdk/src/storage/models.js";
++import type { LocalMessage, ServerMessage, Committed, UserPage } from "../../../shared/protocol-sdk/src/storage/models.js";
+ import { content, decode, envelope, uuid } from "../../../shared/protocol-sdk/src/send/wire.js";
+ export interface Session { userId: string; sessionId: string; sessionEpoch: bigint; accessToken[REDACTED] }
+ export interface Socket {
+   onopen: ((event:Event)=>void)|null; onmessage: ((event:MessageEvent<unknown>)=>void)|null;
+   onclose: ((event:CloseEvent)=>void)|null; onerror: ((event:Event)=>void)|null;
+-  send(text: string): void; close(): void;
+-}
++  send(text: string): void; close(): void;}
+ export interface SendState { connection: "offline"|"binding"|"ready"; messages: ReadonlyArray<ReadonlyArray<string|null>>; error: "storage"|"protocol"|null }
+ // Each instance owns exactly one account/session. Retiring it cannot publish into
+ // a replacement account. All Repository operations and confirmations are ordered.
+@@ -23,6 +22,7 @@ export class SendApplication {
+   // settled identities until disconnect so delayed rejects remain unattributable.
+   private requestConversations=new Map<string,string|null>();
+   private listeners=new Set<(state:SendState)=>void>();
++  private deliveries=new Set<(conversationId:string,seq:bigint)=>void>();
+   private conversation="";
+   private current: SendState={connection:"offline",messages:[],error:null};
+   private readonly session: Readonly<Session>;
+@@ -30,8 +30,11 @@ export class SendApplication {
+     this.session=Object.freeze({...session,userId:uuid(session.userId),sessionId:uuid(session.sessionId)});
+     if(session.sessionEpoch<1n || !session.accessToken || timeoutMs<1) throw new Error("Invalid send session");
+   }
++  matchesSession(s:Session):boolean {return s.userId===this.session.userId && s.sessionId===this.session.sessionId && s.sessionEpoch===this.session.sessionEpoch && s.accessToken[REDACTED];}
+   get state(): SendState { return this.current; }
+   observe(listener:(state:SendState)=>void): ()=>void { this.listeners.add(listener); listener(this.current); return ()=>this.listeners.delete(listener); }
++  observeDelivery(listener:(conversationId:string,seq:bigint)=>void):()=>void { this.deliveries.add(listener); return ()=>this.deliveries.delete(listener); }
++  private delivered(c:string,n:bigint):void { if(!this.retired) for(const listener of this.deliveries) {try {listener(c,n);} catch {/* Commit already completed. */}} }
+   private publish(state: SendState): void {
+     if(this.retired) return;
+     this.current=Object.freeze({...state,messages:Object.freeze(state.messages.map(r=>Object.freeze([...r])))});
+@@ -72,7 +75,7 @@ export class SendApplication {
+       void this.serial(async()=>{await this.repository.markFailed(attempt.message.conversationId,attempt.message.requestId); await this.refresh();}).catch(()=>{});
+     }
+   }
+-  close(): void { this.disconnect(); this.retired=true; this.listeners.clear(); this.current={connection:"offline",messages:[],error:null}; }
++  close(): void { this.disconnect(); this.retired=true; this.listeners.clear(); this.deliveries.clear(); this.current={connection:"offline",messages:[],error:null}; }
+   async send(conversationId:string,text:string): Promise<string> {
+     const requestId=uuid(this.id());
+     const message: LocalMessage={conversationId:uuid(conversationId),requestId,senderId:this.session.userId,content:content({kind:"TEXT",text})};
+@@ -121,7 +124,7 @@ export class SendApplication {
+     if(frame.type==="session.revoked") { if(p.sessionId!==this.session.sessionId) this.protocolFailure(); else this.disconnect(); return; }
+     if(frame.type==="message.created") {
+       const message={...p,requestId:frame.requestId} as unknown as ServerMessage;
+-      await this.repository.syncMessages([message]); this.clear(message.conversationId,message.requestId); await this.refresh(); return;
++      await this.repository.syncMessages([message]); this.clear(message.conversationId,message.requestId); await this.refresh(); this.delivered(message.conversationId,BigInt(message.seq)); return;
+     }
+     if(frame.type==="message.ack") {
+       if(p.status==="rejected") {
+@@ -134,11 +137,15 @@ export class SendApplication {
+         // An ACK only confirms a send issued by this application; retry reloads
+         // the durable intent after restart. Realtime/Sync own other deliveries.
+         if(!this.known.has(key)) return;
+-        await this.repository.committedAck(frame.requestId,p as unknown as Committed); this.clear(c,frame.requestId); await this.refresh();
++        await this.repository.committedAck(frame.requestId,p as unknown as Committed); this.clear(c,frame.requestId); await this.refresh(); this.delivered(c,p.seq as bigint);
+       }
+     }
+   }
+-  async mergeMessages(messages:ServerMessage[]): Promise<void> {
+-    return this.serial(async()=>{if(this.retired) return; await this.repository.syncMessages(messages); for(const m of messages) this.clear(m.conversationId,m.requestId); await this.refresh();});
++  async mergeMessages(messages:ServerMessage[], active:()=>boolean=()=>true, failBeforeAdvance=false): Promise<void> {
++    return this.serial(async()=>{if(this.retired || !active()) return; await this.repository.syncMessages(messages,failBeforeAdvance); for(const m of messages) this.clear(m.conversationId,m.requestId); await this.refresh();});
++  }
++  async mergeUserPage(page:UserPage,expectedCursor:string,active:()=>boolean,failBeforeAdvance=false):Promise<void> {
++    return this.serial(async()=>{if(this.retired || !active()) return; await this.repository.userPage(page,expectedCursor,failBeforeAdvance);});
+   }
++
+ }
+diff --git a/clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt b/clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt
+index 286d08f..342c6bb 100644
+--- a/clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt
++++ b/clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt
+@@ -4,6 +4,8 @@ import im.platform.client.storage.Repository
+ import im.platform.client.storage.LocalMessage
+ import im.platform.client.storage.ServerMessage
+ import im.platform.client.storage.Committed
++import im.platform.client.storage.UserEvent
++import java.util.concurrent.CopyOnWriteArraySet
+ import kotlinx.coroutines.*
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.StateFlow
+@@ -33,6 +35,9 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
+     private var binding=""
+     private var bound=false
+     private var retired=false
++    private val deliveries=CopyOnWriteArraySet<(String,Long)->Unit>()
++    fun observeDelivery(listener:(String,Long)->Unit):()->Unit {deliveries.add(listener); return {deliveries.remove(listener); Unit}}
++    private fun delivered(c:String,n:Long) {if(!retired) deliveries.forEach {try {it(c,n)} catch(_:Exception) { /* Commit already completed. */ }}}
+     private var conversation=""
+     private data class Attempt(val message:LocalMessage,val generation:Long,var sent:Boolean=false,var timer:Job?=null)
+     private val attempts=mutableMapOf<String,Attempt>()
+@@ -41,6 +46,8 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
+     // retain that fact after ACK/timeout until the connection is retired.
+     private val requestConversations=mutableMapOf<String,String?>()
+     init { require(Wire.uuid(session.userId)==session.userId && Wire.uuid(session.sessionId)==session.sessionId && session.sessionEpoch.signum()>0 && session.accessToken.isNotEmpty() && timeoutMs>0) }
++    fun matchesSession(s:SendSession)=session==s
++    fun matchesRepository(repository:Repository)=repo===repository
+     private fun key(c:String,r:String)="$c/$r"
+     private fun publish(value:SendState) { if(!retired) mutableState.value=value }
+     private fun refresh() { publish(mutableState.value.copy(messages=if(conversation.isEmpty()) emptyList() else repo.messages(conversation))) }
+@@ -61,7 +68,7 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
+     }
+     suspend fun disconnect() = operation { disconnectNow() }
+     suspend fun dispose() = lock.withLock {
+-        retired=true; mutableState.value=SendState(error=mutableState.value.error)
++        retired=true; deliveries.clear(); mutableState.value=SendState(error=mutableState.value.error)
+         try {
+             try { disconnectNow() } finally { if(ownsRepository) repo.close() }
+         } catch(_:Exception) {
+@@ -71,7 +78,7 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
+         }
+     }
+     override fun onCleared() {
+-        socket?.close(); retired=true; requestConversations.clear(); mutableState.value=SendState()
++        socket?.close(); retired=true; deliveries.clear(); requestConversations.clear(); mutableState.value=SendState()
+         scope.launch { try { lock.withLock { if(ownsRepository) repo.close() } } finally { scope.cancel() } }
+     }
+     suspend fun send(c:String,text:String):String {
+@@ -107,7 +114,7 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
+         if(f.type=="message.created") {
+             val content=p["content"] as Map<*,*>
+             val m=ServerMessage(p["conversationId"] as String,f.requestId,p["senderId"] as String,content["text"] as String,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)
+-            repo.syncMessages(listOf(m)); clear(m.conversationId,m.requestId!!); refresh(); return
++            repo.syncMessages(listOf(m)); clear(m.conversationId,m.requestId!!); refresh(); delivered(m.conversationId,m.seq); return
+         }
+         if(f.type=="message.ack") {
+             if(p["status"]=="rejected") {
+@@ -116,10 +123,11 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
+                 if(matches.size==1) { val (k,a)=matches.entries.single(); if(requestConversations[f.requestId]==a.message.conversationId) fail(k,a) }
+             }
+             else { val c=p["conversationId"] as String; if(key(c,f.requestId) !in known) return
+-                repo.committedAck(f.requestId,Committed(c,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)); clear(c,f.requestId); refresh() }
++                repo.committedAck(f.requestId,Committed(c,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)); clear(c,f.requestId); refresh(); delivered(c,(p["seq"] as BigInteger).longValueExact()) }
+         }
+     }
+-    suspend fun mergeMessages(messages:List<ServerMessage>) = operation { if(!retired) {repo.syncMessages(messages); messages.forEach {clear(it.conversationId,it.requestId!!)}; refresh()} }
++    suspend fun mergeMessages(messages:List<ServerMessage>,active:()->Boolean={true},failBeforeAdvance:Boolean=false) = operation { if(!retired && active()) {repo.syncMessages(messages,failBeforeAdvance); messages.forEach {clear(it.conversationId,it.requestId!!)}; refresh()} }
++    suspend fun mergeUserPage(events:List<UserEvent>,nextCursor:String,expectedCursor:String,active:()->Boolean,failBeforeAdvance:Boolean=false) = operation {if(!retired && active()) repo.userPage(events,nextCursor,expectedCursor,failBeforeAdvance)}
+ }
+ 
+ // Account binding is fixed by the authenticated session, never a selected path.
+diff --git a/clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt b/clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt
+index caec56d..2db61ca 100644
+--- a/clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt
++++ b/clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt
+@@ -25,18 +25,18 @@ object Wire {
+         if(n.signum()<=0) invalid()
+         return n
+     }
+-    private fun obj(v: Any?, keys: Set<String>): Map<String,Any> {
++    fun obj(v: Any?, keys: Set<String>): Map<String,Any> {
+         if(v !is Map<*,*> || v.keys!=keys) invalid()
+         return keys.associateWith { v[it] ?: invalid() }
+     }
+-    private fun time(v: Any?): String {
++    fun time(v: Any?): String {
+         val s=v as? String ?: invalid()
+         if(!s.matches(Regex("[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?(?:[Zz]|[+-][0-9]{2}:[0-9]{2})"))) invalid()
+         val normalized=s.replace(Regex("(\\.[0-9]{9})[0-9]+"),"$1")
+         try { OffsetDateTime.parse(normalized) } catch(_: Exception) { invalid() }
+         return s
+     }
+-    private class Parser(val raw: String) {
++    private class Parser(val raw: String,val maxIntegerDigits:Int?=null) {
+         var at=0
+         fun space() { while(at<raw.length && raw[at] in " \t\r\n") at++ }
+         fun string(): String {
+@@ -70,12 +70,27 @@ object Wire {
+                 }
+                 if(at>=raw.length || raw[at++]!='}') invalid(); return out
+             }
++            if(raw[at]=='[') {
++                at++; space(); val out=mutableListOf<Any>()
++                if(at<raw.length && raw[at]!=']') while(true) { out.add(value(depth+1)); space(); if(at>=raw.length || raw[at]!=',') break; at++ }
++                if(at>=raw.length || raw[at++]!=']') invalid(); return out
++            }
++            if(raw.startsWith("true",at)) {at+=4;return true}
++            if(raw.startsWith("false",at)) {at+=5;return false}
+             val m=Regex("-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?").find(raw,at)
+             if(m==null || m.range.first!=at) invalid(); at=m.range.last+1
+-            return try { BigDecimal(m.value).toBigIntegerExact() } catch(_:Exception) { invalid() }
++            return try {
++                val number=BigDecimal(m.value)
++                if(maxIntegerDigits==null) number.toBigIntegerExact() else {
++                    val exact=number.stripTrailingZeros()
++                    if(exact.signum()!=0 && (exact.scale()>0 || exact.precision().toLong()-exact.scale().toLong()>maxIntegerDigits)) invalid()
++                    exact.toBigIntegerExact()
++                }
++            } catch(_:Exception) { invalid() }
+         }
+-        fun parse(): Any { if(raw.length>131072) invalid(); val v=value(); space(); if(at!=raw.length) invalid(); return v }
++        fun parse(maxLength:Int=131072): Any { if(raw.length>maxLength) invalid(); val v=value(); space(); if(at!=raw.length) invalid(); return v }
+     }
++    fun parse(raw:String,maxLength:Int=131072,maxIntegerDigits:Int?=null):Any = Parser(raw,maxIntegerDigits).parse(maxLength)
+     private val authErrors=setOf("VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED")
+     private val sendErrors=setOf("VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED")
+     fun decode(raw: String): Frame {
+diff --git a/clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt b/clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt
+index 18644b2..658da53 100644
+--- a/clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt
++++ b/clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt
+@@ -131,6 +131,7 @@ class Repository(context: Context, accountId: String) : Closeable {
+     fun messages(c: String) = query("""SELECT request_id,sender_id,content,state,server_message_id,CAST(server_seq AS TEXT),server_time
+         FROM messages WHERE conversation_id=? ORDER BY server_seq IS NULL,server_seq,local_id""", arrayOf(c))
+     fun contiguous(c: String) = query("SELECT contiguous_seq FROM conversations WHERE conversation_id=?",arrayOf(c)).firstOrNull()?.first()?.toLong() ?: 0L
++    fun conversationIds() = query("SELECT conversation_id FROM conversations UNION SELECT conversation_id FROM messages UNION SELECT subject_id FROM user_state WHERE kind IN ('conversation.changed','membership.changed') ORDER BY 1").map { it.single()!! }
+     fun cursor() = query("SELECT cursor FROM user_cursor WHERE singleton=1").single().single()!!
+     override fun close() { db.close() }
+ }
+diff --git a/clients/shared/protocol-sdk/src/send/wire.ts b/clients/shared/protocol-sdk/src/send/wire.ts
+index 5ec04b7..527cd16 100644
+--- a/clients/shared/protocol-sdk/src/send/wire.ts
++++ b/clients/shared/protocol-sdk/src/send/wire.ts
+@@ -15,7 +15,7 @@ export function positive(v: unknown): bigint {
+   if (typeof v !== "bigint" || v < 1n) return invalid();
+   return v;
+ }
+-function timestamp(v: unknown): string {
++export function timestamp(v: unknown): string {
+   if (typeof v !== "string" || !/^\d{4}-\d\d-\d\d[Tt]\d\d:\d\d:\d\d(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/.test(v) || !Number.isFinite(Date.parse(v))) return invalid();
+   const date = v.slice(0,10), day = Number(date.slice(8)), month = Number(date.slice(5,7)), year = Number(date.slice(0,4));
+   if (month<1 || month>12 || day<1 || day>new Date(Date.UTC(year,month,0)).getUTCDate()) return invalid();
+@@ -28,8 +28,8 @@ export function content(v: unknown): {kind: "TEXT"; text: string} {
+ }
+ // Parse integers before JavaScript Number can round them. Reject duplicate keys,
+ // exponent/fraction values where the canonical fields require positive integers.
+-function parse(raw: string): unknown {
+-  if(raw.length>131072) return invalid();
++export function parse(raw: string, maxLength=131072): unknown {
++  if(raw.length>maxLength) return invalid();
+   let at=0, depth=0;
+   const whitespace=()=>{ while(/[\x20\t\r\n]/.test(raw[at]??"x")) at++; };
+   function string(): string {
+@@ -53,6 +53,12 @@ function parse(raw: string): unknown {
+         if(raw[at]!==",") break; at++;
+       }
+       if(raw[at++]!=="}") return invalid(); out=o;
++    } else if(raw[at]==="[") {
++      at++; const items: unknown[]=[]; whitespace();
++      if(raw[at]!=="]") for(;;) { items.push(value()); whitespace(); if(raw[at]!==",") break; at++; }
++      if(raw[at++]!=="]") return invalid(); out=items;
++    } else if(raw.startsWith("true",at)) { at+=4; out=true;
++    } else if(raw.startsWith("false",at)) { at+=5; out=false;
+     } else {
+       const number=raw.slice(at).match(/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
+       if(number) { at+=number[0].length; const parts=number[0].toLowerCase().split("e"), exponent=Number(parts[1]??"0");
+@@ -75,13 +81,13 @@ export function decode(raw: string): Frame {
+   const requestId=uuid(e.requestId); let p: ObjectValue;
+   function rejected(codes: string[]): ObjectValue {
+     const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
+-    if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
++    if(p.status!=="rejected" || typeof error.code!=="string" || !codes.includes(error.code) || typeof error.message!=="string" || !error.message) return invalid();
+     return p;
+   }
+   switch(e.type) {
+     case "auth.ack":
+       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
+-      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
++      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || typeof p.clientType!=="string" || !["WEB","DESKTOP","MOBILE"].includes(p.clientType)) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+       break;
+     case "message.ack":
+       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
+@@ -90,7 +96,7 @@ export function decode(raw: string): Frame {
+     case "message.created":
+       p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
+     case "session.revoked":
+-      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
++      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(typeof p.reason!=="string" || !["LOGOUT","REPLACED","REVOKED"].includes(p.reason)) return invalid(); break;
+     case "ping": case "pong": p=object(e.payload,[]); break;
+     default: return invalid();
+   }
+diff --git a/clients/shared/protocol-sdk/src/storage/repository.ts b/clients/shared/protocol-sdk/src/storage/repository.ts
+index 50b6abd..fed7c91 100644
+--- a/clients/shared/protocol-sdk/src/storage/repository.ts
++++ b/clients/shared/protocol-sdk/src/storage/repository.ts
+@@ -128,5 +128,8 @@ export class Repository {
+     const rows = await this.db.query("SELECT CAST(contiguous_seq AS TEXT) FROM conversations WHERE conversation_id=?",[conversationId]);
+     return BigInt(rows[0]?.[0] ?? "0");
+   }
++  async conversationIds(): Promise<string[]> {
++    return (await this.db.query("SELECT conversation_id FROM conversations UNION SELECT conversation_id FROM messages UNION SELECT subject_id FROM user_state WHERE kind IN ('conversation.changed','membership.changed') ORDER BY 1", [])).map(r=>r[0]!);
++  }
+   async cursor(): Promise<string> { return (await this.db.query("SELECT cursor FROM user_cursor WHERE singleton=1",[]))[0][0]!; }
+ }
