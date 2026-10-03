@@ -1,0 +1,32 @@
+# Independent Review: LOOP1-SYNC-TRANSPORT-001
+Result: PASS (local independent Review only; no blocking findings).
+Reviewer /root/sync_transport_review is a freshly delegated context with no implementation/fix ownership.
+Exact SHA: 57404dcc58d27920264e87252e0cf827dd950881
+Branch: task/LOOP1-SYNC-001
+Diff range: a0304fcc7be18b87f5986d014849d6b48b96a071..57404dcc58d27920264e87252e0cf827dd950881
+Method: read-only review of assigned committed worktree H:/.codex/worktrees/sync-resume/IM-platform; initial and final porcelain empty, assigned root verified by observed startup and Recorder initial/final Git states. Private evidence lives only in Git administrative directory. No repository, branches, main, contract or existing evidence edited.
+
+Startup: handoff -> current -> unique review Task -> authority resolver/hash and canonical task inputs/governance/ADRs -> Git state/diff/log -> minimum baseline. PDF546915 and current canonical457c405b hashes match. Inputs preceding Recorder have disclosed read-only trace gap, prospective_resume/pre_recorder_trace_complete=false. Large initial canonical read output was truncated, required sections subsequently targeted directly.
+
+Reviewed scope: full accepted-base range, including predecessor blocker bc1bebb, newly included authorized Coordinator sealed research, candidate source/tests/CI/docs and all research run structure. No backend/client/database/migration/dependency changes. Existing committed predecessor implementation evidence unchanged bc1bebb..HEAD; all research streams structurally validated independently. Raw Recorder CRLF/unified-patch whitespace is disclosed and preserved. Non-Recorder authored paths diff-check PASS.
+
+Authority: Human expressly approved minimal prerequisite public binding flow; candidate ADR-0008/canonical11.5/manifest distinguish candidate from effective freeze. Two HTTPS POST operations reference existing four Sync shapes and Bearer/error authority; no WSS/envelope/ACK change. Go write boundary remains later specific Human consent after accepted prerequisite. SYNC uniquely backlog, current prerequisite uniquely review, S1 PASS/S2 OPEN retained. Earlier SEND-only endpoint expressly superseded by direct Human authorization; no GUI/Web advance.
+
+Semantic/source review: exact integer limit/afterSeq validation before bounded oracle copies; 10**100 exact input remains intact. Invalid/bool/fraction/string/missing/extra/type/version/UUID fields are not laundered by normalization. User account-bound opaque cursor/stable committed prefix/empty cursor retention/hasMore progress; conversation gap-free afterSeq/isolation; response correlation and canonical status/error mapping agree. Non-catalogued server failures expressly transport failures, not fabricated canonical errors or pages. Offline checks cannot establish server ownership/order/auth execution; real runtime tests explicitly deferred. No new generic abstraction/framework/core dependency. Actual future Core/Gateway source inspected: Gateway already proxies /v1/; existing social producer locks recipient user rows; proposal read-side lock + concurrency proof is plausible without producer rewrite. Future product task must independently inspect every then-active producer and real TLS/Session/authorization behavior.
+
+Independent executed checks, all exit0 (duration/raw-output hashes in private Recorder):
+- ci/check_architecture.py --scope all --json: PASS no violations.
+- tools/verify_frozen_architecture.py: PASS.
+- tools/verify_sync_transport.py --node bundled Node: external refs + official OAI structural lint PASS.
+- unittest tests/contract/test_sync_transport.py: 4 test groups PASS including 11 document mutations and behavior negatives.
+- unittest tests/architecture: 53 tests PASS.
+- contracts/http/verify-auth-user-friend.ps1: 9 operations, 6positive/21negative/15mutations PASS.
+- contracts/websocket/verify.py:18vectors/44mutations PASS.
+- contracts/plugin-api/verify.py:79vectors/16mutations PASS.
+- Private independent_probe.py:16 extra malformed request negatives, huge exact values preserved, no product/schema paths, predecessor byte preservation PASS.
+- Existing Recorder runs independently validate: Coordinator20events, predecessor16events, writer45events all finished/valid.
+- Final HEAD/git status/diff whitespace checks PASS.
+
+Reviewer Recorder: R-20261003T112320Z-9d2ad7fc-5017-4dc1-aac5-7b9dd76ed7ad sealed PASS and validate PASS. Instrumentation failures: unsupported manual run_id (two start attempts), unsupported review_result event; corrected with generated run ID and supported review_finished; never edited artifacts or silently omitted failures. Public human prompt/delegation registered via stdin-base64. No hidden reasoning collected.
+
+Limitations/next action: This PASS is local independent Review only. Coordinator reports push auto-review rejected pending specific trusted Human authorization; no hosted candidate CI exists yet. Require applicable exact-head all13jobs and actual required steps, protected integration, actual-main Review/CI and verified H:/IM-platform sync before prerequisite done/effective. Then present concrete Go proposal and obtain Human consent before product writes. Task SYNC/runtime/S2 acceptance remains pending.

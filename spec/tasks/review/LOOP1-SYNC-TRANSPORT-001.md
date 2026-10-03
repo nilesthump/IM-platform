@@ -2,7 +2,7 @@
 task_id: LOOP1-SYNC-TRANSPORT-001
 title: Public Sync HTTPS transport prerequisite
 status: review
-owner: /root/sync_transport_design
+owner: /root
 stage: S2
 gate: S2
 ---
@@ -72,3 +72,7 @@ In progress; accepted base a0304fcc7be18b87f5986d014849d6b48b96a071. Assigned ex
 # Review-ready handoff
 
 Local final binding/ref/official OAI lint PASS; 4 Sync test groups and 53 architecture tests PASS; final architecture all/frozen PASS; existing HTTP/WSS/SyncPlugin regression PASS. Full actual commands/exit/elapsed/hash: spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/verification-history.md; failures retained. Predecessor implementation evidence/Recorder plus Coordinator sealed rootresearch are immutable authorized inputs, not permission to edit. No Go/product code. Fresh independent Review/exact-head hosted full13jobs/protected integration/actual-main acceptance/main sync pending. Concrete Go proposal requires Human consent after prerequisite acceptance. Known good accepted main a0304fc; ownership and startup-order exception in implementation-handoff.md; candidate SHA supplied after commit.
+
+# Independent Review and external publication hold
+
+Fresh independent Review PASS for clean57404dcc, full range a0304fc..57404dcc. Report/35-event sealed validated Recorder archived byte-exact in independent-review-57404dcc/. Architecture/contract/regression checks PASS; commands/results in report. No hosted CI/integration/main sync. Auto-review rejected GitHub publication pending explicit Human authorization of this prerequisite branch to https://github.com/nilesthump/IM-platform.git. Execution BLOCKED_EXTERNAL_ACCESS; state review, no Task/Gate PASS. Next: review this administrative increment, specific publication consent, final full13-job exact-head CI/protected integration/actual-main audit-CI/main sync, then show Go proposal for separate consent. Last accepted main a0304fc unchanged; Coordinator owns administrative increment. No product writes/SYNC advancement. See external-publication-blocker.md.

@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-SYNC-only
 Current Task: LOOP1-SYNC-TRANSPORT-001
 Current Task State: review
-Execution Status: REVIEW_READY_LOCAL_ONLY
+Execution Status: BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
@@ -27,11 +27,11 @@ Bounded Sync OpenAPI, external-ref guards, ADR-0008/canonical §11.5/hash discov
 
 ## Known Failures, Risks, and Assumptions
 
-Go runtime/client SYNC absent. All prerequisite Review/hosted/integration/main acceptance pending. Go proposal awaits Human consent after prerequisite acceptance. Unknown main work preserved.
+Go runtime/client SYNC absent. Independent clean candidate Review PASS at57404dcc; hosted/integration/main acceptance pending. Push rejected by auto-review pending specific Human publication consent. Go proposal awaits Human consent after prerequisite acceptance. Unknown main work preserved.
 
 ## Next Exact Action
 
-Fresh independent Review of clean committed freeze candidate; recorded checks PASS. Coordinator then exact-head hosted CI/protected integration/main synchronization, show concrete Go plan and obtain Human consent before product writes. Do not mark SYNC done or advance GUI/Web.
+Local fresh independent Review PASS at57404dcc, archived in evidence. Review administrative increment, request explicit authorization to publish this prerequisite branch to https://github.com/nilesthump/IM-platform.git, then final full13-job exact-head hosted CI/protected integration/main synchronization. Show Go plan and obtain separate Human consent before product writes. Do not mark SYNC done or advance GUI/Web.
 
 ## Last Known Good Commit
 
@@ -43,7 +43,7 @@ spec/progress/checkpoints/2026-10-03-loop1-client-send-001-accepted.md remains l
 
 ## Uncommitted Changes / Ownership
 
-Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch task/LOOP1-SYNC-001. Sole prerequisite writer /root/sync_transport_design owns narrow task paths; root research sealed20BLOCKED input owned/authorized by Coordinator and preserved. No unknown main writes.
+Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch task/LOOP1-SYNC-001. Original candidate writer released clean57404dcc. Coordinator /root owns only Task/current/review archive/blocker administrative increment; root research sealed20BLOCKED input owned/authorized by Coordinator and preserved. No unknown main writes. Main stays a0304fc;781 unrelated entries preserved. Administrative commit SHA supplied after commit; see evidence/LOOP1-SYNC-TRANSPORT-001/external-publication-blocker.md.
 
 ## Architecture Conflicts / ACP / ADR
 
