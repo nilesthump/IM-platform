@@ -1,0 +1,722 @@
+H:/.codex/worktrees/sync-resume/IM-platform
+8bcc732 docs(sync): complete original Fix prompt evidence archive
+180a77b fix(sync): reject nonstring Sync and WSS enum fields
+ccd780b feat(sync): implement Desktop and Mobile continuous two-level synchronization
+a859e61 Activate accepted-input Desktop and Mobile Sync task
+0fe4fcc Merge pull request #21 from nilesthump/task/LOOP1-SYNC-001
+1f02488 Record independently accepted Go Sync runtime closure
+6f93412 Merge pull request #20 from nilesthump/task/LOOP1-SYNC-001
+a78f7f9 Complete sealed Go implementation prompt provenance
+ .github/workflows/ci.yml                           |    9 +
+ clients/desktop/src/application/send.ts            |   23 +-
+ .../desktop/src/application/sync/accountSync.ts    |    9 +
+ .../desktop/src/application/sync/application.ts    |   64 +
+ .../im/platform/client/sync/SyncInstrumentation.kt |  167 ++
+ .../im/platform/client/send/SendViewModel.kt       |   18 +-
+ .../main/kotlin/im/platform/client/send/Wire.kt    |   25 +-
+ .../im/platform/client/storage/Repository.kt       |    1 +
+ .../main/kotlin/im/platform/client/sync/Https.kt   |   48 +
+ .../im/platform/client/sync/SyncViewModel.kt       |   81 +
+ .../main/kotlin/im/platform/client/sync/Wire.kt    |   59 +
+ clients/shared/protocol-sdk/src/send/wire.ts       |   18 +-
+ .../shared/protocol-sdk/src/storage/repository.ts  |    3 +
+ clients/shared/protocol-sdk/src/sync/http.ts       |   27 +
+ clients/shared/protocol-sdk/src/sync/wire.ts       |   54 +
+ clients/shared/protocol-sdk/tsconfig.json          |    2 +-
+ .../2026-10-03-loop1-sync-001-client-local.md      |    7 +
+ spec/progress/current.md                           |  110 +-
+ .../client-fix/archive-manifest.json               |  650 ++++++
+ .../LOOP1-SYNC-001/client-fix/command-index.json   | 1237 ++++++++++
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ .../client-fix/failed-review/review.md             |   28 +
+ ...08c43f24-5e59-4855-8cbb-a61a6c7f3414.stderr.txt |    0
+ ...08c43f24-5e59-4855-8cbb-a61a6c7f3414.stdout.txt |    1 +
+ ...18b500cb-fb4e-47f3-9cd7-e79e1a0ec6d6.stderr.txt |    0
+ ...18b500cb-fb4e-47f3-9cd7-e79e1a0ec6d6.stdout.txt |  308 +++
+ ...399fafc6-be83-45c1-a630-896323dc5393.stderr.txt |    0
+ ...399fafc6-be83-45c1-a630-896323dc5393.stdout.txt |    2 +
+ ...437766c8-063d-4559-ae11-c97133782ec5.stderr.txt |    0
+ ...437766c8-063d-4559-ae11-c97133782ec5.stdout.txt |    0
+ ...44d799fd-2478-4d37-aac7-0054119f1b9e.stderr.txt |    0
+ ...44d799fd-2478-4d37-aac7-0054119f1b9e.stdout.txt |    3 +
+ ...4504f3ab-e509-4d52-a07d-b1a5b87423e2.stderr.txt |    0
+ ...4504f3ab-e509-4d52-a07d-b1a5b87423e2.stdout.txt |  384 ++++
+ ...47af06be-fa8f-4a70-8613-bd24e5f322a7.stderr.txt |    0
+ ...47af06be-fa8f-4a70-8613-bd24e5f322a7.stdout.txt |    9 +
+ ...4efc8d04-28dc-4146-8ea2-c0be0865a2e7.stderr.txt |    0
+ ...4efc8d04-28dc-4146-8ea2-c0be0865a2e7.stdout.txt | 2223 ++++++++++++++++++
+ ...56b5f109-5e51-4ce7-9083-fb8aae59dad9.stderr.txt |    0
+ ...56b5f109-5e51-4ce7-9083-fb8aae59dad9.stdout.txt |  244 ++
+ ...6100912f-cdcc-456f-ac1c-a5948057b9e9.stderr.txt |    0
+ ...6100912f-cdcc-456f-ac1c-a5948057b9e9.stdout.txt |   10 +
+ ...709e4dc2-4348-4c59-8db5-7303e257d992.stderr.txt |    0
+ ...709e4dc2-4348-4c59-8db5-7303e257d992.stdout.txt |    1 +
+ ...9184671c-00dd-4c76-b3dc-d687a350d69b.stderr.txt |    0
+ ...9184671c-00dd-4c76-b3dc-d687a350d69b.stdout.txt |    0
+ ...932aa8ff-2ee8-4c76-9f9d-0553ebc39b8c.stderr.txt |    0
+ ...932aa8ff-2ee8-4c76-9f9d-0553ebc39b8c.stdout.txt |  197 ++
+ ...990d778b-ad08-45d1-a3ac-199094f74f58.stderr.txt |    0
+ ...990d778b-ad08-45d1-a3ac-199094f74f58.stdout.txt |    5 +
+ ...b041dc40-2510-4a77-ba78-d0db028a3cbb.stderr.txt |    0
+ ...b041dc40-2510-4a77-ba78-d0db028a3cbb.stdout.txt |  165 ++
+ ...b7ffc7f7-ee07-43c3-b8cb-a39e6cbdc893.stderr.txt |    0
+ ...b7ffc7f7-ee07-43c3-b8cb-a39e6cbdc893.stdout.txt |  145 ++
+ ...c3a14826-7732-4f9c-9dda-3e02df168ed1.stderr.txt |    0
+ ...c3a14826-7732-4f9c-9dda-3e02df168ed1.stdout.txt |  632 ++++++
+ ...c42ebd18-feb6-4a22-8b85-c977f79206cc.stderr.txt |    0
+ ...c42ebd18-feb6-4a22-8b85-c977f79206cc.stdout.txt |    1 +
+ ...dae7b8cb-1b62-4f05-abea-de9404dc3a9d.stderr.txt |   58 +
+ ...dae7b8cb-1b62-4f05-abea-de9404dc3a9d.stdout.txt |    1 +
+ ...e317caef-8514-467a-ba3b-c3afaf502f0c.stderr.txt |    0
+ ...e317caef-8514-467a-ba3b-c3afaf502f0c.stdout.txt |    0
+ ...eacc8c91-928c-4283-9cd9-6c627f7f7b2d.stderr.txt |    0
+ ...eacc8c91-928c-4283-9cd9-6c627f7f7b2d.stdout.txt |  565 +++++
+ .../diff.patch                                     |    0
+ .../events.jsonl                                   |   46 +
+ .../final_state.json                               |  300 +++
+ .../initial_state.json                             |  300 +++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ .../client-fix/fix-research/generated-receipt.json | 1866 +++++++++++++++
+ .../prompts/P-SYNC-CLIENT-FIX/metadata.json        |   13 +
+ .../prompts/P-SYNC-CLIENT-FIX/prompt.txt           |    1 +
+ ...05e201eb-b2a1-427e-aaad-741df2c8c9ca.stderr.txt |    0
+ ...05e201eb-b2a1-427e-aaad-741df2c8c9ca.stdout.txt |    1 +
+ ...0b1aa95f-25a0-43ac-9624-416aed527cfc.stderr.txt |    6 +
+ ...0b1aa95f-25a0-43ac-9624-416aed527cfc.stdout.txt |    0
+ ...0ca70223-223a-4ebc-8396-1871668bbbb3.stderr.txt |    0
+ ...0ca70223-223a-4ebc-8396-1871668bbbb3.stdout.txt |  120 +
+ ...161b14a4-dc18-4476-a095-4f49c664ed3c.stderr.txt |    0
+ ...161b14a4-dc18-4476-a095-4f49c664ed3c.stdout.txt |  532 +++++
+ ...16b62c8d-b4e2-4357-aaf1-e3b4108e4bc4.stderr.txt |    0
+ ...16b62c8d-b4e2-4357-aaf1-e3b4108e4bc4.stdout.txt |   99 +
+ ...1fb2dcc1-372e-457d-b4b8-f2da78944018.stderr.txt |    0
+ ...1fb2dcc1-372e-457d-b4b8-f2da78944018.stdout.txt |    1 +
+ ...414f83a6-0c5a-48d8-a029-68784f35230c.stderr.txt |    0
+ ...414f83a6-0c5a-48d8-a029-68784f35230c.stdout.txt |    2 +
+ ...4943076f-9f47-4a89-b7b4-51b403331a26.stderr.txt |   58 +
+ ...4943076f-9f47-4a89-b7b4-51b403331a26.stdout.txt |    0
+ ...4e9a01ed-7ab4-4677-81a0-f1051a0834ab.stderr.txt |    0
+ ...4e9a01ed-7ab4-4677-81a0-f1051a0834ab.stdout.txt |   10 +
+ ...65484c04-ec61-4120-bfa0-d8c7c861cbb4.stderr.txt |    0
+ ...65484c04-ec61-4120-bfa0-d8c7c861cbb4.stdout.txt |    1 +
+ ...6ad74137-1dff-4c19-8b54-27c4fde713ec.stderr.txt |    0
+ ...6ad74137-1dff-4c19-8b54-27c4fde713ec.stdout.txt |   10 +
+ ...81e07804-78ef-4976-83bd-6eb374e61833.stderr.txt |   20 +
+ ...81e07804-78ef-4976-83bd-6eb374e61833.stdout.txt |    9 +
+ ...89b05ac0-fa3f-4343-88f1-6ebbd340a9eb.stderr.txt |    0
+ ...89b05ac0-fa3f-4343-88f1-6ebbd340a9eb.stdout.txt |   60 +
+ ...8a6160c5-eacf-445f-8e97-5c174cdc3370.stderr.txt |    0
+ ...8a6160c5-eacf-445f-8e97-5c174cdc3370.stdout.txt |    1 +
+ ...8e3326bf-2293-4bf1-be78-8278ba7f88cf.stderr.txt |    0
+ ...8e3326bf-2293-4bf1-be78-8278ba7f88cf.stdout.txt |    2 +
+ ...8fcaab43-86b1-41c9-b3bb-a327a36e1581.stderr.txt |    0
+ ...8fcaab43-86b1-41c9-b3bb-a327a36e1581.stdout.txt |    4 +
+ ...975c0ce0-03a4-4d38-ab62-00d95962af81.stderr.txt |    0
+ ...975c0ce0-03a4-4d38-ab62-00d95962af81.stdout.txt |  371 +++
+ ...a98cbe5a-b367-4ec7-b37e-74dfa83fa3fb.stderr.txt |    0
+ ...a98cbe5a-b367-4ec7-b37e-74dfa83fa3fb.stdout.txt |    1 +
+ ...c7cc82c0-5222-4d44-bf00-2bb06a836ef6.stderr.txt |    0
+ ...c7cc82c0-5222-4d44-bf00-2bb06a836ef6.stdout.txt |    6 +
+ ...cd3fb5fe-4a3f-46f6-86c9-afa5081a3427.stderr.txt |   72 +
+ ...cd3fb5fe-4a3f-46f6-86c9-afa5081a3427.stdout.txt |    0
+ ...cfc46c4c-bcc4-4479-8a0f-e57343535305.stderr.txt |    0
+ ...cfc46c4c-bcc4-4479-8a0f-e57343535305.stdout.txt |    1 +
+ ...d75824bc-9237-4e39-91dd-1a34e194be8e.stderr.txt |    0
+ ...d75824bc-9237-4e39-91dd-1a34e194be8e.stdout.txt |    3 +
+ ...dbcf2ccb-54a3-4c2c-8051-a447cb5a0f3e.stderr.txt |    0
+ ...dbcf2ccb-54a3-4c2c-8051-a447cb5a0f3e.stdout.txt |    0
+ ...f94604ee-d771-4faf-a228-fa60ff158827.stderr.txt |    0
+ ...f94604ee-d771-4faf-a228-fa60ff158827.stdout.txt |    1 +
+ .../runs/R-SYNC-CLIENT-FIX-20261003/diff.patch     |  176 ++
+ .../runs/R-SYNC-CLIENT-FIX-20261003/events.jsonl   |   52 +
+ .../R-SYNC-CLIENT-FIX-20261003/final_state.json    |  321 +++
+ .../R-SYNC-CLIENT-FIX-20261003/initial_state.json  |  300 +++
+ .../runs/R-SYNC-CLIENT-FIX-20261003/metadata.json  |   32 +
+ .../runs/R-SYNC-CLIENT-FIX-20261003/summary.json   |   10 +
+ .../client-fix/local-verification.md               |   16 +
+ .../artifact-manifest-sha256.txt                   |    8 +
+ .../client-implementation/command-index.json       | 2370 ++++++++++++++++++++
+ .../client-implementation/local-verification.md    |   43 +
+ .../research-archive-manifest.json                 | 1078 +++++++++
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    1 +
+ ...00dd4347-d1d8-4887-9ba8-230f6613b86a.stderr.txt |    0
+ ...00dd4347-d1d8-4887-9ba8-230f6613b86a.stdout.txt |   54 +
+ ...01b50565-b3e7-492d-8a33-a4489539a0a5.stderr.txt |    0
+ ...01b50565-b3e7-492d-8a33-a4489539a0a5.stdout.txt |   10 +
+ ...0a00ce58-f7ac-47e0-8ba3-03a03b600726.stderr.txt |   19 +
+ ...0a00ce58-f7ac-47e0-8ba3-03a03b600726.stdout.txt |   65 +
+ ...0c985987-c825-4f4f-9c7c-c9e31eab1132.stderr.txt |    0
+ ...0c985987-c825-4f4f-9c7c-c9e31eab1132.stdout.txt |    1 +
+ ...0d4e5e60-d848-46b0-bd84-d4c8746f1f47.stderr.txt |    0
+ ...0d4e5e60-d848-46b0-bd84-d4c8746f1f47.stdout.txt |    1 +
+ ...103f3795-ae52-4d3e-8573-57f2d23c8018.stderr.txt |    2 +
+ ...103f3795-ae52-4d3e-8573-57f2d23c8018.stdout.txt |  111 +
+ ...10fdde67-f346-43d9-a2b6-005232e0fed1.stderr.txt |    0
+ ...10fdde67-f346-43d9-a2b6-005232e0fed1.stdout.txt |    3 +
+ ...14f44bb9-8484-4d47-bbfc-716d030f7eb8.stderr.txt |    0
+ ...14f44bb9-8484-4d47-bbfc-716d030f7eb8.stdout.txt |  227 ++
+ ...15ef5e7a-5066-44df-ad1b-267d2553d9d9.stderr.txt |    0
+ ...15ef5e7a-5066-44df-ad1b-267d2553d9d9.stdout.txt |    0
+ ...16de356c-eb58-4926-9875-657a38656aa0.stderr.txt |    0
+ ...16de356c-eb58-4926-9875-657a38656aa0.stdout.txt |    1 +
+ ...1a5c9772-78b5-4291-96e1-d98897657276.stderr.txt |    0
+ ...1a5c9772-78b5-4291-96e1-d98897657276.stdout.txt |    4 +
+ ...25a73969-d1db-43ec-8eab-32727d907edc.stderr.txt |    0
+ ...25a73969-d1db-43ec-8eab-32727d907edc.stdout.txt |   12 +
+ ...28497a7a-d2ca-4db0-9d34-b891a5db128a.stderr.txt |   12 +
+ ...28497a7a-d2ca-4db0-9d34-b891a5db128a.stdout.txt |    0
+ ...291fac9e-1148-4c2d-afb4-534f191b0f65.stderr.txt |    0
+ ...291fac9e-1148-4c2d-afb4-534f191b0f65.stdout.txt |  250 +++
+ ...2988b2bf-104b-4e7e-9b0b-cf9f48e130e9.stderr.txt |    0
+ ...2988b2bf-104b-4e7e-9b0b-cf9f48e130e9.stdout.txt |    1 +
+ ...2c500e3e-94a9-4fef-970d-deafd1023c0c.stderr.txt |    0
+ ...2c500e3e-94a9-4fef-970d-deafd1023c0c.stdout.txt |    2 +
+ ...2e317723-f93b-4c0f-b553-92c21d2fd7ec.stderr.txt |    1 +
+ ...2e317723-f93b-4c0f-b553-92c21d2fd7ec.stdout.txt |  100 +
+ ...2f9c30a1-8635-420f-b4eb-77d858a4ea3f.stderr.txt |    2 +
+ ...2f9c30a1-8635-420f-b4eb-77d858a4ea3f.stdout.txt |    4 +
+ ...2faa55fa-d3ca-4d55-a179-f6b1daec9dcc.stderr.txt |    0
+ ...2faa55fa-d3ca-4d55-a179-f6b1daec9dcc.stdout.txt |   46 +
+ ...30789cfb-10ae-441e-a1f6-33b11362c33c.stderr.txt |    0
+ ...30789cfb-10ae-441e-a1f6-33b11362c33c.stdout.txt |  113 +
+ ...33f80bfb-df5c-452f-be0a-eb6955c98db8.stderr.txt |    0
+ ...33f80bfb-df5c-452f-be0a-eb6955c98db8.stdout.txt |    1 +
+ ...3a5b2990-ace4-4907-92eb-25cb9639510b.stderr.txt |    0
+ ...3a5b2990-ace4-4907-92eb-25cb9639510b.stdout.txt |    3 +
+ ...3d5e3d5e-7f0f-4b31-9a0f-ef607bdc5857.stderr.txt |    0
+ ...3d5e3d5e-7f0f-4b31-9a0f-ef607bdc5857.stdout.txt |    1 +
+ ...420645ce-b77c-496b-96bb-c002c2f7ced8.stderr.txt |    0
+ ...420645ce-b77c-496b-96bb-c002c2f7ced8.stdout.txt |    1 +
+ ...47912fbd-c0b4-49b4-848b-626c245681d6.stderr.txt |    0
+ ...47912fbd-c0b4-49b4-848b-626c245681d6.stdout.txt |    1 +
+ ...4ae1ddb5-abaa-422c-ba3d-2e6984cc6267.stderr.txt |    0
+ ...4ae1ddb5-abaa-422c-ba3d-2e6984cc6267.stdout.txt |    2 +
+ ...4bed53a6-1172-4344-a8a3-aac88f953423.stderr.txt |    3 +
+ ...4bed53a6-1172-4344-a8a3-aac88f953423.stdout.txt |   90 +
+ ...4c49f0a0-830c-4f6b-ad7a-cc90cde7d720.stderr.txt |    0
+ ...4c49f0a0-830c-4f6b-ad7a-cc90cde7d720.stdout.txt |    7 +
+ ...4d87529b-aff3-4450-b141-a38c85a526c9.stderr.txt |    0
+ ...4d87529b-aff3-4450-b141-a38c85a526c9.stdout.txt |    1 +
+ ...4e1a9768-efa1-49be-a5ac-f38fc899ee62.stderr.txt |    0
+ ...4e1a9768-efa1-49be-a5ac-f38fc899ee62.stdout.txt |  627 ++++++
+ ...4ea2b918-f0ca-48f9-b5c1-710a722aef60.stderr.txt |    0
+ ...4ea2b918-f0ca-48f9-b5c1-710a722aef60.stdout.txt |  180 ++
+ ...50aea46c-107e-4307-a344-8da23ba629b3.stderr.txt |    0
+ ...50aea46c-107e-4307-a344-8da23ba629b3.stdout.txt |   15 +
+ ...50c92ee6-8232-4bda-a223-ff0e9c00d6cd.stderr.txt |    0
+ ...50c92ee6-8232-4bda-a223-ff0e9c00d6cd.stdout.txt |   15 +
+ ...50fca8ba-89e9-40e9-ab77-611b0ab2396e.stderr.txt |    2 +
+ ...50fca8ba-89e9-40e9-ab77-611b0ab2396e.stdout.txt |    6 +
+ ...50ffe04f-96ca-4288-b56c-6b0331886ccb.stderr.txt |    2 +
+ ...50ffe04f-96ca-4288-b56c-6b0331886ccb.stdout.txt |   23 +
+ ...52f5f01e-39db-427f-9174-9a3b7302c158.stderr.txt |    0
+ ...52f5f01e-39db-427f-9174-9a3b7302c158.stdout.txt |    3 +
+ ...54026c26-a672-4d19-afbf-286a04bfe4b9.stderr.txt |    9 +
+ ...54026c26-a672-4d19-afbf-286a04bfe4b9.stdout.txt |    0
+ ...5451252d-0872-40cf-a58f-27308b7f97ec.stderr.txt |   20 +
+ ...5451252d-0872-40cf-a58f-27308b7f97ec.stdout.txt |   21 +
+ ...58e84141-456d-4e05-ba65-b5a85abc902a.stderr.txt |    0
+ ...58e84141-456d-4e05-ba65-b5a85abc902a.stdout.txt |  147 ++
+ ...5b40cd9c-cd74-4e7f-9456-b3ab7eda6ff0.stderr.txt |    0
+ ...5b40cd9c-cd74-4e7f-9456-b3ab7eda6ff0.stdout.txt |    2 +
+ ...6189a8c8-0d6a-4f39-96b7-3883366d7b07.stderr.txt |    0
+ ...6189a8c8-0d6a-4f39-96b7-3883366d7b07.stdout.txt |  183 ++
+ ...61ebe07f-9917-4c0a-b6cf-719ba06480f2.stderr.txt |    0
+ ...61ebe07f-9917-4c0a-b6cf-719ba06480f2.stdout.txt |   11 +
+ ...651985c2-4fb6-4c7e-93d9-3b1cb892f5cf.stderr.txt |    0
+ ...651985c2-4fb6-4c7e-93d9-3b1cb892f5cf.stdout.txt |   77 +
+ ...676d3626-e5d5-4cf5-a324-95fead48459d.stderr.txt |    0
+ ...676d3626-e5d5-4cf5-a324-95fead48459d.stdout.txt |  130 ++
+ ...683b6070-f795-4be1-9147-0bde3b499f45.stderr.txt |    0
+ ...683b6070-f795-4be1-9147-0bde3b499f45.stdout.txt |    1 +
+ ...6d176bf6-137b-4005-8894-03d6f349c6a0.stderr.txt |    0
+ ...6d176bf6-137b-4005-8894-03d6f349c6a0.stdout.txt |    9 +
+ ...725267c5-eec9-44f6-9cda-3f3bdb37c316.stderr.txt |    0
+ ...725267c5-eec9-44f6-9cda-3f3bdb37c316.stdout.txt |    3 +
+ ...7fe143bc-0963-4b6e-906d-2ff4c0962926.stderr.txt |    0
+ ...7fe143bc-0963-4b6e-906d-2ff4c0962926.stdout.txt |    1 +
+ ...84f6dc9d-5ac0-4a3a-a661-f8740dbbed0d.stderr.txt |    0
+ ...84f6dc9d-5ac0-4a3a-a661-f8740dbbed0d.stdout.txt |   23 +
+ ...857c0b87-2e74-4d43-ae42-89e4c77095f0.stderr.txt |    1 +
+ ...857c0b87-2e74-4d43-ae42-89e4c77095f0.stdout.txt |  100 +
+ ...867d56fa-1152-47a3-9dd2-8c0c6d2166ab.stderr.txt |    0
+ ...867d56fa-1152-47a3-9dd2-8c0c6d2166ab.stdout.txt |    1 +
+ ...8a39e8ba-edf8-4eab-82df-77ea8c9a419a.stderr.txt |    0
+ ...8a39e8ba-edf8-4eab-82df-77ea8c9a419a.stdout.txt |    0
+ ...8b5022a2-665a-47ce-8037-9dc439ea559a.stderr.txt |    0
+ ...8b5022a2-665a-47ce-8037-9dc439ea559a.stdout.txt |    1 +
+ ...8c691fc5-4e82-414a-aea9-578cc5211c36.stderr.txt |    0
+ ...8c691fc5-4e82-414a-aea9-578cc5211c36.stdout.txt |    3 +
+ ...920a9179-7494-469e-974a-df08513f5eb3.stderr.txt |    2 +
+ ...920a9179-7494-469e-974a-df08513f5eb3.stdout.txt |   23 +
+ ...93984a50-0e0f-4989-a526-1b9d698f9677.stderr.txt |    0
+ ...93984a50-0e0f-4989-a526-1b9d698f9677.stdout.txt |    2 +
+ ...94a8ca7b-dd60-40ca-aabe-abc16adfe45a.stderr.txt |    0
+ ...94a8ca7b-dd60-40ca-aabe-abc16adfe45a.stdout.txt |    1 +
+ ...953bc121-0b80-44cd-b032-d20d6dbd61ac.stderr.txt |   20 +
+ ...953bc121-0b80-44cd-b032-d20d6dbd61ac.stdout.txt |   21 +
+ ...966b7d9f-d9a7-4439-979f-4c219136da2b.stderr.txt |    0
+ ...966b7d9f-d9a7-4439-979f-4c219136da2b.stdout.txt |    4 +
+ ...9859f8fe-2912-4564-9656-6084d1fc20b6.stderr.txt |    0
+ ...9859f8fe-2912-4564-9656-6084d1fc20b6.stdout.txt |    1 +
+ ...9b580aa1-7b49-4032-8bd7-a8654802045b.stderr.txt |    0
+ ...9b580aa1-7b49-4032-8bd7-a8654802045b.stdout.txt |   11 +
+ ...9d370653-f38c-466c-84dc-84178320e975.stderr.txt |    2 +
+ ...9d370653-f38c-466c-84dc-84178320e975.stdout.txt |   23 +
+ ...9e07daa7-819f-4d39-a995-b3d89f1ce310.stderr.txt |    0
+ ...9e07daa7-819f-4d39-a995-b3d89f1ce310.stdout.txt |    1 +
+ ...a5011d37-f72b-489f-92a3-62d48bd3edc1.stderr.txt |    0
+ ...a5011d37-f72b-489f-92a3-62d48bd3edc1.stdout.txt |    1 +
+ ...a76928ce-35ed-4001-b2ae-4ece5ae5a248.stderr.txt |    1 +
+ ...a76928ce-35ed-4001-b2ae-4ece5ae5a248.stdout.txt |  104 +
+ ...a7a206ec-015b-4f0c-b49a-53a493aa71d6.stderr.txt |    0
+ ...a7a206ec-015b-4f0c-b49a-53a493aa71d6.stdout.txt |    0
+ ...a81971d2-39ea-4729-9618-21435dec6801.stderr.txt |    0
+ ...a81971d2-39ea-4729-9618-21435dec6801.stdout.txt |    0
+ ...aa4dde4e-22e7-4b09-9f46-28fbaf44e034.stderr.txt |    0
+ ...aa4dde4e-22e7-4b09-9f46-28fbaf44e034.stdout.txt |    0
+ ...ab1c11d5-3fe5-4c21-9e41-3a5dbd7f4518.stderr.txt |    0
+ ...ab1c11d5-3fe5-4c21-9e41-3a5dbd7f4518.stdout.txt |    1 +
+ ...ac8eb197-9d42-4a20-8500-3233c225bc44.stderr.txt |    0
+ ...ac8eb197-9d42-4a20-8500-3233c225bc44.stdout.txt |    1 +
+ ...b1239e98-cc38-456b-a3ee-a734f7b7a2d6.stderr.txt |    0
+ ...b1239e98-cc38-456b-a3ee-a734f7b7a2d6.stdout.txt |    1 +
+ ...b13d92a8-84d7-4972-98c3-66b17c996940.stderr.txt |    0
+ ...b13d92a8-84d7-4972-98c3-66b17c996940.stdout.txt |  333 +++
+ ...b23608e2-9657-4c39-9920-8dd82d1ec894.stderr.txt |    0
+ ...b23608e2-9657-4c39-9920-8dd82d1ec894.stdout.txt |    1 +
+ ...b49ded78-bca7-409a-9a78-0c568d4bc767.stderr.txt |    0
+ ...b49ded78-bca7-409a-9a78-0c568d4bc767.stdout.txt |    3 +
+ ...b6344691-54ae-47de-b11d-a19dc9af123d.stderr.txt |    0
+ ...b6344691-54ae-47de-b11d-a19dc9af123d.stdout.txt |    1 +
+ ...be26e5c7-eb70-4f33-9ae6-5f1835ee20d1.stderr.txt |    0
+ ...be26e5c7-eb70-4f33-9ae6-5f1835ee20d1.stdout.txt |   71 +
+ ...bea5a21d-14f9-4193-b485-1dd3a086b845.stderr.txt |    0
+ ...bea5a21d-14f9-4193-b485-1dd3a086b845.stdout.txt |    1 +
+ ...bf8edb6f-43ef-4a8d-a784-09ea154bad65.stderr.txt |   58 +
+ ...bf8edb6f-43ef-4a8d-a784-09ea154bad65.stdout.txt |    0
+ ...c06b528c-1eaa-41e4-9935-f95d32d3b303.stderr.txt |    0
+ ...c06b528c-1eaa-41e4-9935-f95d32d3b303.stdout.txt |    1 +
+ ...c696a9ab-0b14-4e5f-b194-11ac0cc7f72f.stderr.txt |    2 +
+ ...c696a9ab-0b14-4e5f-b194-11ac0cc7f72f.stdout.txt |    4 +
+ ...c76ac7c9-9623-44ae-82bc-8eb6c634e894.stderr.txt |    0
+ ...c76ac7c9-9623-44ae-82bc-8eb6c634e894.stdout.txt |   13 +
+ ...d10b1f6f-b08f-49e8-afb9-5a059936b685.stderr.txt |    0
+ ...d10b1f6f-b08f-49e8-afb9-5a059936b685.stdout.txt |    1 +
+ ...d41b12ab-2d53-48fb-a6a0-67bb296e1db9.stderr.txt |    0
+ ...d41b12ab-2d53-48fb-a6a0-67bb296e1db9.stdout.txt |    0
+ ...d7d4ecd0-b2a2-4422-b62c-66ef2baa7e11.stderr.txt |    0
+ ...d7d4ecd0-b2a2-4422-b62c-66ef2baa7e11.stdout.txt |    1 +
+ ...d87e887b-28a2-439c-99a3-d79a1a00f187.stderr.txt |    1 +
+ ...d87e887b-28a2-439c-99a3-d79a1a00f187.stdout.txt |  101 +
+ ...d967f65d-8a6d-4cc9-9622-1f5dfbfe9522.stderr.txt |    0
+ ...d967f65d-8a6d-4cc9-9622-1f5dfbfe9522.stdout.txt |    1 +
+ ...d9bd7d11-d5be-466c-aa8c-006f2c4a856d.stderr.txt |    1 +
+ ...d9bd7d11-d5be-466c-aa8c-006f2c4a856d.stdout.txt |  100 +
+ ...de7b8640-c0bc-4b97-a2c9-380db75860fd.stderr.txt |    0
+ ...de7b8640-c0bc-4b97-a2c9-380db75860fd.stdout.txt |    1 +
+ ...dfe34f12-ccf6-407c-bb27-4d784a21a265.stderr.txt |   72 +
+ ...dfe34f12-ccf6-407c-bb27-4d784a21a265.stdout.txt |    0
+ ...dffa2a9e-cf77-4180-a343-d3d194ada184.stderr.txt |    0
+ ...dffa2a9e-cf77-4180-a343-d3d194ada184.stdout.txt |    1 +
+ ...e212560e-5929-439f-af9a-3deb18e9d26c.stderr.txt |    9 +
+ ...e212560e-5929-439f-af9a-3deb18e9d26c.stdout.txt |   47 +
+ ...e5214951-0c3b-484f-83fe-74a38dcf88f2.stderr.txt |    0
+ ...e5214951-0c3b-484f-83fe-74a38dcf88f2.stdout.txt |    1 +
+ ...e8f63b67-4a12-4a9e-8c1f-4977172075b0.stderr.txt |    0
+ ...e8f63b67-4a12-4a9e-8c1f-4977172075b0.stdout.txt |    1 +
+ ...ea1b1c50-1e0b-457b-a91e-360db9b274e1.stderr.txt |    0
+ ...ea1b1c50-1e0b-457b-a91e-360db9b274e1.stdout.txt |    2 +
+ ...eb132897-e367-4624-82cc-0dc6b4a96fe7.stderr.txt |   21 +
+ ...eb132897-e367-4624-82cc-0dc6b4a96fe7.stdout.txt |   21 +
+ ...ebf5ec34-59e3-4f48-96ab-d2fb178d45eb.stderr.txt |    0
+ ...ebf5ec34-59e3-4f48-96ab-d2fb178d45eb.stdout.txt |    1 +
+ ...ee84d777-b1d6-45ce-ae52-3ae5dfdf99be.stderr.txt |    0
+ ...ee84d777-b1d6-45ce-ae52-3ae5dfdf99be.stdout.txt |    1 +
+ ...eff8bc32-69f3-4047-b25b-45d6e84dad4e.stderr.txt |    0
+ ...eff8bc32-69f3-4047-b25b-45d6e84dad4e.stdout.txt |    1 +
+ ...f337c08a-086d-41d0-9c0b-64191a99c709.stderr.txt |    1 +
+ ...f337c08a-086d-41d0-9c0b-64191a99c709.stdout.txt |  101 +
+ ...f361a04e-ca1f-4c0f-81d4-12bc146270d3.stderr.txt |    0
+ ...f361a04e-ca1f-4c0f-81d4-12bc146270d3.stdout.txt |  174 ++
+ ...f47be06f-8eb7-4b96-bade-4ae282fbf5e1.stderr.txt |   26 +
+ ...f47be06f-8eb7-4b96-bade-4ae282fbf5e1.stdout.txt |   74 +
+ ...f7676860-8b0e-473d-a4b0-d80f3eaf3132.stderr.txt |    0
+ ...f7676860-8b0e-473d-a4b0-d80f3eaf3132.stdout.txt |  564 +++++
+ ...fef74df1-e648-4c5c-9b43-d512136763d0.stderr.txt |    0
+ ...fef74df1-e648-4c5c-9b43-d512136763d0.stdout.txt |    1 +
+ .../diff.patch                                     |  575 +++++
+ .../events.jsonl                                   |  210 ++
+ .../final_state.json                               |  374 +++
+ .../initial_state.json                             |  300 +++
+ .../metadata.json                                  |   32 +
+ .../summary.json                                   |   10 +
+ .../client-implementation/run_native.py.txt        |   23 +
+ spec/tasks/backlog/LOOP1-SYNC-001.md               |  112 -
+ spec/tasks/review/LOOP1-SYNC-001.md                |  158 ++
+ tests/clients/sync/desktop.mjs                     |   61 +
+ tests/clients/sync/go_client.mjs                   |   27 +
+ tests/clients/sync/go_smoke.py                     |   91 +
+ tests/clients/sync/shared.mjs                      |   67 +
+ tests/clients/sync/tls_fixture.py                  |   91 +
+ tools/verify_client_sync.py                        |   55 +
+ 356 files changed, 22779 insertions(+), 195 deletions(-)
+.github/workflows/ci.yml
+clients/desktop/src/application/send.ts
+clients/desktop/src/application/sync/accountSync.ts
+clients/desktop/src/application/sync/application.ts
+clients/mobile/app/src/androidTest/kotlin/im/platform/client/sync/SyncInstrumentation.kt
+clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt
+clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt
+clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt
+clients/mobile/app/src/main/kotlin/im/platform/client/sync/Https.kt
+clients/mobile/app/src/main/kotlin/im/platform/client/sync/SyncViewModel.kt
+clients/mobile/app/src/main/kotlin/im/platform/client/sync/Wire.kt
+clients/shared/protocol-sdk/src/send/wire.ts
+clients/shared/protocol-sdk/src/storage/repository.ts
+clients/shared/protocol-sdk/src/sync/http.ts
+clients/shared/protocol-sdk/src/sync/wire.ts
+clients/shared/protocol-sdk/tsconfig.json
+spec/progress/checkpoints/2026-10-03-loop1-sync-001-client-local.md
+spec/progress/current.md
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/archive-manifest.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/command-index.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/prompts/P-58bd1023-e145-4cf5-a5cd-4baa33b52ff8/metadata.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/prompts/P-58bd1023-e145-4cf5-a5cd-4baa33b52ff8/prompt.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/review.md
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-08c43f24-5e59-4855-8cbb-a61a6c7f3414.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-08c43f24-5e59-4855-8cbb-a61a6c7f3414.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-18b500cb-fb4e-47f3-9cd7-e79e1a0ec6d6.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-18b500cb-fb4e-47f3-9cd7-e79e1a0ec6d6.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-399fafc6-be83-45c1-a630-896323dc5393.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-399fafc6-be83-45c1-a630-896323dc5393.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-437766c8-063d-4559-ae11-c97133782ec5.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-437766c8-063d-4559-ae11-c97133782ec5.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-44d799fd-2478-4d37-aac7-0054119f1b9e.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-44d799fd-2478-4d37-aac7-0054119f1b9e.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-4504f3ab-e509-4d52-a07d-b1a5b87423e2.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-4504f3ab-e509-4d52-a07d-b1a5b87423e2.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-47af06be-fa8f-4a70-8613-bd24e5f322a7.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-47af06be-fa8f-4a70-8613-bd24e5f322a7.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-4efc8d04-28dc-4146-8ea2-c0be0865a2e7.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-4efc8d04-28dc-4146-8ea2-c0be0865a2e7.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-56b5f109-5e51-4ce7-9083-fb8aae59dad9.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-56b5f109-5e51-4ce7-9083-fb8aae59dad9.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-6100912f-cdcc-456f-ac1c-a5948057b9e9.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-6100912f-cdcc-456f-ac1c-a5948057b9e9.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-709e4dc2-4348-4c59-8db5-7303e257d992.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-709e4dc2-4348-4c59-8db5-7303e257d992.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-9184671c-00dd-4c76-b3dc-d687a350d69b.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-9184671c-00dd-4c76-b3dc-d687a350d69b.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-932aa8ff-2ee8-4c76-9f9d-0553ebc39b8c.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-932aa8ff-2ee8-4c76-9f9d-0553ebc39b8c.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-990d778b-ad08-45d1-a3ac-199094f74f58.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-990d778b-ad08-45d1-a3ac-199094f74f58.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-b041dc40-2510-4a77-ba78-d0db028a3cbb.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-b041dc40-2510-4a77-ba78-d0db028a3cbb.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-b7ffc7f7-ee07-43c3-b8cb-a39e6cbdc893.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-b7ffc7f7-ee07-43c3-b8cb-a39e6cbdc893.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-c3a14826-7732-4f9c-9dda-3e02df168ed1.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-c3a14826-7732-4f9c-9dda-3e02df168ed1.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-c42ebd18-feb6-4a22-8b85-c977f79206cc.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-c42ebd18-feb6-4a22-8b85-c977f79206cc.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-dae7b8cb-1b62-4f05-abea-de9404dc3a9d.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-dae7b8cb-1b62-4f05-abea-de9404dc3a9d.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-e317caef-8514-467a-ba3b-c3afaf502f0c.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-e317caef-8514-467a-ba3b-c3afaf502f0c.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-eacc8c91-928c-4283-9cd9-6c627f7f7b2d.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/blobs/C-eacc8c91-928c-4283-9cd9-6c627f7f7b2d.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/diff.patch
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/events.jsonl
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/final_state.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/initial_state.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/metadata.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/failed-review/runs/R-20261003T154043Z-b21579c7-4f71-457b-9fa7-bf2d38dd69ff/summary.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/generated-receipt.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/prompts/P-SYNC-CLIENT-FIX/metadata.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/prompts/P-SYNC-CLIENT-FIX/prompt.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-05e201eb-b2a1-427e-aaad-741df2c8c9ca.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-05e201eb-b2a1-427e-aaad-741df2c8c9ca.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-0b1aa95f-25a0-43ac-9624-416aed527cfc.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-0b1aa95f-25a0-43ac-9624-416aed527cfc.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-0ca70223-223a-4ebc-8396-1871668bbbb3.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-0ca70223-223a-4ebc-8396-1871668bbbb3.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-161b14a4-dc18-4476-a095-4f49c664ed3c.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-161b14a4-dc18-4476-a095-4f49c664ed3c.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-16b62c8d-b4e2-4357-aaf1-e3b4108e4bc4.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-16b62c8d-b4e2-4357-aaf1-e3b4108e4bc4.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-1fb2dcc1-372e-457d-b4b8-f2da78944018.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-1fb2dcc1-372e-457d-b4b8-f2da78944018.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-414f83a6-0c5a-48d8-a029-68784f35230c.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-414f83a6-0c5a-48d8-a029-68784f35230c.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-4943076f-9f47-4a89-b7b4-51b403331a26.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-4943076f-9f47-4a89-b7b4-51b403331a26.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-4e9a01ed-7ab4-4677-81a0-f1051a0834ab.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-4e9a01ed-7ab4-4677-81a0-f1051a0834ab.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-65484c04-ec61-4120-bfa0-d8c7c861cbb4.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-65484c04-ec61-4120-bfa0-d8c7c861cbb4.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-6ad74137-1dff-4c19-8b54-27c4fde713ec.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-6ad74137-1dff-4c19-8b54-27c4fde713ec.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-81e07804-78ef-4976-83bd-6eb374e61833.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-81e07804-78ef-4976-83bd-6eb374e61833.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-89b05ac0-fa3f-4343-88f1-6ebbd340a9eb.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-89b05ac0-fa3f-4343-88f1-6ebbd340a9eb.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-8a6160c5-eacf-445f-8e97-5c174cdc3370.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-8a6160c5-eacf-445f-8e97-5c174cdc3370.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-8e3326bf-2293-4bf1-be78-8278ba7f88cf.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-8e3326bf-2293-4bf1-be78-8278ba7f88cf.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-8fcaab43-86b1-41c9-b3bb-a327a36e1581.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-8fcaab43-86b1-41c9-b3bb-a327a36e1581.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-975c0ce0-03a4-4d38-ab62-00d95962af81.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-975c0ce0-03a4-4d38-ab62-00d95962af81.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-a98cbe5a-b367-4ec7-b37e-74dfa83fa3fb.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-a98cbe5a-b367-4ec7-b37e-74dfa83fa3fb.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-c7cc82c0-5222-4d44-bf00-2bb06a836ef6.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-c7cc82c0-5222-4d44-bf00-2bb06a836ef6.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-cd3fb5fe-4a3f-46f6-86c9-afa5081a3427.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-cd3fb5fe-4a3f-46f6-86c9-afa5081a3427.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-cfc46c4c-bcc4-4479-8a0f-e57343535305.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-cfc46c4c-bcc4-4479-8a0f-e57343535305.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-d75824bc-9237-4e39-91dd-1a34e194be8e.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-d75824bc-9237-4e39-91dd-1a34e194be8e.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-dbcf2ccb-54a3-4c2c-8051-a447cb5a0f3e.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-dbcf2ccb-54a3-4c2c-8051-a447cb5a0f3e.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-f94604ee-d771-4faf-a228-fa60ff158827.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/blobs/C-f94604ee-d771-4faf-a228-fa60ff158827.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/diff.patch
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/events.jsonl
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/final_state.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/initial_state.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/metadata.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/fix-research/runs/R-SYNC-CLIENT-FIX-20261003/summary.json
+spec/progress/evidence/LOOP1-SYNC-001/client-fix/local-verification.md
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/artifact-manifest-sha256.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/command-index.json
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/local-verification.md
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research-archive-manifest.json
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/prompts/P-4f7122e3-d9f2-433c-bc56-81047aa774be/metadata.json
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/prompts/P-4f7122e3-d9f2-433c-bc56-81047aa774be/prompt.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-00dd4347-d1d8-4887-9ba8-230f6613b86a.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-00dd4347-d1d8-4887-9ba8-230f6613b86a.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-01b50565-b3e7-492d-8a33-a4489539a0a5.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-01b50565-b3e7-492d-8a33-a4489539a0a5.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0a00ce58-f7ac-47e0-8ba3-03a03b600726.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0a00ce58-f7ac-47e0-8ba3-03a03b600726.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0c985987-c825-4f4f-9c7c-c9e31eab1132.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0c985987-c825-4f4f-9c7c-c9e31eab1132.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0d4e5e60-d848-46b0-bd84-d4c8746f1f47.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0d4e5e60-d848-46b0-bd84-d4c8746f1f47.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-103f3795-ae52-4d3e-8573-57f2d23c8018.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-103f3795-ae52-4d3e-8573-57f2d23c8018.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-10fdde67-f346-43d9-a2b6-005232e0fed1.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-10fdde67-f346-43d9-a2b6-005232e0fed1.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-14f44bb9-8484-4d47-bbfc-716d030f7eb8.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-14f44bb9-8484-4d47-bbfc-716d030f7eb8.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-15ef5e7a-5066-44df-ad1b-267d2553d9d9.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-15ef5e7a-5066-44df-ad1b-267d2553d9d9.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-16de356c-eb58-4926-9875-657a38656aa0.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-16de356c-eb58-4926-9875-657a38656aa0.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-1a5c9772-78b5-4291-96e1-d98897657276.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-1a5c9772-78b5-4291-96e1-d98897657276.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-25a73969-d1db-43ec-8eab-32727d907edc.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-25a73969-d1db-43ec-8eab-32727d907edc.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-28497a7a-d2ca-4db0-9d34-b891a5db128a.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-28497a7a-d2ca-4db0-9d34-b891a5db128a.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-291fac9e-1148-4c2d-afb4-534f191b0f65.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-291fac9e-1148-4c2d-afb4-534f191b0f65.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2988b2bf-104b-4e7e-9b0b-cf9f48e130e9.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2988b2bf-104b-4e7e-9b0b-cf9f48e130e9.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2c500e3e-94a9-4fef-970d-deafd1023c0c.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2c500e3e-94a9-4fef-970d-deafd1023c0c.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2e317723-f93b-4c0f-b553-92c21d2fd7ec.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2e317723-f93b-4c0f-b553-92c21d2fd7ec.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2f9c30a1-8635-420f-b4eb-77d858a4ea3f.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2f9c30a1-8635-420f-b4eb-77d858a4ea3f.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2faa55fa-d3ca-4d55-a179-f6b1daec9dcc.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2faa55fa-d3ca-4d55-a179-f6b1daec9dcc.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-30789cfb-10ae-441e-a1f6-33b11362c33c.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-30789cfb-10ae-441e-a1f6-33b11362c33c.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-33f80bfb-df5c-452f-be0a-eb6955c98db8.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-33f80bfb-df5c-452f-be0a-eb6955c98db8.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3a5b2990-ace4-4907-92eb-25cb9639510b.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3a5b2990-ace4-4907-92eb-25cb9639510b.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3d5e3d5e-7f0f-4b31-9a0f-ef607bdc5857.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3d5e3d5e-7f0f-4b31-9a0f-ef607bdc5857.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-420645ce-b77c-496b-96bb-c002c2f7ced8.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-420645ce-b77c-496b-96bb-c002c2f7ced8.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-47912fbd-c0b4-49b4-848b-626c245681d6.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-47912fbd-c0b4-49b4-848b-626c245681d6.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ae1ddb5-abaa-422c-ba3d-2e6984cc6267.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ae1ddb5-abaa-422c-ba3d-2e6984cc6267.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4bed53a6-1172-4344-a8a3-aac88f953423.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4bed53a6-1172-4344-a8a3-aac88f953423.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4c49f0a0-830c-4f6b-ad7a-cc90cde7d720.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4c49f0a0-830c-4f6b-ad7a-cc90cde7d720.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4d87529b-aff3-4450-b141-a38c85a526c9.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4d87529b-aff3-4450-b141-a38c85a526c9.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4e1a9768-efa1-49be-a5ac-f38fc899ee62.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4e1a9768-efa1-49be-a5ac-f38fc899ee62.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ea2b918-f0ca-48f9-b5c1-710a722aef60.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ea2b918-f0ca-48f9-b5c1-710a722aef60.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50aea46c-107e-4307-a344-8da23ba629b3.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50aea46c-107e-4307-a344-8da23ba629b3.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50c92ee6-8232-4bda-a223-ff0e9c00d6cd.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50c92ee6-8232-4bda-a223-ff0e9c00d6cd.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50fca8ba-89e9-40e9-ab77-611b0ab2396e.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50fca8ba-89e9-40e9-ab77-611b0ab2396e.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50ffe04f-96ca-4288-b56c-6b0331886ccb.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50ffe04f-96ca-4288-b56c-6b0331886ccb.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-52f5f01e-39db-427f-9174-9a3b7302c158.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-52f5f01e-39db-427f-9174-9a3b7302c158.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-54026c26-a672-4d19-afbf-286a04bfe4b9.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-54026c26-a672-4d19-afbf-286a04bfe4b9.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5451252d-0872-40cf-a58f-27308b7f97ec.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5451252d-0872-40cf-a58f-27308b7f97ec.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-58e84141-456d-4e05-ba65-b5a85abc902a.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-58e84141-456d-4e05-ba65-b5a85abc902a.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5b40cd9c-cd74-4e7f-9456-b3ab7eda6ff0.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5b40cd9c-cd74-4e7f-9456-b3ab7eda6ff0.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-6189a8c8-0d6a-4f39-96b7-3883366d7b07.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-6189a8c8-0d6a-4f39-96b7-3883366d7b07.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-61ebe07f-9917-4c0a-b6cf-719ba06480f2.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-61ebe07f-9917-4c0a-b6cf-719ba06480f2.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-651985c2-4fb6-4c7e-93d9-3b1cb892f5cf.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-651985c2-4fb6-4c7e-93d9-3b1cb892f5cf.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-676d3626-e5d5-4cf5-a324-95fead48459d.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-676d3626-e5d5-4cf5-a324-95fead48459d.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-683b6070-f795-4be1-9147-0bde3b499f45.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-683b6070-f795-4be1-9147-0bde3b499f45.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-6d176bf6-137b-4005-8894-03d6f349c6a0.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-6d176bf6-137b-4005-8894-03d6f349c6a0.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-725267c5-eec9-44f6-9cda-3f3bdb37c316.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-725267c5-eec9-44f6-9cda-3f3bdb37c316.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-7fe143bc-0963-4b6e-906d-2ff4c0962926.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-7fe143bc-0963-4b6e-906d-2ff4c0962926.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-84f6dc9d-5ac0-4a3a-a661-f8740dbbed0d.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-84f6dc9d-5ac0-4a3a-a661-f8740dbbed0d.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-857c0b87-2e74-4d43-ae42-89e4c77095f0.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-857c0b87-2e74-4d43-ae42-89e4c77095f0.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-867d56fa-1152-47a3-9dd2-8c0c6d2166ab.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-867d56fa-1152-47a3-9dd2-8c0c6d2166ab.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-8a39e8ba-edf8-4eab-82df-77ea8c9a419a.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-8a39e8ba-edf8-4eab-82df-77ea8c9a419a.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-8b5022a2-665a-47ce-8037-9dc439ea559a.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-8b5022a2-665a-47ce-8037-9dc439ea559a.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-8c691fc5-4e82-414a-aea9-578cc5211c36.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-8c691fc5-4e82-414a-aea9-578cc5211c36.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-920a9179-7494-469e-974a-df08513f5eb3.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-920a9179-7494-469e-974a-df08513f5eb3.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-93984a50-0e0f-4989-a526-1b9d698f9677.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-93984a50-0e0f-4989-a526-1b9d698f9677.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-94a8ca7b-dd60-40ca-aabe-abc16adfe45a.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-94a8ca7b-dd60-40ca-aabe-abc16adfe45a.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-953bc121-0b80-44cd-b032-d20d6dbd61ac.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-953bc121-0b80-44cd-b032-d20d6dbd61ac.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-966b7d9f-d9a7-4439-979f-4c219136da2b.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-966b7d9f-d9a7-4439-979f-4c219136da2b.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9859f8fe-2912-4564-9656-6084d1fc20b6.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9859f8fe-2912-4564-9656-6084d1fc20b6.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9b580aa1-7b49-4032-8bd7-a8654802045b.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9b580aa1-7b49-4032-8bd7-a8654802045b.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9d370653-f38c-466c-84dc-84178320e975.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9d370653-f38c-466c-84dc-84178320e975.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9e07daa7-819f-4d39-a995-b3d89f1ce310.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-9e07daa7-819f-4d39-a995-b3d89f1ce310.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a5011d37-f72b-489f-92a3-62d48bd3edc1.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a5011d37-f72b-489f-92a3-62d48bd3edc1.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a76928ce-35ed-4001-b2ae-4ece5ae5a248.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a76928ce-35ed-4001-b2ae-4ece5ae5a248.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a7a206ec-015b-4f0c-b49a-53a493aa71d6.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a7a206ec-015b-4f0c-b49a-53a493aa71d6.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a81971d2-39ea-4729-9618-21435dec6801.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-a81971d2-39ea-4729-9618-21435dec6801.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-aa4dde4e-22e7-4b09-9f46-28fbaf44e034.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-aa4dde4e-22e7-4b09-9f46-28fbaf44e034.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ab1c11d5-3fe5-4c21-9e41-3a5dbd7f4518.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ab1c11d5-3fe5-4c21-9e41-3a5dbd7f4518.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ac8eb197-9d42-4a20-8500-3233c225bc44.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ac8eb197-9d42-4a20-8500-3233c225bc44.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b1239e98-cc38-456b-a3ee-a734f7b7a2d6.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b1239e98-cc38-456b-a3ee-a734f7b7a2d6.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b13d92a8-84d7-4972-98c3-66b17c996940.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b13d92a8-84d7-4972-98c3-66b17c996940.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b23608e2-9657-4c39-9920-8dd82d1ec894.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b23608e2-9657-4c39-9920-8dd82d1ec894.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b49ded78-bca7-409a-9a78-0c568d4bc767.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b49ded78-bca7-409a-9a78-0c568d4bc767.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b6344691-54ae-47de-b11d-a19dc9af123d.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-b6344691-54ae-47de-b11d-a19dc9af123d.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-be26e5c7-eb70-4f33-9ae6-5f1835ee20d1.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-be26e5c7-eb70-4f33-9ae6-5f1835ee20d1.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-bea5a21d-14f9-4193-b485-1dd3a086b845.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-bea5a21d-14f9-4193-b485-1dd3a086b845.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-bf8edb6f-43ef-4a8d-a784-09ea154bad65.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-bf8edb6f-43ef-4a8d-a784-09ea154bad65.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-c06b528c-1eaa-41e4-9935-f95d32d3b303.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-c06b528c-1eaa-41e4-9935-f95d32d3b303.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-c696a9ab-0b14-4e5f-b194-11ac0cc7f72f.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-c696a9ab-0b14-4e5f-b194-11ac0cc7f72f.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-c76ac7c9-9623-44ae-82bc-8eb6c634e894.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-c76ac7c9-9623-44ae-82bc-8eb6c634e894.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d10b1f6f-b08f-49e8-afb9-5a059936b685.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d10b1f6f-b08f-49e8-afb9-5a059936b685.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d41b12ab-2d53-48fb-a6a0-67bb296e1db9.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d41b12ab-2d53-48fb-a6a0-67bb296e1db9.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d7d4ecd0-b2a2-4422-b62c-66ef2baa7e11.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d7d4ecd0-b2a2-4422-b62c-66ef2baa7e11.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d87e887b-28a2-439c-99a3-d79a1a00f187.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d87e887b-28a2-439c-99a3-d79a1a00f187.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d967f65d-8a6d-4cc9-9622-1f5dfbfe9522.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d967f65d-8a6d-4cc9-9622-1f5dfbfe9522.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d9bd7d11-d5be-466c-aa8c-006f2c4a856d.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-d9bd7d11-d5be-466c-aa8c-006f2c4a856d.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-de7b8640-c0bc-4b97-a2c9-380db75860fd.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-de7b8640-c0bc-4b97-a2c9-380db75860fd.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-dfe34f12-ccf6-407c-bb27-4d784a21a265.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-dfe34f12-ccf6-407c-bb27-4d784a21a265.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-dffa2a9e-cf77-4180-a343-d3d194ada184.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-dffa2a9e-cf77-4180-a343-d3d194ada184.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-e212560e-5929-439f-af9a-3deb18e9d26c.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-e212560e-5929-439f-af9a-3deb18e9d26c.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-e5214951-0c3b-484f-83fe-74a38dcf88f2.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-e5214951-0c3b-484f-83fe-74a38dcf88f2.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-e8f63b67-4a12-4a9e-8c1f-4977172075b0.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-e8f63b67-4a12-4a9e-8c1f-4977172075b0.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ea1b1c50-1e0b-457b-a91e-360db9b274e1.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ea1b1c50-1e0b-457b-a91e-360db9b274e1.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-eb132897-e367-4624-82cc-0dc6b4a96fe7.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-eb132897-e367-4624-82cc-0dc6b4a96fe7.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ebf5ec34-59e3-4f48-96ab-d2fb178d45eb.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ebf5ec34-59e3-4f48-96ab-d2fb178d45eb.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ee84d777-b1d6-45ce-ae52-3ae5dfdf99be.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-ee84d777-b1d6-45ce-ae52-3ae5dfdf99be.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-eff8bc32-69f3-4047-b25b-45d6e84dad4e.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-eff8bc32-69f3-4047-b25b-45d6e84dad4e.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f337c08a-086d-41d0-9c0b-64191a99c709.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f337c08a-086d-41d0-9c0b-64191a99c709.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f361a04e-ca1f-4c0f-81d4-12bc146270d3.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f361a04e-ca1f-4c0f-81d4-12bc146270d3.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f47be06f-8eb7-4b96-bade-4ae282fbf5e1.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f47be06f-8eb7-4b96-bade-4ae282fbf5e1.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f7676860-8b0e-473d-a4b0-d80f3eaf3132.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-f7676860-8b0e-473d-a4b0-d80f3eaf3132.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-fef74df1-e648-4c5c-9b43-d512136763d0.stderr.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-fef74df1-e648-4c5c-9b43-d512136763d0.stdout.txt
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/diff.patch
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/events.jsonl
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/final_state.json
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/initial_state.json
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/metadata.json
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research/runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/summary.json
+spec/progress/evidence/LOOP1-SYNC-001/client-implementation/run_native.py.txt
+spec/tasks/backlog/LOOP1-SYNC-001.md
+spec/tasks/review/LOOP1-SYNC-001.md
+tests/clients/sync/desktop.mjs
+tests/clients/sync/go_client.mjs
+tests/clients/sync/go_smoke.py
+tests/clients/sync/shared.mjs
+tests/clients/sync/tls_fixture.py
+tools/verify_client_sync.py
