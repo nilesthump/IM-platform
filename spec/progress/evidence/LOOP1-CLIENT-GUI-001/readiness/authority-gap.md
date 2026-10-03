@@ -36,3 +36,7 @@ Next exact action is fresh prerequisite writer for LOOP1-CLIENT-NATIVE-ARCH-001/
 ## Recovery verification outcomes
 
 Development recovery verifier initially failed because Windows legacy PowerShell lacks Get-FileHash. Corrected to bundled PowerShell7; then failed four current.md required formatting controls (exact backtick Command/Evidence/SHA/checkpoint). Formatting repaired; rerun tools/verify-loop1-ctrl-002.ps1 -Mode Development exits0 PASS task GUI/backlog, queues5/task_specs30. Original failures remain in sealed command stream. Baseline architecture/frozen exit0 PASS. Development is local evidence only, not independent acceptance. All commands recorded; command summaries contain exact duration/output hashes. No Recorder failures.
+
+Final diff-check found CRCRLF in generated current.md; initial shell continued commit despite diff-check exit2. Linked continuation R-GUI-READINESS-NEWLINE-20261004 corrects newline-only formatting. Initial31-event sealed stream remains immutable.
+
+Recorder continuation startup initially rejected reuse of an already-associated prompt; two following run-command calls consequently failed missing metadata. No mutation occurred. Registered same exact prompt under distinct continuation prompt ID and started prospective_resume marking this incomplete pre-run gap. Final newline diff-check exit0 and Development recovery exit0 PASS. All original failures disclosed; no evidence stream edited.
