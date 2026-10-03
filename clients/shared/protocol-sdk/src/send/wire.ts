@@ -81,13 +81,13 @@ export function decode(raw: string): Frame {
   const requestId=uuid(e.requestId); let p: ObjectValue;
   function rejected(codes: string[]): ObjectValue {
     const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
-    if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
+    if(p.status!=="rejected" || typeof error.code!=="string" || !codes.includes(error.code) || typeof error.message!=="string" || !error.message) return invalid();
     return p;
   }
   switch(e.type) {
     case "auth.ack":
       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
-      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || typeof p.clientType!=="string" || !["WEB","DESKTOP","MOBILE"].includes(p.clientType)) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
       break;
     case "message.ack":
       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
@@ -96,7 +96,7 @@ export function decode(raw: string): Frame {
     case "message.created":
       p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
     case "session.revoked":
-      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
+      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(typeof p.reason!=="string" || !["LOGOUT","REPLACED","REVOKED"].includes(p.reason)) return invalid(); break;
     case "ping": case "pong": p=object(e.payload,[]); break;
     default: return invalid();
   }

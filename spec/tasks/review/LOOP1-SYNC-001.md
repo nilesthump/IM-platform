@@ -2,7 +2,7 @@
 task_id: LOOP1-SYNC-001
 title: Desktop/Mobile two-level sync orchestration
 status: review
-owner: /root/sync_client_implementation
+owner: /root/sync_client_fix
 stage: S2
 gate: S2
 ---
@@ -148,3 +148,11 @@ Current numeric resource bound: Sync Kotlin parser uses a caller-specific19digit
 Current state review; earlier backlog/blocked/active records above are historical. Desktop/Mobile Sync fully implemented within declared current responsibility. Local final Android Sync62 assertions includes onCleared cancellation/join before owned Repository disposal; Desktop controlled actualSQLx and actualGoTLS/PG smoke pass. Shared maximum literal/escaped Unicode and exact wire negatives pass; legacy Send/SQLite regressions,53 architecture controls/source-only all zero violations/frozen and existing contracts pass. Recovery Development first failed11 formatting issues in activation current.md, repaired to exact required sections and PASS. No independent Task/Gate acceptance claimed.
 
 Evidence: spec/progress/evidence/LOOP1-SYNC-001/client-implementation/local-verification.md and sealed own Recorder/command-index; checkpoint spec/progress/checkpoints/2026-10-03-loop1-sync-001-client-local.md. Preserve all disclosed ordinary failures, startup/read-only/stdin capture gaps and owned fixture/generated artifact maintenance. Clean committed Acceptance exact identity supplied by handoff continuation; independent Review/CI/protected integration/main sync remain Coordinator duties. Candidate commit SHA follows commit; last known accepted0fe4fccc3deacd492895967cff9cc40cf34321d4. Main unknown781entries untouched. Assigned branch task/LOOP1-SYNC-001 sole writer /root/sync_client_implementation owns only declared files and new evidence, releases after clean handoff.
+
+# Fresh independent Review FAIL repair (2026-10-03)
+
+Candidate ccd780bd independently FAIL: Sync kind/code and legacy WSS error.code/clientType/reason coerced arrays into enum strings after parser syntax widened. Fresh sole Fix /root/sync_client_fix repairs only strict string-before-enum matching in existing declared Sync/send wire seams and tests/clients/sync/shared.mjs negative controls; Kotlin already strict. No contracts/backend/schema/native/config/dependencies/GUI edits. Original Review FAIL and exact old CI success remain historical, cannot accept repaired head. Current active repair then NEW fresh independent Review of full candidate and exact-head hosted CI/protected integration/main sync. Own prospective_resume Recorder R-SYNC-CLIENT-FIX-20261003 fresh_context=true discloses initial read-only startup and one PowerShell quote parse error outside command capture. Last accepted0fe4fccc; main unknown781 untouched.
+
+# Fresh Fix local verification handoff
+
+Five strictly typed enum guards and174 malformed-value/29 legal-value controls repair both reproduced P2. Red original actual compiled run failed; repaired shared Sync, old SEND golden/numbers/bound and Desktop TS compile PASS. Architecture53 controls initially generated-only FAIL, own4dirs368files preserved byte-exact privately, rerunPASS. Legacy Windows PowerShell Get-FileHash unavailable corrected to bundled7; original failures retained. Final frozen/source/recovery/clean committed Acceptance recorded in client-fix/local-verification.md and own sealed Recorder/observer handoff. Review queue/status unique; fresh Fix cannot accept its own work. NEW independent Review full base0fe4fccc..newcandidate + exact-head CI then protected integration/actual-main audit/main sync required. Main untouched/unknown781 preserved; no GUI/Web. Writer releases after clean committed handoff identity in private final-handoff.json.

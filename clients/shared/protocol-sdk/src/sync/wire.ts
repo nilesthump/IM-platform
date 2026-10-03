@@ -13,7 +13,7 @@ export function userPage(raw:string,requestId:string,inputCursor:string):UserPag
     const ids=new Set<string>(), cursors=new Set<string>();
     const events=list(p.events).map(v=>{const e=object(v,["eventId","cursor","kind","subjectId","revision"]);
       const eventId=uuid(e.eventId), token=cursor(e.cursor);
-      if(ids.has(eventId) || cursors.has(token) || token===inputCursor || !kinds.includes(String(e.kind))) return invalid();
+      if(ids.has(eventId) || cursors.has(token) || token===inputCursor || typeof e.kind!=="string" || !kinds.includes(e.kind)) return invalid();
       ids.add(eventId);cursors.add(token);
       return {eventId,cursor:token,kind:e.kind,subjectId:uuid(e.subjectId),revision:positive(e.revision)} as UserEvent;
     });
@@ -43,7 +43,8 @@ export function errorResponse(raw:string,requestId:string,status:number,conversa
     const p=object(parse(raw,MAX_RESPONSE),["requestId","error"]);if(uuid(p.requestId)!==requestId) return invalid();
     const e=p.error as Record<string,unknown>;if(!e || typeof e!=="object" || Array.isArray(e) || Object.keys(e).some(k=>!["code","message","violations"].includes(k)) || typeof e.message!=="string" || !e.message) return invalid();
     if(e.violations!==undefined) {if(!Array.isArray(e.violations)) return invalid();for(const v of e.violations){const f=object(v,["field","reason"]);if(typeof f.field!=="string" || !f.field || typeof f.reason!=="string" || !f.reason) return invalid();}}
-    if(status===401 && ["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"].includes(String(e.code))) return new SyncFailure("authentication");
+    if(typeof e.code!=="string") return invalid();
+    if(status===401 && ["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"].includes(e.code)) return new SyncFailure("authentication");
     if(conversation && status===403 && e.code==="AUTHORIZATION_DENIED") return new SyncFailure("unavailable");
     if(status===400 && e.code==="VALIDATION_FAILED" || status===426 && e.code==="PROTOCOL_VERSION_UNSUPPORTED") return new SyncFailure("protocol");
     return invalid();

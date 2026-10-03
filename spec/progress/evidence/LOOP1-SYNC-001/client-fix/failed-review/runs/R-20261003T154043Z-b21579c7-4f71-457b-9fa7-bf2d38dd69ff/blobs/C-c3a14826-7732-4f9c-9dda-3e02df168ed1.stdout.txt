@@ -1,0 +1,632 @@
+<a id="section-3"></a>
+## 3. 系统总体架构与部署单元
+
+```mermaid
+flowchart LR
+  Web["Web<br/>临时内存态"]
+  Desktop["Desktop<br/>SQLite"]
+  Mobile["Mobile<br/>SQLite"]
+  UI["Plugin UI Host<br/>声明式 UI + Render Bundle"]
+  Gateway["TLS Proxy / Gateway<br/>HTTPS + WSS"]
+  Core["Core 模块化单体<br/>Auth / IM / Sync"]
+  Plugin["Plugin Host<br/>WASM Sandbox"]
+  PG["PostgreSQL<br/>事实来源 + Outbox"]
+  NATS["NATS<br/>实时事件总线"]
+  Web --> Gateway
+  Desktop --> Gateway
+  Mobile --> Gateway
+  UI --> Gateway
+  Gateway --> Core
+  Core --> Plugin
+  Core --> PG
+  Core --> NATS
+  NATS --> Gateway
+```
+
+> 图 3-1 逻辑组件图。
+
+> 实时路径为 Core 的 Outbox dispatcher → NATS → Gateway；PostgreSQL 写入由 Core 事务负责。历史 PDF 的 NATS → PostgreSQL 箭头只保留在历史来源中，不代表现行运行依赖。
+
+<a id="section-3-1"></a>
+### 3.1 三个物理部署单元
+
+| 部署单元 | 职责 | 明确不负责 |
+| --- | --- | --- |
+| gateway | TLS 之后的 WSS 生命周期、auth.bind、session/cache 校验、connection registry、协议路由、local fan-out、heartbeat/限流 | 好友/群成员规则、消息持久化、插件业务逻辑 |
+| core | Auth、Session、User、Friendship、Conversation、Message、Sync、Outbox；模块化单体 | 不可信插件执行；大量 socket 连接状态 |
+| plugin-host | WASM runtime、事件分派、经授权的 Query/Action Host bridge、资源限制、熔断、编译缓存 | 不可信 WASM 直接访问数据库/文件/任意网络；绕过 Core 业务授权；成为 IM 主链单点 |
+
+<a id="section-3-2"></a>
+### 3.2 运行 profile
+
+```text
+docker compose --profile go up
+# gateway-go + core-go + plugin-host-go adapter + shared PostgreSQL/NATS/TLS
+docker compose --profile java up
+# gateway-java + core-java + plugin-host adapter + same canonical schema/contracts
+```
+
+profile 的目标是行为可替换；服务内部源码结构可以不同，但 §3 职责、§10 服务源码归属和依赖方向共同约束两个后端。Go 与 Java 可使用各自惯用的框架和组织方式，但必须共享：公共契约、数据库迁移语义、错误码、测试向量、插件 API、Release Manifest 格式。
+
+Go/Java 可采用不同内部组织方式，但所有新增框架、ORM、runtime、核心依赖必须先遵守 §2.3；结构自由不是技术选型授权。
+
+<a id="section-3-3"></a>
+### 3.3 Loop 1 单机部署
+
+| 层 | Loop 1 单机部署规则 |
+| --- | --- |
+| 入口 | TLS reverse proxy 暴露 HTTPS/WSS；部署 smoke、E2E、容量与发布验收流量经过真实入口。单元和隔离集成测试可直接访问被测组件，但不得替代入口验收 |
+| 服务 | 仅启动一个后端 profile；gateway/core/plugin-host 为可独立启动的部署角色。可复用一个构建制品按角色启动；不强制三个 module 或三个 binary，禁止把源码职责混为一个业务包 |
+| 数据 | PostgreSQL 单实例；所有 migration 有 forward/rollback 规则 |
+| 事件 | Core NATS，默认非事实来源；Outbox dispatcher 可重放 |
+| 存储 | 3TB 是机器容量约束，不代表测试必须填满；记录实际占用与增长 |
+
+
+<a id="section-6"></a>
+## 6. 客户端状态、本地存储与离线同步
+
+<a id="section-6-1"></a>
+### 6.1 三端差异
+
+| 客户端 | 本地持久化 | 离线历史 | 启动行为 |
+| --- | --- | --- | --- |
+| Web | 无聊天 DB；Memory only | 不补聊天历史；登录后获取当前好友/会话状态 | HTTPS 登录 -> WSS auth.bind -> 仅展示本会话实时数据 |
+| Desktop | 按账号独立 SQLite + OS secure token storage | 支持 | 先读 SQLite 立即渲染，再后台同步 |
+| Mobile | 按账号独立 SQLite + OS secure token storage | 支持 | 先读 SQLite 立即渲染，再后台同步 |
+
+
+#### 已批准客户端技术栈与边界（Human-approved v1.1 clarification）
+
+- Web = React + TypeScript；仅临时在线 Memory only；无 SQLite、无聊天历史持久化、无离线历史加载；通过 HTTPS + WSS 通信，页面生命周期结束后不保证消息状态保留。
+- Desktop = Tauri + React + TypeScript；UI 独立实现；共享协议、模型、适用 hooks、Design Token 和 UI 语义，不共享完整 React 视觉组件（ADR-0006）；按账号 SQLite、离线历史、optimistic send、SENDING/SENT/FAILED、ACK 回写、retry 复用 request_id、Sync 收敛。
+- Desktop 必要 Rust/native 代码仅限 `clients/desktop/src-tauri/**`，仅作为 SQLite native access、OS secure storage、必要文件系统等系统能力的 native adapter；客户端业务层、Repository API、protocol/model/plugin SDK 仍为 TypeScript，不得迁入 Rust。Desktop SQLite native boundary 使用 Tauri + SQLx(SQLite)；TypeScript 持有共享 Repository、模型和事务意图，Rust 仅提供数据库连接、查询和原子 transaction adapter。不得通过多个独立 tauri-plugin-sql execute() 调用模拟跨调用事务。SQLx 以外的 SQLite crate/plugin/library 未批准。
+- Mobile = Android + Kotlin + Jetpack Compose；Human 明确移除 Mobile TypeScript 技术栈，具体 framework 不再 TBD。Android Studio emulator 为真实 Android 验证环境；按账号 SQLite、离线历史、optimistic send、ACK/retry/Sync 与其他客户端相同。
+- Mobile 在 `clients/mobile/**` 使用 Kotlin 等价模型、Repository 语义、协议/插件适配与 data/domain 行为，服从同一 canonical contracts/fixtures；不要求直接复用 TypeScript SDK。优先 Android SDK 自带 SQLite 事务能力，不授权 Room、第三方 SQLite/ORM/network library 或其他架构敏感依赖。不得为共享代码自行加入 JS runtime、TS/JS bridge、codegen 或把 shared 层改写成跨端 native。完整 Mobile acceptance 未满足时 S2 Gate OPEN；Desktop host/mock 不能冒充 Android emulator acceptance。
+- `clients/shared/{protocol-sdk,plugin-sdk,ui}/` 及 Web/Desktop shared models、Repository、data/domain logic 保持 TypeScript 生态。Mobile 以同一公共契约与 fixtures 验证等价行为；不创建新公共契约。保留现有目录权威，无无意义搬迁。S2 不实现 S4 WASM host、marketplace 或完整 lifecycle。
+- Dart/Flutter 不属于当前批准 active client 技术栈；历史 PR7/Review/FAIL/Recorder/evidence 保留，但 PR7 不提供授权或新 TypeScript acceptance。
+
+机器检查读取下列已批准技术标识；标准包名仅对应上述显式栈及必要 type/build bindings，不授权额外框架、runtime、数据库驱动或原生依赖。每个架构敏感新依赖仍须独立 Review 追溯授权。Android SDK、Gradle、Kotlin/Compose compiler/plugin、标准 Compose UI 与 Android activity binding 是所选栈的必要工程标识，仅限 Mobile；不授权其他 Kotlin frameworks、ORM、网络或 plugin runtimes。
+
+<!-- client-technology-policy -->
+```json
+{
+  "decision": "ADR-0005-client-technology-clarification",
+  "languages": [
+    "TypeScript",
+    "JavaScript",
+    "Rust",
+    "Kotlin"
+  ],
+  "frameworks": [
+    "React",
+    "Tauri",
+    "Jetpack Compose"
+  ],
+  "runtimes": [
+    "Tauri",
+    "Android"
+  ],
+  "packages": [
+    "typescript",
+    "react",
+    "react-dom",
+    "@types/react",
+    "@types/react-dom",
+    "@tauri-apps/api",
+    "@tauri-apps/cli"
+  ],
+  "native_packages": [
+    "tauri",
+    "tauri-build",
+    "sqlx"
+  ],
+  "mobile_framework": "Jetpack Compose",
+  "native_boundary": "clients/desktop/src-tauri/",
+  "mobile_languages": [
+    "Kotlin"
+  ],
+  "mobile_runtimes": [
+    "Android"
+  ],
+  "mobile_frameworks": [
+    "Jetpack Compose"
+  ],
+  "mobile_plugins": [
+    "com.android.application",
+    "com.android.library",
+    "org.jetbrains.kotlin.android",
+    "org.jetbrains.kotlin.plugin.compose"
+  ],
+  "mobile_dependencies": [
+    "com.android.tools.build:gradle",
+    "org.jetbrains.kotlin:kotlin-gradle-plugin",
+    "org.jetbrains.kotlin:compose-compiler-gradle-plugin",
+    "org.jetbrains.kotlin:kotlin-stdlib",
+    "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+    "org.jetbrains.kotlin:kotlin-test",
+    "androidx.activity:activity-compose",
+    "androidx.compose:compose-bom",
+    "androidx.compose.runtime:runtime",
+    "androidx.compose.ui:ui",
+    "androidx.compose.ui:ui-tooling",
+    "androidx.compose.ui:ui-tooling-preview",
+    "androidx.compose.foundation:foundation",
+    "androidx.compose.animation:animation",
+    "androidx.compose.material3:material3",
+    "androidx.lifecycle:lifecycle-viewmodel-compose",
+    "androidx.lifecycle:lifecycle-runtime-compose",
+    "androidx.navigation:navigation-compose",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-android"
+  ],
+  "mobile_tooling": [
+    "Android SDK",
+    "Android Studio",
+    "Gradle",
+    "android-actions/setup-android",
+    "gradle/actions/setup-gradle",
+    "reactivecircus/android-emulator-runner"
+  ],
+  "mobile_import_prefixes": [
+    "android.",
+    "kotlin.",
+    "java.",
+    "javax.",
+    "org.json.",
+    "org.xml.",
+    "org.w3c.",
+    "androidx.compose.",
+    "androidx.activity.",
+    "androidx.lifecycle.",
+    "androidx.navigation.",
+    "kotlinx.coroutines."
+  ]
+}
+```
+
+JavaScript 仅为 TypeScript 生态的必要配置/构建互操作；Web/Desktop/shared 客户端业务/API/protocol/model/plugin SDK 必须 TypeScript；Mobile 的等价实现为 Kotlin。Rust 仅上述 native adapter。此标识表不授权 Node/Bun/Deno 等产品 runtime，SQLite native driver 仅批准 Desktop SQLx(SQLite)。Mobile 已批准 Android Kotlin + Jetpack Compose，Android Studio emulator 验证；Android 工程标识不是其他框架或第三方核心依赖的选型授权。
+
+<a id="section-6-2"></a>
+### 6.2 Optimistic write 与状态机
+
+以下 SQLite 持久状态机适用于 Desktop/Mobile；Web 使用内存态收敛，不引入聊天历史数据库。
+
+1. 用户点击发送
+2. -> 生成不可变 request_id
+3. -> SQLite 事务 UPSERT，state=SENDING
+4. -> UI 立即渲染
+5. -> WSS message.send
+6. -> ACK: SENT + server_message_id + seq + server_time
+7. -> timeout/offline: FAILED
+8. -> Retry: 复用相同 request_id，FAILED -> SENDING
+
+FAILED 仅表示当前尝试没有收到成功确认，不证明服务端未提交。SENT 是终态，不能倒退到 FAILED。Sync 若看到本地FAILED 但服务端已有相同 (conversation_id, request_id)，必须 UPSERT 为 SENT，而不是新增一行。
+
+<a id="section-6-3"></a>
+### 6.3 SQLite 事务不变量
+
+- UNIQUE(conversation_id, request_id)
+- UNIQUE(server_message_id) WHERE server_message_id IS NOT NULL
+- UNIQUE(conversation_id, server_seq) WHERE server_seq IS NOT NULL
+- 所有本地发送 / ACK / WSS realtime / Sync 均走事务 UPSERT
+- 业务数据变更与 cursor / contiguous_seq 推进必须在同一事务
+
+```mermaid
+flowchart LR
+  Start["启动<br/>读取 SQLite 并渲染"] --> Connect["连接<br/>HTTPS + WSS"]
+  Connect --> UserSync["用户状态同步<br/>user_sync_cursor"]
+  UserSync --> GapSync["消息缺口同步<br/>conversation seq"]
+  UserSync --> Tx["同一 SQLite 事务<br/>UPSERT 数据 + 推进 cursor / contiguous_seq"]
+  GapSync --> Tx
+```
+
+> WSS 实时流与 Sync 补偿流允许交叉，靠唯一约束和事务收敛，不暂停实时推送。
+>
+> 图 6-1 双层同步与本地收敛。
+
+<a id="section-6-4"></a>
+### 6.4 双层 Cursor
+
+user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频用户状态。消息不进入用户级事件流，以避免群消息按成员写放大。每个会话维护 contiguous_seq，只有本地从旧值开始连续无缺口时才能前移。
+
+### 6.5 客户端 UI 架构与 GUI 验收（Human-approved ADR-0006 候选）
+
+以下 Human 决定待新独立 Review、精确候选 hosted CI、集成与实际 main 核验后生效；此前不得据候选启动产品实现。补充设计说明位于 `spec/architecture/decisions/client-ui/architecture.md` 和 `design-direction.md`；GUI 验收规约为 `spec/acceptance/client-gui.md`；这些从属于本正文和 ADR-0006，不是第二 canonical 或公共 wire/schema 权威。
+
+- 产品构界 IM+ / PlugWorldIM；Adaptive Glass Workspace；视觉重点 50% Future AI Communication / 30% Productivity Tool / 20% Developer Extensibility。简洁、玻璃层次、AI-native、模块化、可配置；该比例不是功能能力承诺。Minimal Glassmorphism 使用 translucent surface、subtle border、blur、layered depth 表达层次；禁止信息堆砌、复杂 Dashboard、过度 Cyber/HUD、重度发光/霓虹/粒子/复杂 3D 和为炫技添加视觉元素。
+- 两主题 Cold AI（冷蓝、紫色渐变、深色玻璃）和 Warm Creative（暖色渐变、柔和玻璃、亲和）。共享 Logo、品牌、Layout、Component semantic；主题切换只改变 Color token。用户独立本地设置 Typography/Spacing；插件不得修改主导航、品牌核心或基础 UI 语义。主题切换不得重置字体/间距；设计值/像素布局和具体偏好存储机制由后续受控 GUI Task 给出，不授权 Web 聊天持久化。可读性/焦点/状态不能仅靠颜色或透明效果表达。
+- Application Shell 拥有 Chat / Friends / AI / Plugin 一级导航；未来仅客户端受控任务可增加 Settings/Profile；插件不得新增一级导航或直接控制 Shell。Chat 负责 Conversation List/View/Message；好友搜索、关系、添加属 Friends。AI 仅入口/插图/施工中，不含 AI chat、Agent、RAG、Tool Calling、API 或假 AI 数据。Plugin 为 Installed Plugins/Status/Entry 个人能力面板；缺失能力诚实显示未开放，不制造假数据；不是商店或 Marketplace。
+- Web React/TypeScript 工程分层为 Shell/routing、定制业务组件、hooks/data/state 和 Repository/protocol adapter；默认 useState/useReducer/Context/custom hooks。不选择第三方 router/data/state 库；Zustand/Redux/MobX 或敏感库需单独 ADR 批准。基础 icon/accessibility/utility 类别并非具体包的 blanket approval；不得绑定完整业务 UI framework。
+- Desktop Tauri/React/TypeScript 独立 UI，定位舒适、高频、生产力，允许后续受控任务提供更丰富布局/交互/本地能力展示。共享 protocol-sdk/plugin-sdk/models、Repository 行为、适用平台中立 hooks、Design Token/UI semantic；不共享完整 Button/MessageBubble/ChatWindow。Mobile 分享规范和 canonical contracts/fixtures，通过 Kotlin 等价实现，不要求复用 TS hook/SDK/组件。现行 SQLx/TypeScript 原子适配边界不变。
+- Mobile Compose UI 向 ViewModel 发出意图；ViewModel 调用 Repository 并通过 StateFlow 暴露状态；Compose 生命周期感知地观察 StateFlow。Repository 委托 SDK SQLite 与授权 WSS/protocol adapter。Jetpack Navigation Compose 管理宿主导航；仅明确 state/navigation 所需依赖按本节 machine policy；Android Studio emulator 验收，不授权额外 Room/ORM/network/runtime/bridge/codegen。
+- UI 只显示观察状态并发出意图；Repository 拥有本地 materialized data/事务收敛，protocol 层遵循 contracts/；UI 不直连 SQLite、不自行推进 cursor/contiguous_seq、不伪造 ACK/SENT、不决定服务端权限。Desktop/Mobile 本地先显示再背景 Sync；SENDING/SENT/FAILED、retry 复用 request_id、SENT 不回退、失败与服务端事件收敛、数据与 cursor 原子性沿用 §6.2-6.4。Web memory only、无离线历史；账号切换不显示旧账号数据。
+- S2 不下载/执行插件 UI 代码、不动态加载/注入任意远程组件、不实现 Renderer/runtime/安装系统。未来声明式 poll 描述是方向，不是新契约。Human 明确上述代码执行禁令仅限 S2；S4 保留 §8.2 审查加沙箱 Custom Render Bundle/白名单 Bridge、签名/hash/schema/API/权限/CSP/资源/入口校验及历史版本绑定；本节不删除或放宽它们。插件不能控制宿主导航。
+- 后续 GUI 覆盖现有 contracts/ 的 Auth login/refresh/logout/session-expired、User info、Friend search/add、Conversation list/open、Message send/receive/state、Sync state；传输/字段来自现行 OpenAPI/WSS，不发明 HTTP route 或 AI/Plugin API。无 AI 功能、Plugin runtime、Marketplace 实现。
+- GUI Task acceptance 必须含真实运行截图 -> Architect Review -> 修复/重新截图 -> Architect Approval，并保留独立实现 Review、精确候选 CI 与集成/main 核验。Web 截图覆盖 Login/Chat/Friends/AI Placeholder/Plugin Page；Desktop 覆盖主窗口/Chat/Friends/Offline History/真实 Notification-Tray/Theme；Mobile 为真实 Android emulator Login/Chat/Friends/Offline History/Sync 状态/Theme。两主题/受支持字体间距变化与相关加载/空/错误/会话失效/离线状态需实际证据；局部任务明确剩余范围，不得宣称全客户端 PASS。
+- 截图绑定 Task、候选 SHA/build/runtime、屏幕状态/尺寸、theme/配置、可重复步骤、文件/hash；使用受控无秘密数据。Architect 决策绑定同一候选和截图集，失败留未完成；影响已批准视觉的改动必须重新截图批准。截图不能证明 ACK/事务/幂等，不替代行为/权限/契约/源码依赖测试；Task PASS 不等于 S2 Gate PASS。
+
+
+<a id="section-7"></a>
+## 7. HTTPS/WSS/TLS 与认证协议
+
+<a id="section-7-1"></a>
+### 7.1 登录与 Token
+
+- 登录端点、字段名、版本与传输形状由 contracts/http/ 定义（当前为 POST /v1/auth/login）。本章 snake_case 领域名称不是另一套 wire schema。
+
+- Access Token 短期、Refresh Token 长期；具体时长是配置，不写死进协议。
+
+- Web 优先使用 HttpOnly Secure Cookie 持有 Refresh Token；原生端使用 OS secure storage。
+
+- 显式 logout 撤销 Session、Refresh Token 与 WSS；退出登录不等于立即删除本地 SQLite。
+
+<a id="section-7-2"></a>
+### 7.2 WSS 状态机
+
+1. TCP/TLS -> WebSocket Upgrade -> UNAUTHENTICATED
+2. UNAUTHENTICATED 只允许 auth.bind 与 ping/pong
+3. auth.bind 校验签名、exp、session_id、client_type、session_epoch
+4. 成功 -> AUTHENTICATED，socket 永久绑定 user/session/client_type
+5. 同端新登录 -> session.revoked -> 推送旧连接 -> close
+
+<a id="section-7-3"></a>
+### 7.3 Session 缓存一致性
+
+Core 在 Session 创建/撤销事务中写 outbox；Gateway 经 NATS 更新内存映射 (user_id, client_type) ->session_id/epoch/connection_id。每条消息不查询 PostgreSQL。实时撤销事件是体验优化；每次新绑定/重连必须验证数据库权威 Session ID 与 epoch，拒绝旧凭据；不得把实时撤销事件作为唯一有效性来源。Gateway 只拥有验证/连接能力；注册、登录、刷新、退出、Session 写事务及其 Outbox 属于 Core，不能通过共享完整 Auth 服务绕过边界。
+
+<a id="section-7-4"></a>
+### 7.4 传输与日志安全
+
+| 规则 | 要求 |
+| --- | --- |
+| 传输 | 生产入口仅 HTTPS/WSS/TLS；禁用明文回退 |
+| Token | 禁止放 URL query；禁止写应用日志/trace；错误响应不得回显 |
+| 密码 | 只存强哈希；凭证与普通用户资料分离 |
+| 插件 | 永不向 Custom Renderer 暴露认证 token 或 SQLite 直连 |
+| 日志 | request_id/message_id 可观测；消息正文默认不进入结构化日志 |
+
+
+<a id="section-10"></a>
+## 10. Monorepo 与规范控制面
+
+```text
+/
+├── spec/
+│ ├── architecture/
+│ │ ├── README.md + baseline.md # resolver 与完整性元数据
+│ │ ├── frozen-architecture.md # 唯一现行正文
+│ │ └── decisions/ # ADR + frozen decisions
+│ ├── domain/ # auth/user/friend/conversation/message/sync/plugin
+│ ├── invariants/ # 跨语言不可变量
+│ ├── acceptance/ # loop-1.md + stage gates
+│ ├── progress/
+│ │ ├── current.md
+│ │ └── checkpoints/
+│ ├── handoff/agent-context.md
+│ └── tasks/{backlog,ready,active,review,done}/
+├── contracts/
+│ ├── http/
+│ ├── websocket/
+│ ├── errors/
+│ ├── database/
+│ ├── plugin-api/
+│ └── fixtures/ # golden vectors / old clients / plugins
+├── backend/
+│ ├── go/{gateway,core,plugin-host,tests,shared}/
+│ └── java/{gateway,core,plugin-host,tests,shared}/
+├── clients/
+│ ├── shared/{protocol-sdk,plugin-sdk,ui}/
+│ ├── web/
+│ ├── desktop/
+│ └── mobile/
+├── plugins/fixtures/{echo,poll}/
+├── tests/{contract,integration,e2e,compatibility,load}/
+├── deploy/{compose,proxy,observability}/
+├── ci/
+└── tools/
+```
+
+### 服务源码与依赖规则（Go / Java 共同适用）
+
+- **SRC-01**：`backend/<language>/gateway/**` 只实现 §3.1 Gateway；`core/**` 拥有 Auth/Session 写事务、User/Friend/Conversation/Message/Sync/Outbox；`plugin-host/**` 拥有受控插件执行与代理。业务源码 MUST 位于对应服务范围，不能放在语言根目录或未批准的 `internal/**` 业务目录。
+- **SRC-02**：语言根目录只白名单允许入口装配（Go `main.go`、Java `Main.java`）、模块/依赖/构建文件（Go `go.mod`/`go.sum`，Java `pom.xml` 或 Gradle 配置）、Dockerfile、README.md、config.example.json 及根入口测试（Go `main_test.go`、Java `MainTest.java`）。入口只能读取配置、选择角色、连接依赖、启动/关闭对应服务；不得实现路由业务、Auth 服务或 Session 写逻辑。根测试仅验证装配，服务测试与职责同迁或置于 `tests/**`；不能以测试文件名藏业务实现。新增根源码例外必须先明确批准、列入检查器白名单并限定用途。
+- **SRC-03**：`shared/**` 可承载配置读取、日志、连接建立、通用编解码、密码学/令牌原语和由 canonical contracts 约束的传输数据类型。共享包 MUST NOT 承载完整 Auth 服务、注册/登录/刷新/退出流程、Session 写事务、业务仓储、权限/成员决策、Outbox 业务编排，亦不得反向依赖任何服务包。Gateway 的只读权威 Session 校验归 Gateway；Core 保有写事务。共享不是绕过职责的后门。
+- **SRC-04**：服务可依赖共享支持与本服务内部包；任何服务 MUST NOT 直接 import/依赖另一服务内部实现。服务间通过现有授权的 HTTP/WSS/事件/受控 Host bridge 边界协作；不因源码整改新增 RPC、公共契约、module 或基础设施。根装配可依赖各服务的最小启动接口，测试可跨服务作黑盒组合验证，均不得成为运行期业务反向依赖。
+- **SRC-05**：Go 与 Java 可使用不同的服务内部包/模块/线程组织；共同职责、物理角色和上述源码边界不可被“行为等价”豁免。不强制三 module、三 binary 或多层架构。Reviewer 检查实际职责和 import 图，不只看文件名或目录存在。
+- **SRC-06**：S0 历史占位白名单为 Go `backend/go/main.go` 与 Java `backend/java/InfraPlaceholder.java` 的非业务启动/健康/transport echo 骨架；清单不允许其承载业务。按后端分别退出：该后端第一次业务实现开始即移除业务路径的占位豁免；另一后端仍按明确占位清单验证，不能永久跳过结构规则。新规则暴露的旧实现偏离必须在迁移任务消除，不能 grandfather。单次跨服务迁移需 Task Spec 明确列出迁移文件/职责、范围和退出条件。
+- **SRC-07**：Task `allowed_paths` 仅限定可修改范围，不是架构豁免。普通业务任务按服务职责收窄；结构/依赖检查和行为测试共同验收。规范冲突必须在实现前升级，禁止事后修改架构追认错误布局。
+
+<a id="section-10-1"></a>
+### 10.1 spec/ 各目录的职责
+
+| 路径 | 回答的问题 | 禁止内容 |
+| --- | --- | --- |
+| architecture/decisions | 为什么这样设计，哪些已经冻结？ | 临时实现笔记 |
+| domain | 业务对象与行为是什么？ | 某语言的类结构 |
+| invariants | 无论实现如何都必须成立什么？ | 性能猜测 |
+| acceptance | 怎样判定阶段/Loop 通过？ | 不可验证的“基本完成” |
+| progress/current.md | 现在整体在哪里？最后已验证状态是什么？ | 任务细节堆积 |
+| checkpoints | 稳定里程碑的可恢复快照是什么？ | 每次小编辑日志 |
+| handoff/agent-context.md | 新 Agent 先知道什么？ | 重复全部文档 |
+| tasks | 下一件可执行工作是什么？允许修改哪里？ | 架构自由发挥 |
+
+
+<a id="section-11"></a>
+## 11. 公共契约与双后端实现
+
+<a id="section-11-1"></a>
+### 11.1 唯一权威
+
+Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户端 SDK。契约包含 OpenAPI/HTTP、WSS envelope 与消息类型、错误码、协议版本与 capabilities、数据库 schema/migrations、Plugin API、Golden Test Vectors。实现代码不得成为反向权威。
+
+<a id="section-11-2"></a>
+### 11.2 等价而非同构
+
+| 必须相同 | 允许不同 |
+| --- | --- |
+| HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、插件权限、数据库结果；§3/§10 服务职责、源码归属和依赖方向 | 服务内部框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部接口 |
+| Release Manifest、健康检查、metrics 标签、日志关联字段 | 内部模块名称与代码风格 |
+
+内部结构可不同不等于可自行选型；§2.3 适用于所有新增 architecture-sensitive framework、ORM、runtime 与核心依赖。§11.2 的可不同栏目仅表示在各自已批准技术决定内不要求同构。
+
+<a id="section-11-3"></a>
+### 11.3 Golden Contract Tests
+
+```text
+同一 fixture 输入 -> Go profile -> 规范化结果 A
+同一 fixture 输入 -> Java profile -> 规范化结果 B
+断言 A == Canonical Expected && B == Canonical Expected
+必须覆盖：auth/session、friend/direct uniqueness、group idempotency、message ACK/outbox、retry、sync gap、plugin permissions、errors/version negotiation
+```
+
+<a id="section-11-4"></a>
+### 11.4 数据库迁移
+
+两套后端共享数据库语义，但单次部署只运行一个 profile。migration 由独立迁移组件执行，不允许应用实例竞争执行。所有兼容窗口内的服务与客户端 fixture 必须通过 migration 测试。破坏性 schema 变更采用 expand -> migrate/backfill-> switch -> contract，多版本共存期间禁止先删旧字段。
+
+<a id="section-11-5"></a>
+### 11.5 公开 Sync HTTPS 绑定（Human-approved ADR-0008 候选）
+
+公开拉取通过 HTTPS POST /v1/sync/user 与 /v1/sync/conversation；唯一机器权威 contracts/http/sync.openapi.json，复用现有四种 Sync v1 形状和既有 Bearer/HTTP 错误目录。WSS realtime/ACK 保持原义，不添加 Sync envelope。Gateway 仅代理，Core 负责每请求数据库权威 Session、用户隔离、会话成员授权、稳定已提交分页；无新服务/依赖/数据库对象。
+
+用户初值 cursor 为 0，后续 opaque cursor 绑定认证用户、可跨其 Session 重放；客户端不解析/排序。仅 friend/conversation/membership/plugin metadata；消息仍使用会话 seq。内部 cursor_id 可在响应投影为 external event.cursor/nextCursor，既有 producer payload/schema 不改。任意正整数 limit 仍合法，effectiveLimit=min(limit,100)，先精确取 cap 再有界转换。空页 terminal（user 保持输入 cursor）；非空 user nextCursor=末事件 cursor 且前进；hasMore 要求非空进展且存在额外已提交合格项，不能跳过并发晚提交。会话消息从 afterSeq+1 有序连续；客户端仅跨无 gap 前缀推进 contiguous_seq，数据/cursor 同事务不变。
+
+100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
+
+成功/可解码有效 requestId 的 canonical error 与 body UUID 关联；不可关联格式错误用 server UUID。具体认证、字段、错误码/状态、资源界限和关联行为以 contracts/ 为准，不从实现推导。无效/外账号 cursor 400 VALIDATION_FAILED，不存在/非成员会话403 AUTHORIZATION_DENIED。未列入错误目录的服务器/传输失败不得冒充成功页或推进 cursor。查询参数禁止，入口 HTTPS、日志/错误无凭据，响应 no-store。
+
+批准来源与兼容/迁移见 ADR-0008。此绑定仅经 fresh independent Review、精确候选 hosted CI、protected integration/actual-main 与主仓库同步后生效；接受后仍须展示具体 Go 入口实现方案并取得 Human 同意才可写 Go 产品代码。SYNC 仍须真实服务与客户端独立接受；本前置不等于 Task SYNC/S2 Gate PASS。
+
+
+<a id="section-19"></a>
+## 19. 第一批 Agent 可执行任务
+
+任务必须逐个进入 ready。S0 Gate 未通过前，S1 任务不得 active；依此类推。下面清单是阶段规划，不是现行队列快照；按 Task Spec 的真实依赖选择，不以表格/文件名顺序代替依赖。不授权并行修改同一契约。
+
+| Task ID | 目标 | 阶段 | 交付物 | 验收 |
+| --- | --- | --- | --- | --- |
+| LOOP1-CTRL-001 | 建立 Monorepo 与规范目录 | S0 | repo skeleton; spec/ contracts/tasks/ progress/；README 仅指向权威入口 | 目录 lint PASS；无重复权威文档 |
+| LOOP1-CTRL-002 | 编写 agent-context/current/task 模板 | S0 | handoff、progress、task schema | 新 Agent dry-run 能按顺序恢复 |
+| LOOP1-CONTRACT-001 | 冻结 HTTP Auth/User/Friend 契约 | S0 | OpenAPI + errors + golden fixtures | schema lint；正/负例齐全 |
+| LOOP1-CONTRACT-002 | 冻结 WSS Envelope/Auth/Message 契约 | S0 | auth.bind/ack、message.send/ack/created、session.revoked | contract generator/tests PASS |
+| LOOP1-CONTRACT-003 | 冻结 Sync 与 Plugin API v1 | S0 | user cursor、conversation seq、Events/Queries/Actions/UI Host | fixtures 覆盖重复/乱序/权限拒绝 |
+| LOOP1-DB-001 | 建立 canonical schema 与migration runner | S0 | users/sessions/friendships/conversations/members/messages/outbox/plugins | 唯一约束与迁移测试 PASS |
+| LOOP1-INFRA-001 | Compose + PostgreSQL +NATS + TLS Proxy | S0 | go/java profile skeleton、真实 TLS入口 | clean checkout 一键启动 +smoke |
+| LOOP1-CI-001 | Path-aware CI skeleton | S0 | diff classifier、Go/Java/client/shared jobs | 路径矩阵单元测试 PASS |
+| LOOP1-GO-AUTH-001 | Go Auth/Session 纵切 | S1 | login/refresh/logout、slot、epoch、auth.bind | 同端替换旧 Session；多端并存 |
+| LOOP1-GO-SOCIAL-001 | Go 搜索/好友/唯一私聊事务 | S1 | normalized pair、direct uniqueness、sync/outbox | 并发互加最终 1 friendship+ 1 direct |
+| LOOP1-GO-MSG-001 | Go 文本消息 + seq +outbox | S1 | durable ACK、idempotency、dispatcher、NATS | ACK 丢失重试不重复；接收端实时收到 |
+| LOOP1-E2E-001 | 首条纵向 E2E | S1 | A 登录搜索添加 B 并发送 hello | 从 TLS 入口运行；证据归档 |
+| LOOP1-CLIENT-SQLITE-001 | SQLite schema 与 repository | S2 | UNIQUE(conversation_id, request_id)、UPSERT、migration fixture | 四条入口均幂等收敛 |
+| LOOP1-CLIENT-UI-ARCH-001 | 客户端 UI 架构冻结 | S2 | 三端职责、Adaptive Glass Workspace、截图驱动 Architect Review | 独立 Review/CI 与 main 核验后冻结；不代替 GUI 实现 |
+| LOOP1-CLIENT-SEND-001 | Optimistic send 状态机 | S2 | SENDING/SENT/FAILED/retry | SENT 不倒退；retry 复用request_id |
+| LOOP1-SYNC-001 | 双层离线同步 | S2 | user cursor + per-conversation contiguous_seq | 乱序/重复/交叉实时流无gap |
+| LOOP1-CLIENT-GUI-001 | Desktop/Mobile 完整 Loop1 GUI | S2 | Login/session、Chat、Friends、AI Placeholder、Plugin capability/unavailable、Settings/Profile、双主题/本地字体间距、Offline History、SENDING/SENT/FAILED/retry、Sync/reconnect、Desktop notification/tray/shortcut、Android emulator | CLIENT-UI-ARCH 与 spec/acceptance/client-gui.md；真实截图/Architect Review/修复重拍/Approval，再独立 Review、精确 HEAD CI、protected main 核验 |
+| LOOP1-WEB-001 | Web 完整 Loop1 GUI | S2 | React + TypeScript；memory only；Chat/Friends/AI Placeholder/Plugin/Settings/Profile、双主题和本地字体/间距 | 无 SQLite/离线历史；遵守 CLIENT-UI-ARCH、client-gui 截图验收和独立 Review/精确 HEAD CI/main 核验 |
+
+### S2 最小任务依赖与执行顺序（Human-approved ADR-0007）
+
+LOOP1-CLIENT-SQLITE-001（已接受） → LOOP1-CLIENT-UI-ARCH-001（UI 冻结已接受，当前规划补充另行验收） → LOOP1-CLIENT-SEND-001 → LOOP1-SYNC-001 → LOOP1-CLIENT-GUI-001 → LOOP1-WEB-001 → S2 Gate。
+
+该补充只新增一个产品 UI ID LOOP1-CLIENT-GUI-001。Desktop/Mobile GUI 独立边界包含上述完整界面及既有发送/同步编排的可观察状态，不重新实现 SQLite、发送或 Sync 领域逻辑。GUI 明确依赖 SQLITE、UI-ARCH、SEND、SYNC 四个已接受任务；Web 完整 GUI 使用原 LOOP1-WEB-001 且在 GUI 后执行。各任务在真实队列中唯一存在，依赖未接受不得激活；本轮 Human endpoint 为 SEND done，后续任务保持 backlog。
+
+GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成真实运行截图 → Architect Review → 修复 → 重新截图 → Architect Approval → fresh independent Review → exact-head applicable hosted CI → protected integration/actual-main verification。S2 不实现 AI API/chat/Agent/RAG、Plugin runtime、Marketplace、S4 renderer 或新公共 API；Web 始终 React/TypeScript memory only、no SQLite、no offline history。偏好仅存外观设置，不授权聊天持久化；未冻结具体存储机制按 §2.3 先决策后实现。
+
+
+<a id="section-20"></a>
+## 20. 后续任务队列与依赖
+
+| Task ID | 依赖 | 目标 | Gate |
+| --- | --- | --- | --- |
+| LOOP1-CLIENT-UI-ARCH-001 | LOOP1-CLIENT-SQLITE-001 | UI architecture 冻结与当前 MVP 规划补充验收 | S2 |
+| LOOP1-CLIENT-SEND-001 | LOOP1-CLIENT-SQLITE-001 + LOOP1-CLIENT-UI-ARCH-001 | Desktop/Mobile 发送编排；Repository 先持久化再 WSS，ACK/realtime/Sync 收敛、FAILED/retry 同 ID | S2 |
+| LOOP1-SYNC-001 | LOOP1-CLIENT-SEND-001 | 双层 Sync 编排及断线重连；保留领域职责 | S2 |
+| LOOP1-CLIENT-GUI-001 | LOOP1-CLIENT-SQLITE-001 + LOOP1-CLIENT-UI-ARCH-001 + LOOP1-CLIENT-SEND-001 + LOOP1-SYNC-001 | Desktop/Mobile 完整 GUI；CLIENT-UI-ARCH、client-gui 截图/Architect/独立 Review/CI/main 验收 | S2 |
+| LOOP1-WEB-001 | LOOP1-CLIENT-GUI-001 | Web 完整 Loop1 GUI；React/TypeScript memory only，无 SQLite/离线历史，同一截图验收 | S2 |
+| LOOP1-JAVA-AUTH-001 | S2 PASS + Auth contracts | Java/Spring Auth/Session 等价实现 | S3 |
+| LOOP1-JAVA-IM-001 | Java Auth + IM contracts | Friend/Conversation/Message/Sync/Outbox/NATS | S3 |
+| LOOP1-PARITY-001 | Go + Java core + S2 PASS | Golden parity；同一客户端制品/代码无需业务修改切换 Go/Java profile，GUI 不改写协议，两 profile 当前关键纵向流程通过 | S3 |
+| LOOP1-PLUGIN-REG-001 | Plugin API v1 | Registry、immutable artifact、validation | S4 |
+| LOOP1-PLUGIN-WASM-001 | Registry | WASM host、permissions、limits、circuit breaker | S4 |
+| LOOP1-PLUGIN-UI-001 | Registry + client hosts | Declarative UI/Render Bundle review/sandbox；遵守 CLIENT-UI-ARCH，禁止控制一级导航；真实宿主 UI 证据，显著视觉变化按 client-gui Architect 截图验收 | S4 |
+| LOOP1-PLUGIN-LIFE-001 | WASM/UI | install/enable/disable/uninstall/upgrade/rollback | S4 |
+| LOOP1-PLUGIN-FIX-001 | Plugin runtime | Echo/Poll 在 Web/Desktop/Mobile 真实宿主 UI 与两 profile 验证；真实运行证据及适用 Architect 截图批准 | S4 |
+| LOOP1-COMPAT-001 | S4 PASS | Web/Desktop/Android 与 old-client 兼容矩阵、SQLite migration、UI/theme/local preference 与 Plugin UI compatibility | S5 |
+| LOOP1-RELEASE-001 | compat CI | Desktop/Android 实际制品、Web 制品、manifest/hash/signing、install/upgrade/rollback smoke 和 staging rehearsal | S5 |
+| LOOP1-LOAD-001 | S5 PASS | Go load generator + scenarios + evidence format | S6 |
+| LOOP1-LOAD-GO-001 | load harness | Go 500->5000 benchmark/soak | S6 |
+| LOOP1-LOAD-JAVA-001 | load harness | Java 500->5000 benchmark/soak | S6 |
+| LOOP1-RC-001 | all gates | 三端最终可运行制品、关键 GUI smoke；相对最近 Architect-approved 截图集有实质视觉变化则重拍并批准；最终 5k/RC/rollback/architecture snapshot，容量负载由 harness 承担，不把 GUI 自动化放入 5000 WSS 热路径 | Loop 1 |
+
+<a id="section-20-1"></a>
+### 20.1 依赖纪律
+
+- 先契约与不变量，后实现；先 Go reference vertical slice，后客户端，再 Java parity。
+
+- 插件平台不得抢跑到 IM 主链稳定之前；兼容 CI 不得延后到发布前临时补。
+
+- 性能优化必须有 profile/metric 证据和回归测试；禁止先加基础设施再找问题。
+
+- 提前完成形成 schedule buffer，并立即推进下一 Gate，不做无验收价值的额外功能。
+
+
+
+FILE spec/governance/minimality.md
+# Minimality Contract
+
+Every additional abstraction must pay rent. This is a development and review rule subordinate to Frozen Architecture, approved ADRs, public contracts, invariants, acceptance criteria, and the current Task Spec. It creates no product requirement or authority to rewrite a contract.
+
+Implement the smallest direct mechanism that satisfies current approved requirements, invariants, acceptance criteria, and observed implementation constraints. A new interface, layer, framework, dependency, option, database object, worker, service, compatibility layer, or extension point needs a present responsibility. Possible future reuse, future stages, elegance, and generic “best practice” are insufficient on their own.
+
+When a less direct mechanism is needed, identify the current requirement or observed failure it serves, why the simpler path falls short, and the smallest added mechanism. Record measurements where performance or reliability motivates the change, and a removal or replacement condition if the mechanism is provisional. Do not use lines of code as a decision rule.
+
+Necessary boundaries and abstractions remain valid: for example, a real transaction boundary, shared Go/Java observable contract checks, an existing plugin capability boundary, or required Outbox reliability. Prefer one direct path when only one behavior exists. Do not add a strategy/factory hierarchy for a hypothetical second implementation, compatibility for nonexistent versions, or Loop 2 infrastructure in Loop 1 without current evidence and the required architecture approval.
+
+The Frozen Architecture already applies this judgment: Loop 2 goals do not expand Loop 1 implementation scope (chapter 1.3); Redis, Kafka, sharding, and automatic failover require fault or load evidence and an approved ADR (chapter 1.3); the simple conversation sequence row is allowed to be hot until load testing proves contention unacceptable (chapter 5); tasks do not grant architectural discretion, and agents stop at architecture conflicts (chapters 2 and 21). This document does not reinterpret those decisions or permanently ban a technology.
+
+## Independent review
+
+Alongside correctness, security, contracts, and acceptance, review added complexity against current responsibility. Inspect abstractions without current consumers; production code for future stages; new dependencies; strategy, factory, or framework layers for one current path; speculative compatibility or infrastructure; and production mechanisms whose removal would leave every approved acceptance criterion satisfied.
+
+Ask: **If this code or abstraction were removed or simplified, would every currently approved acceptance criterion still pass?** If yes, request deletion or simplification, or a concrete current requirement and evidence justifying it. A finding must cite that requirement or evidence gap and the affected code. Personal style preference and a raw size or LOC threshold are not findings. Reviewers cannot change product requirements, public contracts, or Frozen Architecture; a conflict follows the approved architecture process.
+
+Complexity delta (files, production/test lines, dependencies, public symbols, configuration, database objects, services) may help focus review. It is a signal, never an automatic score or FAIL.
+
+
+FILE spec/governance/execution-boundaries.md
+# Executing canonical source boundaries
+
+This subordinate execution guide does not create a second architecture authority. Resolve/hash-check spec/architecture/README.md -> baseline.md; business tasks read canonical §3/§10 SRC-01 through SRC-07/§11. These sections decide responsibility, root assembly/build/test whitelist, minimal shared support, import direction and separate backend placeholder expiry.
+
+allowed_paths limits writes and cannot waive higher authority. Ordinary tasks name service responsibility areas and presently required specific tests/assembly files. Escalate conflicts before implementation. A temporary migration records actual source/destination file/responsibility map, authorization, scope and acceptance exit before edits. No post-implementation architecture legalization.
+
+Acceptance combines canonical behavior/security/transaction fixtures with applicable ownership/import checks. Inspect actual logic and runtime graph: directory names and passing behavior cannot prove responsibility. Shared support cannot hide complete Auth/session-write business. Backend equivalence never exempts these rules; the Minimality Contract justifies only presently necessary interfaces/dependencies.
+
+## Current transition and recovery
+
+Stage001 is bounded done under v1.1. Stage002 propagates execution inputs. Stage003 must implement and independently verify effective ownership/dependency/task/trigger checks with negative controls and Java stage fixtures. These tools are bounded accepted at2afeac8/run36726926394: ci/check_architecture.py --scope all --json and tests/architecture, with evidence003/hosted-acceptance.md; Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. Stage004 bound accepted exact checker commands before migration and eliminated I01 old Go deviations; see evidence004/conflict-closure-supplement.md. Stage003 expected Go failures permit stage004, but do not prove Go compliance or batch/S1 Gate PASS. No grandfather exception.
+
+The stage004 language-wide scope is a single migration authorization ending at batch completion. Its actual file/responsibility map precedes edits. Social/Message/E2E activation waits for the entire remediation batch and final exact-head hosted acceptance. Original Auth remains historical done under old checks. Resolve the unique current task; no parallel unique Current Task or normal business resumption.
+
+## Future Java task creation
+
+Canonical §20 supplies planning IDs; actual queue dependencies and TASK_TEMPLATE.md govern readiness. Before future S3 Java activation use canonical contracts and §3/§10/§11, the same service boundaries, exact narrow task paths and accepted structural/dependency commands. Choose Java service-internal structure independently; Go layout is not authority. No mandate for three modules/binaries or extra layers. The explicit Java S0 placeholder is checked now; its own first business implementation expires its allowance. Go expiry never forces early Java business or a permanent Java skip.
+
+## Technology authorization
+
+Read `spec/governance/technology-selection.md` and canonical §2.3 / §6.1 before implementation or Review. Every new architecture-sensitive language/framework/runtime/core dependency requires traceable accepted Frozen Architecture / approved ADR authority. Missing decision: stop affected work BLOCKED_BY_ARCHITECTURE -> smallest question -> Human/Architect decision -> freeze -> fresh independent Review/applicable exact-head hosted CI -> implementation. Task text/allowed_paths/tests cannot approve selection. Reviewer FAIL on absent authority; inspect real imports/native responsibility beyond static guards. Desktop native SQLite is explicitly Tauri + SQLx(SQLite) with atomic transaction adapter; TypeScript holds Repository/models/transaction intent. No separate tauri-plugin-sql execute-call transactions. Mobile is Android Kotlin + Jetpack Compose, validated on Android Studio emulator. Mobile models/Repository/protocol/plugin adapters implement equivalent behavior under the same canonical contracts/fixtures; direct TypeScript SDK reuse is not required. Web/Desktop/shared stay TypeScript. Android SDK/Gradle/Kotlin/Compose engineering identifiers do not authorize Room/ORM/network libraries, JS runtime/bridge/codegen or shared native rewrite.
+
+
+FILE spec/governance/independent-review.md
+# Independent candidate Review checklist
+
+This checklist executes canonical §12-14/§21 and SRC-01 through SRC-07; it does not redefine architecture/contracts. A fresh Review Agent who neither implemented nor fixed the candidate reads unique current task, canonical hash/ADRs, task inputs, Minimality Contract and diff. Record independence, exact reviewed SHA/branch/range and clean committed checkout method. Renaming roles is not independence.
+
+- Check behavioral fixtures, transaction/ACK/Session/epoch/Sync invariants, authorization, security negative cases and actual live test enable conditions/skips. Tokens/passwords cannot appear in query, logs, traces or errors.
+- Inspect real service responsibility, root assembly whitelist, shared support semantics and runtime import graph against canonical §3/§10/§11. Reject cross-service internal imports, shared reverse imports, full Auth hidden in shared, business disguised as tests or task globs treated as waivers.
+- Check exact write scope, migration file/responsibility map, temporary authorization/exit and effective positive/negative structural checks. Directory/file names and observable equivalence alone are insufficient.
+- Apply separate backend stages. Java placeholder rules apply now; future Java business uses canonical boundaries and expiry, never Go layout. Stage003 exposes old Go deviations for stage004, not grandfathering.
+- Review interfaces/exports/dependencies against present responsibility and Minimality Contract; no speculative layers or future infrastructure.
+- Verify task queue/status uniqueness, dependencies, recovery and evidence; preserve historical PDF/done/checkpoints/Recorder. Check current accepted baseline discovery.
+- Verify exact final candidate hosted head, changed-path job selection and actual required conclusions. Execution-rule Markdown changes require applicable checks; missing/failed/cancelled/anomalously skipped jobs fail acceptance. Old CI and expired ADR-0001 cannot substitute.
+- Distinguish bounded stages from product, batch and S1 Gate. Stage003 checker effectiveness can pass while old Go fails; final migration must pass applicable structure/live regression.
+
+FAIL remains unfinished: fresh Fix Agent repairs within authorized scope, then a new Review Agent reviews the candidate. Local independent PASS still requires applicable hosted CI before closure. An irreducible authority conflict blocks its dependent portion and records the smallest decision question.
+
+## Technology authorization
+
+Read `spec/governance/technology-selection.md` and canonical §2.3 / §6.1 before implementation or Review. Every new architecture-sensitive language/framework/runtime/core dependency requires traceable accepted Frozen Architecture / approved ADR authority. Missing decision: stop affected work BLOCKED_BY_ARCHITECTURE -> smallest question -> Human/Architect decision -> freeze -> fresh independent Review/applicable exact-head hosted CI -> implementation. Task text/allowed_paths/tests cannot approve selection. Reviewer FAIL on absent authority; inspect real imports/native responsibility beyond static guards. Desktop native SQLite is explicitly Tauri + SQLx(SQLite) with atomic transaction adapter; TypeScript holds Repository/models/transaction intent. No separate tauri-plugin-sql execute-call transactions. Mobile is Android Kotlin + Jetpack Compose, validated on Android Studio emulator. Mobile models/Repository/protocol/plugin adapters implement equivalent behavior under the same canonical contracts/fixtures; direct TypeScript SDK reuse is not required. Web/Desktop/shared stay TypeScript. Android SDK/Gradle/Kotlin/Compose engineering identifiers do not authorize Room/ORM/network libraries, JS runtime/bridge/codegen or shared native rewrite.
+
+
+FILE spec/governance/technology-selection.md
+# Architecture-sensitive technology selection
+
+This execution rule applies to every present and future task, under canonical §2.2 and §2.3. It creates no product contract or alternative architecture authority.
+
+An Agent has no unapproved technology-selection authority. A sufficiently explicit current Frozen Architecture, approved ADR, contracts or Human architecture decision must answer the proposed selection. Long-term decisions must be recorded in Frozen Architecture / approved ADR and independently accepted before product implementation. Categories include programming language, UI/application/client/cross-platform framework, runtime, database/local database, ORM, networking framework, IPC/RPC, state management, plugin runtime, serialization, message queue, cache, storage engine, native bridge, authentication framework, major infrastructure dependency and any core third-party library creating long-term coupling.
+
+If authority does not provide a sufficiently clear answer: stop only affected work, mark `BLOCKED_BY_ARCHITECTURE`, record the smallest question and impact, obtain Architect/Human decision, freeze that decision in the canonical body / approved ADR, add applicable machine guards, obtain fresh independent Review and applicable exact-head hosted CI, then resume product implementation. Complete independent already-authorized work while the blocked portion waits. Never implement first and amend authority after tests to legalize the result.
+
+Familiarity, installed tools, convenience, popularity, fewer lines, a withdrawn attempt, absence of a prohibition, Task Spec text, allowed_paths and CI PASS are not approval. Unprohibited does not mean approved. Chat, handoff, progress, implementation README and source comments alone cannot freeze a long-term decision. Task Specs narrow scope and select already-authorized details; they cannot invent a language, framework, runtime, database, platform strategy, service boundary or protocol. Permitted Go/Java internal structural variation does not confer permission to select a new sensitive technology.
+
+Every Reviewer traces each new sensitive language/framework/dependency to a precise accepted canonical clause or ADR. If this trace fails, Review FAIL. Machine checks supplement this semantic obligation, never replace it.
+
+For client tasks, declare choices in `# Technology Authorization` using `client_framework:`, `client_runtime:`, `client_language:` and `client_dependency:` (one name per line; `TBD` is a blocker, not approval). The checker resolves the canonical client policy and rejects unapproved declarations even when paths permit them or tests pass. Approval comes from authority, never the declaration. Free-form decisions and disguised dependencies still require semantic Review.
+
+Current client policy is canonical §6.1 and ADR-0005: React/TypeScript Web; Tauri/React/TypeScript Desktop with necessary Rust only in clients/desktop/src-tauri; Android Kotlin + Jetpack Compose Mobile; Web/Desktop/shared protocol/plugin/model/Repository/domain/UI direction TypeScript. Mobile equivalent behavior/models/adapters follow the same contracts/fixtures, without mandatory TS SDK reuse. Desktop native SQLite is approved as Tauri + SQLx(SQLite); TypeScript holds Repository/models/transaction intent and Rust only database connections/queries/atomic transaction adapter. Separate tauri-plugin-sql execute() calls cannot emulate a cross-call transaction. Android Studio emulator validates Mobile Android runtime. Only necessary Android SDK/Gradle/Kotlin/Compose engineering identifiers and built-in SDK SQLite follow that choice; no arbitrary Room/ORM/network libs, JS runtime/bridge/codegen or shared native rewrite. Standard package names for the explicitly chosen stack and its type/build bindings are enumerated in canonical policy; this is not permission for other frameworks, state managers, bridges or runtime libraries. No S4 implementation is authorized by reusable SDK direction.
+
+
+FILE spec/domain/messaging.md
+# Messaging Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-002`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| MSG-D-001 | A client request identity MUST be unique within a Conversation and is the identity reused by retry and local convergence. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-D-002 | The server idempotency identity MUST include sender, Conversation, and client request identity; the server message identity MUST be globally unique. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-003 | Conversation sequence numbers MUST be unique and monotonically increasing within each Conversation. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-004 | Message send MUST authorize the sender as a Conversation member before persistence. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-D-005 | Sequence allocation, Message persistence, and the matching Outbox event MUST commit atomically; a successful ACK MUST mean that durable commit has completed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message, Outbox). |
+| MSG-D-006 | Outbox delivery and NATS delivery MAY repeat or be briefly missed; consumers MUST be idempotent and Sync MUST provide eventual completeness. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-D-007 | Gateway MUST fan out only to locally active connections and MUST NOT own friendship, membership, persistence, or plugin business rules. | Architecture Baseline v1.0, chapters 2 (F-05) and 5.2. |
+| MSG-D-008 | A GROUP send MUST create one logical Message and one Outbox event; it MUST NOT create one persistent message record per member. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-D-009 | Loop 1 MUST NOT treat NATS JetStream as the message source of truth. | Architecture Baseline v1.0, chapters 2 (F-03) and 5.2. |
+
+
+FILE spec/invariants/messaging.md
+# Messaging Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| MSG-I-001 | Repeating a send with the same server idempotency identity MUST converge on the same logical Message and MUST NOT allocate another Conversation sequence. | Architecture Baseline v1.0, chapters 4.4 and 5.1. |
+| MSG-I-002 | A successful message ACK MUST NOT be observable before the Message and matching Outbox event are durably committed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-I-003 | Every committed logical Message MUST have exactly one logical Outbox event, even when publication delivery is retried. | Architecture Baseline v1.0, chapters 4 (Figure 4-1), 5.1, and 5.2. |
+| MSG-I-004 | No recipient MUST receive a Message for the wrong Conversation, and no permanent sequence gap may remain after Sync convergence. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-I-005 | Duplicate NATS delivery MUST NOT create a duplicate logical Message or duplicate client materialization. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-I-006 | A send by a non-member MUST be rejected before persistence and before a success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-I-007 | GROUP fan-out MUST remain an online delivery concern and MUST NOT alter the single-Message, single-Outbox persistence outcome. | Architecture Baseline v1.0, chapter 5.3. |
+
+
+FILE spec/domain/sync-plugin.md
+# Sync and Plugin Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-003`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| SP-D-001 | Web MUST remain memory-only and MUST NOT claim offline history; Desktop and Mobile MUST use per-account local materialized views and render local state before background Sync. | Architecture Baseline v1.0, chapters 2 (F-07) and 6.1, and appendix B (Web). |
+| SP-D-002 | A local optimistic send MUST create one client request identity, persist SENDING before transmission, converge to SENT after ACK, and reuse the same request identity when retrying FAILED. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-D-003 | SENT MUST be terminal and MUST NOT regress to FAILED; FAILED means only that the current attempt lacks success confirmation. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-D-004 | User Sync cursor MUST cover only low-frequency user-level state; message state MUST use per-Conversation sequence and contiguous sequence tracking. | Architecture Baseline v1.0, chapters 2 (F-06) and 6.4, and appendix B (Sync). |
+| SP-D-005 | Sync MUST advance a per-Conversation contiguous sequence only across a gap-free prefix; duplicate and out-of-order input MUST converge without skipping a gap. | Architecture Baseline v1.0, chapter 6.4 and appendix B (Sync). |
+| SP-D-006 | All local send, ACK, realtime, and Sync write paths MUST converge through transactional upsert; data and cursor advancement MUST commit together. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-D-007 | Plugin API v1 MUST expose Events, Queries, Actions, and UI Host surfaces, each constrained by declared capability and permission. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-D-008 | Queries MUST be read-only, paginated, and limited; each Action MUST be re-authorized, idempotent, and audited; plugins MUST NOT call Core internals or databases directly. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-D-009 | A custom renderer MUST pass package hash, signature, manifest-schema, API-compatibility, permission, resource-size, CSP, and entry-point checks before loading, and MUST run in the stated UI sandbox. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-D-010 | A plugin artifact identified by plugin and version MUST be immutable; backend and renderer MUST remain version-bound, and history MUST retain the renderer needed by referenced messages plus fallback text. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-D-011 | WASM execution MUST default-deny database, server-file, arbitrary-network, and other-plugin-memory access and MUST enforce CPU/time, memory, concurrency, storage, and network limits. | Architecture Baseline v1.0, chapter 8.3 and appendix B (Plugin). |
+| SP-D-012 | Plugin artifact lifecycle and Conversation-scoped instance lifecycle MUST remain distinct; upgrade MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed, and MUST roll back on failure. | Architecture Baseline v1.0, chapters 9.1 and 9.2. |
+| SP-D-013 | DISABLE MUST preserve data, UNINSTALL MUST default to RETAINED, and PURGE MUST require an explicit irreversible operation with elevated permission, audit, and a confirmed retention policy. | Architecture Baseline v1.0, chapter 9.3. |
+
+
+FILE spec/invariants/sync-plugin.md
+# Sync and Plugin Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| SP-I-001 | Duplicate or out-of-order Sync input MUST be idempotent, and contiguous sequence MUST NOT advance across a missing sequence. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-I-002 | When Sync observes a server Message matching a locally FAILED send identity, it MUST converge that local item to SENT rather than create another item. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-I-003 | Local materialized data and its corresponding cursor or contiguous-sequence advance MUST commit atomically. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-I-004 | User-level cursor input MUST NOT contain Message events. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-I-005 | Plugin capability or permission denial MUST prevent the Event subscription, Query, Action, or UI behavior without granting an alternate direct access path. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-I-006 | Query operations MUST NOT mutate state; each Action MUST be re-authorized at execution, MUST be idempotent, and MUST be auditable. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-I-007 | A changed package, backend, or renderer hash under an existing plugin version MUST be rejected. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-I-008 | WASM and custom-renderer execution MUST remain sandboxed with least privilege and MUST NOT directly reach host-sensitive resources. | Architecture Baseline v1.0, chapters 8.2 and 8.3, and appendix B (Plugin). |
+| SP-I-009 | Upgrade MUST NOT split backend and renderer versions and MUST leave the previous version serviceable until atomic switch; any failed step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-I-010 | DISABLE and UNINSTALL MUST NOT purge retained data; PURGE MUST NOT occur implicitly. | Architecture Baseline v1.0, chapter 9.3. |
+

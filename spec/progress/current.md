@@ -7,21 +7,21 @@ Gate Status: OPEN
 Current Batch: S2-SYNC-only
 Current Task: LOOP1-SYNC-001
 Current Task State: review
-Execution Status: AWAITING_INDEPENDENT_CLIENT_SYNC_REVIEW
+Execution Status: AWAITING_NEW_INDEPENDENT_CLIENT_SYNC_REVIEW
 
 ## Immediately Relevant Completed Work
 
-Go product/admin independently accepted and synchronized at0fe4fccc; SEND accepted. Client Desktop/Mobile two-level Sync locally implemented and enabled native/real Go verification passed. Local proof is not independent Task acceptance.
+Go/SEND accepted; Desktop/Mobile Sync implemented locally. Fresh Fix repairs strict enum typing after independent Review FAIL. Shared Sync/SEND regression and Desktop compile PASS; NEW independent acceptance pending.
 
 ## Current Blockers
 
-No architecture/runtime/Human blocker. Independent Review, exact-head hosted CI, protected integration/main audit/safe synchronization remain required.
+Original candidate independent Review FAIL on nonstring enum coercion; fresh scoped Fix locally repaired. No architecture/runtime/Human blocker. NEW independent Review, exact-head hosted CI, protected integration/main audit/safe synchronization remain required.
 
 ## Verification
 
-- Command: `python -B tools/verify_client_sync.py --scope mobile --serial emulator-5590`
-  - Result: Local PASS actual API34 SDK SQLite/trusted HTTPS/WSS62 assertions; Desktop/shared, actual Go and regressions also local PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-001/client-implementation/local-verification.md`
+- Command: `python -B tools/verify_client_sync.py --scope shared`
+  - Result: Local repaired PASS; all174 malformed enum controls,29 legal values, fullUnicode/exact integers/bounds; SEND shared and Desktop build PASS. Architecture53 PASS after verified own generated preservation.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-001/client-fix/local-verification.md`
 
 ## Changed Files or Migrations
 
@@ -33,7 +33,7 @@ Repaired build/fixture/input formatting failures retained; source checks initial
 
 ## Next Exact Action
 
-Finish clean committed local handoff to fresh independent Review, exact hosted CI, protected integration/actual-main audit and safe sync. Stop after SYNC independently accepted and synchronized.
+NEW fresh independent Review of repaired full candidate, exact hosted CI, protected integration/actual-main audit and safe sync. Stop after SYNC independently accepted and synchronized.
 
 ## Last Known Good Commit
 
@@ -45,7 +45,7 @@ Finish clean committed local handoff to fresh independent Review, exact hosted C
 
 ## Uncommitted Changes / Ownership
 
-Sole writer /root/sync_client_implementation at assigned H:/.codex/worktrees/sync-resume/IM-platform task/LOOP1-SYNC-001 owns only declared Task paths and private own Recorder/artifacts. Main H:/IM-platform unknown781entries preserved.
+Fresh Fix /root/sync_client_fix releases sole writer after clean commit at assigned H:/.codex/worktrees/sync-resume/IM-platform task/LOOP1-SYNC-001 owns only declared Task paths and private own Recorder/artifacts. Main H:/IM-platform unknown781entries preserved.
 
 ## Architecture Conflicts / ACP / ADR
 

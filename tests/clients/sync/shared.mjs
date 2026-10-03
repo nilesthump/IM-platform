@@ -23,6 +23,35 @@ assert.equal(conversationPage(json(huge).replace('"seq":1','"seq":90071992547409
 assert.equal(errorResponse(json({requestId:id,error:{code:"AUTH_SESSION_REVOKED",message:"Revoked"}}),id,401,false).kind,"authentication");
 assert.equal(errorResponse(json({requestId:id,error:{code:"AUTHORIZATION_DENIED",message:"Denied"}}),id,403,true).kind,"unavailable");
 assert.equal(errorResponse(json({requestId:id,error:{code:"AUTHORIZATION_DENIED",message:"Denied"}}),id,403,false).kind,"protocol");
+// Nonstring enum values must never inherit array/object String coercion.
+const malformedEnum=value=>[[value],[[value]],{value},true,false,1];
+const syncAuthCodes=["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"];
+for(const kind of ["friend.changed","conversation.changed","membership.changed","plugin.changed"]) {
+  assert.equal(userPage(json({...page,events:[{...event,kind}]}),id,"0").events[0].kind,kind);
+  for(const invalidKind of malformedEnum(kind)) throws(()=>userPage(json({...page,events:[{...event,kind:invalidKind}]}),id,"0"));
+}
+for(const code of syncAuthCodes) {
+  assert.equal(errorResponse(json({requestId:id,error:{code,message:"Error"}}),id,401,false).kind,"authentication");
+  for(const invalidCode of malformedEnum(code)) assert.equal(errorResponse(json({requestId:id,error:{code:invalidCode,message:"Error"}}),id,401,false).kind,"protocol");
+}
+const wss=(type,payload)=>json({protocolVersion:"1.0",type,requestId:id,payload});
+const rejectedCodes={
+  "auth.ack":["VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED"],
+  "message.ack":["VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED"]
+};
+for(const [type,codes] of Object.entries(rejectedCodes)) for(const code of codes) {
+  assert.equal(decode(wss(type,{status:"rejected",error:{code,message:"Error"}})).payload.error.code,code);
+  for(const invalidCode of malformedEnum(code)) assert.throws(()=>decode(wss(type,{status:"rejected",error:{code:invalidCode,message:"Error"}})),/Invalid WSS frame/);
+}
+for(const clientType of ["WEB","DESKTOP","MOBILE"]) {
+  const payload={status:"bound",userId:u,sessionId:id,clientType,sessionEpoch:1};
+  assert.equal(decode(wss("auth.ack",payload)).payload.clientType,clientType);
+  for(const invalidType of malformedEnum(clientType)) assert.throws(()=>decode(wss("auth.ack",{...payload,clientType:invalidType})),/Invalid WSS frame/);
+}
+for(const reason of ["LOGOUT","REPLACED","REVOKED"]) {
+  assert.equal(decode(wss("session.revoked",{sessionId:id,reason})).payload.reason,reason);
+  for(const invalidReason of malformedEnum(reason)) assert.throws(()=>decode(wss("session.revoked",{sessionId:id,reason:invalidReason})),/Invalid WSS frame/);
+}
 const session={userId:u,sessionId:id,sessionEpoch:1n,accessToken:"fixture-desktop"};
 for(const url of ["http://localhost/","https://user@localhost/","https://localhost/?token=x","https://localhost/sub"])assert.throws(()=>new SyncHttp(url,session));
 let calls=0;
@@ -35,4 +64,4 @@ const bad=new SyncHttp("https://localhost/",session,async()=>new Response("x".re
 await assert.rejects(bad.user("0",new AbortController().signal),SyncFailure);
 const frame=json({protocolVersion:"1.0",type:"ping",requestId:id,payload:{}});
 assert.throws(()=>decode(" ".repeat(131073)+frame));
-console.log("PASS: exact Sync correlation/shapes/gap/progress/kinds/numbers, 100x4096 escaped/literal Unicode bounded transport, WSS bound regression");
+console.log("PASS: exact Sync correlation/shapes/gap/progress/kinds/numbers, 100x4096 escaped/literal Unicode bounded transport, strict nonstring Sync/WSS enums and WSS bound regression");

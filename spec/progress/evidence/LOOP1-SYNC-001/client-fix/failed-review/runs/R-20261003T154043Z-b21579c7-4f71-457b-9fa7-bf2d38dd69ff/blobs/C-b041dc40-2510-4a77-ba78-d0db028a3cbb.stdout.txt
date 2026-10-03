@@ -1,0 +1,165 @@
+
+FILE clients/desktop/src/application/sync/application.ts
+1: import {uuid} from "../../../../shared/protocol-sdk/src/send/wire.js";
+2: import {SendApplication} from "../send.js";
+3: import {SyncHttp} from "../../../../shared/protocol-sdk/src/sync/http.js";
+4: import {SyncFailure} from "../../../../shared/protocol-sdk/src/sync/wire.js";
+5: export interface SyncState {status:"idle"|"syncing"|"failed"|"retired";error:string|null;unavailable:readonly string[]}
+6: export class SyncApplication {
+7:   private opened="";
+8:   private generation=0;private retired=false;private stopped=false;private controller=new AbortController();
+9:   private queue:Promise<void>=Promise.resolve();private requested=false;private listeners=new Set<(s:SyncState)=>void>();
+10:   private detach:()=>void;private detachDelivery:()=>void;private wasReady=false;
+11:   private current:SyncState={status:"idle",error:null,unavailable:[]};
+12:   constructor(readonly send:SendApplication,private http:SyncHttp) {
+13:     if(!http.matchesSession(s=>send.matchesSession(s))) throw new SyncFailure("authentication");
+14:     this.detachDelivery=send.observeDelivery(()=>{if(send.state.connection==="ready") void this.synchronize().catch(()=>{});});
+15:     this.detach=send.observe(s=>{
+16:       const ready=s.connection==="ready";
+17:       if(!ready && this.wasReady){this.generation++;this.controller.abort();this.controller=new AbortController();}
+18:       if(ready && !this.wasReady && !this.stopped) void this.synchronize().catch(()=>{});
+19:       this.wasReady=ready;
+20:     });
+21:   }
+22:   get state():SyncState{return this.current;}
+23:   observe(listener:(s:SyncState)=>void):()=>void{this.listeners.add(listener);listener(this.current);return()=>this.listeners.delete(listener);}
+24:   private publish(s:SyncState){if(this.retired)return;this.current=Object.freeze({...s,unavailable:Object.freeze([...s.unavailable])});for(const l of this.listeners){try{l(this.current);}catch{/* Observer owns no commit. */}}}
+25:   async openConversation(c:string):Promise<void>{const selected=uuid(c);await this.send.openConversation(selected);this.opened=selected;await this.synchronize();}
+26:   synchronize():Promise<void>{
+27:     if(this.retired || this.stopped)return Promise.resolve();
+28:     this.requested=true;
+29:     const job=this.queue.then(async()=>{
+30:       if(!this.requested || this.retired || this.stopped)return;
+31:       this.requested=false;const g=this.generation,signal=this.controller.signal;
+32:       const active=()=>!this.retired && !this.stopped && this.generation===g && !signal.aborted;
+33:       this.publish({status:"syncing",error:null,unavailable:[]});
+34:       const unavailable:string[]=[];
+35:       try{
+36:         do{
+37:           if(!active())return;const cursor=await this.send.repository.cursor(),page=await this.http.user(cursor,signal);
+38:           if(!active())return;await this.send.mergeUserPage(page,cursor,active);if(!active())return;
+39:           if(!page.hasMore)break;
+40:           if(await this.send.repository.cursor()===cursor)throw new SyncFailure("protocol");
+41:         }while(active());
+42:         for(const c of new Set([...(await this.send.repository.conversationIds()),...(this.opened?[this.opened]:[])])){
+43:           try{
+44:             do{
+45:               if(!active())return;const after=await this.send.repository.contiguous(c),page=await this.http.conversation(c,after,signal);
+46:               if(!active())return;await this.send.mergeMessages(page.messages,active);if(!active())return;
+47:               if(!page.hasMore)break;
+48:               if(await this.send.repository.contiguous(c)<=after)throw new SyncFailure("protocol");
+49:             }while(active());
+50:           }catch(error){if(error instanceof SyncFailure && error.kind==="unavailable"){unavailable.push(c);continue;}throw error;}
+51:         }
+52:         if(active())this.publish({status:"idle",error:null,unavailable});
+53:       }catch(error){
+54:         if(!active())return;
+55:         const kind=error instanceof SyncFailure?error.kind:"storage";
+56:         if(kind==="authentication"){this.stopped=true;this.generation++;this.controller.abort();this.send.disconnect();}
+57:         this.publish({status:"failed",error:kind,unavailable});throw new SyncFailure(kind);
+58:       }
+59:     });
+60:     this.queue=job.catch(()=>{});return job;
+61:   }
+62:   async idle(){await this.queue;await this.send.idle();}
+63:   async close(){if(this.retired)return;this.retired=true;this.generation++;this.controller.abort();this.detach();this.detachDelivery();this.listeners.clear();this.current={status:"retired",error:null,unavailable:[]};this.send.close();await this.queue;await this.send.idle();}
+64: }
+
+
+FILE clients/desktop/src/application/sync/accountSync.ts
+1: import {accountSend} from "../accountSend.js";
+2: import type {Session} from "../send.js";
+3: import {SyncHttp} from "../../../../shared/protocol-sdk/src/sync/http.js";
+4: import {SyncApplication} from "./application.js";
+5: // The existing account factory owns native SQLx binding and local-first loading.
+6: export async function accountSync(session:Session,endpoint:string):Promise<SyncApplication>{
+7:   const owner=Object.freeze({...session});const http=new SyncHttp(endpoint,owner);
+8:   return new SyncApplication(await accountSend(owner),http);
+9: }
+
+
+FILE clients/shared/protocol-sdk/src/sync/http.ts
+1: import {MAX_RESPONSE,SyncFailure,errorResponse,userRequest,conversationRequest,userPage,conversationPage} from "./wire.js";
+2: export interface SyncSession {userId:string;sessionId:string;sessionEpoch:bigint;accessToken[REDACTED]
+3: export class SyncHttp {
+4:   private readonly session:Readonly<SyncSession>;
+5:   matchesSession(check:(s:Readonly<SyncSession>)=>boolean):boolean{return check(this.session);}
+6:   private readonly base:string;private readonly token:string;
+7:   constructor(endpoint:string,session:SyncSession,private fetcher:typeof fetch=fetch,private id:()=>string=()=>crypto.randomUUID()) {
+8:     this.session=Object.freeze({...session});const accessToken[REDACTED];
+9:     let url:URL;try{url=new URL(endpoint);}catch{throw new SyncFailure("protocol");}
+10:     if(url.protocol!=="https:" || !url.hostname || url.username || url.password || url.search || url.hash || url.pathname!=="/" || !accessToken || /[\r\n]/.test(accessToken)) throw new SyncFailure("protocol");
+11:     this.base=url.origin;this.token=accessToken;
+12:   }
+13:   private async post(path:string,body:string,requestId:string,signal:AbortSignal):Promise<string> {
+14:     try {
+15:       const response=await this.fetcher(this.base+path,{method:"POST",headers:{"Authorization":"Bearer "+this.token,"Content-Type":"application/json"},body,signal,redirect:"error",credentials:"omit",cache:"no-store"});
+16:       if(response.redirected || response.headers.get("cache-control")!=="no-store" || !/^application\/json(?:\s*;|$)/i.test(response.headers.get("content-type")??"")) throw new SyncFailure(response.status>=500?"transport":"protocol");
+17:       const reader=response.body?.getReader();if(!reader) throw new SyncFailure("transport");
+18:       const decoder=new TextDecoder("utf-8",{fatal:true});let raw="",size=0;
+19:       try {for(;;){const item=await reader.read();if(item.done) break;size+=item.value.byteLength;if(size>MAX_RESPONSE) throw new SyncFailure("protocol");raw+=decoder.decode(item.value,{stream:true});}raw+=decoder.decode();}
+20:       finally {await reader.cancel().catch(()=>{});}
+21:       if(response.status!==200) {if([400,401,403,426].includes(response.status)) throw errorResponse(raw,requestId,response.status,path.endsWith("conversation"));throw new SyncFailure("transport");}
+22:       return raw;
+23:     } catch(error) {if(error instanceof SyncFailure) throw error;throw new SyncFailure("transport");}
+24:   }
+25:   async user(inputCursor:string,signal:AbortSignal) {const requestId=this.id();return userPage(await this.post("/v1/sync/user",userRequest(requestId,inputCursor),requestId,signal),requestId,inputCursor);}
+26:   async conversation(c:string,afterSeq:bigint,signal:AbortSignal) {const requestId=this.id();return conversationPage(await this.post("/v1/sync/conversation",conversationRequest(requestId,c,afterSeq),requestId,signal),requestId,c,afterSeq);}
+27: }
+
+
+FILE clients/shared/protocol-sdk/src/sync/wire.ts
+1: import {parse,object,uuid,positive,timestamp,content} from "../send/wire.js";
+2: import type {UserPage,UserEvent,ServerMessage} from "../storage/models.js";
+3: export const MAX_RESPONSE=6*1024*1024;
+4: export interface ConversationPage {messages:ServerMessage[];hasMore:boolean}
+5: const invalid=():never=>{throw new Error("Invalid Sync response");};
+6: const kinds=["friend.changed","conversation.changed","membership.changed","plugin.changed"];
+7: export function cursor(v:unknown):string {if(typeof v!=="string" || [...v].length<1 || [...v].length>256) return invalid();return v;}
+8: function list(v:unknown):unknown[] {if(!Array.isArray(v) || v.length>100) return invalid();return v;}
+9: function base(raw:string,keys:string[],requestId:string,type:string) {const p=object(parse(raw,MAX_RESPONSE),keys);if(p.syncVersion!=="1.0" || p.type!==type || uuid(p.requestId)!==requestId || typeof p.hasMore!=="boolean") return invalid();return p;}
+10: export function userPage(raw:string,requestId:string,inputCursor:string):UserPage {
+11:   try {
+12:     const p=base(raw,["syncVersion","type","requestId","events","nextCursor","hasMore"],requestId,"sync.user.page");
+13:     const ids=new Set<string>(), cursors=new Set<string>();
+14:     const events=list(p.events).map(v=>{const e=object(v,["eventId","cursor","kind","subjectId","revision"]);
+15:       const eventId=uuid(e.eventId), token=cursor(e.cursor);
+16:       if(ids.has(eventId) || cursors.has(token) || token===inputCursor || !kinds.includes(String(e.kind))) return invalid();
+17:       ids.add(eventId);cursors.add(token);
+18:       return {eventId,cursor:token,kind:e.kind,subjectId:uuid(e.subjectId),revision:positive(e.revision)} as UserEvent;
+19:     });
+20:     const nextCursor=cursor(p.nextCursor),hasMore=p.hasMore as boolean;
+21:     if(events.length ? nextCursor!==events.at(-1)!.cursor || nextCursor===inputCursor : nextCursor!==inputCursor || hasMore) return invalid();
+22:     return {syncVersion:"1.0",type:"sync.user.page",requestId,events,nextCursor,hasMore};
+23:   } catch {return invalid();}
+24: }
+25: export function conversationPage(raw:string,requestId:string,conversationId:string,afterSeq:bigint):ConversationPage {
+26:   try {
+27:     const p=base(raw,["syncVersion","type","requestId","conversationId","messages","hasMore"],requestId,"sync.conversation.page");
+28:     if(uuid(p.conversationId)!==conversationId) return invalid();
+29:     let next=afterSeq+1n;const ids=new Set<string>(),requests=new Set<string>();
+30:     const messages=list(p.messages).map(v=>{const m=object(v,["conversationId","seq","messageId","senderId","requestId","createdAt","content"]);
+31:       const messageId=uuid(m.messageId),rid=uuid(m.requestId),seq=positive(m.seq);
+32:       if(uuid(m.conversationId)!==conversationId || seq!==next++ || ids.has(messageId) || requests.has(rid)) return invalid();
+33:       ids.add(messageId);requests.add(rid);
+34:       return {conversationId,seq,messageId,senderId:uuid(m.senderId),requestId:rid,createdAt:timestamp(m.createdAt),content:content(m.content)};
+35:     });
+36:     if(p.hasMore && !messages.length) return invalid();
+37:     return {messages,hasMore:p.hasMore as boolean};
+38:   } catch {return invalid();}
+39: }
+40: export class SyncFailure extends Error {constructor(readonly kind:"authentication"|"unavailable"|"protocol"|"transport"|"storage") {super("Sync "+kind+" failure");}}
+41: export function errorResponse(raw:string,requestId:string,status:number,conversation:boolean):SyncFailure {
+42:   try {
+43:     const p=object(parse(raw,MAX_RESPONSE),["requestId","error"]);if(uuid(p.requestId)!==requestId) return invalid();
+44:     const e=p.error as Record<string,unknown>;if(!e || typeof e!=="object" || Array.isArray(e) || Object.keys(e).some(k=>!["code","message","violations"].includes(k)) || typeof e.message!=="string" || !e.message) return invalid();
+45:     if(e.violations!==undefined) {if(!Array.isArray(e.violations)) return invalid();for(const v of e.violations){const f=object(v,["field","reason"]);if(typeof f.field!=="string" || !f.field || typeof f.reason!=="string" || !f.reason) return invalid();}}
+46:     if(status===401 && ["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"].includes(String(e.code))) return new SyncFailure("authentication");
+47:     if(conversation && status===403 && e.code==="AUTHORIZATION_DENIED") return new SyncFailure("unavailable");
+48:     if(status===400 && e.code==="VALIDATION_FAILED" || status===426 && e.code==="PROTOCOL_VERSION_UNSUPPORTED") return new SyncFailure("protocol");
+49:     return invalid();
+50:   } catch {return new SyncFailure("protocol");}
+51: }
+52: export function userRequest(requestId:string,inputCursor:string):string {return JSON.stringify({syncVersion:"1.0",type:"sync.user.request",requestId:uuid(requestId),cursor:cursor(inputCursor),limit:100});}
+53: export function conversationRequest(requestId:string,c:string,afterSeq:bigint):string {if(afterSeq<0n) return invalid();return JSON.stringify({syncVersion:"1.0",type:"sync.conversation.request",requestId:uuid(requestId),conversationId:uuid(c),afterSeq:"SEQ",limit:100}).replace('"SEQ"',afterSeq.toString());}
+
