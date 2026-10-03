@@ -1,0 +1,24 @@
+WSS alternatives: [{'$ref': '#/$defs/AuthBind'}, {'$ref': '#/$defs/AuthAck'}, {'$ref': '#/$defs/MessageSend'}, {'$ref': '#/$defs/MessageAck'}, {'$ref': '#/$defs/MessageCreated'}, {'$ref': '#/$defs/SessionRevoked'}, {'$ref': '#/$defs/Ping'}, {'$ref': '#/$defs/Pong'}]
+HTTP paths: ['/v1/auth/register', '/v1/auth/login', '/v1/auth/logout', '/v1/users/me', '/v1/users/search', '/v1/friends', '/v1/friends/{friendUserId}', '/v1/auth/refresh/web', '/v1/auth/refresh/native']
+Gateway Sync references: []
+Core routes: package core
+
+import (
+	"github.com/jackc/pgx/v5/pgxpool"
+	"im-platform/backend/go/shared"
+	"net/http"
+	"time"
+)
+
+func NewHandler(db *pgxpool.Pool, key []byte) http.Handler {
+	s := &authService{db: db, codec: &shared.Codec{Key: key, Now: time.Now}, now: time.Now}
+	m := shared.InfraMux("core")
+	m.Handle("/v1/", s.handler())
+	m.HandleFunc("POST /__core/message", s.sendMessage)
+	m.HandleFunc("POST /__core/history", s.conversationHistory)
+	return m
+}
+
+Core scope: // Only the existing canonical per-Conversation gap shape is served privately.
+// User Sync and client cursor/materialization are outside this task.
+Repository User Sync existing: [('clients\\mobile\\app\\src\\main\\kotlin\\im\\platform\\client\\storage\\Repository.kt', 120, '    fun userPage(events: List<UserEvent>, nextCursor: String, expectedCursor: String, failBeforeAdvance: Boolean=false) {')]
