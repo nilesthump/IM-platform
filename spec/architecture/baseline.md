@@ -60,3 +60,7 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 
 - ui_previous_sha256: `aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c`
 
 以上基础修订字段保留 ADR-0005 的技术来源。最新 UI 修订为 ADR-0006；当前规范哈希为 a234bc06e33fd0ae08efd944331930320b8cf1d58800fa4e66886452d8084237。v1.1 保持不变；历史 PDF 和此前已接受谱系保持不可变。这是 Human 批准的候选，尚未生效：仍待新的独立 Review、精确 HEAD 托管 CI、集成/实际 main 验证与受保护同步。S1 PASS/S2 OPEN；不激活 GUI 或产品任务。
+
+## UI 冻结验收发现（2026-10-03）
+
+上述候选说明保留为历史过程。ADR-0006 / UI 规范内容已在候选 33cc754、PR12 实际 main 4f18d222 独立 Review 与精确 HEAD CI 接受，并已同步主仓库；当前规范哈希不变。完整证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。收尾记录仍在 review，S1 PASS / S2 OPEN，不启动后续产品任务。

@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-client-UI-architecture
 Current Task: LOOP1-CLIENT-UI-ARCH-001
 Current Task State: review
-Execution Status: UI_ARCHITECTURE_CHINESE_REVISION_REVIEW_PENDING
+Execution Status: UI_ARCHITECTURE_ACCEPTED_CLOSURE_REVIEW
 
 ## Immediately Relevant Completed Work
 
@@ -62,3 +62,16 @@ ADR-0006 candidate records Human UI decision and S2-only plugin prohibition. Fut
 Human 要求「架构文档用中文编写」。Fresh Fix Agent /root/ui_arch_chinese_fix 已翻译四份新文档和最新索引/清单段落，规范正文/候选哈希保持不变。旧 Review 的 BASE..HEAD whitespace FAIL 如实保留，原始字节 gzip 归档并用清单标明原始与 LF 规范化哈希。证据：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/chinese-revision/。本轮 Recorder 使用独立 .git-ui-chinese-research；root Recorder 不变。下一步：新独立 Review → 精确 HEAD 托管 CI → 受保护集成/main 同步与实际 SHA 验证。任务 review；未完成同步；S1 PASS/S2 OPEN。
 
 中文修订本地验证：frozen integrity/source all/53 architecture tests/完整 BASE 至工作区 diff check/recovery Development 均 PASS；精确命令、退出码、时长见 chinese-revision/checks.json。待提交后还须精确 BASE..HEAD 检查与新的独立验收。
+
+## 最新恢复状态（2026-10-03）
+
+架构内容已在33cc754/PR12/main4f18d222独立 Review、精确 hosted CI及受保护主仓库同步通过。先前 pending 段落是历史过程；当前 Task 仍为 review，收尾记录需新的独立 Review/CI/同步。无产品改动或 GUI 激活。
+
+- Command: `git -C H:/IM-platform rev-parse HEAD`
+  - Result: 同步 PASS，`4f18d222c75bb03166b2b5ead84b9999150a300c`；772 个既有文件受保护。
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/synchronization.json`
+- Last Known Good Commit: `4f18d222c75bb03166b2b5ead84b9999150a300c`。
+- Latest Checkpoint: `spec/progress/checkpoints/2026-10-03-client-ui-architecture-accepted.md`。
+- Next Exact Action: 收尾记录独立 Review -> 精确 HEAD CI -> 受保护主仓库同步 -> 验收后关闭任务。
+- Ownership: /root 仅拥有本任务收尾文档；原主仓库两份 done 任务及769个未跟踪文件为既有未知工作，不改变；旧 current 备份仅本地。
+- Known failures: 初次 Review 换行 FAIL 已修复并保留；Recorder 重复 prompt 启动失败已纠正；自动审批拒绝提前 done，操作未执行。S1 PASS/S2 OPEN。
