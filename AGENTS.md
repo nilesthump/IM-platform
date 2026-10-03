@@ -42,6 +42,13 @@ Without explicit approval, an agent MUST NOT change Frozen Architecture, public 
 - Keep task state in exactly one queue: `backlog -> ready -> active -> review -> done`.
 - A task may enter `done` only after accepted independent review and the applicable independent acceptance mechanism.
 
+## Codex worktree and main-repository synchronization
+
+- Implementation Agents MUST modify code only inside the Codex worktree currently assigned to their task. They MUST NOT create a new clone, repository copy, or independent working directory under `H:/`.
+- Before starting a task, run `git rev-parse --show-toplevel` and verify that the resolved Git root exactly matches the assigned Codex worktree Git root. If no worktree is assigned or the roots do not match, STOP and report `WORKSPACE_ERROR`; do not begin implementation or silently choose another directory.
+- After implementation, commit the task-owned changes to the current task branch in that assigned worktree, then synchronize the committed changes back to the main repository at `H:/IM-platform` through the existing independent review, acceptance, and integration process. Preserve unrelated or unknown uncommitted work during synchronization.
+- Implementation is NOT complete until synchronization back to `H:/IM-platform` is verified. Record the task branch, committed SHA, synchronization result, and main-repository SHA in the task handoff/evidence. Before synchronization is complete, MUST NOT report completion or move the task to `done`. A worktree commit alone does not satisfy completion, and synchronization does not replace independent review or applicable exact-head CI.
+
 ## Applicable execution constraints
 
 Read [execution constraints](spec/governance/execution-boundaries.md) and [the independent Review checklist](spec/governance/independent-review.md). allowed_paths never overrides or exempts architecture. Ordinary business tasks narrow paths by responsibility; one-time cross-service migration lists affected files/responsibilities, scope and exit before edits. Applicable source/dependency checks supplement behavior. Reviewer inspects actual logic and imports plus minimality; Java inherits canonical boundaries, never Go layout. Escalate conflicts before implementation; do not legalize errors after implementation.
