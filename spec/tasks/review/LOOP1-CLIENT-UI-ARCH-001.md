@@ -92,3 +92,7 @@ Independent Review of 6e9f7327c6cf301a3841bcc49244b70974e82a06 failed full BASE.
 First repair verification found additional CRLF in checks.json, pr-body.md and recorder-relocation.json. Exact originals were preserved before LF-only normalization; first FAIL attempt is retained in whitespace-fix/rechecks-attempt1.zip. No old result/command/duration/relocation fact changed.
 
 Local repair verification (not independent acceptance): frozen --base-commit PASS 0.188s; source all PASS 0.515s; 53 architecture tests PASS 6.032s; planning with3 negative controls PASS 0.171s; fixed-base full working diff PASS0.047s; Recovery Development PASS6.719s. Exact argv/exit/duration: whitespace-fix/rechecks-attempt2/checks.json. All original/archive/normalized hashes verified. Pending clean fix commit, complete staged and committed range checks, clean Recovery Acceptance, then NEW fresh independent Review/exact-head CI and main synchronization. No sync or completion claimed.
+
+## 规划补充已接受，收尾候选仍 review
+
+Fresh Review2接受7466ce7；PR14实际main b60f116及exactmain37105047668独立PASS，已保护同步H:/IM-platform/781无关记录不变，3旧ownedmetadata保护。见mvp-planning/closure/acceptance.md/archive-manifest.json/synchronization.json。规范16e9c7b4/v1.1/PDF unchanged；本段/ADR状态/baseline/index只发现已接受事实，当前Task仍review至新收尾独立Review、精确CI、集成同步；之后立即done并激活SEND，不启动SYNC/GUI/WEB。Last good b60f116a14f9265031bff255db500f3414f2a357；/root只拥有这批metadata/evidence。

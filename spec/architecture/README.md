@@ -28,3 +28,7 @@ ADR-0006 记录 Human 明确的客户端 UI、设计与截图验收决定，以�
 ## 当前 MVP 任务规划补充
 
 通过 baseline.md 的 planning_revision_adr/approval_source/previous_sha256 解析 ADR-0007 与本轮 Human 请求。当前 canonical hash 记录规划候选，v1.1 不变；ADR-0006 已接受 UI 内容保持权威。仅新增 LOOP1-CLIENT-GUI-001，原 WEB 和 S3～S6 承接 GUI acceptance。待新的独立 Review、精确 HEAD hosted CI 与 protected integration/实际 main 同步接受后生效；此前不得实施 SEND。
+
+## MVP 规划接受发现
+
+planning_revision_adr对应ADR-0007的canonical16e9c7b4已接受于candidate7466ce7/PR14/actualmain b60f116并同步主仓库。证据见mvp-planning/closure/acceptance.md。此前候选pending语句为历史；此接受发现不改变canonical字节，不建立S2PASS。收尾metadata仍保留review至独立闭环，本轮随后只执行SEND。
