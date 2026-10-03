@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-SYNC-001
 title: Desktop/Mobile two-level sync orchestration
-status: backlog
-owner: unassigned
+status: active
+owner: /root/sync_client_implementation
 stage: S2
 gate: S2
 ---
@@ -12,6 +12,8 @@ gate: S2
 基于既有 Repository 实现 user cursor 与 per-conversation contiguous_seq 同步、实时交叉、缺口补偿及断线重连；不改存储职责。
 
 # Inputs
+
+- Accepted ADR-0008-sync-https-transport.md; contracts/http/sync.openapi.json and contracts/errors/http-errors.schema.json; contracts/websocket/sync-v1.schema.json.
 
 - `spec/architecture/README.md` -> `spec/architecture/baseline.md` -> `spec/architecture/frozen-architecture.md`，§2.3/§3/§6/§10 SRC-01 through SRC-07/§11/§19/§20。
 - `spec/architecture/decisions/ADR-0005-client-technology-clarification.md`、`spec/architecture/decisions/ADR-0006-client-ui-architecture.md`、`spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md`。
@@ -30,6 +32,8 @@ client_runtime: Tauri
 client_runtime: Android
 
 # Dependencies
+
+- LOOP1-SYNC-TRANSPORT-001 and LOOP1-SYNC-GO-001: done; Go product6f934127 and administrative0fe4fccc independently accepted and synchronized.
 
 - LOOP1-CLIENT-SEND-001 (必须独立接受并 done).
 
@@ -52,6 +56,14 @@ client_runtime: Android
 - `spec/progress/current.md`
 - `spec/progress/evidence/LOOP1-SYNC-001/**`
 - `spec/progress/checkpoints/*loop1-sync-001*.md`
+
+- `clients/shared/protocol-sdk/src/storage/repository.ts` (Only readonly conversationIds: union existing conversation rows and conversation.changed/membership.changed subjects; metadata never grants authorization.)
+- `clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt` (Equivalent readonly conversationIds; no schema or write semantic change.)
+- `clients/desktop/src/application/send.ts` (Postdurablecommit delivery observer and serialized guarded Sync merge; cancellation check inside existing Send queue prevents retired-session commits. No ACK change.)
+- `clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt` (Equivalent delivery observer and guarded commit under existing Mutex; no ACK change.)
+- `clients/shared/protocol-sdk/src/send/wire.ts` (Expose existing exact parser/timestamp, add arrays/booleans and caller-specific bound; WSS default131072 and validators unchanged.)
+- `clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt` (Equivalent exact parser arrays/booleans/caller-specific bound and validators reused.)
+- `clients/shared/protocol-sdk/tsconfig.json` (Include src/sync/**/*.ts in existing TypeScript compilation only.)
 
 # Acceptance
 
@@ -110,3 +122,15 @@ LOOP1-SYNC-TRANSPORT-001 is independently accepted and synchronized at c2ff0502f
 Earlier missing binding/runtime/consent statements are historical. Human separate Go consent received. LOOP1-SYNC-GO-001 product candidate a78f7f96227e25980c5a51255e92a2e6a34a1bf0 / protected PR20 actual main6f9341276c6481e982c2a9b2f2d490b76bc1df96 accepted by fresh independent Review and new same-role actual-main audit; exact37127049105/37127820035 each13jobs106stepsSUCCESS. Actual PG/race/strict TLS208metadata205messages plus postterminal206th/huge numbers executed. Safe main sync190paths/781originalentries verified. Evidence: spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md.
 
 Execution: WAITING_GO_ADMINISTRATIVE_ACCEPTANCE. Unique backlog retained until Go administrative closure acceptance and Coordinator readiness reassessment. No client product or scope changes in this note. min(limit,100) per-page; data/cursor transaction commits precede continuation to hasMore=false without total cutoff. S1PASS/S2OPEN, SYNC not accepted. Authorized final endpoint remains SYNC done then stop.
+
+# Current activated implementation (2026-10-03)
+
+Earlier backlog/blocker text above is immutable historical recovery. Go administrative candidate1f02488/PR21 actual main0fe4fccc3deacd492895967cff9cc40cf34321d4 accepted fresh independent Review34events and new same-role actual-main audit15events. Exact37129883344 selected5jobs37stepsSUCCESS/8correctinactive. Safe main134noRenamepaths/original781status/mode/size/hash preserved. Receipt observed by Coordinator under Git-private sync-go-coordinator-research/administrative-main-sync-receipt.json. No consent/runtime/architecture blocker remains. Dependency-satisfied transition backlog -> ready -> active performed sequentially by sole Implementation Agent. No GUI/Web authorization.
+
+Narrow seam responsibility is declared above before any source edits. Current requirements justify shared exact-parser reuse (avoids duplicate serialization logic), readonly discovery (repair every known Conversation), postcommit observer (realtime gap compensation), and guarded serialized merge (session retirement during in-flight pull). No speculative mechanisms, dependencies, schema/native/contract/backend edits.
+
+Acceptance additionally requires fixed perpage100 continuous commits until hasMore=false, no total cutoff; user cursor opaque equality and atomic materialization; gapfree Conversation pages through Send merge for attempt cancellation and visible refresh; live WSS remains active. Canonical403 isolates one unavailable Conversation,401 stops session. New authenticated-ready transition resumes persisted positions. Immutable account/session ownership, cancellation/generation checks before commit and old-account callback suppression. Sync response bound6MiB admits100x4096astralcodepoints including escaped surrogate representation; WSS bound unchanged.
+
+Verification to execute: tools/verify_client_sync.py --scope shared; --scope desktop using actual SQLx native adapter; --scope mobile --serial emulator-5554 using actual AndroidAPI34 SDK SQLite. Existing storage/send verifiers retained. tests/clients/sync real trusted TLS -> Gateway -> Core -> PostgreSQL smoke plus untrusted CA rejection in existing deployment job. Both native clients cover >100events/messages, terminal/new commits, realtime duplicate/outoforder/nonselected gap, rollback/restart, FAILED->SENT,403/401 and account retirement; strict correlation/schema/exact integer/fullUnicode negative controls. Frozen verifier/architecture all and clean Acceptance; independent exact-head hosted checks remain pending until execution.
+
+Activation baseline0fe4fccc clean assigned task/LOOP1-SYNC-001. Own Recorder R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15 prospective_resume/freshcontext true records incomplete initial read-only trace, corrected initial UTF8-output/quoting/base64-newline failures. Only private own Recorder changed before activation. No product acceptance yet; S1PASS/S2OPEN.
