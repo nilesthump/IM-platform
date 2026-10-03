@@ -16,3 +16,7 @@ Current client clarification accepted at e7c80c7: Android Kotlin/Jetpack Compose
 ## Accepted clarification discovery (2026-10-01)
 
 Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 under scoped Human GString waiver; original4b5 Review FAIL immutable. Exactpush36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS. Canonicalaa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c/PDF546915 unchanged. ADR0005 effective at accepted prerequisite. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md. Earlier pending paragraphs are historical; later administrative closure needs NEW independent Review/exactHEADCI before S2activation. No product/contract change; S1PASS/S2OPEN.
+
+## UI amendment candidate (2026-10-03)
+
+ADR-0006 records explicit Human client UI/design/screenshot decisions and S2-only plugin execution prohibition. Resolve the current hash plus ui_revision_adr fields in baseline.md. Candidate pending independent Review/exact-head hosted CI/integrated-main verification; accepted main remains last known good. Subordinate explanations under decisions/client-ui/ and spec/acceptance/client-gui.md create no second canonical source or public contract authority. ADR-0005 remains base technology provenance; S4 reviewed sandbox Render Bundle is retained.
