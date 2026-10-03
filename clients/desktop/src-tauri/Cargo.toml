@@ -2,14 +2,22 @@
 name = "im-client-storage"
 version = "0.1.0"
 edition = "2021"
+default-run = "im-client-storage"
 
 [lib]
 name = "im_client_storage"
 path = "src/lib.rs"
 
 [dependencies]
-tauri = "2"
+tauri = { version = "2", features = [] }
 sqlx = { version = "0.8", default-features = false, features = ["sqlite", "runtime-tokio"] }
 
 [build-dependencies]
-tauri-build = "2"
+tauri-build = { version = "2", features = [] }
+
+[target.'cfg(windows)'.dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+reqwest = { version = "0.12", default-features = false, features = ["native-tls"] }
+keyring = { version = "3", default-features = false, features = ["windows-native"] }
+tauri-plugin-notification = "2"
+tauri-plugin-global-shortcut = "2"

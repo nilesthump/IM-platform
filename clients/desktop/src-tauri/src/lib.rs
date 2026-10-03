@@ -1,4 +1,6 @@
 pub mod database;
+#[cfg(windows)]
+mod desktop_capabilities;
 use std::path::PathBuf;
 use tauri::Manager;
 
@@ -20,8 +22,17 @@ async fn database_query(app: tauri::AppHandle, account_id: String,
     database::query(&mut connection, &sql, binds).await
 }
 pub fn run() {
-    tauri::Builder::default()
+    #[cfg(not(windows))]
+    let builder=tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![database_transaction, database_query])
-        .run(tauri::generate_context!())
+        ;
+    #[cfg(windows)]
+    let builder=tauri::Builder::default()
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .setup(desktop_capabilities::setup)
+        .on_window_event(|window,event|if let tauri::WindowEvent::CloseRequested{api,..}=event {api.prevent_close();let _=window.hide();})
+        .invoke_handler(tauri::generate_handler![database_transaction,database_query,desktop_capabilities::native_https,desktop_capabilities::credential_read,desktop_capabilities::credential_write,desktop_capabilities::credential_remove,desktop_capabilities::appearance_load,desktop_capabilities::appearance_save,desktop_capabilities::native_notify]);
+    builder.run(tauri::generate_context!())
         .expect("Tauri startup failed");
 }

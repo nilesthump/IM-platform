@@ -190,7 +190,11 @@ jobs:
   desktop:
     needs: classify
     if: needs.classify.outputs.desktop == 'true'
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -199,12 +203,14 @@ jobs:
         with:
           node-version: '22'
       - name: Native Tauri prerequisites and approved Rust compiler
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
           rustup toolchain install stable --profile minimal
           rustup default stable
       - name: Actual TypeScript Repository on SQLx SQLite
+        if: runner.os == 'Linux'
         env:
           CARGO_TARGET_DIR: ${{ runner.temp }}/client-sqlite-target
         run: |
@@ -212,6 +218,25 @@ jobs:
           python3 -B tools/verify_client_send.py --scope desktop
           python3 -B tools/verify_client_sync.py --scope desktop
           python3 -B tests/clients/sync/go_smoke.py --probe "$CARGO_TARGET_DIR/debug/storage_probe"
+      - name: Approved Windows GUI assembly and auth controls
+        if: runner.os == 'Windows'
+        shell: pwsh
+          env:
+            CARGO_TARGET_DIR: ${{ runner.temp }}/client-gui-target
+        run: |
+          npm --prefix clients/desktop ci --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm --prefix clients/desktop run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tests/clients/gui/auth.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo test --manifest-path clients/desktop/src-tauri/Cargo.toml --locked --lib
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Push-Location clients/desktop
+          $env:CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS='-C link-arg=/SUBSYSTEM:WINDOWS -C link-arg=/ENTRY:mainCRTStartup'
+          npm run tauri -- build --target x86_64-pc-windows-msvc --debug --bundles nsis
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Pop-Location
 
   mobile:
     needs: classify
@@ -256,6 +281,7 @@ jobs:
             python3 -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554
             python3 -B tools/verify_client_send.py --scope mobile --serial emulator-5554
             python3 -B tools/verify_client_sync.py --scope mobile --serial emulator-5554
+            python3 -B tests/clients/gui/android.py --serial emulator-5554
 
   shared:
     needs: classify

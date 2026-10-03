@@ -11,56 +11,50 @@ Execution Status: AUTHORIZED_LOCAL_CANDIDATE_PREPARATION
 
 ## Immediately Relevant Completed Work
 
-Accepted SYNC actual main ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597. Human authorized next GUI, exact eight assembly paths, then concrete minimal native prerequisite. Sole fresh writer freezes ADR-0009/sections6.1/6.5/native policy; no GUI runtime work.
+Accepted SYNC main remains ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597. Human authorized next GUI, exact eight assembly paths, minimal native freeze and unified review/push after GUI. Desktop React/Tauri and Mobile Kotlin Compose/Navigation/StateFlow product screens and bounded native adapters compile. Local Settings/AI/Plugin available before sign-in. Actual owned API34 GUI instrumentation PASS (14 assertions); controlled Desktop auth/workspace tests PASS including delayed login/search/add isolation. This is local evidence only.
 
 ## Current Blockers
 
-Native task remains review/pending whole batch. Exact Human 完成GUI任务后统一审查推送 authorizes local GUI implementation using already approved local frozen native choices; separate prerequisite acceptance-before-local-preparation superseded for this batch only. No missing same-plan Human consent; no acceptance/done/effectiveness/main sync yet. Full GUI runtime/screenshots/Architect Approval remain to implement/verify.
+Signed-in production-transport runtime screenshots require a trusted fixture endpoint. Concrete short-lived constrained CA proposal awaits Human approval in spec/progress/evidence/LOOP1-CLIENT-GUI-001/fixture-trust-proposal.md; no trust installed. Unaffected build/UI/native regression work continues. Native task remains review/pending unified batch. Architect approval and fresh full independent review/exact-head hosted CI/push/main synchronization have not occurred.
 
 ## Verification
 
-- Command: `python -B ci/check_architecture.py --scope all --json`
-  - Result: candidate local PASS; independent hosted acceptance pending.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
-- Command: `python -B tools/verify_frozen_architecture.py`
-  - Result: candidate local PASS; independent hosted acceptance pending.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
+- Command: `python tests/clients/gui/check_sources.py`
+  - Result: local PASS unchanged source/frozen guards and architecture tests; independent acceptance pending.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/verification.md`
+- Command: `python tests/clients/gui/native.py gui-mobile --serial emulator-5590`
+  - Result: actual API34 local PASS, 14 GUI/Keystore assertions; independent acceptance pending.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/verification.md`
+- Command: `node tests/clients/gui/auth.mjs`
+  - Result: local PASS including controlled delayed login/search/add isolation; independent acceptance pending.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/verification.md`
 
-- Command: `python -B -m unittest discover -s tests/architecture -p test_*.py`
-  - Result: local PASS, all53 tests; independent acceptance pending.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
-- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: prior local PASS native review; timing followup GUI active recovery rechecked.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
+Run history: private Research Recorder R-GUI-PRODUCT-20261004 at H:/IM-platform/.git/worktrees/IM-platform3/gui-product-research, plus task evidence. Original failed command streams preserved. Last committed recovery HEAD: 0d220e9ce41a80c7e2a2b3cf58ffb1412b1ce993. Branch: task/LOOP1-CLIENT-GUI-001. Sole uncommitted owner: /root/gui_product_implementation; exact assigned root H:/.codex/worktrees/s/IM-platform. Main untouched; synchronization pending.
 
 ## Changed Files or Migrations
 
-Bounded architecture/ADR9/manifest/resolver, unique native Task, GUI dependency readiness, current/evidence/checkpoint only. No product/dependencies/contracts/schema/backend/CI/governance/checker change.
-
-## Known Failures, Risks, and Assumptions
-
-S1 PASS/S2 OPEN; native authority candidate only. Local/Recorder evidence does not establish Task/Gate PASS. Initial read-only Recorder capture incomplete and disclosed; one pre-execution JS tool parse failure and initial Task declaration/discovery and modified hash-line formatting failures repaired within scope; original runs preserved. Prior historical evidence immutable. Genuine Windows notification proof requires installed owned package.
+Exact authorized GUI/native assembly/CI files, UI application/screens/native capabilities, GUI tests and task/current/evidence only. No backend/contracts/schema/accepted Repository/Send/Sync source changes.
 
 ## Next Exact Action
 
-Fresh GUI implementation writer resumes unified native+GUI local candidate from clean timing handoff, verifies actual runtime inputs and completes exact authorized GUI/screenshot/Architect Review/Approval. Then fresh independent full-candidate Review, unified push, actual required exact-head hosted jobs, protected integration/actual-main and safe synchronization preserving unknown main work. Do not advance Web/later tasks or mark either task done prematurely.
+Complete GUI-only Windows subsystem package, native tray/shortcut/installed notification proof, readable runtime screenshots and existing native regressions. Run unchanged guards with only verified ignored generated outputs isolated/restored; then stable local checkpoint/commit. After actual trust approval, complete authenticated fixture proof and final SHA-bound manifest for Architect approval, then fresh unified native+GUI technical review/CI/push/integration by Coordinator. Do not move either task to done or claim Gate PASS before independent acceptance and verified main synchronization.
+
+## Known Failures, Risks, and Assumptions
+
+Original tool/compile/package/signing/source-guard failures remain recorded; ordinary repair cycles continue. Android signing environment restoration preserved installed app data. Preliminary screenshot is pre-fix/uncommitted QA only. No backend/contracts/security/ACK/schema/accepted Send/Sync source edits, mock screenshot acceptance, OS trust changes or remote publication. Previous checkpoint remains historical; stable GUI product checkpoint follows passing local checks.
 
 ## Last Known Good Commit
 
-`ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597` independently accepted SYNC administrative main, actually synchronized.
+`ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597` independently accepted and synchronized SYNC main. Current local source handoff HEAD is recorded above; product candidate acceptance pending.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-04-loop1-client-native-arch-001-unified-batch.md`
+`spec/progress/checkpoints/2026-10-04-loop1-client-gui-001-local-product.md`
 
 ## Uncommitted Changes / Ownership
 
-Sole /root/native_architecture_freeze owns timing metadata continuation until clean handoff; next fresh GUI writer owns approved GUI scope in assigned H:/.codex/worktrees/s/IM-platform task/LOOP1-CLIENT-NATIVE-ARCH-001. Git root exactly verified before writes. Main unknown work untouched. Task branch committed candidate SHA supplied by Git handoff; synchronization PENDING.
+Sole `/root/gui_product_implementation` owns all task-scoped uncommitted GUI changes in assigned `H:/.codex/worktrees/s/IM-platform`, branch `task/LOOP1-CLIENT-GUI-001`. Main unknown work untouched. Local task commit/checkpoint and synchronization pending.
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0009 records already Human-approved strict native HTTPS/secure refresh/official notification/global shortcut/tray and scalar appearance plan. Native authority APPROVED_PENDING_FREEZE; ADR-0009 localized explicit Human exception permits this batch's local candidate implementation before joint acceptance/publication/main synchronization. TypeScript/Kotlin auth/business/Repository/protocol ownership preserved.
-
-## Unified batch timing provenance
-
-Exact Human 完成GUI任务后统一审查推送 recorded at `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/unified-batch.md`. Native review pending, GUI active candidate preparation; canceled partial Review not PASS, no successful push/hosted acceptance. Latest timing checkpoint supplements preserved original freeze checkpoint; canonical hash unchanged.
+ADR-0009 records already Human-approved bounded native families and appearance plan; localized unified-batch exception permits local candidate preparation before joint independent acceptance/publication/main sync. Native task remains review/pending. TypeScript/Kotlin retain auth/business/Repository/protocol ownership. Test-host trust proposal awaits distinct explicit approval; no product TLS bypass.

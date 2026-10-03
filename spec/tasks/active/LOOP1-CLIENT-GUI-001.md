@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-GUI-001
 title: Desktop/Mobile complete Loop1 GUI
 status: active
-owner: /root/gui_implementation
+owner: /root/gui_product_implementation
 stage: S2
 gate: S2
 ---
@@ -136,3 +136,7 @@ Exact latest instruction: 完成GUI任务后统一审查推送. Source: spec/pro
 GUI is now locally authorized candidate preparation, sequential backlog -> ready -> active. Previous BLOCKED_BY_ARCHITECTURE/backlog/standalone-acceptance statements above are historical before latest directive. Eight assembly paths/approved libraries/storage plan remain exact and unchanged; no new technology/contracts/backend/CORS/schema/ACK/security/business migration. Actual GUI readiness/verification/screenshot setup must be assessed by fresh implementation writer. Runtime screenshots -> Architect Review/fix/Approval remain mandatory, followed by fresh independent full-candidate Review/unified push/applicable exact-head hosted CI/protected integration/actual-main/safe sync. Native/GUI acceptance/done/main sync wait for their complete applicable evidence.
 
 Next exact action: fresh GUI implementation writer resumes combined candidate from clean timing handoff. No independent Review PASS/hosted acceptance/push has yet occurred.
+
+## Product implementation recovery 2026-10-04
+
+Sole writer /root/gui_product_implementation; assigned worktree H:/.codex/worktrees/s/IM-platform, branch task/LOOP1-CLIENT-GUI-001; last committed HEAD 0d220e9ce41a80c7e2a2b3cf58ffb1412b1ce993. Task-owned GUI changes remain local/uncommitted. Both approved product clients compile, actual API34 GuiInstrumentation PASS with 14 assertions; Desktop auth/workspace delayed login/search/add isolation PASS. Real preliminary screenshot remains pre-fix/uncommitted QA. Existing tests/regressions, installed native capabilities, full SHA-bound runtime screenshots/Architect approval, unified independent review/exact-head hosted CI and main synchronization remain pending. Exact trust proposal is pending Human approval; no certificate installed. Current details and next action are in spec/progress/current.md; original failures preserved in Research Recorder R-GUI-PRODUCT-20261004. No Task done, native acceptance or S2 PASS claimed.
