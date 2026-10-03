@@ -1,0 +1,72 @@
+classify	Verify clean repository recovery	﻿2026-10-03T11:55:58.5499650Z ##[group]Run ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance
+classify	Verify clean repository recovery	2026-10-03T11:55:58.5500049Z ^[[36;1m./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance^[[0m
+classify	Verify clean repository recovery	2026-10-03T11:55:58.5521522Z shell: /usr/bin/pwsh -command ". '{0}'"
+classify	Verify clean repository recovery	2026-10-03T11:55:58.5521765Z ##[endgroup]
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9795056Z FAIL: recovery verification found 8 issue(s).
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9810122Z  - current.md Verification is missing an exact command.
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9811704Z  - current.md Verification is missing a non-empty result.
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9813096Z  - current.md Verification is missing a durable evidence path.
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9814701Z  - current.md Last Known Good Commit is missing a full commit SHA.
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9816260Z  - current.md Latest Checkpoint is missing a repository checkpoint path.
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9817577Z  - Current Task is missing a non-empty # Evidence section.
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9818970Z  - Current Task is missing a non-empty # Next Action section.
+classify	Verify clean repository recovery	2026-10-03T11:56:13.9820352Z  - Current Task verification exposes no discoverable tools/ entry point.
+classify	Verify clean repository recovery	2026-10-03T11:56:14.0216459Z ##[error]Process completed with exit code 1.
+gate	Require every selected job to pass	﻿2026-10-03T11:56:22.8343706Z ##[group]Run python3 ci/check_gate.py
+gate	Require every selected job to pass	2026-10-03T11:56:22.8344068Z ^[[36;1mpython3 ci/check_gate.py^[[0m
+gate	Require every selected job to pass	2026-10-03T11:56:23.0393173Z shell: /usr/bin/bash -e {0}
+gate	Require every selected job to pass	2026-10-03T11:56:23.0393618Z env:
+gate	Require every selected job to pass	2026-10-03T11:56:23.0395215Z   NEEDS_JSON: {
+gate	Require every selected job to pass	  "classify": {
+gate	Require every selected job to pass	    "result": "failure",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "architecture": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "source_go": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "source_java": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "go": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "java": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "web": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "desktop": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "mobile": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "shared": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "compatibility": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  },
+gate	Require every selected job to pass	  "deploy": {
+gate	Require every selected job to pass	    "result": "skipped",
+gate	Require every selected job to pass	    "outputs": {}
+gate	Require every selected job to pass	  }
+gate	Require every selected job to pass	}
+gate	Require every selected job to pass	2026-10-03T11:56:23.0397100Z   PYTHONDONTWRITEBYTECODE: 1
+gate	Require every selected job to pass	2026-10-03T11:56:23.0397308Z ##[endgroup]
+gate	Require every selected job to pass	2026-10-03T11:56:23.0662599Z FAIL: classification and repository recovery did not pass
+gate	Require every selected job to pass	2026-10-03T11:56:23.0707941Z ##[error]Process completed with exit code 1.

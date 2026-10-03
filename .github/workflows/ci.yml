@@ -276,6 +276,10 @@ jobs:
         run: |
           ./contracts/http/verify-auth-user-friend.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 -B tools/verify_sync_transport.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 -B -m unittest discover -s tests/contract -p test_sync_transport.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python3 contracts/websocket/verify.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python3 contracts/plugin-api/verify.py

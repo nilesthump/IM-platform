@@ -1,0 +1,287 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IM Sync HTTPS API",
+    "version": "1.0.0",
+    "description": "Canonical pull transport for existing Sync v1 shapes; HTTPS only. WSS realtime and ACK are unchanged. Both operations accept exactly one required JSON body and no query parameters. Authentication credentials are accepted only through Authorization Bearer, never query/body/cookie; each request validates token and authoritative Session ID, epoch, client type, revocation and expiry. Core derives user identity from credentials. Success and canonical errors echo the decoded valid UUID body requestId; otherwise a fresh server UUID is used, no alternate header correlation. Sync version other than 1.0 returns 426 PROTOCOL_VERSION_UNSUPPORTED; other malformed inputs return 400 VALIDATION_FAILED. Precedence: reject query parameters or uncorrelatable malformed JSON, authenticate, then validate version/body/cursor/membership. All positive integer limit values remain valid; page length <= min(limit,100), calculate cap exactly before bounded conversion. Read at most effectiveLimit+1 eligible items; hasMore is true iff an additional committed eligible item exists, requiring nonempty progress. Empty page is terminal; User nextCursor equals input cursor. Nonempty User nextCursor equals last event cursor, differs from input; events have distinct IDs/cursors in source order and form a stable committed prefix so concurrent late commits cannot be skipped. Initial User cursor is literal 0; subsequent event/next cursors are opaque server-issued tokens bound to the authenticated user, replayable across that user's Sessions. Invalid, fabricated or other-user cursors return 400 VALIDATION_FAILED; clients never parse/order cursors. Conversation messages strictly ascend from afterSeq+1 with no gap, identify the requested Conversation, and the next request uses last returned seq. afterSeq beyond current committed head yields empty terminal page. Valid user cursors remain usable for current Loop 1 (no cursor expiry/retention/reset protocol). Servers may project internal cursor_id to opaque external event.cursor without changing existing wire shapes or persistent producer payloads. Only catalogued canonical errors use ErrorResponse. Unexpected server/unavailable transport failures are non-2xx transport failures without any successful page or cursor advancement; no uncatalogued code/envelope is introduced. Responses contain no credentials and use no-store; retrieval is read-only and retry can observe newly committed data. afterSeq accepts all nonnegative JSON integers exactly, including values beyond storage signed64 range; after authorization, values beyond storage head return empty terminal page without lossy conversion."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.invalid"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/sync/user": {
+      "post": {
+        "operationId": "pullUserSync",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Pull only authenticated user's low-frequency events after an opaque cursor. No Message or Session event. Core validates cursor ownership and durable committed prefix.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../websocket/sync-v1.schema.json#/$defs/UserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Correlated Sync page; never an ACK or write effect",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../websocket/sync-v1.schema.json#/$defs/UserPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or user cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authoritative authentication failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Unsupported syncVersion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sync/conversation": {
+      "post": {
+        "operationId": "pullConversationSync",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Pull committed messages after afterSeq for a currently authorized Conversation member; absent and foreign Conversation both return 403. Each page is ordered and gap-free.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../websocket/sync-v1.schema.json#/$defs/ConversationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Correlated Sync page; never an ACK or write effect",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../websocket/sync-v1.schema.json#/$defs/ConversationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or user cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authoritative authentication failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Conversation access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTHORIZATION_DENIED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Unsupported syncVersion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "$ref": "./auth-user-friend.openapi.json#/components/securitySchemes/bearerAuth"
+      }
+    }
+  },
+  "x-sync-binding": {
+    "initialCursor": "0",
+    "cursorOwnership": "authenticated-user",
+    "cursorComparison": "opaque-equality-only",
+    "effectiveLimitCap": 100,
+    "limitPolicy": "accept-all-positive-integers-cap-before-conversion",
+    "authentication": "authoritative-session-each-request",
+    "authorization": "core-user-scope-and-conversation-membership",
+    "correlation": "decoded-valid-body-requestId-echo-else-server-uuid",
+    "emptyUserPage": "retain-request-cursor-hasMore-false",
+    "userOrder": "stable-committed-prefix",
+    "userNextCursor": "last-event-cursor",
+    "conversationOrder": "ascending-gap-free-afterSeq",
+    "hasMore": "additional-committed-item-exists",
+    "failure": "non-2xx-never-a-sync-page",
+    "queryParameters": "none",
+    "runtimeAcceptance": "deferred-until-human-approved-Go-plan",
+    "afterSeqPolicy": "accept-all-nonnegative-integers-above-storage-head-empty",
+    "pagination": "commit-page-then-continue-hasMore-to-terminal-without-fixed-total-cap",
+    "completion": "latest-committed-visible-at-terminal-read-not-future-writes"
+  }
+}

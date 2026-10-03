@@ -1,0 +1,141 @@
+contracts/websocket/sync-v1.schema.json:3:  "$id": "https://im.example/contracts/websocket/sync-v1.schema.json",
+contracts/websocket/sync-v1.schema.json:4:  "title": "Sync v1 request and response contract",
+contracts/websocket/sync-v1.schema.json:15:    "UserRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","cursor","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.request"},"requestId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"limit":{"type":"integer","minimum":1}}},
+contracts/websocket/sync-v1.schema.json:17:    "UserPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","events","nextCursor","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.page"},"requestId":{"$ref":"#/$defs/Id"},"events":{"type":"array","items":{"$ref":"#/$defs/UserEvent"}},"nextCursor":{"$ref":"#/$defs/Cursor"},"hasMore":{"type":"boolean"}}},
+contracts/websocket/sync-v1.schema.json:18:    "ConversationRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","afterSeq","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.request"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"afterSeq":{"$ref":"#/$defs/Seq"},"limit":{"type":"integer","minimum":1}}},
+contracts/websocket/sync-v1.schema.json:20:    "ConversationPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","messages","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.page"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"messages":{"type":"array","items":{"$ref":"#/$defs/Message"}},"hasMore":{"type":"boolean"}}}
+contracts/plugin-api/README.md:1:# Canonical Sync and Plugin API v1 contracts
+contracts/plugin-api/README.md:3:`../websocket/sync-v1.schema.json` defines the four Sync v1 wire objects: user request/page and Conversation request/page. `v1.schema.json` defines Plugin API v1 manifests, Event subscriptions, Queries, Actions, UI Host calls, and immutable artifact descriptors. `policy-v1.json` fixes the capability and permission map, Query page limit, renderer preflight and sandbox choices, WASM denials and limit classes, upgrade stages, and purge requirements. These files under `contracts/` are the public machine-verifiable authority. The verifier and golden vectors live beside them; implementations must conform to the contracts.
+contracts/plugin-api/README.md:5:The user cursor is opaque and advances only with friend, Conversation, membership, or plugin state. Message pages use a per-Conversation sequence. A client materializes data and advances the corresponding cursor or contiguous sequence in one transaction. A failed transaction changes neither. Duplicate and out-of-order Messages upsert by `(conversationId, requestId)`, `messageId`, and `(conversationId, seq)`; a conflicting identity is rejected. `contiguous_seq` advances only across a complete prefix. A locally FAILED item with the same Conversation and request identity becomes SENT, and SENT never regresses to FAILED. Web remains memory-only; Desktop and Mobile render account-scoped local materialized state before background Sync.
+contracts/plugin-api/README.md:13:Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; observable Sync checkpoints record rollback, materialized user state, the gap before repair, and retry. The local send trace records FAILED before matching Sync, SENT after Sync with one item, and terminal SENT after a later failure signal. Query fixtures observe linked result pages, item counts, and zero side effects. Action fixtures record every authorization/audit result, and upgrade fixtures record each attempted stage while the old version serves.
+contracts/plugin-api/README.md:15:`contracts/fixtures/sync-plugin/profile-outcomes/go.json` and `java.json` are separately stored normalized **contract vectors** for the two planned backend profiles. The verifier checks each artifact's complete case set against the canonical expected outcome and rejects a divergent value in either profile. These static vectors were initially populated from the canonical fixture expectations; they are not outputs from Go or Java backend execution, because neither backend exists at this stage. Backend conformance must replace or validate these observations when those implementations arrive. The verifier also runs malformed-wire, wrong-outcome, seven scenario mutation, and profile-divergence controls.
+backend/go/core/sync.go:9:	SyncVersion    string `json:"syncVersion"`
+backend/go/core/sync.go:18:// User Sync and client cursor/materialization are outside this task.
+backend/go/core/sync.go:21:	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq == nil || *v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
+backend/go/core/sync.go:81:	writeJSON(w, 200, map[string]any{"syncVersion": "1.0", "type": "sync.conversation.page", "requestId": v.RequestID, "conversationId": conversation, "messages": messages, "hasMore": more})
+contracts/http\verify-auth-user-friend.ps1
+contracts/http\openapi-3.1-lint.md
+contracts/http\openapi-3.1-2026-08-03.schema.json
+contracts/http\check-openapi-3.1.js
+contracts/http\build-openapi-3.1-validator.js
+contracts/http\auth-user-friend.openapi.validator.js
+contracts/http\auth-user-friend.openapi.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/websocket/sync-v1.schema.json",
+  "title": "Sync v1 request and response contract",
+  "description": "User cursor carries only low-frequency friend, conversation, membership and plugin state. Message history uses a per-conversation sequence. Cursor and materialized data commit atomically on a client.",
+  "oneOf": [
+    {"$ref":"#/$defs/UserRequest"}, {"$ref":"#/$defs/UserPage"},
+    {"$ref":"#/$defs/ConversationRequest"}, {"$ref":"#/$defs/ConversationPage"}
+  ],
+  "$defs": {
+    "Id": {"type":"string","format":"uuid"},
+    "Seq": {"type":"integer","minimum":0},
+    "PositiveSeq": {"type":"integer","minimum":1},
+    "Cursor": {"type":"string","minLength":1,"maxLength":256},
+    "UserRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","cursor","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.request"},"requestId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"limit":{"type":"integer","minimum":1}}},
+    "UserEvent": {"type":"object","additionalProperties":false,"required":["eventId","cursor","kind","subjectId","revision"],"properties":{"eventId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"kind":{"enum":["friend.changed","conversation.changed","membership.changed","plugin.changed"]},"subjectId":{"$ref":"#/$defs/Id"},"revision":{"$ref":"#/$defs/PositiveSeq"}}},
+    "UserPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","events","nextCursor","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.page"},"requestId":{"$ref":"#/$defs/Id"},"events":{"type":"array","items":{"$ref":"#/$defs/UserEvent"}},"nextCursor":{"$ref":"#/$defs/Cursor"},"hasMore":{"type":"boolean"}}},
+    "ConversationRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","afterSeq","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.request"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"afterSeq":{"$ref":"#/$defs/Seq"},"limit":{"type":"integer","minimum":1}}},
+    "Message": {"type":"object","additionalProperties":false,"required":["conversationId","seq","messageId","senderId","requestId","createdAt","content"],"properties":{"conversationId":{"$ref":"#/$defs/Id"},"seq":{"$ref":"#/$defs/PositiveSeq"},"messageId":{"$ref":"#/$defs/Id"},"senderId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"},"createdAt":{"type":"string","format":"date-time"},"content":{"type":"object","additionalProperties":false,"required":["kind","text"],"properties":{"kind":{"const":"TEXT"},"text":{"type":"string","minLength":1,"maxLength":4096}}}}},
+    "ConversationPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","messages","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.page"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"messages":{"type":"array","items":{"$ref":"#/$defs/Message"}},"hasMore":{"type":"boolean"}}}
+  }
+}
+package core
+
+import (
+	"net/http"
+	"strings"
+)
+
+type conversationRequest struct {
+	SyncVersion    string `json:"syncVersion"`
+	Type           string `json:"type"`
+	RequestID      string `json:"requestId"`
+	ConversationID string `json:"conversationId"`
+	AfterSeq       *int64 `json:"afterSeq"`
+	Limit          int64  `json:"limit"`
+}
+
+// Only the existing canonical per-Conversation gap shape is served privately.
+// User Sync and client cursor/materialization are outside this task.
+func (s *authService) conversationHistory(w http.ResponseWriter, r *http.Request) {
+	var v conversationRequest
+	if decode(r, &v) != nil || v.SyncVersion != "1.0" || v.Type != "sync.conversation.request" || !socialUUIDPattern.MatchString(v.RequestID) || !socialUUIDPattern.MatchString(v.ConversationID) || v.AfterSeq == nil || *v.AfterSeq < 0 || v.Limit < 1 || r.URL.RawQuery != "" {
+		writeError(w, r, fail(400, "VALIDATION_FAILED", "Request body is invalid."))
+		return
+	}
+	token, err := bearer(r)
+	if err != nil {
+		writeError(w, r, fail(401, "AUTH_REQUIRED", "Authentication is required."))
+		return
+	}
+	c, err := s.codec.Parse(token)
+	if err != nil {
+		writeError(w, r, fail(401, "AUTH_SESSION_REVOKED", "Request rejected"))
+		return
+	}
+	ctx := r.Context()
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		writeError(w, r, err)
+		return
+	}
+	defer tx.Rollback(ctx)
+	conversation := strings.ToLower(v.ConversationID)
+	if err = s.authorizeMessage(ctx, tx, c, conversation); err != nil {
+		writeError(w, r, err)
+		return
+	}
+	rows, err := tx.Query(ctx, `SELECT server_message_id,sender_id,request_id,seq,created_at,text_body FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT' ORDER BY seq LIMIT $3`, conversation, *v.AfterSeq, v.Limit)
+	if err != nil {
+		writeError(w, r, err)
+		return
+	}
+	messages := make([]storedMessage, 0)
+	for rows.Next() {
+		m := storedMessage{ConversationID: conversation, Content: textContent{Kind: "TEXT"}}
+		if err = rows.Scan(&m.MessageID, &m.SenderID, &m.RequestID, &m.Seq, &m.CreatedAt, &m.Content.Text); err != nil {
+			rows.Close()
+			writeError(w, r, err)
+			return
+		}
+		messages = append(messages, m)
+	}
+	err = rows.Err()
+	rows.Close()
+	if err != nil {
+		writeError(w, r, err)
+		return
+	}
+	after := *v.AfterSeq
+	if len(messages) > 0 {
+		after = messages[len(messages)-1].Seq
+	}
+	var more bool
+	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM messages WHERE conversation_id=$1 AND seq>$2 AND kind='TEXT')`, conversation, after).Scan(&more); err != nil {
+		writeError(w, r, err)
+		return
+	}
+	if err = tx.Commit(ctx); err != nil {
+		writeError(w, r, err)
+		return
+	}
+	writeJSON(w, 200, map[string]any{"syncVersion": "1.0", "type": "sync.conversation.page", "requestId": v.RequestID, "conversationId": conversation, "messages": messages, "hasMore": more})
+}
+# Canonical Sync and Plugin API v1 contracts
+
+`../websocket/sync-v1.schema.json` defines the four Sync v1 wire objects: user request/page and Conversation request/page. `v1.schema.json` defines Plugin API v1 manifests, Event subscriptions, Queries, Actions, UI Host calls, and immutable artifact descriptors. `policy-v1.json` fixes the capability and permission map, Query page limit, renderer preflight and sandbox choices, WASM denials and limit classes, upgrade stages, and purge requirements. These files under `contracts/` are the public machine-verifiable authority. The verifier and golden vectors live beside them; implementations must conform to the contracts.
+
+The user cursor is opaque and advances only with friend, Conversation, membership, or plugin state. Message pages use a per-Conversation sequence. A client materializes data and advances the corresponding cursor or contiguous sequence in one transaction. A failed transaction changes neither. Duplicate and out-of-order Messages upsert by `(conversationId, requestId)`, `messageId`, and `(conversationId, seq)`; a conflicting identity is rejected. `contiguous_seq` advances only across a complete prefix. A locally FAILED item with the same Conversation and request identity becomes SENT, and SENT never regresses to FAILED. Web remains memory-only; Desktop and Mobile render account-scoped local materialized state before background Sync.
+
+Each Plugin API surface requires both its declared capability and current permission. A Query request is limited to 100 items; an allowed Query returns a `query.page` with at most the requested number of host-projected items, a matching request page token, a continuation token when `hasMore` is true, and `sideEffects: 0`. A follow-up request presents the prior continuation token. An unauthorized or invalid Query returns no page. Actions are re-authorized at execution, use `(pluginId, conversationId, requestId)` as the idempotency identity, and leave an audit record for every attempt. The Host bridge is the only route to Core data or actions; no direct Core or database access is granted.
+
+A renderer loads only after package hash, signature, manifest schema, API compatibility, permission, resource size, CSP, and entry-point checks succeed. It executes in a sandbox iframe or isolated WebView and reaches UI Host only through the mediated bridge. The verifier's renderer runtime cases reject direct host-sensitive resource access. A `(pluginId, version)` artifact is immutable: package, backend, and renderer hashes cannot change under that identity. Backend and renderer versions must match. Messages referring to Plugin content must retain the referenced renderer version and fallback TEXT. WSS v1's existing `message.send` remains TEXT-only; this contract does not change it.
+
+WASM denies database, server-file, arbitrary-network, and other-plugin-memory access by default. CPU/time, memory, concurrency, storage, and network limits are enforced; three consecutive timeout, panic, or limit violations trigger AUTO_DISABLED. Plugin artifact lifecycle and Conversation instance lifecycle remain distinct. During upgrade the old version serves until snapshot, migration, backend and renderer health checks, and atomic switch succeed. Any failed stage restores the snapshot and leaves the old version serving. DISABLE preserves data; UNINSTALL defaults to RETAINED; PURGE requires an explicit, elevated, audited, retention-confirmed operation.
+
+Run `python contracts/fixtures/sync-plugin/generate.py` to deliberately regenerate canonical shared vectors, then `python contracts/plugin-api/verify.py` to lint schemas and check outcomes. The verifier is an offline contract oracle, not a Plugin or Sync runtime. Golden fixture expectations are fixed in `contracts/fixtures/sync-plugin/golden.json`; observable Sync checkpoints record rollback, materialized user state, the gap before repair, and retry. The local send trace records FAILED before matching Sync, SENT after Sync with one item, and terminal SENT after a later failure signal. Query fixtures observe linked result pages, item counts, and zero side effects. Action fixtures record every authorization/audit result, and upgrade fixtures record each attempted stage while the old version serves.
+
+`contracts/fixtures/sync-plugin/profile-outcomes/go.json` and `java.json` are separately stored normalized **contract vectors** for the two planned backend profiles. The verifier checks each artifact's complete case set against the canonical expected outcome and rejects a divergent value in either profile. These static vectors were initially populated from the canonical fixture expectations; they are not outputs from Go or Java backend execution, because neither backend exists at this stage. Backend conformance must replace or validate these observations when those implementations arrive. The verifier also runs malformed-wire, wrong-outcome, seven scenario mutation, and profile-divergence controls.

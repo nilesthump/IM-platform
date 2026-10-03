@@ -1,0 +1,27 @@
+# SYNC prerequisite inspection — BLOCKED_BY_ARCHITECTURE
+
+Date: 2026-10-03. Fresh Implementation Agent /root/sync_implementation; assigned Git root H:/.codex/worktrees/sync-resume/IM-platform verified exactly before writes. Branch task/LOOP1-SYNC-001; base/last accepted main a0304fcc7be18b87f5986d014849d6b48b96a071. Human exact scope: “开始 SYNC，完成后停止”. SEND unique done; SYNC unique backlog. No SYNC runtime implemented, accepted, synchronized or done. S1 PASS/S2 OPEN. Main untouched.
+
+## Authority and observed inputs
+
+Resolved README → baseline; canonical SHA25616e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c matches. Canonical §2.1/2.3/3/6/10 SRC01–07/11/19/20, ADR0005/0006/0007, minimality/execution/Review/technology policies and task domain/invariants/acceptance inputs inspected. Accepted client-ui architecture.md line54 explicitly forbids invented conversation/message/Sync HTTP routes and assigns transport/fields to accepted protocols; frozen §11 makes contracts sole public authority. SYNC allowed_paths contains no backend/contracts authority.
+
+- contracts/websocket/sync-v1.schema.json lines6–9/15–20 defines four standalone Sync objects. UserEvent metadata (kind/subjectId/revision) is legitimate existing materialization input; no rich user payload gap is asserted.
+- contracts/websocket/envelope.schema.json oneOf has AuthBind/AuthAck/MessageSend/MessageAck/MessageCreated/SessionRevoked/Ping/Pong, with no Sync alternative.
+- contracts/http/auth-user-friend.openapi.json has nine Auth/User/Friend paths and no Sync path. No other product OpenAPI exists in contracts/http.
+- Corrected direct source inventory finds no sync.user/sync.conversation/__core/history routing references in backend/go/gateway/*.go.
+- backend/go/core/http.go lines14–15 privately serves /__core/message and /__core/history. backend/go/core/sync.go lines17–18 says only private per-Conversation gap shape is served and User Sync is outside its task. It is not an authorized public client endpoint.
+- clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt line120 already has userPage transactional materialization; shared/storage/repository.ts line110 likewise. Storage is not the blocker.
+- contracts/plugin-api/README.md lines13/15 explicitly distinguishes offline oracle/static profile vectors from running backend observations. A controlled mock cannot establish actual missing User Sync runtime.
+
+## Smallest decision and scope
+
+Approve a prerequisite public Sync transport binding for existing user/Conversation shapes (authentication, correlation and error behavior included), and a narrowly scoped Go Core/Gateway runtime task before client orchestration? No particular route or transport is prescribed here. Decision must follow Architect/Human approval → canonical/approved contract authority → independent Review/applicable exact-head hosted CI → actual service inputs accepted → reassess SYNC readiness. Task path expansion cannot replace authority. SYNC remains backlog/BLOCKED_BY_ARCHITECTURE, no ready/active transition; GUI/Web not advanced.
+
+## Verification and trace limits
+
+Own recorded python -B ci/check_architecture.py --scope all --json: exit0 PASS/no violations. Own recorded python -B tools/verify_frozen_architecture.py: exit0 PASS current SHA/PDF provenance/ADR structure. Corrected JSON/source inventory: exit0, exact alternatives/routes above. Record blobs/events contain outputs, timestamps/durations/raw hashes. git diff --check exit0. These are local baseline/input evidence; no runtime/Task/Gate/hosted acceptance claim.
+
+Own R-SYNC-IMPLEMENTATION-20261003 under implementation-research is prospective_resume; initial mandatory read-only startup and launcher preparation are incomplete/unrecorded, explicitly not a complete prospective trace. Initial Windows PowerShell base64 pipeline register failed “Excess data after padding”, followed by start-run missing prompt metadata FAIL; reliable subprocess base64 register succeeded. First successful P-SYNC-IMPLEMENTATION-20261003 is an English scope translation plus delegation, not exact Chinese wording; superseding P-SYNC-IMPLEMENTATION-EXACT-20261003 records exact Chinese Human wording plus visible delegation summary and is the actual run prompt. Recorder marked that prompt redacted; no hidden/internal prompt claim. First recorded canonical-section output had gbk encoding FAIL, retried with -X utf8 PASS. Initial inspection mistakenly named envelope-v1.schema.json and one nonexistent gateway/ws.go; subsequent exact JSON/file/source inventory corrects both. Failed logs are preserved, not edited to PASS. A shell command combining rg/read actions returned0 despite first missing-file diagnostic; it is not claimed as successful exact inventory. Root's separate research stream remains root-owned/unchanged.
+
+Recovery task note appended without altering historical bytes; current recovery replaced stale SEND endpoint with authorized SYNC-only blocked state. No product/backend/contracts/frozen/schema/migration/Repository writes. Implementer owns task/current/implementation/implementation-research; Coordinator owns pre-existing research evidence. Independent Review of this blocker recovery is next. New record commit will be identified in handoff; recovery main sync PENDING. Recorder validation concerns trace structure only.

@@ -1,0 +1,29 @@
+12:function Add-Failure([string]$message) {
+16:function Require-File([string]$relativePath) {
+24:function Get-Section([string]$content, [string]$heading) {
+25:    $pattern = "(?ms)^# $([regex]::Escape($heading))\s*\r?\n(.*?)(?=^# |\z)"
+31:function Get-CurrentSection([string]$content, [string]$heading) {
+32:    $pattern = "(?ms)^## $([regex]::Escape($heading))\s*\r?\n(.*?)(?=^## |\z)"
+38:function Invoke-Git([string[]]$arguments, [string]$purpose) {
+97:    Add-Failure 'current.md is missing the Current Execution State heading.'
+112:    'Verification',
+116:    'Last Known Good Commit',
+121:foreach ($heading in $requiredCurrentSections) {
+122:    if ([string]::IsNullOrWhiteSpace((Get-CurrentSection $current $heading))) {
+123:        Add-Failure "current.md is missing a non-empty ## $heading section."
+127:$currentVerification = Get-CurrentSection $current 'Verification'
+128:if ($currentVerification -notmatch '(?m)^- Command:\s*`[^`]+`\s*$') { Add-Failure 'current.md Verification is missing an exact command.' }
+129:if ($currentVerification -notmatch '(?m)^\s+- Result:\s*\S.+$') { Add-Failure 'current.md Verification is missing a non-empty result.' }
+130:$currentEvidenceMatches = [regex]::Matches($currentVerification, '(?m)^\s+- Evidence:\s*`([^`]+)`\s*$')
+131:if ($currentEvidenceMatches.Count -eq 0) {
+132:    Add-Failure 'current.md Verification is missing a durable evidence path.'
+134:    foreach ($evidenceMatch in $currentEvidenceMatches) {
+137:            Add-Failure "current.md Verification evidence does not exist: $evidencePath"
+142:$lastKnownGoodSection = Get-CurrentSection $current 'Last Known Good Commit'
+145:    Add-Failure 'current.md Last Known Good Commit is missing a full commit SHA.'
+147:    [void](Invoke-Git @('cat-file', '-e', "$($lastKnownGoodMatch.Groups[1].Value)^{commit}") 'Last Known Good Commit')
+243:    $requiredHeadings = @('Goal', 'Inputs', 'Dependencies', 'Allowed Paths', 'Acceptance', 'Forbidden', 'Verification', 'Evidence', 'Handoff', 'Next Action')
+244:    foreach ($heading in $requiredHeadings) {
+245:        if ([string]::IsNullOrWhiteSpace((Get-Section $currentTaskContent $heading))) { Add-Failure "Current Task is missing a non-empty # $heading section." }
+268:    $verification = Get-Section $currentTaskContent 'Verification'
+271:        Add-Failure 'Current Task verification exposes no discoverable tools/ entry point.'

@@ -1,0 +1,183 @@
+spec/architecture/decisions/ADR-0005-client-technology-clarification.md
+# ADR-0005: Client technology clarification and universal selection governance
+
+Status: Human-approved clarification independently accepted at e7c80c7 under bounded Human GString waiver; final administrative confirmation pending before S2 activation.
+Date: 2026-10-01
+Approval source: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md; full explicit Human instruction human-approved-request.txt and supplemental human-desktop-sqlx-mobile-emulator-decision.txt in the same directory (raw-byte SHA25691033f339f337105bc70f45b20c312b8ed2490d01c0b1607e197cda6e09c770b; normalized prompt SHA25678aa2191a4f3614185781a17ebd5204c949312d3a8eb159435af469d0d1929b5; Recorder P-CLIENT-SQLX-DECISION-20261001).
+
+## Motivation and decision
+
+PR7 implemented Dart SQLite despite missing architecture authorization. PR8 restored main3f352a8e465c0c4b093cca8e5f404ea587550b6e to accepted pre-PR7 tree. The withdrawn attempt and its tests/reviews are historical evidence, not authority or new acceptance.
+
+Canonical §2.3 freezes universal no-unapproved-technology governance; §6.1 freezes React/TypeScript memory-only Web, Tauri/React/TypeScript SQLite Desktop and Android Kotlin + Jetpack Compose SQLite Mobile. Web/Desktop/shared protocol/plugin/models/Repository/domain/UI remain TypeScript, necessary Desktop Rust is confined to clients/desktop/src-tauri. Mobile uses Kotlin equivalent models/Repository/behavior/adapters under the SAME canonical contracts/fixtures; no mandatory direct TypeScript SDK reuse, new public contract, JS runtime/bridge/codegen or shared native rewrite. Android Studio emulator validates the real Mobile runtime; host tests/mocks cannot replace it. Android SDK/Gradle/Kotlin/Compose engineering identifiers and built-in Android SQLite access follow the approved stack, not arbitrary Room/ORM/network/native dependencies.
+
+Supplemental Desktop approval remains Tauri + SQLx(SQLite). TypeScript holds shared Repository/models/transaction intent; Rust only connections, queries and atomic transaction adapter. Independent tauri-plugin-sql execute() calls MUST NOT simulate a cross-call transaction. Other sensitive dependency choices remain subject to §2.3.
+
+Approval chain: original full Human instruction -> supplemental Desktop SQLx/emulator instruction -> NEW exact Human answer “moblie明确为kotlin jetpack compose，移除moblie ts技术栈”. Latest answer supersedes ONLY the original Mobile TS/TBD/direct-TS-reuse clauses. Raw evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt; raw-byte SHA2561901f6dcd93069a19b6a88f5249858c8017ad36c71d61a109cbbad2ec5e9c061; normalized Recorder SHA256863da9423040acffa2c11b7e67d6c71673f5d7aeb7edd26954108884b5705dd4; prompt P-CLIENT-MOBILE-KOTLIN-20261001. Candidate188d24a / canonical ac042107 was superseded before independent acceptance, never an accepted baseline. Previous accepted canonical83d124b remains the lineage. Original prompt, approval/recovery and finished Recorder archives remain immutable.
+
+Missing sensitive decision: stop affected work -> smallest question -> Human/Architect -> frozen body/approved ADR -> machine guards -> fresh independent Review/applicable exact-head hosted CI -> product implementation. Task text, allowed_paths, familiarity/popularity/installed tools or passing tests cannot authorize a technology. Go/Java internal variation does not bypass this universal rule.
+
+## Normative effect and compatibility
+
+semantic_change=true: this is a Human-approved architecture clarification, not a representation-only migration. Version remains v1.1; canonical bytes and hash change. Previous canonical SHA25683d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e is preserved in manifest revision history. PDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 remains byte-for-byte unchanged. Older ADRs, checkpoints, PR7/FAIL/Review/Recorder/evidence are immutable. No contract, server schema, ACK/Sync, security or compatibility semantics change. S1 PASS; S2 OPEN.
+
+## Implementation, effectiveness and migration
+
+This bounded prerequisite changes authority, execution governance and existing checker/classifier/CI only, without S2 product code or dependencies. Source/dependency/import/config/workflow/task declaration controls inspect active clients; historical evidence is excluded by exact active path ownership, never deletion. Direct static checks supplement mandatory semantic independent Review of language/dependency authority and Rust responsibility.
+
+New independent Review of clean committed candidate and real applicable exact-head hosted CI must accept this prerequisite before task done or S2 activation. Local/Recorder PASS cannot establish Task/S2 PASS. Acceptance SHA/run/effective point are pending and must be recorded by Coordinator truthfully after acceptance. S4/Java/Loop2 are not advanced. New S2 tasks require fresh authorized TypeScript/Kotlin implementation Review/CI; PR7 cannot be restored or reused as acceptance.
+
+## Rollback
+
+Before acceptance, retain accepted main and repair candidate on FAIL. After acceptance, any authority correction uses a Human-approved corrective ADR and new independently reviewed commit; do not rewrite historical commits/evidence/PDF or silently restore Dart. There is no product/data migration in this prerequisite.
+
+Prompt raw-byte vs Recorder LF-normalized hashes are distinguished in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/prompt-hash-normalization.md; original approval/recovery and prompt bytes are preserved.
+
+## Accepted clarification discovery (2026-10-01)
+
+Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 under scoped Human GString waiver; original4b5 Review FAIL immutable. Exactpush36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS. Canonicalaa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c/PDF546915 unchanged. ADR0005 effective at accepted prerequisite. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md. Earlier pending paragraphs are historical; later administrative closure needs NEW independent Review/exactHEADCI before S2activation. No product/contract change; S1PASS/S2OPEN.
+
+spec/architecture/decisions/ADR-0006-client-ui-architecture.md
+# ADR-0006：客户端 UI 架构与截图验收
+
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
+日期：2026-10-03
+批准来源：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/human-request.txt
+补充决定：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/human-supplement.txt
+
+## 动机与明确决策
+
+Human 要求在 GUI 实现前冻结三端 UI 架构、Adaptive Glass Workspace 设计方向，以及由截图驱动的 Architect 验收。请求明确选择 Desktop 独立 UI、React 内置状态机制和 Mobile ViewModel/StateFlow/Jetpack Navigation Compose。后续 Human 答复将 UI 代码执行禁令限定于 S2，保留 S4 经审查的沙箱 Render Bundle。工作树补充说明授权：没有分配时，在 Codex 设置的工作树目录中自主分配受管理工作树。新增 Human 要求「架构文档用中文编写」，本 ADR 与三份新交付文档据此使用中文。
+
+规范 §6.5 记录全部规范性决定；从属架构/设计文档解释这些要求，不建立另一份规范权威。§6.1 原完整组件复用规则改为各端独立视觉实现，共享协议、模型、适用 hooks、Token 和 UI 语义。不共享 Button/MessageBubble/ChatWindow。Mobile Kotlin 等价行为保持不变；批准的 Navigation/Lifecycle/StateFlow 依赖仅在规范机器策略中限定列出，供未来已批准任务使用。Web 路由以及通用图标/无障碍/工具库类别未选择任何新增具体包。不选择状态管理框架、AI API 或 Plugin 运行时。
+
+## 规范效力与兼容性
+
+semantic_change=true。保留 v1.1。规范正文及哈希已由此前候选更新；已接受输入 aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c 在 baseline.md 中保留为 UI 修订谱系，客户端基础技术来源仍为 ADR-0005。基础修订元数据、ADR-0001 至 ADR-0005、原 PDF546915、PR7/PR8 历史及既有 FAIL/豁免/证据保持不可变。§8.2 安全校验、sandbox、Bridge 和插件契约保持完整；S2 不实现 renderer、下载、安装或运行时。不改变 wire contract、ACK、兼容性、存储 schema、安全权限或后端。不涉及产品/数据迁移。本次中文修订不改变规范正文或其候选哈希。
+
+## 初始交付与生效点
+
+交付文档为 decisions/client-ui/architecture.md、decisions/client-ui/design-direction.md 和 spec/acceptance/client-gui.md。GUI 任务必须要求绑定候选 SHA 的真实运行截图清单、Architect 审查/修复/重拍/批准、独立语义实现 Review，以及适用的精确 HEAD 托管 CI。截图批准不替代这些检查，也不能建立 S2 PASS。
+
+冻结仅在新的独立干净候选 Review、适用的精确 HEAD 托管 CI、被接受的集成与实际 main 验证之后生效。此前已接受 main 仍是最后已知良好提交，产品实现不得将候选当作已接受权威。Reviewer 须检查规范变更、从属文档、精确写入范围、机器策略依赖新增及历史谱系保留。如实记录生效 SHA/CI/main 和受保护同步结果之后，任务才可 done；保留 S1 PASS/S2 OPEN。不激活 SEND/SYNC/WEB 任务。
+
+## 最小性与回滚
+
+范围为三份文档、限定的规范/ADR/索引/清单修订和 Human 要求的 AGENTS 补充；不实现组件、Token 引擎、库安装、插件运行时或 AI。新增工程标识仅服务明确的 Mobile 状态/导航设计，不授权 Room、网络或测试框架。生效前，在已接受 main 不变的情况下修复候选；生效后修正必须使用 Human 批准的纠正 ADR 和新的独立验收，不得重写历史、PDF 或 Recorder。
+
+spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md
+# ADR-0007：客户端 MVP 任务规划补充
+
+状态：规划核心已独立接受于 candidate7466ce7/PR14/actualmain b60f116a14f9265031bff255db500f3414f2a357，并保护同步 H:/IM-platform；证据 mvp-planning/closure/acceptance.md。本状态发现仅行政收尾，仍待新独立 Review/精确 CI/集成；之后立即执行本轮 SEND。
+日期：2026-10-03
+批准来源：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/human-request.txt
+
+## 动机与决定
+
+ADR-0006 已冻结 UI 架构但 §19/§20 未完整落实产品 GUI 工作。Human 明确批准 minimum-task-count 补全：S2 仅新增 LOOP1-CLIENT-GUI-001，覆盖 Desktop/Mobile 完整 Loop1 GUI，依赖 SQLITE/UI-ARCH/SEND/SYNC；原 LOOP1-WEB-001 是 Web 完整 GUI，保持 React/TypeScript memory only、无 SQLite/离线历史。S2 顺序 SQLITE → UI-ARCH → SEND → SYNC → GUI → WEB → Gate。客户端自有 Settings/Profile、双主题与本地字体间距、真实发送/同步状态及平台能力均在 GUI 任务验收内。
+
+S3 PARITY 兼顾无业务修改切换 profile；S4 PLUGIN-UI/FIX 承接真实宿主 UI、导航限制、截图证据；S5 COMPAT/RELEASE 承接三端兼容、SQLite/主题偏好/Plugin UI、实际制品与安装升级回滚；S6 仅 RC 增加最终三端 GUI smoke 和实质变化重拍批准，5000 WSS 由 load harness 承担。禁止新增 UI parity/plugin/release/soak/E2E ID。GUI/Web 引用既有 client-gui 截图 → Architect Review → 修复重拍 → Approval → fresh independent Review → exact-head CI → protected integration/main 链。
+
+## 影响、兼容与迁移
+
+semantic_change=true（任务规划与 Gate obligations）；v1.1 不变。规范 §15/§19/§20/附录 A 同步，baseline 当前 hash 更新，planning_previous_sha256 记录接受输入 a234bc06。不更改 §3/§6 存储/发送/Sync 职责、技术政策、契约/schema/ACK/security/compatibility；不选新依赖、不迁移产品数据；历史 PDF/ADR-0006/PR7/PR8/FAIL/Recorder 不变。单独最小 ADR 留下新批准来源，避免把已接受 ADR-0006 的旧 CI 当成本轮验收。
+
+## 接受与本轮 endpoint
+
+本次补充在 clean committed candidate 的完整性、architecture、dependency/negative controls、新 independent Review、精确候选 applicable hosted CI、protected merge/actual-main 与受保护主仓库同步完成后生效。之后立即进入 SEND 编排实现；本轮正常停止点 SEND 已独立接受、集成同步且 done；SYNC/GUI/WEB 不激活。UI 架构 Task 已接受内容不撤回，本次 pending 仅指新增规划。
+
+## 最小性与回滚
+
+复用 UI-ARCH 行政任务，产品只新增 GUI ID；其余队列实例化已有规划 ID，不生成未来 S3～S6 新任务层。生效前修复候选；生效后纠正通过新 Human 决定与独立验收，不重写历史。无产品/数据回滚。
+
+## 接受发现
+
+原文候选效力说明为历史流程。当前canonical16e9c7b4通过fresh candidate/actualmain Review与精确hosted5jobs/every stepPASS，v1.1/PDF不变；本段不修改规范职责/边界，S1PASS/S2OPEN。
+
+spec/tasks/backlog/LOOP1-SYNC-001.md
+---
+task_id: LOOP1-SYNC-001
+title: Desktop/Mobile two-level sync orchestration
+status: backlog
+owner: unassigned
+stage: S2
+gate: S2
+---
+
+# Goal
+
+基于既有 Repository 实现 user cursor 与 per-conversation contiguous_seq 同步、实时交叉、缺口补偿及断线重连；不改存储职责。
+
+# Inputs
+
+- `spec/architecture/README.md` -> `spec/architecture/baseline.md` -> `spec/architecture/frozen-architecture.md`，§2.3/§3/§6/§10 SRC-01 through SRC-07/§11/§19/§20。
+- `spec/architecture/decisions/ADR-0005-client-technology-clarification.md`、`spec/architecture/decisions/ADR-0006-client-ui-architecture.md`、`spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md`。
+- `spec/governance/minimality.md`、`spec/governance/execution-boundaries.md`、`spec/governance/independent-review.md`、`spec/governance/technology-selection.md`。
+- `spec/domain/messaging.md`、`spec/invariants/messaging.md`、`spec/domain/sync-plugin.md`、`spec/invariants/sync-plugin.md`、`contracts/websocket/`。
+- `spec/architecture/decisions/client-ui/architecture.md`、`spec/architecture/decisions/client-ui/design-direction.md`、`spec/acceptance/client-gui.md`。
+
+# Technology Authorization
+
+已接受 canonical §6.1/§6.5 与 ADR-0005/0006 授权；本声明不选择新依赖，未明技术按 §2.3 停止受影响实现。Mobile Kotlin 等价契约行为，不强制 TS 复用；Desktop TypeScript application/Repository 与 existing Tauri SQLx boundary。
+client_language: TypeScript
+client_language: Kotlin
+client_framework: Tauri
+client_framework: Jetpack Compose
+client_runtime: Tauri
+client_runtime: Android
+
+# Dependencies
+
+- LOOP1-CLIENT-SEND-001 (必须独立接受并 done).
+
+- ADR-0007 本轮规划须独立 Review/精确 HEAD CI/集成 main 同步接受才可激活。依赖未满足保持 backlog；GUI/Web 在本轮 Human endpoint 之后，无本轮激活授权。
+
+# Allowed Paths
+
+- `clients/desktop/src/application/sync/**`
+- `clients/shared/protocol-sdk/src/sync/**`
+- `clients/mobile/app/src/main/kotlin/im/platform/client/sync/**`
+- `clients/mobile/app/src/androidTest/kotlin/im/platform/client/sync/**`
+- `tests/clients/sync/**`
+- `tools/verify_client_sync.py`
+- `.github/workflows/ci.yml`
+- `spec/tasks/backlog/LOOP1-SYNC-001.md`
+- `spec/tasks/ready/LOOP1-SYNC-001.md`
+- `spec/tasks/active/LOOP1-SYNC-001.md`
+- `spec/tasks/review/LOOP1-SYNC-001.md`
+- `spec/tasks/done/LOOP1-SYNC-001.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-SYNC-001/**`
+- `spec/progress/checkpoints/*loop1-sync-001*.md`
+
+# Acceptance
+
+乱序/重复/交叉实时流不越过 gap；事务回滚 data/cursor 一致；FAILED 被服务端消息收敛 SENT；按账号隔离，Desktop/Mobile 真实运行。独立 Review、exact-head CI、protected main sync。
+适用 architecture/source/dependency guard 与实际职责/import/minimality Review 必需。Task allowed_paths 不授权新架构。
+
+# Forbidden
+
+不实现 GUI/Web/Plugin/AI；不改契约、安全、ACK 或 Repository schema。
+
+# Minimality
+
+仅实现当前目标，用已有 Repository/规范协议/已冻结技术；不增加未来机制。激活前读实际源码，路径不足先显式收窄/补充 task scope，不借范围泛化。
+
+# Verification
+
+- Minimum baseline: python -B ci/check_architecture.py --scope all --json 与 `tools/verify_frozen_architecture.py`。
+- `tools/verify-loop1-ctrl-002.ps1` -Mode Development；候选 clean Acceptance；独立 exact-head applicable hosted jobs。
+- 激活时将新增实现的精确行为验证命令、运行环境、启用条件和负例写入本节；尚未运行的测试不计 PASS。
+
+# Evidence
+
+spec/progress/evidence/LOOP1-SYNC-001/；本次仅规划，未生成产品验收；prospective Research Recorder 激活时独立运行。
+
+# Handoff
+
+Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品 ID。S1 PASS/S2 OPEN；未实现、未验收、未同步产品；known good59dcf34e4538d2f35ccafde8104e860f8cf5cd7a。当前规划文本 /root 所有；不覆盖主仓库未知工作。具体 code paths 在激活时按责任与实际源码确认。
+
+# Next Action
+
+等待依赖与规划独立接受；本轮仅 SEND 允许随后激活，SYNC/GUI/WEB 保持 backlog。
+

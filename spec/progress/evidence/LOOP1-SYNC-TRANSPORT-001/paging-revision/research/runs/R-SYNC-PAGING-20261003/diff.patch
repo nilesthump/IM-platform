@@ -1,0 +1,160 @@
+diff --git a/contracts/http/sync.openapi.json b/contracts/http/sync.openapi.json
+index 011495b..2df50e2 100644
+--- a/contracts/http/sync.openapi.json
++++ b/contracts/http/sync.openapi.json
+@@ -280,6 +280,8 @@
+     "failure": "non-2xx-never-a-sync-page",
+     "queryParameters": "none",
+     "runtimeAcceptance": "deferred-until-human-approved-Go-plan",
+-    "afterSeqPolicy": "accept-all-nonnegative-integers-above-storage-head-empty"
++    "afterSeqPolicy": "accept-all-nonnegative-integers-above-storage-head-empty",
++    "pagination": "commit-page-then-continue-hasMore-to-terminal-without-fixed-total-cap",
++    "completion": "latest-committed-visible-at-terminal-read-not-future-writes"
+   }
+ }
+diff --git a/spec/architecture/baseline.md b/spec/architecture/baseline.md
+index b51b45d..67775ec 100644
+--- a/spec/architecture/baseline.md
++++ b/spec/architecture/baseline.md
+@@ -5,7 +5,7 @@
+ - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
+ - canonical_format: `markdown`
+ - repository_path: `spec/architecture/frozen-architecture.md`
+-- sha256: `457c405b79ca068af2b398b9fbe49859810c455359b01dbfdb2d4c6d72a9d966`
++- sha256: `ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03`
+ - previous_canonical_format: `pdf`
+ - previous_repository_path: `scalable-distributed-im-architecture.pdf`
+ - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
+@@ -90,3 +90,5 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252
+ - sync_previous_sha256: `16e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c`
+ 
+ Candidate only: fresh independent Review, exact-head hosted CI, protected integration/actual-main verification and main synchronization pending. Go product implementation additionally awaits Human consent to concrete plan after prerequisite acceptance. Existing wire shapes/PDF/prior accepted history unchanged; S2 OPEN.
++
++分页修正候选：Human 保持 min(limit,100) 单页 cap，要求持续分页直到 terminal；批准见 paging-revision/human-authorization.txt。此前457c405b79ca068af2b398b9fbe49859810c455359b01dbfdb2d4c6d72a9d966为已审未 hosted 接受候选，保留谱系；新 SHA 须独立接受。
+diff --git a/spec/architecture/decisions/ADR-0008-sync-https-transport.md b/spec/architecture/decisions/ADR-0008-sync-https-transport.md
+index 505cef5..65c4a24 100644
+--- a/spec/architecture/decisions/ADR-0008-sync-https-transport.md
++++ b/spec/architecture/decisions/ADR-0008-sync-https-transport.md
+@@ -23,3 +23,9 @@ SYNC 的四种现有 JSON 形状已有 contracts/websocket/sync-v1.schema.json
+ 新增传输操作，不改现有四形状、Auth API、WSS/ACK、数据库/迁移、存储、客户端技术政策或安全边界。旧 schema/oracle 离线向量保持原样且仍有效；opaque token 的具体编码是后续 Core 边界实现细节，不能反向定义契约。冻结正文增加 §11.5（绑定），baseline 保存旧 canonical hash16e9c7b4 与批准来源。历史 PDF/ADR/失败/Recorder 不改。
+ 
+ 候选未接受前不得作为 Go/client 产品实现授权；接受后依然必须先向 Human 展示 Go 实现方案并取得同意。规则接受不代表实际 Sync 服务存在，不解除 SYNC backlog 的 runtime 输入阻塞。新任务只有这一个当前已证明必要的前置，不实例化未来产品/UI 层。撤销未接受候选即可回滚；生效后的调整走新决定与独立接受，不重写历史。
++
++## Human 分页修正（2026-10-03）
++
++100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
++
++新增批准来源：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/human-authorization.txt。只冻结持续分页语义与后续验收要求，当前不实现客户端循环。旧候选 Review 不覆盖修正后 SHA；仍待新独立 Review/精确 HEAD CI/集成同步。
+diff --git a/spec/architecture/frozen-architecture.md b/spec/architecture/frozen-architecture.md
+index b413509..09f2a3a 100644
+--- a/spec/architecture/frozen-architecture.md
++++ b/spec/architecture/frozen-architecture.md
+@@ -851,6 +851,8 @@ Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户
+ 
+ 用户初值 cursor 为 0，后续 opaque cursor 绑定认证用户、可跨其 Session 重放；客户端不解析/排序。仅 friend/conversation/membership/plugin metadata；消息仍使用会话 seq。内部 cursor_id 可在响应投影为 external event.cursor/nextCursor，既有 producer payload/schema 不改。任意正整数 limit 仍合法，effectiveLimit=min(limit,100)，先精确取 cap 再有界转换。空页 terminal（user 保持输入 cursor）；非空 user nextCursor=末事件 cursor 且前进；hasMore 要求非空进展且存在额外已提交合格项，不能跳过并发晚提交。会话消息从 afterSeq+1 有序连续；客户端仅跨无 gap 前缀推进 contiguous_seq，数据/cursor 同事务不变。
+ 
++100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
++
+ 成功/可解码有效 requestId 的 canonical error 与 body UUID 关联；不可关联格式错误用 server UUID。具体认证、字段、错误码/状态、资源界限和关联行为以 contracts/ 为准，不从实现推导。无效/外账号 cursor 400 VALIDATION_FAILED，不存在/非成员会话403 AUTHORIZATION_DENIED。未列入错误目录的服务器/传输失败不得冒充成功页或推进 cursor。查询参数禁止，入口 HTTPS、日志/错误无凭据，响应 no-store。
+ 
+ 批准来源与兼容/迁移见 ADR-0008。此绑定仅经 fresh independent Review、精确候选 hosted CI、protected integration/actual-main 与主仓库同步后生效；接受后仍须展示具体 Go 入口实现方案并取得 Human 同意才可写 Go 产品代码。SYNC 仍须真实服务与客户端独立接受；本前置不等于 Task SYNC/S2 Gate PASS。
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index a0854f8..c4d9dbd 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -7,7 +7,7 @@ Gate Status: OPEN
+ Current Batch: S2-SYNC-only
+ Current Task: LOOP1-SYNC-TRANSPORT-001
+ Current Task State: review
+-Execution Status: BLOCKED_EXTERNAL_ACCESS
++Execution Status: REVIEW_PENDING
+ 
+ ## Immediately Relevant Completed Work
+ 
+@@ -48,3 +48,7 @@ Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch
+ ## Architecture Conflicts / ACP / ADR
+ 
+ Human authorized public Sync binding freeze via ADR-0008 candidate; absence of runtime remains SYNC blocker. No Go implementation before later Human plan consent.
++
++## 最新 Human 修正与恢复（2026-10-03）
++
++发布授权已收到，原 auto-review hold 为历史。当前新 writer /root/sync_paging_revision 只澄清持续分页到最新、单页 min(limit,100) 保持，未写 Go/client 产品。旧独立 Review 不覆盖新候选；下一步 fresh Review → 全13必跑精确 HEAD hosted CI → protected integration/actual-main 验证 → 主仓库同步。Go 同意时序保留，SYNC backlog/S2 OPEN；最后良好 main a0304fc。本次证据 paging-revision/；Recorder 启动前只读恢复及后续 authority 阅读 gap 如实披露，无完整 trace 声称。
+diff --git a/spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md b/spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md
+index 85490a8..27a6e3e 100644
+--- a/spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md
++++ b/spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md
+@@ -29,3 +29,9 @@
+ 真实 PostgreSQL + Go Core/Gateway + TLS入口（当前既有部署/harness），不是 offline oracle/profile结果文件。测试有效多页/空页/retry/限额/大整数/关联；缺失、无效、过期、撤销、旧epoch和client mismatch；跨用户cursor/伪造/无权限会话；被阻塞写者和并发commit不得丢低频事件；无gap消息页、readonly/无新Outbox；service/source/import/minimality和旧Auth/social/message/ACK回归。每项绑定实际candidate/environment/output，不制造结果。
+ 
+ fresh independent Review → exact-head hosted applicable jobs → protected integration/actual-main Review和CI → H:/IM-platform同步与SHA记录。Go前置实际服务接受后才评估 LOOP1-SYNC-001 的依赖/输入并恢复Desktop/Mobile双层同步；完成SYNC同样需要独立Review/CI/真实客户端运行和主仓库同步。最终在SYNC完成后停止，GUI/Web不继续；Go任务PASS并不等于SYNC/S2 PASS。
++
++## Human 分页修正与真实验收要求
++
++100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
++
++真实 PostgreSQL + Go/Gateway/TLS 验收必须为 user 与 conversation 各准备超过100项的已提交数据，逐页拉到 terminal，断言每页不超过 min(limit,100)、完整总数、身份去重与最后 cursor/seq；证明未在第一页或固定总页数处截断，并验证 terminal 后新提交由再次同步获取。离线向量只判定契约预期，不证明数据库查询、事务或运行入口正确；后续 Desktop/Mobile SYNC 再证明本地事务成功后分页推进。
+diff --git a/spec/tasks/review/LOOP1-SYNC-TRANSPORT-001.md b/spec/tasks/review/LOOP1-SYNC-TRANSPORT-001.md
+index a659d12..c151b44 100644
+--- a/spec/tasks/review/LOOP1-SYNC-TRANSPORT-001.md
++++ b/spec/tasks/review/LOOP1-SYNC-TRANSPORT-001.md
+@@ -76,3 +76,7 @@ Local final binding/ref/official OAI lint PASS; 4 Sync test groups and 53 archit
+ # Independent Review and external publication hold
+ 
+ Fresh independent Review PASS for clean57404dcc, full range a0304fc..57404dcc. Report/35-event sealed validated Recorder archived byte-exact in independent-review-57404dcc/. Architecture/contract/regression checks PASS; commands/results in report. No hosted CI/integration/main sync. Auto-review rejected GitHub publication pending explicit Human authorization of this prerequisite branch to https://github.com/nilesthump/IM-platform.git. Execution BLOCKED_EXTERNAL_ACCESS; state review, no Task/Gate PASS. Next: review this administrative increment, specific publication consent, final full13-job exact-head CI/protected integration/actual-main audit-CI/main sync, then show Go proposal for separate consent. Last accepted main a0304fc unchanged; Coordinator owns administrative increment. No product writes/SYNC advancement. See external-publication-blocker.md.
++
++# Human 分页修正与发布恢复
++
++Human 已明确授权推送既定分支到 GitHub/PR/CI及接受后保护合并同步，原发布阻断是历史。min(limit,100) 保持单页 cap；事务提交后持续分页至 terminal，无固定总条数/页数截断。canonical/ADR/contract binding及13文档mutation控制一致；四个JSON shapes不变。新修正待 fresh independent Review/精确 HEAD hosted CI/主仓库同步；不得沿用此前候选PASS关闭任务。writer /root/sync_paging_revision，lastgood main a0304fc，无 main/Go/client 写入；最新请求/恢复事实与验证在 paging-revision/。
+diff --git a/tests/contract/test_sync_transport.py b/tests/contract/test_sync_transport.py
+index ec274bf..c30e5af 100644
+--- a/tests/contract/test_sync_transport.py
++++ b/tests/contract/test_sync_transport.py
+@@ -21,6 +21,8 @@ class SyncTransportTests(unittest.TestCase):
+             lambda d: d["servers"].__setitem__(0, {"url": "http://api.example.invalid"}),
+             lambda d: d.__setitem__("security", []),
+             lambda d: d["x-sync-binding"].__setitem__("effectiveLimitCap", 0),
++            lambda d: d["x-sync-binding"].__setitem__("pagination", "stop-after-100-total"),
++            lambda d: d["x-sync-binding"].__setitem__("completion", "future-writes-already-synced"),
+             lambda d: d["x-sync-binding"].__setitem__("cursorOwnership", "global"),
+             lambda d: d["x-sync-binding"].__setitem__("correlation", "random"),
+             lambda d: d["paths"]["/v1/sync/user"]["post"].__setitem__("security", []),
+diff --git a/tools/verify_sync_transport.py b/tools/verify_sync_transport.py
+index 403b1ce..1f028f8 100644
+--- a/tools/verify_sync_transport.py
++++ b/tools/verify_sync_transport.py
+@@ -11,7 +11,7 @@ CONTRACT = ROOT / "contracts/http/sync.openapi.json"
+ ORACLE = runpy.run_path(str(ROOT / "contracts/plugin-api/verify.py"))
+ Invalid = ORACLE["Invalid"]
+ SYNC = ORACLE["SYNC"]
+-BINDING = {"initialCursor":"0","cursorOwnership":"authenticated-user","cursorComparison":"opaque-equality-only","effectiveLimitCap":100,"limitPolicy":"accept-all-positive-integers-cap-before-conversion","authentication":"authoritative-session-each-request","authorization":"core-user-scope-and-conversation-membership","correlation":"decoded-valid-body-requestId-echo-else-server-uuid","emptyUserPage":"retain-request-cursor-hasMore-false","userOrder":"stable-committed-prefix","userNextCursor":"last-event-cursor","conversationOrder":"ascending-gap-free-afterSeq","hasMore":"additional-committed-item-exists","failure":"non-2xx-never-a-sync-page","queryParameters":"none","runtimeAcceptance":"deferred-until-human-approved-Go-plan","afterSeqPolicy":"accept-all-nonnegative-integers-above-storage-head-empty"}
++BINDING = {"pagination":"commit-page-then-continue-hasMore-to-terminal-without-fixed-total-cap","completion":"latest-committed-visible-at-terminal-read-not-future-writes","initialCursor":"0","cursorOwnership":"authenticated-user","cursorComparison":"opaque-equality-only","effectiveLimitCap":100,"limitPolicy":"accept-all-positive-integers-cap-before-conversion","authentication":"authoritative-session-each-request","authorization":"core-user-scope-and-conversation-membership","correlation":"decoded-valid-body-requestId-echo-else-server-uuid","emptyUserPage":"retain-request-cursor-hasMore-false","userOrder":"stable-committed-prefix","userNextCursor":"last-event-cursor","conversationOrder":"ascending-gap-free-afterSeq","hasMore":"additional-committed-item-exists","failure":"non-2xx-never-a-sync-page","queryParameters":"none","runtimeAcceptance":"deferred-until-human-approved-Go-plan","afterSeqPolicy":"accept-all-nonnegative-integers-above-storage-head-empty"}
+ 
+ def require(ok, why):
+     if not ok:
+
+# Untracked paths observed; content intentionally not captured
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/handoff.md
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/human-authorization.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/prompts/P-SYNC-PAGING-20261003/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/prompts/P-SYNC-PAGING-20261003/prompt.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-16b17afe-f3bb-4caf-8c7b-da6bf5b5dc4f.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-16b17afe-f3bb-4caf-8c7b-da6bf5b5dc4f.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-6cb0d969-9b44-4935-ad4d-1b6ac1c24bdd.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-6cb0d969-9b44-4935-ad4d-1b6ac1c24bdd.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-8b5d233e-96c3-4b27-bea4-cbf9524b5352.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-8b5d233e-96c3-4b27-bea4-cbf9524b5352.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-db35a34d-4a22-4003-a1dc-e747f9f082d5.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-db35a34d-4a22-4003-a1dc-e747f9f082d5.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-e4450445-1681-4667-8dc9-84d4f5509103.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-e4450445-1681-4667-8dc9-84d4f5509103.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-ecf75946-e790-459b-8b8f-f7f7621a7697.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-ecf75946-e790-459b-8b8f-f7f7621a7697.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-f19ada17-0e57-47d0-ae1b-c2341d4c6fb6.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-f19ada17-0e57-47d0-ae1b-c2341d4c6fb6.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-f2303073-8dfb-4fd7-8e1a-7277addd57eb.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-f2303073-8dfb-4fd7-8e1a-7277addd57eb.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-f6425a4c-ea80-4991-a769-32ea163a20c0.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/blobs/C-f6425a4c-ea80-4991-a769-32ea163a20c0.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/events.jsonl
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/initial_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/research/runs/R-SYNC-PAGING-20261003/metadata.json

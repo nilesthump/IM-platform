@@ -1,0 +1,22 @@
+..E
+======================================================================
+ERROR: test_user_pages_and_negative_controls (test_sync_transport.SyncTransportTests.test_user_pages_and_negative_controls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "H:\.codex\worktrees\sync-resume\IM-platform\tests\contract\test_sync_transport.py", line 44, in test_user_pages_and_negative_controls
+    v.check_page("user", request, page)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\worktrees\sync-resume\IM-platform\tools\verify_sync_transport.py", line 61, in check_page
+    ORACLE["validate"](request, SYNC["$defs"][shape + "Request"], SYNC)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\worktrees\sync-resume\IM-platform\contracts\plugin-api\verify.py", line 93, in validate
+    validate(value[key], props[key], root, f"{path}.{key}")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\worktrees\sync-resume\IM-platform\contracts\plugin-api\verify.py", line 118, in validate
+    raise Invalid(f"{path}: invalid integer")
+<run_path>.Invalid: $.limit: invalid integer
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.011s
+
+FAILED (errors=1)
