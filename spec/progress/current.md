@@ -7,15 +7,15 @@ Gate Status: OPEN
 Current Batch: S2-MVP-planning-then-SEND
 Current Task: LOOP1-CLIENT-SEND-001
 Current Task State: done
-Execution Status: SEND_ACCEPTED_DONE_RECORD_CANDIDATE
+Execution Status: SEND_ACCEPTED_ENDPOINT_REACHED
 
 ## Immediately Relevant Completed Work
 
-S1 PASS. Architecture planning accepted/synchronized main10b77b22386234c98409ca41b3622ad6d25f3884, Frozen v1.1/PDF unchanged. SEND772b independently reviewed, protected PR16 integrated actual main9fea27c4ae070cbf837132bcc860a434efd16872, new exact-main CI/independent review PASS and safe H:/IM-platform synchronization complete. New administrative done-record candidate requires its own independent review/CI/integration; no product code edits.
+S1 PASS. Architecture planning accepted/synchronized main10b77b22386234c98409ca41b3622ad6d25f3884, Frozen v1.1/PDF unchanged. SEND772b independently reviewed, protected PR16 integrated actual main9fea27c4ae070cbf837132bcc860a434efd16872, new exact-main CI/independent review PASS and safe H:/IM-platform synchronization complete. These records discover accepted product facts and follow normal independent administrative review/CI/integration; no product code edits.
 
 ## Current Blockers
 
-No unresolved SEND product/architecture blocker. Administrative record acceptance pending. SYNC/GUI/Web outside Human endpoint and unstarted.
+No unresolved SEND product/architecture blocker. SYNC/GUI/Web are outside this Human endpoint and remain unstarted. New record integration must follow independent governance; it does not reopen accepted product work.
 
 ## Verification
 
@@ -39,7 +39,7 @@ Original1822 independent Review FAIL repaired by fresh Fix and NEW Reviewer2; ol
 
 ## Next Exact Action
 
-Fresh independent administrative record Review/exact-head CI/protected integration/actual-main verification/synchronization; then STOP. Next LOOP1-SYNC-001 UNSTARTED backlog; do not advance SYNC/GUI/Web this turn.
+STOP at accepted SEND endpoint. Next LOOP1-SYNC-001 remains UNSTARTED backlog; await a new Human instruction. Do not advance SYNC/GUI/Web this turn. Administrative record integration uses the normal independent Review/exact-head CI/main-verification/synchronization process before final reporting.
 
 ## Last Known Good Commit
 

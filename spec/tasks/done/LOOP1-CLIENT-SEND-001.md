@@ -141,7 +141,7 @@ Coordinator owns only factual metadata/evidence/checkpoint candidate, no unknown
 
 # Next Action
 
-Finish independent administrative record Review, applicable exact-head hosted CI, protected integration/actual-main verification and main synchronization. Then stop at SEND accepted endpoint. Next LOOP1-SYNC-001 remains UNSTARTED backlog; do not activate SYNC/GUI/Web without new Human instruction. S1 PASS/S2 OPEN.
+STOP at accepted SEND product endpoint. Next LOOP1-SYNC-001 remains UNSTARTED backlog; do not activate SYNC/GUI/Web without a new Human instruction. The Coordinator completes normal independent administrative record Review/exact-head CI/protected integration/actual-main verification/synchronization before final integration reporting. S1 PASS/S2 OPEN.
 
 # Final Evidence
 
