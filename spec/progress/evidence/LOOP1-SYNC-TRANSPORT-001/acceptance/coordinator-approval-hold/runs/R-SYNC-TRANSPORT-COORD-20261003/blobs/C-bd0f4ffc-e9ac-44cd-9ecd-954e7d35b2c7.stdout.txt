@@ -1,0 +1,105 @@
+ .github/workflows/ci.yml                           |    4 +
+ contracts/http/sync.openapi.json                   |  285 +++
+ spec/architecture/README.md                        |    4 +
+ spec/architecture/baseline.md                      |   13 +-
+ .../decisions/ADR-0008-sync-https-transport.md     |   25 +
+ spec/architecture/frozen-architecture.md           |   12 +
+ spec/progress/current.md                           |   36 +-
+ .../P-SYNC-IMPLEMENTATION-20261003/metadata.json   |   13 +
+ .../P-SYNC-IMPLEMENTATION-20261003/prompt.txt      |    1 +
+ .../metadata.json                                  |   13 +
+ .../prompt.txt                                     |    3 +
+ ...0c854a25-4a44-48e0-8168-6fb80dac33af.stderr.txt |    1 +
+ ...0c854a25-4a44-48e0-8168-6fb80dac33af.stdout.txt |  141 ++
+ ...5fbc4255-754d-441e-b961-dd6ff1af711f.stderr.txt |    0
+ ...5fbc4255-754d-441e-b961-dd6ff1af711f.stdout.txt |    1 +
+ ...80939d3e-9152-405f-abdf-758ed145573d.stderr.txt |    0
+ ...80939d3e-9152-405f-abdf-758ed145573d.stdout.txt |  468 +++++
+ ...9ad448a2-960f-4d5c-b787-7978ed017779.stderr.txt |    0
+ ...9ad448a2-960f-4d5c-b787-7978ed017779.stdout.txt |    1 +
+ ...baed6ac2-e12b-4ca5-a931-e960e2aefd6f.stderr.txt |    0
+ ...baed6ac2-e12b-4ca5-a931-e960e2aefd6f.stdout.txt |   24 +
+ .../runs/R-SYNC-IMPLEMENTATION-20261003/diff.patch |  135 ++
+ .../R-SYNC-IMPLEMENTATION-20261003/events.jsonl    |   16 +
+ .../final_state.json                               |  372 ++++
+ .../initial_state.json                             |  336 ++++
+ .../R-SYNC-IMPLEMENTATION-20261003/metadata.json   |   32 +
+ .../R-SYNC-IMPLEMENTATION-20261003/summary.json    |   10 +
+ .../implementation/authority-blocker.md            |   27 +
+ .../prompts/P-SYNC-RESUME-20261003/metadata.json   |   13 +
+ .../prompts/P-SYNC-RESUME-20261003/prompt.txt      |    1 +
+ ...31b59ec7-60c2-41a5-ac95-45793ff06e87.stderr.txt |    0
+ ...31b59ec7-60c2-41a5-ac95-45793ff06e87.stdout.txt |  183 ++
+ ...56c712df-a873-408b-b60d-9783afa4c038.stderr.txt |    0
+ ...56c712df-a873-408b-b60d-9783afa4c038.stdout.txt |    1 +
+ ...a3581c26-3f5f-422d-9652-67c930c0b3fb.stderr.txt |    0
+ ...a3581c26-3f5f-422d-9652-67c930c0b3fb.stdout.txt |    1 +
+ ...ac5b9fe0-edd3-4e49-8307-06f4c603fbf0.stderr.txt |    0
+ ...ac5b9fe0-edd3-4e49-8307-06f4c603fbf0.stdout.txt |    1 +
+ ...bf8085dd-e0cf-47cb-a588-b8cdc342e901.stderr.txt |    0
+ ...bf8085dd-e0cf-47cb-a588-b8cdc342e901.stdout.txt |    1 +
+ ...fa570a6c-b69f-4b9b-bf34-727968dcae25.stderr.txt |    0
+ ...fa570a6c-b69f-4b9b-bf34-727968dcae25.stdout.txt |    1 +
+ .../runs/R-SYNC-RESUME-20261003/diff.patch         | 1829 ++++++++++++++++++++
+ .../runs/R-SYNC-RESUME-20261003/events.jsonl       |   20 +
+ .../runs/R-SYNC-RESUME-20261003/final_state.json   |  328 ++++
+ .../runs/R-SYNC-RESUME-20261003/initial_state.json |  298 ++++
+ .../runs/R-SYNC-RESUME-20261003/metadata.json      |   32 +
+ .../runs/R-SYNC-RESUME-20261003/summary.json       |   10 +
+ .../go-implementation-proposal.md                  |   31 +
+ .../human-authorization.txt                        |    6 +
+ .../implementation-handoff.md                      |   29 +
+ .../P-SYNC-TRANSPORT-20261003/metadata.json        |   13 +
+ .../prompts/P-SYNC-TRANSPORT-20261003/prompt.txt   |    1 +
+ ...0f0e3dbe-c189-44e8-8957-1aab5e157b35.stderr.txt |    5 +
+ ...0f0e3dbe-c189-44e8-8957-1aab5e157b35.stdout.txt |    0
+ ...10ce5d69-d03c-4522-9be7-6326329cd513.stderr.txt |    5 +
+ ...10ce5d69-d03c-4522-9be7-6326329cd513.stdout.txt |    0
+ ...14c36375-e5e8-4488-8d4b-b5c39ddcafa7.stderr.txt |    5 +
+ ...14c36375-e5e8-4488-8d4b-b5c39ddcafa7.stdout.txt |    0
+ ...2e30696d-08a8-4852-9a98-ab1f95077606.stderr.txt |    5 +
+ ...2e30696d-08a8-4852-9a98-ab1f95077606.stdout.txt |    0
+ ...328e8210-c027-4ee0-ba5c-f2edb117a882.stderr.txt |    0
+ ...328e8210-c027-4ee0-ba5c-f2edb117a882.stdout.txt |    0
+ ...36bff3c3-725e-4804-b28a-e316e1ad2970.stderr.txt |    0
+ ...36bff3c3-725e-4804-b28a-e316e1ad2970.stdout.txt |    1 +
+ ...472c0e29-3930-475e-807e-57a7d230aff6.stderr.txt |    0
+ ...472c0e29-3930-475e-807e-57a7d230aff6.stdout.txt |    1 +
+ ...4b16273d-6116-44fe-b6d2-08b02a25b1f6.stderr.txt |    0
+ ...4b16273d-6116-44fe-b6d2-08b02a25b1f6.stdout.txt |    1 +
+ ...526820db-34ec-4af6-911c-5261c3fb7c91.stderr.txt |    0
+ ...526820db-34ec-4af6-911c-5261c3fb7c91.stdout.txt |    1 +
+ ...5a3c83fc-ae99-4b66-b4aa-0ed6ee84a9dd.stderr.txt |    0
+ ...5a3c83fc-ae99-4b66-b4aa-0ed6ee84a9dd.stdout.txt |    0
+ ...5d4aa70e-ba70-4ff3-a1a2-5386e2782c6c.stderr.txt |   22 +
+ ...5d4aa70e-ba70-4ff3-a1a2-5386e2782c6c.stdout.txt |    0
+ ...6daaedae-4649-4140-b654-c337affdb98f.stderr.txt |    0
+ ...6daaedae-4649-4140-b654-c337affdb98f.stdout.txt |    1 +
+ ...6f106dec-3aec-4854-b984-c52728eb5b6c.stderr.txt |    0
+ ...6f106dec-3aec-4854-b984-c52728eb5b6c.stdout.txt |    1 +
+ ...959958f7-33e8-4c93-8a08-dc1e492104ee.stderr.txt |    0
+ ...959958f7-33e8-4c93-8a08-dc1e492104ee.stdout.txt |    1 +
+ ...b7f5b89f-b881-44dd-abcc-f0475d2231c8.stderr.txt |    0
+ ...b7f5b89f-b881-44dd-abcc-f0475d2231c8.stdout.txt |    1 +
+ ...bad62218-035c-4c1f-b9ec-ca1cdcfdba74.stderr.txt |    5 +
+ ...bad62218-035c-4c1f-b9ec-ca1cdcfdba74.stdout.txt |    0
+ ...bbc1e173-7182-4fbe-9402-fca8a5ab2da4.stderr.txt |    0
+ ...bbc1e173-7182-4fbe-9402-fca8a5ab2da4.stdout.txt |    1 +
+ ...c4539fee-5cb1-4e30-a0aa-3ef6d59995df.stderr.txt |    0
+ ...c4539fee-5cb1-4e30-a0aa-3ef6d59995df.stdout.txt |    1 +
+ ...e4711082-9e92-4b94-b9bc-425523669bd7.stderr.txt |    0
+ ...e4711082-9e92-4b94-b9bc-425523669bd7.stdout.txt |    1 +
+ ...ea5a963d-e89c-41a5-aa0c-b7b4829be552.stderr.txt |    0
+ ...ea5a963d-e89c-41a5-aa0c-b7b4829be552.stdout.txt |    1 +
+ .../runs/R-SYNC-TRANSPORT-20261003/diff.patch      |  240 +++
+ .../runs/R-SYNC-TRANSPORT-20261003/events.jsonl    |   45 +
+ .../R-SYNC-TRANSPORT-20261003/final_state.json     |  462 +++++
+ .../R-SYNC-TRANSPORT-20261003/initial_state.json   |  334 ++++
+ .../runs/R-SYNC-TRANSPORT-20261003/metadata.json   |   32 +
+ .../runs/R-SYNC-TRANSPORT-20261003/summary.json    |   10 +
+ .../verification-history.md                        |   24 +
+ spec/tasks/backlog/LOOP1-SYNC-001.md               |   17 +
+ spec/tasks/review/LOOP1-SYNC-TRANSPORT-001.md      |   74 +
+ tests/contract/test_sync_transport.py              |   88 +
+ tools/verify_sync_transport.py                     |  115 ++
+ 104 files changed, 6249 insertions(+), 23 deletions(-)

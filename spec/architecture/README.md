@@ -36,3 +36,7 @@ planning_revision_adr对应ADR-0007的canonical16e9c7b4已接受于candidate7466
 ## Sync transport prerequisite candidate (2026-10-03)
 
 Resolve sync_revision_adr/approval_source/previous_sha256 in baseline.md for Human-authorized ADR-0008 additive public HTTPS binding at canonical section11.5. New candidate independent Review/exact-head hosted CI/protected integration/actual-main synchronization pending. No Go/client runtime acceptance. Concrete Go plan requires Human consent after prerequisite acceptance; SYNC stays backlog pending real service input, S2 OPEN.
+
+## Sync transport 接受发现 (2026-10-03)
+
+ADR-0008 / 公开 HTTPS Sync 绑定 已在 candidate b8200783ea3eadc1ed4e4050238f051a7ab708b3 / PR18 actual main c2ff0502fdad80f463abe038a960ca1b798e6d7a 通过 fresh independent Review 与 精确 HEAD CI 接受，并同步 H:/IM-platform。 canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 / v1.1 / 历史 PDF 不变。 证据：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/acceptance/acceptance.md。 此前 pending 段落为历史过程。 Go 产品仍待 方案展示后 Human 同意；SYNC backlog/S2 OPEN。 本收尾记录另待独立 Review/CI/同步。

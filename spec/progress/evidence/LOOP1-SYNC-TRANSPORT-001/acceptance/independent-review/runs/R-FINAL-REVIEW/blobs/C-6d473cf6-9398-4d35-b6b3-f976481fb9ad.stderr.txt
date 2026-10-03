@@ -1,0 +1,11 @@
+fatal: failed to stat '8c672a22c5fb9fd640791117c919e1b5a1b8bf69:spec/progress/evidence/LOOP1-CLIENT-SEND-001/acceptance/archive/actual-main-review/runs/R-SEND-ACTUALMAIN-REVIEW-20261003/blobs/C-01b4b61d-9944-4ce6-a4b5-ed44984e2f1a.stderr.txt.gz': Filename too long
+Traceback (most recent call last):
+  File "H:\IM-platform\.git\worktrees\IM-platform5\sync-final-candidate-review\probe.py", line 22, in <module>
+    assert subprocess.check_output(["git","show",old+":"+f])==(root/f).read_bytes(),f
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'show', '8c672a22c5fb9fd640791117c919e1b5a1b8bf69:spec/progress/evidence/LOOP1-CLIENT-SEND-001/acceptance/archive/actual-main-review/runs/R-SEND-ACTUALMAIN-REVIEW-20261003/blobs/C-01b4b61d-9944-4ce6-a4b5-ed44984e2f1a.stderr.txt.gz']' returned non-zero exit status 128.
