@@ -83,3 +83,7 @@ Three documents, ADR-0006, canonical v1.1 UI amendment/hash and Settings-directo
 Fresh Fix Agent /root/ui_arch_chinese_fix 将 ADR-0006、UI architecture、design-direction、client-gui 四份新交付文档全部正文改为中文；同步翻译索引/清单最新 UI 候选段落。规范正文与 a234bc06 候选哈希不变。旧 Review 发现 BASE..HEAD diff whitespace FAIL；原始字节以 gzip 与 SHA 清单保留，文本副本明确标注 LF 规范化。历史提交、根 Agent Recorder、原始失败结论未覆盖。新证据位于 chinese-revision/。仍为 review，待新独立 Review、精确 HEAD 托管 CI、受保护集成/main 同步；不声明最终接受。最后已知良好 main9c0eba89219b3fab73fe9258a7cfc59831c499dc，S1 PASS/S2 OPEN。本修订仅由 fresh Fix Agent 写入；root 的本地 Recorder 未跟踪目录归 root 所有。
 
 中文修订本地验证：frozen integrity/source all/53 architecture tests/完整 BASE 至工作区 diff check/recovery Development 均 PASS；精确命令、退出码、时长见 chinese-revision/checks.json。待提交后还须精确 BASE..HEAD 检查与新的独立验收。
+
+## 架构内容已接受，收尾 review
+
+候选33cc754及PR12/main4f18d222已由两个新鲜独立 Review 接受、精确 hosted CI通过并同步到 H:/IM-platform。当前 Last Known Good Commit：`4f18d222c75bb03166b2b5ead84b9999150a300c`。证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。任务保留 review，下一步为本收尾记录的独立 Review、精确 HEAD CI、主仓库同步；禁止后续 GUI 激活。原始主仓库既有文件已受保护，收尾改动仅归 /root 所有。

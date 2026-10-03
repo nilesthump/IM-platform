@@ -20,3 +20,7 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 
 ## UI 修订候选（2026-10-03）
 
 ADR-0006 记录 Human 明确的客户端 UI、设计与截图验收决定，以及仅适用于 S2 的插件执行禁令。通过 baseline.md 的当前哈希和 ui_revision_adr 字段解析。候选仍待独立 Review、精确 HEAD 托管 CI 和集成后 main 验证；已接受 main 仍是最后已知良好提交。decisions/client-ui/ 和 spec/acceptance/client-gui.md 的从属说明不建立第二份规范权威或公共契约权威。ADR-0005 仍是基础技术来源；保留 S4 经审查的沙箱 Render Bundle。
+
+## UI 冻结验收发现（2026-10-03）
+
+上述候选说明保留为历史过程。ADR-0006 / UI 规范内容已在候选 33cc754、PR12 实际 main 4f18d222 独立 Review 与精确 HEAD CI 接受，并已同步主仓库；当前规范哈希不变。完整证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。收尾记录仍在 review，S1 PASS / S2 OPEN，不启动后续产品任务。

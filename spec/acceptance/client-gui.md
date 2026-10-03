@@ -1,6 +1,6 @@
 # GUI 验收规范
 
-状态：Human 已批准的流程候选，仍待架构冻结的独立验收。本规范适用于后续 GUI 实现任务；当前架构任务没有运行中的 GUI，不得伪造截图。
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
 
 ## 必需验收链
 
