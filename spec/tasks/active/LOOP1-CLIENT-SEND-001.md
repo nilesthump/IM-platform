@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CLIENT-SEND-001
 title: Desktop/Mobile optimistic send orchestration
-status: backlog
-owner: unassigned
+status: active
+owner: fresh Implementation Agent
 stage: S2
 gate: S2
 ---
@@ -48,6 +48,9 @@ client_runtime: Android
 - `clients/shared/protocol-sdk/tsconfig.json`
 - `clients/mobile/app/build.gradle.kts`
 - `clients/mobile/app/src/main/AndroidManifest.xml`
+- `clients/mobile/app/src/androidTest/AndroidManifest.xml`
+- `ci/classify.py`
+- `tests/ci/test_classify.py`
 - `.github/workflows/ci.yml`
 - `spec/tasks/backlog/LOOP1-CLIENT-SEND-001.md`
 - `spec/tasks/ready/LOOP1-CLIENT-SEND-001.md`
@@ -88,3 +91,13 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 # Next Action
 
 等待依赖与规划独立接受；本轮仅 SEND 允许随后激活，SYNC/GUI/WEB 保持 backlog。
+
+
+## 激活前具体范围与验证
+
+依赖SQLITE和UIARCH唯一done；架构规划已接受actualmain10b77b2并同步。Coordinator按此真实状态backlog→ready→active；owner fresh Implementation Agent。本次增加CI classifier/test仅为新SEND verifier/fixture删除与正负触发覆盖，Android androidTest Manifest仅为测试Instrumentation声明，均不是新产品能力/技术选择。现有Repository/native/schema/contracts/backend不修改。
+实现必须先读actual sources/contracts；共享仅协议编解码，不共享GUI。Desktop用现有Tauri accountDatabase/Repository；Mobile为Kotlin ViewModel/StateFlow + SDK SQLite，网络实现不得选未批准第三方库。Test fixtures可提供受控TLS服务器，但真实WSS/SQLx、Android Emulator以及已接受Go真实入口durableACK验证证据必须明确区分；不得把mock/接口stub称为完整真实运行。
+精确验证命令在完成verifier时落实：python -B tools/verify_client_send.py --scope shared；--scope desktop；--scope mobile --serial emulator-<actual>。原SQLite行为验证必须保留。CI的Desktop/Mobile/shared必须实际执行SEND行为；CI修改按现有classify全矩阵。增加--scope构成verification内部入口，不是公共契约。
+覆盖事务提交前不传输；可观察SENDING；offline/timeout/拒绝FAILED；same immutable ID retry/restart；lateACK/realtime/Sync收敛；SENT终态；账号隔离/会话撤销/旧连接事件；持久化失败不发布SENT；严格wire/malformed/错误会话；seq>2^53精确；完整git BASE10b77b2..HEAD diffcheck。真实Android runtime不可跳过。Scope解释仅限当前需求，不授权GUI/SYNCrunner/Web/newHTTP。
+已接受UIARCH最终交接metadata（done/review队列移动与mvp-planning/closure/final证据）由Coordinator在SEND激活前生成，candidate审查分别按UIARCH与SEND的authoritative allowed_paths核验。SEND实现者不得修改它们。
+Last accepted main10b77b22386234c98409ca41b3622ad6d25f3884；assigned root H:/.codex/worktrees/client-mvp-planning/IM-platform；main781未知工作原字节保护不动。

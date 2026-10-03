@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CLIENT-UI-ARCH-001
 title: Human-approved MVP client GUI task planning supplement
-status: review
+status: done
 owner: Coordinator /root
 stage: S2
 gate: S2
@@ -96,3 +96,7 @@ Local repair verification (not independent acceptance): frozen --base-commit PAS
 ## 规划补充已接受，收尾候选仍 review
 
 Fresh Review2接受7466ce7；PR14实际main b60f116及exactmain37105047668独立PASS，已保护同步H:/IM-platform/781无关记录不变，3旧ownedmetadata保护。见mvp-planning/closure/acceptance.md/archive-manifest.json/synchronization.json。规范16e9c7b4/v1.1/PDF unchanged；本段/ADR状态/baseline/index只发现已接受事实，当前Task仍review至新收尾独立Review、精确CI、集成同步；之后立即done并激活SEND，不启动SYNC/GUI/WEB。Last good b60f116a14f9265031bff255db500f3414f2a357；/root只拥有这批metadata/evidence。
+
+## 最终接受交接
+
+规划及行政收尾已独立接受/精确hostedCI/普通保护PR15 merge/actualmainReview/保护同步PASS。main10b77b22386234c98409ca41b3622ad6d25f3884，candidate6824564，branch task/LOOP1-CLIENT-MVP-PLAN-20261003。证据mvp-planning/closure/final/acceptance.md与同步receipt。此前pending/fix段落为历史，均保留；done仅限本规划职责，S1PASS/S2OPEN。下一exact action SEND，其他backlog；当前本地交接metadata由Coordinator/root所有，进入SEND候选Review。
