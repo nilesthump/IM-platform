@@ -121,3 +121,11 @@ Go1.26.6 windows/amd64; PostgreSQL16.15 x86_64 Alpine; NATS2.10.29.
 Two task-owned PG/NATS containers remain running for independent Reviewer reuse at
 55439/44229; Coordinator removes these exact owned resources after acceptance.
 Ephemeral strictTLS Compose projects were inspected and cleaned by their verifier.
+
+## First clean candidate recovery check
+
+Existing Acceptance PASS at08dc1bf2a6ecd5b2e58f70f1036f7875701e9b27,
+review/currentTask unique, zero status/diff. Archive prompt-directory selection was
+corrected afterward by copying the two exact primary prompt files and refreshing only
+the archive manifest. Final metadata candidate is checked again privately; product
+bytes unchanged. This same-context observer is never independent Review.
