@@ -4,6 +4,8 @@ import im.platform.client.storage.Repository
 import im.platform.client.storage.LocalMessage
 import im.platform.client.storage.ServerMessage
 import im.platform.client.storage.Committed
+import im.platform.client.storage.UserEvent
+import java.util.concurrent.CopyOnWriteArraySet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +35,9 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
     private var binding=""
     private var bound=false
     private var retired=false
+    private val deliveries=CopyOnWriteArraySet<(String,Long)->Unit>()
+    fun observeDelivery(listener:(String,Long)->Unit):()->Unit {deliveries.add(listener); return {deliveries.remove(listener); Unit}}
+    private fun delivered(c:String,n:Long) {if(!retired) deliveries.forEach {try {it(c,n)} catch(_:Exception) { /* Commit already completed. */ }}}
     private var conversation=""
     private data class Attempt(val message:LocalMessage,val generation:Long,var sent:Boolean=false,var timer:Job?=null)
     private val attempts=mutableMapOf<String,Attempt>()
@@ -41,6 +46,8 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
     // retain that fact after ACK/timeout until the connection is retired.
     private val requestConversations=mutableMapOf<String,String?>()
     init { require(Wire.uuid(session.userId)==session.userId && Wire.uuid(session.sessionId)==session.sessionId && session.sessionEpoch.signum()>0 && session.accessToken.isNotEmpty() && timeoutMs>0) }
+    fun matchesSession(s:SendSession)=session==s
+    fun matchesRepository(repository:Repository)=repo===repository
     private fun key(c:String,r:String)="$c/$r"
     private fun publish(value:SendState) { if(!retired) mutableState.value=value }
     private fun refresh() { publish(mutableState.value.copy(messages=if(conversation.isEmpty()) emptyList() else repo.messages(conversation))) }
@@ -61,7 +68,7 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
     }
     suspend fun disconnect() = operation { disconnectNow() }
     suspend fun dispose() = lock.withLock {
-        retired=true; mutableState.value=SendState(error=mutableState.value.error)
+        retired=true; deliveries.clear(); mutableState.value=SendState(error=mutableState.value.error)
         try {
             try { disconnectNow() } finally { if(ownsRepository) repo.close() }
         } catch(_:Exception) {
@@ -71,7 +78,7 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
         }
     }
     override fun onCleared() {
-        socket?.close(); retired=true; requestConversations.clear(); mutableState.value=SendState()
+        socket?.close(); retired=true; deliveries.clear(); requestConversations.clear(); mutableState.value=SendState()
         scope.launch { try { lock.withLock { if(ownsRepository) repo.close() } } finally { scope.cancel() } }
     }
     suspend fun send(c:String,text:String):String {
@@ -107,7 +114,7 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
         if(f.type=="message.created") {
             val content=p["content"] as Map<*,*>
             val m=ServerMessage(p["conversationId"] as String,f.requestId,p["senderId"] as String,content["text"] as String,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)
-            repo.syncMessages(listOf(m)); clear(m.conversationId,m.requestId!!); refresh(); return
+            repo.syncMessages(listOf(m)); clear(m.conversationId,m.requestId!!); refresh(); delivered(m.conversationId,m.seq); return
         }
         if(f.type=="message.ack") {
             if(p["status"]=="rejected") {
@@ -116,10 +123,11 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
                 if(matches.size==1) { val (k,a)=matches.entries.single(); if(requestConversations[f.requestId]==a.message.conversationId) fail(k,a) }
             }
             else { val c=p["conversationId"] as String; if(key(c,f.requestId) !in known) return
-                repo.committedAck(f.requestId,Committed(c,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)); clear(c,f.requestId); refresh() }
+                repo.committedAck(f.requestId,Committed(c,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)); clear(c,f.requestId); refresh(); delivered(c,(p["seq"] as BigInteger).longValueExact()) }
         }
     }
-    suspend fun mergeMessages(messages:List<ServerMessage>) = operation { if(!retired) {repo.syncMessages(messages); messages.forEach {clear(it.conversationId,it.requestId!!)}; refresh()} }
+    suspend fun mergeMessages(messages:List<ServerMessage>,active:()->Boolean={true},failBeforeAdvance:Boolean=false) = operation { if(!retired && active()) {repo.syncMessages(messages,failBeforeAdvance); messages.forEach {clear(it.conversationId,it.requestId!!)}; refresh()} }
+    suspend fun mergeUserPage(events:List<UserEvent>,nextCursor:String,expectedCursor:String,active:()->Boolean,failBeforeAdvance:Boolean=false) = operation {if(!retired && active()) repo.userPage(events,nextCursor,expectedCursor,failBeforeAdvance)}
 }
 
 // Account binding is fixed by the authenticated session, never a selected path.

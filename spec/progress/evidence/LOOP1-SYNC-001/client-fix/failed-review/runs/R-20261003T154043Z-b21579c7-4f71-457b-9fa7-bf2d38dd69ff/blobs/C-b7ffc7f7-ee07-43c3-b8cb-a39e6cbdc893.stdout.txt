@@ -1,0 +1,145 @@
+
+FILE tools/verify_client_sync.py
+#!/usr/bin/env python3
+"""Fail-closed client Sync acceptance on actual native runtimes."""
+from pathlib import Path
+import argparse,base64,importlib.util,os,subprocess,sys,tempfile
+ROOT=Path(__file__).resolve().parents[1]
+def run(argv,cwd=ROOT,env=None):
+    print("+"," ".join(map(str,argv)),flush=True);subprocess.run(list(map(str,argv)),cwd=cwd,env=env,check=True)
+def main():
+    p=argparse.ArgumentParser();p.add_argument("--scope",choices=["shared","desktop","mobile"],required=True);p.add_argument("--serial");a=p.parse_args()
+    if a.scope in ("shared","desktop"):
+        npm="npm.cmd" if os.name=="nt" else "npm"
+        run([npm,"--prefix","clients/shared/protocol-sdk","ci","--ignore-scripts","--no-audit","--no-fund"]);run([npm,"--prefix","clients/shared/protocol-sdk","run","build"]);run(["node","tests/clients/sync/shared.mjs"])
+        if a.scope=="shared":return
+        run([npm,"--prefix","clients/desktop","ci","--ignore-scripts","--no-audit","--no-fund"]);run([npm,"--prefix","clients/desktop","run","build"])
+        native=ROOT/"clients/desktop/src-tauri";run(["cargo","build","--locked","--bin","storage_probe"],native)
+        target=Path(os.environ.get("CARGO_TARGET_DIR",native/"target"));target=target if target.is_absolute() else native/target
+        probe=target/"debug"/("storage_probe.exe" if os.name=="nt" else "storage_probe")
+    else:
+        if not a.serial or not a.serial.startswith("emulator-"):raise RuntimeError("Actual emulator serial required")
+        wrapper=os.environ.get("IM_CLIENT_GRADLE",ROOT/"clients/mobile"/("gradlew.bat" if os.name=="nt" else "gradlew"))
+        if os.name!="nt":run(["chmod","+x",wrapper])
+        run([wrapper,"--no-daemon","-PimSendInstrumentation=im.platform.client.sync.SyncInstrumentation","assembleDebug","assembleDebugAndroidTest"],ROOT/"clients/mobile")
+        adb=os.environ.get("IM_CLIENT_ADB","adb");serial=a.serial
+        def shell(*args):return subprocess.check_output([adb,"-s",serial,"shell",*args],text=True,timeout=30).strip()
+        if shell("getprop","ro.build.version.sdk")!="34" or shell("getprop","sys.boot_completed")!="1" or shell("getprop","sys.user.0.ce_available")!="true":raise RuntimeError("Unlocked booted API34 emulator required")
+        for apk in ("debug/app-debug.apk","androidTest/debug/app-debug-androidTest.apk"):run([adb,"-s",serial,"install","-r",ROOT/"clients/mobile/app/build/outputs/apk"/apk])
+    with tempfile.TemporaryDirectory(prefix="im-client-sync-tls-") as temp:
+        temp=Path(temp);cert=temp/"cert.pem";key=temp/"key.pem"
+        openssl=os.environ.get("IM_CLIENT_OPENSSL","D:/Git/usr/bin/openssl.exe" if os.name=="nt" and Path("D:/Git/usr/bin/openssl.exe").exists() else "openssl")
+        subprocess.run([openssl,"req","-x509","-newkey","rsa:2048","-nodes","-keyout",str(key),"-out",str(cert),"-days","1","-subj","/CN=localhost","-addext","subjectAltName=DNS:localhost,IP:127.0.0.1"],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        spec=importlib.util.spec_from_file_location("sync_tls_fixture",ROOT/"tests/clients/sync/tls_fixture.py");module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        fixture=module.Fixture(cert,key)
+        try:
+            endpoint="https://localhost:"+str(fixture.port)
+            if a.scope=="desktop":
+                env=os.environ.copy();env["NODE_EXTRA_CA_CERTS"]=str(cert);run(["node","tests/clients/sync/desktop.mjs",probe,endpoint],env=env)
+            else:
+                run([adb,"-s",serial,"reverse","tcp:"+str(fixture.port),"tcp:"+str(fixture.port)])
+                try:
+                    der=base64.b64encode(base64.b64decode("".join(cert.read_text().splitlines()[1:-1]))).decode()
+                    argv=[adb,"-s",serial,"shell","am","instrument","-w","-e","endpoint",endpoint,"-e","certificate",der,"im.platform.client.test/im.platform.client.sync.SyncInstrumentation"]
+                    print("+ actual API34 SyncInstrumentation, private fixture CA",flush=True)
+                    r=subprocess.run(argv,capture_output=True,text=True,timeout=240);print(r.stdout);print(r.stderr,file=sys.stderr)
+                    if r.returncode or "INSTRUMENTATION_RESULT: result=PASS" not in r.stdout or "INSTRUMENTATION_RESULT: sdkInt=34" not in r.stdout or "INSTRUMENTATION_CODE: -1" not in r.stdout:raise RuntimeError("Actual Android Sync instrumentation failed")
+                finally:run([adb,"-s",serial,"reverse","--remove","tcp:"+str(fixture.port)])
+            if fixture.errors:raise RuntimeError("Controlled TLS fixture assertion failed: "+str(fixture.errors))
+            if fixture.frames<5:raise RuntimeError("Actual realtime WSS crossing was not executed")
+            users=[r for p,r in fixture.requests if p=="/v1/sync/user"]
+            messages=[r for p,r in fixture.requests if p=="/v1/sync/conversation" and r["conversationId"]==module.C]
+            if len(users)<4 or len(messages)<4 or not any(r["cursor"]=="u-200" for r in users):raise RuntimeError("Multiple pages and terminal/new-write acceptance missing")
+            print("PASS: actual native HTTPS/WSS controlled fixture; Go/PostgreSQL runtime acceptance is separately identified",flush=True)
+        finally:fixture.close()
+if __name__=="__main__":
+    try:main()
+    except (OSError,RuntimeError,subprocess.SubprocessError) as error:print("FAIL:",error,file=sys.stderr);sys.exit(1)
+
+
+FILE tests/clients/sync/shared.mjs
+import assert from "node:assert/strict";
+import {userPage,conversationPage,conversationRequest,MAX_RESPONSE,errorResponse,SyncFailure} from "../../../clients/shared/protocol-sdk/dist/sync/wire.js";
+import {SyncHttp} from "../../../clients/shared/protocol-sdk/dist/sync/http.js";
+import {decode} from "../../../clients/shared/protocol-sdk/dist/send/wire.js";
+const id="40000000-0000-4000-8000-000000000001",c="30000000-0000-4000-8000-000000000001",u="10000000-0000-4000-8000-000000000001";
+const uid=n=>"50000000-0000-4000-8000-"+String(n).padStart(12,"0");
+const event={eventId:id,cursor:"opaque",kind:"conversation.changed",subjectId:c,revision:1};
+const page={syncVersion:"1.0",type:"sync.user.page",requestId:id,events:[event],nextCursor:"opaque",hasMore:false};
+const message=n=>({conversationId:c,seq:n,messageId:uid(n),senderId:u,requestId:uid(n+1000),createdAt:"2026-10-03T00:00:00Z",content:{kind:"TEXT",text:"😀".repeat(4096)}});
+const cp={syncVersion:"1.0",type:"sync.conversation.page",requestId:id,conversationId:c,messages:Array.from({length:100},(_,i)=>message(i+1)),hasMore:true};
+const json=p=>JSON.stringify(p),throws=f=>assert.throws(f,/Invalid Sync response/);
+assert.equal(userPage(json(page),id,"0").events[0].revision,1n);
+for(const n of ["9007199254740993","9007199254740993.0","90071992547409930e-1"])assert.equal(userPage(json(page).replace('"revision":1','"revision":'+n),id,"0").events[0].revision,9007199254740993n);
+for(const p of [{...page,hasMore:"false"},{...page,nextCursor:"different"},{...page,events:[],hasMore:true},{...page,extra:1},{...page,syncVersion:"2.0"},{...page,events:[{...event,kind:"message.created"}]},{...page,events:[event,event]}])throws(()=>userPage(json(p),id,"0"));
+throws(()=>userPage(json(page).replace('"revision":1','"revision":1,"revision":2'),id,"0"));
+throws(()=>userPage(json(page),uid(999),"0"));
+assert.equal(conversationPage(json(cp),id,c,0n).messages.length,100);
+const escaped=json(cp).replaceAll("😀","\\ud83d\\ude00");assert(Buffer.byteLength(escaped)<MAX_RESPONSE);assert.equal(conversationPage(escaped,id,c,0n).messages[99].content.text,cp.messages[99].content.text);
+for(const p of [{...cp,messages:[message(2)]},{...cp,messages:[message(1),message(1)]},{...cp,messages:[],hasMore:true},{...cp,messages:[{...message(1),conversationId:u}]},{...cp,messages:[{...message(1),content:{kind:"TEXT",text:"😀".repeat(4097)}}]},{...cp,messages:Array.from({length:101},(_,i)=>message(i+1))}])throws(()=>conversationPage(json(p),id,c,0n));
+assert(conversationRequest(id,c,9007199254740993n).includes('"afterSeq":9007199254740993'));
+const huge={...cp,messages:[{...message(1),seq:1,content:{kind:"TEXT",text:"x"}}],hasMore:false};
+assert.equal(conversationPage(json(huge).replace('"seq":1','"seq":9007199254740993'),id,c,9007199254740992n).messages[0].seq,9007199254740993n);
+assert.equal(errorResponse(json({requestId:id,error:{code:"AUTH_SESSION_REVOKED",message:"Revoked"}}),id,401,false).kind,"authentication");
+assert.equal(errorResponse(json({requestId:id,error:{code:"AUTHORIZATION_DENIED",message:"Denied"}}),id,403,true).kind,"unavailable");
+assert.equal(errorResponse(json({requestId:id,error:{code:"AUTHORIZATION_DENIED",message:"Denied"}}),id,403,false).kind,"protocol");
+const session={userId:u,sessionId:id,sessionEpoch:1n,accessToken[REDACTED];
+for(const url of ["http://localhost/","https://user@localhost/","https://localhost/?token=x","https://localhost/sub"])assert.throws(()=>new SyncHttp(url,session));
+let calls=0;
+const http=new SyncHttp("https://localhost/",session,async (url,options)=>{
+calls++;assert.equal(url,"https://localhost/v1/sync/user");assert.equal(options.redirect,"error");assert.equal(options.credentials,"omit");assert.equal(options.cache,"no-store");assert.equal(options.headers.Authorization,"Bearer fixture-desktop");const request=JSON.parse(options.body);assert.equal(request.limit,100);
+return new Response(json({...page,requestId:request.requestId}),{headers:{"content-type":"application/json","cache-control":"no-store"}});
+});
+assert.equal((await http.user("0",new AbortController().signal)).nextCursor,"opaque");assert.equal(calls,1);
+const bad=new SyncHttp("https://localhost/",session,async()=>new Response("x".repeat(MAX_RESPONSE+1),{headers:{"content-type":"application/json","cache-control":"no-store"}}));
+await assert.rejects(bad.user("0",new AbortController().signal),SyncFailure);
+const frame=json({protocolVersion:"1.0",type:"ping",requestId:id,payload:{}});
+assert.throws(()=>decode(" ".repeat(131073)+frame));
+console.log("PASS: exact Sync correlation/shapes/gap/progress/kinds/numbers, 100x4096 escaped/literal Unicode bounded transport, WSS bound regression");
+
+
+FILE spec/progress/evidence/LOOP1-SYNC-001/client-implementation/local-verification.md
+# Local client Sync implementation evidence
+
+Implementation Agent /root/sync_client_implementation; assigned H:/.codex/worktrees/sync-resume/IM-platform, branch task/LOOP1-SYNC-001, reviewed base 0fe4fccc3deacd492895967cff9cc40cf34321d4, activation a859e61. This is local evidence only: independent Review, exact-head hosted CI, protected integration, actual-main audit and safe synchronization remain pending. S1 PASS/S2 OPEN; GUI/Web not selected.
+
+Desktop TypeScript orchestration and Mobile Kotlin ViewModel use existing Repository atomic materialization and persisted user cursor/per-Conversation contiguous positions. Each page requests100 and commits before continuing until hasMore=false without a total cutoff. Realtime remains active; durable delivery observers only enqueue compensation outside Send commit locks. Sync uses Send merge for FAILED-to-SENT convergence, attempt cancellation and selected-visible refresh. Readonly known-Conversation discovery includes conversations, local messages and Conversation/membership metadata; current explicit selection is also pulled. Canonical403 isolates one Conversation;401 stops the authenticated session. Immutable session equality and Mobile Repository identity prevent mismatched public compositions. Generation/retirement guards run inside serialized commits; cancellation joins precede owned Mobile storage disposal.
+
+Shared exact-parser reuse admits arrays/booleans with caller-specific6MiB Sync response limits while retaining WSS131072 behavior. Mobile Sync exact integer conversion prechecks stripped scale and precision against existing signed64 storage budget before exponent expansion; five short huge exponents are rejected in bounded time. No new contract/storage limit, native adapter, schema, dependency, backend, GUI or Web change.
+
+## Executed local behavior
+
+| Exact entrypoint | Actual execution/result |
+| --- | --- |
+| tools/verify_client_sync.py --scope shared | PASS strict wire/correlation/error/progress/exact integers;100x4096 astral codepoints literal and escaped surrogate maximum; oversized/malformed negatives; platform Fetch header/no-query/redirect-credential protection |
+| tools/verify_client_sync.py --scope desktop | PASS actual locked-built SQLx adapter plus trusted HTTPS/WSS controlled fixture:205 events/messages through terminal;208 after new commits; duplicate/out-of-order/nonselected gap compensation; FAILED-to-SENT, restart/reconnect,403/401, native rollback, mismatched session, in-flight retirement, untrusted CA; FAILED-only and empty selected Conversation discovery |
+| tools/verify_client_sync.py --scope mobile --serial emulator-5590 | PASS actual API34 Android SDK SQLite/standard verified TLS/StateFlow,62 assertions including maximum Unicode, both discovery cases, five hostile numbers, onCleared blocked pull cancellation/join/reopen |
+| tests/clients/sync/go_smoke.py --probe H:/.codex/toolchains/client-sqlite/target-final/debug/storage_probe.exe | Final PASS actual Desktop SQLx + Send/Sync -> trusted HTTPS/WSS Gateway/Core/PostgreSQL:208 metadata/205 durable messages, continuous pages/terminal/restart/new206th/read-only effects, inspected owned Compose cleanup |
+| tests/clients/sync/go_smoke.py | PASS separately executed standalone shared SyncHttp transport -> same actual Go/PG public entrypoints. This does not establish native Android-Go execution |
+| tools/verify_client_send.py --scope desktop | PASS existing actual SQLx/TLS Send regressions plus old strict shared WSS wire checks |
+| tools/verify_client_send.py --scope mobile --serial emulator-5590 | PASS actual API34 Send66 assertions; WSS default parser path preserved |
+| tools/verify_client_sqlite.py --scope desktop | PASS actual SQLx13 canonical cases/141 assertions; locked Rust atomic/read-only transaction regression |
+| tools/verify_client_sqlite.py --scope mobile --serial emulator-5590 | PASS actual SDK SQLite13 canonical cases/137 assertions both install and owned data-clear phases |
+| tools/verify_sync_transport.py --node H:/node.js/node.exe | PASS existing official OpenAPI3.1 lint/binding |
+| ci/check_architecture.py --scope all --json | PASS source-only zero violations |
+| python -m unittest discover -s tests/architecture -v | PASS53 architecture controls |
+| tools/verify_frozen_architecture.py | PASS canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03/PDF/ADR bindings |
+
+Raw exact executed argv, return codes, timestamps, duration and hashed stdout/stderr are indexed in command-index.json and sealed Recorder archive. The native wrapper only supplies accepted existing toolchain environment; preserved run_native.py is reproducibility input. Each verifier invokes real native build/runtime rather than a development-mode surrogate. Controlled fixture metadata/HTTP doubles are distinguished in test code from actual TLS sockets and the actual Go/PG smoke. No actual plugin producer claimed. Existing ADR0004 deferred friend-denial scenario remains deferred and does not count as PASS.
+
+## Preserved failures and coverage limits
+
+Initial pre-run read-only startup had incomplete command instrumentation, Unicode console display/quoting and base64-newline registration failures; corrected Python UTF8 reads resolved critical sections before product edits, supplemental full canonical11/19/20/UI reads were later. Direct collaboration, some read-only diagnostic/provenance calls and private-helper construction are not recorded as commands. Python stdin mutation scripts record argv/output but not their stdin; final diff preserves resulting source. No complete prospective trace claimed.
+
+Ordinary repaired failures: first tsc build before locked npm installation; test-only misplaced declaration corrected before compilation; wrong existing Mobile UserEvent test projection; private MSVC quoting; Desktop test empty native vector encoding; Desktop test importing duplicate compiled SDK class identity; Android owned debug-package signing mismatch; malformed newly added hostile-number test literal. All failed command outputs remain unchanged. Only inspected owned im.platform.client(.test) SEND fixtures on IMClientSend34/emulator5590 were replaced; unrelated im.review.dispose/apps/AVD preserved.
+
+Architecture all initially reported1461 generated-artifact violations and one of53 controls failed after client builds. Source checker deliberately scans all files. Only7 explicitly verified ignored/untracked task-owned generated directories were moved to Git-private preserved-generated,1204 files hashed before/after; no checker exclusion/weakening or global cleanup. Source-only checks then PASS. External toolchains/caches and native source untouched. Fresh reviewers must likewise preserve/remove only their own generated outputs before source authority checks. Artifact manifest is bound by artifact-manifest-sha256.txt.
+
+First current recovery Development checker found11 missing required formatting/sections introduced by activation. Mutable current.md repaired to exact required schema; failure retained. Development output never constitutes acceptance. Clean committed Acceptance will be run after final candidate commit, via new same-role continuation instrumentation; independent acceptance is still Coordinator-owned.
+
+## Next action and ownership
+
+Finish local committed handoff, release sole writer to Coordinator for fresh independent Review/fix cycle, applicable exact-head hosted CI, protected integration/actual-main audit/main safe sync. Task stays review until independently accepted and synchronized; execution endpoint remains SYNC complete then stop. Unknown main work and all prior sealed streams untouched. This Agent owns only seven declared seams, Sync folders/tests/verifier, narrow existing CI hooks, mutable Task/current, new client-implementation evidence/checkpoint and its private instrumentation/artifacts.
+
+Sealed implementation Recorder finished/validated210 events PASS (instrumentation only). New same-role final-handoff observer R-20261003T153404Z-d297dab5-9ecc-42b2-8251-02d95d5305aa fresh_context=false stays Git-private. Its initial start was rejected for missing --pre-recorder-work; corrected before archival/commit, exposed as a continuation gap. Primary run/prompt archived exact bytes independently hash-bound by research-archive-manifest.json; no old evidence or active Coordinator stream copied.
+

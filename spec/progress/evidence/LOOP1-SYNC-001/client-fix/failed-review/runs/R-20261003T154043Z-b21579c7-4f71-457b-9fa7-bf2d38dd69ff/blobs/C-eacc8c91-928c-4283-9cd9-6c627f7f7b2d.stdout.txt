@@ -1,0 +1,565 @@
+
+FILE spec/governance/minimality.md
+# Minimality Contract
+
+Every additional abstraction must pay rent. This is a development and review rule subordinate to Frozen Architecture, approved ADRs, public contracts, invariants, acceptance criteria, and the current Task Spec. It creates no product requirement or authority to rewrite a contract.
+
+Implement the smallest direct mechanism that satisfies current approved requirements, invariants, acceptance criteria, and observed implementation constraints. A new interface, layer, framework, dependency, option, database object, worker, service, compatibility layer, or extension point needs a present responsibility. Possible future reuse, future stages, elegance, and generic “best practice” are insufficient on their own.
+
+When a less direct mechanism is needed, identify the current requirement or observed failure it serves, why the simpler path falls short, and the smallest added mechanism. Record measurements where performance or reliability motivates the change, and a removal or replacement condition if the mechanism is provisional. Do not use lines of code as a decision rule.
+
+Necessary boundaries and abstractions remain valid: for example, a real transaction boundary, shared Go/Java observable contract checks, an existing plugin capability boundary, or required Outbox reliability. Prefer one direct path when only one behavior exists. Do not add a strategy/factory hierarchy for a hypothetical second implementation, compatibility for nonexistent versions, or Loop 2 infrastructure in Loop 1 without current evidence and the required architecture approval.
+
+The Frozen Architecture already applies this judgment: Loop 2 goals do not expand Loop 1 implementation scope (chapter 1.3); Redis, Kafka, sharding, and automatic failover require fault or load evidence and an approved ADR (chapter 1.3); the simple conversation sequence row is allowed to be hot until load testing proves contention unacceptable (chapter 5); tasks do not grant architectural discretion, and agents stop at architecture conflicts (chapters 2 and 21). This document does not reinterpret those decisions or permanently ban a technology.
+
+## Independent review
+
+Alongside correctness, security, contracts, and acceptance, review added complexity against current responsibility. Inspect abstractions without current consumers; production code for future stages; new dependencies; strategy, factory, or framework layers for one current path; speculative compatibility or infrastructure; and production mechanisms whose removal would leave every approved acceptance criterion satisfied.
+
+Ask: **If this code or abstraction were removed or simplified, would every currently approved acceptance criterion still pass?** If yes, request deletion or simplification, or a concrete current requirement and evidence justifying it. A finding must cite that requirement or evidence gap and the affected code. Personal style preference and a raw size or LOC threshold are not findings. Reviewers cannot change product requirements, public contracts, or Frozen Architecture; a conflict follows the approved architecture process.
+
+Complexity delta (files, production/test lines, dependencies, public symbols, configuration, database objects, services) may help focus review. It is a signal, never an automatic score or FAIL.
+
+
+FILE spec/architecture/decisions/ADR-0008-sync-https-transport.md
+# ADR-0008：公开 Sync HTTPS 拉取绑定
+
+状态：Human-approved freeze candidate；仅经 fresh independent Review、精确候选 hosted CI、protected integration/actual-main 核验及 H:/IM-platform 同步后生效。
+日期：2026-10-03
+批准来源：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/human-authorization.txt
+任务：LOOP1-SYNC-TRANSPORT-001
+semantic_change=true；版本 v1.1 不变。
+
+## 动机与最小决定
+
+SYNC 的四种现有 JSON 形状已有 contracts/websocket/sync-v1.schema.json，但无公开传输绑定。Human 授权先提出并冻结公开 Sync 方案；Go 产品代码另待本前置接受后展示具体方案并取得同意。
+
+新增两个 HTTPS POST 拉取操作 /v1/sync/user 与 /v1/sync/conversation。机器权威为 contracts/http/sync.openapi.json，外部引用现有 UserRequest/UserPage/ConversationRequest/ConversationPage、Bearer 与 HTTP ErrorResponse。WSS 保留实时/ACK，不新增 envelope/type；Core 保有 Sync、成员/用户授权和 PostgreSQL 查询；Gateway 沿用公开 HTTP 代理，不写业务。无新语言、framework/runtime/dependency、服务、DB 对象或通用协议层。
+
+每次请求验证数据库权威 Session；身份只来自 Bearer。用户 cursor 初值 0，随后是当前用户绑定、可跨其 Session 重放的 opaque token，客户端只作相等比较。无效/外账号 token 返回既有400 VALIDATION_FAILED；当前 Loop 1 不引入 cursor 过期、保留窗口或重置协议。user events 仍为四种低频 metadata，排除 Message/Session；边界可把内存/持久化内部 cursor_id 投影为外部 event.cursor 与 nextCursor，无需修改 producer payload/schema。
+
+任何现有正整数 limit 均接受，先精确取 min(limit,100)，再作有界转换；查询最多 effectiveLimit+1 合格项，返回不超过 effectiveLimit。空页终止且 user nextCursor 保持请求 cursor；非空 user 页 nextCursor 为末事件 cursor 并前进。hasMore 仅表示当前读取有额外已提交合格项，不能产生无限无进展页。用户流必须是稳定已提交前缀，不能跳过并发较低序号晚提交；conversation 顺序从 afterSeq+1 连续前进，超 head 空页终止。不改变客户端数据/cursor 同事务或 contiguous_seq/gap 语义。
+
+成功和已解码有效 UUID 的错误响应 echo 请求 body requestId；不可关联的格式错误用 server UUID。错误码/状态仅沿用既有目录，未知服务器或基础设施失败为 non-2xx transport failure，不冒充成功页、不引入错误码。Query 参数一律拒绝，凭据/正文不进入日志/错误；响应 no-store。具体优先级/字段/状态以公开契约为准。不存在/非成员会话统一403避免泄露；权限由 Core 每请求判定。
+
+## 影响、兼容与回滚
+
+新增传输操作，不改现有四形状、Auth API、WSS/ACK、数据库/迁移、存储、客户端技术政策或安全边界。旧 schema/oracle 离线向量保持原样且仍有效；opaque token 的具体编码是后续 Core 边界实现细节，不能反向定义契约。冻结正文增加 §11.5（绑定），baseline 保存旧 canonical hash16e9c7b4 与批准来源。历史 PDF/ADR/失败/Recorder 不改。
+
+候选未接受前不得作为 Go/client 产品实现授权；接受后依然必须先向 Human 展示 Go 实现方案并取得同意。规则接受不代表实际 Sync 服务存在，不解除 SYNC backlog 的 runtime 输入阻塞。新任务只有这一个当前已证明必要的前置，不实例化未来产品/UI 层。撤销未接受候选即可回滚；生效后的调整走新决定与独立接受，不重写历史。
+
+## Human 分页修正（2026-10-03）
+
+100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
+
+新增批准来源：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/human-authorization.txt。只冻结持续分页语义与后续验收要求，当前不实现客户端循环。旧候选 Review 不覆盖修正后 SHA；仍待新独立 Review/精确 HEAD CI/集成同步。
+
+
+FILE spec/architecture/decisions/ADR-0005-client-technology-clarification.md
+# ADR-0005: Client technology clarification and universal selection governance
+
+Status: Human-approved clarification independently accepted at e7c80c7 under bounded Human GString waiver; final administrative confirmation pending before S2 activation.
+Date: 2026-10-01
+Approval source: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md; full explicit Human instruction human-approved-request.txt and supplemental human-desktop-sqlx-mobile-emulator-decision.txt in the same directory (raw-byte SHA25691033f339f337105bc70f45b20c312b8ed2490d01c0b1607e197cda6e09c770b; normalized prompt SHA25678aa2191a4f3614185781a17ebd5204c949312d3a8eb159435af469d0d1929b5; Recorder P-CLIENT-SQLX-DECISION-20261001).
+
+## Motivation and decision
+
+PR7 implemented Dart SQLite despite missing architecture authorization. PR8 restored main3f352a8e465c0c4b093cca8e5f404ea587550b6e to accepted pre-PR7 tree. The withdrawn attempt and its tests/reviews are historical evidence, not authority or new acceptance.
+
+Canonical §2.3 freezes universal no-unapproved-technology governance; §6.1 freezes React/TypeScript memory-only Web, Tauri/React/TypeScript SQLite Desktop and Android Kotlin + Jetpack Compose SQLite Mobile. Web/Desktop/shared protocol/plugin/models/Repository/domain/UI remain TypeScript, necessary Desktop Rust is confined to clients/desktop/src-tauri. Mobile uses Kotlin equivalent models/Repository/behavior/adapters under the SAME canonical contracts/fixtures; no mandatory direct TypeScript SDK reuse, new public contract, JS runtime/bridge/codegen or shared native rewrite. Android Studio emulator validates the real Mobile runtime; host tests/mocks cannot replace it. Android SDK/Gradle/Kotlin/Compose engineering identifiers and built-in Android SQLite access follow the approved stack, not arbitrary Room/ORM/network/native dependencies.
+
+Supplemental Desktop approval remains Tauri + SQLx(SQLite). TypeScript holds shared Repository/models/transaction intent; Rust only connections, queries and atomic transaction adapter. Independent tauri-plugin-sql execute() calls MUST NOT simulate a cross-call transaction. Other sensitive dependency choices remain subject to §2.3.
+
+Approval chain: original full Human instruction -> supplemental Desktop SQLx/emulator instruction -> NEW exact Human answer “moblie明确为kotlin jetpack compose，移除moblie ts技术栈”. Latest answer supersedes ONLY the original Mobile TS/TBD/direct-TS-reuse clauses. Raw evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt; raw-byte SHA2561901f6dcd93069a19b6a88f5249858c8017ad36c71d61a109cbbad2ec5e9c061; normalized Recorder SHA256863da9423040acffa2c11b7e67d6c71673f5d7aeb7edd26954108884b5705dd4; prompt P-CLIENT-MOBILE-KOTLIN-20261001. Candidate188d24a / canonical ac042107 was superseded before independent acceptance, never an accepted baseline. Previous accepted canonical83d124b remains the lineage. Original prompt, approval/recovery and finished Recorder archives remain immutable.
+
+Missing sensitive decision: stop affected work -> smallest question -> Human/Architect -> frozen body/approved ADR -> machine guards -> fresh independent Review/applicable exact-head hosted CI -> product implementation. Task text, allowed_paths, familiarity/popularity/installed tools or passing tests cannot authorize a technology. Go/Java internal variation does not bypass this universal rule.
+
+## Normative effect and compatibility
+
+semantic_change=true: this is a Human-approved architecture clarification, not a representation-only migration. Version remains v1.1; canonical bytes and hash change. Previous canonical SHA25683d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e is preserved in manifest revision history. PDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 remains byte-for-byte unchanged. Older ADRs, checkpoints, PR7/FAIL/Review/Recorder/evidence are immutable. No contract, server schema, ACK/Sync, security or compatibility semantics change. S1 PASS; S2 OPEN.
+
+## Implementation, effectiveness and migration
+
+This bounded prerequisite changes authority, execution governance and existing checker/classifier/CI only, without S2 product code or dependencies. Source/dependency/import/config/workflow/task declaration controls inspect active clients; historical evidence is excluded by exact active path ownership, never deletion. Direct static checks supplement mandatory semantic independent Review of language/dependency authority and Rust responsibility.
+
+New independent Review of clean committed candidate and real applicable exact-head hosted CI must accept this prerequisite before task done or S2 activation. Local/Recorder PASS cannot establish Task/S2 PASS. Acceptance SHA/run/effective point are pending and must be recorded by Coordinator truthfully after acceptance. S4/Java/Loop2 are not advanced. New S2 tasks require fresh authorized TypeScript/Kotlin implementation Review/CI; PR7 cannot be restored or reused as acceptance.
+
+## Rollback
+
+Before acceptance, retain accepted main and repair candidate on FAIL. After acceptance, any authority correction uses a Human-approved corrective ADR and new independently reviewed commit; do not rewrite historical commits/evidence/PDF or silently restore Dart. There is no product/data migration in this prerequisite.
+
+Prompt raw-byte vs Recorder LF-normalized hashes are distinguished in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/prompt-hash-normalization.md; original approval/recovery and prompt bytes are preserved.
+
+## Accepted clarification discovery (2026-10-01)
+
+Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 under scoped Human GString waiver; original4b5 Review FAIL immutable. Exactpush36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS. Canonicalaa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c/PDF546915 unchanged. ADR0005 effective at accepted prerequisite. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md. Earlier pending paragraphs are historical; later administrative closure needs NEW independent Review/exactHEADCI before S2activation. No product/contract change; S1PASS/S2OPEN.
+
+
+FILE clients/desktop/src-tauri/tauri.conf.json
+{
+  "productName": "IM Storage",
+  "version": "0.1.0",
+  "identifier": "im.platform.desktop",
+  "build": {
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": []
+  },
+  "bundle": {
+    "active": false
+  }
+}
+
+
+FILE spec/progress/evidence/LOOP1-SYNC-001/client-implementation/research-archive-manifest.json
+{
+  "sealed_run": "R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15",
+  "events": 210,
+  "validated": true,
+  "immutable_original_bytes": true,
+  "files": [
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-00dd4347-d1d8-4887-9ba8-230f6613b86a.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-00dd4347-d1d8-4887-9ba8-230f6613b86a.stdout.txt",
+      "size": 3114,
+      "sha256": "df2dee9930b5187b953dc9ea760124fa4acaf87c0ea576fc5b50321bad3562e4"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-01b50565-b3e7-492d-8a33-a4489539a0a5.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-01b50565-b3e7-492d-8a33-a4489539a0a5.stdout.txt",
+      "size": 2429,
+      "sha256": "028c7ea251e0e5b3f29426f6e8019cefd4aadbd3ea89738704a5fa3bed9d9f5a"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0a00ce58-f7ac-47e0-8ba3-03a03b600726.stderr.txt",
+      "size": 1374,
+      "sha256": "a20ba52e9deed9efafe8b3383e2d822bedba0a8fdb2e021b8808200436d2a85c"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0a00ce58-f7ac-47e0-8ba3-03a03b600726.stdout.txt",
+      "size": 2846,
+      "sha256": "0ba5acb16a04cabf36b5013b5e7f87576913009f48f982892536681c6c7728d3"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0c985987-c825-4f4f-9c7c-c9e31eab1132.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0c985987-c825-4f4f-9c7c-c9e31eab1132.stdout.txt",
+      "size": 106446,
+      "sha256": "a0fdafcfa67a9de3117463f63581169580eca5d12000026d8907f71ec0eed029"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0d4e5e60-d848-46b0-bd84-d4c8746f1f47.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-0d4e5e60-d848-46b0-bd84-d4c8746f1f47.stdout.txt",
+      "size": 87,
+      "sha256": "99973ace6911c66a8d87af9ff1148bc3bce26d8dccb146158217b63f2c0878c5"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-103f3795-ae52-4d3e-8573-57f2d23c8018.stderr.txt",
+      "size": 4,
+      "sha256": "dba5166ad9db9ba648c1032ebbd34dcd0d085b50023b839ef5c68ca1db93a563"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-103f3795-ae52-4d3e-8573-57f2d23c8018.stdout.txt",
+      "size": 5926,
+      "sha256": "f5dd4f5813858d66685d57bbeec804092ea44300e3f001f870bda0a4587303a0"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-10fdde67-f346-43d9-a2b6-005232e0fed1.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-10fdde67-f346-43d9-a2b6-005232e0fed1.stdout.txt",
+      "size": 226,
+      "sha256": "9afe337e3cdd040b8c634b506a08749268c0f7caafb07f1b73b89b7269b3d997"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-14f44bb9-8484-4d47-bbfc-716d030f7eb8.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-14f44bb9-8484-4d47-bbfc-716d030f7eb8.stdout.txt",
+      "size": 18889,
+      "sha256": "51b4f0b9294f4a1c2f6501cb341c021bc09b28221d6c9ea58b43acad8b304631"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-15ef5e7a-5066-44df-ad1b-267d2553d9d9.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-15ef5e7a-5066-44df-ad1b-267d2553d9d9.stdout.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-16de356c-eb58-4926-9875-657a38656aa0.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-16de356c-eb58-4926-9875-657a38656aa0.stdout.txt",
+      "size": 109,
+      "sha256": "4eb2bd895b7d0d6ff48c073898cc8eb117c642cfbf3c0e34477adc556e1dc78b"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-1a5c9772-78b5-4291-96e1-d98897657276.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-1a5c9772-78b5-4291-96e1-d98897657276.stdout.txt",
+      "size": 56,
+      "sha256": "88ba7f53302563585bcabe9da7430f895499bb087c9285d86708f9fe00cd9f95"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-25a73969-d1db-43ec-8eab-32727d907edc.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-25a73969-d1db-43ec-8eab-32727d907edc.stdout.txt",
+      "size": 433,
+      "sha256": "8b116c62361057fcdfffe30ed6f9ef07f2f5ff03145dd9b0ebc4a620a82d64d8"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-28497a7a-d2ca-4db0-9d34-b891a5db128a.stderr.txt",
+      "size": 1214,
+      "sha256": "48760eb08422a977fd6177663b5cb47690c173b13bbc103dfbcc04307a0db9dc"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-28497a7a-d2ca-4db0-9d34-b891a5db128a.stdout.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-291fac9e-1148-4c2d-afb4-534f191b0f65.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-291fac9e-1148-4c2d-afb4-534f191b0f65.stdout.txt",
+      "size": 29833,
+      "sha256": "f89cff5ee34fa2bce2b9327885f9410eeb6b9ea81807f2a4d9ee6b7fd3cc49f7"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2988b2bf-104b-4e7e-9b0b-cf9f48e130e9.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2988b2bf-104b-4e7e-9b0b-cf9f48e130e9.stdout.txt",
+      "size": 99,
+      "sha256": "06bcf5c5053ef39c4f3288bab0789f739545552002ef580278ec6b2cba9e7ac8"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2c500e3e-94a9-4fef-970d-deafd1023c0c.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2c500e3e-94a9-4fef-970d-deafd1023c0c.stdout.txt",
+      "size": 26,
+      "sha256": "ab7b66f4250dfdd37045093859d4b90ee0cd5418c7215919a74ccdb18fe12d4c"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2e317723-f93b-4c0f-b553-92c21d2fd7ec.stderr.txt",
+      "size": 2,
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2e317723-f93b-4c0f-b553-92c21d2fd7ec.stdout.txt",
+      "size": 5304,
+      "sha256": "8454ced1d40bf4587c55b2b8026643d5f7c63154ce50c52031d0d9c65dce7279"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2f9c30a1-8635-420f-b4eb-77d858a4ea3f.stderr.txt",
+      "size": 94,
+      "sha256": "9aa621a287f43ce021cd4d4e17e5e8c04923c1f3f23ab4ecb8e1d2d228c85595"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2f9c30a1-8635-420f-b4eb-77d858a4ea3f.stdout.txt",
+      "size": 56,
+      "sha256": "88ba7f53302563585bcabe9da7430f895499bb087c9285d86708f9fe00cd9f95"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2faa55fa-d3ca-4d55-a179-f6b1daec9dcc.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-2faa55fa-d3ca-4d55-a179-f6b1daec9dcc.stdout.txt",
+      "size": 2847,
+      "sha256": "bf2fb255d0949f6ba73527e59b01890fe1ff60aec6b7c80a711a03b1ffedbff6"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-30789cfb-10ae-441e-a1f6-33b11362c33c.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-30789cfb-10ae-441e-a1f6-33b11362c33c.stdout.txt",
+      "size": 8626,
+      "sha256": "542c9522b0683f3b98870695ccf192df6430dc4b08ee180ba065af7c4f0c4816"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-33f80bfb-df5c-452f-be0a-eb6955c98db8.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-33f80bfb-df5c-452f-be0a-eb6955c98db8.stdout.txt",
+      "size": 63,
+      "sha256": "47f9be9d56f17638ef67728707a9c338a067c863035bb97129a384b703748c95"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3a5b2990-ace4-4907-92eb-25cb9639510b.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3a5b2990-ace4-4907-92eb-25cb9639510b.stdout.txt",
+      "size": 198,
+      "sha256": "8bc3f4e64afe3e0f8f598bc5b710212d509b4dd399301ab8befed16e7f17ffec"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3d5e3d5e-7f0f-4b31-9a0f-ef607bdc5857.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-3d5e3d5e-7f0f-4b31-9a0f-ef607bdc5857.stdout.txt",
+      "size": 325,
+      "sha256": "d5cf99a0015791c5b1fa46288348e170898b052aa3ffc877fa1f5d3108d27512"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-420645ce-b77c-496b-96bb-c002c2f7ced8.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-420645ce-b77c-496b-96bb-c002c2f7ced8.stdout.txt",
+      "size": 137,
+      "sha256": "6038241326c96ffd97323a39fbbb92c1ea52871a5fba6e61b18e8ea5cf2155ce"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-47912fbd-c0b4-49b4-848b-626c245681d6.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-47912fbd-c0b4-49b4-848b-626c245681d6.stdout.txt",
+      "size": 82,
+      "sha256": "59ee35c4e038048a925e6ecac89a16c32cc0435550527509fc288bb4c0080b74"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ae1ddb5-abaa-422c-ba3d-2e6984cc6267.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ae1ddb5-abaa-422c-ba3d-2e6984cc6267.stdout.txt",
+      "size": 405,
+      "sha256": "b486a13d85b02d21139259336181c9556ce6b40b2437a4b3e11ae4a235478f07"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4bed53a6-1172-4344-a8a3-aac88f953423.stderr.txt",
+      "size": 507,
+      "sha256": "6e817be6f3c6658e4d06f5e3838e50f79a057ae9fc8a25daa538149478cbe60c"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4bed53a6-1172-4344-a8a3-aac88f953423.stdout.txt",
+      "size": 5496,
+      "sha256": "7c2d97c5d992b288e448140f9f1da8712818b73843a3e8fbb8e277014fc7fb6e"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4c49f0a0-830c-4f6b-ad7a-cc90cde7d720.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4c49f0a0-830c-4f6b-ad7a-cc90cde7d720.stdout.txt",
+      "size": 431,
+      "sha256": "00d1cf6a51a38be5d5e281104326b639f29b73fbc51b6887c573f6e5f5d5e460"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4d87529b-aff3-4450-b141-a38c85a526c9.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4d87529b-aff3-4450-b141-a38c85a526c9.stdout.txt",
+      "size": 163,
+      "sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4e1a9768-efa1-49be-a5ac-f38fc899ee62.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4e1a9768-efa1-49be-a5ac-f38fc899ee62.stdout.txt",
+      "size": 42881,
+      "sha256": "ae65f22ade7da260ea115b10f710c9c5bfa57c941523a375f4eead72f2e5e3f8"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ea2b918-f0ca-48f9-b5c1-710a722aef60.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-4ea2b918-f0ca-48f9-b5c1-710a722aef60.stdout.txt",
+      "size": 19498,
+      "sha256": "50b584b30710f591030ee58fe6f4c27c0393ab11bc1d669e2a5e3c5323cc920d"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50aea46c-107e-4307-a344-8da23ba629b3.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50aea46c-107e-4307-a344-8da23ba629b3.stdout.txt",
+      "size": 451,
+      "sha256": "51233bba95e33d1fc9772d98e842912ce2f34f11e00e613f410f103eefe9cfc4"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50c92ee6-8232-4bda-a223-ff0e9c00d6cd.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50c92ee6-8232-4bda-a223-ff0e9c00d6cd.stdout.txt",
+      "size": 448,
+      "sha256": "b5016759bb4018867e9485304d541c3d74ad903d4e5f6bc1265f90007e1b28ce"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50fca8ba-89e9-40e9-ab77-611b0ab2396e.stderr.txt",
+      "size": 135,
+      "sha256": "d3bd86e1f3f653762fbc5d6ce324486d57acd3b9d9bd2823f9b36f5fc05d6ff3"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50fca8ba-89e9-40e9-ab77-611b0ab2396e.stdout.txt",
+      "size": 628,
+      "sha256": "2886056694af86e76b61da0809fea89d3051b8950f005ba6ea27a62c3ce0df4e"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50ffe04f-96ca-4288-b56c-6b0331886ccb.stderr.txt",
+      "size": 182,
+      "sha256": "8b671246a9c935b3d84f8b0cbc547248ad8a491c77682dc23dd347a2bbc4932e"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-50ffe04f-96ca-4288-b56c-6b0331886ccb.stdout.txt",
+      "size": 1169,
+      "sha256": "e961f62ea95513ed12ad0e28c5c40015a10dce1cd6bf55488f454292eaa02c6b"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-52f5f01e-39db-427f-9174-9a3b7302c158.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-52f5f01e-39db-427f-9174-9a3b7302c158.stdout.txt",
+      "size": 169,
+      "sha256": "2a0ec856e8d9ee9a6687583d882f94b2779f19445d1dfea29505489d51bf9a1b"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-54026c26-a672-4d19-afbf-286a04bfe4b9.stderr.txt",
+      "size": 571,
+      "sha256": "80b3a0968214a4661f84bca2715cc933dc91494e3d0660c2695435658a01f4e4"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-54026c26-a672-4d19-afbf-286a04bfe4b9.stdout.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5451252d-0872-40cf-a58f-27308b7f97ec.stderr.txt",
+      "size": 1131,
+      "sha256": "bc7e1117abd77ef932981357b8df98570de8461d257142ef0dd5b7894ada0c40"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5451252d-0872-40cf-a58f-27308b7f97ec.stdout.txt",
+      "size": 825,
+      "sha256": "44f513fdbaf62214bf2dfe3ffccbb74fdfc3f70d1b6afa14b82490adad40045f"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-58e84141-456d-4e05-ba65-b5a85abc902a.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-58e84141-456d-4e05-ba65-b5a85abc902a.stdout.txt",
+      "size": 9256,
+      "sha256": "6cf381311dcd366919e9126a3c5fc29bc0e54307d6921c905fe4de0c7ae66d6e"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5b40cd9c-cd74-4e7f-9456-b3ab7eda6ff0.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-5b40cd9c-cd74-4e7f-9456-b3ab7eda6ff0.stdout.txt",
+      "size": 27,
+      "sha256": "47dd93a94c0eef87d0d21baea9f6aa353a30a1fa28bc47a5ea42efe8a02a2057"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-6189a8c8-0d6a-4f39-96b7-3883366d7b07.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-6189a8c8-0d6a-4f39-96b7-3883366d7b07.stdout.txt",
+      "size": 10910,
+      "sha256": "783a364de4b6b42b62287214e36c50e9f7adfccbcc120982c7e7dede7e1d18ef"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-61ebe07f-9917-4c0a-b6cf-719ba06480f2.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-61ebe07f-9917-4c0a-b6cf-719ba06480f2.stdout.txt",
+      "size": 698,
+      "sha256": "ec6e107849a579bcf85fe6d3428d675cd0d0c7b64833c33eb8bcbbc92d342019"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-651985c2-4fb6-4c7e-93d9-3b1cb892f5cf.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-651985c2-4fb6-4c7e-93d9-3b1cb892f5cf.stdout.txt",
+      "size": 5579,
+      "sha256": "7724e49e184abb37e3c03a05886113f5f0e666d90aa1c37108a32d3f494e1c5c"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-676d3626-e5d5-4cf5-a324-95fead48459d.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/R-20261003T143811Z-f75093f7-8424-4f4b-8736-3ae171ac3d15/blobs/C-676d3626-e5d5-4cf5-a324-95fead48459d.stdout.txt",
+      "size": 5903,
+      "sha256": "9c54ad12e6b205af60b9bf589d4b646f7c3a0361c9cb0a21a906f1d1
+STRINGCHECKLINES
+84     if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
+90       else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+99       p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
+ARCHIVESCHEMA 214

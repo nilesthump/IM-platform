@@ -1,0 +1,176 @@
+diff --git a/clients/shared/protocol-sdk/src/send/wire.ts b/clients/shared/protocol-sdk/src/send/wire.ts
+index 1dce566..527cd16 100644
+--- a/clients/shared/protocol-sdk/src/send/wire.ts
++++ b/clients/shared/protocol-sdk/src/send/wire.ts
+@@ -81,13 +81,13 @@ export function decode(raw: string): Frame {
+   const requestId=uuid(e.requestId); let p: ObjectValue;
+   function rejected(codes: string[]): ObjectValue {
+     const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
+-    if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
++    if(p.status!=="rejected" || typeof error.code!=="string" || !codes.includes(error.code) || typeof error.message!=="string" || !error.message) return invalid();
+     return p;
+   }
+   switch(e.type) {
+     case "auth.ack":
+       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
+-      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
++      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || typeof p.clientType!=="string" || !["WEB","DESKTOP","MOBILE"].includes(p.clientType)) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+       break;
+     case "message.ack":
+       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
+@@ -96,7 +96,7 @@ export function decode(raw: string): Frame {
+     case "message.created":
+       p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
+     case "session.revoked":
+-      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
++      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(typeof p.reason!=="string" || !["LOGOUT","REPLACED","REVOKED"].includes(p.reason)) return invalid(); break;
+     case "ping": case "pong": p=object(e.payload,[]); break;
+     default: return invalid();
+   }
+diff --git a/clients/shared/protocol-sdk/src/sync/wire.ts b/clients/shared/protocol-sdk/src/sync/wire.ts
+index ca1e956..9e89646 100644
+--- a/clients/shared/protocol-sdk/src/sync/wire.ts
++++ b/clients/shared/protocol-sdk/src/sync/wire.ts
+@@ -13,7 +13,7 @@ export function userPage(raw:string,requestId:string,inputCursor:string):UserPag
+     const ids=new Set<string>(), cursors=new Set<string>();
+     const events=list(p.events).map(v=>{const e=object(v,["eventId","cursor","kind","subjectId","revision"]);
+       const eventId=uuid(e.eventId), token=cursor(e.cursor);
+-      if(ids.has(eventId) || cursors.has(token) || token===inputCursor || !kinds.includes(String(e.kind))) return invalid();
++      if(ids.has(eventId) || cursors.has(token) || token===inputCursor || typeof e.kind!=="string" || !kinds.includes(e.kind)) return invalid();
+       ids.add(eventId);cursors.add(token);
+       return {eventId,cursor:token,kind:e.kind,subjectId:uuid(e.subjectId),revision:positive(e.revision)} as UserEvent;
+     });
+@@ -43,7 +43,8 @@ export function errorResponse(raw:string,requestId:string,status:number,conversa
+     const p=object(parse(raw,MAX_RESPONSE),["requestId","error"]);if(uuid(p.requestId)!==requestId) return invalid();
+     const e=p.error as Record<string,unknown>;if(!e || typeof e!=="object" || Array.isArray(e) || Object.keys(e).some(k=>!["code","message","violations"].includes(k)) || typeof e.message!=="string" || !e.message) return invalid();
+     if(e.violations!==undefined) {if(!Array.isArray(e.violations)) return invalid();for(const v of e.violations){const f=object(v,["field","reason"]);if(typeof f.field!=="string" || !f.field || typeof f.reason!=="string" || !f.reason) return invalid();}}
+-    if(status===401 && ["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"].includes(String(e.code))) return new SyncFailure("authentication");
++    if(typeof e.code!=="string") return invalid();
++    if(status===401 && ["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"].includes(e.code)) return new SyncFailure("authentication");
+     if(conversation && status===403 && e.code==="AUTHORIZATION_DENIED") return new SyncFailure("unavailable");
+     if(status===400 && e.code==="VALIDATION_FAILED" || status===426 && e.code==="PROTOCOL_VERSION_UNSUPPORTED") return new SyncFailure("protocol");
+     return invalid();
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index cf01e3e..268d1ad 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -7,21 +7,21 @@ Gate Status: OPEN
+ Current Batch: S2-SYNC-only
+ Current Task: LOOP1-SYNC-001
+ Current Task State: review
+-Execution Status: AWAITING_INDEPENDENT_CLIENT_SYNC_REVIEW
++Execution Status: AWAITING_NEW_INDEPENDENT_CLIENT_SYNC_REVIEW
+ 
+ ## Immediately Relevant Completed Work
+ 
+-Go product/admin independently accepted and synchronized at0fe4fccc; SEND accepted. Client Desktop/Mobile two-level Sync locally implemented and enabled native/real Go verification passed. Local proof is not independent Task acceptance.
++Go/SEND accepted; Desktop/Mobile Sync implemented locally. Fresh Fix repairs strict enum typing after independent Review FAIL. Shared Sync/SEND regression and Desktop compile PASS; NEW independent acceptance pending.
+ 
+ ## Current Blockers
+ 
+-No architecture/runtime/Human blocker. Independent Review, exact-head hosted CI, protected integration/main audit/safe synchronization remain required.
++Original candidate independent Review FAIL on nonstring enum coercion; fresh scoped Fix locally repaired. No architecture/runtime/Human blocker. NEW independent Review, exact-head hosted CI, protected integration/main audit/safe synchronization remain required.
+ 
+ ## Verification
+ 
+-- Command: `python -B tools/verify_client_sync.py --scope mobile --serial emulator-5590`
+-  - Result: Local PASS actual API34 SDK SQLite/trusted HTTPS/WSS62 assertions; Desktop/shared, actual Go and regressions also local PASS.
+-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-001/client-implementation/local-verification.md`
++- Command: `python -B tools/verify_client_sync.py --scope shared`
++  - Result: Local repaired PASS; all174 malformed enum controls,29 legal values, fullUnicode/exact integers/bounds; SEND shared and Desktop build PASS. Architecture53 PASS after verified own generated preservation.
++  - Evidence: `spec/progress/evidence/LOOP1-SYNC-001/client-fix/local-verification.md`
+ 
+ ## Changed Files or Migrations
+ 
+@@ -33,7 +33,7 @@ Repaired build/fixture/input formatting failures retained; source checks initial
+ 
+ ## Next Exact Action
+ 
+-Finish clean committed local handoff to fresh independent Review, exact hosted CI, protected integration/actual-main audit and safe sync. Stop after SYNC independently accepted and synchronized.
++NEW fresh independent Review of repaired full candidate, exact hosted CI, protected integration/actual-main audit and safe sync. Stop after SYNC independently accepted and synchronized.
+ 
+ ## Last Known Good Commit
+ 
+@@ -45,7 +45,7 @@ Finish clean committed local handoff to fresh independent Review, exact hosted C
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Sole writer /root/sync_client_implementation at assigned H:/.codex/worktrees/sync-resume/IM-platform task/LOOP1-SYNC-001 owns only declared Task paths and private own Recorder/artifacts. Main H:/IM-platform unknown781entries preserved.
++Fresh Fix /root/sync_client_fix releases sole writer after clean commit at assigned H:/.codex/worktrees/sync-resume/IM-platform task/LOOP1-SYNC-001 owns only declared Task paths and private own Recorder/artifacts. Main H:/IM-platform unknown781entries preserved.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+diff --git a/spec/tasks/review/LOOP1-SYNC-001.md b/spec/tasks/review/LOOP1-SYNC-001.md
+index 2cdde3e..6d44be7 100644
+--- a/spec/tasks/review/LOOP1-SYNC-001.md
++++ b/spec/tasks/review/LOOP1-SYNC-001.md
+@@ -2,7 +2,7 @@
+ task_id: LOOP1-SYNC-001
+ title: Desktop/Mobile two-level sync orchestration
+ status: review
+-owner: /root/sync_client_implementation
++owner: /root/sync_client_fix
+ stage: S2
+ gate: S2
+ ---
+@@ -148,3 +148,11 @@ Current numeric resource bound: Sync Kotlin parser uses a caller-specific19digit
+ Current state review; earlier backlog/blocked/active records above are historical. Desktop/Mobile Sync fully implemented within declared current responsibility. Local final Android Sync62 assertions includes onCleared cancellation/join before owned Repository disposal; Desktop controlled actualSQLx and actualGoTLS/PG smoke pass. Shared maximum literal/escaped Unicode and exact wire negatives pass; legacy Send/SQLite regressions,53 architecture controls/source-only all zero violations/frozen and existing contracts pass. Recovery Development first failed11 formatting issues in activation current.md, repaired to exact required sections and PASS. No independent Task/Gate acceptance claimed.
+ 
+ Evidence: spec/progress/evidence/LOOP1-SYNC-001/client-implementation/local-verification.md and sealed own Recorder/command-index; checkpoint spec/progress/checkpoints/2026-10-03-loop1-sync-001-client-local.md. Preserve all disclosed ordinary failures, startup/read-only/stdin capture gaps and owned fixture/generated artifact maintenance. Clean committed Acceptance exact identity supplied by handoff continuation; independent Review/CI/protected integration/main sync remain Coordinator duties. Candidate commit SHA follows commit; last known accepted0fe4fccc3deacd492895967cff9cc40cf34321d4. Main unknown781entries untouched. Assigned branch task/LOOP1-SYNC-001 sole writer /root/sync_client_implementation owns only declared files and new evidence, releases after clean handoff.
++
++# Fresh independent Review FAIL repair (2026-10-03)
++
++Candidate ccd780bd independently FAIL: Sync kind/code and legacy WSS error.code/clientType/reason coerced arrays into enum strings after parser syntax widened. Fresh sole Fix /root/sync_client_fix repairs only strict string-before-enum matching in existing declared Sync/send wire seams and tests/clients/sync/shared.mjs negative controls; Kotlin already strict. No contracts/backend/schema/native/config/dependencies/GUI edits. Original Review FAIL and exact old CI success remain historical, cannot accept repaired head. Current active repair then NEW fresh independent Review of full candidate and exact-head hosted CI/protected integration/main sync. Own prospective_resume Recorder R-SYNC-CLIENT-FIX-20261003 fresh_context=true discloses initial read-only startup and one PowerShell quote parse error outside command capture. Last accepted0fe4fccc; main unknown781 untouched.
++
++# Fresh Fix local verification handoff
++
++Five strictly typed enum guards and174 malformed-value/29 legal-value controls repair both reproduced P2. Red original actual compiled run failed; repaired shared Sync, old SEND golden/numbers/bound and Desktop TS compile PASS. Architecture53 controls initially generated-only FAIL, own4dirs368files preserved byte-exact privately, rerunPASS. Legacy Windows PowerShell Get-FileHash unavailable corrected to bundled7; original failures retained. Final frozen/source/recovery/clean committed Acceptance recorded in client-fix/local-verification.md and own sealed Recorder/observer handoff. Review queue/status unique; fresh Fix cannot accept its own work. NEW independent Review full base0fe4fccc..newcandidate + exact-head CI then protected integration/actual-main audit/main sync required. Main untouched/unknown781 preserved; no GUI/Web. Writer releases after clean committed handoff identity in private final-handoff.json.
+diff --git a/tests/clients/sync/shared.mjs b/tests/clients/sync/shared.mjs
+index bd981f5..9ca6368 100644
+--- a/tests/clients/sync/shared.mjs
++++ b/tests/clients/sync/shared.mjs
+@@ -23,6 +23,35 @@ assert.equal(conversationPage(json(huge).replace('"seq":1','"seq":90071992547409
+ assert.equal(errorResponse(json({requestId:id,error:{code:"AUTH_SESSION_REVOKED",message:"Revoked"}}),id,401,false).kind,"authentication");
+ assert.equal(errorResponse(json({requestId:id,error:{code:"AUTHORIZATION_DENIED",message:"Denied"}}),id,403,true).kind,"unavailable");
+ assert.equal(errorResponse(json({requestId:id,error:{code:"AUTHORIZATION_DENIED",message:"Denied"}}),id,403,false).kind,"protocol");
++// Nonstring enum values must never inherit array/object String coercion.
++const malformedEnum=value=>[[value],[[value]],{value},true,false,1];
++const syncAuthCodes=["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"];
++for(const kind of ["friend.changed","conversation.changed","membership.changed","plugin.changed"]) {
++  assert.equal(userPage(json({...page,events:[{...event,kind}]}),id,"0").events[0].kind,kind);
++  for(const invalidKind of malformedEnum(kind)) throws(()=>userPage(json({...page,events:[{...event,kind:invalidKind}]}),id,"0"));
++}
++for(const code of syncAuthCodes) {
++  assert.equal(errorResponse(json({requestId:id,error:{code,message:"Error"}}),id,401,false).kind,"authentication");
++  for(const invalidCode of malformedEnum(code)) assert.equal(errorResponse(json({requestId:id,error:{code:invalidCode,message:"Error"}}),id,401,false).kind,"protocol");
++}
++const wss=(type,payload)=>json({protocolVersion:"1.0",type,requestId:id,payload});
++const rejectedCodes={
++  "auth.ack":["VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED"],
++  "message.ack":["VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED"]
++};
++for(const [type,codes] of Object.entries(rejectedCodes)) for(const code of codes) {
++  assert.equal(decode(wss(type,{status:"rejected",error:{code,message:"Error"}})).payload.error.code,code);
++  for(const invalidCode of malformedEnum(code)) assert.throws(()=>decode(wss(type,{status:"rejected",error:{code:invalidCode,message:"Error"}})),/Invalid WSS frame/);
++}
++for(const clientType of ["WEB","DESKTOP","MOBILE"]) {
++  const payload={status:"bound",userId:u,sessionId:id,clientType,sessionEpoch:1};
++  assert.equal(decode(wss("auth.ack",payload)).payload.clientType,clientType);
++  for(const invalidType of malformedEnum(clientType)) assert.throws(()=>decode(wss("auth.ack",{...payload,clientType:invalidType})),/Invalid WSS frame/);
++}
++for(const reason of ["LOGOUT","REPLACED","REVOKED"]) {
++  assert.equal(decode(wss("session.revoked",{sessionId:id,reason})).payload.reason,reason);
++  for(const invalidReason of malformedEnum(reason)) assert.throws(()=>decode(wss("session.revoked",{sessionId:id,reason:invalidReason})),/Invalid WSS frame/);
++}
+ const session={userId:u,sessionId:id,sessionEpoch:1n,accessToken[REDACTED];
+ for(const url of ["http://localhost/","https://user@localhost/","https://localhost/?token=x","https://localhost/sub"])assert.throws(()=>new SyncHttp(url,session));
+ let calls=0;
+@@ -35,4 +64,4 @@ const bad=new SyncHttp("https://localhost/",session,async()=>new Response("x".re
+ await assert.rejects(bad.user("0",new AbortController().signal),SyncFailure);
+ const frame=json({protocolVersion:"1.0",type:"ping",requestId:id,payload:{}});
+ assert.throws(()=>decode(" ".repeat(131073)+frame));
+-console.log("PASS: exact Sync correlation/shapes/gap/progress/kinds/numbers, 100x4096 escaped/literal Unicode bounded transport, WSS bound regression");
++console.log("PASS: exact Sync correlation/shapes/gap/progress/kinds/numbers, 100x4096 escaped/literal Unicode bounded transport, strict nonstring Sync/WSS enums and WSS bound regression");
+
+# Untracked paths observed; content intentionally not captured
+# ?? spec/progress/evidence/LOOP1-SYNC-001/client-fix/local-verification.md

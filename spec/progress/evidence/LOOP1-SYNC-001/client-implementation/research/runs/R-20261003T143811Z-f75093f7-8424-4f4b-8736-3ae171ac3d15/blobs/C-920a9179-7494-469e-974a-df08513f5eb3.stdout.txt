@@ -1,0 +1,23 @@
+Enabled native verification mode=send-desktop
++ npm.cmd --prefix clients/shared/protocol-sdk ci --ignore-scripts --no-audit --no-fund
+
+added 1 package in 982ms
++ npm.cmd --prefix clients/shared/protocol-sdk run build
+
+> @im/protocol-sdk@0.1.0 build
+> tsc -p tsconfig.json
+
++ node tests/clients/send/shared.mjs
+PASS: strict schema fields, duplicate keys, exact integer lexemes, invalid frames, escaped content
++ npm.cmd --prefix clients/desktop ci --ignore-scripts --no-audit --no-fund
+
+added 2 packages in 651ms
++ npm.cmd --prefix clients/desktop run build
+
+> im-desktop@0.1.0 build
+> tsc -p tsconfig.json
+
++ cargo build --locked --bin storage_probe
++ node tests/clients/send/desktop.mjs H:\.codex\toolchains\client-sqlite\target-final\debug\storage_probe.exe wss://localhost:54426
+PASS: actual SQLx + builtin WSS TLS send, persisted SENDING, timeout/offline/reject, same-ID restart retry, late ACK/realtime/Sync terminal merge, strict invalid/session checks, transactional rollback, stale socket and account isolation
+PASS: controlled TLS fixture actual client behavior; this is distinct from Go durable-ACK E2E

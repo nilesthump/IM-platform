@@ -1,12 +1,11 @@
 import { Repository } from "../../../shared/protocol-sdk/src/storage/repository.js";
-import type { LocalMessage, ServerMessage, Committed } from "../../../shared/protocol-sdk/src/storage/models.js";
+import type { LocalMessage, ServerMessage, Committed, UserPage } from "../../../shared/protocol-sdk/src/storage/models.js";
 import { content, decode, envelope, uuid } from "../../../shared/protocol-sdk/src/send/wire.js";
 export interface Session { userId: string; sessionId: string; sessionEpoch: bigint; accessToken: string }
 export interface Socket {
   onopen: ((event:Event)=>void)|null; onmessage: ((event:MessageEvent<unknown>)=>void)|null;
   onclose: ((event:CloseEvent)=>void)|null; onerror: ((event:Event)=>void)|null;
-  send(text: string): void; close(): void;
-}
+  send(text: string): void; close(): void;}
 export interface SendState { connection: "offline"|"binding"|"ready"; messages: ReadonlyArray<ReadonlyArray<string|null>>; error: "storage"|"protocol"|null }
 // Each instance owns exactly one account/session. Retiring it cannot publish into
 // a replacement account. All Repository operations and confirmations are ordered.
@@ -23,6 +22,7 @@ export class SendApplication {
   // settled identities until disconnect so delayed rejects remain unattributable.
   private requestConversations=new Map<string,string|null>();
   private listeners=new Set<(state:SendState)=>void>();
+  private deliveries=new Set<(conversationId:string,seq:bigint)=>void>();
   private conversation="";
   private current: SendState={connection:"offline",messages:[],error:null};
   private readonly session: Readonly<Session>;
@@ -30,8 +30,11 @@ export class SendApplication {
     this.session=Object.freeze({...session,userId:uuid(session.userId),sessionId:uuid(session.sessionId)});
     if(session.sessionEpoch<1n || !session.accessToken || timeoutMs<1) throw new Error("Invalid send session");
   }
+  matchesSession(s:Session):boolean {return s.userId===this.session.userId && s.sessionId===this.session.sessionId && s.sessionEpoch===this.session.sessionEpoch && s.accessToken===this.session.accessToken;}
   get state(): SendState { return this.current; }
   observe(listener:(state:SendState)=>void): ()=>void { this.listeners.add(listener); listener(this.current); return ()=>this.listeners.delete(listener); }
+  observeDelivery(listener:(conversationId:string,seq:bigint)=>void):()=>void { this.deliveries.add(listener); return ()=>this.deliveries.delete(listener); }
+  private delivered(c:string,n:bigint):void { if(!this.retired) for(const listener of this.deliveries) {try {listener(c,n);} catch {/* Commit already completed. */}} }
   private publish(state: SendState): void {
     if(this.retired) return;
     this.current=Object.freeze({...state,messages:Object.freeze(state.messages.map(r=>Object.freeze([...r])))});
@@ -72,7 +75,7 @@ export class SendApplication {
       void this.serial(async()=>{await this.repository.markFailed(attempt.message.conversationId,attempt.message.requestId); await this.refresh();}).catch(()=>{});
     }
   }
-  close(): void { this.disconnect(); this.retired=true; this.listeners.clear(); this.current={connection:"offline",messages:[],error:null}; }
+  close(): void { this.disconnect(); this.retired=true; this.listeners.clear(); this.deliveries.clear(); this.current={connection:"offline",messages:[],error:null}; }
   async send(conversationId:string,text:string): Promise<string> {
     const requestId=uuid(this.id());
     const message: LocalMessage={conversationId:uuid(conversationId),requestId,senderId:this.session.userId,content:content({kind:"TEXT",text})};
@@ -121,7 +124,7 @@ export class SendApplication {
     if(frame.type==="session.revoked") { if(p.sessionId!==this.session.sessionId) this.protocolFailure(); else this.disconnect(); return; }
     if(frame.type==="message.created") {
       const message={...p,requestId:frame.requestId} as unknown as ServerMessage;
-      await this.repository.syncMessages([message]); this.clear(message.conversationId,message.requestId); await this.refresh(); return;
+      await this.repository.syncMessages([message]); this.clear(message.conversationId,message.requestId); await this.refresh(); this.delivered(message.conversationId,BigInt(message.seq)); return;
     }
     if(frame.type==="message.ack") {
       if(p.status==="rejected") {
@@ -134,11 +137,15 @@ export class SendApplication {
         // An ACK only confirms a send issued by this application; retry reloads
         // the durable intent after restart. Realtime/Sync own other deliveries.
         if(!this.known.has(key)) return;
-        await this.repository.committedAck(frame.requestId,p as unknown as Committed); this.clear(c,frame.requestId); await this.refresh();
+        await this.repository.committedAck(frame.requestId,p as unknown as Committed); this.clear(c,frame.requestId); await this.refresh(); this.delivered(c,p.seq as bigint);
       }
     }
   }
-  async mergeMessages(messages:ServerMessage[]): Promise<void> {
-    return this.serial(async()=>{if(this.retired) return; await this.repository.syncMessages(messages); for(const m of messages) this.clear(m.conversationId,m.requestId); await this.refresh();});
+  async mergeMessages(messages:ServerMessage[], active:()=>boolean=()=>true, failBeforeAdvance=false): Promise<void> {
+    return this.serial(async()=>{if(this.retired || !active()) return; await this.repository.syncMessages(messages,failBeforeAdvance); for(const m of messages) this.clear(m.conversationId,m.requestId); await this.refresh();});
   }
+  async mergeUserPage(page:UserPage,expectedCursor:string,active:()=>boolean,failBeforeAdvance=false):Promise<void> {
+    return this.serial(async()=>{if(this.retired || !active()) return; await this.repository.userPage(page,expectedCursor,failBeforeAdvance);});
+  }
+
 }

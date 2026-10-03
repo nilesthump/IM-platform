@@ -1,0 +1,197 @@
+
+FILE clients/mobile/app/src/main/kotlin/im/platform/client/sync/SyncViewModel.kt
+1: package im.platform.client.sync
+2: import androidx.lifecycle.ViewModel
+3: import im.platform.client.send.SendViewModel
+4: import im.platform.client.send.SendSession
+5: import im.platform.client.send.Wire as SendWire
+6: import im.platform.client.storage.Repository
+7: import kotlinx.coroutines.*
+8: import kotlinx.coroutines.flow.*
+9: import kotlinx.coroutines.sync.Mutex
+10: import kotlinx.coroutines.sync.withLock
+11: import java.util.concurrent.atomic.AtomicBoolean
+12: 
+13: data class SyncState(val status:String="idle",val error:String?=null,val unavailable:List<String> = emptyList())
+14: class SyncViewModel(val send:SendViewModel,private val repo:Repository,private val http:SyncHttps):ViewModel() {
+15:     private val scope=CoroutineScope(SupervisorJob()+Dispatchers.IO)
+16:     @Volatile private var opened=""
+17:     private val lock=Mutex();private val pending=AtomicBoolean(false)
+18:     @Volatile private var generation=0L
+19:     @Volatile private var retired=false
+20:     @Volatile private var stopped=false
+21:     @Volatile private var pull:Job?=null
+22:     private val mutableState=MutableStateFlow(SyncState())
+23:     val state:StateFlow<SyncState> = mutableState.asStateFlow()
+24:     private val detach:()->Unit
+25:     init {
+26:         require(send.matchesRepository(repo) && http.matchesSession {send.matchesSession(it)}) {"Mismatched Sync session"}
+27:         detach=send.observeDelivery {_,_->if(send.state.value.connection=="ready")enqueue()}
+28:         scope.launch {
+29:             var ready=false
+30:             send.state.collect {s->
+31:                 val now=s.connection=="ready"
+32:                 if(!now && ready){generation++;pull?.cancel()}
+33:                 if(now && !ready && !stopped)enqueue()
+34:                 ready=now
+35:             }
+36:         }
+37:     }
+38:     private fun enqueue(){scope.launch {try{synchronize()}catch(_:Exception){/* Failure already observable. */}}}
+39:     suspend fun openConversation(c:String){val selected=SendWire.uuid(c);send.openConversation(selected);opened=selected;synchronize()}
+40:     suspend fun synchronize() {
+41:         if(retired || stopped)return;pending.set(true)
+42:         lock.withLock {
+43:             if(!pending.getAndSet(false) || retired || stopped)return
+44:             val g=generation;val job=currentCoroutineContext()[Job];pull=job
+45:             fun active()=!retired && !stopped && generation==g && job?.isActive!=false
+46:             val unavailable=mutableListOf<String>();mutableState.value=SyncState("syncing")
+47:             try {
+48:                 while(active()){
+49:                     val cursor=repo.cursor();val page=http.user(cursor);if(!active())return
+50:                     send.mergeUserPage(page.events,page.nextCursor,cursor,::active);if(!active())return
+51:                     if(!page.hasMore)break;if(repo.cursor()==cursor)throw SyncFailure("protocol")
+52:                 }
+53:                 for(c in (repo.conversationIds()+listOfNotNull(opened.takeIf {it.isNotEmpty()})).distinct()){
+54:                     try {
+55:                         while(active()){
+56:                             val after=repo.contiguous(c);val page=http.conversation(c,after);if(!active())return
+57:                             send.mergeMessages(page.messages,::active);if(!active())return
+58:                             if(!page.hasMore)break;if(repo.contiguous(c)<=after)throw SyncFailure("protocol")
+59:                         }
+60:                     }catch(error:SyncFailure){if(error.kind=="unavailable"){unavailable.add(c);continue};throw error}
+61:                 }
+62:                 if(active())mutableState.value=SyncState(unavailable=unavailable.toList())
+63:             }catch(error:Exception){
+64:                 if(!active())return
+65:                 val kind=if(error is SyncFailure)error.kind else "storage"
+66:                 if(kind=="authentication"){stopped=true;generation++;send.disconnect()}
+67:                 mutableState.value=SyncState("failed",kind,unavailable.toList());throw SyncFailure(kind)
+68:             }finally{if(pull===job)pull=null}
+69:         }
+70:     }
+71:     suspend fun dispose(){
+72:         if(retired)return;retired=true;generation++;detach();scope.coroutineContext[Job]?.cancelAndJoin()
+73:         pull?.cancelAndJoin();mutableState.value=SyncState("retired");send.dispose()
+74:     }
+75:     override fun onCleared(){retired=true;generation++;detach();pull?.cancel();scope.launch {try {pull?.cancelAndJoin();send.dispose()} finally {scope.cancel()}}}
+76: }
+77: suspend fun accountSync(context:android.content.Context,session:SendSession,endpoint:String):SyncViewModel=withContext(Dispatchers.IO){
+78:     val http=SyncHttps(endpoint,session);val repository=Repository(context,session.userId)
+79:     try{repository.initialize();SyncViewModel(SendViewModel(repository,session,ownsRepository=true),repository,http)}
+80:     catch(_:Exception){repository.close();throw SyncFailure("storage")}
+81: }
+
+
+FILE clients/mobile/app/src/main/kotlin/im/platform/client/sync/Https.kt
+1: package im.platform.client.sync
+2: import im.platform.client.send.SendSession
+3: import java.net.URI
+4: import java.net.URL
+5: import javax.net.ssl.HttpsURLConnection
+6: import java.nio.ByteBuffer
+7: import java.nio.charset.CodingErrorAction
+8: import java.util.UUID
+9: import java.util.concurrent.atomic.AtomicReference
+10: import kotlinx.coroutines.*
+11: import kotlin.coroutines.resume
+12: import kotlin.coroutines.resumeWithException
+13: 
+14: class SyncHttps(endpoint:String,private val session:SendSession,
+15:     private val connection:(URL)->HttpsURLConnection={it.openConnection() as HttpsURLConnection},
+16:     private val id:()->String={UUID.randomUUID().toString()}) {
+17:     private val base:String
+18:     fun matchesSession(check:(SendSession)->Boolean)=check(session)
+19:     init {
+20:         val uri=try {URI(endpoint)} catch(_:Exception){throw SyncFailure("protocol")}
+21:         if(uri.scheme!="https" || uri.host==null || uri.rawUserInfo!=null || uri.rawQuery!=null || uri.rawFragment!=null || uri.rawPath !in listOf("","/") || session.accessToken.isEmpty() || session.accessToken.any {it=='\r' || it=='\n'}) throw SyncFailure("protocol")
+22:         base=URI("https",null,uri.host,uri.port,null,null,null).toString()
+23:     }
+24:     private suspend fun post(path:String,body:String,id:String):String=suspendCancellableCoroutine {continuation->
+25:         val current=AtomicReference<HttpsURLConnection?>()
+26:         val job=CoroutineScope(continuation.context).launch(Dispatchers.IO) {
+27:             try {
+28:                 val c=connection(URL(base+path));current.set(c)
+29:                 if(!continuation.isActive) return@launch
+30:                 c.instanceFollowRedirects=false;c.requestMethod="POST";c.connectTimeout=15000;c.readTimeout=15000;c.useCaches=false;c.doOutput=true
+31:                 c.setRequestProperty("Authorization","Bearer "+session.accessToken);c.setRequestProperty("Content-Type","application/json")
+32:                 val bytes=body.toByteArray(Charsets.UTF_8);c.setFixedLengthStreamingMode(bytes.size);c.outputStream.use {it.write(bytes)}
+33:                 val status=c.responseCode
+34:                 if(c.getHeaderField("Cache-Control")!="no-store" || c.contentType?.matches(Regex("(?i)application/json(?:\\s*;.*)?"))!=true) throw SyncFailure(if(status>=500)"transport" else "protocol")
+35:                 val stream=(if(status==200)c.inputStream else c.errorStream) ?: throw SyncFailure("transport")
+36:                 val out=java.io.ByteArrayOutputStream()
+37:                 stream.use {val buffer=ByteArray(8192);while(true){val count=it.read(buffer);if(count<0)break;if(out.size()+count>MAX_RESPONSE)throw SyncFailure("protocol");out.write(buffer,0,count)}}
+38:                 val raw=Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(out.toByteArray())).toString()
+39:                 if(status!=200) throw if(status in setOf(400,401,403,426))Wire.error(raw,id,status,path.endsWith("conversation")) else SyncFailure("transport")
+40:                 if(continuation.isActive)continuation.resume(raw)
+41:             } catch(error:Exception) {if(continuation.isActive)continuation.resumeWithException(if(error is SyncFailure)error else SyncFailure("transport"))}
+42:             finally {current.getAndSet(null)?.disconnect()}
+43:         }
+44:         continuation.invokeOnCancellation {current.getAndSet(null)?.disconnect();job.cancel()}
+45:     }
+46:     suspend fun user(cursor:String):UserPage {val request=id();return Wire.user(post("/v1/sync/user",Wire.userRequest(request,cursor),request),request,cursor)}
+47:     suspend fun conversation(c:String,after:Long):ConversationPage {val request=id();return Wire.conversation(post("/v1/sync/conversation",Wire.conversationRequest(request,c,after),request),request,c,after)}
+48: }
+
+
+FILE clients/mobile/app/src/main/kotlin/im/platform/client/sync/Wire.kt
+1: package im.platform.client.sync
+2: import im.platform.client.send.Wire as SendWire
+3: import im.platform.client.storage.UserEvent
+4: import im.platform.client.storage.ServerMessage
+5: import java.math.BigInteger
+6: import org.json.JSONObject
+7: const val MAX_RESPONSE=6*1024*1024
+8: class SyncFailure(val kind:String):Exception("Sync $kind failure")
+9: data class UserPage(val events:List<UserEvent>,val nextCursor:String,val hasMore:Boolean)
+10: data class ConversationPage(val messages:List<ServerMessage>,val hasMore:Boolean)
+11: object Wire {
+12:     private fun invalid():Nothing=throw SyncFailure("protocol")
+13:     private fun cursor(v:Any?):String {val s=v as? String ?: invalid();if(s.isEmpty() || s.codePointCount(0,s.length)>256) invalid();return s}
+14:     private fun list(v:Any?):List<*> {val l=v as? List<*> ?: invalid();if(l.size>100) invalid();return l}
+15:     private fun base(raw:String,keys:Set<String>,requestId:String,type:String):Map<String,Any> {
+16:         val p=SendWire.obj(SendWire.parse(raw,MAX_RESPONSE,19),keys)
+17:         if(p["syncVersion"]!="1.0" || p["type"]!=type || SendWire.uuid(p["requestId"])!=requestId || p["hasMore"] !is Boolean) invalid();return p
+18:     }
+19:     fun user(raw:String,id:String,input:String):UserPage=try {
+20:         val p=base(raw,setOf("syncVersion","type","requestId","events","nextCursor","hasMore"),id,"sync.user.page")
+21:         val ids=mutableSetOf<String>();val tokens=mutableSetOf<String>();var last=input
+22:         val events=list(p["events"]).map {v->
+23:             val e=SendWire.obj(v,setOf("eventId","cursor","kind","subjectId","revision"))
+24:             val eventId=SendWire.uuid(e["eventId"]);val token=cursor(e["cursor"]);val kind=e["kind"] as? String ?: invalid()
+25:             if(!ids.add(eventId) || !tokens.add(token) || token==input || kind !in setOf("friend.changed","conversation.changed","membership.changed","plugin.changed")) invalid()
+26:             last=token;UserEvent(kind,SendWire.uuid(e["subjectId"]),SendWire.integer(e["revision"]).longValueExact())
+27:         }
+28:         val next=cursor(p["nextCursor"]);val more=p["hasMore"] as Boolean
+29:         if(if(events.isEmpty()) next!=input || more else next!=last || next==input) invalid()
+30:         UserPage(events,next,more)
+31:     }catch(_:Exception){invalid()}
+32:     fun conversation(raw:String,id:String,c:String,after:Long):ConversationPage=try {
+33:         val p=base(raw,setOf("syncVersion","type","requestId","conversationId","messages","hasMore"),id,"sync.conversation.page")
+34:         if(SendWire.uuid(p["conversationId"])!=c) invalid()
+35:         var next=BigInteger.valueOf(after).add(BigInteger.ONE)
+36:         val ids=mutableSetOf<String>();val requests=mutableSetOf<String>()
+37:         val messages=list(p["messages"]).map {v->
+38:             val m=SendWire.obj(v,setOf("conversationId","seq","messageId","senderId","requestId","createdAt","content"))
+39:             val seq=SendWire.integer(m["seq"]);val message=SendWire.uuid(m["messageId"]);val request=SendWire.uuid(m["requestId"])
+40:             if(SendWire.uuid(m["conversationId"])!=c || seq!=next || !ids.add(message) || !requests.add(request)) invalid();next=next.add(BigInteger.ONE)
+41:             val content=SendWire.obj(m["content"],setOf("kind","text"));if(content["kind"]!="TEXT") invalid()
+42:             ServerMessage(c,request,SendWire.uuid(m["senderId"]),SendWire.text(content["text"]),message,seq.longValueExact(),SendWire.time(m["createdAt"]))
+43:         }
+44:         val more=p["hasMore"] as Boolean;if(more && messages.isEmpty()) invalid();ConversationPage(messages,more)
+45:     }catch(_:Exception){invalid()}
+46:     fun error(raw:String,id:String,status:Int,conversation:Boolean):SyncFailure=try {
+47:         val p=SendWire.obj(SendWire.parse(raw,MAX_RESPONSE,19),setOf("requestId","error"));if(SendWire.uuid(p["requestId"])!=id) invalid()
+48:         val e=p["error"] as? Map<*,*> ?: invalid();if(e.keys.any {it !in setOf("code","message","violations")} || e["message"] !is String || (e["message"] as String).isEmpty()) invalid()
+49:         if(e.containsKey("violations")) {(e["violations"] as? List<*> ?: invalid()).forEach {v->val f=SendWire.obj(v,setOf("field","reason"));if(f.values.any {it !is String || it.isEmpty()}) invalid()}}
+50:         when {
+51:             status==401 && e["code"] in setOf("AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH")->SyncFailure("authentication")
+52:             conversation && status==403 && e["code"]=="AUTHORIZATION_DENIED"->SyncFailure("unavailable")
+53:             status==400 && e["code"]=="VALIDATION_FAILED" || status==426 && e["code"]=="PROTOCOL_VERSION_UNSUPPORTED"->SyncFailure("protocol")
+54:             else->invalid()
+55:         }
+56:     }catch(_:Exception){SyncFailure("protocol")}
+57:     fun userRequest(id:String,input:String)=JSONObject().put("syncVersion","1.0").put("type","sync.user.request").put("requestId",SendWire.uuid(id)).put("cursor",cursor(input)).put("limit",100).toString()
+58:     fun conversationRequest(id:String,c:String,after:Long):String {if(after<0) invalid();return JSONObject().put("syncVersion","1.0").put("type","sync.conversation.request").put("requestId",SendWire.uuid(id)).put("conversationId",SendWire.uuid(c)).put("afterSeq",after).put("limit",100).toString()}
+59: }
+

@@ -1,0 +1,564 @@
+"""Controlled TLS/WSS behavior fixture; NOT proof of Go/PostgreSQL durability."""
+import base64, hashlib, json, socket, ssl, struct, threading, time, uuid
+USER="10000000-0000-4000-8000-000000000001"
+SESSION="20000000-0000-4000-8000-000000000001"
+class Fixture:
+    def __init__(self,cert,key):
+        self.context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);self.context.load_cert_chain(cert,key)
+        self.server=socket.socket();self.server.bind(('127.0.0.1',0));self.server.listen()
+        self.port=self.server.getsockname()[1];self.messages={};self.lock=threading.Lock();self.errors=[];self.sends=0
+        threading.Thread(target=self.accept,daemon=True).start()
+    def accept(self):
+        while True:
+            try: conn,_=self.server.accept()
+            except OSError:return
+            threading.Thread(target=self.connection,args=(conn,),daemon=True).start()
+    def connection(self,conn):
+        try:
+            with self.context.wrap_socket(conn,server_side=True) as s:
+                s.settimeout(20);header=b''
+                while not header.endswith(b'\r\n\r\n'):
+                    header+=s.recv(1)
+                    if len(header)>16384:raise ValueError('header too large')
+                lines=header.decode('ascii').split('\r\n');path=lines[0].split()[1]
+                if '?' in path:raise ValueError('query forbidden')
+                headers=dict(line.split(':',1) for line in lines[1:] if ':' in line)
+                key=next(v.strip() for k,v in headers.items() if k.lower()=='sec-websocket-key')
+                accept=base64.b64encode(hashlib.sha1((key+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest()).decode()
+                s.sendall(('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: '+accept+'\r\n\r\n').encode())
+                def receive():
+                    def exact(n):
+                        out=b''
+                        while len(out)<n:
+                            part=s.recv(n-len(out))
+                            if not part:raise EOFError()
+                            out+=part
+                        return out
+                    first,second=exact(2);op=first&15;n=second&127
+                    if n==126:n=struct.unpack('!H',exact(2))[0]
+                    elif n==127:n=struct.unpack('!Q',exact(8))[0]
+                    if n>131072:raise ValueError('frame too large')
+                    if not second&128:raise ValueError('unmasked client')
+                    mask=exact(4);body=exact(n);body=bytes(v^mask[i%4] for i,v in enumerate(body))
+                    if op==8:raise EOFError()
+                    if op!=1:raise ValueError('text expected')
+                    return json.loads(body)
+                def send(type,r,p):
+                    raw=json.dumps({'protocolVersion':'1.0','type':type,'requestId':r,'payload':p},separators=(',',':')).encode()
+                    prefix=bytes([0x81,len(raw)]) if len(raw)<126 else bytes([0x81,126])+struct.pack('!H',len(raw))
+                    s.sendall(prefix+raw)
+                auth=receive()
+                if set(auth)!= {'protocolVersion','type','requestId','payload'} or auth['type']!='auth.bind' or set(auth['payload'])!={'accessToken'}:raise ValueError('bad bind')
+                token=auth['payload']['accessToken']
+                client='MOBILE' if token=='fixture-mobile' else 'DESKTOP'
+                if token not in ('fixture-mobile','fixture-desktop'):raise ValueError('unexpected fixture credential')
+                p={'status':'bound','userId':USER,'sessionId':SESSION,'clientType':client,'sessionEpoch':1}
+                if path=='/wrong-session':p['sessionId']=str(uuid.uuid4())
+                send('auth.ack',auth['requestId'],p)
+                while True:
+                    e=receive()
+                    if e['type']=='pong':continue
+                    if e['type']!='message.send' or set(e['payload'])!={'conversationId','content'}:raise ValueError('bad send')
+                    r=e['requestId'];c=e['payload']['conversationId'];content=e['payload']['content']
+                    with self.lock:
+                        self.sends+=1;k=(USER,c,r);old=self.messages.get(k)
+                        if old is None:
+                            old={'conversationId':c,'messageId':str(uuid.uuid4()),'senderId':USER,'seq':9007199254740993+len(self.messages),'createdAt':'2026-10-03T00:00:00Z','content':content};self.messages[k]=old
+                        elif old['content']!=content:raise ValueError('retry changed identity/content')
+                    if path=='/revoked':send('session.revoked',str(uuid.uuid4()),{'sessionId':SESSION,'reason':'LOGOUT'});return
+                    if path=='/timeout':continue
+                    if path=='/reject':send('message.ack',r,{'status':'rejected','error':{'code':'AUTHORIZATION_DENIED','message':'Denied'}});continue
+                    if path=='/late':time.sleep(.8)
+                    ack={key:old[key] for key in ('conversationId','messageId','seq','createdAt')};ack['status']='committed'
+                    if path=='/invalid':ack['unexpected']=True
+                    if path=='/realtime':send('message.created',r,old)
+                    else:send('message.ack',r,ack)
+                    if path not in ('/invalid',):send('message.created',r,old)
+        except (EOFError,ConnectionError,OSError,ssl.SSLError):pass
+        except Exception as e:self.errors.append(type(e).__name__+': '+str(e))
+    def close(self):self.server.close()
+
+#!/usr/bin/env python3
+"""Real public Sync through existing Compose TLS -> Gateway -> Core/PostgreSQL."""
+import importlib.util
+import json
+import os
+from pathlib import Path
+import secrets
+import socket
+import ssl
+import subprocess
+import tempfile
+import time
+import urllib.error
+import urllib.request
+import uuid
+
+ROOT = Path(__file__).resolve().parents[1]
+spec = importlib.util.spec_from_file_location("go_tls_harness", ROOT / "tests/e2e/go_tls_messaging.py")
+harness = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(harness)
+require = harness.require
+
+
+def main():
+    project = "im-sync-runtime-" + str(os.getpid()) + "-" + secrets.token_hex(4)
+    with socket.socket() as reservation:
+        reservation.bind(("127.0.0.1", 0))
+        port = reservation.getsockname()[1]
+    env = os.environ.copy()
+    env.update(IM_HTTPS_PORT=str(port), COMPOSE_PROGRESS="quiet")
+    command = ["docker", "compose", "-f", str(ROOT / "deploy/compose.yaml"), "-p", project, "--profile", "go"]
+
+    def docker(args, data=None):
+        result = subprocess.run(args, env=env, input=data, capture_output=True, timeout=600)
+        if result.returncode:
+            raise RuntimeError("Disposable Compose command failed: " + result.stderr.decode(errors="replace"))
+        return result.stdout
+
+    def compose(*args):
+        return docker(command + list(args))
+
+    def sql(query):
+        return compose("exec", "-T", "postgres", "psql", "-U", "im", "-d", "im", "-v", "ON_ERROR_STOP=1", "-Atc", query).decode().strip()
+
+    with tempfile.TemporaryDirectory(prefix="im-sync-runtime-") as temp:
+        config = Path(temp) / "config"
+        config.mkdir()
+        env["IM_GO_CONFIG_DIR"] = str(config)
+        (config / "config.json").write_bytes((ROOT / "backend/go/config.example.json").read_bytes())
+        (config / "pg_password").write_text("local-development-only", encoding="utf-8")
+        (config / "jwt_key").write_text(secrets.token_urlsafe(48), encoding="utf-8")
+        ws = None
+        try:
+            compose("config", "--quiet")
+            compose("up", "-d", "--build")
+            tls_id = compose("ps", "-q", "tls-go").decode().strip()
+            require(bool(tls_id), "TLS role missing")
+            ca = Path(temp) / "root.crt"
+            for _ in range(60):
+                try:
+                    docker(["docker", "cp", tls_id + ":/data/caddy/pki/authorities/local/root.crt", str(ca)])
+                    break
+                except RuntimeError:
+                    time.sleep(.5)
+            else:
+                raise RuntimeError("Public root CA unavailable")
+            context = ssl.create_default_context(cafile=str(ca))
+            require(context.check_hostname and context.verify_mode == ssl.CERT_REQUIRED, "TLS verification disabled")
+
+            def call(path, body, token=None, expected=200, raw=None):
+                headers = {"Content-Type": "application/json"}
+                if token:
+                    headers["Authorization"] = "Bearer " + token
+                request = urllib.request.Request("https://localhost:" + str(port) + path,
+                                                 data=json.dumps(body).encode() if raw is None else raw, headers=headers, method="POST")
+                try:
+                    response = urllib.request.urlopen(request, context=context, timeout=20)
+                except urllib.error.HTTPError as error:
+                    response = error
+                with response:
+                    require(response.code == expected, "Unexpected status " + str(response.code) + " on " + path)
+                    value = json.loads(response.read())
+                    if path.startswith("/v1/sync/"):
+                        require(response.headers.get("Cache-Control") == "no-store", "Sync response cacheable")
+                        require(value.get("requestId") == body["requestId"], "Sync correlation lost")
+                    return value
+
+            for _ in range(60):
+                try:
+                    with urllib.request.urlopen("https://localhost:" + str(port) + "/__infra/health", context=context, timeout=2) as response:
+                        require(response.read().strip() == b"profile=go role=gateway", "Wrong HTTPS role")
+                    break
+                except OSError:
+                    time.sleep(.5)
+            else:
+                raise RuntimeError("Verified TLS Gateway unavailable")
+            try:
+                with socket.create_connection(("localhost", port), timeout=5) as raw:
+                    ssl.create_default_context().wrap_socket(raw, server_hostname="localhost")
+            except ssl.SSLCertVerificationError:
+                pass
+            else:
+                raise AssertionError("Untrusted CA accepted")
+            users = []
+            for i in range(2):
+                name = "sync" + secrets.token_hex(8)
+                user = call("/v1/auth/register", {"username": name, "password": "fixture-password-not-a-real-secret"
+name: Loop 1 CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.paths.outputs.go }}
+      java: ${{ steps.paths.outputs.java }}
+      web: ${{ steps.paths.outputs.web }}
+      desktop: ${{ steps.paths.outputs.desktop }}
+      mobile: ${{ steps.paths.outputs.mobile }}
+      shared: ${{ steps.paths.outputs.shared }}
+      old_client: ${{ steps.paths.outputs.old_client }}
+      plugin: ${{ steps.paths.outputs.plugin }}
+      migration: ${{ steps.paths.outputs.migration }}
+      compatibility: ${{ steps.paths.outputs.compatibility }}
+      deploy: ${{ steps.paths.outputs.deploy }}
+      architecture: ${{ steps.paths.outputs.architecture }}
+      source_go: ${{ steps.paths.outputs.source_go }}
+      source_java: ${{ steps.paths.outputs.source_java }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Diagnose checkout status
+        shell: pwsh
+        run: |
+          $status = @(git -c core.excludesFile=.git/info/exclude status --porcelain=v1 --untracked-files=all 2>&1)
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Host "checkout_status_entries=$($status.Count)"
+          foreach ($entry in $status) { Write-Host "checkout_status=$entry" }
+      - name: Verify clean repository recovery
+        shell: pwsh
+        run: ./tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance
+      - name: Test path matrix
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -m unittest discover -s tests/ci -v
+      - name: Classify full diff, including deletions
+        id: paths
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        shell: bash
+        run: |
+          base="$BASE_SHA"
+          if [[ -z "$base" || "$base" =~ ^0+$ ]]; then
+            base=$(git hash-object -t tree /dev/null)
+          fi
+          python3 ci/classify.py --base "$base" --head "$HEAD_SHA" --github-output "$GITHUB_OUTPUT"
+
+  architecture:
+    needs: classify
+    if: needs.classify.outputs.architecture == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Canonical integrity and authority structure
+        shell: pwsh
+        run: ./tools/verify-frozen-architecture.ps1
+      - name: Current governance references and task scopes
+        run: python3 ci/check_architecture.py --scope governance
+      - name: Active client technology/source/dependency/configuration guard
+        run: python3 ci/check_architecture.py --scope clients --json
+      - name: Checker positive and negative controls
+        run: python3 -m unittest discover -s tests/architecture -v
+
+  source_go:
+    needs: classify
+    if: needs.classify.outputs.source_go == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Real Go source ownership and AST dependency graph
+        run: python3 ci/check_architecture.py --scope go --json
+
+  source_java:
+    needs: classify
+    if: needs.classify.outputs.source_java == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Java current source and explicit placeholder boundary
+        run: python3 ci/check_architecture.py --scope java --json
+
+  go:
+    needs: classify
+    if: needs.classify.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: im_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d im_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      nats:
+        image: nats:2.10-alpine
+        ports:
+          - 4222:4222
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: ci-only-password
+      PGDATABASE: im_ci
+      DB_TEST_ENABLE: '1'
+      NATS_URL: nats://localhost:4222
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: backend/go/go.sum
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Migrate canonical schema
+        run: python3 contracts/database/migrate.py up
+      - name: Go Auth build, integration and contract verification
+        run: |
+          test -z "$(find backend/go -name '*.go' -type f -print0 | xargs -0 gofmt -l)"
+          cd backend/go
+          go build ./...
+          go build -o "$RUNNER_TEMP/im-go" .
+          go vet ./...
+          go test -count=1 ./...
+          go test -race -count=1 ./...
+          cd ../..
+          python3 contracts/websocket/verify.py
+          pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1
+
+  java:
+    needs: classify
+    if: needs.classify.outputs.java == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Java S0 compile
+        run: |
+          python3 ci/check_s0_boundary.py java
+          javac -d "$RUNNER_TEMP" backend/java/InfraPlaceholder.java
+
+  web:
+    needs: classify
+    if: needs.classify.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Web S0 skeleton boundary
+        run: python3 ci/check_s0_boundary.py web
+
+  desktop:
+    needs: classify
+    if: needs.classify.outputs.desktop == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Native Tauri prerequisites and approved Rust compiler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Actual TypeScript Repository on SQLx SQLite
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/client-sqlite-target
+        run: |
+          python3 -B tools/verify_client_sqlite.py --scope desktop
+          python3 -B tools/verify_client_send.py --scope desktop
+
+  mobile:
+    needs: classify
+    if: needs.classify.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Enable hosted Linux KVM permissions
+        run: |
+          id
+          if [[ ! -c /dev/kvm ]]; then
+            printf '%s\n' 'ERROR: /dev/kvm is missing or is not a character device.' >&2
+            exit 1
+          fi
+          stat --format='KVM before: %F %a %U:%G' /dev/kvm
+          printf '%s\n' 'Granting disposable runner user read/write access to the existing KVM device.'
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod 0600 /dev/kvm
+          stat --format='KVM after: %F %a %U:%G' /dev/kvm
+          if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+            printf '%s\n' 'ERROR: current runner user cannot read and write /dev/kvm.' >&2
+            exit 1
+          fi
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          disable-linux-hw-accel: false
+          pre-emulator-launch-script: '$ANDROID_HOME/emulator/emulator -accel-check'
+          script: |
+            python3 -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554
+            python3 -B tools/verify_client_send.py --scope mobile --serial emulator-5554
+
+  shared:
+    needs: classify
+    if: needs.classify.outputs.shared == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Actual shared TypeScript storage compile
+        run: |
+          python3 -B tools/verify_client_sqlite.py --scope shared
+          python3 -B tools/verify_client_send.py --scope shared
+      - name: HTTP, WSS, Sync and Plugin contracts
+        shell: pwsh
+        run: |
+          ./contracts/http/verify-auth-user-friend.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 -B tools/verify_sync_transport.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 -B -m unittest discover -s tests/contract -p test_sync_transport.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 contracts/websocket/verify.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 contracts/plugin-api/verify.py
+          exit $LASTEXITCODE
+
+  compatibility:
+    needs: classify
+    if: needs.classify.outputs.compatibility == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: im_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d im_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: ci-only-password
+      PGDATABASE: im_ci
+      PYTHONDONTWRITEBYTECODE: '1'
+      DB_TEST_ENABLE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Shared fixture compatibility and migration
+        run: |
+          python3 contracts/websocket/verify.py
+          python3 contracts/plugin-api/verify.py
+          python3 -m unittest discover -s tests/database -v
+      - name: Current client source and remaining Web skeleton boundary
+        run: |
+          python3 ci/check_s0_boundary.py web
+          python3 ci/check_architecture.py --scope clients --json
+
+  deploy:
+    needs: classify
+    if: needs.classify.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable Go profile configuration
+        shell: pwsh
+        env:
+          IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config
+        run: |
+          New-Item -ItemType Directory -Path $env:IM_GO_CONFIG_DIR -Force | Out-Null
+          Add-Content -Path $env:GITHUB_ENV -Value "IM_GO_CONFIG_DIR=$env:IM_GO_CONFIG_DIR"
+          Copy-Item backend/go/config.example.json (Join-Path $env:IM_GO_CONFIG_DIR 'config.json')
+          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'pg_password'), 'local-development-only')
+          $key = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'jwt_key'), $key)
+      - name: Validate both Compose profiles
+        run: |
+          docker compose -f deploy/compose.yaml --profile go config --quiet
+          docker compose -f deploy/compose.yaml --profile java config --quiet
+      - name: Frozen architecture integrity
+        shell: pwsh
+        run: ./tools/verify-frozen-architecture.ps1
+      - name: Go transport smoke
+        shell: pwsh
+        run: ./tests/infrastructure/smoke.ps1 -Profile go
+      - name: Go Auth actual roles and TLS event smoke
+        run: python3 tests/go/live_role_smoke.py
+      - name: Go public Sync strict TLS runtime
+        run: python3 -B tools/verify_sync_runtime.py
+      - name: Go S1 strict TLS messaging E2E
+        run: python3 -B tests/e2e/go_tls_messaging.py
+      - name: Java transport smoke
+        shell: pwsh
+        run: ./tests/infrastructure/smoke.ps1 -Profile java
+
+  gate:
+    if: always()
+    needs: [classify, architecture, source_go, source_java, go, java, web, desktop, mobile, shared, compatibility, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require every selected job to pass
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 ci/check_gate.py
+

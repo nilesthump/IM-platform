@@ -1,0 +1,113 @@
+import { accountDatabase } from "../storage/database.js";
+import { Repository } from "../../../shared/protocol-sdk/src/storage/repository.js";
+import { SendApplication, type Session } from "./send.js";
+export async function accountSend(session: Session): Promise<SendApplication> {
+  const repository=new Repository(accountDatabase(session.userId));
+  await repository.initialize();
+  return new SendApplication(repository,session);
+}
+
+package im.platform.client.send
+import android.app.Activity
+import android.app.Instrumentation
+import android.os.Bundle
+import im.platform.client.storage.Repository
+import im.platform.client.storage.ServerMessage
+import im.platform.client.storage.LocalMessage
+import kotlinx.coroutines.*
+import java.math.BigInteger
+import java.util.UUID
+import java.io.ByteArrayInputStream
+import java.security.KeyStore
+import java.security.cert.CertificateFactory
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
+import org.json.JSONObject
+
+class SendInstrumentation: Instrumentation() {
+    private lateinit var args:Bundle
+    private var assertions=0
+    private var phase="wire"
+    private val user="10000000-0000-4000-8000-000000000001"
+    private val session="20000000-0000-4000-8000-000000000001"
+    private val conversation="30000000-0000-4000-8000-000000000001"
+    private fun equal(actual:Any?,expected:Any?) {check(actual==expected) { "Assertion $assertions failed: actual=$actual expected=$expected" };assertions++}
+    private suspend fun until(test:()->Boolean) { repeat(500) {if(test())return;delay(10)};error("Condition timed out") }
+    private fun credentials()=SendSession(user,session,BigInteger.ONE,"fixture-mobile")
+    private fun fakeFrame(type:String,id:String,p:JSONObject)=Wire.envelope(type,id,p)
+    private class Fake:SendSocket {
+        var open:(()->Unit)?=null;var message:((String)->Unit)?=null;var end:(()->Unit)?=null
+        val frames=mutableListOf<JSONObject>()
+        override fun send(text:String){frames.add(JSONObject(text))}
+        var closed=false
+        override fun close(){closed=true}
+        fun bound(user:String,session:String){val auth=frames.last();message!!(Wire.envelope("auth.ack",auth.getString("requestId"),JSONObject().put("status","bound").put("userId",user).put("sessionId",session).put("clientType","MOBILE").put("sessionEpoch",1)))}
+    }
+    private fun committed(c:String,id:String,seq:Long=9007199254740993L)=JSONObject().put("status","committed").put("conversationId",c).put("messageId",id).put("seq",seq).put("createdAt","2026-10-03T00:00:00Z")
+    private suspend fun actualTls() {
+        phase="TLS/offline"
+        targetContext.deleteDatabase("im-$user.sqlite")
+        val certificate=CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(java.util.Base64.getDecoder().decode(args.getString("certificate"))))
+        val store=KeyStore.getInstance(KeyStore.getDefaultType());store.load(null);store.setCertificateEntry("fixture",certificate)
+        val trust=TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());trust.init(store)
+        val tls=SSLContext.getInstance("TLS");tls.init(null,trust.trustManagers,null)
+        val endpoint=args.getString("endpoint") ?: error("TLS fixture endpoint required")
+        val repo=Repository(targetContext,user);repo.initialize()
+        fun app()=SendViewModel(repo,credentials(),{url,open,message,end->Wss(url,open,message,end,tls.socketFactory)},300)
+        suspend fun connect(vm:SendViewModel,mode:String="normal") {vm.connect("$endpoint/$mode");until {vm.state.value.connection=="ready"};vm.openConversation(conversation)}
+        var vm=app();vm.openConversation(conversation);val offline=vm.send(conversation,"mobile-offline");equal(repo.messages(conversation).first {it[0]==offline}[3],"FAILED")
+        connect(vm);vm.retry(conversation,offline);until {vm.state.value.messages.firstOrNull {it[0]==offline}?.get(3)=="SENT"};equal(repo.messages(conversation).first {it[0]==offline}[5],"9007199254740993");vm.dispose()
+        phase="TLS/restart";vm=app();connect(vm,"timeout");val retry=vm.send(conversation,"mobile-restart");until {vm.state.value.messages.firstOrNull {it[0]==retry}?.get(3)=="FAILED"};vm.dispose();repo.close()
+        val reopened=Repository(targetContext,user);reopened.initialize()
+        vm=SendViewModel(reopened,credentials(),{url,open,message,end->Wss(url,open,message,end,tls.socketFactory)},300);connect(vm);vm.retry(conversation,retry);until {vm.state.value.messages.firstOrNull {it[0]==retry}?.get(3)=="SENT"};equal(reopened.messages(conversation).count {it[0]==retry},1);vm.dispose()
+        for(mode in listOf("late","realtime","reject","invalid","revoked")) {
+            phase="TLS/$mode"
+            vm=SendViewModel(reopened,credentials(),{url,open,message,end->Wss(url,open,message,end,tls.socketFactory)},300);connect(vm,mode)
+            val request=vm.send(conversation,"mobile-$mode")
+            if(mode=="late") {until {vm.state.value.messages.firstOrNull {it[0]==request}?.get(3)=="FAILED"};until {vm.state.value.messages.firstOrNull {it[0]==request}?.get(3)=="SENT"}}
+            if(mode=="realtime") {until {vm.state.value.messages.firstOrNull {it[0]==request}?.get(3)=="SENT"};equal(reopened.messages(conversation).count {it[0]==request},1)}
+            if(mode=="reject") {until {vm.state.value.messages.firstOrNull {it[0]==request}?.get(3)=="FAILED"};vm.mergeMessages(listOf(ServerMessage(conversation,request,user,"mobile-$mode",UUID.randomUUID().toString(),99,"2026-10-03T00:00:00Z")));equal(vm.state.value.messages.first {it[0]==request}[3],"SENT");vm.retry(conversation,request);equal(vm.state.value.messages.first {it[0]==request}[3],"SENT")}
+            if(mode=="revoked") {until {vm.state.value.connection=="offline" && vm.state.value.messages.firstOrNull {it[0]==request}?.get(3)=="FAILED"};equal(reopened.messages(conversation).first {it[0]==request}[3],"FAILED");val offline=vm.send(conversation,"after revoked");equal(reopened.messages(conversation).first {it[0]==offline}[3],"FAILED")}
+            if(mode=="invalid") {until {vm.state.value.connection=="offline" && vm.state.value.error=="protocol"};equal(reopened.messages(conversation).first {it[0]==request}[3],"FAILED");equal(vm.state.value.error,"protocol")}
+            vm.dispose();equal(vm.state.value.messages.size,0)
+        }
+        vm=SendViewModel(reopened,credentials(),{url,open,message,end->Wss(url,open,message,end,tls.socketFactory)});vm.connect("$endpoint/wrong-session");until {vm.state.value.error=="protocol"};equal(vm.state.value.connection,"offline");vm.dispose()
+        // The platform default trust store must reject the private fixture CA.
+        vm=SendViewModel(reopened,credentials());vm.connect("$endpoint/normal");until {vm.state.value.connection=="offline"};equal(vm.state.value.connection,"offline");vm.dispose()
+        reopened.close();targetContext.deleteDatabase("im-$user.sqlite")
+    }
+    private suspend fun racesAndStorage() {
+        phase="races/storage"
+        val account=UUID.randomUUID().toString();val other=UUID.randomUUID().toString()
+        val repo=Repository(targetContext,account);repo.initialize()
+        val creds=credentials().copy(userId=account);val sockets=mutableListOf<Fake>()
+        val vm=SendViewModel(repo,creds,{_,open,message,end->Fake().also {it.open=open;it.message=message;it.end=end;sockets.add(it)}},100)
+        v
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
+}
+android {
+    namespace = "im.platform.client"
+    compileSdk = 35
+    defaultConfig {
+        applicationId = "im.platform.client"
+        minSdk = 34
+        targetSdk = 35
+        versionCode = 1
+        versionName = "0.1"
+        testInstrumentationRunner = providers.gradleProperty("imSendInstrumentation").orNull ?: "im.platform.client.storage.StorageInstrumentation"
+    }
+    compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
+    kotlinOptions { jvmTarget = "17" }
+    buildFeatures { compose = true }
+}
+dependencies {
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation(platform("androidx.compose:compose-bom:2024.12.01"))
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.compose.foundation:foundation:1.7.6")
+}
+

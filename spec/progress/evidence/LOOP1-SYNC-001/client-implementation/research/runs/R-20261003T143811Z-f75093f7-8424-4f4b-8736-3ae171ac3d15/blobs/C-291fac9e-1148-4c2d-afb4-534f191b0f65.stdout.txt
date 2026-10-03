@@ -1,0 +1,250 @@
+## 11. 公共契约与双后端实现
+
+<a id="section-11-1"></a>
+### 11.1 唯一权威
+
+Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户端 SDK。契约包含 OpenAPI/HTTP、WSS envelope 与消息类型、错误码、协议版本与 capabilities、数据库 schema/migrations、Plugin API、Golden Test Vectors。实现代码不得成为反向权威。
+
+<a id="section-11-2"></a>
+### 11.2 等价而非同构
+
+| 必须相同 | 允许不同 |
+| --- | --- |
+| HTTP/WSS 可观察行为、错误码、事务语义、幂等、顺序、Sync、插件权限、数据库结果；§3/§10 服务职责、源码归属和依赖方向 | 服务内部框架、包结构、依赖注入、ORM/SQL 工具、线程/协程模型、内部接口 |
+| Release Manifest、健康检查、metrics 标签、日志关联字段 | 内部模块名称与代码风格 |
+
+内部结构可不同不等于可自行选型；§2.3 适用于所有新增 architecture-sensitive framework、ORM、runtime 与核心依赖。§11.2 的可不同栏目仅表示在各自已批准技术决定内不要求同构。
+
+<a id="section-11-3"></a>
+### 11.3 Golden Contract Tests
+
+```text
+同一 fixture 输入 -> Go profile -> 规范化结果 A
+同一 fixture 输入 -> Java profile -> 规范化结果 B
+断言 A == Canonical Expected && B == Canonical Expected
+必须覆盖：auth/session、friend/direct uniqueness、group idempotency、message ACK/outbox、retry、sync gap、plugin permissions、errors/version negotiation
+```
+
+<a id="section-11-4"></a>
+### 11.4 数据库迁移
+
+两套后端共享数据库语义，但单次部署只运行一个 profile。migration 由独立迁移组件执行，不允许应用实例竞争执行。所有兼容窗口内的服务与客户端 fixture 必须通过 migration 测试。破坏性 schema 变更采用 expand -> migrate/backfill-> switch -> contract，多版本共存期间禁止先删旧字段。
+
+<a id="section-11-5"></a>
+### 11.5 公开 Sync HTTPS 绑定（Human-approved ADR-0008 候选）
+
+公开拉取通过 HTTPS POST /v1/sync/user 与 /v1/sync/conversation；唯一机器权威 contracts/http/sync.openapi.json，复用现有四种 Sync v1 形状和既有 Bearer/HTTP 错误目录。WSS realtime/ACK 保持原义，不添加 Sync envelope。Gateway 仅代理，Core 负责每请求数据库权威 Session、用户隔离、会话成员授权、稳定已提交分页；无新服务/依赖/数据库对象。
+
+用户初值 cursor 为 0，后续 opaque cursor 绑定认证用户、可跨其 Session 重放；客户端不解析/排序。仅 friend/conversation/membership/plugin metadata；消息仍使用会话 seq。内部 cursor_id 可在响应投影为 external event.cursor/nextCursor，既有 producer payload/schema 不改。任意正整数 limit 仍合法，effectiveLimit=min(limit,100)，先精确取 cap 再有界转换。空页 terminal（user 保持输入 cursor）；非空 user nextCursor=末事件 cursor 且前进；hasMore 要求非空进展且存在额外已提交合格项，不能跳过并发晚提交。会话消息从 afterSeq+1 有序连续；客户端仅跨无 gap 前缀推进 contiguous_seq，数据/cursor 同事务不变。
+
+100 仅限制单页，不限制总同步条数或页数。客户端每页数据与游标/连续序号事务提交成功后，若 hasMore=true，用户流使用 nextCursor、会话流使用已提交无 gap 前缀的 afterSeq 继续拉取，直到 hasMore=false；不得以固定总条数或总页数提前截断。终止页表示该次读取可见的已提交最新状态，不保证终止后的新写入已经同步；后续实时流/再次同步承担新变化。
+
+成功/可解码有效 requestId 的 canonical error 与 body UUID 关联；不可关联格式错误用 server UUID。具体认证、字段、错误码/状态、资源界限和关联行为以 contracts/ 为准，不从实现推导。无效/外账号 cursor 400 VALIDATION_FAILED，不存在/非成员会话403 AUTHORIZATION_DENIED。未列入错误目录的服务器/传输失败不得冒充成功页或推进 cursor。查询参数禁止，入口 HTTPS、日志/错误无凭据，响应 no-store。
+
+批准来源与兼容/迁移见 ADR-0008。此绑定仅经 fresh independent Review、精确候选 hosted CI、protected integration/actual-main 与主仓库同步后生效；接受后仍须展示具体 Go 入口实现方案并取得 Human 同意才可写 Go 产品代码。SYNC 仍须真实服务与客户端独立接受；本前置不等于 Task SYNC/S2 Gate PASS。
+
+<a id="section-12"></a>
+
+## 19. 第一批 Agent 可执行任务
+
+任务必须逐个进入 ready。S0 Gate 未通过前，S1 任务不得 active；依此类推。下面清单是阶段规划，不是现行队列快照；按 Task Spec 的真实依赖选择，不以表格/文件名顺序代替依赖。不授权并行修改同一契约。
+
+| Task ID | 目标 | 阶段 | 交付物 | 验收 |
+| --- | --- | --- | --- | --- |
+| LOOP1-CTRL-001 | 建立 Monorepo 与规范目录 | S0 | repo skeleton; spec/ contracts/tasks/ progress/；README 仅指向权威入口 | 目录 lint PASS；无重复权威文档 |
+| LOOP1-CTRL-002 | 编写 agent-context/current/task 模板 | S0 | handoff、progress、task schema | 新 Agent dry-run 能按顺序恢复 |
+| LOOP1-CONTRACT-001 | 冻结 HTTP Auth/User/Friend 契约 | S0 | OpenAPI + errors + golden fixtures | schema lint；正/负例齐全 |
+| LOOP1-CONTRACT-002 | 冻结 WSS Envelope/Auth/Message 契约 | S0 | auth.bind/ack、message.send/ack/created、session.revoked | contract generator/tests PASS |
+| LOOP1-CONTRACT-003 | 冻结 Sync 与 Plugin API v1 | S0 | user cursor、conversation seq、Events/Queries/Actions/UI Host | fixtures 覆盖重复/乱序/权限拒绝 |
+| LOOP1-DB-001 | 建立 canonical schema 与migration runner | S0 | users/sessions/friendships/conversations/members/messages/outbox/plugins | 唯一约束与迁移测试 PASS |
+| LOOP1-INFRA-001 | Compose + PostgreSQL +NATS + TLS Proxy | S0 | go/java profile skeleton、真实 TLS入口 | clean checkout 一键启动 +smoke |
+| LOOP1-CI-001 | Path-aware CI skeleton | S0 | diff classifier、Go/Java/client/shared jobs | 路径矩阵单元测试 PASS |
+| LOOP1-GO-AUTH-001 | Go Auth/Session 纵切 | S1 | login/refresh/logout、slot、epoch、auth.bind | 同端替换旧 Session；多端并存 |
+| LOOP1-GO-SOCIAL-001 | Go 搜索/好友/唯一私聊事务 | S1 | normalized pair、direct uniqueness、sync/outbox | 并发互加最终 1 friendship+ 1 direct |
+| LOOP1-GO-MSG-001 | Go 文本消息 + seq +outbox | S1 | durable ACK、idempotency、dispatcher、NATS | ACK 丢失重试不重复；接收端实时收到 |
+| LOOP1-E2E-001 | 首条纵向 E2E | S1 | A 登录搜索添加 B 并发送 hello | 从 TLS 入口运行；证据归档 |
+| LOOP1-CLIENT-SQLITE-001 | SQLite schema 与 repository | S2 | UNIQUE(conversation_id, request_id)、UPSERT、migration fixture | 四条入口均幂等收敛 |
+| LOOP1-CLIENT-UI-ARCH-001 | 客户端 UI 架构冻结 | S2 | 三端职责、Adaptive Glass Workspace、截图驱动 Architect Review | 独立 Review/CI 与 main 核验后冻结；不代替 GUI 实现 |
+| LOOP1-CLIENT-SEND-001 | Optimistic send 状态机 | S2 | SENDING/SENT/FAILED/retry | SENT 不倒退；retry 复用request_id |
+| LOOP1-SYNC-001 | 双层离线同步 | S2 | user cursor + per-conversation contiguous_seq | 乱序/重复/交叉实时流无gap |
+| LOOP1-CLIENT-GUI-001 | Desktop/Mobile 完整 Loop1 GUI | S2 | Login/session、Chat、Friends、AI Placeholder、Plugin capability/unavailable、Settings/Profile、双主题/本地字体间距、Offline History、SENDING/SENT/FAILED/retry、Sync/reconnect、Desktop notification/tray/shortcut、Android emulator | CLIENT-UI-ARCH 与 spec/acceptance/client-gui.md；真实截图/Architect Review/修复重拍/Approval，再独立 Review、精确 HEAD CI、protected main 核验 |
+| LOOP1-WEB-001 | Web 完整 Loop1 GUI | S2 | React + TypeScript；memory only；Chat/Friends/AI Placeholder/Plugin/Settings/Profile、双主题和本地字体/间距 | 无 SQLite/离线历史；遵守 CLIENT-UI-ARCH、client-gui 截图验收和独立 Review/精确 HEAD CI/main 核验 |
+
+### S2 最小任务依赖与执行顺序（Human-approved ADR-0007）
+
+LOOP1-CLIENT-SQLITE-001（已接受） → LOOP1-CLIENT-UI-ARCH-001（UI 冻结已接受，当前规划补充另行验收） → LOOP1-CLIENT-SEND-001 → LOOP1-SYNC-001 → LOOP1-CLIENT-GUI-001 → LOOP1-WEB-001 → S2 Gate。
+
+该补充只新增一个产品 UI ID LOOP1-CLIENT-GUI-001。Desktop/Mobile GUI 独立边界包含上述完整界面及既有发送/同步编排的可观察状态，不重新实现 SQLite、发送或 Sync 领域逻辑。GUI 明确依赖 SQLITE、UI-ARCH、SEND、SYNC 四个已接受任务；Web 完整 GUI 使用原 LOOP1-WEB-001 且在 GUI 后执行。各任务在真实队列中唯一存在，依赖未接受不得激活；本轮 Human endpoint 为 SEND done，后续任务保持 backlog。
+
+GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成真实运行截图 → Architect Review → 修复 → 重新截图 → Architect Approval → fresh independent Review → exact-head applicable hosted CI → protected integration/actual-main verification。S2 不实现 AI API/chat/Agent/RAG、Plugin runtime、Marketplace、S4 renderer 或新公共 API；Web 始终 React/TypeScript memory only、no SQLite、no offline history。偏好仅存外观设置，不授权聊天持久化；未冻结具体存储机制按 §2.3 先决策后实现。
+
+<a id="section-20"></a>
+## 20. 后续任务队列与依赖
+
+| Task ID | 依赖 | 目标 | Gate |
+| --- | --- | --- | --- |
+| LOOP1-CLIENT-UI-ARCH-001 | LOOP1-CLIENT-SQLITE-001 | UI architecture 冻结与当前 MVP 规划补充验收 | S2 |
+| LOOP1-CLIENT-SEND-001 | LOOP1-CLIENT-SQLITE-001 + LOOP1-CLIENT-UI-ARCH-001 | Desktop/Mobile 发送编排；Repository 先持久化再 WSS，ACK/realtime/Sync 收敛、FAILED/retry 同 ID | S2 |
+| LOOP1-SYNC-001 | LOOP1-CLIENT-SEND-001 | 双层 Sync 编排及断线重连；保留领域职责 | S2 |
+| LOOP1-CLIENT-GUI-001 | LOOP1-CLIENT-SQLITE-001 + LOOP1-CLIENT-UI-ARCH-001 + LOOP1-CLIENT-SEND-001 + LOOP1-SYNC-001 | Desktop/Mobile 完整 GUI；CLIENT-UI-ARCH、client-gui 截图/Architect/独立 Review/CI/main 验收 | S2 |
+| LOOP1-WEB-001 | LOOP1-CLIENT-GUI-001 | Web 完整 Loop1 GUI；React/TypeScript memory only，无 SQLite/离线历史，同一截图验收 | S2 |
+| LOOP1-JAVA-AUTH-001 | S2 PASS + Auth contracts | Java/Spring Auth/Session 等价实现 | S3 |
+| LOOP1-JAVA-IM-001 | Java Auth + IM contracts | Friend/Conversation/Message/Sync/Outbox/NATS | S3 |
+| LOOP1-PARITY-001 | Go + Java core + S2 PASS | Golden parity；同一客户端制品/代码无需业务修改切换 Go/Java profile，GUI 不改写协议，两 profile 当前关键纵向流程通过 | S3 |
+| LOOP1-PLUGIN-REG-001 | Plugin API v1 | Registry、immutable artifact、validation | S4 |
+| LOOP1-PLUGIN-WASM-001 | Registry | WASM host、permissions、limits、circuit breaker | S4 |
+| LOOP1-PLUGIN-UI-001 | Registry + client hosts | Declarative UI/Render Bundle review/sandbox；遵守 CLIENT-UI-ARCH，禁止控制一级导航；真实宿主 UI 证据，显著视觉变化按 client-gui Architect 截图验收 | S4 |
+| LOOP1-PLUGIN-LIFE-001 | WASM/UI | install/enable/disable/uninstall/upgrade/rollback | S4 |
+| LOOP1-PLUGIN-FIX-001 | Plugin runtime | Echo/Poll 在 Web/Desktop/Mobile 真实宿主 UI 与两 profile 验证；真实运行证据及适用 Architect 截图批准 | S4 |
+| LOOP1-COMPAT-001 | S4 PASS | Web/Desktop/Android 与 old-client 兼容矩阵、SQLite migration、UI/theme/local preference 与 Plugin UI compatibility | S5 |
+| LOOP1-RELEASE-001 | compat CI | Desktop/Android 实际制品、Web 制品、manifest/hash/signing、install/upgrade/rollback smoke 和 staging rehearsal | S5 |
+| LOOP1-LOAD-001 | S5 PASS | Go load generator + scenarios + evidence format | S6 |
+| LOOP1-LOAD-GO-001 | load harness | Go 500->5000 benchmark/soak | S6 |
+| LOOP1-LOAD-JAVA-001 | load harness | Java 500->5000 benchmark/soak | S6 |
+| LOOP1-RC-001 | all gates | 三端最终可运行制品、关键 GUI smoke；相对最近 Architect-approved 截图集有实质视觉变化则重拍并批准；最终 5k/RC/rollback/architecture snapshot，容量负载由 harness 承担，不把 GUI 自动化放入 5000 WSS 热路径 | Loop 1 |
+
+<a id="section-20-1"></a>
+### 20.1 依赖纪律
+
+- 先契约与不变量，后实现；先 Go reference vertical slice，后客户端，再 Java parity。
+
+- 插件平台不得抢跑到 IM 主链稳定之前；兼容 CI 不得延后到发布前临时补。
+
+- 性能优化必须有 profile/metric 证据和回归测试；禁止先加基础设施再找问题。
+
+- 提前完成形成 schedule buffer，并立即推进下一 Gate，不做无验收价值的额外功能。
+
+<a id="section-21"></a>
+
+spec/architecture/decisions/client-ui/architecture.md # 客户端 UI 架构
+
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
+
+## 产品与信息架构
+
+产品名为「构界 IM+ / PlugWorldIM」，采用 Adaptive Glass Workspace。视觉重点为未来 AI 通信 50%、生产力工具 30%、开发者扩展性 20%。这些比例表达设计优先级，不承诺功能或容量。
+
+| 一级入口 | 职责 | 边界 |
+| --- | --- | --- |
+| Chat | 会话列表、会话视图、消息 | 好友管理归 Friends |
+| Friends | 用户搜索、好友关系、添加好友 | 好友关系和唯一私聊由服务端权威判定 |
+| AI | 未来入口、插图、施工提示 | 仅占位；不实现 AI 聊天、Agent、RAG、工具调用、API 或虚假数据 |
+| Plugin | 已安装插件、插件状态、插件入口 | 个人能力面板；不是商店或 Marketplace，不实现 S2 安装系统或运行时 |
+
+Application Shell 负责一级导航、账号上下文和入口选择。后续任务授权后，仅客户端自有代码可增加 Settings/Profile 等入口。插件不得增加一级导航，不得控制 Shell、主题品牌或基础 UI 语义。插件的下级入口仍位于宿主控制的 Plugin 页面内，且必须具有可用的已授权能力；能力不存在时，应如实展示不可用状态，不得伪造已安装清单或可执行操作。
+
+## 数据归属与流向
+
+UI 渲染视图状态并发出用户意图。页面状态、hooks 或 ViewModel 将意图转换为既有 Repository/协议操作，并提供加载、空、错误、认证过期、连接和同步状态。Repository 负责物化数据与事务收敛；协议适配器负责规范 HTTP/WSS 的序列化和传输行为。UI 不得直接打开 SQLite、推进游标、伪造 ACK、独立写入消息状态，或判定成员身份与权限。后端职责仍遵循 §3 和 SRC-01 至 SRC-07 的 Core/Gateway/Plugin Host 边界。
+
+Desktop/Mobile 的发送方向为：用户意图 → 已批准的发送编排 → Repository 持久化 SENDING → 传输 → 服务端 durable commit 后的 ACK → Repository UPSERT → UI 观察状态。本任务只规定方向，不实现发送编排。重试复用 request_id；FAILED 只表示该次尝试尚未确认成功；匹配的实时事件或 Sync 可收敛为 SENT；SENT 不得回退。数据和游标更新必须原子提交；用户游标不包含消息；contiguous_seq 不得越过缺口。离线历史来自按账号隔离的本地视图，随后后台 Sync；切换账号必须停止旧账号观察，且不得显示前一账号数据。
+
+Web 仅使用内存 Repository 状态，不建立聊天数据库，不持久化历史，不承诺离线历史或跨页面生命周期的数据保留。离线和错误视图必须表达真实连接状态。本地外观偏好不得包含消息、令牌或业务数据，也不构成聊天持久化授权。
+
+## Web
+
+采用 React + TypeScript，定位为简洁、高效的在线通信。Shell/路由负责入口选择；页面和自定义业务组件负责展示；自定义 hooks/数据层连接 Repository 与协议操作。状态管理采用 useState/useReducer/Context/custom hooks。页面局部状态留在本页面；Context 只承载当前确实需要共享的职责。不得为假设需求增加通用事件总线、store 或 controller 层级。
+
+路由是职责描述，不是对某个第三方路由库的授权。不选择 Zustand/Redux/MobX、数据框架或整套业务 UI 框架。图标、无障碍和工具类基础库仍需遵循依赖治理；类别名称不能批准具体库。
+
+## Desktop
+
+采用 Tauri + React + TypeScript，使用独立 UI，面向舒适、高频的生产力场景。更丰富的布局、交互和原生能力展示由后续限定任务实施。本决策替代原 §6.1「最大程度复用 Web UI」要求。共享协议、模型、Repository 行为、适合跨平台的 hooks、Design Token 和 UI 语义；不得共享 Button、MessageBubble、ChatWindow 等完整 React 视觉组件。不得重复协议/领域逻辑，也不得将 Desktop 原生 hooks 引入 Web。
+
+TypeScript 负责 Repository、模型和事务意图；SQLx Rust 原生适配器仍限于连接、查询和单次原子事务。系统通知、托盘和安全存储须遵循已授权的原生边界及后续任务；本设计不增加库或功能实现。
+
+## Mobile
+
+采用 Android Kotlin + Jetpack Compose。UI 向 ViewModel 发出意图；ViewModel 调用 Repository 并通过 StateFlow 暴露状态；Compose 按生命周期收集该状态。StateFlow 是可观察状态，不是传输或存储层。Repository 委托给 SDK SQLite 和已授权协议适配器。Jetpack Navigation Compose 负责宿主导航。ViewModel/StateFlow/Navigation 是明确的 Human 决策，记录于规范 §6.5 / ADR-0006，而非由 Task Spec 自行选型。
+
+必须在真实 Android Studio 模拟器中验证。Kotlin 模型、Repository、协议和插件适配器依据相同规范契约与 fixtures 实现等价行为；不要求复用 TypeScript SDK、hooks 或组件。不得引入 Room/ORM、任意网络库、JS bridge/runtime/codegen 或共享原生重写。
+
+## 共享 UI 边界
+
+共享设计规范、Token 含义和 UI 行为语义。Web/Desktop 共享 TypeScript protocol-sdk/plugin-sdk/models 和适用 hooks；Mobile 根据同一契约与 fixtures 实现等价 Kotlin 行为。不建立三端视觉组件库。本文件中的 UI contract 指展示义务，不建立新的机器可验证 wire/API/schema 权威；该权威仍唯一归属 contracts/。
+
+## Plugin 与 AI 边界
+
+S2 仅预留宿主控制的 Plugin/AI 入口。不实现 renderer、UI 代码下载或执行、远程组件注入、插件安装、动态加载或运行时。声明式投票描述仅用于说明未来设计，不定义新 schema/API，也不是 S2 实现。S4 保留 §8.2 经审查的 Custom Render Bundle 和声明式 UI，以及包/签名/哈希/schema/兼容性/权限/资源/CSP/入口校验、sandbox iframe/隔离 WebView 和白名单 Bridge。不得放宽令牌、SQLite、宿主敏感资源保护或规范插件 fixtures。AI 在单独明确 API、契约、架构决策并完成验收前始终为占位。
+
+## 后续 GUI 的 API 覆盖
+
+覆盖认证登录、Web/原生 refresh、logout、会话过期处理；当前用户信息；用户搜索和添加好友；会话列表/打开；消息发送/接收/状态；Sync 状态。操作必须从 contracts/http/auth-user-friend.openapi.json 和规范 WSS envelope/sync schema 解析。不得自行发明会话/消息/Sync HTTP 路由；已接受的协议契约决定传输方式与字段结构。本任务不授权修改 OpenAPI 或后端。其他既有操作或未来能力需另行限定任务。Plugin/AI 占位不得暗示缺失的后端能力已经存在。
+
+## 交付边界
+
+本任务不交付页面、组件、UI 交互实现、像素级设计或运行时。后续 GUI 任务必须引用独立验收后的规范架构/ADR 和 spec/acceptance/client-gui.md。架构冻结、GUI Task PASS 与 S2 Gate PASS 是三个不同结果。
+
+spec/architecture/decisions/client-ui/design-direction.md # 客户端设计方向
+
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
+
+## Adaptive Glass Workspace
+
+「构界 IM+ / PlugWorldIM」结合简洁通信、舒适生产力和模块化扩展。设计重点为未来 AI 通信 50%、生产力工具 30%、开发者扩展性 20%。AI-native 表示视觉方向；S2 的 AI 仅为施工占位。避免信息堆叠、复杂 Dashboard、过度 Cyber/HUD 风格，以及仅为展示技术而增加的视觉元素。
+
+Minimal Glassmorphism 通过半透明表面、细微边框、模糊和层次深度表达清晰层级。玻璃用于表达层级，不用于装饰。不采用重度发光、霓虹、粒子特效或复杂 3D。背景变化时仍须保持可读性；前景对比、焦点/选中/错误提示不能仅依赖透明度或色相。平台性能或可读性不适合模糊/透明时，使用克制的不透明表面保持同一层级；这不授权新的渲染库。
+
+## 主题
+
+| 主题 | 定位 | 色彩方向 |
+| --- | --- | --- |
+| Cold AI | AI / 科技 / 智能 | 冷蓝、紫色渐变、深色玻璃 |
+| Warm Creative | 社交 / 创意 / 人文 | 暖色渐变、柔和玻璃、亲和感 |
+
+两个主题必须保留同一 Logo、品牌元素、布局、交互含义和组件语义。主题切换仅改变 Color Token，包括背景、表面、前景、边框、强调、渐变、选中和状态色；不得改变字体、间距、模糊、导航或行为。本方向不增加额外明暗主题矩阵。两主题中的透明表面层级必须一致。
+
+## Design Token 原则
+
+使用单一职责的语义名称；各端共享含义，采用各端原生表示。Color Token 表达表面/文字/边框/强调/状态；Typography Token 表达字体族/字号/行高；Spacing Token 表达密度/间距。固定字体、间距、颜色值、像素布局、字体资源、尺度及生成/构建工具不属于本次初始方向。后续 GUI 任务在已接受方向内确定具体值，并提供截图证据与 Architect 批准；敏感依赖仍遵循 §2.3。
+
+两个主题预设仅改变颜色。用户外观偏好可在验证支持的范围内独立调整本地 Typography 和 Spacing。重启或切换主题后仍须保持这一分工：主题切换不重置用户字体/密度，用户设置不改变组件含义。不授权云同步、插件样式控制、任意 CSS/脚本注入或下载字体系统。Web 外观偏好必须与仅内存聊天状态分离；具体存储机制需后续限定决策。Desktop/Mobile 偏好不得改变 Repository 消息、schema 或事务语义。
+
+## 配置与交互约束
+
+主题、字体与间距由宿主客户端控制。插件不得修改一级导航、品牌核心或基础 UI 语义。各端采用较大字体/间距后，仍须保证内容可读、输入可用、导航可达，以及空/加载/错误/同步状态含义清晰。适用场景中必须提供键盘焦点和无障碍标签；消息投递状态不得仅靠颜色区分。这些是未来 GUI Review 义务，不是对某个无障碍库或组件库的授权。
+
+## 各端表达
+
+Web 面向紧凑的在线通信。Desktop 面向舒适的反复使用、更丰富的工作区布局和原生能力展示。Mobile 面向触控可读的 Compose 展示，并通过模拟器验证行为。共享设计语义与 Token 含义，不共享完整视觉组件，也不强制像素一致布局。Logo 制作和像素级页面不属于本任务交付物。
+
+spec/acceptance/client-gui.md # GUI 验收规范
+
+状态：已冻结。Human 批准的设计内容已在候选33cc754与PR12实际 main4f18d222，经新鲜独立 Review、精确 HEAD 托管 CI 和主仓库同步接受。验收证据：`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`。本状态记录不启动 GUI 实现，S2 Gate 仍为 OPEN。
+
+## 必需验收链
+
+GUI 实现 → 真实运行截图 → Architect Review → 限定范围修复 → 新截图 → Architect Approval → 新的独立候选 Review 与适用的精确 HEAD 托管 CI → 受保护的集成/主仓库验证 → GUI Task PASS。各项审查可共享证据，但不能取消彼此独立的义务。Architect 批准展示效果；独立 Review 审查实现、权威和最小性；CI 判定适用的可执行检查。任何单项都不能建立 S2 Gate PASS。仓库规定的完整验收与集成完成前，不得进入 done。
+
+截图是 Task 验收要求，不是可选设计反馈。每个 GUI Task 必须在实现前声明入口/运行环境矩阵和证据路径。必须捕获真实客户端运行画面，不接受 mockup 或编辑过的图片。记录 Task ID、候选 SHA、源代码/构建来源、平台/运行环境版本、不含秘密的账号/测试 fixture 标识、页面/状态、视口/窗口/设备尺寸、主题和字体/间距设置、精确复现步骤，以及图片文件名/哈希。图片不得包含真实凭据、令牌展示或私人用户数据；使用受控 fixtures。
+
+## 最低覆盖矩阵
+
+| 客户端 | 必需运行证据 |
+| --- | --- |
+| Web | 真实浏览器中的登录、Chat、Friends、AI 占位、Plugin 页面 |
+| Desktop | 真实 Tauri 客户端中的主窗口、Chat、Friends、离线历史、通知/托盘、主题 |
+| Mobile | 真实 Android Studio 模拟器中的登录、Chat、Friends、离线历史、Sync 状态、主题 |
+
+Cold AI 和 Warm Creative 都必须展示一致的布局/语义；布局受影响时，覆盖支持的字体/间距极值。跨端共有入口须展示各端实际宿主布局。Desktop 通知/托盘证据须包含真实原生表面和复现步骤，仅画在应用内不能替代。Mobile 证据须标明模拟器/设备/API；宿主测试或 mock 页面不能替代。
+
+每个范围内页面须覆盖有意义且相关的加载、空、错误和成功状态。认证须覆盖 refresh/logout/session-expired，且不暴露凭据。Chat 须展示真实 SENDING/SENT/FAILED、重试身份和收敛行为，并由可执行协议/存储证据支持；截图本身不能证明 durable ACK、去重或原子性。离线/Sync 须覆盖受控断开/重连；Web 不得宣称持久化或离线历史。主题/偏好须在允许的本地生命周期内保留，不得暗示业务数据持久化。
+
+若某个限定 GUI Task 未实现全部矩阵界面，必须在激活前于 Task Spec 明确该切片和剩余任务。缺失证据不得计作整个客户端验收。Plugin/AI 能力不可用时，截图须如实展示预留入口、占位或不可用状态。不得伪造可工作的控件或 AI/插件数据。
+
+## Architect 决策与修复循环
+
+Architect Review 记录精确候选 SHA、截图清单/哈希、PASS/FAIL 决策、具体逐页面问题、所检查的信息层级/导航/可读性/主题/配置规则，以及审查者身份。FAIL 时保持任务未完成，在 allowed_paths 内修复并重新截图。既有截图与问题记录保持不可变；批准必须标明最新被接受的截图集和构建。后续视觉、状态或代码变更影响已批准证据时，必须重新捕获并再次批准。未受影响的旧图可以附哈希和理由引用，但不得重新标为新截图。
+
+新的独立 Reviewer 检查实际 Repository/协议/状态/原生职责、源码导入、最小性、公共契约和安全边界。所有新增敏感依赖必须可追溯至已接受的规范架构/ADR；截图质量不能使框架或契约变更合法化。适用 CI 必须对应精确被审查候选 SHA 和正确的必需任务；缺失、失败、取消或异常跳过的任务不能建立 PASS。
+
+## 证据与闭环
+
+在 spec/progress/evidence/<GUI_TASK_ID>/ 下保存截图清单、原始图片、Architect 决策、修复迭代、独立 Review 与托管验收。Task handoff 记录命令、退出码/时长、已知失败和最后已知良好 SHA；current.md 只链接简洁恢复状态与最新稳定 checkpoint。视觉证据须绑定到集成后的产品树，声明完成前须记录任务分支/提交/同步结果/主仓库 SHA。不接受 Photoshop 或生成图片作为运行证明，不以截图替代 CI，不因单个 GUI Task 推进 Stage。
+
+## MVP 任务归属（ADR-0007 规划候选）
+
+新增且唯一产品 UI ID 为 LOOP1-CLIENT-GUI-001（Desktop/Mobile）；Web 完整 Loop1 GUI 使用既有 LOOP1-WEB-001。两者均覆盖 Login/session、Chat、Friends、AI Placeholder、Plugin capability/unavailable、Settings/Profile、Cold AI/Warm Creative、本地字体/间距与真实发送/重连状态。Desktop/Mobile 还覆盖 Offline History、Sync，Desktop 真实通知/托盘/快捷键，Mobile Android Studio emulator；Web 无 SQLite/离线历史，不持久化聊天。
+
+S3 PARITY、S4 PLUGIN-UI/FIX、S5 COMPAT/RELEASE、S6 RC 在各自既有 acceptance 承接适用 GUI 要求，规则见 canonical §20；不新增 GUI E2E/parity/plugin/release/soak Task。实质视觉变化须针对最近 Architect-approved set 重新截图批准；容量测试由 load harness 承担，GUI 自动化不进入 5000 WSS 热路径。本段随 ADR-0007 独立接受后生效；既有截图与架构验收要求不降低。
+

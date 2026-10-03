@@ -1,0 +1,627 @@
+clients/shared/protocol-sdk/src/storage/repository.ts import type { Bind, Committed, Database, LocalMessage, RealtimeMessage, ServerMessage, Sequence, Statement, UserPage } from "./models.js";
+import { v1, v2 } from "./schema.js";
+
+function text(m: LocalMessage | RealtimeMessage): string {
+  if (m.content.kind !== "TEXT" || !m.content.text || [...m.content.text].length > 4096) throw new Error("Invalid text");
+  return m.content.text;
+}
+function seq(n: Sequence): string {
+  // Numbers outside the safe range may already have rounded before this call.
+  if (typeof n === "number" && !Number.isSafeInteger(n)) throw new Error("Use bigint for exact sequence");
+  const value = BigInt(n);
+  if (value < 1n || value > 9223372036854775807n) throw new Error("Sequence outside SQLite integer storage");
+  return value.toString();
+}
+const step = (sql: string, binds: Bind[] = [], expected: number | null = null): Statement => [sql, binds, expected];
+// An assertion is an UPDATE with a predicate over the SAME transaction snapshot.
+// Every account has exactly one cursor row; no schema-level business trigger.
+const assert = (condition: string, binds: Bind[]): Statement =>
+  step("UPDATE user_cursor SET cursor=cursor WHERE singleton=1 AND (" + condition + ")", binds, 1);
+function advance(conversationId: string): Statement[] {
+  return [
+    step("INSERT INTO conversations(conversation_id) VALUES(?) ON CONFLICT DO NOTHING", [conversationId]),
+    step(`WITH RECURSIVE prefix(n) AS (
+      SELECT contiguous_seq FROM conversations WHERE conversation_id=?
+      UNION ALL SELECT n+1 FROM prefix WHERE n<9223372036854775807 AND EXISTS(
+        SELECT 1 FROM messages WHERE conversation_id=? AND server_seq=n+1)
+    ) UPDATE conversations SET contiguous_seq=(SELECT MAX(n) FROM prefix) WHERE conversation_id=?`,
+    [conversationId, conversationId, conversationId], 1),
+  ];
+}
+export class Repository {
+  constructor(readonly db: Database) {}
+  async initialize(): Promise<void> {
+    const version = Number((await this.db.query("PRAGMA user_version", []))[0][0]);
+    if (![0,1,2].includes(version)) throw new Error("Unsupported local schema version");
+    if (version === 2) return;
+    await this.db.transaction([...(version === 0 ? v1 : []), ...v2]);
+  }
+  async localSend(m: LocalMessage): Promise<void> {
+    await this.db.transaction([step(`INSERT INTO messages(conversation_id,request_id,sender_id,content,state)
+      VALUES(?,?,?,?,'SENDING') ON CONFLICT(conversation_id,request_id) DO UPDATE SET
+      state=CASE WHEN messages.state='SENT' THEN 'SENT' ELSE 'SENDING' END
+      WHERE messages.sender_id=excluded.sender_id AND messages.content=excluded.content`,
+      [m.conversationId,m.requestId,m.senderId,text(m)],1)]);
+  }
+  async markFailed(conversationId: string, requestId: string): Promise<void> {
+    await this.db.transaction([step(`UPDATE messages SET state=CASE WHEN state='SENT' THEN 'SENT' ELSE 'FAILED' END
+      WHERE conversation_id=? AND request_id=?`, [conversationId,requestId],1)]);
+  }
+  private materialize(m: ServerMessage | RealtimeMessage, requestId: string | null): Statement[] {
+    const values: Bind[] = [m.conversationId,requestId,m.senderId,text(m),m.messageId,seq(m.seq),m.createdAt];
+    // Check every durable identity/content before an unknown realtime row can
+    // be merged. No INSERT OR REPLACE may erase a conflicting committed row.
+    const guards: Statement[] = [
+      assert(`NOT EXISTS(SELECT 1 FROM messages WHERE
+        ((conversation_id=? AND request_id=?) OR server_message_id=? OR (conversation_id=? AND server_seq=?))
+        AND (conversation_id<>? OR sender_id<>? OR content<>? OR
+          (request_id IS NOT NULL AND ? IS NOT NULL AND request_id<>?) OR
+          (server_message_id IS NOT NULL AND server_message_id<>?) OR
+          (server_seq IS NOT NULL AND server_seq<>?) OR
+          (server_time IS NOT NULL AND server_time<>?)))`,
+      [m.conversationId,requestId,m.messageId,m.conversationId,seq(m.seq),
+       m.conversationId,m.senderId,text(m),requestId,requestId,m.messageId,seq(m.seq),m.createdAt]),
+    ];
+    if (requestId !== null) {
+      guards.push(step("DELETE FROM messages WHERE server_message_id=? AND request_id IS NULL AND EXISTS(SELECT 1 FROM messages WHERE conversation_id=? AND request_id=?)",
+        [m.messageId,m.conversationId,requestId]));
+      // If no local row exists, first attach the request to an existing realtime row.
+      guards.push(step("UPDATE messages SET request_id=? WHERE server_message_id=? AND request_id IS NULL",
+        [requestId,m.messageId]));
+    }
+    guards.push(step(`INSERT INTO messages(conversation_id,request_id,sender_id,content,state,server_message_id,server_seq,server_time)
+      VALUES(?,?,?,?,'SENT',?,?,?)
+      ON CONFLICT DO UPDATE SET
+        state='SENT', server_message_id=excluded.server_message_id,
+        server_seq=excluded.server_seq, server_time=excluded.server_time,
+        request_id=COALESCE(messages.request_id,excluded.request_id)`,values,1));
+    return guards;
+  }
+  async syncMessages(messages: ServerMessage[], failBeforeAdvance = false): Promise<void> {
+    const statements = messages.flatMap(m => this.materialize(m,m.requestId));
+    if (failBeforeAdvance) statements.push(step("INSERT INTO __fault_injection_missing_table VALUES(1)"));
+    for (const id of new Set(messages.map(m => m.conversationId))) statements.push(...advance(id));
+    await this.db.transaction(statements);
+  }
+  async realtime(m: RealtimeMessage, failBeforeAdvance = false): Promise<void> {
+    const statements = this.materialize(m,null);
+    if (failBeforeAdvance) statements.push(step("INSERT INTO __fault_injection_missing_table VALUES(1)"));
+    await this.db.transaction([...statements,...advance(m.conversationId)]);
+  }
+  async committedAck(requestId: string, ack: Committed): Promise<void> {
+    if (ack.status !== "committed") throw new Error("Only durable committed ACK accepted");
+    const c = ack.conversationId, id = ack.messageId, n = seq(ack.seq), time = ack.createdAt;
+    await this.db.transaction([
+      assert("EXISTS(SELECT 1 FROM messages WHERE conversation_id=? AND request_id=?)",[c,requestId]),
+      assert(`NOT EXISTS(SELECT 1 FROM messages s JOIN messages l ON l.conversation_id=? AND l.request_id=?
+        WHERE (s.server_message_id=? OR (s.conversation_id=? AND s.server_seq=?) OR s.local_id=l.local_id)
+        AND (s.conversation_id<>? OR s.sender_id<>l.sender_id OR s.content<>l.content OR
+          (s.request_id IS NOT NULL AND s.request_id<>?) OR
+          (s.server_message_id IS NOT NULL AND s.server_message_id<>?) OR
+          (s.server_seq IS NOT NULL AND s.server_seq<>?) OR
+          (s.server_time IS NOT NULL AND s.server_time<>?)))`,
+        [c,requestId,id,c,n,c,requestId,id,n,time]),
+      step("DELETE FROM messages WHERE server_message_id=? AND request_id IS NULL",[id]),
+      step("UPDATE messages SET state='SENT',server_message_id=?,server_seq=?,server_time=? WHERE conversation_id=? AND request_id=?",
+        [id,n,time,c,requestId],1),
+      ...advance(c),
+    ]);
+  }
+  async userPage(page: UserPage, expectedCursor: string, failBeforeAdvance = false): Promise<void> {
+    if (page.syncVersion !== "1.0" || page.type !== "sync.user.page" || !page.nextCursor || [...page.nextCursor].length > 256) throw new Error("Invalid user page");
+    const statements: Statement[] = [assert("cursor=?", [expectedCursor])];
+    for (const event of page.events) {
+      if (!["friend.changed","conversation.changed","membership.changed","plugin.changed"].includes(event.kind)) throw new Error("Message in user cursor");
+      const revision = seq(event.revision);
+      statements.push(step(`INSERT INTO user_state VALUES(?,?,?) ON CONFLICT(kind,subject_id)
+        DO UPDATE SET revision=MAX(user_state.revision,excluded.revision)`,[event.kind,event.subjectId,revision],1));
+    }
+    if (failBeforeAdvance) statements.push(step("INSERT INTO __fault_injection_missing_table VALUES(1)"));
+    statements.push(step("UPDATE user_cursor SET cursor=? WHERE singleton=1 AND cursor=?", [page.nextCursor,expectedCursor],1));
+    await this.db.transaction(statements);
+  }
+  async messages(conversationId: string): Promise<(string | null)[][]> {
+    return this.db.query(`SELECT request_id,sender_id,content,state,server_message_id,CAST(server_seq AS TEXT),server_time
+      FROM messages WHERE conversation_id=? ORDER BY server_seq IS NULL,server_seq,local_id`,[conversationId]);
+  }
+  async contiguous(conversationId: string): Promise<bigint> {
+    const rows = await this.db.query("SELECT CAST(contiguous_seq AS TEXT) FROM conversations WHERE conversation_id=?",[conversationId]);
+    return BigInt(rows[0]?.[0] ?? "0");
+  }
+  async cursor(): Promise<string> { return (await this.db.query("SELECT cursor FROM user_cursor WHERE singleton=1",[]))[0][0]!; }
+}
+
+clients/desktop/src/application/send.ts import { Repository } from "../../../shared/protocol-sdk/src/storage/repository.js";
+import type { LocalMessage, ServerMessage, Committed } from "../../../shared/protocol-sdk/src/storage/models.js";
+import { content, decode, envelope, uuid } from "../../../shared/protocol-sdk/src/send/wire.js";
+export interface Session { userId: string; sessionId: string; sessionEpoch: bigint; accessToken[REDACTED] }
+export interface Socket {
+  onopen: ((event:Event)=>void)|null; onmessage: ((event:MessageEvent<unknown>)=>void)|null;
+  onclose: ((event:CloseEvent)=>void)|null; onerror: ((event:Event)=>void)|null;
+  send(text: string): void; close(): void;
+}
+export interface SendState { connection: "offline"|"binding"|"ready"; messages: ReadonlyArray<ReadonlyArray<string|null>>; error: "storage"|"protocol"|null }
+// Each instance owns exactly one account/session. Retiring it cannot publish into
+// a replacement account. All Repository operations and confirmations are ordered.
+export class SendApplication {
+  private socket: Socket|null=null;
+  private generation=0;
+  private binding="";
+  private bound=false;
+  private retired=false;
+  private queue: Promise<void>=Promise.resolve();
+  private attempts=new Map<string,{message:LocalMessage; generation:number; timer:ReturnType<typeof setTimeout>|null; sent:boolean}>();
+  private known=new Map<string,LocalMessage>();
+  // RID -> sole Conversation, or null once ambiguous on this connection. Keep
+  // settled identities until disconnect so delayed rejects remain unattributable.
+  private requestConversations=new Map<string,string|null>();
+  private listeners=new Set<(state:SendState)=>void>();
+  private conversation="";
+  private current: SendState={connection:"offline",messages:[],error:null};
+  private readonly session: Readonly<Session>;
+  constructor(readonly repository: Repository, session: Session, private factory:(url:string)=>Socket = url=>new WebSocket(url), private timeoutMs=15000, private id:()=>string=()=>crypto.randomUUID()) {
+    this.session=Object.freeze({...session,userId:uuid(session.userId),sessionId:uuid(session.sessionId)});
+    if(session.sessionEpoch<1n || !session.accessToken || timeoutMs<1) throw new Error("Invalid send session");
+  }
+  get state(): SendState { return this.current; }
+  observe(listener:(state:SendState)=>void): ()=>void { this.listeners.add(listener); listener(this.current); return ()=>this.listeners.delete(listener); }
+  private publish(state: SendState): void {
+    if(this.retired) return;
+    this.current=Object.freeze({...state,messages:Object.freeze(state.messages.map(r=>Object.freeze([...r])))});
+    for(const listener of this.listeners) { try { listener(this.current); } catch { /* Observers do not own the transaction. */ } }
+  }
+  private serial(action:()=>Promise<void>): Promise<void> {
+    const result=this.queue.then(action);
+    this.queue=result.catch(()=>{this.publish({...this.current,error:"storage"});});
+    return result;
+  }
+  async idle(): Promise<void> { await this.queue; }
+  private async refresh(): Promise<void> {
+    const messages=this.conversation?await this.repository.messages(this.conversation):[];
+    this.publish({...this.current,messages});
+  }
+  async openConversation(conversationId:string): Promise<void> {
+    return this.serial(async()=>{if(this.retired) return; this.conversation=uuid(conversationId); await this.refresh();});
+  }
+  connect(endpoint:string): void {
+    if(this.retired) throw new Error("Send application retired");
+    let url: URL; try { url=new URL(endpoint); } catch { throw new Error("Invalid WSS endpoint"); }
+    if(url.protocol!=="wss:" || url.username || url.password || url.search || url.hash) throw new Error("Invalid WSS endpoint");
+    this.disconnect(); const generation=++this.generation; this.binding=uuid(this.id()); this.bound=false;
+    const socket=this.factory(url.href); this.socket=socket;
+    this.publish({...this.current,connection:"binding"});
+    const active=()=>!this.retired && this.socket===socket && this.generation===generation;
+    socket.onopen=()=>{if(active()) { try { socket.send(envelope("auth.bind",this.binding,{accessToken[REDACTED]; } catch { this.disconnect(); } }};
+    socket.onmessage=event=>{if(active()) void this.serial(async()=>{if(!active()) return; if(typeof event.data!=="string") { this.protocolFailure(); return; } try { await this.receive(event.data,generation); } catch(error) { if(error instanceof Error && error.message==="Invalid WSS frame") this.protocolFailure(); else throw new Error("Send storage operation failed"); }}).catch(()=>{});};
+    socket.onerror=socket.onclose=()=>{if(active()) this.disconnect();};
+  }
+  private protocolFailure(): void { this.disconnect(); this.publish({...this.current,error:"protocol"}); }
+  disconnect(): void {
+    const old=this.socket; this.socket=null; this.bound=false; this.generation++; this.requestConversations.clear();
+    if(old) { old.onopen=old.onmessage=old.onclose=old.onerror=null; try { old.close(); } catch { /* Already closed. */ } }
+    this.publish({...this.current,connection:"offline"});
+    for(const [key,attempt] of this.attempts) {
+      if(attempt.timer) clearTimeout(attempt.timer); this.attempts.delete(key);
+      void this.serial(async()=>{await this.repository.markFailed(attempt.message.conversationId,attempt.message.requestId); await this.refresh();}).catch(()=>{});
+    }
+  }
+  close(): void { this.disconnect(); this.retired=true; this.listeners.clear(); this.current={connection:"offline",messages:[],error:null}; }
+  async send(conversationId:string,text:string): Promise<string> {
+    const requestId=uuid(this.id());
+    const message: LocalMessage={conversationId:uuid(conversationId),requestId,senderId:this.session.userId,content:content({kind:"TEXT",text})};
+    await this.start(message); return requestId;
+  }
+  async retry(conversationId:string,requestId:string): Promise<void> {
+    await this.serial(async()=>{
+      if(this.retired) throw new Error("Send application retired");
+      const c=uuid(conversationId), r=uuid(requestId), row=(await this.repository.messages(c)).find(row=>row[0]===r);
+      if(!row || row[1]!==this.session.userId) throw new Error("Unknown own send");
+      if(row[3]==="SENT") return;
+      await this.begin({conversationId:c,requestId:r,senderId:row[1]!,content:content({kind:"TEXT",text:row[2]})});
+    });
+  }
+  private start(message:LocalMessage): Promise<void> { return this.serial(()=>this.begin(message)); }
+  private key(message:Pick<LocalMessage,"conversationId"|"requestId">): string { return message.conversationId+"/"+message.requestId; }
+  private async begin(message:LocalMessage): Promise<void> {
+    if(this.retired) throw new Error("Send application retired");
+    await this.repository.localSend(message);
+    this.known.set(this.key(message),message); await this.refresh();
+    if(this.retired) return;
+    const key=this.key(message), prior=this.attempts.get(key); if(prior?.timer) clearTimeout(prior.timer);
+    const attempt={message,generation:this.generation,timer:null as ReturnType<typeof setTimeout>|null,sent:false};
+    this.attempts.set(key,attempt);
+    if(!this.bound || !this.socket) { await this.fail(key,attempt); return; }
+    try { this.socket.send(envelope("message.send",message.requestId,{conversationId:message.conversationId,content:message.content})); attempt.sent=true; }
+    catch { await this.fail(key,attempt); return; }
+    const priorConversation=this.requestConversations.get(message.requestId);
+    this.requestConversations.set(message.requestId,priorConversation===undefined || priorConversation===message.conversationId ? message.conversationId : null);
+    attempt.timer=setTimeout(()=>{void this.serial(()=>this.fail(key,attempt)).catch(()=>{});},this.timeoutMs);
+  }
+  private async fail(key:string,attempt:{message:LocalMessage}): Promise<void> {
+    if(this.attempts.get(key)!==attempt) return;
+    this.attempts.delete(key); await this.repository.markFailed(attempt.message.conversationId,attempt.message.requestId); await this.refresh();
+  }
+  private clear(c:string,r:string): void { const key=c+"/"+r, a=this.attempts.get(key); if(a?.timer) clearTimeout(a.timer); this.attempts.delete(key); }
+  private async receive(raw:string,generation:number): Promise<void> {
+    const frame=decode(raw), p=frame.payload;
+    if(frame.type==="ping") { this.socket?.send(envelope("pong",frame.requestId,{})); return; }
+    if(frame.type==="pong") return;
+    if(frame.type==="auth.ack") {
+      if(frame.requestId!==this.binding || p.status!=="bound" || p.userId!==this.session.userId || p.sessionId!==this.session.sessionId || p.clientType!=="DESKTOP" || p.sessionEpoch!==this.session.sessionEpoch || this.bound) { this.protocolFailure(); return; }
+      this.bound=true; this.publish({...this.current,connection:"ready"}); return;
+    }
+    if(!this.bound) { this.protocolFailure(); return; }
+    if(frame.type==="session.revoked") { if(p.sessionId!==this.session.sessionId) this.protocolFailure(); else this.disconnect(); return; }
+    if(frame.type==="message.created") {
+      const message={...p,requestId:frame.requestId} as unknown as ServerMessage;
+      await this.repository.syncMessages([message]); this.clear(message.conversationId,message.requestId); await this.refresh(); return;
+    }
+    if(frame.type==="message.ack") {
+      if(p.status==="rejected") {
+        // Rejection has no Conversation. Ambiguous identities must keep their
+        // independent confirmation/timeout paths instead of failing all sends.
+        const matches=[...this.attempts].filter(([,a])=>a.message.requestId===frame.requestId && a.sent && a.generation===generation);
+        if(matches.length===1 && this.requestConversations.get(frame.requestId)===matches[0][1].message.conversationId) await this.fail(matches[0][0],matches[0][1]);
+      } else {
+        const c=p.conversationId as string, key=c+"/"+frame.requestId;
+        // An ACK only confirms a send issued by this application; retry reloads
+        // the durable intent after restart. Realtime/Sync own other deliveries.
+        if(!this.known.has(key)) return;
+        await this.repository.committedAck(frame.requestId,p as unknown as Committed); this.clear(c,frame.requestId); await this.refresh();
+      }
+    }
+  }
+  async mergeMessages(messages:ServerMessage[]): Promise<void> {
+    return this.serial(async()=>{if(this.retired) return; await this.repository.syncMessages(messages); for(const m of messages) this.clear(m.conversationId,m.requestId); await this.refresh();});
+  }
+}
+
+clients/shared/protocol-sdk/src/send/wire.ts // Canonical schema: contracts/websocket/envelope.schema.json. No wire library.
+export type ObjectValue = { [key: string]: unknown };
+const invalid = (): never => { throw new Error("Invalid WSS frame"); };
+export function object(v: unknown, keys: string[]): ObjectValue {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return invalid();
+  const o = v as ObjectValue;
+  if (Object.keys(o).length !== keys.length || keys.some(k => !Object.hasOwn(o,k))) return invalid();
+  return o;
+}
+export function uuid(v: unknown): string {
+  if (typeof v !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)) return invalid();
+  return v.toLowerCase();
+}
+export function positive(v: unknown): bigint {
+  if (typeof v !== "bigint" || v < 1n) return invalid();
+  return v;
+}
+function timestamp(v: unknown): string {
+  if (typeof v !== "string" || !/^\d{4}-\d\d-\d\d[Tt]\d\d:\d\d:\d\d(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/.test(v) || !Number.isFinite(Date.parse(v))) return invalid();
+  const date = v.slice(0,10), day = Number(date.slice(8)), month = Number(date.slice(5,7)), year = Number(date.slice(0,4));
+  if (month<1 || month>12 || day<1 || day>new Date(Date.UTC(year,month,0)).getUTCDate()) return invalid();
+  return v;
+}
+export function content(v: unknown): {kind: "TEXT"; text: string} {
+  const o=object(v,["kind","text"]);
+  if(o.kind!=="TEXT" || typeof o.text!=="string" || [...o.text].length<1 || [...o.text].length>4096) return invalid();
+  return {kind:"TEXT",text:o.text};
+}
+// Parse integers before JavaScript Number can round them. Reject duplicate keys,
+// exponent/fraction values where the canonical fields require positive integers.
+function parse(raw: string): unknown {
+  if(raw.length>131072) return invalid();
+  let at=0, depth=0;
+  const whitespace=()=>{ while(/[\x20\t\r\n]/.test(raw[at]??"x")) at++; };
+  function string(): string {
+    const start=at++;
+    while(at<raw.length) {
+      if(raw[at]==='"') { at++; try { return JSON.parse(raw.slice(start,at)); } catch { return invalid(); } }
+      if(raw[at]==="\\") at++;
+      at++;
+    }
+    return invalid();
+  }
+  function value(): unknown {
+    whitespace(); if(++depth>32) return invalid();
+    let out: unknown;
+    if(raw[at]==='"') out=string();
+    else if(raw[at]==="{") {
+      at++; const o: ObjectValue=Object.create(null); whitespace();
+      if(raw[at]!=="}") for(;;) {
+        whitespace(); if(raw[at]!=='"') return invalid(); const k=string();
+        if(Object.hasOwn(o,k)) return invalid(); whitespace(); if(raw[at++]!==":") return invalid(); o[k]=value(); whitespace();
+        if(raw[at]!==",") break; at++;
+      }
+      if(raw[at++]!=="}") return invalid(); out=o;
+    } else {
+      const number=raw.slice(at).match(/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
+      if(number) { at+=number[0].length; const parts=number[0].toLowerCase().split("e"), exponent=Number(parts[1]??"0");
+        const [whole,fraction=""]=parts[0].split("."); const scale=fraction.length-exponent;
+        if(!Number.isSafeInteger(exponent) || Math.abs(exponent)>131072) return invalid();
+        const digits=BigInt(whole+fraction);
+        out=scale<=0?digits*10n**BigInt(-scale):digits%10n**BigInt(scale)===0n?digits/10n**BigInt(scale):Number(number[0]); }
+      else return invalid();
+    }
+    depth--; return out;
+  }
+  const out=value(); whitespace(); if(at!==raw.length) return invalid(); return out;
+}
+export interface Frame { type: string; requestId: string; payload: ObjectValue }
+const authErrors=["VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED"];
+const messageErrors=["VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED"];
+export function decode(raw: string): Frame {
+  const e=object(parse(raw),["protocolVersion","type","requestId","payload"]);
+  if(e.protocolVersion!=="1.0" || typeof e.type!=="string") return invalid();
+  const requestId=uuid(e.requestId); let p: ObjectValue;
+  function rejected(codes: string[]): ObjectValue {
+    const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
+    if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
+    return p;
+  }
+  switch(e.type) {
+    case "auth.ack":
+      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
+      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+      break;
+    case "message.ack":
+      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
+      else { p=object(e.payload,["status","conversationId","messageId","seq","createdAt"]); if(p.status!=="committed") return invalid(); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); }
+      break;
+    case "message.created":
+      p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
+    case "session.revoked":
+      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
+    case "ping": case "pong": p=object(e.payload,[]); break;
+    default: return invalid();
+  }
+  return {type:e.type,requestId,payload:p};
+}
+export function envelope(type: "auth.bind" | "message.send" | "ping" | "pong", requestId: string, payload: unknown): string {
+  return JSON.stringify({protocolVersion:"1.0",type,requestId:uuid(requestId),payload});
+}
+
+clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt package im.platform.client.send
+import androidx.lifecycle.ViewModel
+import im.platform.client.storage.Repository
+import im.platform.client.storage.LocalMessage
+import im.platform.client.storage.ServerMessage
+import im.platform.client.storage.Committed
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.math.BigInteger
+import java.net.URI
+import java.util.UUID
+import org.json.JSONObject
+
+data class SendSession(val userId:String,val sessionId:String,val sessionEpoch:BigInteger,val accessToken[REDACTED] {
+    override fun toString()="SendSession(credentials redacted)"
+}
+data class SendState(val connection:String="offline",val messages:List<List<String?>> = emptyList(),val error:String?=null)
+// One ViewModel belongs to one authenticated account. The supplied Repository
+// uses that account's existing SDK SQLite; it remains the sole storage writer.
+class SendViewModel(private val repo:Repository, private val session:SendSession,
+    private val factory:(String,()->Unit,(String)->Unit,()->Unit)->SendSocket = { url,open,message,end -> Wss(url,open,message,end) },
+    private val timeoutMs:Long=15000, private val id:()->String={UUID.randomUUID().toString()}, private val ownsRepository:Boolean=false): ViewModel() {
+    private val scope=CoroutineScope(SupervisorJob()+Dispatchers.IO)
+    private val lock=Mutex()
+    private val mutableState=MutableStateFlow(SendState())
+    val state:StateFlow<SendState> = mutableState.asStateFlow()
+    private var socket:SendSocket?=null
+    private var generation=0L
+    private var binding=""
+    private var bound=false
+    private var retired=false
+    private var conversation=""
+    private data class Attempt(val message:LocalMessage,val generation:Long,var sent:Boolean=false,var timer:Job?=null)
+    private val attempts=mutableMapOf<String,Attempt>()
+    private val known=mutableSetOf<String>()
+    // null means this RID has identified multiple Conversations on this socket;
+    // retain that fact after ACK/timeout until the connection is retired.
+    private val requestConversations=mutableMapOf<String,String?>()
+    init { require(Wire.uuid(session.userId)==session.userId && Wire.uuid(session.sessionId)==session.sessionId && session.sessionEpoch.signum()>0 && session.accessToken.isNotEmpty() && timeoutMs>0) }
+    private fun key(c:String,r:String)="$c/$r"
+    private fun publish(value:SendState) { if(!retired) mutableState.value=value }
+    private fun refresh() { publish(mutableState.value.copy(messages=if(conversation.isEmpty()) emptyList() else repo.messages(conversation))) }
+    private suspend fun operation(action:suspend ()->Unit) { lock.withLock { try { action() } catch(_:Exception) { publish(mutableState.value.copy(error="storage")); throw IllegalStateException("Send storage operation failed") } } }
+    private fun callback(action:suspend ()->Unit) { scope.launch { try { operation(action) } catch(_:Exception) {} } }
+    suspend fun openConversation(c:String) = operation { if(!retired) { conversation=Wire.uuid(c); refresh() } }
+    suspend fun connect(endpoint:String) = operation {
+        check(!retired); val uri=URI(endpoint); require(uri.scheme=="wss" && uri.host!=null && uri.rawQuery==null && uri.rawFragment==null && uri.rawUserInfo==null) { "Invalid WSS endpoint" }
+        disconnectNow(); generation++; val g=generation; binding=Wire.uuid(id()); val bind=binding
+        publish(mutableState.value.copy(connection="binding"))
+        socket=factory(endpoint,{callback { if(g==generation && !retired) socket?.send(Wire.envelope("auth.bind",bind,JSONObject().put("accessToken",session.accessToken))) }},
+            {raw -> callback { if(g==generation && !retired) receive(raw,g) }},{callback { if(g==generation && !retired) disconnectNow() }})
+    }
+    private fun disconnectNow() {
+        generation++; bound=false; requestConversations.clear(); val old=socket; socket=null; old?.close()
+        publish(mutableState.value.copy(connection="offline"))
+        val pending=attempts.values.toList(); attempts.clear(); pending.forEach { it.timer?.cancel(); repo.markFailed(it.message.conversationId,it.message.requestId) }; refresh()
+    }
+    suspend fun disconnect() = operation { disconnectNow() }
+    suspend fun dispose() = lock.withLock {
+        retired=true; mutableState.value=SendState(error=mutableState.value.error)
+        try {
+            try { disconnectNow() } finally { if(ownsRepository) repo.close() }
+        } catch(_:Exception) {
+            mutableState.value=SendState(error="storage"); throw IllegalStateException("Send storage operation failed")
+        } finally {
+            attempts.values.forEach { it.timer?.cancel() }; attempts.clear(); scope.cancel()
+        }
+    }
+    override fun onCleared() {
+        socket?.close(); retired=true; requestConversations.clear(); mutableState.value=SendState()
+        scope.launch { try { lock.withLock { if(ownsRepository) repo.close() } } finally { scope.cancel() } }
+    }
+    suspend fun send(c:String,text:String):String {
+        val r=Wire.uuid(id()); val m=LocalMessage(Wire.uuid(c),r,session.userId,Wire.text(text)); operation { begin(m) }; return r
+    }
+    suspend fun retry(c:String,r:String) = operation {
+        check(!retired); val conversation=Wire.uuid(c); val request=Wire.uuid(r)
+        val row=repo.messages(conversation).firstOrNull {it[0]==request} ?: error("Unknown send")
+        require(row[1]==session.userId); if(row[3]!="SENT") begin(LocalMessage(conversation,request,session.userId,row[2]!!))
+    }
+    private fun begin(m:LocalMessage) {
+        check(!retired); repo.localSend(m); known.add(key(m.conversationId,m.requestId)); refresh()
+        val k=key(m.conversationId,m.requestId); attempts[k]?.timer?.cancel(); val a=Attempt(m,generation); attempts[k]=a
+        if(!bound || socket==null) { fail(k,a); return }
+        try { socket!!.send(Wire.envelope("message.send",m.requestId,JSONObject().put("conversationId",m.conversationId).put("content",JSONObject().put("kind","TEXT").put("text",m.text)))); a.sent=true }
+        catch(_:Exception) { fail(k,a); return }
+        val priorConversation=requestConversations[m.requestId]
+        requestConversations[m.requestId]=if(!requestConversations.containsKey(m.requestId) || priorConversation==m.conversationId) m.conversationId else null
+        a.timer=scope.launch { delay(timeoutMs); try { operation { fail(k,a) } } catch(_:Exception) { /* Storage error is already observable; never crash the application timer. */ } }
+    }
+    private fun fail(k:String,a:Attempt) { if(attempts[k]!==a) return; attempts.remove(k); repo.markFailed(a.message.conversationId,a.message.requestId); refresh() }
+    private fun clear(c:String,r:String) { attempts.remove(key(c,r))?.timer?.cancel() }
+    private fun protocolFailure() { disconnectNow(); publish(mutableState.value.copy(error="protocol")) }
+    private fun receive(raw:String,g:Long) {
+        val f=try {Wire.decode(raw)} catch(_:IllegalArgumentException) {protocolFailure(); return}; val p=f.payload
+        if(f.type=="ping") { socket?.send(Wire.envelope("pong",f.requestId,JSONObject())); return }; if(f.type=="pong") return
+        if(f.type=="auth.ack") {
+            if(f.requestId!=binding || p["status"]!="bound" || p["userId"]!=session.userId || p["sessionId"]!=session.sessionId || p["sessionEpoch"]!=session.sessionEpoch || p["clientType"]!="MOBILE" || bound) {protocolFailure(); return}
+            bound=true; publish(mutableState.value.copy(connection="ready")); return
+        }
+        if(!bound) {protocolFailure(); return}
+        if(f.type=="session.revoked") { if(p["sessionId"]!=session.sessionId) protocolFailure() else disconnectNow(); return }
+        if(f.type=="message.created") {
+            val content=p["content"] as Map<*,*>
+            val m=ServerMessage(p["conversationId"] as String,f.requestId,p["senderId"] as String,content["text"] as String,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)
+            repo.syncMessages(listOf(m)); clear(m.conversationId,m.requestId!!); refresh(); return
+        }
+        if(f.type=="message.ack") {
+            if(p["status"]=="rejected") {
+                // No Conversation is present: leave ambiguous attempts to their own ACK/timer.
+                val matches=attempts.filter { (_,a) -> a.message.requestId==f.requestId && a.sent && a.generation==g }
+                if(matches.size==1) { val (k,a)=matches.entries.single(); if(requestConversations[f.requestId]==a.message.conversationId) fail(k,a) }
+            }
+            else { val c=p["conversationId"] as String; if(key(c,f.requestId) !in known) return
+                repo.committedAck(f.requestId,Committed(c,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)); clear(c,f.requestId); refresh() }
+        }
+    }
+    suspend fun mergeMessages(messages:List<ServerMessage>) = operation { if(!retired) {repo.syncMessages(messages); messages.forEach {clear(it.conversationId,it.requestId!!)}; refresh()} }
+}
+
+// Account binding is fixed by the authenticated session, never a selected path.
+suspend fun accountSend(context:android.content.Context,session:SendSession):SendViewModel = withContext(Dispatchers.IO) {
+    val repository=Repository(context,Wire.uuid(session.userId))
+    try {repository.initialize();SendViewModel(repository,session,ownsRepository=true)} catch(error:Exception) {repository.close();throw IllegalStateException("Send initialization failed")}
+}
+
+clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt package im.platform.client.send
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.time.OffsetDateTime
+import java.util.UUID
+import org.json.JSONObject
+
+// Strict subset of JSON used by canonical WSS objects. Integer lexemes never
+// pass through Double; storage conversion happens separately at the Repo edge.
+object Wire {
+    data class Frame(val type: String, val requestId: String, val payload: Map<String,Any>)
+    private fun invalid(): Nothing = throw IllegalArgumentException("Invalid WSS frame")
+    fun uuid(v: Any?): String {
+        val s=v as? String ?: invalid()
+        if(!s.matches(Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))) invalid()
+        return UUID.fromString(s).toString()
+    }
+    fun text(v: Any?): String {
+        val s=v as? String ?: invalid()
+        if(s.isEmpty() || s.codePointCount(0,s.length)>4096) invalid()
+        return s
+    }
+    fun integer(v: Any?): BigInteger {
+        val n=v as? BigInteger ?: invalid()
+        if(n.signum()<=0) invalid()
+        return n
+    }
+    private fun obj(v: Any?, keys: Set<String>): Map<String,Any> {
+        if(v !is Map<*,*> || v.keys!=keys) invalid()
+        return keys.associateWith { v[it] ?: invalid() }
+    }
+    private fun time(v: Any?): String {
+        val s=v as? String ?: invalid()
+        if(!s.matches(Regex("[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?(?:[Zz]|[+-][0-9]{2}:[0-9]{2})"))) invalid()
+        val normalized=s.replace(Regex("(\\.[0-9]{9})[0-9]+"),"$1")
+        try { OffsetDateTime.parse(normalized) } catch(_: Exception) { invalid() }
+        return s
+    }
+    private class Parser(val raw: String) {
+        var at=0
+        fun space() { while(at<raw.length && raw[at] in " \t\r\n") at++ }
+        fun string(): String {
+            if(at>=raw.length || raw[at++]!='"') invalid()
+            val out=StringBuilder()
+            while(at<raw.length) {
+                val c=raw[at++]
+                if(c=='"') return out.toString()
+                if(c<' ') invalid()
+                if(c!='\\') out.append(c) else {
+                    if(at>=raw.length) invalid()
+                    when(val e=raw[at++]) {
+                        '"','\\','/' -> out.append(e)
+                        'b' -> out.append('\b'); 'f' -> out.append('\u000c'); 'n' -> out.append('\n'); 'r' -> out.append('\r'); 't' -> out.append('\t')
+                        'u' -> { if(at+4>raw.length) invalid(); val hex=raw.substring(at,at+4); if(!hex.matches(Regex("[0-9a-fA-F]{4}"))) invalid(); out.append(hex.toInt(16).toChar()); at+=4 }
+                        else -> invalid()
+                    }
+                }
+            }
+            invalid()
+        }
+        fun value(depth: Int=0): Any {
+            if(depth>32) invalid(); space(); if(at>=raw.length) invalid()
+            if(raw[at]=='"') return string()
+            if(raw[at]=='{') {
+                at++; space(); val out=mutableMapOf<String,Any>()
+                if(at<raw.length && raw[at]!='}') while(true) {
+                    space(); val key=string(); if(out.containsKey(key)) invalid(); space()
+                    if(at>=raw.length || raw[at++]!=':') invalid(); out[key]=value(depth+1); space()
+                    if(at>=raw.length || raw[at]!=',') break; at++
+                }
+                if(at>=raw.length || raw[at++]!='}') invalid(); return out
+            }
+            val m=Regex("-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?").find(raw,at)
+            if(m==null || m.range.first!=at) invalid(); at=m.range.last+1
+            return try { BigDecimal(m.value).toBigIntegerExact() } catch(_:Exception) { invalid() }
+        }
+        fun parse(): Any { if(raw.length>131072) invalid(); val v=value(); space(); if(at!=raw.length) invalid(); return v }
+    }
+    private val authErrors=setOf("VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED")
+    private val sendErrors=setOf("VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED")
+    fun decode(raw: String): Frame {
+        val e=obj(Parser(raw).parse(),setOf("protocolVersion","type","requestId","payload"))
+        if(e["protocolVersion"]!="1.0") invalid()
+        val type=e["type"] as? String ?: invalid(); val id=uuid(e["requestId"])
+        fun rejected(codes: Set<String>): Map<String,Any> {
+            val p=obj(e["payload"],setOf("status","error")); val error=obj(p["error"],setOf("code","message"))
+            if(p["status"]!="rejected" || error["code"] !in codes || error["message"] !is String || (error["message"] as String).isEmpty()) invalid()
+            return p
+        }
+        val status=(e["payload"] as? Map<*,*>)?.get("status")
+        val p=when(type) {
+            "auth.ack" -> if(status=="rejected") rejected(authErrors) else {
+                val p=obj(e["payload"],setOf("status","userId","sessionId","clientType","sessionEpoch"))
+                if(p["status"]!="bound" || p["clientType"] !in setOf("WEB","DESKTOP","MOBILE")) invalid()
+                p+mapOf("userId" to uuid(p["userId"]),"sessionId" to uuid(p["sessionId"]),"sessionEpoch" to integer(p["sessionEpoch"]))
+            }
+            "message.ack" -> if(status=="rejected") rejected(sendErrors) else {
+                val p=obj(e["payload"],setOf("status","conversationId","messageId","seq","createdAt")); if(p["status"]!="committed") invalid()
+                p+mapOf("conversationId" to uuid(p["conversationId"]),"messageId" to uuid(p["messageId"]),"seq" to integer(p["seq"]),"createdAt" to time(p["createdAt"]))
+            }
+            "message.created" -> {
+                val p=obj(e["payload"],setOf("conversationId","messageId","senderId","seq","createdAt","content"))
+                val content=obj(p["content"],setOf("kind","text")); if(content["kind"]!="TEXT") invalid(); text(content["text"])
+                p+mapOf("conversationId" to uuid(p["conversationId"]),"messageId" to uuid(p["messageId"]),"senderId" to uuid(p["senderId"]),"seq" to integer(p["seq"]),"createdAt" to time(p["createdAt"]))
+            }
+            "session.revoked" -> {
+                val p=obj(e["payload"],setOf("sessionId","reason")); if(p["reason"] !in setOf("LOGOUT","REPLACED","REVOKED")) invalid()
+                p+mapOf("sessionId" to uuid(p["sessionId"]))
+            }
+            "ping","pong" -> obj(e["payload"],emptySet())
+            else -> invalid()
+        }
+        return Frame(type,id,p)
+    }
+    fun envelope(type: String,id: String,payload: JSONObject) = JSONObject().put("protocolVersion","1.0").put("type",type).put("requestId",uuid(id)).put("payload",payload).toString()
+}
+

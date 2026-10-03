@@ -1,0 +1,371 @@
+
+
+    目录: H:\IM-platform\.git\worktrees\IM-platform5\sync-client-review
+
+
+Mode                 LastWriteTime         Length Name                                                                           
+----                 -------------         ------ ----                                                                           
+d-----         2026/10/3     23:45                preserved-generated                                                            
+d-----         2026/10/3     23:40                prompts                                                                        
+d-----         2026/10/3     23:40                runs                                                                           
+-a----         2026/10/3     23:45          22603 generated-receipt.json                                                         
+-a----         2026/10/3     23:40            294 prompt.txt                                                                     
+-a----         2026/10/3     23:46           6227 review.md                                                                      
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {decode,envelope} from "../../../clients/shared/protocol-sdk/dist/send/wire.js";
+const id="40000000-0000-4000-8000-000000000001", c="30000000-0000-4000-8000-000000000001", m="50000000-0000-4000-8000-000000000001";
+const payload={status:"committed",conversationId:c,messageId:m,seq:1,createdAt:"2026-10-03T00:00:00Z"};
+const frame=p=>JSON.stringify({protocolVersion:"1.0",type:"message.ack",requestId:id,payload:p});
+for(const n of ['9007199254740993','9007199254740993.0','90071992547409930e-1','9223372036854775808']) assert.equal(decode(frame(payload).replace('"seq":1','"seq":'+n)).payload.seq,BigInt(n.includes('.')?n.split('.')[0]:n.includes('e')?'9007199254740993':n));
+for(const p of [{...payload,extra:1},{...payload,seq:"1"},{...payload,seq:0},{...payload,seq:1.5},{...payload,messageId:"wrong"},{...payload,createdAt:"2026-02-30T00:00:00Z"}]) assert.throws(()=>decode(frame(p)));
+assert.throws(()=>decode(frame(payload).replace('"seq":1','"seq":1,"seq":2')));
+assert.throws(()=>decode(frame(payload).replace('"type":"message.ack"','"type":"hello"')));
+assert.throws(()=>decode(frame(payload).slice(0,-1)+',"extra":1}'));
+const created={conversationId:c,messageId:m,senderId:m,seq:2,createdAt:payload.createdAt,content:{kind:"TEXT",text:'quote "seq": 9007199254740993 and escaped \\ token'}};
+const decoded=decode(JSON.stringify({protocolVersion:"1.0",type:"message.created",requestId:id,payload:created}));assert.equal(decoded.payload.content.text,created.content.text);
+const schema=JSON.parse(readFileSync('contracts/websocket/envelope.schema.json'));
+assert.deepEqual(Object.keys(created).sort(),schema.$defs.MessageCreated.allOf[1].properties.payload.required.toSorted());
+assert.deepEqual(Object.keys(payload).sort(),schema.$defs.Committed.required.toSorted());
+assert.equal(JSON.parse(envelope('message.send',id,{conversationId:c,content:created.content})).requestId,id);
+const golden=JSON.parse(readFileSync('contracts/fixtures/websocket/golden.json'));let frames=0;for(const scenario of golden.scenarios)for(const step of scenario.steps)for(const frame of step.out??[]){decode(JSON.stringify(frame));frames++;}assert(frames>10);
+console.log('PASS: strict schema fields, duplicate keys, exact integer lexemes, invalid frames, escaped content');
+ clients/shared/protocol-sdk/src/send/wire.ts | 214 +++++++++++++--------------
+ clients/shared/protocol-sdk/src/sync/wire.ts | 107 +++++++-------
+ spec/progress/current.md                     | 104 ++++++-------
+ spec/tasks/review/LOOP1-SYNC-001.md          | 150 -------------------
+ tests/clients/sync/shared.mjs                | 105 ++++++++-----
+ 5 files changed, 280 insertions(+), 400 deletions(-)
+diff --git a/clients/shared/protocol-sdk/src/send/wire.ts b/clients/shared/protocol-sdk/src/send/wire.ts
+index 1dce566..a65c227 100644
+--- a/clients/shared/protocol-sdk/src/send/wire.ts
++++ b/clients/shared/protocol-sdk/src/send/wire.ts
+@@ -1,107 +1,107 @@
+-// Canonical schema: contracts/websocket/envelope.schema.json. No wire library.
+-export type ObjectValue = { [key: string]: unknown };
+-const invalid = (): never => { throw new Error("Invalid WSS frame"); };
+-export function object(v: unknown, keys: string[]): ObjectValue {
+-  if (!v || typeof v !== "object" || Array.isArray(v)) return invalid();
+-  const o = v as ObjectValue;
+-  if (Object.keys(o).length !== keys.length || keys.some(k => !Object.hasOwn(o,k))) return invalid();
+-  return o;
+-}
+-export function uuid(v: unknown): string {
+-  if (typeof v !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)) return invalid();
+-  return v.toLowerCase();
+-}
+-export function positive(v: unknown): bigint {
+-  if (typeof v !== "bigint" || v < 1n) return invalid();
+-  return v;
+-}
+-export function timestamp(v: unknown): string {
+-  if (typeof v !== "string" || !/^\d{4}-\d\d-\d\d[Tt]\d\d:\d\d:\d\d(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/.test(v) || !Number.isFinite(Date.parse(v))) return invalid();
+-  const date = v.slice(0,10), day = Number(date.slice(8)), month = Number(date.slice(5,7)), year = Number(date.slice(0,4));
+-  if (month<1 || month>12 || day<1 || day>new Date(Date.UTC(year,month,0)).getUTCDate()) return invalid();
+-  return v;
+-}
+-export function content(v: unknown): {kind: "TEXT"; text: string} {
+-  const o=object(v,["kind","text"]);
+-  if(o.kind!=="TEXT" || typeof o.text!=="string" || [...o.text].length<1 || [...o.text].length>4096) return invalid();
+-  return {kind:"TEXT",text:o.text};
+-}
+-// Parse integers before JavaScript Number can round them. Reject duplicate keys,
+-// exponent/fraction values where the canonical fields require positive integers.
+-export function parse(raw: string, maxLength=131072): unknown {
+-  if(raw.length>maxLength) return invalid();
+-  let at=0, depth=0;
+-  const whitespace=()=>{ while(/[\x20\t\r\n]/.test(raw[at]??"x")) at++; };
+-  function string(): string {
+-    const start=at++;
+-    while(at<raw.length) {
+-      if(raw[at]==='"') { at++; try { return JSON.parse(raw.slice(start,at)); } catch { return invalid(); } }
+-      if(raw[at]==="\\") at++;
+-      at++;
+-    }
+-    return invalid();
+-  }
+-  function value(): unknown {
+-    whitespace(); if(++depth>32) return invalid();
+-    let out: unknown;
+-    if(raw[at]==='"') out=string();
+-    else if(raw[at]==="{") {
+-      at++; const o: ObjectValue=Object.create(null); whitespace();
+-      if(raw[at]!=="}") for(;;) {
+-        whitespace(); if(raw[at]!=='"') return invalid(); const k=string();
+-        if(Object.hasOwn(o,k)) return invalid(); whitespace(); if(raw[at++]!==":") return invalid(); o[k]=value(); whitespace();
+-        if(raw[at]!==",") break; at++;
+-      }
+-      if(raw[at++]!=="}") return invalid(); out=o;
+-    } else if(raw[at]==="[") {
+-      at++; const items: unknown[]=[]; whitespace();
+-      if(raw[at]!=="]") for(;;) { items.push(value()); whitespace(); if(raw[at]!==",") break; at++; }
+-      if(raw[at++]!=="]") return invalid(); out=items;
+-    } else if(raw.startsWith("true",at)) { at+=4; out=true;
+-    } else if(raw.startsWith("false",at)) { at+=5; out=false;
+-    } else {
+-      const number=raw.slice(at).match(/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
+-      if(number) { at+=number[0].length; const parts=number[0].toLowerCase().split("e"), exponent=Number(parts[1]??"0");
+-        const [whole,fraction=""]=parts[0].split("."); const scale=fraction.length-exponent;
+-        if(!Number.isSafeInteger(exponent) || Math.abs(exponent)>131072) return invalid();
+-        const digits=BigInt(whole+fraction);
+-        out=scale<=0?digits*10n**BigInt(-scale):digits%10n**BigInt(scale)===0n?digits/10n**BigInt(scale):Number(number[0]); }
+-      else return invalid();
+-    }
+-    depth--; return out;
+-  }
+-  const out=value(); whitespace(); if(at!==raw.length) return invalid(); return out;
+-}
+-export interface Frame { type: string; requestId: string; payload: ObjectValue }
+-const authErrors=["VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED"];
+-const messageErrors=["VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED"];
+-export function decode(raw: string): Frame {
+-  const e=object(parse(raw),["protocolVersion","type","requestId","payload"]);
+-  if(e.protocolVersion!=="1.0" || typeof e.type!=="string") return invalid();
+-  const requestId=uuid(e.requestId); let p: ObjectValue;
+-  function rejected(codes: string[]): ObjectValue {
+-    const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
+-    if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
+-    return p;
+-  }
+-  switch(e.type) {
+-    case "auth.ack":
+-      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
+-      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+-      break;
+-    case "message.ack":
+-      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
+-      else { p=object(e.payload,["status","conversationId","messageId","seq","createdAt"]); if(p.status!=="committed") return invalid(); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); }
+-      break;
+-    case "message.created":
+-      p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
+-    case "session.revoked":
+-      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
+-    case "ping": case "pong": p=object(e.payload,[]); break;
+-    default: return invalid();
+-  }
+-  return {type:e.type,requestId,payload:p};
+-}
+-export function envelope(type: "auth.bind" | "message.send" | "ping" | "pong", requestId: string, payload: unknown): string {
+-  return JSON.stringify({protocolVersion:"1.0",type,requestId:uuid(requestId),payload});
+-}
++// Canonical schema: contracts/websocket/envelope.schema.json. No wire library.
++export type ObjectValue = { [key: string]: unknown };
++const invalid = (): never => { throw new Error("Invalid WSS frame"); };
++export function object(v: unknown, keys: string[]): ObjectValue {
++  if (!v || typeof v !== "object" || Array.isArray(v)) return invalid();
++  const o = v as ObjectValue;
++  if (Object.keys(o).length !== keys.length || keys.some(k => !Object.hasOwn(o,k))) return invalid();
++  return o;
++}
++export function uuid(v: unknown): string {
++  if (typeof v !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)) return invalid();
++  return v.toLowerCase();
++}
++export function positive(v: unknown): bigint {
++  if (typeof v !== "bigint" || v < 1n) return invalid();
++  return v;
++}
++export function timestamp(v: unknown): string {
++  if (typeof v !== "string" || !/^\d{4}-\d\d-\d\d[Tt]\d\d:\d\d:\d\d(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/.test(v) || !Number.isFinite(Date.parse(v))) return invalid();
++  const date = v.slice(0,10), day = Number(date.slice(8)), month = Number(date.slice(5,7)), year = Number(date.slice(0,4));
++  if (month<1 || month>12 || day<1 || day>new Date(Date.UTC(year,month,0)).getUTCDate()) return invalid();
++  return v;
++}
++export function content(v: unknown): {kind: "TEXT"; text: string} {
++  const o=object(v,["kind","text"]);
++  if(o.kind!=="TEXT" || typeof o.text!=="string" || [...o.text].length<1 || [...o.text].length>4096) return invalid();
++  return {kind:"TEXT",text:o.text};
++}
++// Parse integers before JavaScript Number can round them. Reject duplicate keys,
++// exponent/fraction values where the canonical fields require positive integers.
++export function parse(raw: string, maxLength=131072): unknown {
++  if(raw.length>maxLength) return invalid();
++  let at=0, depth=0;
++  const whitespace=()=>{ while(/[\x20\t\r\n]/.test(raw[at]??"x")) at++; };
++  function string(): string {
++    const start=at++;
++    while(at<raw.length) {
++      if(raw[at]==='"') { at++; try { return JSON.parse(raw.slice(start,at)); } catch { return invalid(); } }
++      if(raw[at]==="\\") at++;
++      at++;
++    }
++    return invalid();
++  }
++  function value(): unknown {
++    whitespace(); if(++depth>32) return invalid();
++    let out: unknown;
++    if(raw[at]==='"') out=string();
++    else if(raw[at]==="{") {
++      at++; const o: ObjectValue=Object.create(null); whitespace();
++      if(raw[at]!=="}") for(;;) {
++        whitespace(); if(raw[at]!=='"') return invalid(); const k=string();
++        if(Object.hasOwn(o,k)) return invalid(); whitespace(); if(raw[at++]!==":") return invalid(); o[k]=value(); whitespace();
++        if(raw[at]!==",") break; at++;
++      }
++      if(raw[at++]!=="}") return invalid(); out=o;
++    } else if(raw[at]==="[") {
++      at++; const items: unknown[]=[]; whitespace();
++      if(raw[at]!=="]") for(;;) { items.push(value()); whitespace(); if(raw[at]!==",") break; at++; }
++      if(raw[at++]!=="]") return invalid(); out=items;
++    } else if(raw.startsWith("true",at)) { at+=4; out=true;
++    } else if(raw.startsWith("false",at)) { at+=5; out=false;
++    } else {
++      const number=raw.slice(at).match(/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
++      if(number) { at+=number[0].length; const parts=number[0].toLowerCase().split("e"), exponent=Number(parts[1]??"0");
++        const [whole,fraction=""]=parts[0].split("."); const scale=fraction.length-exponent;
++        if(!Number.isSafeInteger(exponent) || Math.abs(exponent)>131072) return invalid();
++        const digits=BigInt(whole+fraction);
++        out=scale<=0?digits*10n**BigInt(-scale):digits%10n**BigInt(scale)===0n?digits/10n**BigInt(scale):Number(number[0]); }
++      else return invalid();
++    }
++    depth--; return out;
++  }
++  const out=value(); whitespace(); if(at!==raw.length) return invalid(); return out;
++}
++export interface Frame { type: string; requestId: string; payload: ObjectValue }
++const authErrors=["VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED"];
++const messageErrors=["VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED"];
++export function decode(raw: string): Frame {
++  const e=object(parse(raw),["protocolVersion","type","requestId","payload"]);
++  if(e.protocolVersion!=="1.0" || typeof e.type!=="string") return invalid();
++  const requestId=uuid(e.requestId); let p: ObjectValue;
++  function rejected(codes: string[]): ObjectValue {
++    const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
++    if(p.status!=="rejected" || typeof error.code!=="string" || !codes.includes(error.code) || typeof error.message!=="string" || !error.message) return invalid();
++    return p;
++  }
++  switch(e.type) {
++    case "auth.ack":
++      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
++      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || typeof p.clientType!=="string" || !["WEB","DESKTOP","MOBILE"].includes(p.clientType)) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
++      break;
++    case "message.ack":
++      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
++      else { p=object(e.payload,["status","conversationId","messageId","seq","createdAt"]); if(p.status!=="committed") return invalid(); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); }
++      break;
++    case "message.created":
++      p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
++    case "session.revoked":
++      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(typeof p.reason!=="string" || !["LOGOUT","REPLACED","REVOKED"].includes(p.reason)) return invalid(); break;
++    case "ping": case "pong": p=object(e.payload,[]); break;
++    default: return invalid();
++  }
++  return {type:e.type,requestId,payload:p};
++}
++export function envelope(type: "auth.bind" | "message.send" | "ping" | "pong", requestId: string, payload: unknown): string {
++  return JSON.stringify({protocolVersion:"1.0",type,requestId:uuid(requestId),payload});
++}
+diff --git a/clients/shared/protocol-sdk/src/sync/wire.ts b/clients/shared/protocol-sdk/src/sync/wire.ts
+index ca1e956..ecbd6ea 100644
+--- a/clients/shared/protocol-sdk/src/sync/wire.ts
++++ b/clients/shared/protocol-sdk/src/sync/wire.ts
+@@ -1,53 +1,54 @@
+-import {parse,object,uuid,positive,timestamp,content} from "../send/wire.js";
+-import type {UserPage,UserEvent,ServerMessage} from "../storage/models.js";
+-export const MAX_RESPONSE=6*1024*1024;
+-export interface ConversationPage {messages:ServerMessage[];hasMore:boolean}
+-const invalid=():never=>{throw new Error("Invalid Sync response");};
+-const kinds=["friend.changed","conversation.changed","membership.changed","plugin.changed"];
+-export function cursor(v:unknown):string {if(typeof v!=="string" || [...v].length<1 || [...v].length>256) return invalid();return v;}
+-function list(v:unknown):unknown[] {if(!Array.isArray(v) || v.length>100) return invalid();return v;}
+-function base(raw:string,keys:string[],requestId:string,type:string) {const p=object(parse(raw,MAX_RESPONSE),keys);if(p.syncVersion!=="1.0" || p.type!==type || uuid(p.requestId)!==requestId || typeof p.hasMore!=="boolean") return invalid();return p;}
+-export function userPage(raw:string,requestId:string,inputCursor:string):UserPage {
+-  try {
+-    const p=base(raw,["syncVersion","type","requestId","events","nextCursor","hasMore"],requestId,"sync.user.page");
+-    const ids=new Set<string>(), cursors=new Set<string>();
+-    const events=list(p.events).map(v=>{const e=object(v,["eventId","cursor","kind","subjectId","revision"]);
+-      const eventId=uuid(e.eventId), token=cursor(e.cursor);
+-      if(ids.has(eventId) || cursors.has(token) || token===inputCursor || !kinds.includes(String(e.kind))) return invalid();
+-      ids.add(eventId);cursors.add(token);
+-      return {eventId,cursor:token,kind:e.kind,subjectId:uuid(e.subjectId),revision:positive(e.revision)} as UserEvent;
+-    });
+-    const nextCursor=cursor(p.nextCursor),hasMore=p.hasMore as boolean;
+-    if(events.length ? nextCursor!==events.at(-1)!.cursor || nextCursor===inputCursor : nextCursor!==inputCursor || hasMore) return invalid();
+-    return {syncVersion:"1.0",type:"sync.user.page",requestId,events,nextCursor,hasMore};
+-  } catch {return invalid();}
+-}
+-export function conversationPage(raw:string,requestId:string,conversationId:string,afterSeq:bigint):ConversationPage {
+-  try {
+-    const p=base(raw,["syncVersion","type","requestId","conversationId","messages","hasMore"],requestId,"sync.conversation.page");
+-    if(uuid(p.conversationId)!==conversationId) return invalid();
+-    let next=afterSeq+1n;const ids=new Set<string>(),requests=new Set<string>();
+-    const messages=list(p.messages).map(v=>{const m=object(v,["conversationId","seq","messageId","senderId","requestId","createdAt","content"]);
+-      const messageId=uuid(m.messageId),rid=uuid(m.requestId),seq=positive(m.seq);
+-      if(uuid(m.conversationId)!==conversationId || seq!==next++ || ids.has(messageId) || requests.has(rid)) return invalid();
+-      ids.add(messageId);requests.add(rid);
+-      return {conversationId,seq,messageId,senderId:uuid(m.senderId),requestId:rid,createdAt:timestamp(m.createdAt),content:content(m.content)};
+-    });
+-    if(p.hasMore && !messages.length) return invalid();
+-    return {messages,hasMore:p.hasMore as boolean};
+-  } catch {return invalid();}
+-}
+-export class SyncFailure extends Error {constructor(readonly kind:"authentication"|"unavailable"|"protocol"|"transport"|"storage") {super("Sync "+kind+" failure");}}
+-export function errorResponse(raw:string,requestId:string,status:number,conversation:boolean):SyncFailure {
+-  try {
+-    const p=object(parse(raw,MAX_RESPONSE),["requestId","error"]);if(uuid(p.requestId)!==requestId) return invalid();
+-    const e=p.error as Record<string,unknown>;if(!e || typeof e!=="object" || Array.isArray(e) || Object.keys(e).some(k=>!["code","message","violations"].includes(k)) || typeof e.message!=="string" || !e.message) return invalid();
+-    if(e.violations!==undefined) {if(!Array.isArray(e.violations)) return invalid();for(const v of e.violations){const f=object(v,["field","reason"]);if(typeof f.field!=="string" || !f.field || typeof f.reason!=="string" || !f.reason) return invalid();}}
+-    if(status===401 && ["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"].includes(String(e.code))) return new SyncFailure("authentication");
+-    if(conversation && status===403 && e.code==="AUTHORIZATION_DENIED") return new SyncFailure("unavailable");
+-    if(status===400 && e.code==="VALIDATION_FAILED" || status===426 && e.code==="PROTOCOL_VERSION_UNSUPPORTED") return new SyncFailure("protocol");
+-    return invalid();
+-  } catch {return new SyncFailure("protocol");}
+-}
+-export function userRequest(requestId:string,inputCursor:string):string {return JSON.stringify({syncVersion:"1.0",type:"sync.user.request",requestId:uuid(requestId),cursor:cursor(inputCursor),limit:100});}
+-export function conversationRequest(requestId:string,c:string,afterSeq:bigint):string {if(afterSeq<0n) return invalid();return JSON.stringify({syncVersion:"1.0",type:"sync.conversation.request",requestId:uuid(requestId),conversationId:uuid(c),afterSeq:"SEQ",limit:100}).replace('"SEQ"',afterSeq.toString());}
++import {parse,object,uuid,positive,timestamp,content} from "../send/wire.js";
++import type {UserPage,UserEvent,ServerMessage} from "../storage/models.js";
++export const MAX_RESPONSE=6*1024*1024;
++export interface ConversationPage {messages:ServerMessage[];hasMore:boolean}
++const invalid=():never=>{throw new Error("Invalid Sync response");};
++const kinds=["friend.changed","conversation.changed","membership.changed","plugin.changed"];
++export function cursor(v:unknown):string {if(typeof v!=="string" || [...v].length<1 || [...v].length>256) return invalid();return v;}
++function list(v:unknown):unknown[] {if(!Array.isArray(v) || v.length>100) return invalid();return v;}
++function base(raw:string,keys:string[],requestId:string,type:string) {const p=object(parse(raw,MAX_RESPONSE),keys);if(p.syncVersion!=="1.0" || p.type!==type || uuid(p.requestId)!==requestId || typeof p.hasMore!=="boolean") return invalid();return p;}
++export function userPage(raw:string,requestId:string,inputCursor:string):UserPage {
++  try {
++    const p=base(raw,["syncVersion","type","requestId","events","nextCursor","hasMore"],requestId,"sync.user.page");
++    const ids=new Set<string>(), cursors=new Set<string>();
++    const events=list(p.events).map(v=>{const e=object(v,["eventId","cursor","kind","subjectId","revision"]);
++      const eventId=uuid(e.eventId), token=cursor(e.cursor);
++      if(ids.has(eventId) || cursors.has(token) || token===inputCursor || typeof e.kind!=="string" || !kinds.includes(e.kind)) return invalid();
++      ids.add(eventId);cursors.add(token);
++      return {eventId,cursor:token,kind:e.kind,subjectId:uuid(e.subjectId),revision:positive(e.revision)} as UserEvent;
++    });
++    const nextCursor=cursor(p.nextCursor),hasMore=p.hasMore as boolean;
++    if(events.length ? nextCursor!==events.at(-1)!.cursor || nextCursor===inputCursor : nextCursor!==inputCursor || hasMore) return invalid();
++    return {syncVersion:"1.0",type:"sync.user.page",requestId,events,nextCursor,hasMore};
++  } catch {return invalid();}
++}
++export function conversationPage(raw:string,requestId:string,conversationId:string,afterSeq:bigint):ConversationPage {
++  try {
++    const p=base(raw,["syncVersion","type","requestId","conversationId","messages","hasMore"],requestId,"sync.conversation.page");
++    if(uuid(p.conversationId)!==conversationId) return invalid();
++    let next=afterSeq+1n;const ids=new Set<string>(),requests=new Set<string>();
++    const messages=list(p.messages).map(v=>{const m=object(v,["conversationId","seq","messageId","senderId","requestId","createdAt","content"]);
++      const messageId=uuid(m.messageId),rid=uuid(m.requestId),seq=positive(m.seq);
++      if(uuid(m.conversationId)!==conversationId || seq!==next++ || ids.has(messageId) || requests.has(rid)) return invalid();
++      ids.add(messageId);requests.add(rid);
++      return {conversationId,seq,messageId,senderId:uuid(m.senderId),requestId:rid,createdAt:timestamp(m.createdAt),content:content(m.content)};
++    });
++    if(p.hasMore && !messages.length) return invalid();
++    return {messages,hasMore:p.hasMore as boolean};
++  } catch {return invalid();}
++}
++export class SyncFailure extends Error {constructor(readonly kind:"authentication"|"unavailable"|"protocol"|"transport"|"storage") {super("Sync "+kind+" failure");}}
++export function errorResponse(raw:string,requestId:string,status:number,conversation:boolean):SyncFailure {
++  try {
++    const p=object(parse(raw,MAX_RESPONSE),["requestId","error"]);if(uuid(p.requestId)!==requestId) return invalid();
++    const e=p.error as Record<string,unknown>;if(!e || typeof e!=="object" || Array.isArray(e) || Object.keys(e).some(k=>!["code","message","violations"].includes(k)) || typeof e.message!=="string" || !e.message) return invalid();
++    if(e.violations!==undefined) {if(!Array.isArray(e.violations)) return invalid();for(const v of e.violations){const f=object(v,["field","reason"]);if(typeof f.field!=="string" || !f.field || typeof f.reason!=="string" || !f.reason) return invalid();}}
++    if(typeof e.code!=="string") return invalid();
++    if(status===401 && ["AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"].includes(e.code)) return new SyncFailure("authentication");
++    if(conversation && status===403 && e.code==="AUTHORIZATION_DENIED") return new SyncFailure("unavailable");
++    if(status===400 && e.code==="VALIDATION_FAILED" || status===426 && e.code==="PROTOCOL_VERSION_UNSUPPORTED") return new SyncFailure("protocol");
++    return invalid();
++  } catch {return new SyncFailure("protocol");}
++}
++export function userRequest(requestId:string,inputCursor:string):string {return JSON.stringify({syncVersion:"1.0",type:"sync.user.request",requestId:uuid(requestId),cursor:cursor(inputCursor),limit:100});}
++export function conversationRequest(requestId:string,c:string,afterSeq:bigint):string {if(afterSeq<0n) return invalid();return JSON.stringify({syncVersion:"1.0",type:"sync.conversation.request",requestId:uuid(requestId),conversationId:uuid(c),afterSeq:"SEQ",limit:100}).replace('"SEQ"',afterSeq.toString());}
+
+

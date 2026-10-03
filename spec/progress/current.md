@@ -5,54 +5,48 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-SYNC-only
-Current Task: LOOP1-SYNC-GO-001
-Current Task State: done
-Execution Status: WAITING_GO_ADMINISTRATIVE_ACCEPTANCE
+Current Task: LOOP1-SYNC-001
+Current Task State: review
+Execution Status: AWAITING_NEW_INDEPENDENT_CLIENT_SYNC_REVIEW
 
 ## Immediately Relevant Completed Work
 
-Go public Sync product accepted and synchronized at 6f9341276c6481e982c2a9b2f2d490b76bc1df96, candidatea78f7f9/PR20. Fresh independent candidate Review and new same-role actual-main audit PASS. Both exact hosted runs passed13jobs106steps. Evidence: spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md.
+Go/SEND accepted; Desktop/Mobile Sync implemented locally. Fresh Fix repairs strict enum typing after independent Review FAIL. Shared Sync/SEND regression and Desktop compile PASS; NEW independent acceptance pending.
 
 ## Current Blockers
 
-No architecture/runtime/Go-consent blocker remains. This administrative discovery candidate awaits fresh independent Review/exact CI/protected integration/actual-main audit/main sync before client selection. LOOP1-SYNC-001 remains unique backlog. S1 PASS/S2 OPEN.
+Original candidate independent Review FAIL on nonstring enum coercion; fresh scoped Fix locally repaired. No architecture/runtime/Human blocker. NEW independent Review, exact-head hosted CI, protected integration/main audit/safe synchronization remain required.
 
 ## Verification
 
-- Command: `python -B tools/verify_frozen_architecture.py`
-  - Result: PASS canonical ef90846/PDF unchanged at accepted6f934 before closure writes.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md`
-- Command: `python -B ci/check_architecture.py --scope all --json`
-  - Result: PASS zero violations before closure writes.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md`
-- Command: `gh run view 37127820035 --json headSha,status,conclusion,jobs`
-  - Result: Independent exact actual-main CI PASS13jobs106steps; enabled PG/race/strict TLS and native regressions actually executed.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md`
+- Command: `python -B tools/verify_client_sync.py --scope shared`
+  - Result: Local repaired PASS; all174 malformed enum controls,29 legal values, fullUnicode/exact integers/bounds; SEND shared and Desktop build PASS. Architecture53 PASS after verified own generated preservation.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-001/client-fix/local-verification.md`
 
 ## Changed Files or Migrations
 
-Only administrative Task/current/checkpoint/backlog recovery facts and byte-exact evidence archives in this closure. Accepted Go two public Core Sync handlers; no new schema/migration/contract/client changes.
+Seven explicitly scoped Repository/Send/parser/tsconfig seams; Sync folders/tests/verifier and existing CI hooks. No schema/native/backend/contracts/dependency/GUI/Web changes.
 
 ## Known Failures, Risks, and Assumptions
 
-Immutable implementation failures and instrumentation gaps retained. Local/Recorder PASS is not independent acceptance. ADR0004 friend-denial remains deferred. Client SYNC/S2 not accepted; terminal read excludes future writes. Full history belongs to durable acceptance evidence.
+Repaired build/fixture/input formatting failures retained; source checks initially saw generated outputs, then PASS after only own verified ignored artifacts preserved privately. Recorder startup/read-only/stdin capture gaps disclosed in evidence. ADR0004 friend-denial remains deferred; S2OPEN.
 
 ## Next Exact Action
 
-Fresh independent administrative Review and exact applicable hosted CI, protected integration, new actual-main audit and safe main synchronization. Then reassess and activate existing LOOP1-SYNC-001; complete Desktop/Mobile SYNC and stop. No GUI/Web advancement.
+NEW fresh independent Review of repaired full candidate, exact hosted CI, protected integration/actual-main audit and safe sync. Stop after SYNC independently accepted and synchronized.
 
 ## Last Known Good Commit
 
-`6f9341276c6481e982c2a9b2f2d490b76bc1df96` independently accepted Go product, synchronized H:/IM-platform.
+`0fe4fccc3deacd492895967cff9cc40cf34321d4` accepted prerequisite base; local candidate identity supplied in handoff, independent acceptance pending.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-03-loop1-sync-go-001-accepted.md`
+`spec/progress/checkpoints/2026-10-03-loop1-sync-001-client-local.md`
 
 ## Uncommitted Changes / Ownership
 
-Assigned H:/.codex/worktrees/sync-resume/IM-platform; task/LOOP1-SYNC-001. Sole administrative writer /root/sync_go_closure_writer owns closure changes until committed/released. Main recovery/s1-handoff-20261001 original781entries protected. No other writer.
+Fresh Fix /root/sync_client_fix releases sole writer after clean commit at assigned H:/.codex/worktrees/sync-resume/IM-platform task/LOOP1-SYNC-001 owns only declared Task paths and private own Recorder/artifacts. Main H:/IM-platform unknown781entries preserved.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Accepted ADR0008 and separate Human Go consent effective. Reassess client task actual inputs/scope before implementation. Existing frozen/contracts remain authoritative.
+None. Canonicalef90846/ADR0005/6/7/8 unchanged.

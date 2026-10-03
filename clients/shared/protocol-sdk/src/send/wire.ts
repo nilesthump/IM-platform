@@ -15,7 +15,7 @@ export function positive(v: unknown): bigint {
   if (typeof v !== "bigint" || v < 1n) return invalid();
   return v;
 }
-function timestamp(v: unknown): string {
+export function timestamp(v: unknown): string {
   if (typeof v !== "string" || !/^\d{4}-\d\d-\d\d[Tt]\d\d:\d\d:\d\d(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/.test(v) || !Number.isFinite(Date.parse(v))) return invalid();
   const date = v.slice(0,10), day = Number(date.slice(8)), month = Number(date.slice(5,7)), year = Number(date.slice(0,4));
   if (month<1 || month>12 || day<1 || day>new Date(Date.UTC(year,month,0)).getUTCDate()) return invalid();
@@ -28,8 +28,8 @@ export function content(v: unknown): {kind: "TEXT"; text: string} {
 }
 // Parse integers before JavaScript Number can round them. Reject duplicate keys,
 // exponent/fraction values where the canonical fields require positive integers.
-function parse(raw: string): unknown {
-  if(raw.length>131072) return invalid();
+export function parse(raw: string, maxLength=131072): unknown {
+  if(raw.length>maxLength) return invalid();
   let at=0, depth=0;
   const whitespace=()=>{ while(/[\x20\t\r\n]/.test(raw[at]??"x")) at++; };
   function string(): string {
@@ -53,6 +53,12 @@ function parse(raw: string): unknown {
         if(raw[at]!==",") break; at++;
       }
       if(raw[at++]!=="}") return invalid(); out=o;
+    } else if(raw[at]==="[") {
+      at++; const items: unknown[]=[]; whitespace();
+      if(raw[at]!=="]") for(;;) { items.push(value()); whitespace(); if(raw[at]!==",") break; at++; }
+      if(raw[at++]!=="]") return invalid(); out=items;
+    } else if(raw.startsWith("true",at)) { at+=4; out=true;
+    } else if(raw.startsWith("false",at)) { at+=5; out=false;
     } else {
       const number=raw.slice(at).match(/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
       if(number) { at+=number[0].length; const parts=number[0].toLowerCase().split("e"), exponent=Number(parts[1]??"0");
@@ -75,13 +81,13 @@ export function decode(raw: string): Frame {
   const requestId=uuid(e.requestId); let p: ObjectValue;
   function rejected(codes: string[]): ObjectValue {
     const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
-    if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
+    if(p.status!=="rejected" || typeof error.code!=="string" || !codes.includes(error.code) || typeof error.message!=="string" || !error.message) return invalid();
     return p;
   }
   switch(e.type) {
     case "auth.ack":
       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
-      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || typeof p.clientType!=="string" || !["WEB","DESKTOP","MOBILE"].includes(p.clientType)) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
       break;
     case "message.ack":
       if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
@@ -90,7 +96,7 @@ export function decode(raw: string): Frame {
     case "message.created":
       p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
     case "session.revoked":
-      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
+      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(typeof p.reason!=="string" || !["LOGOUT","REPLACED","REVOKED"].includes(p.reason)) return invalid(); break;
     case "ping": case "pong": p=object(e.payload,[]); break;
     default: return invalid();
   }

@@ -210,6 +210,8 @@ jobs:
         run: |
           python3 -B tools/verify_client_sqlite.py --scope desktop
           python3 -B tools/verify_client_send.py --scope desktop
+          python3 -B tools/verify_client_sync.py --scope desktop
+          python3 -B tests/clients/sync/go_smoke.py --probe "$CARGO_TARGET_DIR/debug/storage_probe"
 
   mobile:
     needs: classify
@@ -253,6 +255,7 @@ jobs:
           script: |
             python3 -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554
             python3 -B tools/verify_client_send.py --scope mobile --serial emulator-5554
+            python3 -B tools/verify_client_sync.py --scope mobile --serial emulator-5554
 
   shared:
     needs: classify
@@ -271,6 +274,7 @@ jobs:
         run: |
           python3 -B tools/verify_client_sqlite.py --scope shared
           python3 -B tools/verify_client_send.py --scope shared
+          python3 -B tools/verify_client_sync.py --scope shared
       - name: HTTP, WSS, Sync and Plugin contracts
         shell: pwsh
         run: |
@@ -355,6 +359,11 @@ jobs:
         run: ./tests/infrastructure/smoke.ps1 -Profile go
       - name: Go Auth actual roles and TLS event smoke
         run: python3 tests/go/live_role_smoke.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Current shared Sync client actual Go TLS runtime
+        run: python3 -B tests/clients/sync/go_smoke.py
       - name: Go public Sync strict TLS runtime
         run: python3 -B tools/verify_sync_runtime.py
       - name: Go S1 strict TLS messaging E2E
