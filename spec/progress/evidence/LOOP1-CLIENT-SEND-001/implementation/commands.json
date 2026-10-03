@@ -1,0 +1,1331 @@
+{
+  "run_id": "R-CLIENT-SEND-IMPLEMENTATION-20261003",
+  "capture_mode": "prospective_resume",
+  "pre_recorder_trace_complete": false,
+  "export_through_event": 83,
+  "note": "Completed commands through export include failures. Exported blobs are Recorder redacted UTF-8; byte_exact_raw distinguishes transformations from recorded raw hash. Final clean checks/finish remain in immutable private Recorder for Coordinator archive.",
+  "commands": [
+    {
+      "command_id": "C-cf286181-d7f9-4d99-b406-35d0ad91454f",
+      "argv": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-FileHash spec/architecture/frozen-architecture.md; Get-FileHash scalable-distributed-im-architecture.pdf; Get-Content -Encoding UTF8 spec/architecture/frozen-architecture.md"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:33:30.954886Z",
+      "finished_at": "2026-10-03T07:33:31.573556Z",
+      "duration_ms": 609.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-cf286181-d7f9-4d99-b406-35d0ad91454f.stdout.txt.gz",
+        "recorder_raw_sha256": "3db2b45c7a5d7ccf7371b8d62ada09801a41e72ac96c2436347bc4f1ba49c544",
+        "exported_blob_sha256": "3db2b45c7a5d7ccf7371b8d62ada09801a41e72ac96c2436347bc4f1ba49c544",
+        "byte_exact_raw": true,
+        "bytes": 84722
+      },
+      "stderr": {
+        "gzip": "outputs/C-cf286181-d7f9-4d99-b406-35d0ad91454f.stderr.txt.gz",
+        "recorder_raw_sha256": "247e9930bf40e4079448fff034b835f6a1cb3cbf87d9f0ebee232a403966d8eb",
+        "exported_blob_sha256": "247e9930bf40e4079448fff034b835f6a1cb3cbf87d9f0ebee232a403966d8eb",
+        "byte_exact_raw": true,
+        "bytes": 1064
+      }
+    },
+    {
+      "command_id": "C-bb3d54eb-b650-40b8-9ad3-81a8227f4a71",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:34:06.372576Z",
+      "finished_at": "2026-10-03T07:34:07.003372Z",
+      "duration_ms": 610.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": true,
+      "stdout": {
+        "gzip": "outputs/C-bb3d54eb-b650-40b8-9ad3-81a8227f4a71.stdout.txt.gz",
+        "recorder_raw_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f",
+        "exported_blob_sha256": "66cfaab538a082c57e01fcb2b5c699fab3f43d2ab752f9df7c0f15c0b3b7940b",
+        "byte_exact_raw": false,
+        "bytes": 89454
+      },
+      "stderr": {
+        "gzip": "outputs/C-bb3d54eb-b650-40b8-9ad3-81a8227f4a71.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-cb656ce1-5364-43d5-9d20-ee7cd0fce173",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:34:13.366590Z",
+      "finished_at": "2026-10-03T07:34:13.468820Z",
+      "duration_ms": 94.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-cb656ce1-5364-43d5-9d20-ee7cd0fce173.stdout.txt.gz",
+        "recorder_raw_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+        "exported_blob_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+        "byte_exact_raw": true,
+        "bytes": 163
+      },
+      "stderr": {
+        "gzip": "outputs/C-cb656ce1-5364-43d5-9d20-ee7cd0fce173.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-f0301988-11fc-4d66-a181-7b4386346955",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:36:38.257836Z",
+      "finished_at": "2026-10-03T07:36:38.610511Z",
+      "duration_ms": 344.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-f0301988-11fc-4d66-a181-7b4386346955.stdout.txt.gz",
+        "recorder_raw_sha256": "7ca7bb51f49dc15caf0d9e20220443243f57eaaf94f456ee6f8b8fd73961affc",
+        "exported_blob_sha256": "7ca7bb51f49dc15caf0d9e20220443243f57eaaf94f456ee6f8b8fd73961affc",
+        "byte_exact_raw": true,
+        "bytes": 50
+      },
+      "stderr": {
+        "gzip": "outputs/C-f0301988-11fc-4d66-a181-7b4386346955.stderr.txt.gz",
+        "recorder_raw_sha256": "9aa621a287f43ce021cd4d4e17e5e8c04923c1f3f23ab4ecb8e1d2d228c85595",
+        "exported_blob_sha256": "9aa621a287f43ce021cd4d4e17e5e8c04923c1f3f23ab4ecb8e1d2d228c85595",
+        "byte_exact_raw": true,
+        "bytes": 94
+      }
+    },
+    {
+      "command_id": "C-92c443a1-4b37-4e94-9495-f5d57646be19",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "ci",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:39:01.583163Z",
+      "finished_at": "2026-10-03T07:39:02.836150Z",
+      "duration_ms": 1250.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-92c443a1-4b37-4e94-9495-f5d57646be19.stdout.txt.gz",
+        "recorder_raw_sha256": "4a419706c25790dc7fc2b1b5348a72b9a6be13963235b4ceab0582c3f86faf9f",
+        "exported_blob_sha256": "4a419706c25790dc7fc2b1b5348a72b9a6be13963235b4ceab0582c3f86faf9f",
+        "byte_exact_raw": true,
+        "bytes": 27
+      },
+      "stderr": {
+        "gzip": "outputs/C-92c443a1-4b37-4e94-9495-f5d57646be19.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-13643973-db9b-4c65-a17c-279ff4a35c71",
+      "argv": [
+        "H:/gradle/wrapper/dists/gradle-8.9-bin/78qddjpeqn5v6yec3xb8kv9ca/gradle-8.9/bin/gradle.bat",
+        "--no-daemon",
+        "assembleDebug",
+        "assembleDebugAndroidTest"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:39:09.496742Z",
+      "finished_at": "2026-10-03T07:39:12.358454Z",
+      "duration_ms": 2860.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-13643973-db9b-4c65-a17c-279ff4a35c71.stdout.txt.gz",
+        "recorder_raw_sha256": "4cc12a633fa971f333dd1ec197f3d256078d81d881e97f6d69caa4de72330bf4",
+        "exported_blob_sha256": "4cc12a633fa971f333dd1ec197f3d256078d81d881e97f6d69caa4de72330bf4",
+        "byte_exact_raw": true,
+        "bytes": 281
+      },
+      "stderr": {
+        "gzip": "outputs/C-13643973-db9b-4c65-a17c-279ff4a35c71.stderr.txt.gz",
+        "recorder_raw_sha256": "965e3c38d5ca32aca8af4f8f99751036db63acc3d28b18411e45ef6bea593ce9",
+        "exported_blob_sha256": "965e3c38d5ca32aca8af4f8f99751036db63acc3d28b18411e45ef6bea593ce9",
+        "byte_exact_raw": true,
+        "bytes": 1042
+      }
+    },
+    {
+      "command_id": "C-0821cb58-ae62-4ef5-b33c-5be09f904b40",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:39:47.480903Z",
+      "finished_at": "2026-10-03T07:39:48.771991Z",
+      "duration_ms": 1297.0,
+      "exit_code": 2,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-0821cb58-ae62-4ef5-b33c-5be09f904b40.stdout.txt.gz",
+        "recorder_raw_sha256": "2228c8ba887f3a095818b5d5c02767696ecf2f5c21beb8b531471dd60bfb7962",
+        "exported_blob_sha256": "2228c8ba887f3a095818b5d5c02767696ecf2f5c21beb8b531471dd60bfb7962",
+        "byte_exact_raw": true,
+        "bytes": 480
+      },
+      "stderr": {
+        "gzip": "outputs/C-0821cb58-ae62-4ef5-b33c-5be09f904b40.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-c45e330c-d032-4e36-a789-28dc21e88648",
+      "argv": [
+        "H:/gradle/wrapper/dists/gradle-8.9-bin/78qddjpeqn5v6yec3xb8kv9ca/gradle-8.9/bin/gradle.bat",
+        "-p",
+        "clients/mobile",
+        "--no-daemon",
+        "assembleDebug",
+        "assembleDebugAndroidTest"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:39:32.005812Z",
+      "finished_at": "2026-10-03T07:39:53.043719Z",
+      "duration_ms": 21031.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-c45e330c-d032-4e36-a789-28dc21e88648.stdout.txt.gz",
+        "recorder_raw_sha256": "4cc12a633fa971f333dd1ec197f3d256078d81d881e97f6d69caa4de72330bf4",
+        "exported_blob_sha256": "4cc12a633fa971f333dd1ec197f3d256078d81d881e97f6d69caa4de72330bf4",
+        "byte_exact_raw": true,
+        "bytes": 281
+      },
+      "stderr": {
+        "gzip": "outputs/C-c45e330c-d032-4e36-a789-28dc21e88648.stderr.txt.gz",
+        "recorder_raw_sha256": "44c00561327f3d64a26482ab519b11509247969601718d9a6cfa6577011aba7d",
+        "exported_blob_sha256": "44c00561327f3d64a26482ab519b11509247969601718d9a6cfa6577011aba7d",
+        "byte_exact_raw": true,
+        "bytes": 3055
+      }
+    },
+    {
+      "command_id": "C-74b1112d-1652-4269-8f00-d2534b528198",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:40:40.218811Z",
+      "finished_at": "2026-10-03T07:40:41.134706Z",
+      "duration_ms": 922.0,
+      "exit_code": 2,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-74b1112d-1652-4269-8f00-d2534b528198.stdout.txt.gz",
+        "recorder_raw_sha256": "d9843b63137b057682f6065008eaf96057730fded271ef9bd84fc38b6c44c69b",
+        "exported_blob_sha256": "d9843b63137b057682f6065008eaf96057730fded271ef9bd84fc38b6c44c69b",
+        "byte_exact_raw": true,
+        "bytes": 689
+      },
+      "stderr": {
+        "gzip": "outputs/C-74b1112d-1652-4269-8f00-d2534b528198.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-b6210cea-8831-4bf1-8b41-d44b44bd2d3c",
+      "argv": [
+        "H:/gradle/wrapper/dists/gradle-8.9-bin/78qddjpeqn5v6yec3xb8kv9ca/gradle-8.9/bin/gradle.bat",
+        "-p",
+        "clients/mobile",
+        "--no-daemon",
+        "assembleDebug",
+        "assembleDebugAndroidTest"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:40:50.238956Z",
+      "finished_at": "2026-10-03T07:41:37.301349Z",
+      "duration_ms": 47047.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-b6210cea-8831-4bf1-8b41-d44b44bd2d3c.stdout.txt.gz",
+        "recorder_raw_sha256": "0b3e3a975f4c4506cf8090ffc30de101bdf63308e4d0ad007a6dcdb4271cbbe8",
+        "exported_blob_sha256": "0b3e3a975f4c4506cf8090ffc30de101bdf63308e4d0ad007a6dcdb4271cbbe8",
+        "byte_exact_raw": true,
+        "bytes": 4657
+      },
+      "stderr": {
+        "gzip": "outputs/C-b6210cea-8831-4bf1-8b41-d44b44bd2d3c.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-9f2b4417-524f-44c1-ac9d-5fcb2acc171e",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:41:59.674389Z",
+      "finished_at": "2026-10-03T07:42:00.653965Z",
+      "duration_ms": 969.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-9f2b4417-524f-44c1-ac9d-5fcb2acc171e.stdout.txt.gz",
+        "recorder_raw_sha256": "7ca7bb51f49dc15caf0d9e20220443243f57eaaf94f456ee6f8b8fd73961affc",
+        "exported_blob_sha256": "7ca7bb51f49dc15caf0d9e20220443243f57eaaf94f456ee6f8b8fd73961affc",
+        "byte_exact_raw": true,
+        "bytes": 50
+      },
+      "stderr": {
+        "gzip": "outputs/C-9f2b4417-524f-44c1-ac9d-5fcb2acc171e.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-09f76b29-9f3b-42ce-b542-a8f41f28e7f4",
+      "argv": [
+        "H:/gradle/wrapper/dists/gradle-8.9-bin/78qddjpeqn5v6yec3xb8kv9ca/gradle-8.9/bin/gradle.bat",
+        "-p",
+        "clients/mobile",
+        "--no-daemon",
+        "assembleDebug",
+        "assembleDebugAndroidTest"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:45:46.859015Z",
+      "finished_at": "2026-10-03T07:46:05.388970Z",
+      "duration_ms": 18531.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-09f76b29-9f3b-42ce-b542-a8f41f28e7f4.stdout.txt.gz",
+        "recorder_raw_sha256": "83ed10474eda352355d89cecf255cf5ec5c901afb5c56250dc95263539dd76d0",
+        "exported_blob_sha256": "83ed10474eda352355d89cecf255cf5ec5c901afb5c56250dc95263539dd76d0",
+        "byte_exact_raw": true,
+        "bytes": 4101
+      },
+      "stderr": {
+        "gzip": "outputs/C-09f76b29-9f3b-42ce-b542-a8f41f28e7f4.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-c75f9cfc-7f42-48f5-84a4-ad2e6770053b",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:45:30.549397Z",
+      "finished_at": "2026-10-03T07:46:18.951482Z",
+      "duration_ms": 48390.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-c75f9cfc-7f42-48f5-84a4-ad2e6770053b.stdout.txt.gz",
+        "recorder_raw_sha256": "824d2c2fd188375aead4998eb312520cd90949a4df1c27c32acd84977463c8a7",
+        "exported_blob_sha256": "824d2c2fd188375aead4998eb312520cd90949a4df1c27c32acd84977463c8a7",
+        "byte_exact_raw": true,
+        "bytes": 743
+      },
+      "stderr": {
+        "gzip": "outputs/C-c75f9cfc-7f42-48f5-84a4-ad2e6770053b.stderr.txt.gz",
+        "recorder_raw_sha256": "a0329902f50141a1cb52d5856fbeb7a324aae3fbe0db208d28e012b983052411",
+        "exported_blob_sha256": "a0329902f50141a1cb52d5856fbeb7a324aae3fbe0db208d28e012b983052411",
+        "byte_exact_raw": true,
+        "bytes": 1131
+      }
+    },
+    {
+      "command_id": "C-31e38873-827a-47d0-8cd1-f4a6019dde49",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:46:48.269375Z",
+      "finished_at": "2026-10-03T07:46:57.894375Z",
+      "duration_ms": 9609.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-31e38873-827a-47d0-8cd1-f4a6019dde49.stdout.txt.gz",
+        "recorder_raw_sha256": "c58fc1c5d82db83db85c993de130f70005459fa344280198f1237c2da0774b52",
+        "exported_blob_sha256": "c58fc1c5d82db83db85c993de130f70005459fa344280198f1237c2da0774b52",
+        "byte_exact_raw": true,
+        "bytes": 1075
+      },
+      "stderr": {
+        "gzip": "outputs/C-31e38873-827a-47d0-8cd1-f4a6019dde49.stderr.txt.gz",
+        "recorder_raw_sha256": "a27e87ece08f339c93f9eeb50d6c589872bb980c39c59f8f5a767313d37e9f42",
+        "exported_blob_sha256": "a27e87ece08f339c93f9eeb50d6c589872bb980c39c59f8f5a767313d37e9f42",
+        "byte_exact_raw": true,
+        "bytes": 190
+      }
+    },
+    {
+      "command_id": "C-6237f23d-f184-4ee2-a0b5-f91681b70479",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:48:30.829989Z",
+      "finished_at": "2026-10-03T07:48:34.671574Z",
+      "duration_ms": 3828.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-6237f23d-f184-4ee2-a0b5-f91681b70479.stdout.txt.gz",
+        "recorder_raw_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52",
+        "exported_blob_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52",
+        "byte_exact_raw": true,
+        "bytes": 389
+      },
+      "stderr": {
+        "gzip": "outputs/C-6237f23d-f184-4ee2-a0b5-f91681b70479.stderr.txt.gz",
+        "recorder_raw_sha256": "1d987cd25153cdeb5b2d10e0c9fc8309d8821002e6a9e1d459e2d326db51c6ab",
+        "exported_blob_sha256": "1d987cd25153cdeb5b2d10e0c9fc8309d8821002e6a9e1d459e2d326db51c6ab",
+        "byte_exact_raw": true,
+        "bytes": 6629
+      }
+    },
+    {
+      "command_id": "C-9ae0d637-7545-4f98-bb59-cebe50e94276",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "client",
+        "--json"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:48:45.015183Z",
+      "finished_at": "2026-10-03T07:48:45.109597Z",
+      "duration_ms": 78.0,
+      "exit_code": 2,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-9ae0d637-7545-4f98-bb59-cebe50e94276.stdout.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      },
+      "stderr": {
+        "gzip": "outputs/C-9ae0d637-7545-4f98-bb59-cebe50e94276.stderr.txt.gz",
+        "recorder_raw_sha256": "7f156e8e66b1194d1f1902080c91c0acb7b99ebb4ce3e6fe9184ac740ca3fefa",
+        "exported_blob_sha256": "7f156e8e66b1194d1f1902080c91c0acb7b99ebb4ce3e6fe9184ac740ca3fefa",
+        "byte_exact_raw": true,
+        "bytes": 284
+      }
+    },
+    {
+      "command_id": "C-0766359c-ff81-488b-839b-22284d5aac66",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "clients",
+        "--json"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:49:07.992264Z",
+      "finished_at": "2026-10-03T07:49:12.782898Z",
+      "duration_ms": 4750.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-0766359c-ff81-488b-839b-22284d5aac66.stdout.txt.gz",
+        "recorder_raw_sha256": "ff6a74a973389be73f210f023d8827a291b863126bcf60b82ffa1435a8da6b87",
+        "exported_blob_sha256": "ff6a74a973389be73f210f023d8827a291b863126bcf60b82ffa1435a8da6b87",
+        "byte_exact_raw": true,
+        "bytes": 257706
+      },
+      "stderr": {
+        "gzip": "outputs/C-0766359c-ff81-488b-839b-22284d5aac66.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-95404167-b3a9-469c-b4f5-db95a0949ce6",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:49:46.419114Z",
+      "finished_at": "2026-10-03T07:49:59.660825Z",
+      "duration_ms": 13235.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-95404167-b3a9-469c-b4f5-db95a0949ce6.stdout.txt.gz",
+        "recorder_raw_sha256": "949107923dd939b261b670752ff19b2a81162147653c1e50fce75ec814d82738",
+        "exported_blob_sha256": "949107923dd939b261b670752ff19b2a81162147653c1e50fce75ec814d82738",
+        "byte_exact_raw": true,
+        "bytes": 5243
+      },
+      "stderr": {
+        "gzip": "outputs/C-95404167-b3a9-469c-b4f5-db95a0949ce6.stderr.txt.gz",
+        "recorder_raw_sha256": "f9ad00986821d445259f7da17a79907d4418eccea6e7ce14ab93080fb91ab8aa",
+        "exported_blob_sha256": "f9ad00986821d445259f7da17a79907d4418eccea6e7ce14ab93080fb91ab8aa",
+        "byte_exact_raw": true,
+        "bytes": 606
+      }
+    },
+    {
+      "command_id": "C-e6accc43-f5b9-40e6-890b-9b46777a506d",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:51:27.432446Z",
+      "finished_at": "2026-10-03T07:51:55.864449Z",
+      "duration_ms": 28437.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-e6accc43-f5b9-40e6-890b-9b46777a506d.stdout.txt.gz",
+        "recorder_raw_sha256": "25532a1cbe51eae33d73aad8a9e8dbcaa7962c71dc45d0a82b3d879dfb330a75",
+        "exported_blob_sha256": "25532a1cbe51eae33d73aad8a9e8dbcaa7962c71dc45d0a82b3d879dfb330a75",
+        "byte_exact_raw": true,
+        "bytes": 5380
+      },
+      "stderr": {
+        "gzip": "outputs/C-e6accc43-f5b9-40e6-890b-9b46777a506d.stderr.txt.gz",
+        "recorder_raw_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "exported_blob_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "byte_exact_raw": true,
+        "bytes": 2
+      }
+    },
+    {
+      "command_id": "C-e1564ed3-f1e9-4889-8baf-15c6348f4d2a",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_sqlite.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:52:37.997605Z",
+      "finished_at": "2026-10-03T07:53:02.408429Z",
+      "duration_ms": 24407.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-e1564ed3-f1e9-4889-8baf-15c6348f4d2a.stdout.txt.gz",
+        "recorder_raw_sha256": "a39826f645bd3a9491c95fccd5553e1943858f5f26cbcaafdd826513e14d25e2",
+        "exported_blob_sha256": "a39826f645bd3a9491c95fccd5553e1943858f5f26cbcaafdd826513e14d25e2",
+        "byte_exact_raw": true,
+        "bytes": 5797
+      },
+      "stderr": {
+        "gzip": "outputs/C-e1564ed3-f1e9-4889-8baf-15c6348f4d2a.stderr.txt.gz",
+        "recorder_raw_sha256": "dba5166ad9db9ba648c1032ebbd34dcd0d085b50023b839ef5c68ca1db93a563",
+        "exported_blob_sha256": "dba5166ad9db9ba648c1032ebbd34dcd0d085b50023b839ef5c68ca1db93a563",
+        "byte_exact_raw": true,
+        "bytes": 4
+      }
+    },
+    {
+      "command_id": "C-134b31fe-7f31-445c-b9ea-3999a2d1649d",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tests/clients/send/go_smoke.py",
+        "H:/.codex/toolchains/client-sqlite/target-final/debug/storage_probe.exe"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:54:05.568566Z",
+      "finished_at": "2026-10-03T07:54:23.196073Z",
+      "duration_ms": 17625.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-134b31fe-7f31-445c-b9ea-3999a2d1649d.stdout.txt.gz",
+        "recorder_raw_sha256": "6805e3b8db5db4da5941510b459d807ce9eee043c393cf10eb4ad70a352bca5b",
+        "exported_blob_sha256": "6805e3b8db5db4da5941510b459d807ce9eee043c393cf10eb4ad70a352bca5b",
+        "byte_exact_raw": true,
+        "bytes": 126
+      },
+      "stderr": {
+        "gzip": "outputs/C-134b31fe-7f31-445c-b9ea-3999a2d1649d.stderr.txt.gz",
+        "recorder_raw_sha256": "33d530bda580b9f5296f1cd206105b104e641c139b19b21116ed416e17039d9b",
+        "exported_blob_sha256": "33d530bda580b9f5296f1cd206105b104e641c139b19b21116ed416e17039d9b",
+        "byte_exact_raw": true,
+        "bytes": 2391
+      }
+    },
+    {
+      "command_id": "C-dd32be93-df73-4c48-b077-82138ced592e",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tests/clients/send/go_smoke.py",
+        "H:/.codex/toolchains/client-sqlite/target-final/debug/storage_probe.exe"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:55:00.882940Z",
+      "finished_at": "2026-10-03T07:55:17.903157Z",
+      "duration_ms": 17016.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-dd32be93-df73-4c48-b077-82138ced592e.stdout.txt.gz",
+        "recorder_raw_sha256": "6805e3b8db5db4da5941510b459d807ce9eee043c393cf10eb4ad70a352bca5b",
+        "exported_blob_sha256": "6805e3b8db5db4da5941510b459d807ce9eee043c393cf10eb4ad70a352bca5b",
+        "byte_exact_raw": true,
+        "bytes": 126
+      },
+      "stderr": {
+        "gzip": "outputs/C-dd32be93-df73-4c48-b077-82138ced592e.stderr.txt.gz",
+        "recorder_raw_sha256": "d1f1552fa0a27cf35880acea3b1fecf441bc07eca0165b9a552980853a05e506",
+        "exported_blob_sha256": "d1f1552fa0a27cf35880acea3b1fecf441bc07eca0165b9a552980853a05e506",
+        "byte_exact_raw": true,
+        "bytes": 572
+      }
+    },
+    {
+      "command_id": "C-442ef6e5-a2b6-4498-aaaa-fd57be68b741",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tests/clients/send/go_smoke.py",
+        "H:/.codex/toolchains/client-sqlite/target-final/debug/storage_probe.exe"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:55:59.257015Z",
+      "finished_at": "2026-10-03T07:56:14.060474Z",
+      "duration_ms": 14797.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-442ef6e5-a2b6-4498-aaaa-fd57be68b741.stdout.txt.gz",
+        "recorder_raw_sha256": "6805e3b8db5db4da5941510b459d807ce9eee043c393cf10eb4ad70a352bca5b",
+        "exported_blob_sha256": "6805e3b8db5db4da5941510b459d807ce9eee043c393cf10eb4ad70a352bca5b",
+        "byte_exact_raw": true,
+        "bytes": 126
+      },
+      "stderr": {
+        "gzip": "outputs/C-442ef6e5-a2b6-4498-aaaa-fd57be68b741.stderr.txt.gz",
+        "recorder_raw_sha256": "d1f1552fa0a27cf35880acea3b1fecf441bc07eca0165b9a552980853a05e506",
+        "exported_blob_sha256": "d1f1552fa0a27cf35880acea3b1fecf441bc07eca0165b9a552980853a05e506",
+        "byte_exact_raw": true,
+        "bytes": 572
+      }
+    },
+    {
+      "command_id": "C-ef0984ab-c62a-4890-9cfc-f06610021d37",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tests/clients/send/go_smoke.py",
+        "H:/.codex/toolchains/client-sqlite/target-final/debug/storage_probe.exe"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:56:40.505277Z",
+      "finished_at": "2026-10-03T07:56:56.620446Z",
+      "duration_ms": 16109.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-ef0984ab-c62a-4890-9cfc-f06610021d37.stdout.txt.gz",
+        "recorder_raw_sha256": "e7199c24696f16ff00ab9d30a4b80d1a4085b3c9fbc57f6f08b45958705df540",
+        "exported_blob_sha256": "e7199c24696f16ff00ab9d30a4b80d1a4085b3c9fbc57f6f08b45958705df540",
+        "byte_exact_raw": true,
+        "bytes": 269
+      },
+      "stderr": {
+        "gzip": "outputs/C-ef0984ab-c62a-4890-9cfc-f06610021d37.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-634282a7-333e-41d1-a51b-471e3cccbfc7",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:57:22.467839Z",
+      "finished_at": "2026-10-03T07:57:54.777406Z",
+      "duration_ms": 32313.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-634282a7-333e-41d1-a51b-471e3cccbfc7.stdout.txt.gz",
+        "recorder_raw_sha256": "c65a94fc2b852e76084b98e9a6ded19446c299937ce8a4dc6b3fe484386691b2",
+        "exported_blob_sha256": "c65a94fc2b852e76084b98e9a6ded19446c299937ce8a4dc6b3fe484386691b2",
+        "byte_exact_raw": true,
+        "bytes": 5315
+      },
+      "stderr": {
+        "gzip": "outputs/C-634282a7-333e-41d1-a51b-471e3cccbfc7.stderr.txt.gz",
+        "recorder_raw_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "exported_blob_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "byte_exact_raw": true,
+        "bytes": 2
+      }
+    },
+    {
+      "command_id": "C-2047fe78-f6df-48a0-93b1-9a5f4aebfe72",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_sqlite.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:57:25.209356Z",
+      "finished_at": "2026-10-03T07:58:04.800291Z",
+      "duration_ms": 39578.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-2047fe78-f6df-48a0-93b1-9a5f4aebfe72.stdout.txt.gz",
+        "recorder_raw_sha256": "b344d9ff2581f919b03a7dbec3c00ae7c6fc407e91643e1d75939b9d068858a7",
+        "exported_blob_sha256": "b344d9ff2581f919b03a7dbec3c00ae7c6fc407e91643e1d75939b9d068858a7",
+        "byte_exact_raw": true,
+        "bytes": 1402
+      },
+      "stderr": {
+        "gzip": "outputs/C-2047fe78-f6df-48a0-93b1-9a5f4aebfe72.stderr.txt.gz",
+        "recorder_raw_sha256": "8b2286a8b2dd5eb5454b1e6d29e745afb84aa89bee94b0d15f6c93bca9f3ee80",
+        "exported_blob_sha256": "8b2286a8b2dd5eb5454b1e6d29e745afb84aa89bee94b0d15f6c93bca9f3ee80",
+        "byte_exact_raw": true,
+        "bytes": 946
+      }
+    },
+    {
+      "command_id": "C-69f16fb7-8d2d-47c3-8267-7bdd73c4611a",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T07:59:04.484857Z",
+      "finished_at": "2026-10-03T07:59:15.603270Z",
+      "duration_ms": 11125.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-69f16fb7-8d2d-47c3-8267-7bdd73c4611a.stdout.txt.gz",
+        "recorder_raw_sha256": "0b5c2fae496aee5b664ec9533672937e3c2b5dd1b5658db1d38c37bc95aafbac",
+        "exported_blob_sha256": "0b5c2fae496aee5b664ec9533672937e3c2b5dd1b5658db1d38c37bc95aafbac",
+        "byte_exact_raw": true,
+        "bytes": 1075
+      },
+      "stderr": {
+        "gzip": "outputs/C-69f16fb7-8d2d-47c3-8267-7bdd73c4611a.stderr.txt.gz",
+        "recorder_raw_sha256": "dfa82dac026cbb2f560c975767e1e7f88e19d46608a243fe9f434a9023fe8b39",
+        "exported_blob_sha256": "dfa82dac026cbb2f560c975767e1e7f88e19d46608a243fe9f434a9023fe8b39",
+        "byte_exact_raw": true,
+        "bytes": 190
+      }
+    },
+    {
+      "command_id": "C-6eccb00f-204f-45dc-9c64-40d73df2c1d9",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:00:04.224412Z",
+      "finished_at": "2026-10-03T08:00:14.588646Z",
+      "duration_ms": 10359.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-6eccb00f-204f-45dc-9c64-40d73df2c1d9.stdout.txt.gz",
+        "recorder_raw_sha256": "dc7b704617fb6905a42719eff46e407eef6ded4345ec28359c463eba00efb206",
+        "exported_blob_sha256": "dc7b704617fb6905a42719eff46e407eef6ded4345ec28359c463eba00efb206",
+        "byte_exact_raw": true,
+        "bytes": 1075
+      },
+      "stderr": {
+        "gzip": "outputs/C-6eccb00f-204f-45dc-9c64-40d73df2c1d9.stderr.txt.gz",
+        "recorder_raw_sha256": "f45fccedd8ae98eff506c14ad641fca656bdb1f1467a6af695b489cbe5a14dd1",
+        "exported_blob_sha256": "f45fccedd8ae98eff506c14ad641fca656bdb1f1467a6af695b489cbe5a14dd1",
+        "byte_exact_raw": true,
+        "bytes": 190
+      }
+    },
+    {
+      "command_id": "C-77f6b2c6-e809-4842-bf6d-42f43aae0058",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:00:55.994435Z",
+      "finished_at": "2026-10-03T08:01:19.005766Z",
+      "duration_ms": 23016.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-77f6b2c6-e809-4842-bf6d-42f43aae0058.stdout.txt.gz",
+        "recorder_raw_sha256": "3af3ad93ceb4e3cf2dc7d90f59a76b22e13b30b8681f13c9fe6bba5b8b6c1f29",
+        "exported_blob_sha256": "3af3ad93ceb4e3cf2dc7d90f59a76b22e13b30b8681f13c9fe6bba5b8b6c1f29",
+        "byte_exact_raw": true,
+        "bytes": 5391
+      },
+      "stderr": {
+        "gzip": "outputs/C-77f6b2c6-e809-4842-bf6d-42f43aae0058.stderr.txt.gz",
+        "recorder_raw_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "exported_blob_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "byte_exact_raw": true,
+        "bytes": 2
+      }
+    },
+    {
+      "command_id": "C-67537b6f-45ee-4aef-ae60-cb282c316102",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:02:05.803164Z",
+      "finished_at": "2026-10-03T08:02:07.186086Z",
+      "duration_ms": 1359.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": true,
+      "stdout": {
+        "gzip": "outputs/C-67537b6f-45ee-4aef-ae60-cb282c316102.stdout.txt.gz",
+        "recorder_raw_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f",
+        "exported_blob_sha256": "66cfaab538a082c57e01fcb2b5c699fab3f43d2ab752f9df7c0f15c0b3b7940b",
+        "byte_exact_raw": false,
+        "bytes": 89454
+      },
+      "stderr": {
+        "gzip": "outputs/C-67537b6f-45ee-4aef-ae60-cb282c316102.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-913a2102-cb03-4dc6-96e0-f7146d7bf650",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture",
+        "-v"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:02:16.279760Z",
+      "finished_at": "2026-10-03T08:02:23.372942Z",
+      "duration_ms": 7093.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-913a2102-cb03-4dc6-96e0-f7146d7bf650.stdout.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      },
+      "stderr": {
+        "gzip": "outputs/C-913a2102-cb03-4dc6-96e0-f7146d7bf650.stderr.txt.gz",
+        "recorder_raw_sha256": "73d11fb41d93ddac64beb5c118283ad6e8fa0e8fbe6d5c08fc55780d8b88ac23",
+        "exported_blob_sha256": "73d11fb41d93ddac64beb5c118283ad6e8fa0e8fbe6d5c08fc55780d8b88ac23",
+        "byte_exact_raw": true,
+        "bytes": 8380
+      }
+    },
+    {
+      "command_id": "C-31031549-fe4b-47b4-ab41-5a5d2e4ed56d",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:03:15.547339Z",
+      "finished_at": "2026-10-03T08:03:47.974620Z",
+      "duration_ms": 32438.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-31031549-fe4b-47b4-ab41-5a5d2e4ed56d.stdout.txt.gz",
+        "recorder_raw_sha256": "ed7007f7f7f6823c65a8da1239c36650e3803c11178a7841922d93c35740bac1",
+        "exported_blob_sha256": "ed7007f7f7f6823c65a8da1239c36650e3803c11178a7841922d93c35740bac1",
+        "byte_exact_raw": true,
+        "bytes": 5739
+      },
+      "stderr": {
+        "gzip": "outputs/C-31031549-fe4b-47b4-ab41-5a5d2e4ed56d.stderr.txt.gz",
+        "recorder_raw_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "exported_blob_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "byte_exact_raw": true,
+        "bytes": 52
+      }
+    },
+    {
+      "command_id": "C-055eea0a-b6e6-43cc-b489-08f4bb635415",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:03:35.129015Z",
+      "finished_at": "2026-10-03T08:03:51.048412Z",
+      "duration_ms": 15906.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-055eea0a-b6e6-43cc-b489-08f4bb635415.stdout.txt.gz",
+        "recorder_raw_sha256": "41d086529826837d90306e1c6b946604891cc714d75e27ccc978f2a2c13d57d6",
+        "exported_blob_sha256": "41d086529826837d90306e1c6b946604891cc714d75e27ccc978f2a2c13d57d6",
+        "byte_exact_raw": true,
+        "bytes": 1072
+      },
+      "stderr": {
+        "gzip": "outputs/C-055eea0a-b6e6-43cc-b489-08f4bb635415.stderr.txt.gz",
+        "recorder_raw_sha256": "8459e782b2e1a39c5fb0e6f415a24d53f75a6c608f1ba3e2a758673887d7d5bb",
+        "exported_blob_sha256": "8459e782b2e1a39c5fb0e6f415a24d53f75a6c608f1ba3e2a758673887d7d5bb",
+        "byte_exact_raw": true,
+        "bytes": 190
+      }
+    },
+    {
+      "command_id": "C-c9c7ea55-5fd9-4905-9ebc-9a9fcd47fe40",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:05:17.666776Z",
+      "finished_at": "2026-10-03T08:05:48.957421Z",
+      "duration_ms": 31281.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-c9c7ea55-5fd9-4905-9ebc-9a9fcd47fe40.stdout.txt.gz",
+        "recorder_raw_sha256": "eb12a529eef7b8eaa90b1848bc2eb3d3f575285f3e5ec676ba89267136fea720",
+        "exported_blob_sha256": "eb12a529eef7b8eaa90b1848bc2eb3d3f575285f3e5ec676ba89267136fea720",
+        "byte_exact_raw": true,
+        "bytes": 5292
+      },
+      "stderr": {
+        "gzip": "outputs/C-c9c7ea55-5fd9-4905-9ebc-9a9fcd47fe40.stderr.txt.gz",
+        "recorder_raw_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "exported_blob_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "byte_exact_raw": true,
+        "bytes": 52
+      }
+    },
+    {
+      "command_id": "C-c875943b-e594-4b7d-af2d-d160d1de6745",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:06:35.626581Z",
+      "finished_at": "2026-10-03T08:06:58.123960Z",
+      "duration_ms": 22484.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-c875943b-e594-4b7d-af2d-d160d1de6745.stdout.txt.gz",
+        "recorder_raw_sha256": "f937892e49f3f605138fc268c8492ec408574f12aedbd685b32c94fa0f477dbd",
+        "exported_blob_sha256": "f937892e49f3f605138fc268c8492ec408574f12aedbd685b32c94fa0f477dbd",
+        "byte_exact_raw": true,
+        "bytes": 5391
+      },
+      "stderr": {
+        "gzip": "outputs/C-c875943b-e594-4b7d-af2d-d160d1de6745.stderr.txt.gz",
+        "recorder_raw_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "exported_blob_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "byte_exact_raw": true,
+        "bytes": 2
+      }
+    },
+    {
+      "command_id": "C-03a3c5ea-7946-45dc-aa7e-c92fd591958c",
+      "argv": [
+        "powershell",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:10:16.280864Z",
+      "finished_at": "2026-10-03T08:10:16.897085Z",
+      "duration_ms": 625.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-03a3c5ea-7946-45dc-aa7e-c92fd591958c.stdout.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      },
+      "stderr": {
+        "gzip": "outputs/C-03a3c5ea-7946-45dc-aa7e-c92fd591958c.stderr.txt.gz",
+        "recorder_raw_sha256": "06fba72964c728cea26d753ea0df6450e556bed1003209c16b05c7f470a43f15",
+        "exported_blob_sha256": "06fba72964c728cea26d753ea0df6450e556bed1003209c16b05c7f470a43f15",
+        "byte_exact_raw": true,
+        "bytes": 516
+      }
+    },
+    {
+      "command_id": "C-56d41329-af6c-48e8-ba0f-0c733ffef09d",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:10:17.177187Z",
+      "finished_at": "2026-10-03T08:10:18.179689Z",
+      "duration_ms": 969.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": true,
+      "stdout": {
+        "gzip": "outputs/C-56d41329-af6c-48e8-ba0f-0c733ffef09d.stdout.txt.gz",
+        "recorder_raw_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f",
+        "exported_blob_sha256": "66cfaab538a082c57e01fcb2b5c699fab3f43d2ab752f9df7c0f15c0b3b7940b",
+        "byte_exact_raw": false,
+        "bytes": 89454
+      },
+      "stderr": {
+        "gzip": "outputs/C-56d41329-af6c-48e8-ba0f-0c733ffef09d.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-46f652a1-74ea-41b9-aff0-2fee671fc7f4",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:10:43.422497Z",
+      "finished_at": "2026-10-03T08:10:52.311585Z",
+      "duration_ms": 8891.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-46f652a1-74ea-41b9-aff0-2fee671fc7f4.stdout.txt.gz",
+        "recorder_raw_sha256": "c53fc4350089416991ed3f53c8d0dc2855b24f81d72cbbbb854a91c9c303fab3",
+        "exported_blob_sha256": "c53fc4350089416991ed3f53c8d0dc2855b24f81d72cbbbb854a91c9c303fab3",
+        "byte_exact_raw": true,
+        "bytes": 331
+      },
+      "stderr": {
+        "gzip": "outputs/C-46f652a1-74ea-41b9-aff0-2fee671fc7f4.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-61f60542-c49a-4060-a0d1-159142a29d05",
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--check",
+        "10b77b22386234c98409ca41b3622ad6d25f3884"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:11:35.892108Z",
+      "finished_at": "2026-10-03T08:11:35.981276Z",
+      "duration_ms": 78.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-61f60542-c49a-4060-a0d1-159142a29d05.stdout.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      },
+      "stderr": {
+        "gzip": "outputs/C-61f60542-c49a-4060-a0d1-159142a29d05.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-3d4f2242-18fe-46ed-bfdf-e4077aa981ed",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "shared"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:12:03.953228Z",
+      "finished_at": "2026-10-03T08:12:05.976688Z",
+      "duration_ms": 2032.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stdout": {
+        "gzip": "outputs/C-3d4f2242-18fe-46ed-bfdf-e4077aa981ed.stdout.txt.gz",
+        "recorder_raw_sha256": "1ecdab1677b7b7d01a9071fd176dc2e63059ecd61f45ac25ff506396f0af6936",
+        "exported_blob_sha256": "1ecdab1677b7b7d01a9071fd176dc2e63059ecd61f45ac25ff506396f0af6936",
+        "byte_exact_raw": true,
+        "bytes": 366
+      },
+      "stderr": {
+        "gzip": "outputs/C-3d4f2242-18fe-46ed-bfdf-e4077aa981ed.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    }
+  ]
+}

@@ -207,7 +207,9 @@ jobs:
       - name: Actual TypeScript Repository on SQLx SQLite
         env:
           CARGO_TARGET_DIR: ${{ runner.temp }}/client-sqlite-target
-        run: python3 -B tools/verify_client_sqlite.py --scope desktop
+        run: |
+          python3 -B tools/verify_client_sqlite.py --scope desktop
+          python3 -B tools/verify_client_send.py --scope desktop
 
   mobile:
     needs: classify
@@ -248,7 +250,9 @@ jobs:
           disable-animations: true
           disable-linux-hw-accel: false
           pre-emulator-launch-script: '$ANDROID_HOME/emulator/emulator -accel-check'
-          script: python3 -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554
+          script: |
+            python3 -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554
+            python3 -B tools/verify_client_send.py --scope mobile --serial emulator-5554
 
   shared:
     needs: classify
@@ -264,7 +268,9 @@ jobs:
         with:
           node-version: '22'
       - name: Actual shared TypeScript storage compile
-        run: python3 -B tools/verify_client_sqlite.py --scope shared
+        run: |
+          python3 -B tools/verify_client_sqlite.py --scope shared
+          python3 -B tools/verify_client_send.py --scope shared
       - name: HTTP, WSS, Sync and Plugin contracts
         shell: pwsh
         run: |
