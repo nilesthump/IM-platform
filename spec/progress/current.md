@@ -5,46 +5,46 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-SYNC-only
-Current Task: LOOP1-SYNC-001
-Current Task State: backlog
-Execution Status: BLOCKED_BY_ARCHITECTURE
+Current Task: LOOP1-SYNC-TRANSPORT-001
+Current Task State: review
+Execution Status: REVIEW_READY_LOCAL_ONLY
 
 ## Immediately Relevant Completed Work
 
-S1 PASS. SEND product and administrative closure independently accepted, protected-integrated and synchronized; accepted main a0304fcc7be18b87f5986d014849d6b48b96a071. Human now explicitly authorizes “开始 SYNC，完成后停止”. SYNC dependency SEND is satisfied; GUI/Web remain outside this endpoint.
+S1 PASS; SEND accepted and synchronized main a0304fcc7be18b87f5986d014849d6b48b96a071. Human authorizes “开始 SYNC，完成后停止”, then expressly authorizes minimal architecture/contract prerequisite. Go implementation must be shown and separately consented after prerequisite independent Review/CI acceptance. GUI/Web outside endpoint.
 
 ## Current Blockers
 
-Accepted public Sync transport binding and actual User Sync backend entrypoint are absent. Existing Sync standalone shapes and transactional Repository are present; offline vectors and private Conversation history do not supply the missing public service boundary. SYNC stays unique backlog because inputs are incomplete. No product writes or fabricated runtime acceptance.
+LOOP1-SYNC-001 remains unique backlog BLOCKED_BY_ARCHITECTURE awaiting accepted public binding and actual accepted User Sync runtime. Named prerequisite is expressly authorized current work; no client/backend product writes. Candidate is not accepted authority until independent process/main synchronization.
 
 ## Verification
 
-Fresh implementation baseline: python -B ci/check_architecture.py --scope all --json PASS; python -B tools/verify_frozen_architecture.py PASS. Corrected direct JSON/source inventory confirms the missing transport/runtime input. Evidence: spec/progress/evidence/LOOP1-SYNC-001/implementation/authority-blocker.md. Local/Recorder PASS does not establish Task or Gate PASS.
+Recorded minimum baseline architecture all + frozen integrity PASS. Candidate contract/ref/official OAI lint/4 negative-test groups/53 architecture tests and unchanged HTTP/WSS/SyncPlugin regressions PASS; durable spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/. Recorder prospective_resume exposes read-only startup gap and interpreter/encoding/quoting failures. Local/Recorder PASS does not establish task/Gate PASS.
 
 ## Changed Files or Migrations
 
-Only SYNC recovery task/current metadata and task-owned evidence/Research Recorder. No product, backend, public contract, frozen authority, Repository, schema or migration change.
+Bounded Sync OpenAPI, external-ref guards, ADR-0008/canonical §11.5/hash discovery, narrow prerequisite task/progress/evidence. No product/schema/migration/WSS/ACK change. Prior blocker bc1bebb and sealed Coordinator research remain owned authorized inputs unchanged.
 
 ## Known Failures, Risks, and Assumptions
 
-Recorder initial read-only startup gap is explicitly prospective_resume. Windows base64-pipeline registration/start and output-encoding failures exposed; corrected registration/output succeed. An initial wrong filename was corrected by exact JSON/source inventory. SYNC not implemented/accepted/done; S2 OPEN. Unknown main work untouched.
+Go runtime/client SYNC absent. All prerequisite Review/hosted/integration/main acceptance pending. Go proposal awaits Human consent after prerequisite acceptance. Unknown main work preserved.
 
 ## Next Exact Action
 
-Fresh independent Review of blocker recovery. Architect/Human decides the smallest prerequisite: approved public Sync transport binding plus narrowly scoped Go runtime delivery, then freeze/independent Review/applicable exact-head hosted CI/service acceptance before SYNC readiness. Do not invent an endpoint or widen SYNC paths. Do not advance GUI/Web or mark SYNC done. Recovery-record main synchronization remains PENDING.
+Fresh independent Review of clean committed freeze candidate; recorded checks PASS. Coordinator then exact-head hosted CI/protected integration/main synchronization, show concrete Go plan and obtain Human consent before product writes. Do not mark SYNC done or advance GUI/Web.
 
 ## Last Known Good Commit
 
-`a0304fcc7be18b87f5986d014849d6b48b96a071` accepted SEND administrative actual-main and synchronized H:/IM-platform; recovery branch task/LOOP1-SYNC-001 starts from this base.
+a0304fcc7be18b87f5986d014849d6b48b96a071 (accepted SEND administrative actual-main).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-03-loop1-client-send-001-accepted.md` remains the latest accepted stable product recovery point.
+spec/progress/checkpoints/2026-10-03-loop1-client-send-001-accepted.md remains latest accepted stable product recovery.
 
 ## Uncommitted Changes / Ownership
 
-Assigned root H:/.codex/worktrees/sync-resume/IM-platform verified exactly. Fresh implementer /root/sync_implementation owns only SYNC task/current recovery, implementation evidence and implementation-research. Coordinator /root owns pre-existing evidence/research. Main unknown work preserved. New blocker record is unaccepted until independent governance; candidate SHA follows clean handoff.
+Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch task/LOOP1-SYNC-001. Sole prerequisite writer /root/sync_transport_design owns narrow task paths; root research sealed20BLOCKED input owned/authorized by Coordinator and preserved. No unknown main writes.
 
 ## Architecture Conflicts / ACP / ADR
 
-BLOCKED_BY_ARCHITECTURE: absent accepted Sync public binding and actual User Sync runtime. Frozen §2.1/§11 and accepted client-ui architecture forbid implementing a new route/contract silently. Minimal decision is recorded in the SYNC task and durable evidence; no specific transport/route prescribed.
+Human authorized public Sync binding freeze via ADR-0008 candidate; absence of runtime remains SYNC blocker. No Go implementation before later Human plan consent.

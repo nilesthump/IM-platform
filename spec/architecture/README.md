@@ -32,3 +32,7 @@ ADR-0006 记录 Human 明确的客户端 UI、设计与截图验收决定，以�
 ## MVP 规划接受发现
 
 planning_revision_adr对应ADR-0007的canonical16e9c7b4已接受于candidate7466ce7/PR14/actualmain b60f116并同步主仓库。证据见mvp-planning/closure/acceptance.md。此前候选pending语句为历史；此接受发现不改变canonical字节，不建立S2PASS。收尾metadata仍保留review至独立闭环，本轮随后只执行SEND。
+
+## Sync transport prerequisite candidate (2026-10-03)
+
+Resolve sync_revision_adr/approval_source/previous_sha256 in baseline.md for Human-authorized ADR-0008 additive public HTTPS binding at canonical section11.5. New candidate independent Review/exact-head hosted CI/protected integration/actual-main synchronization pending. No Go/client runtime acceptance. Concrete Go plan requires Human consent after prerequisite acceptance; SYNC stays backlog pending real service input, S2 OPEN.

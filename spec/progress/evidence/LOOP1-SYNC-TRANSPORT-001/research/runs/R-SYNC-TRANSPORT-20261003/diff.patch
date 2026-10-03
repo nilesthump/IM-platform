@@ -1,0 +1,240 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 862cf40..b180950 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -276,6 +276,10 @@ jobs:
+         run: |
+           ./contracts/http/verify-auth-user-friend.ps1
+           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
++          python3 -B tools/verify_sync_transport.py
++          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
++          python3 -B -m unittest discover -s tests/contract -p test_sync_transport.py
++          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+           python3 contracts/websocket/verify.py
+           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+           python3 contracts/plugin-api/verify.py
+diff --git a/spec/architecture/README.md b/spec/architecture/README.md
+index 9c325d6..abcc693 100644
+--- a/spec/architecture/README.md
++++ b/spec/architecture/README.md
+@@ -32,3 +32,7 @@ ADR-0006 记录 Human 明确的客户端 UI、设计与截图验收决定，以
+ ## MVP 规划接受发现
+ 
+ planning_revision_adr对应ADR-0007的canonical16e9c7b4已接受于candidate7466ce7/PR14/actualmain b60f116并同步主仓库。证据见mvp-planning/closure/acceptance.md。此前候选pending语句为历史；此接受发现不改变canonical字节，不建立S2PASS。收尾metadata仍保留review至独立闭环，本轮随后只执行SEND。
++
++## Sync transport prerequisite candidate (2026-10-03)
++
++Resolve sync_revision_adr/approval_source/previous_sha256 in baseline.md for Human-authorized ADR-0008 additive public HTTPS binding at canonical section11.5. New candidate independent Review/exact-head hosted CI/protected integration/actual-main synchronization pending. No Go/client runtime acceptance. Concrete Go plan requires Human consent after prerequisite acceptance; SYNC stays backlog pending real service input, S2 OPEN.
+diff --git a/spec/architecture/baseline.md b/spec/architecture/baseline.md
+index 5652aa3..b51b45d 100644
+--- a/spec/architecture/baseline.md
++++ b/spec/architecture/baseline.md
+@@ -5,7 +5,7 @@
+ - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
+ - canonical_format: `markdown`
+ - repository_path: `spec/architecture/frozen-architecture.md`
+-- sha256: `16e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c`
++- sha256: `457c405b79ca068af2b398b9fbe49859810c455359b01dbfdb2d4c6d72a9d966`
+ - previous_canonical_format: `pdf`
+ - previous_repository_path: `scalable-distributed-im-architecture.pdf`
+ - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
+@@ -79,3 +79,14 @@ Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252
+ ## MVP 规划接受发现（2026-10-03）
+ 
+ 上述planning候选段落保留为历史。ADR-0007当前规范16e9c7b4已在candidate7466ce7、PR14实际main b60f116a14f9265031bff255db500f3414f2a357通过fresh independent Review、精确候选与actualmain hosted CI，并受保护同步H:/IM-platform。完整证据：spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/closure/acceptance.md。v1.1/hash/PDF不变；本收尾候选另待新Review/CI/集成。本轮后续仅SEND；S1PASS/S2OPEN。
++
++## Human-approved Sync transport candidate
++
++- sync_revision_type: `human_approved_sync_https_binding`
++- sync_semantic_change: `true`
++- sync_revision_task_id: `LOOP1-SYNC-TRANSPORT-001`
++- sync_revision_adr: `spec/architecture/decisions/ADR-0008-sync-https-transport.md`
++- sync_approval_source: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/human-authorization.txt`
++- sync_previous_sha256: `16e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c`
++
++Candidate only: fresh independent Review, exact-head hosted CI, protected integration/actual-main verification and main synchronization pending. Go product implementation additionally awaits Human consent to concrete plan after prerequisite acceptance. Existing wire shapes/PDF/prior accepted history unchanged; S2 OPEN.
+diff --git a/spec/architecture/frozen-architecture.md b/spec/architecture/frozen-architecture.md
+index 7b06f02..b413509 100644
+--- a/spec/architecture/frozen-architecture.md
++++ b/spec/architecture/frozen-architecture.md
+@@ -71,6 +71,7 @@
+   - [11.2 等价而非同构](#section-11-2) · 原 PDF 第 16 页
+   - [11.3 Golden Contract Tests](#section-11-3) · 原 PDF 第 16 页
+   - [11.4 数据库迁移](#section-11-4) · 原 PDF 第 16 页
++  - [11.5 公开 Sync HTTPS 绑定](#section-11-5)
+ - [12. AI Development Loop](#section-12) · 原 PDF 第 17 页
+   - [12.1 Task Spec 模板](#section-12-1) · 原 PDF 第 17 页
+   - [12.2 状态队列](#section-12-2) · 原 PDF 第 17 页
+@@ -843,6 +844,17 @@ Canonical Contracts 位于 contracts/，同时驱动 Go、Java/Spring 和客户
+ 
+ 两套后端共享数据库语义，但单次部署只运行一个 profile。migration 由独立迁移组件执行，不允许应用实例竞争执行。所有兼容窗口内的服务与客户端 fixture 必须通过 migration 测试。破坏性 schema 变更采用 expand -> migrate/backfill-> switch -> contract，多版本共存期间禁止先删旧字段。
+ 
++<a id="section-11-5"></a>
++### 11.5 公开 Sync HTTPS 绑定（Human-approved ADR-0008 候选）
++
++公开拉取通过 HTTPS POST /v1/sync/user 与 /v1/sync/conversation；唯一机器权威 contracts/http/sync.openapi.json，复用现有四种 Sync v1 形状和既有 Bearer/HTTP 错误目录。WSS realtime/ACK 保持原义，不添加 Sync envelope。Gateway 仅代理，Core 负责每请求数据库权威 Session、用户隔离、会话成员授权、稳定已提交分页；无新服务/依赖/数据库对象。
++
++用户初值 cursor 为 0，后续 opaque cursor 绑定认证用户、可跨其 Session 重放；客户端不解析/排序。仅 friend/conversation/membership/plugin metadata；消息仍使用会话 seq。内部 cursor_id 可在响应投影为 external event.cursor/nextCursor，既有 producer payload/schema 不改。任意正整数 limit 仍合法，effectiveLimit=min(limit,100)，先精确取 cap 再有界转换。空页 terminal（user 保持输入 cursor）；非空 user nextCursor=末事件 cursor 且前进；hasMore 要求非空进展且存在额外已提交合格项，不能跳过并发晚提交。会话消息从 afterSeq+1 有序连续；客户端仅跨无 gap 前缀推进 contiguous_seq，数据/cursor 同事务不变。
++
++成功/可解码有效 requestId 的 canonical error 与 body UUID 关联；不可关联格式错误用 server UUID。具体认证、字段、错误码/状态、资源界限和关联行为以 contracts/ 为准，不从实现推导。无效/外账号 cursor 400 VALIDATION_FAILED，不存在/非成员会话403 AUTHORIZATION_DENIED。未列入错误目录的服务器/传输失败不得冒充成功页或推进 cursor。查询参数禁止，入口 HTTPS、日志/错误无凭据，响应 no-store。
++
++批准来源与兼容/迁移见 ADR-0008。此绑定仅经 fresh independent Review、精确候选 hosted CI、protected integration/actual-main 与主仓库同步后生效；接受后仍须展示具体 Go 入口实现方案并取得 Human 同意才可写 Go 产品代码。SYNC 仍须真实服务与客户端独立接受；本前置不等于 Task SYNC/S2 Gate PASS。
++
+ <a id="section-12"></a>
+ ## 12. AI Development Loop
+ 
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index d15d236..3d022a8 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -5,46 +5,46 @@ Current Stage: S2
+ Current Gate: S2
+ Gate Status: OPEN
+ Current Batch: S2-SYNC-only
+-Current Task: LOOP1-SYNC-001
+-Current Task State: backlog
+-Execution Status: BLOCKED_BY_ARCHITECTURE
++Current Task: LOOP1-SYNC-TRANSPORT-001
++Current Task State: review
++Execution Status: REVIEW_READY_LOCAL_ONLY
+ 
+ ## Immediately Relevant Completed Work
+ 
+-S1 PASS. SEND product and administrative closure independently accepted, protected-integrated and synchronized; accepted main a0304fcc7be18b87f5986d014849d6b48b96a071. Human now explicitly authorizes “开始 SYNC，完成后停止”. SYNC dependency SEND is satisfied; GUI/Web remain outside this endpoint.
++S1 PASS; SEND accepted and synchronized main a0304fcc7be18b87f5986d014849d6b48b96a071. Human authorizes “开始 SYNC，完成后停止”, then expressly authorizes minimal architecture/contract prerequisite. Go implementation must be shown and separately consented after prerequisite independent Review/CI acceptance. GUI/Web outside endpoint.
+ 
+ ## Current Blockers
+ 
+-Accepted public Sync transport binding and actual User Sync backend entrypoint are absent. Existing Sync standalone shapes and transactional Repository are present; offline vectors and private Conversation history do not supply the missing public service boundary. SYNC stays unique backlog because inputs are incomplete. No product writes or fabricated runtime acceptance.
++LOOP1-SYNC-001 remains unique backlog BLOCKED_BY_ARCHITECTURE awaiting accepted public binding and actual accepted User Sync runtime. Named prerequisite is expressly authorized current work; no client/backend product writes. Candidate is not accepted authority until independent process/main synchronization.
+ 
+ ## Verification
+ 
+-Fresh implementation baseline: python -B ci/check_architecture.py --scope all --json PASS; python -B tools/verify_frozen_architecture.py PASS. Corrected direct JSON/source inventory confirms the missing transport/runtime input. Evidence: spec/progress/evidence/LOOP1-SYNC-001/implementation/authority-blocker.md. Local/Recorder PASS does not establish Task or Gate PASS.
++Recorded minimum baseline architecture all + frozen integrity PASS. Candidate contract/ref/official OAI lint/4 negative-test groups/53 architecture tests and unchanged HTTP/WSS/SyncPlugin regressions PASS; durable spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/. Recorder prospective_resume exposes read-only startup gap and interpreter/encoding/quoting failures. Local/Recorder PASS does not establish task/Gate PASS.
+ 
+ ## Changed Files or Migrations
+ 
+-Only SYNC recovery task/current metadata and task-owned evidence/Research Recorder. No product, backend, public contract, frozen authority, Repository, schema or migration change.
++Bounded Sync OpenAPI, external-ref guards, ADR-0008/canonical §11.5/hash discovery, narrow prerequisite task/progress/evidence. No product/schema/migration/WSS/ACK change. Prior blocker bc1bebb and sealed Coordinator research remain owned authorized inputs unchanged.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-Recorder initial read-only startup gap is explicitly prospective_resume. Windows base64-pipeline registration/start and output-encoding failures exposed; corrected registration/output succeed. An initial wrong filename was corrected by exact JSON/source inventory. SYNC not implemented/accepted/done; S2 OPEN. Unknown main work untouched.
++Go runtime/client SYNC absent. All prerequisite Review/hosted/integration/main acceptance pending. Go proposal awaits Human consent after prerequisite acceptance. Unknown main work preserved.
+ 
+ ## Next Exact Action
+ 
+-Fresh independent Review of blocker recovery. Architect/Human decides the smallest prerequisite: approved public Sync transport binding plus narrowly scoped Go runtime delivery, then freeze/independent Review/applicable exact-head hosted CI/service acceptance before SYNC readiness. Do not invent an endpoint or widen SYNC paths. Do not advance GUI/Web or mark SYNC done. Recovery-record main synchronization remains PENDING.
++Fresh independent Review of clean committed freeze candidate; recorded checks PASS. Coordinator then exact-head hosted CI/protected integration/main synchronization, show concrete Go plan and obtain Human consent before product writes. Do not mark SYNC done or advance GUI/Web.
+ 
+ ## Last Known Good Commit
+ 
+-`a0304fcc7be18b87f5986d014849d6b48b96a071` accepted SEND administrative actual-main and synchronized H:/IM-platform; recovery branch task/LOOP1-SYNC-001 starts from this base.
++a0304fcc7be18b87f5986d014849d6b48b96a071 (accepted SEND administrative actual-main).
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-10-03-loop1-client-send-001-accepted.md` remains the latest accepted stable product recovery point.
++spec/progress/checkpoints/2026-10-03-loop1-client-send-001-accepted.md remains latest accepted stable product recovery.
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Assigned root H:/.codex/worktrees/sync-resume/IM-platform verified exactly. Fresh implementer /root/sync_implementation owns only SYNC task/current recovery, implementation evidence and implementation-research. Coordinator /root owns pre-existing evidence/research. Main unknown work preserved. New blocker record is unaccepted until independent governance; candidate SHA follows clean handoff.
++Verified exact assigned root H:/.codex/worktrees/sync-resume/IM-platform, branch task/LOOP1-SYNC-001. Sole prerequisite writer /root/sync_transport_design owns narrow task paths; root research sealed20BLOCKED input owned/authorized by Coordinator and preserved. No unknown main writes.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-BLOCKED_BY_ARCHITECTURE: absent accepted Sync public binding and actual User Sync runtime. Frozen §2.1/§11 and accepted client-ui architecture forbid implementing a new route/contract silently. Minimal decision is recorded in the SYNC task and durable evidence; no specific transport/route prescribed.
+\ No newline at end of file
++Human authorized public Sync binding freeze via ADR-0008 candidate; absence of runtime remains SYNC blocker. No Go implementation before later Human plan consent.
+diff --git a/spec/tasks/backlog/LOOP1-SYNC-001.md b/spec/tasks/backlog/LOOP1-SYNC-001.md
+index abb82aa..8977c1d 100644
+--- a/spec/tasks/backlog/LOOP1-SYNC-001.md
++++ b/spec/tasks/backlog/LOOP1-SYNC-001.md
+@@ -96,4 +96,7 @@ Smallest decision question: Approve a prerequisite public Sync transport binding
+ 
+ Verification: own recorded python -B ci/check_architecture.py --scope all --json PASS; own recorded python -B tools/verify_frozen_architecture.py PASS. Canonical SHA25616e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c matches. Recorded corrected JSON inventory confirms missing binding. Earlier inspection used wrong envelope filename and had one missing gateway filename; corrected direct inventory succeeds. Windows Recorder pipeline/base64 registration and canonical-output encoding failures are disclosed in implementation/authority-blocker.md; prospective_resume explicitly marks incomplete initial read-only trace.
+ 
+-Evidence: spec/progress/evidence/LOOP1-SYNC-001/implementation/authority-blocker.md and implementation-research/. Local PASS is baseline evidence only; no SYNC Task PASS, runtime acceptance, hosted candidate acceptance or synchronization claimed. Main H:/IM-platform untouched; unknown work preserved. Branch commit identity is supplied in implementation handoff; main sync PENDING for this recovery record. Independent Review of blocker recovery is next; do not mark done. Last known good a0304fcc7be18b87f5986d014849d6b48b96a071. Coordinator /root owns pre-existing evidence/research; implementer owns only this appended note/current recovery/implementation evidence/own Recorder. No other-agent stream edited.
+\ No newline at end of file
++Evidence: spec/progress/evidence/LOOP1-SYNC-001/implementation/authority-blocker.md and implementation-research/. Local PASS is baseline evidence only; no SYNC Task PASS, runtime acceptance, hosted candidate acceptance or synchronization claimed. Main H:/IM-platform untouched; unknown work preserved. Branch commit identity is supplied in implementation handoff; main sync PENDING for this recovery record. Independent Review of blocker recovery is next; do not mark done. Last known good a0304fcc7be18b87f5986d014849d6b48b96a071. Coordinator /root owns pre-existing evidence/research; implementer owns only this appended note/current recovery/implementation evidence/own Recorder. No other-agent stream edited.
++# Human-authorized prerequisite (2026-10-03)
++
++Human authorizes minimal public Sync architecture/contract prerequisite LOOP1-SYNC-TRANSPORT-001. This is current active task; SYNC remains backlog BLOCKED_BY_ARCHITECTURE awaiting accepted binding and actual accepted Go service inputs. Go product implementation requires prerequisite independent Review/CI acceptance and Human consent to concrete plan beforehand. GUI/Web not authorized. No change to SYNC product allowed_paths/acceptance.
+
+# Untracked paths observed; content intentionally not captured
+# ?? contracts/http/sync.openapi.json
+# ?? spec/architecture/decisions/ADR-0008-sync-https-transport.md
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/prompts/P-SYNC-RESUME-20261003/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/prompts/P-SYNC-RESUME-20261003/prompt.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-31b59ec7-60c2-41a5-ac95-45793ff06e87.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-31b59ec7-60c2-41a5-ac95-45793ff06e87.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-56c712df-a873-408b-b60d-9783afa4c038.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-56c712df-a873-408b-b60d-9783afa4c038.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-a3581c26-3f5f-422d-9652-67c930c0b3fb.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-a3581c26-3f5f-422d-9652-67c930c0b3fb.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-ac5b9fe0-edd3-4e49-8307-06f4c603fbf0.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-ac5b9fe0-edd3-4e49-8307-06f4c603fbf0.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-bf8085dd-e0cf-47cb-a588-b8cdc342e901.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-bf8085dd-e0cf-47cb-a588-b8cdc342e901.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-fa570a6c-b69f-4b9b-bf34-727968dcae25.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/blobs/C-fa570a6c-b69f-4b9b-bf34-727968dcae25.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/diff.patch
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/events.jsonl
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/final_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/initial_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-001/research/runs/R-SYNC-RESUME-20261003/summary.json
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/human-authorization.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/implementation-handoff.md
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/prompts/P-SYNC-TRANSPORT-20261003/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/prompts/P-SYNC-TRANSPORT-20261003/prompt.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-0f0e3dbe-c189-44e8-8957-1aab5e157b35.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-0f0e3dbe-c189-44e8-8957-1aab5e157b35.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-10ce5d69-d03c-4522-9be7-6326329cd513.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-10ce5d69-d03c-4522-9be7-6326329cd513.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-14c36375-e5e8-4488-8d4b-b5c39ddcafa7.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-14c36375-e5e8-4488-8d4b-b5c39ddcafa7.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-2e30696d-08a8-4852-9a98-ab1f95077606.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-2e30696d-08a8-4852-9a98-ab1f95077606.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-328e8210-c027-4ee0-ba5c-f2edb117a882.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-328e8210-c027-4ee0-ba5c-f2edb117a882.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-36bff3c3-725e-4804-b28a-e316e1ad2970.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-36bff3c3-725e-4804-b28a-e316e1ad2970.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-472c0e29-3930-475e-807e-57a7d230aff6.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-472c0e29-3930-475e-807e-57a7d230aff6.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-4b16273d-6116-44fe-b6d2-08b02a25b1f6.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-4b16273d-6116-44fe-b6d2-08b02a25b1f6.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-526820db-34ec-4af6-911c-5261c3fb7c91.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-526820db-34ec-4af6-911c-5261c3fb7c91.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-5a3c83fc-ae99-4b66-b4aa-0ed6ee84a9dd.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-5a3c83fc-ae99-4b66-b4aa-0ed6ee84a9dd.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-5d4aa70e-ba70-4ff3-a1a2-5386e2782c6c.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-5d4aa70e-ba70-4ff3-a1a2-5386e2782c6c.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-6daaedae-4649-4140-b654-c337affdb98f.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-6daaedae-4649-4140-b654-c337affdb98f.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-6f106dec-3aec-4854-b984-c52728eb5b6c.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-6f106dec-3aec-4854-b984-c52728eb5b6c.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-959958f7-33e8-4c93-8a08-dc1e492104ee.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-959958f7-33e8-4c93-8a08-dc1e492104ee.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-b7f5b89f-b881-44dd-abcc-f0475d2231c8.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-b7f5b89f-b881-44dd-abcc-f0475d2231c8.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-bad62218-035c-4c1f-b9ec-ca1cdcfdba74.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-bad62218-035c-4c1f-b9ec-ca1cdcfdba74.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-bbc1e173-7182-4fbe-9402-fca8a5ab2da4.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-bbc1e173-7182-4fbe-9402-fca8a5ab2da4.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-c4539fee-5cb1-4e30-a0aa-3ef6d59995df.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-c4539fee-5cb1-4e30-a0aa-3ef6d59995df.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-e4711082-9e92-4b94-b9bc-425523669bd7.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-e4711082-9e92-4b94-b9bc-425523669bd7.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-ea5a963d-e89c-41a5-aa0c-b7b4829be552.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/blobs/C-ea5a963d-e89c-41a5-aa0c-b7b4829be552.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/events.jsonl
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/initial_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/research/runs/R-SYNC-TRANSPORT-20261003/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/verification-history.md
+# ?? spec/tasks/review/LOOP1-SYNC-TRANSPORT-001.md
+# ?? tests/contract/test_sync_transport.py
+# ?? tools/verify_sync_transport.py

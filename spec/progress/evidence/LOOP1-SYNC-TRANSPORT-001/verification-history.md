@@ -1,0 +1,24 @@
+# Recorded actual local command history
+
+Research trace only; not independent acceptance. Recorder sealed 45 events/result PASS/validate PASS; never Task or Gate PASS. Commit follows seal and is identified by Coordinator handoff. Each raw output SHA/blob is preserved by Recorder.
+
+- ["python", "-B", "ci/check_architecture.py", "--scope", "all", "--json"]; exit=0; elapsed_ms=438.8606; result=PASS; stdout_sha256=3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f
+- ["python", "-B", "tools/verify_frozen_architecture.py"]; exit=0; elapsed_ms=94.2842; result=PASS; stdout_sha256=05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e
+- ["python", "-B", "tools/verify_sync_transport.py", "--node", "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe"]; exit=0; elapsed_ms=834.1268; result=PASS; stdout_sha256=7463263b065fa0355404d1dee5921d66c765e10ebc3c01452fe23c5c4fb95859
+- ["python", "-B", "-m", "unittest", "discover", "-s", "tests/contract", "-p", "test_sync_transport.py"]; exit=1; elapsed_ms=143.078; result=FAIL; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- ["python", "-B", "tools/verify_frozen_architecture.py"]; exit=0; elapsed_ms=94.3112; result=PASS; stdout_sha256=05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e
+- ["python", "-B", "-m", "unittest", "discover", "-s", "tests/architecture"]; exit=0; elapsed_ms=6599.3365; result=PASS; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- ["python", "-B", "tools/verify_sync_transport.py", "--node", "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe"]; exit=0; elapsed_ms=140.7561; result=PASS; stdout_sha256=7463263b065fa0355404d1dee5921d66c765e10ebc3c01452fe23c5c4fb95859
+- ["python", "-B", "-m", "unittest", "discover", "-s", "tests/contract", "-p", "test_sync_transport.py"]; exit=0; elapsed_ms=111.7964; result=PASS; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- ["python", "-B", "contracts/websocket/verify.py"]; exit=0; elapsed_ms=86.0861; result=PASS; stdout_sha256=4eb2bd895b7d0d6ff48c073898cc8eb117c642cfbf3c0e34477adc556e1dc78b
+- ["python", "-B", "contracts/plugin-api/verify.py"]; exit=0; elapsed_ms=77.848; result=PASS; stdout_sha256=1ebc963302a2587a60c0685b89613c10d25d2e1ee37bf6eff5ba50173f41083f
+- ["python", "-B", "-m", "unittest", "discover", "-s", "tests/contract", "-p", "test_sync_transport.py"]; exit=0; elapsed_ms=119.6484; result=PASS; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- ["pwsh", "-NoProfile", "-File", "contracts/http/verify-auth-user-friend.ps1"]; exit=0; elapsed_ms=6219.2591; result=PASS; stdout_sha256=9319b415bda0de93cd5905fa183e8e09b44e61e4172c5a22b14c645f2c9c4811
+- ["python", "-B", "tools/verify_frozen_architecture.py"]; exit=0; elapsed_ms=92.1252; result=PASS; stdout_sha256=05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e
+- ["python", "-B", "-c", "import subprocess,json; r=subprocess.run(['python','-B','ci/check_architecture.py','--scope','all','--json'],capture_output=True); print(json.dumps({'exit_code':r.returncode,'result':json.loads(r.stdout).get('result'),'violations':json.loads(r.stdout).get('violations')})); raise SystemExit(r.returncode)"]; exit=0; elapsed_ms=475.3759; result=PASS; stdout_sha256=a6940f0ed2e104c4ce38a8c081e26aaa66e466c8bb33fb1b82a4a2ca8f6fbb0d
+- ["git", "diff", "--check"]; exit=0; elapsed_ms=51.1517; result=PASS; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- ["python", "-B", "tools/verify_sync_transport.py", "--node", "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe"]; exit=0; elapsed_ms=140.9155; result=PASS; stdout_sha256=7463263b065fa0355404d1dee5921d66c765e10ebc3c01452fe23c5c4fb95859
+- ["python", "-B", "-m", "unittest", "discover", "-s", "tests/contract", "-p", "test_sync_transport.py"]; exit=0; elapsed_ms=123.7236; result=PASS; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- ["python", "-B", "-m", "unittest", "discover", "-s", "tests/architecture"]; exit=0; elapsed_ms=5750.3112; result=PASS; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- ["python", "-B", "-c", "import subprocess,json; r=subprocess.run(['python','-B','ci/check_architecture.py','--scope','all','--json'],capture_output=True); d=json.loads(r.stdout); print(json.dumps({'exit_code':r.returncode,'result':d['result'],'violations':d['violations']})); raise SystemExit(r.returncode)"]; exit=0; elapsed_ms=473.9853; result=PASS; stdout_sha256=a6940f0ed2e104c4ce38a8c081e26aaa66e466c8bb33fb1b82a4a2ca8f6fbb0d
+- ["git", "diff", "--check"]; exit=0; elapsed_ms=52.1333; result=PASS; stdout_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
