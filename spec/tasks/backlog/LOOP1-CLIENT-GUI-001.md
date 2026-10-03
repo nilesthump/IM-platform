@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-GUI-001
 title: Desktop/Mobile complete Loop1 GUI
 status: backlog
-owner: unassigned
+owner: /root/gui_implementation
 stage: S2
 gate: S2
 ---
@@ -39,6 +39,15 @@ client_runtime: Android
 - ADR-0007 本轮规划须独立 Review/精确 HEAD CI/集成 main 同步接受才可激活。依赖未满足保持 backlog；GUI/Web 在本轮 Human endpoint 之后，无本轮激活授权。
 
 # Allowed Paths
+
+- `clients/desktop/package.json` (Human-authorized GUI assembly only; no new sensitive technology authority.)
+- `clients/desktop/package-lock.json` (Human-authorized GUI assembly only; no new sensitive technology authority.)
+- `clients/desktop/tsconfig.json` (Human-authorized GUI assembly only; no new sensitive technology authority.)
+- `clients/desktop/src-tauri/Cargo.toml` (Human-authorized GUI assembly only; no new sensitive technology authority.)
+- `clients/desktop/src-tauri/Cargo.lock` (Human-authorized GUI assembly only; no new sensitive technology authority.)
+- `clients/desktop/src-tauri/src/lib.rs` (Human-authorized GUI assembly only; no new sensitive technology authority.)
+- `clients/mobile/app/build.gradle.kts` (Human-authorized GUI assembly only; no new sensitive technology authority.)
+- `.github/workflows/ci.yml` (Human-authorized GUI assembly only; no new sensitive technology authority.)
 
 - `clients/desktop/src/ui/**`
 - `clients/desktop/src/application/ui/**`
@@ -87,3 +96,29 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 # Next Action
 
 等待依赖与规划独立接受；本轮仅 SEND 允许随后激活，SYNC/GUI/WEB 保持 backlog。
+
+# Authorized GUI readiness recovery (2026-10-04)
+
+Human exact visible prompt: 启动下一个task. This supersedes the earlier SYNC-only endpoint for GUI only. SYNC administrative closure is independently accepted at actual main ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597; old SYNC done/current endpoint text is historical. SQLITE/UI-ARCH/SEND/SYNC dependencies are accepted/done; Web and later tasks are not authorized. Human subsequent exact approval: 授权补充这 8 个文件，继续 GUI. Eight assembly paths above are scope authorization only.
+
+Execution: BLOCKED_BY_ARCHITECTURE; unique backlog/status backlog retained because complete GUI runtime inputs still lack accepted native/appearance selections. No product code, dependency, contract, backend, frozen authority, schema, Send or Sync edits. Startup baseline is local evidence, not Task/Gate acceptance.
+
+Assigned managed root H:/.codex/worktrees/s/IM-platform exactly verified by git rev-parse; branch task/LOOP1-CLIENT-GUI-001 clean at accepted main ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597. Do not copy unknown main changes or create a substitute workspace. Own Recorder R-GUI-IMPLEMENTATION-20261004 uses prospective_resume/fresh_context=true; initial read-only startup and a few direct inspections are explicitly incomplete command capture. Exact visible prompt P-GUI-START-20261004; parent R-GUI-COORDINATOR-20261004.
+
+Existing Desktop is a storage host: no React dependencies/JSX compile, windows empty, lib only registers database commands, no registered desktop_capabilities module. Existing Mobile MainActivity renders a storage validation label; Navigation/Lifecycle runtime bindings absent. Approved eight-file scope solves assembly reachability, not sensitive native/prefs choices. SyncHttp supports injected fetch so existing orchestration can be reused through UI composition; accepted Send/Sync modules need no rewrite.
+
+Smallest decision question: freeze the native HTTPS/OS-secure-refresh/notification/shortcut and appearance-storage adapters for this GUI task, with Windows Desktop validation and Android standard SDK mechanisms, before runtime implementation? Proposed choices and alternatives are in readiness/authority-gap.md; they are not decisions or approved imports. Native generic adapters must retain TypeScript auth/domain/protocol/Repository authority. No backend CORS change or new public API is proposed.
+
+Baseline recorded commands: bundled Python3 -B ci/check_architecture.py --scope all --json PASS, zero violations; -B tools/verify_frozen_architecture.py PASS. Canonical SHA256 ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 and PDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 verified. No GUI runtime/screenshots/Architect Approval/independent GUI Review/hosted candidate acceptance claimed.
+
+Next exact action: Architect/Human concrete decision -> accepted frozen authority/approved ADR and machine policy guards -> fresh independent Review/applicable exact-head CI/protected integration/actual-main sync -> reassess GUI readiness, then sequential backlog -> ready -> active and actual runnable GUI. Current recovery documentation itself requires fresh independent Review/CI/integration; do not mark GUI done. Last accepted ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597; main synchronization of this local recovery record PENDING. Sole writer owns only GUI task/current/readiness/checkpoint and private Recorder; no unknown main work touched.
+
+## Approved prerequisite plan; freeze acceptance pending
+
+Human exact response: 批准该最小前置方案并继续. The named concrete minimal native/appearance prerequisite plan is approved: Windows Desktop reqwest strict HTTPS, keyring Windows Credential Manager, official Tauri notification/global-shortcut plugins and existing Tauri tray; Desktop app_data JSON appearance values; Android SharedPreferences appearance, Keystore AES/GCM protected refresh credential ciphertext. Earlier proposed/unapproved/no-consent wording describes inspection before this answer. Current status APPROVED_PENDING_FREEZE; GUI remains BLOCKED_BY_ARCHITECTURE/backlog until authority is frozen and independently accepted. No missing Human plan/scope consent remains; do not ask again.
+
+Next exact action is fresh prerequisite writer for LOOP1-CLIENT-NATIVE-ARCH-001/ADR-0009 with precise native responsibilities/policy markers, fresh independent Review/applicable exact-head CI/protected integration/actual-main/main sync. GUI sole writer releases after this clean recovery commit. Product implementation still waits for accepted prerequisite; no GUI agent writes frozen authority outside its allowed scope. Genuine Windows notification proof requires installed owned package, not development PowerShell identity/toast. Scope additions do not authorize backend CORS, public contract or native business migration. Main unchanged; recovery synchronization pending.
+
+## Recovery verification outcomes
+
+Development recovery verifier initially failed because Windows legacy PowerShell lacks Get-FileHash. Corrected to bundled PowerShell7; then failed four current.md required formatting controls (exact backtick Command/Evidence/SHA/checkpoint). Formatting repaired; rerun tools/verify-loop1-ctrl-002.ps1 -Mode Development exits0 PASS task GUI/backlog, queues5/task_specs30. Original failures remain in sealed command stream. Baseline architecture/frozen exit0 PASS. Development is local evidence only, not independent acceptance. All commands recorded; command summaries contain exact duration/output hashes. No Recorder failures.
