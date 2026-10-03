@@ -1,0 +1,590 @@
+go	Set up job	﻿2026-10-03T13:55:48.2315278Z Current runner version: '2.337.0'
+go	Set up job	2026-10-03T13:55:48.2334254Z ##[group]Runner Image Provisioner
+go	Set up job	2026-10-03T13:55:48.2334818Z Hosted Compute Agent
+go	Set up job	2026-10-03T13:55:48.2335196Z Version: 20260901.588
+go	Set up job	2026-10-03T13:55:48.2335642Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+go	Set up job	2026-10-03T13:55:48.2336293Z Build Date: 2026-09-01T19:56:44Z
+go	Set up job	2026-10-03T13:55:48.2336816Z Worker ID: {cb795624-d3b2-4bb9-8d7e-c6455b37c636}
+go	Set up job	2026-10-03T13:55:48.2337287Z Azure Region: centralus
+go	Set up job	2026-10-03T13:55:48.2337646Z ##[endgroup]
+go	Set up job	2026-10-03T13:55:48.2338490Z ##[group]Operating System
+go	Set up job	2026-10-03T13:55:48.2338861Z Ubuntu
+go	Set up job	2026-10-03T13:55:48.2339266Z 24.04.5
+go	Set up job	2026-10-03T13:55:48.2339598Z LTS
+go	Set up job	2026-10-03T13:55:48.2339921Z ##[endgroup]
+go	Set up job	2026-10-03T13:55:48.2340296Z ##[group]Runner Image
+go	Set up job	2026-10-03T13:55:48.2340673Z Image: ubuntu-24.04
+go	Set up job	2026-10-03T13:55:48.2341047Z Version: 20260927.320.1
+go	Set up job	2026-10-03T13:55:48.2341744Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+go	Set up job	2026-10-03T13:55:48.2342797Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+go	Set up job	2026-10-03T13:55:48.2343370Z ##[endgroup]
+go	Set up job	2026-10-03T13:55:48.2344119Z ##[group]GITHUB_TOKEN Permissions
+go	Set up job	2026-10-03T13:55:48.2345314Z Contents: read
+go	Set up job	2026-10-03T13:55:48.2345704Z Metadata: read
+go	Set up job	2026-10-03T13:55:48.2346353Z ##[endgroup]
+go	Set up job	2026-10-03T13:55:48.2347703Z Secret source: Actions
+go	Set up job	2026-10-03T13:55:48.2348310Z Cache mode: write
+go	Set up job	2026-10-03T13:55:48.2348759Z Prepare workflow directory
+go	Set up job	2026-10-03T13:55:48.2636364Z Prepare all required actions
+go	Set up job	2026-10-03T13:55:48.2677953Z Getting action download info
+go	Set up job	2026-10-03T13:55:48.5138574Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+go	Set up job	2026-10-03T13:55:48.6010387Z Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+go	Set up job	2026-10-03T13:55:49.1365964Z Complete job name: go
+go	Initialize containers	﻿2026-10-03T13:55:49.1684577Z ##[group]Checking docker version
+go	Initialize containers	2026-10-03T13:55:49.1692733Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+go	Initialize containers	2026-10-03T13:55:49.2508750Z '1.48'
+go	Initialize containers	2026-10-03T13:55:49.2516629Z Docker daemon API version: '1.48'
+go	Initialize containers	2026-10-03T13:55:49.2517238Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+go	Initialize containers	2026-10-03T13:55:49.2658516Z '1.48'
+go	Initialize containers	2026-10-03T13:55:49.2669968Z Docker client API version: '1.48'
+go	Initialize containers	2026-10-03T13:55:49.2673447Z ##[endgroup]
+go	Initialize containers	2026-10-03T13:55:49.2676308Z ##[group]Clean up resources from previous jobs
+go	Initialize containers	2026-10-03T13:55:49.2680684Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=eea6ee"
+go	Initialize containers	2026-10-03T13:55:49.2791175Z ##[command]/usr/bin/docker network prune --force --filter "label=eea6ee"
+go	Initialize containers	2026-10-03T13:55:49.2891547Z ##[endgroup]
+go	Initialize containers	2026-10-03T13:55:49.2892036Z ##[group]Create local container network
+go	Initialize containers	2026-10-03T13:55:49.2899709Z ##[command]/usr/bin/docker network create --label eea6ee github_network_baeeec4b563645feacbcc20c69ed60e7
+go	Initialize containers	2026-10-03T13:55:49.3328502Z eaa168ba3e3348f7946cd29223d1edc73a59ca4a040b3fe924f7bd60d5db97b0
+go	Initialize containers	2026-10-03T13:55:49.3357743Z ##[endgroup]
+go	Initialize containers	2026-10-03T13:55:49.3374017Z ##[group]Starting postgres service container
+go	Initialize containers	2026-10-03T13:55:49.3387931Z ##[command]/usr/bin/docker pull postgres:16
+go	Initialize containers	2026-10-03T13:55:49.8914080Z 16: Pulling from library/postgres
+go	Initialize containers	2026-10-03T13:55:50.0576678Z 6b37362b3da7: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0577609Z b1fdda8975a0: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0578583Z 106e7e3cf19a: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0579391Z ba0e979d0818: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0580198Z ad29720ebbb9: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0580889Z 3a749597affc: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0581532Z 483fb6941c15: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0582211Z 359ae0fc975d: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0582888Z 56d4d190ef07: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0583583Z 74156cf9f063: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0584301Z f7c7d4dd80ba: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0584989Z 749acf6dc637: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0585714Z 4d848243a73e: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0586791Z 6ad4758748c1: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:50.0587447Z 56d4d190ef07: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0588054Z 74156cf9f063: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0588658Z f7c7d4dd80ba: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0589203Z 749acf6dc637: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0589789Z 4d848243a73e: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0590390Z ba0e979d0818: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0590991Z 3a749597affc: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0591708Z 6ad4758748c1: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0592482Z 483fb6941c15: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0593264Z ad29720ebbb9: Waiting
+go	Initialize containers	2026-10-03T13:55:50.0594053Z 359ae0fc975d: Waiting
+go	Initialize containers	2026-10-03T13:55:50.1817393Z b1fdda8975a0: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.1818489Z b1fdda8975a0: Download complete
+go	Initialize containers	2026-10-03T13:55:50.2874986Z 106e7e3cf19a: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.2876839Z 106e7e3cf19a: Download complete
+go	Initialize containers	2026-10-03T13:55:50.3880089Z 6b37362b3da7: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.3881110Z 6b37362b3da7: Download complete
+go	Initialize containers	2026-10-03T13:55:50.4038480Z ba0e979d0818: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.4042414Z ba0e979d0818: Download complete
+go	Initialize containers	2026-10-03T13:55:50.5207785Z 483fb6941c15: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.5209085Z 483fb6941c15: Download complete
+go	Initialize containers	2026-10-03T13:55:50.5764832Z ad29720ebbb9: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.5766309Z ad29720ebbb9: Download complete
+go	Initialize containers	2026-10-03T13:55:50.5831709Z 3a749597affc: Download complete
+go	Initialize containers	2026-10-03T13:55:50.6350643Z 359ae0fc975d: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.6352153Z 359ae0fc975d: Download complete
+go	Initialize containers	2026-10-03T13:55:50.7153587Z 74156cf9f063: Download complete
+go	Initialize containers	2026-10-03T13:55:50.7930691Z f7c7d4dd80ba: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.7931168Z f7c7d4dd80ba: Download complete
+go	Initialize containers	2026-10-03T13:55:50.8533773Z 749acf6dc637: Download complete
+go	Initialize containers	2026-10-03T13:55:50.9658604Z 4d848243a73e: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.9659458Z 4d848243a73e: Download complete
+go	Initialize containers	2026-10-03T13:55:50.9848931Z 6ad4758748c1: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:50.9849561Z 6ad4758748c1: Download complete
+go	Initialize containers	2026-10-03T13:55:51.0600019Z 56d4d190ef07: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:51.0600354Z 56d4d190ef07: Download complete
+go	Initialize containers	2026-10-03T13:55:51.0769351Z 6b37362b3da7: Pull complete
+go	Initialize containers	2026-10-03T13:55:52.2516490Z b1fdda8975a0: Pull complete
+go	Initialize containers	2026-10-03T13:55:52.4382124Z 106e7e3cf19a: Pull complete
+go	Initialize containers	2026-10-03T13:55:52.4791626Z ba0e979d0818: Pull complete
+go	Initialize containers	2026-10-03T13:55:52.8010516Z ad29720ebbb9: Pull complete
+go	Initialize containers	2026-10-03T13:55:52.8694124Z 3a749597affc: Pull complete
+go	Initialize containers	2026-10-03T13:55:52.8757268Z 483fb6941c15: Pull complete
+go	Initialize containers	2026-10-03T13:55:52.8823161Z 359ae0fc975d: Pull complete
+go	Initialize containers	2026-10-03T13:55:56.1854802Z 56d4d190ef07: Pull complete
+go	Initialize containers	2026-10-03T13:55:56.1949827Z 74156cf9f063: Pull complete
+go	Initialize containers	2026-10-03T13:55:56.2012630Z f7c7d4dd80ba: Pull complete
+go	Initialize containers	2026-10-03T13:55:56.2082223Z 749acf6dc637: Pull complete
+go	Initialize containers	2026-10-03T13:55:56.2151496Z 4d848243a73e: Pull complete
+go	Initialize containers	2026-10-03T13:55:56.2208485Z 6ad4758748c1: Pull complete
+go	Initialize containers	2026-10-03T13:55:56.2236451Z Digest: sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+go	Initialize containers	2026-10-03T13:55:56.2246476Z Status: Downloaded newer image for postgres:16
+go	Initialize containers	2026-10-03T13:55:56.2252635Z docker.io/library/postgres:16
+go	Initialize containers	2026-10-03T13:55:56.2314562Z ##[command]/usr/bin/docker create --name 3a7ad58bee0d416081971275eaddbfca_postgres16_89a5a2 --label eea6ee --network github_network_baeeec4b563645feacbcc20c69ed60e7 --network-alias postgres -p 5432:5432 --health-cmd "pg_isready -U postgres -d im_ci" --health-interval 10s --health-timeout 5s --health-retries 5 -e "POSTGRES_PASSWORD=ci-only-password" -e "POSTGRES_DB=im_ci" -e GITHUB_ACTIONS=true -e CI=true postgres:16
+go	Initialize containers	2026-10-03T13:55:56.2491637Z 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:55:56.2508859Z ##[command]/usr/bin/docker start 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:55:56.4174003Z 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:55:56.4191559Z ##[command]/usr/bin/docker ps --all --filter id=04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+go	Initialize containers	2026-10-03T13:55:56.4294131Z 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766 Up Less than a second (health: starting)
+go	Initialize containers	2026-10-03T13:55:56.4313116Z ##[command]/usr/bin/docker port 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:55:56.4416912Z 5432/tcp -> 0.0.0.0:5432
+go	Initialize containers	2026-10-03T13:55:56.4425760Z 5432/tcp -> [::]:5432
+go	Initialize containers	2026-10-03T13:55:56.4458381Z ##[endgroup]
+go	Initialize containers	2026-10-03T13:55:56.4459056Z ##[group]Starting nats service container
+go	Initialize containers	2026-10-03T13:55:56.4460082Z ##[command]/usr/bin/docker pull nats:2.10-alpine
+go	Initialize containers	2026-10-03T13:55:57.0751700Z 2.10-alpine: Pulling from library/nats
+go	Initialize containers	2026-10-03T13:55:57.2513621Z d49a2dee86fb: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:57.2514211Z 08267b6ab21b: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:57.2514427Z 252dbe15f747: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:57.2514623Z a9d9eb83cd84: Pulling fs layer
+go	Initialize containers	2026-10-03T13:55:57.2514836Z a9d9eb83cd84: Waiting
+go	Initialize containers	2026-10-03T13:55:57.3842713Z 252dbe15f747: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:57.3843041Z 252dbe15f747: Download complete
+go	Initialize containers	2026-10-03T13:55:57.4687279Z d49a2dee86fb: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:57.4687988Z d49a2dee86fb: Download complete
+go	Initialize containers	2026-10-03T13:55:57.4876874Z 08267b6ab21b: Verifying Checksum
+go	Initialize containers	2026-10-03T13:55:57.4877967Z 08267b6ab21b: Download complete
+go	Initialize containers	2026-10-03T13:55:57.5230052Z a9d9eb83cd84: Download complete
+go	Initialize containers	2026-10-03T13:55:57.5337112Z d49a2dee86fb: Pull complete
+go	Initialize containers	2026-10-03T13:55:57.8478107Z 08267b6ab21b: Pull complete
+go	Initialize containers	2026-10-03T13:55:57.8561740Z 252dbe15f747: Pull complete
+go	Initialize containers	2026-10-03T13:55:57.8620627Z a9d9eb83cd84: Pull complete
+go	Initialize containers	2026-10-03T13:55:57.8648647Z Digest: sha256:b83efabe3e7def1e0a4a31ec6e078999bb17c80363f881df35edc70fcb6bb927
+go	Initialize containers	2026-10-03T13:55:57.8659147Z Status: Downloaded newer image for nats:2.10-alpine
+go	Initialize containers	2026-10-03T13:55:57.8665509Z docker.io/library/nats:2.10-alpine
+go	Initialize containers	2026-10-03T13:55:57.8679572Z ##[command]/usr/bin/docker create --name 1d775c597ef243b38c6ebf118d2b8ec1_nats210alpine_a87657 --label eea6ee --network github_network_baeeec4b563645feacbcc20c69ed60e7 --network-alias nats -p 4222:4222  -e GITHUB_ACTIONS=true -e CI=true nats:2.10-alpine
+go	Initialize containers	2026-10-03T13:55:57.8826619Z bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Initialize containers	2026-10-03T13:55:57.8837644Z ##[command]/usr/bin/docker start bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Initialize containers	2026-10-03T13:55:57.9789922Z bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Initialize containers	2026-10-03T13:55:57.9803134Z ##[command]/usr/bin/docker ps --all --filter id=bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+go	Initialize containers	2026-10-03T13:55:57.9889604Z bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b Up Less than a second
+go	Initialize containers	2026-10-03T13:55:57.9900985Z ##[command]/usr/bin/docker port bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Initialize containers	2026-10-03T13:55:57.9982198Z 4222/tcp -> 0.0.0.0:4222
+go	Initialize containers	2026-10-03T13:55:57.9982620Z 4222/tcp -> [::]:4222
+go	Initialize containers	2026-10-03T13:55:57.9993115Z ##[endgroup]
+go	Initialize containers	2026-10-03T13:55:58.0000298Z ##[group]Waiting for all services to be ready
+go	Initialize containers	2026-10-03T13:55:58.0008939Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:55:58.0087250Z starting
+go	Initialize containers	2026-10-03T13:55:58.0102109Z postgres service is starting, waiting 2 seconds before checking again.
+go	Initialize containers	2026-10-03T13:56:00.0100643Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:56:00.0198706Z starting
+go	Initialize containers	2026-10-03T13:56:00.0209341Z postgres service is starting, waiting 4 seconds before checking again.
+go	Initialize containers	2026-10-03T13:56:04.2781160Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:56:04.2873769Z starting
+go	Initialize containers	2026-10-03T13:56:04.2884850Z postgres service is starting, waiting 8 seconds before checking again.
+go	Initialize containers	2026-10-03T13:56:12.3574355Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Initialize containers	2026-10-03T13:56:12.3661643Z healthy
+go	Initialize containers	2026-10-03T13:56:12.3674644Z postgres service is healthy.
+go	Initialize containers	2026-10-03T13:56:12.3675143Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Initialize containers	2026-10-03T13:56:12.3762759Z nats service is healthy.
+go	Initialize containers	2026-10-03T13:56:12.3763237Z ##[endgroup]
+go	Run actions/checkout@v4	﻿2026-10-03T13:56:12.3988187Z ##[group]Run actions/checkout@v4
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3988424Z with:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3988548Z   repository: nilesthump/IM-platform
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3989858Z   token: ***
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3989969Z   ssh-strict: true
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990078Z   ssh-user: git
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990200Z   persist-credentials: true
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990326Z   clean: true
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990441Z   sparse-checkout-cone-mode: true
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990574Z   fetch-depth: 1
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990681Z   fetch-tags: false
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990793Z   show-progress: true
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3990904Z   lfs: false
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991005Z   submodules: false
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991118Z   set-safe-directory: true
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991248Z   allow-unsafe-pr-checkout: false
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991437Z env:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991536Z   PGHOST: localhost
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991644Z   PGPORT: 5432
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991749Z   PGUSER: postgres
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3991866Z   PGPASSWORD: ci-only-password
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3992018Z   PGDATABASE: im_ci
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3992122Z   DB_TEST_ENABLE: 1
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3992240Z   NATS_URL: nats://localhost:4222
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3992385Z   PYTHONDONTWRITEBYTECODE: 1
+go	Run actions/checkout@v4	2026-10-03T13:56:12.3992514Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4625817Z Syncing repository: nilesthump/IM-platform
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4627339Z ##[group]Getting Git version info
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4627592Z Working directory is '/home/runner/work/IM-platform/IM-platform'
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4627913Z [command]/usr/bin/git version
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4695524Z git version 2.55.0
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4708435Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4717823Z Temporarily overriding HOME='/home/runner/work/_temp/813223e0-3afe-4905-8b72-c6418d4b30fa' before making global git config changes
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4718554Z Adding repository directory to the temporary git global config as a safe directory
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4722015Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/IM-platform/IM-platform
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4762783Z Deleting the contents of '/home/runner/work/IM-platform/IM-platform'
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4764986Z ##[group]Initializing the repository
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4767929Z [command]/usr/bin/git init /home/runner/work/IM-platform/IM-platform
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4873828Z hint: Using 'master' as the name for the initial branch. This default branch name
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4874317Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4874817Z hint: to use in all of your new repositories, which will suppress this warning,
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4875186Z hint: call:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4875380Z hint:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4875661Z hint: 	git config --global init.defaultBranch <name>
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4876529Z hint:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4876788Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4877256Z hint: 'development'. The just-created branch can be renamed via this command:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4877618Z hint:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4877797Z hint: 	git branch -m <name>
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4879866Z hint:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4880150Z hint: Disable this message with "git config set advice.defaultBranchName false"
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4880681Z Initialized empty Git repository in /home/runner/work/IM-platform/IM-platform/.git/
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4884940Z [command]/usr/bin/git remote add origin https://github.com/nilesthump/IM-platform
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4979048Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4979449Z ##[group]Disabling automatic garbage collection
+go	Run actions/checkout@v4	2026-10-03T13:56:12.4982674Z [command]/usr/bin/git config --local gc.auto 0
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5017475Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5017782Z ##[group]Setting up auth
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5018031Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5047108Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5351231Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5377608Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5549625Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5577284Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5744029Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5774308Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5774636Z ##[group]Fetching the repository
+go	Run actions/checkout@v4	2026-10-03T13:56:12.5780467Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +6f9341276c6481e982c2a9b2f2d490b76bc1df96:refs/remotes/origin/main
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7306589Z From https://github.com/nilesthump/IM-platform
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7306995Z  * [new ref]         6f9341276c6481e982c2a9b2f2d490b76bc1df96 -> origin/main
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7316315Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7316529Z ##[group]Determining the checkout info
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7316749Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7317908Z [command]/usr/bin/git sparse-checkout disable
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7362078Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7388443Z ##[group]Checking out the ref
+go	Run actions/checkout@v4	2026-10-03T13:56:13.7391756Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+go	Run actions/checkout@v4	2026-10-03T13:56:14.1257778Z Switched to a new branch 'main'
+go	Run actions/checkout@v4	2026-10-03T13:56:14.1260942Z branch 'main' set up to track 'origin/main'.
+go	Run actions/checkout@v4	2026-10-03T13:56:14.1290326Z ##[endgroup]
+go	Run actions/checkout@v4	2026-10-03T13:56:14.1328647Z [command]/usr/bin/git log -1 --format=%H
+go	Run actions/checkout@v4	2026-10-03T13:56:14.1350617Z 6f9341276c6481e982c2a9b2f2d490b76bc1df96
+go	Run actions/setup-go@v5	﻿2026-10-03T13:56:14.1515751Z ##[group]Run actions/setup-go@v5
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1515893Z with:
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1516186Z   go-version: 1.23
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1516361Z   cache-dependency-path: backend/go/go.sum
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1516529Z   check-latest: false
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1517722Z   token: ***
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1517825Z   cache: true
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1517924Z env:
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518024Z   PGHOST: localhost
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518133Z   PGPORT: 5432
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518236Z   PGUSER: postgres
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518353Z   PGPASSWORD: ci-only-password
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518481Z   PGDATABASE: im_ci
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518587Z   DB_TEST_ENABLE: 1
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518714Z   NATS_URL: nats://localhost:4222
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518857Z   PYTHONDONTWRITEBYTECODE: 1
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.1518986Z ##[endgroup]
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.2352226Z Setup go version spec 1.23
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.2580394Z Attempting to download 1.23...
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.2644719Z (node:2663) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+go	Run actions/setup-go@v5	2026-10-03T13:56:14.2645223Z (Use `node --trace-deprecation ...` to show where the warning was created)
+go	Run actions/setup-go@v5	2026-10-03T13:56:16.0173950Z matching 1.23...
+go	Run actions/setup-go@v5	2026-10-03T13:56:16.0198216Z Acquiring 1.23.12 from https://github.com/actions/go-versions/releases/download/1.23.12-16792118003/go-1.23.12-linux-x64.tar.gz
+go	Run actions/setup-go@v5	2026-10-03T13:56:16.6342531Z Extracting Go...
+go	Run actions/setup-go@v5	2026-10-03T13:56:16.6423538Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/82d70512-22a5-439f-b0ee-484b81e16a4c -f /home/runner/work/_temp/aa1ede6d-32f3-4f27-8c9e-b7e281ac2ed9
+go	Run actions/setup-go@v5	2026-10-03T13:56:17.8640263Z Successfully extracted go to /home/runner/work/_temp/82d70512-22a5-439f-b0ee-484b81e16a4c
+go	Run actions/setup-go@v5	2026-10-03T13:56:17.8640664Z Adding to the cache ...
+go	Run actions/setup-go@v5	2026-10-03T13:56:20.9507484Z Successfully cached go to /opt/hostedtoolcache/go/1.23.12/x64
+go	Run actions/setup-go@v5	2026-10-03T13:56:20.9509280Z Added go to the path
+go	Run actions/setup-go@v5	2026-10-03T13:56:20.9511151Z Successfully set up Go version 1.23
+go	Run actions/setup-go@v5	2026-10-03T13:56:20.9661351Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOMODCACHE
+go	Run actions/setup-go@v5	2026-10-03T13:56:20.9695780Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOCACHE
+go	Run actions/setup-go@v5	2026-10-03T13:56:20.9729371Z /home/runner/go/pkg/mod
+go	Run actions/setup-go@v5	2026-10-03T13:56:20.9739741Z /home/runner/.cache/go-build
+go	Run actions/setup-go@v5	2026-10-03T13:56:21.1195893Z Cache hit for: setup-go-Linux-x64-ubuntu24-go-1.23.12-28a3b7d799f0b4321b2520e66f1748c1ff28f306d684de8d9457e91d000d437d
+go	Run actions/setup-go@v5	2026-10-03T13:56:21.1261154Z (node:2663) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+go	Run actions/setup-go@v5	2026-10-03T13:56:22.2642848Z Received 134217728 of 164617918 (81.5%), 128.0 MBs/sec
+go	Run actions/setup-go@v5	2026-10-03T13:56:22.4848104Z Received 164617918 of 164617918 (100.0%), 128.7 MBs/sec
+go	Run actions/setup-go@v5	2026-10-03T13:56:22.4848483Z Cache Size: ~157 MB (164617918 B)
+go	Run actions/setup-go@v5	2026-10-03T13:56:22.4868294Z [command]/usr/bin/tar -xf /home/runner/work/_temp/7ec3be25-c80f-41e6-aceb-554fedbb2733/cache.tzst -P -C /home/runner/work/IM-platform/IM-platform --use-compress-program unzstd
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.0330439Z Cache restored successfully
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.0400861Z Cache restored from key: setup-go-Linux-x64-ubuntu24-go-1.23.12-28a3b7d799f0b4321b2520e66f1748c1ff28f306d684de8d9457e91d000d437d
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.0420488Z go version go1.23.12 linux/amd64
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.0420636Z 
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.0420845Z ##[group]go env
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1053304Z GO111MODULE=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1053565Z GOARCH='amd64'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1053691Z GOBIN=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1053820Z GOCACHE='/home/runner/.cache/go-build'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1053996Z GOENV='/home/runner/.config/go/env'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1054141Z GOEXE=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1054252Z GOEXPERIMENT=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1054386Z GOFLAGS=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1054568Z GOHOSTARCH='amd64'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1054689Z GOHOSTOS='linux'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1054831Z GOINSECURE=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1055008Z GOMODCACHE='/home/runner/go/pkg/mod'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1055416Z GONOPROXY=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1055524Z GONOSUMDB=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1055628Z GOOS='linux'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1055744Z GOPATH='/home/runner/go'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1055885Z GOPRIVATE=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1056175Z GOPROXY='https://proxy.golang.org,direct'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1056385Z GOROOT='/opt/hostedtoolcache/go/1.23.12/x64'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1056555Z GOSUMDB='sum.golang.org'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1056682Z GOTMPDIR=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1056791Z GOTOOLCHAIN='auto'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1056970Z GOTOOLDIR='/opt/hostedtoolcache/go/1.23.12/x64/pkg/tool/linux_amd64'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1057168Z GOVCS=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1057274Z GOVERSION='go1.23.12'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1057392Z GODEBUG=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1057497Z GOTELEMETRY='local'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1057644Z GOTELEMETRYDIR='/home/runner/.config/go/telemetry'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1057811Z GCCGO='gccgo'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1057919Z GOAMD64='v1'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058023Z AR='ar'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058123Z CC='gcc'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058255Z CXX='g++'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058357Z CGO_ENABLED='1'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058468Z GOMOD='/dev/null'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058577Z GOWORK=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058831Z CGO_CFLAGS='-O2 -g'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1058950Z CGO_CPPFLAGS=''
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1059063Z CGO_CXXFLAGS='-O2 -g'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1059182Z CGO_FFLAGS='-O2 -g'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1059298Z CGO_LDFLAGS='-O2 -g'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1059427Z PKG_CONFIG='pkg-config'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1059814Z GOGCCFLAGS='-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build396434294=/tmp/go-build -gno-record-gcc-switches'
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1060125Z 
+go	Run actions/setup-go@v5	2026-10-03T13:56:23.1060315Z ##[endgroup]
+go	Install PostgreSQL client	﻿2026-10-03T13:56:23.1227007Z ##[group]Run sudo apt-get update -qq
+go	Install PostgreSQL client	2026-10-03T13:56:23.1227266Z ^[[36;1msudo apt-get update -qq^[[0m
+go	Install PostgreSQL client	2026-10-03T13:56:23.1227453Z ^[[36;1msudo apt-get install -y postgresql-client^[[0m
+go	Install PostgreSQL client	2026-10-03T13:56:23.1406884Z shell: /usr/bin/bash -e {0}
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407046Z env:
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407158Z   PGHOST: localhost
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407275Z   PGPORT: 5432
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407385Z   PGUSER: postgres
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407519Z   PGPASSWORD: ci-only-password
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407660Z   PGDATABASE: im_ci
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407773Z   DB_TEST_ENABLE: 1
+go	Install PostgreSQL client	2026-10-03T13:56:23.1407905Z   NATS_URL: nats://localhost:4222
+go	Install PostgreSQL client	2026-10-03T13:56:23.1408058Z   PYTHONDONTWRITEBYTECODE: 1
+go	Install PostgreSQL client	2026-10-03T13:56:23.1408196Z ##[endgroup]
+go	Install PostgreSQL client	2026-10-03T13:56:29.5637745Z Reading package lists...
+go	Install PostgreSQL client	2026-10-03T13:56:29.6934042Z Building dependency tree...
+go	Install PostgreSQL client	2026-10-03T13:56:29.6940059Z Reading state information...
+go	Install PostgreSQL client	2026-10-03T13:56:29.8116744Z The following NEW packages will be installed:
+go	Install PostgreSQL client	2026-10-03T13:56:29.8117134Z   postgresql-client
+go	Install PostgreSQL client	2026-10-03T13:56:29.8234590Z 0 upgraded, 1 newly installed, 0 to remove and 25 not upgraded.
+go	Install PostgreSQL client	2026-10-03T13:56:29.8234929Z Need to get 11.6 kB of archives.
+go	Install PostgreSQL client	2026-10-03T13:56:29.8235174Z After this operation, 17.4 kB of additional disk space will be used.
+go	Install PostgreSQL client	2026-10-03T13:56:29.8235410Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+go	Install PostgreSQL client	2026-10-03T13:56:29.8818237Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-client all 16+257build1.1 [11.6 kB]
+go	Install PostgreSQL client	2026-10-03T13:56:30.0468691Z Fetched 11.6 kB in 0s (176 kB/s)
+go	Install PostgreSQL client	2026-10-03T13:56:30.0637194Z Selecting previously unselected package postgresql-client.
+go	Install PostgreSQL client	2026-10-03T13:56:30.0882731Z (Reading database ... 
+go	Install PostgreSQL client	2026-10-03T13:56:30.0882977Z (Reading database ... 5%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0883326Z (Reading database ... 10%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0883680Z (Reading database ... 15%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0883893Z (Reading database ... 20%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0884103Z (Reading database ... 25%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0884323Z (Reading database ... 30%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0884646Z (Reading database ... 35%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0884879Z (Reading database ... 40%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0885162Z (Reading database ... 45%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0885472Z (Reading database ... 50%
+go	Install PostgreSQL client	2026-10-03T13:56:30.0924823Z (Reading database ... 55%
+go	Install PostgreSQL client	2026-10-03T13:56:30.2075981Z (Reading database ... 60%
+go	Install PostgreSQL client	2026-10-03T13:56:30.4122908Z (Reading database ... 65%
+go	Install PostgreSQL client	2026-10-03T13:56:30.6038573Z (Reading database ... 70%
+go	Install PostgreSQL client	2026-10-03T13:56:30.8062444Z (Reading database ... 75%
+go	Install PostgreSQL client	2026-10-03T13:56:30.9634324Z (Reading database ... 80%
+go	Install PostgreSQL client	2026-10-03T13:56:31.1579847Z (Reading database ... 85%
+go	Install PostgreSQL client	2026-10-03T13:56:31.3611255Z (Reading database ... 90%
+go	Install PostgreSQL client	2026-10-03T13:56:31.5084066Z (Reading database ... 95%
+go	Install PostgreSQL client	2026-10-03T13:56:31.5084299Z (Reading database ... 100%
+go	Install PostgreSQL client	2026-10-03T13:56:31.5084512Z (Reading database ... 202296 files and directories currently installed.)
+go	Install PostgreSQL client	2026-10-03T13:56:31.5118076Z Preparing to unpack .../postgresql-client_16+257build1.1_all.deb ...
+go	Install PostgreSQL client	2026-10-03T13:56:31.5179124Z Unpacking postgresql-client (16+257build1.1) ...
+go	Install PostgreSQL client	2026-10-03T13:56:31.5486384Z Setting up postgresql-client (16+257build1.1) ...
+go	Install PostgreSQL client	2026-10-03T13:56:32.0479343Z 
+go	Install PostgreSQL client	2026-10-03T13:56:32.0479889Z Running kernel seems to be up-to-date.
+go	Install PostgreSQL client	2026-10-03T13:56:32.0480136Z 
+go	Install PostgreSQL client	2026-10-03T13:56:32.0480240Z No services need to be restarted.
+go	Install PostgreSQL client	2026-10-03T13:56:32.0480398Z 
+go	Install PostgreSQL client	2026-10-03T13:56:32.0480500Z No containers need to be restarted.
+go	Install PostgreSQL client	2026-10-03T13:56:32.0480653Z 
+go	Install PostgreSQL client	2026-10-03T13:56:32.0481103Z No user sessions are running outdated binaries.
+go	Install PostgreSQL client	2026-10-03T13:56:32.0481291Z 
+go	Install PostgreSQL client	2026-10-03T13:56:32.0481486Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+go	Migrate canonical schema	﻿2026-10-03T13:56:32.6513823Z ##[group]Run python3 contracts/database/migrate.py up
+go	Migrate canonical schema	2026-10-03T13:56:32.6514089Z ^[[36;1mpython3 contracts/database/migrate.py up^[[0m
+go	Migrate canonical schema	2026-10-03T13:56:32.6567177Z shell: /usr/bin/bash -e {0}
+go	Migrate canonical schema	2026-10-03T13:56:32.6567328Z env:
+go	Migrate canonical schema	2026-10-03T13:56:32.6567438Z   PGHOST: localhost
+go	Migrate canonical schema	2026-10-03T13:56:32.6567558Z   PGPORT: 5432
+go	Migrate canonical schema	2026-10-03T13:56:32.6567675Z   PGUSER: postgres
+go	Migrate canonical schema	2026-10-03T13:56:32.6567808Z   PGPASSWORD: ci-only-password
+go	Migrate canonical schema	2026-10-03T13:56:32.6567951Z   PGDATABASE: im_ci
+go	Migrate canonical schema	2026-10-03T13:56:32.6568067Z   DB_TEST_ENABLE: 1
+go	Migrate canonical schema	2026-10-03T13:56:32.6568202Z   NATS_URL: nats://localhost:4222
+go	Migrate canonical schema	2026-10-03T13:56:32.6568363Z   PYTHONDONTWRITEBYTECODE: 1
+go	Migrate canonical schema	2026-10-03T13:56:32.6568504Z ##[endgroup]
+go	Migrate canonical schema	2026-10-03T13:56:32.8815181Z 0001_initial: up complete
+go	Go Auth build, integration and contract verification	﻿2026-10-03T13:56:32.8891094Z ##[group]Run test -z "$(find backend/go -name '*.go' -type f -print0 | xargs -0 gofmt -l)"
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8891488Z ^[[36;1mtest -z "$(find backend/go -name '*.go' -type f -print0 | xargs -0 gofmt -l)"^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8891712Z ^[[36;1mcd backend/go^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8891840Z ^[[36;1mgo build ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8891991Z ^[[36;1mgo build -o "$RUNNER_TEMP/im-go" .^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8892148Z ^[[36;1mgo vet ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8892277Z ^[[36;1mgo test -count=1 ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8892423Z ^[[36;1mgo test -race -count=1 ./...^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8892564Z ^[[36;1mcd ../..^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8892699Z ^[[36;1mpython3 contracts/websocket/verify.py^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8892926Z ^[[36;1mpwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1^[[0m
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8944928Z shell: /usr/bin/bash -e {0}
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945066Z env:
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945173Z   PGHOST: localhost
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945290Z   PGPORT: 5432
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945401Z   PGUSER: postgres
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945544Z   PGPASSWORD: ci-only-password
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945682Z   PGDATABASE: im_ci
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945795Z   DB_TEST_ENABLE: 1
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8945925Z   NATS_URL: nats://localhost:4222
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8946230Z   PYTHONDONTWRITEBYTECODE: 1
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:32.8946369Z ##[endgroup]
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:34.3246599Z ?   	im-platform/backend/go	[no test files]
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:34.8320331Z ?   	im-platform/backend/go/plugin-host	[no test files]
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:36.5477235Z ok  	im-platform/backend/go/core	1.716s
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:36.5477550Z ok  	im-platform/backend/go/gateway	0.281s
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:36.5477780Z ok  	im-platform/backend/go/shared	0.006s
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:52.7102216Z ok  	im-platform/backend/go/tests	17.457s
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:53.2158772Z ?   	im-platform/backend/go	[no test files]
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:53.8463154Z ?   	im-platform/backend/go/plugin-host	[no test files]
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:57.1827574Z ok  	im-platform/backend/go/core	3.334s
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:57.1827912Z ok  	im-platform/backend/go/gateway	1.312s
+go	Go Auth build, integration and contract verification	2026-10-03T13:56:57.1828278Z ok  	im-platform/backend/go/shared	1.010s
+go	Go Auth build, integration and contract verification	2026-10-03T13:58:16.4763486Z ok  	im-platform/backend/go/tests	81.938s
+go	Go Auth build, integration and contract verification	2026-10-03T13:58:16.5853141Z PASS WSS v1: 8 positive, 10 negative shared Go/Java scenarios; 18 schema and 26 behavior mutations rejected
+go	Go Auth build, integration and contract verification	2026-10-03T13:58:23.8704560Z PASS: Auth/User/Friend contracts verified paths=9 operations=9 error_codes=15 positive=6 negative=21 profiles=go,java schema_lint=OAI-OpenAPI-3.1-2026-08-03 mutation_regressions=15.
+go	Post Run actions/setup-go@v5	﻿2026-10-03T13:58:23.9286391Z Post job cleanup.
+go	Post Run actions/setup-go@v5	2026-10-03T13:58:24.0035259Z (node:4677) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+go	Post Run actions/setup-go@v5	2026-10-03T13:58:24.0035803Z (Use `node --trace-deprecation ...` to show where the warning was created)
+go	Post Run actions/setup-go@v5	2026-10-03T13:58:24.0086822Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOCACHE
+go	Post Run actions/setup-go@v5	2026-10-03T13:58:24.0131275Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOMODCACHE
+go	Post Run actions/setup-go@v5	2026-10-03T13:58:24.0143909Z /home/runner/.cache/go-build
+go	Post Run actions/setup-go@v5	2026-10-03T13:58:24.0156495Z /home/runner/go/pkg/mod
+go	Post Run actions/setup-go@v5	2026-10-03T13:58:24.0159384Z Cache hit occurred on the primary key setup-go-Linux-x64-ubuntu24-go-1.23.12-28a3b7d799f0b4321b2520e66f1748c1ff28f306d684de8d9457e91d000d437d, not saving cache.
+go	Post Run actions/checkout@v4	﻿2026-10-03T13:58:24.0289825Z Post job cleanup.
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.0857048Z [command]/usr/bin/git version
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.0887809Z git version 2.55.0
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.0910269Z Temporarily overriding HOME='/home/runner/work/_temp/5910789f-6245-427b-bf46-d007fdefbb44' before making global git config changes
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.0910966Z Adding repository directory to the temporary git global config as a safe directory
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.0913970Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/IM-platform/IM-platform
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.0943874Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.0976595Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.1174747Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.1206809Z http.https://github.com/.extraheader
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.1215792Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.1246316Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.1475053Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+go	Post Run actions/checkout@v4	2026-10-03T13:58:24.1508573Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+go	Stop containers	﻿2026-10-03T13:58:24.1795994Z Print service container logs: 3a7ad58bee0d416081971275eaddbfca_postgres16_89a5a2
+go	Stop containers	2026-10-03T13:58:24.1799350Z ##[command]/usr/bin/docker logs --details 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Stop containers	2026-10-03T13:58:24.1892084Z  The files belonging to this database system will be owned by user "postgres".
+go	Stop containers	2026-10-03T13:58:24.1893219Z  initdb: warning: enabling "trust" authentication for local connections
+go	Stop containers	2026-10-03T13:58:24.1893932Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+go	Stop containers	2026-10-03T13:58:24.1894638Z  2026-10-03 13:55:57.391 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+go	Stop containers	2026-10-03T13:58:24.1895095Z  2026-10-03 13:55:57.391 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+go	Stop containers	2026-10-03T13:58:24.1895519Z  2026-10-03 13:55:57.391 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+go	Stop containers	2026-10-03T13:58:24.1896138Z  2026-10-03 13:55:57.392 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+go	Stop containers	2026-10-03T13:58:24.1896612Z  2026-10-03 13:55:57.394 UTC [64] LOG:  database system was shut down at 2026-10-03 13:55:57 UTC
+go	Stop containers	2026-10-03T13:58:24.1897057Z  2026-10-03 13:55:57.397 UTC [1] LOG:  database system is ready to accept connections
+go	Stop containers	2026-10-03T13:58:24.1897467Z  2026-10-03 13:56:34.989 UTC [120] ERROR:  injected rollback
+go	Stop containers	2026-10-03T13:58:24.1897953Z  2026-10-03 13:56:34.989 UTC [120] CONTEXT:  PL/pgSQL function msgprobe1791035794954381120() line 1 at RAISE
+go	Stop containers	2026-10-03T13:58:24.1898391Z  2026-10-03 13:56:34.989 UTC [120] STATEMENT:  commit
+go	Stop containers	2026-10-03T13:58:24.1898727Z  2026-10-03 13:56:34.990 UTC [115] WARNING:  you don't own a lock of type ExclusiveLock
+go	Stop containers	2026-10-03T13:58:24.1899212Z  2026-10-03 13:56:35.856 UTC [145] ERROR:  insert or update on table "user_sync_events" violates foreign key constraint "user_sync_events_user_id_fkey"
+go	Stop containers	2026-10-03T13:58:24.1899658Z  2026-10-03 13:56:35.856 UTC [145] DETAIL:  Key (user_id)=(00000000-0000-4000-8000-000000000000) is not present in table "users".
+go	Stop containers	2026-10-03T13:58:24.1900292Z  2026-10-03 13:56:35.856 UTC [145] STATEMENT:  INSERT INTO user_sync_events(user_id,event_type,payload) VALUES($1,'session.revoked',$2)
+go	Stop containers	2026-10-03T13:58:24.1900679Z  2026-10-03 13:56:36.483 UTC [141] ERROR:  duplicate key value violates unique constraint "users_username_key"
+go	Stop containers	2026-10-03T13:58:24.1901000Z  2026-10-03 13:56:36.483 UTC [141] DETAIL:  Key (username)=(fixturezypkjigqwd) already exists.
+go	Stop containers	2026-10-03T13:58:24.1901354Z  2026-10-03 13:56:36.483 UTC [141] STATEMENT:  INSERT INTO users(user_id,username,display_name,password_hash) VALUES($1,$2,$3,$4)
+go	Stop containers	2026-10-03T13:58:24.1901660Z  2026-10-03 13:56:40.802 UTC [243] ERROR:  injected rollback
+go	Stop containers	2026-10-03T13:58:24.1901932Z  2026-10-03 13:56:40.802 UTC [243] CONTEXT:  PL/pgSQL function fixtureprobe1791035800787667261() line 1 at RAISE
+go	Stop containers	2026-10-03T13:58:24.1902449Z  2026-10-03 13:56:40.802 UTC [243] STATEMENT:  INSERT INTO outbox_events(event_id,aggregate_type,aggregate_id,event_type,conversation_id,message_id,payload) VALUES($1,'message',$2,'message.created',$3,$2,$4)
+go	Stop containers	2026-10-03T13:58:24.1902893Z  2026-10-03 13:56:54.048 UTC [340] ERROR:  injected rollback
+go	Stop containers	2026-10-03T13:58:24.1903155Z  2026-10-03 13:56:54.048 UTC [340] CONTEXT:  PL/pgSQL function msgprobe1791035814013125881() line 1 at RAISE
+go	Stop containers	2026-10-03T13:58:24.1903417Z  2026-10-03 13:56:54.048 UTC [340] STATEMENT:  commit
+go	Stop containers	2026-10-03T13:58:24.1903633Z  2026-10-03 13:56:54.049 UTC [334] WARNING:  you don't own a lock of type ExclusiveLock
+go	Stop containers	2026-10-03T13:58:24.1904007Z  2026-10-03 13:56:55.099 UTC [358] ERROR:  insert or update on table "user_sync_events" violates foreign key constraint "user_sync_events_user_id_fkey"
+go	Stop containers	2026-10-03T13:58:24.1904445Z  2026-10-03 13:56:55.099 UTC [358] DETAIL:  Key (user_id)=(00000000-0000-4000-8000-000000000000) is not present in table "users".
+go	Stop containers	2026-10-03T13:58:24.1904850Z  2026-10-03 13:56:55.099 UTC [358] STATEMENT:  INSERT INTO user_sync_events(user_id,event_type,payload) VALUES($1,'session.revoked',$2)
+go	Stop containers	2026-10-03T13:58:24.1905390Z  2026-10-03 13:57:07.086 UTC [435] ERROR:  duplicate key value violates unique constraint "users_username_key"
+go	Stop containers	2026-10-03T13:58:24.1905710Z  2026-10-03 13:57:07.086 UTC [435] DETAIL:  Key (username)=(fixture1g9bgr5gs_) already exists.
+go	Stop containers	2026-10-03T13:58:24.1906212Z  2026-10-03 13:57:07.086 UTC [435] STATEMENT:  INSERT INTO users(user_id,username,display_name,password_hash) VALUES($1,$2,$3,$4)
+go	Stop containers	2026-10-03T13:58:24.1906725Z  2026-10-03 13:57:38.443 UTC [485] ERROR:  injected rollback
+go	Stop containers	2026-10-03T13:58:24.1907106Z  2026-10-03 13:57:38.443 UTC [485] CONTEXT:  PL/pgSQL function fixtureprobe1791035858439829736() line 1 at RAISE
+go	Stop containers	2026-10-03T13:58:24.1907693Z  2026-10-03 13:57:38.443 UTC [485] STATEMENT:  INSERT INTO outbox_events(event_id,aggregate_type,aggregate_id,event_type,conversation_id,message_id,payload) VALUES($1,'message',$2,'message.created',$3,$2,$4)
+go	Stop containers	2026-10-03T13:58:24.1908220Z  This user must also own the server process.
+go	Stop containers	2026-10-03T13:58:24.1908460Z  
+go	Stop containers	2026-10-03T13:58:24.1908814Z  The database cluster will be initialized with locale "en_US.utf8".
+go	Stop containers	2026-10-03T13:58:24.1909128Z  The default database encoding has accordingly been set to "UTF8".
+go	Stop containers	2026-10-03T13:58:24.1909469Z  The default text search configuration will be set to "english".
+go	Stop containers	2026-10-03T13:58:24.1909752Z  
+go	Stop containers	2026-10-03T13:58:24.1909989Z  Data page checksums are disabled.
+go	Stop containers	2026-10-03T13:58:24.1910237Z  
+go	Stop containers	2026-10-03T13:58:24.1910459Z  fixing permissions on existing directory /var/lib/postgresql/data ... ok
+go	Stop containers	2026-10-03T13:58:24.1910788Z  creating subdirectories ... ok
+go	Stop containers	2026-10-03T13:58:24.1911035Z  selecting dynamic shared memory implementation ... posix
+go	Stop containers	2026-10-03T13:58:24.1911391Z  selecting default max_connections ... 100
+go	Stop containers	2026-10-03T13:58:24.1911614Z  selecting default shared_buffers ... 128MB
+go	Stop containers	2026-10-03T13:58:24.1922712Z  selecting default time zone ... Etc/UTC
+go	Stop containers	2026-10-03T13:58:24.1922977Z  creating configuration files ... ok
+go	Stop containers	2026-10-03T13:58:24.1923210Z  running bootstrap script ... ok
+go	Stop containers	2026-10-03T13:58:24.1923645Z  performing post-bootstrap initialization ... ok
+go	Stop containers	2026-10-03T13:58:24.1923929Z  syncing data to disk ... ok
+go	Stop containers	2026-10-03T13:58:24.1924129Z  
+go	Stop containers	2026-10-03T13:58:24.1924276Z  
+go	Stop containers	2026-10-03T13:58:24.1924482Z  Success. You can now start the database server using:
+go	Stop containers	2026-10-03T13:58:24.1924745Z  
+go	Stop containers	2026-10-03T13:58:24.1924951Z      pg_ctl -D /var/lib/postgresql/data -l logfile start
+go	Stop containers	2026-10-03T13:58:24.1925201Z  
+go	Stop containers	2026-10-03T13:58:24.1925734Z  waiting for server to start....2026-10-03 13:55:57.114 UTC [48] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+go	Stop containers	2026-10-03T13:58:24.1926614Z  2026-10-03 13:55:57.115 UTC [48] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+go	Stop containers	2026-10-03T13:58:24.1927020Z  2026-10-03 13:55:57.117 UTC [51] LOG:  database system was shut down at 2026-10-03 13:55:56 UTC
+go	Stop containers	2026-10-03T13:58:24.1927316Z  2026-10-03 13:55:57.119 UTC [48] LOG:  database system is ready to accept connections
+go	Stop containers	2026-10-03T13:58:24.1927526Z   done
+go	Stop containers	2026-10-03T13:58:24.1927636Z  server started
+go	Stop containers	2026-10-03T13:58:24.1927758Z  CREATE DATABASE
+go	Stop containers	2026-10-03T13:58:24.1927869Z  
+go	Stop containers	2026-10-03T13:58:24.1927966Z  
+go	Stop containers	2026-10-03T13:58:24.1928148Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+go	Stop containers	2026-10-03T13:58:24.1928360Z  
+go	Stop containers	2026-10-03T13:58:24.1928555Z  waiting for server to shut down...2026-10-03 13:55:57.275 UTC [48] LOG:  received fast shutdown request
+go	Stop containers	2026-10-03T13:58:24.1928841Z  .2026-10-03 13:55:57.276 UTC [48] LOG:  aborting any active transactions
+go	Stop containers	2026-10-03T13:58:24.1929159Z  2026-10-03 13:55:57.277 UTC [48] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+go	Stop containers	2026-10-03T13:58:24.1929452Z  2026-10-03 13:55:57.278 UTC [49] LOG:  shutting down
+go	Stop containers	2026-10-03T13:58:24.1929669Z  2026-10-03 13:55:57.278 UTC [49] LOG:  checkpoint starting: shutdown immediate
+go	Stop containers	2026-10-03T13:58:24.1930266Z  2026-10-03 13:55:57.346 UTC [49] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.066 s, sync=0.002 s, total=0.069 s; sync files=301, longest=0.001 s, average=0.001 s; distance=4273 kB, estimate=4273 kB; lsn=0/191F0E8, redo lsn=0/191F0E8
+go	Stop containers	2026-10-03T13:58:24.1930960Z  2026-10-03 13:55:57.352 UTC [48] LOG:  database system is shut down
+go	Stop containers	2026-10-03T13:58:24.1931147Z   done
+go	Stop containers	2026-10-03T13:58:24.1931252Z  server stopped
+go	Stop containers	2026-10-03T13:58:24.1931363Z  
+go	Stop containers	2026-10-03T13:58:24.1931496Z  PostgreSQL init process complete; ready for start up.
+go	Stop containers	2026-10-03T13:58:24.1931666Z  
+go	Stop containers	2026-10-03T13:58:24.1934590Z Stop and remove container: 3a7ad58bee0d416081971275eaddbfca_postgres16_89a5a2
+go	Stop containers	2026-10-03T13:58:24.1937637Z ##[command]/usr/bin/docker rm --force 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Stop containers	2026-10-03T13:58:24.3285380Z 04d6bad95ce6762dab3085e94c6d536790d53c624da63c7ee914265cf52a9766
+go	Stop containers	2026-10-03T13:58:24.3303169Z Print service container logs: 1d775c597ef243b38c6ebf118d2b8ec1_nats210alpine_a87657
+go	Stop containers	2026-10-03T13:58:24.3304161Z ##[command]/usr/bin/docker logs --details bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Stop containers	2026-10-03T13:58:24.3396655Z  [1] 2026/10/03 13:55:57.980348 [INF] Starting nats-server
+go	Stop containers	2026-10-03T13:58:24.3396949Z  [1] 2026/10/03 13:55:57.980417 [INF]   Version:  2.10.29
+go	Stop containers	2026-10-03T13:58:24.3397272Z  [1] 2026/10/03 13:55:57.980420 [INF]   Git:      [f91ddd8]
+go	Stop containers	2026-10-03T13:58:24.3397570Z  [1] 2026/10/03 13:55:57.980422 [INF]   Cluster:  my_cluster
+go	Stop containers	2026-10-03T13:58:24.3397977Z  [1] 2026/10/03 13:55:57.980423 [INF]   Name:     NAEN7UI3RO7YXC6WPHTE7BH4IB7TUSGSCPZ7UW7QRJ4BTBENEUPVG5WT
+go	Stop containers	2026-10-03T13:58:24.3398329Z  [1] 2026/10/03 13:55:57.980425 [INF]   ID:       NAEN7UI3RO7YXC6WPHTE7BH4IB7TUSGSCPZ7UW7QRJ4BTBENEUPVG5WT
+go	Stop containers	2026-10-03T13:58:24.3398716Z  [1] 2026/10/03 13:55:57.980429 [INF] Using configuration file: /etc/nats/nats-server.conf
+go	Stop containers	2026-10-03T13:58:24.3398980Z  [1] 2026/10/03 13:55:57.980946 [INF] Starting http monitor on 0.0.0.0:8222
+go	Stop containers	2026-10-03T13:58:24.3399226Z  [1] 2026/10/03 13:55:57.981084 [INF] Listening for client connections on 0.0.0.0:4222
+go	Stop containers	2026-10-03T13:58:24.3399710Z  [1] 2026/10/03 13:55:57.981271 [INF] Server is ready
+go	Stop containers	2026-10-03T13:58:24.3399899Z  [1] 2026/10/03 13:55:57.981300 [INF] Cluster name is my_cluster
+go	Stop containers	2026-10-03T13:58:24.3400161Z  [1] 2026/10/03 13:55:57.981437 [INF] Listening for route connections on 0.0.0.0:6222
+go	Stop containers	2026-10-03T13:58:24.3413215Z Stop and remove container: 1d775c597ef243b38c6ebf118d2b8ec1_nats210alpine_a87657
+go	Stop containers	2026-10-03T13:58:24.3413689Z ##[command]/usr/bin/docker rm --force bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Stop containers	2026-10-03T13:58:24.4377044Z bae28ef9fc49251d6773d20e9d145ecfb56fb89810733f3b64d301339f50933b
+go	Stop containers	2026-10-03T13:58:24.4398460Z Remove container network: github_network_baeeec4b563645feacbcc20c69ed60e7
+go	Stop containers	2026-10-03T13:58:24.4401058Z ##[command]/usr/bin/docker network rm github_network_baeeec4b563645feacbcc20c69ed60e7
+go	Stop containers	2026-10-03T13:58:24.5131815Z github_network_baeeec4b563645feacbcc20c69ed60e7
+go	Complete job	﻿2026-10-03T13:58:24.5190002Z Cleaning up orphan processes
+go	Complete job	2026-10-03T13:58:24.5398004Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

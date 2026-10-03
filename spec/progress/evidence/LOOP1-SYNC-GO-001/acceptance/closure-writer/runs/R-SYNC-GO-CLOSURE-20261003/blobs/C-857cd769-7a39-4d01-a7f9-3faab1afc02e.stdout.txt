@@ -1,0 +1,2036 @@
+# ADR-0005: Client technology clarification and universal selection governance
+
+Status: Human-approved clarification independently accepted at e7c80c7 under bounded Human GString waiver; final administrative confirmation pending before S2 activation.
+Date: 2026-10-01
+Approval source: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md; full explicit Human instruction human-approved-request.txt and supplemental human-desktop-sqlx-mobile-emulator-decision.txt in the same directory (raw-byte SHA25691033f339f337105bc70f45b20c312b8ed2490d01c0b1607e197cda6e09c770b; normalized prompt SHA25678aa2191a4f3614185781a17ebd5204c949312d3a8eb159435af469d0d1929b5; Recorder P-CLIENT-SQLX-DECISION-20261001).
+
+## Motivation and decision
+
+PR7 implemented Dart SQLite despite missing architecture authorization. PR8 restored main3f352a8e465c0c4b093cca8e5f404ea587550b6e to accepted pre-PR7 tree. The withdrawn attempt and its tests/reviews are historical evidence, not authority or new acceptance.
+
+Canonical 搂2.3 freezes universal no-unapproved-technology governance; 搂6.1 freezes React/TypeScript memory-only Web, Tauri/React/TypeScript SQLite Desktop and Android Kotlin + Jetpack Compose SQLite Mobile. Web/Desktop/shared protocol/plugin/models/Repository/domain/UI remain TypeScript, necessary Desktop Rust is confined to clients/desktop/src-tauri. Mobile uses Kotlin equivalent models/Repository/behavior/adapters under the SAME canonical contracts/fixtures; no mandatory direct TypeScript SDK reuse, new public contract, JS runtime/bridge/codegen or shared native rewrite. Android Studio emulator validates the real Mobile runtime; host tests/mocks cannot replace it. Android SDK/Gradle/Kotlin/Compose engineering identifiers and built-in Android SQLite access follow the approved stack, not arbitrary Room/ORM/network/native dependencies.
+
+Supplemental Desktop approval remains Tauri + SQLx(SQLite). TypeScript holds shared Repository/models/transaction intent; Rust only connections, queries and atomic transaction adapter. Independent tauri-plugin-sql execute() calls MUST NOT simulate a cross-call transaction. Other sensitive dependency choices remain subject to 搂2.3.
+
+Approval chain: original full Human instruction -> supplemental Desktop SQLx/emulator instruction -> NEW exact Human answer 鈥渕oblie鏄庣‘涓簁otlin jetpack compose锛岀Щ闄oblie ts鎶€鏈爤鈥? Latest answer supersedes ONLY the original Mobile TS/TBD/direct-TS-reuse clauses. Raw evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt; raw-byte SHA2561901f6dcd93069a19b6a88f5249858c8017ad36c71d61a109cbbad2ec5e9c061; normalized Recorder SHA256863da9423040acffa2c11b7e67d6c71673f5d7aeb7edd26954108884b5705dd4; prompt P-CLIENT-MOBILE-KOTLIN-20261001. Candidate188d24a / canonical ac042107 was superseded before independent acceptance, never an accepted baseline. Previous accepted canonical83d124b remains the lineage. Original prompt, approval/recovery and finished Recorder archives remain immutable.
+
+Missing sensitive decision: stop affected work -> smallest question -> Human/Architect -> frozen body/approved ADR -> machine guards -> fresh independent Review/applicable exact-head hosted CI -> product implementation. Task text, allowed_paths, familiarity/popularity/installed tools or passing tests cannot authorize a technology. Go/Java internal variation does not bypass this universal rule.
+
+## Normative effect and compatibility
+
+semantic_change=true: this is a Human-approved architecture clarification, not a representation-only migration. Version remains v1.1; canonical bytes and hash change. Previous canonical SHA25683d124bba4b9c605ae29b637e1ea6f8aa55ec4fb7cc6f631f7c069c6f1f77c2e is preserved in manifest revision history. PDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 remains byte-for-byte unchanged. Older ADRs, checkpoints, PR7/FAIL/Review/Recorder/evidence are immutable. No contract, server schema, ACK/Sync, security or compatibility semantics change. S1 PASS; S2 OPEN.
+
+## Implementation, effectiveness and migration
+
+This bounded prerequisite changes authority, execution governance and existing checker/classifier/CI only, without S2 product code or dependencies. Source/dependency/import/config/workflow/task declaration controls inspect active clients; historical evidence is excluded by exact active path ownership, never deletion. Direct static checks supplement mandatory semantic independent Review of language/dependency authority and Rust responsibility.
+
+New independent Review of clean committed candidate and real applicable exact-head hosted CI must accept this prerequisite before task done or S2 activation. Local/Recorder PASS cannot establish Task/S2 PASS. Acceptance SHA/run/effective point are pending and must be recorded by Coordinator truthfully after acceptance. S4/Java/Loop2 are not advanced. New S2 tasks require fresh authorized TypeScript/Kotlin implementation Review/CI; PR7 cannot be restored or reused as acceptance.
+
+## Rollback
+
+Before acceptance, retain accepted main and repair candidate on FAIL. After acceptance, any authority correction uses a Human-approved corrective ADR and new independently reviewed commit; do not rewrite historical commits/evidence/PDF or silently restore Dart. There is no product/data migration in this prerequisite.
+
+Prompt raw-byte vs Recorder LF-normalized hashes are distinguished in spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/prompt-hash-normalization.md; original approval/recovery and prompt bytes are preserved.
+
+## Accepted clarification discovery (2026-10-01)
+
+Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 under scoped Human GString waiver; original4b5 Review FAIL immutable. Exactpush36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS. Canonicalaa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c/PDF546915 unchanged. ADR0005 effective at accepted prerequisite. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md. Earlier pending paragraphs are historical; later administrative closure needs NEW independent Review/exactHEADCI before S2activation. No product/contract change; S1PASS/S2OPEN.
+
+# ADR-0006锛氬鎴风 UI 鏋舵瀯涓庢埅鍥鹃獙鏀?
+鐘舵€侊細宸插喕缁撱€侶uman 鎵瑰噯鐨勮璁″唴瀹瑰凡鍦ㄥ€欓€?3cc754涓嶱R12瀹為檯 main4f18d222锛岀粡鏂伴矞鐙珛 Review銆佺簿纭?HEAD 鎵樼 CI 鍜屼富浠撳簱鍚屾鎺ュ彈銆傞獙鏀惰瘉鎹細`spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/accepted-freeze/acceptance.md`銆傛湰鐘舵€佽褰曚笉鍚姩 GUI 瀹炵幇锛孲2 Gate 浠嶄负 OPEN銆?鏃ユ湡锛?026-10-03
+鎵瑰噯鏉ユ簮锛歴pec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/human-request.txt
+琛ュ厖鍐冲畾锛歴pec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/human-supplement.txt
+
+## 鍔ㄦ満涓庢槑纭喅绛?
+Human 瑕佹眰鍦?GUI 瀹炵幇鍓嶅喕缁撲笁绔?UI 鏋舵瀯銆丄daptive Glass Workspace 璁捐鏂瑰悜锛屼互鍙婄敱鎴浘椹卞姩鐨?Architect 楠屾敹銆傝姹傛槑纭€夋嫨 Desktop 鐙珛 UI銆丷eact 鍐呯疆鐘舵€佹満鍒跺拰 Mobile ViewModel/StateFlow/Jetpack Navigation Compose銆傚悗缁?Human 绛斿灏?UI 浠ｇ爜鎵ц绂佷护闄愬畾浜?S2锛屼繚鐣?S4 缁忓鏌ョ殑娌欑 Render Bundle銆傚伐浣滄爲琛ュ厖璇存槑鎺堟潈锛氭病鏈夊垎閰嶆椂锛屽湪 Codex 璁剧疆鐨勫伐浣滄爲鐩綍涓嚜涓诲垎閰嶅彈绠＄悊宸ヤ綔鏍戙€傛柊澧?Human 瑕佹眰銆屾灦鏋勬枃妗ｇ敤涓枃缂栧啓銆嶏紝鏈?ADR 涓庝笁浠芥柊浜や粯鏂囨。鎹浣跨敤涓枃銆?
+瑙勮寖 搂6.5 璁板綍鍏ㄩ儴瑙勮寖鎬у喅瀹氾紱浠庡睘鏋舵瀯/璁捐鏂囨。瑙ｉ噴杩欎簺瑕佹眰锛屼笉寤虹珛鍙︿竴浠借鑼冩潈濞併€偮?.1 鍘熷畬鏁寸粍浠跺鐢ㄨ鍒欐敼涓哄悇绔嫭绔嬭瑙夊疄鐜帮紝鍏变韩鍗忚銆佹ā鍨嬨€侀€傜敤 hooks銆乀oken 鍜?UI 璇箟銆備笉鍏变韩 Button/MessageBubble/ChatWindow銆侻obile Kotlin 绛変环琛屼负淇濇寔涓嶅彉锛涙壒鍑嗙殑 Navigation/Lifecycle/StateFlow 渚濊禆浠呭湪瑙勮寖鏈哄櫒绛栫暐涓檺瀹氬垪鍑猴紝渚涙湭鏉ュ凡鎵瑰噯浠诲姟浣跨敤銆俉eb 璺敱浠ュ強閫氱敤鍥炬爣/鏃犻殰纰?宸ュ叿搴撶被鍒湭閫夋嫨浠讳綍鏂板鍏蜂綋鍖呫€備笉閫夋嫨鐘舵€佺鐞嗘鏋躲€丄I API 鎴?Plugin 杩愯鏃躲€?
+## 瑙勮寖鏁堝姏涓庡吋瀹规€?
+semantic_change=true銆備繚鐣?v1.1銆傝鑼冩鏂囧強鍝堝笇宸茬敱姝ゅ墠鍊欓€夋洿鏂帮紱宸叉帴鍙楄緭鍏?aa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c 鍦?baseline.md 涓繚鐣欎负 UI 淇璋辩郴锛屽鎴风鍩虹鎶€鏈潵婧愪粛涓?ADR-0005銆傚熀纭€淇鍏冩暟鎹€丄DR-0001 鑷?ADR-0005銆佸師 PDF546915銆丳R7/PR8 鍘嗗彶鍙婃棦鏈?FAIL/璞佸厤/璇佹嵁淇濇寔涓嶅彲鍙樸€偮?.2 瀹夊叏鏍￠獙銆乻andbox銆丅ridge 鍜屾彃浠跺绾︿繚鎸佸畬鏁达紱S2 涓嶅疄鐜?renderer銆佷笅杞姐€佸畨瑁呮垨杩愯鏃躲€備笉鏀瑰彉 wire contract銆丄CK銆佸吋瀹规€с€佸瓨鍌?schema銆佸畨鍏ㄦ潈闄愭垨鍚庣銆備笉娑夊強浜у搧/鏁版嵁杩佺Щ銆傛湰娆′腑鏂囦慨璁笉鏀瑰彉瑙勮寖姝ｆ枃鎴栧叾鍊欓€夊搱甯屻€?
+## 鍒濆浜や粯涓庣敓鏁堢偣
+
+浜や粯鏂囨。涓?decisions/client-ui/architecture.md銆乨ecisions/client-ui/design-direction.md 鍜?spec/acceptance/client-gui.md銆侴UI 浠诲姟蹇呴』瑕佹眰缁戝畾鍊欓€?SHA 鐨勭湡瀹炶繍琛屾埅鍥炬竻鍗曘€丄rchitect 瀹℃煡/淇/閲嶆媿/鎵瑰噯銆佺嫭绔嬭涔夊疄鐜?Review锛屼互鍙婇€傜敤鐨勭簿纭?HEAD 鎵樼 CI銆傛埅鍥炬壒鍑嗕笉鏇夸唬杩欎簺妫€鏌ワ紝涔熶笉鑳藉缓绔?S2 PASS銆?
+鍐荤粨浠呭湪鏂扮殑鐙珛骞插噣鍊欓€?Review銆侀€傜敤鐨勭簿纭?HEAD 鎵樼 CI銆佽鎺ュ彈鐨勯泦鎴愪笌瀹為檯 main 楠岃瘉涔嬪悗鐢熸晥銆傛鍓嶅凡鎺ュ彈 main 浠嶆槸鏈€鍚庡凡鐭ヨ壇濂芥彁浜わ紝浜у搧瀹炵幇涓嶅緱灏嗗€欓€夊綋浣滃凡鎺ュ彈鏉冨▉銆俁eviewer 椤绘鏌ヨ鑼冨彉鏇淬€佷粠灞炴枃妗ｃ€佺簿纭啓鍏ヨ寖鍥淬€佹満鍣ㄧ瓥鐣ヤ緷璧栨柊澧炲強鍘嗗彶璋辩郴淇濈暀銆傚瀹炶褰曠敓鏁?SHA/CI/main 鍜屽彈淇濇姢鍚屾缁撴灉涔嬪悗锛屼换鍔℃墠鍙?done锛涗繚鐣?S1 PASS/S2 OPEN銆備笉婵€娲?SEND/SYNC/WEB 浠诲姟銆?
+## 鏈€灏忔€т笌鍥炴粴
+
+鑼冨洿涓轰笁浠芥枃妗ｃ€侀檺瀹氱殑瑙勮寖/ADR/绱㈠紩/娓呭崟淇鍜?Human 瑕佹眰鐨?AGENTS 琛ュ厖锛涗笉瀹炵幇缁勪欢銆乀oken 寮曟搸銆佸簱瀹夎銆佹彃浠惰繍琛屾椂鎴?AI銆傛柊澧炲伐绋嬫爣璇嗕粎鏈嶅姟鏄庣‘鐨?Mobile 鐘舵€?瀵艰埅璁捐锛屼笉鎺堟潈 Room銆佺綉缁滄垨娴嬭瘯妗嗘灦銆傜敓鏁堝墠锛屽湪宸叉帴鍙?main 涓嶅彉鐨勬儏鍐典笅淇鍊欓€夛紱鐢熸晥鍚庝慨姝ｅ繀椤讳娇鐢?Human 鎵瑰噯鐨勭籂姝?ADR 鍜屾柊鐨勭嫭绔嬮獙鏀讹紝涓嶅緱閲嶅啓鍘嗗彶銆丳DF 鎴?Recorder銆?
+# ADR-0007锛氬鎴风 MVP 浠诲姟瑙勫垝琛ュ厖
+
+鐘舵€侊細瑙勫垝鏍稿績宸茬嫭绔嬫帴鍙椾簬 candidate7466ce7/PR14/actualmain b60f116a14f9265031bff255db500f3414f2a357锛屽苟淇濇姢鍚屾 H:/IM-platform锛涜瘉鎹?mvp-planning/closure/acceptance.md銆傛湰鐘舵€佸彂鐜颁粎琛屾斂鏀跺熬锛屼粛寰呮柊鐙珛 Review/绮剧‘ CI/闆嗘垚锛涗箣鍚庣珛鍗虫墽琛屾湰杞?SEND銆?鏃ユ湡锛?026-10-03
+鎵瑰噯鏉ユ簮锛歴pec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/human-request.txt
+
+## 鍔ㄦ満涓庡喅瀹?
+ADR-0006 宸插喕缁?UI 鏋舵瀯浣?搂19/搂20 鏈畬鏁磋惤瀹炰骇鍝?GUI 宸ヤ綔銆侶uman 鏄庣‘鎵瑰噯 minimum-task-count 琛ュ叏锛歋2 浠呮柊澧?LOOP1-CLIENT-GUI-001锛岃鐩?Desktop/Mobile 瀹屾暣 Loop1 GUI锛屼緷璧?SQLITE/UI-ARCH/SEND/SYNC锛涘師 LOOP1-WEB-001 鏄?Web 瀹屾暣 GUI锛屼繚鎸?React/TypeScript memory only銆佹棤 SQLite/绂荤嚎鍘嗗彶銆係2 椤哄簭 SQLITE 鈫?UI-ARCH 鈫?SEND 鈫?SYNC 鈫?GUI 鈫?WEB 鈫?Gate銆傚鎴风鑷湁 Settings/Profile銆佸弻涓婚涓庢湰鍦板瓧浣撻棿璺濄€佺湡瀹炲彂閫?鍚屾鐘舵€佸強骞冲彴鑳藉姏鍧囧湪 GUI 浠诲姟楠屾敹鍐呫€?
+S3 PARITY 鍏奸【鏃犱笟鍔′慨鏀瑰垏鎹?profile锛汼4 PLUGIN-UI/FIX 鎵挎帴鐪熷疄瀹夸富 UI銆佸鑸檺鍒躲€佹埅鍥捐瘉鎹紱S5 COMPAT/RELEASE 鎵挎帴涓夌鍏煎銆丼QLite/涓婚鍋忓ソ/Plugin UI銆佸疄闄呭埗鍝佷笌瀹夎鍗囩骇鍥炴粴锛汼6 浠?RC 澧炲姞鏈€缁堜笁绔?GUI smoke 鍜屽疄璐ㄥ彉鍖栭噸鎷嶆壒鍑嗭紝5000 WSS 鐢?load harness 鎵挎媴銆傜姝㈡柊澧?UI parity/plugin/release/soak/E2E ID銆侴UI/Web 寮曠敤鏃㈡湁 client-gui 鎴浘 鈫?Architect Review 鈫?淇閲嶆媿 鈫?Approval 鈫?fresh independent Review 鈫?exact-head CI 鈫?protected integration/main 閾俱€?
+## 褰卞搷銆佸吋瀹逛笌杩佺Щ
+
+semantic_change=true锛堜换鍔¤鍒掍笌 Gate obligations锛夛紱v1.1 涓嶅彉銆傝鑼?搂15/搂19/搂20/闄勫綍 A 鍚屾锛宐aseline 褰撳墠 hash 鏇存柊锛宲lanning_previous_sha256 璁板綍鎺ュ彈杈撳叆 a234bc06銆備笉鏇存敼 搂3/搂6 瀛樺偍/鍙戦€?Sync 鑱岃矗銆佹妧鏈斂绛栥€佸绾?schema/ACK/security/compatibility锛涗笉閫夋柊渚濊禆銆佷笉杩佺Щ浜у搧鏁版嵁锛涘巻鍙?PDF/ADR-0006/PR7/PR8/FAIL/Recorder 涓嶅彉銆傚崟鐙渶灏?ADR 鐣欎笅鏂版壒鍑嗘潵婧愶紝閬垮厤鎶婂凡鎺ュ彈 ADR-0006 鐨勬棫 CI 褰撴垚鏈疆楠屾敹銆?
+## 鎺ュ彈涓庢湰杞?endpoint
+
+鏈琛ュ厖鍦?clean committed candidate 鐨勫畬鏁存€с€乤rchitecture銆乨ependency/negative controls銆佹柊 independent Review銆佺簿纭€欓€?applicable hosted CI銆乸rotected merge/actual-main 涓庡彈淇濇姢涓讳粨搴撳悓姝ュ畬鎴愬悗鐢熸晥銆備箣鍚庣珛鍗宠繘鍏?SEND 缂栨帓瀹炵幇锛涙湰杞甯稿仠姝㈢偣 SEND 宸茬嫭绔嬫帴鍙椼€侀泦鎴愬悓姝ヤ笖 done锛汼YNC/GUI/WEB 涓嶆縺娲汇€俇I 鏋舵瀯 Task 宸叉帴鍙楀唴瀹逛笉鎾ゅ洖锛屾湰娆?pending 浠呮寚鏂板瑙勫垝銆?
+## 鏈€灏忔€т笌鍥炴粴
+
+澶嶇敤 UI-ARCH 琛屾斂浠诲姟锛屼骇鍝佸彧鏂板 GUI ID锛涘叾浣欓槦鍒楀疄渚嬪寲宸叉湁瑙勫垝 ID锛屼笉鐢熸垚鏈潵 S3锝濻6 鏂颁换鍔″眰銆傜敓鏁堝墠淇鍊欓€夛紱鐢熸晥鍚庣籂姝ｉ€氳繃鏂?Human 鍐冲畾涓庣嫭绔嬮獙鏀讹紝涓嶉噸鍐欏巻鍙层€傛棤浜у搧/鏁版嵁鍥炴粴銆?
+## 鎺ュ彈鍙戠幇
+
+鍘熸枃鍊欓€夋晥鍔涜鏄庝负鍘嗗彶娴佺▼銆傚綋鍓峜anonical16e9c7b4閫氳繃fresh candidate/actualmain Review涓庣簿纭甴osted5jobs/every stepPASS锛寁1.1/PDF涓嶅彉锛涙湰娈典笉淇敼瑙勮寖鑱岃矗/杈圭晫锛孲1PASS/S2OPEN銆?
+# Messaging Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-002`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| MSG-D-001 | A client request identity MUST be unique within a Conversation and is the identity reused by retry and local convergence. | Architecture Baseline v1.0, chapter 4.4. |
+| MSG-D-002 | The server idempotency identity MUST include sender, Conversation, and client request identity; the server message identity MUST be globally unique. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-003 | Conversation sequence numbers MUST be unique and monotonically increasing within each Conversation. | Architecture Baseline v1.0, chapter 4.4 and appendix B (Message). |
+| MSG-D-004 | Message send MUST authorize the sender as a Conversation member before persistence. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-D-005 | Sequence allocation, Message persistence, and the matching Outbox event MUST commit atomically; a successful ACK MUST mean that durable commit has completed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message, Outbox). |
+| MSG-D-006 | Outbox delivery and NATS delivery MAY repeat or be briefly missed; consumers MUST be idempotent and Sync MUST provide eventual completeness. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-D-007 | Gateway MUST fan out only to locally active connections and MUST NOT own friendship, membership, persistence, or plugin business rules. | Architecture Baseline v1.0, chapters 2 (F-05) and 5.2. |
+| MSG-D-008 | A GROUP send MUST create one logical Message and one Outbox event; it MUST NOT create one persistent message record per member. | Architecture Baseline v1.0, chapter 5.3. |
+| MSG-D-009 | Loop 1 MUST NOT treat NATS JetStream as the message source of truth. | Architecture Baseline v1.0, chapters 2 (F-03) and 5.2. |
+
+# Sync and Plugin Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-003`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| SP-D-001 | Web MUST remain memory-only and MUST NOT claim offline history; Desktop and Mobile MUST use per-account local materialized views and render local state before background Sync. | Architecture Baseline v1.0, chapters 2 (F-07) and 6.1, and appendix B (Web). |
+| SP-D-002 | A local optimistic send MUST create one client request identity, persist SENDING before transmission, converge to SENT after ACK, and reuse the same request identity when retrying FAILED. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-D-003 | SENT MUST be terminal and MUST NOT regress to FAILED; FAILED means only that the current attempt lacks success confirmation. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-D-004 | User Sync cursor MUST cover only low-frequency user-level state; message state MUST use per-Conversation sequence and contiguous sequence tracking. | Architecture Baseline v1.0, chapters 2 (F-06) and 6.4, and appendix B (Sync). |
+| SP-D-005 | Sync MUST advance a per-Conversation contiguous sequence only across a gap-free prefix; duplicate and out-of-order input MUST converge without skipping a gap. | Architecture Baseline v1.0, chapter 6.4 and appendix B (Sync). |
+| SP-D-006 | All local send, ACK, realtime, and Sync write paths MUST converge through transactional upsert; data and cursor advancement MUST commit together. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-D-007 | Plugin API v1 MUST expose Events, Queries, Actions, and UI Host surfaces, each constrained by declared capability and permission. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-D-008 | Queries MUST be read-only, paginated, and limited; each Action MUST be re-authorized, idempotent, and audited; plugins MUST NOT call Core internals or databases directly. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-D-009 | A custom renderer MUST pass package hash, signature, manifest-schema, API-compatibility, permission, resource-size, CSP, and entry-point checks before loading, and MUST run in the stated UI sandbox. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-D-010 | A plugin artifact identified by plugin and version MUST be immutable; backend and renderer MUST remain version-bound, and history MUST retain the renderer needed by referenced messages plus fallback text. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-D-011 | WASM execution MUST default-deny database, server-file, arbitrary-network, and other-plugin-memory access and MUST enforce CPU/time, memory, concurrency, storage, and network limits. | Architecture Baseline v1.0, chapter 8.3 and appendix B (Plugin). |
+| SP-D-012 | Plugin artifact lifecycle and Conversation-scoped instance lifecycle MUST remain distinct; upgrade MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed, and MUST roll back on failure. | Architecture Baseline v1.0, chapters 9.1 and 9.2. |
+| SP-D-013 | DISABLE MUST preserve data, UNINSTALL MUST default to RETAINED, and PURGE MUST require an explicit irreversible operation with elevated permission, audit, and a confirmed retention policy. | Architecture Baseline v1.0, chapter 9.3. |
+
+# Auth, User, and Friend Domain Input
+
+This document supplies semantic input to `LOOP1-CONTRACT-001`. Names used below identify domain concepts only; they do not define public wire fields, implementation classes, or database tables.
+
+| Rule ID | Domain statement | Source |
+| --- | --- | --- |
+| AUF-D-001 | A user MUST have exactly three login slots: WEB, DESKTOP, and MOBILE; at most one Session for a given user and client type may be valid at a time. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-002 | Sessions for different client types MAY be valid concurrently for the same user. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-003 | A new login for the same user and client type MUST revoke the previous Session and advance the session epoch in one transaction. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-D-004 | PostgreSQL MUST remain authoritative for login state; Gateway memory is only an online-connection and routing cache. | Architecture Baseline v1.0, chapters 2 (F-03), 4.1, and 7.3. |
+| AUF-D-005 | A friendship MUST be represented by one normalized unordered user pair, so `(A,B)` and `(B,A)` denote the same friendship. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-D-006 | Adding a friend in Loop 1 MUST immediately establish the bidirectional friendship and create or reuse the pair's single DIRECT Conversation in the same transaction. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-D-007 | Loop 1 MUST NOT introduce a friend-request approval flow. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-D-008 | A successful explicit logout MUST revoke the Session and Refresh Token and close its WSS connection; it MUST NOT be specified as deletion of local client history. | Architecture Baseline v1.0, chapter 7.1. |
+| AUF-D-009 | Production authentication transport MUST use HTTPS/WSS/TLS; tokens MUST NOT be accepted from a URL query or written to logs or traces, and error responses MUST NOT reveal token material. | Architecture Baseline v1.0, chapter 7.4. |
+
+# Messaging Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| MSG-I-001 | Repeating a send with the same server idempotency identity MUST converge on the same logical Message and MUST NOT allocate another Conversation sequence. | Architecture Baseline v1.0, chapters 4.4 and 5.1. |
+| MSG-I-002 | A successful message ACK MUST NOT be observable before the Message and matching Outbox event are durably committed. | Architecture Baseline v1.0, chapters 2 (F-04) and 5.1, and appendix B (Message). |
+| MSG-I-003 | Every committed logical Message MUST have exactly one logical Outbox event, even when publication delivery is retried. | Architecture Baseline v1.0, chapters 4 (Figure 4-1), 5.1, and 5.2. |
+| MSG-I-004 | No recipient MUST receive a Message for the wrong Conversation, and no permanent sequence gap may remain after Sync convergence. | Architecture Baseline v1.0, chapter 5.3 (message correctness red lines). |
+| MSG-I-005 | Duplicate NATS delivery MUST NOT create a duplicate logical Message or duplicate client materialization. | Architecture Baseline v1.0, chapter 5.2 and appendix B (Outbox). |
+| MSG-I-006 | A send by a non-member MUST be rejected before persistence and before a success ACK. | Architecture Baseline v1.0, chapter 5.1. |
+| MSG-I-007 | GROUP fan-out MUST remain an online delivery concern and MUST NOT alter the single-Message, single-Outbox persistence outcome. | Architecture Baseline v1.0, chapter 5.3. |
+
+# Sync and Plugin Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| SP-I-001 | Duplicate or out-of-order Sync input MUST be idempotent, and contiguous sequence MUST NOT advance across a missing sequence. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-I-002 | When Sync observes a server Message matching a locally FAILED send identity, it MUST converge that local item to SENT rather than create another item. | Architecture Baseline v1.0, chapter 6.2. |
+| SP-I-003 | Local materialized data and its corresponding cursor or contiguous-sequence advance MUST commit atomically. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-I-004 | User-level cursor input MUST NOT contain Message events. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-I-005 | Plugin capability or permission denial MUST prevent the Event subscription, Query, Action, or UI behavior without granting an alternate direct access path. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-I-006 | Query operations MUST NOT mutate state; each Action MUST be re-authorized at execution, MUST be idempotent, and MUST be auditable. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-I-007 | A changed package, backend, or renderer hash under an existing plugin version MUST be rejected. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-I-008 | WASM and custom-renderer execution MUST remain sandboxed with least privilege and MUST NOT directly reach host-sensitive resources. | Architecture Baseline v1.0, chapters 8.2 and 8.3, and appendix B (Plugin). |
+| SP-I-009 | Upgrade MUST NOT split backend and renderer versions and MUST leave the previous version serviceable until atomic switch; any failed step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-I-010 | DISABLE and UNINSTALL MUST NOT purge retained data; PURGE MUST NOT occur implicitly. | Architecture Baseline v1.0, chapter 9.3. |
+
+# Auth, User, and Friend Invariants
+
+These invariants constrain future contracts without prescribing wire shape or persistence schema. Machine-verifiable public authority remains exclusively under `contracts/`.
+
+| Rule ID | Invariant | Source |
+| --- | --- | --- |
+| AUF-I-001 | A contract MUST make it impossible to represent more than one valid Session for the same user and client type. | Architecture Baseline v1.0, chapter 4.1 and appendix B (Session). |
+| AUF-I-002 | Same-slot relogin MUST invalidate the old epoch before the new Session is accepted; an old token MUST NOT reconnect successfully. | Architecture Baseline v1.0, chapters 4.1, 7.2, and 7.3, and appendix B (Session). |
+| AUF-I-003 | WSS MUST remain UNAUTHENTICATED until auth.bind succeeds and MUST permit only auth.bind plus ping/pong in that state. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-004 | Authenticated WSS state MUST bind user, Session, and client type, and a same-slot revocation MUST produce session.revoked before connection close. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-I-005 | Friendship identity MUST be order-independent, and one normalized pair MUST map to one friendship and one DIRECT Conversation. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-I-006 | Friendship creation, DIRECT Conversation creation or reuse, both memberships, Sync events, and Outbox effects MUST form one atomic outcome. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-I-007 | Authentication secrets MUST NOT be exposed through query parameters, logs, traces, or error responses. | Architecture Baseline v1.0, chapter 7.4. |
+
+# S0 Sync and Plugin Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| SP-A-001 | Given duplicate and out-of-order per-Conversation inputs with a gap, the runner MUST assert idempotent materialization and that contiguous sequence stops before the gap; after the missing input arrives it MUST advance across the now-complete prefix. | Architecture Baseline v1.0, chapters 6.3 and 6.4, and appendix B (Sync). |
+| SP-A-002 | Given a locally FAILED item and a matching server Message, the runner MUST assert convergence to SENT without an additional local item; SENT MUST remain terminal under later timeout input. | Architecture Baseline v1.0, chapter 6.2 and appendix B (SQLite). |
+| SP-A-003 | Fault injection between local materialization and cursor advancement MUST roll back both effects; retry MUST converge by transactional upsert. | Architecture Baseline v1.0, chapter 6.3. |
+| SP-A-004 | A user-cursor fixture containing a Message event MUST be rejected; low-frequency friend, Conversation, membership, and plugin state fixtures MUST advance only the user cursor. | Architecture Baseline v1.0, chapter 6.4. |
+| SP-A-005 | Permission-negative fixtures MUST deny undeclared Event subscriptions, unauthorized Queries, unauthorized Actions, and unavailable UI capabilities, with no direct Core or database bypass. | Architecture Baseline v1.0, chapters 2 (F-08) and 8.1. |
+| SP-A-006 | Query fixtures MUST assert read-only, paginated, limited behavior; Action fixtures MUST assert execution-time re-authorization, idempotent outcomes, and audit evidence. | Architecture Baseline v1.0, chapter 8.1. |
+| SP-A-007 | Artifact fixtures MUST reject a changed package, backend, or renderer hash for an existing plugin/version identity and MUST reject backend-renderer version splitting. | Architecture Baseline v1.0, chapter 8.2 and appendix B (Plugin). |
+| SP-A-008 | Renderer-negative fixtures MUST reject failures of hash, signature, manifest schema, API compatibility, permission, resource-size, CSP, or entry-point checks; runtime probes MUST verify the declared UI sandbox boundary. | Architecture Baseline v1.0, chapter 8.2. |
+| SP-A-009 | WASM-negative fixtures MUST verify default denial of database, server-file, arbitrary-network, and other-plugin-memory access plus enforcement of resource limits and AUTO_DISABLED threshold behavior. | Architecture Baseline v1.0, chapter 8.3. |
+| SP-A-010 | Upgrade fixtures MUST keep the old version serving until snapshot, migration, paired health checks, and atomic switch succeed; failure at each step MUST restore the snapshot and continue the old version. | Architecture Baseline v1.0, chapter 9.2. |
+| SP-A-011 | Lifecycle fixtures MUST assert that DISABLE preserves data, UNINSTALL defaults to RETAINED, and PURGE requires an explicit elevated, audited, retention-confirmed operation. | Architecture Baseline v1.0, chapter 9.3. |
+| SP-A-012 | Golden fixtures MUST include duplicate, out-of-order, gap, and permission-denial cases and MUST normalize to identical Sync and Plugin outcomes across both backend profiles. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+| SP-A-013 | Given repeated execution of the same Action, the runner MUST assert one idempotent observable outcome with no duplicate side effect and MUST retain audit evidence for every execution attempt. | Architecture Baseline v1.0, chapter 8.1. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical 搂3/搂10 SRC-01 through SRC-07/搂11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+
+# S0 Auth, User, and Friend Contract Checks
+
+These checks are executable requirements for the future canonical contract runner. They define observable cases and assertions, not endpoint paths, wire fields, classes, or storage schema.
+
+| Rule ID | Executable contract check | Source |
+| --- | --- | --- |
+| AUF-A-001 | Given one valid Session in a login slot, when the same user logs in again for that client type, the fixture runner MUST assert that the old epoch can no longer authenticate and the new Session can; the same test MUST assert that other client types remain valid. | Architecture Baseline v1.0, chapters 4.1, 7.2, and 7.3, and appendix B (Session). |
+| AUF-A-002 | Given an unauthenticated WSS connection, the negative fixture runner MUST reject every operation other than auth.bind and ping/pong; after valid binding it MUST assert the authenticated state is bound to user, Session, and client type. | Architecture Baseline v1.0, chapter 7.2. |
+| AUF-A-003 | Given an active same-slot connection, when a replacement login commits, the fixture runner MUST observe session.revoked followed by closure and MUST reject reconnect with the old token. | Architecture Baseline v1.0, chapters 7.2 and 7.3. |
+| AUF-A-004 | Given users A and B, adding A-to-B and then B-to-A MUST converge to one normalized friendship and one DIRECT Conversation; fixtures MUST reject a second distinct relationship for the same unordered pair. | Architecture Baseline v1.0, chapter 4.2 and appendix B (Friend). |
+| AUF-A-005 | The friend-add contract fixture MUST demonstrate immediate bidirectional success and MUST NOT expose a pending approval state. | Architecture Baseline v1.0, chapter 4.2. |
+| AUF-A-006 | Logout fixtures MUST assert Session and Refresh Token revocation plus WSS closure, while making no assertion that local client history is deleted. | Architecture Baseline v1.0, chapter 7.1. |
+| AUF-A-007 | Security fixtures MUST reject tokens in URL query input and MUST assert that responses and captured structured logs contain no token or password material. | Architecture Baseline v1.0, chapter 7.4. |
+| AUF-A-008 | Both backend profiles MUST run the same positive and negative fixtures and normalize to the same observable auth, friendship, error, and transaction outcomes. | Architecture Baseline v1.0, chapter 11.2 and chapter 11.3. |
+
+## Current implementation acceptance overlay
+
+Source labels above preserve original S0 semantic input provenance, not selection of an old active baseline. Current implementation resolves/hash-checks spec/architecture/README.md/baseline.md and applies canonical 搂3/搂10 SRC-01 through SRC-07/搂11 plus spec/governance/execution-boundaries.md. Unchanged behavioral cases require applicable source ownership/import checks and fresh Review using spec/governance/independent-review.md. allowed_paths and behavioral parity never waive structure.
+
+Stage-three effective checkers are bounded accepted at2afeac8/run36726926394; execute ci/check_architecture.py --scope all --json and tests/architecture with evidence003/hosted-acceptance.md. Go remediation product candidate d0ae52f5615320790ae7039cb48831873de6f486 is independently reviewed and accepted by hosted run36744072690; evidence004/final-hosted-acceptance.md. Historical stage003 source_go/Gate FAIL was expected before migration and remains preserved. Applicable source/dependency checks remain mandatory; no grandfather exception. Administrative closure candidate still requires a new independent Review and exact-head hosted verification; S1 product Gate remains OPEN. No follow-on business is activated by this discovery update. Check each backend stage: Java placeholder now and full Java boundaries at first business implementation. Record actual integration enable conditions/services/skips; unexecuted integration is not PASS. Verify hosted head/required jobs; historical S0/Auth acceptance does not cover new rules.
+
+## Human-approved Loop1 exception: friend403
+
+ADR-0004-loop1-friend-403-exception.md and contracts/fixtures/auth-user-friend/loop1-exceptions.json exempt only friend-add-authorization-denied from Loop1 implementation/runtime acceptance. OpenAPI403 placeholder and full future golden expectation remain unchanged. Report DEFERRED_BY_HUMAN separately; never count it PASS or claim every canonical case executed. AUF-A-008 profile equivalence applies to required stage cases; all other applicable checks remain required. FRIEND-AUTHORIZATION-403 remains a later-iteration TODO requiring approved credential/permission context, exact403/noeffects tests and fresh independent Review/CI. This scope decision does not waive401/422, membership/plugin authorization or transaction invariants.
+
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IM Sync HTTPS API",
+    "version": "1.0.0",
+    "description": "Canonical pull transport for existing Sync v1 shapes; HTTPS only. WSS realtime and ACK are unchanged. Both operations accept exactly one required JSON body and no query parameters. Authentication credentials are accepted only through Authorization Bearer, never query/body/cookie; each request validates token and authoritative Session ID, epoch, client type, revocation and expiry. Core derives user identity from credentials. Success and canonical errors echo the decoded valid UUID body requestId; otherwise a fresh server UUID is used, no alternate header correlation. Sync version other than 1.0 returns 426 PROTOCOL_VERSION_UNSUPPORTED; other malformed inputs return 400 VALIDATION_FAILED. Precedence: reject query parameters or uncorrelatable malformed JSON, authenticate, then validate version/body/cursor/membership. All positive integer limit values remain valid; page length <= min(limit,100), calculate cap exactly before bounded conversion. Read at most effectiveLimit+1 eligible items; hasMore is true iff an additional committed eligible item exists, requiring nonempty progress. Empty page is terminal; User nextCursor equals input cursor. Nonempty User nextCursor equals last event cursor, differs from input; events have distinct IDs/cursors in source order and form a stable committed prefix so concurrent late commits cannot be skipped. Initial User cursor is literal 0; subsequent event/next cursors are opaque server-issued tokens bound to the authenticated user, replayable across that user's Sessions. Invalid, fabricated or other-user cursors return 400 VALIDATION_FAILED; clients never parse/order cursors. Conversation messages strictly ascend from afterSeq+1 with no gap, identify the requested Conversation, and the next request uses last returned seq. afterSeq beyond current committed head yields empty terminal page. Valid user cursors remain usable for current Loop 1 (no cursor expiry/retention/reset protocol). Servers may project internal cursor_id to opaque external event.cursor without changing existing wire shapes or persistent producer payloads. Only catalogued canonical errors use ErrorResponse. Unexpected server/unavailable transport failures are non-2xx transport failures without any successful page or cursor advancement; no uncatalogued code/envelope is introduced. Responses contain no credentials and use no-store; retrieval is read-only and retry can observe newly committed data. afterSeq accepts all nonnegative JSON integers exactly, including values beyond storage signed64 range; after authorization, values beyond storage head return empty terminal page without lossy conversion."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.invalid"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/sync/user": {
+      "post": {
+        "operationId": "pullUserSync",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Pull only authenticated user's low-frequency events after an opaque cursor. No Message or Session event. Core validates cursor ownership and durable committed prefix.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../websocket/sync-v1.schema.json#/$defs/UserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Correlated Sync page; never an ACK or write effect",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../websocket/sync-v1.schema.json#/$defs/UserPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or user cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authoritative authentication failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Unsupported syncVersion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sync/conversation": {
+      "post": {
+        "operationId": "pullConversationSync",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Pull committed messages after afterSeq for a currently authorized Conversation member; absent and foreign Conversation both return 403. Each page is ordered and gap-free.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../websocket/sync-v1.schema.json#/$defs/ConversationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Correlated Sync page; never an ACK or write effect",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../websocket/sync-v1.schema.json#/$defs/ConversationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or user cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authoritative authentication failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Conversation access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "AUTHORIZATION_DENIED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          },
+          "426": {
+            "description": "Unsupported syncVersion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+                }
+              }
+            },
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ],
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "$ref": "./auth-user-friend.openapi.json#/components/securitySchemes/bearerAuth"
+      }
+    }
+  },
+  "x-sync-binding": {
+    "initialCursor": "0",
+    "cursorOwnership": "authenticated-user",
+    "cursorComparison": "opaque-equality-only",
+    "effectiveLimitCap": 100,
+    "limitPolicy": "accept-all-positive-integers-cap-before-conversion",
+    "authentication": "authoritative-session-each-request",
+    "authorization": "core-user-scope-and-conversation-membership",
+    "correlation": "decoded-valid-body-requestId-echo-else-server-uuid",
+    "emptyUserPage": "retain-request-cursor-hasMore-false",
+    "userOrder": "stable-committed-prefix",
+    "userNextCursor": "last-event-cursor",
+    "conversationOrder": "ascending-gap-free-afterSeq",
+    "hasMore": "additional-committed-item-exists",
+    "failure": "non-2xx-never-a-sync-page",
+    "queryParameters": "none",
+    "runtimeAcceptance": "deferred-until-human-approved-Go-plan",
+    "afterSeqPolicy": "accept-all-nonnegative-integers-above-storage-head-empty",
+    "pagination": "commit-page-then-continue-hasMore-to-terminal-without-fixed-total-cap",
+    "completion": "latest-committed-visible-at-terminal-read-not-future-writes"
+  }
+}
+
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IM Auth, User, and Friend HTTP API",
+    "version": "1.0.0",
+    "description": "Canonical Loop 1 HTTP contract. Production transport is HTTPS only. Authentication material is never accepted in URL query parameters and must not be logged or returned in errors. PostgreSQL-backed session and friendship transactions are authoritative."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.invalid"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Friends"
+    }
+  ],
+  "paths": {
+    "/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "registerUser",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict",
+            "x-error-codes": [
+              "USERNAME_ALREADY_EXISTS"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "login",
+        "security": [],
+        "description": "A successful login atomically revokes any active session in the same user/clientType slot, increments that slot's sessionEpoch, creates the replacement session, and only then returns it. Other clientType slots remain valid.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login committed",
+            "headers": {
+              "Set-Cookie": {
+                "description": "For WEB only, __Host-im_refresh is emitted with Secure, HttpOnly, Path=/, and SameSite=Strict attributes; native clients never receive this cookie.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_INVALID_CREDENTIALS"
+            ]
+          },
+          "426": {
+            "$ref": "#/components/responses/UnsupportedProtocol",
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "logout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Atomically revokes the bound session and every refresh token issued for it. The service then emits the session revocation effect and closes its WSS connection. Local client history is not deleted.",
+        "responses": {
+          "204": {
+            "description": "Session and refresh credentials revoked; no response body"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/users/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "getCurrentUser",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/users/search": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "searchUsers",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Username"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exact normalized username match or an empty list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "users"
+                  ],
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "items": {
+                        "$ref": "#/components/schemas/PublicUser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/friends": {
+      "get": {
+        "tags": [
+          "Friends"
+        ],
+        "operationId": "listFriends",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current bidirectional friendships",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "friends"
+                  ],
+                  "properties": {
+                    "friends": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FriendView"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/friends/{friendUserId}": {
+      "put": {
+        "tags": [
+          "Friends"
+        ],
+        "operationId": "addFriend",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Idempotently establishes an immediate bidirectional friendship. The normalized friendship, the pair's single DIRECT conversation, exactly two memberships, user sync events, and outbox effects commit atomically. There is no pending or approval state. Reversing caller and target returns the same friendshipId and directConversationId.",
+        "parameters": [
+          {
+            "name": "friendUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Existing normalized friendship returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FriendshipResult"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Friendship and DIRECT conversation atomically created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FriendshipResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH"
+            ]
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "x-error-codes": [
+              "AUTHORIZATION_DENIED"
+            ]
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "x-error-codes": [
+              "USER_NOT_FOUND"
+            ]
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict",
+            "x-error-codes": [
+              "FRIENDSHIP_STATE_CONFLICT"
+            ]
+          },
+          "422": {
+            "$ref": "#/components/responses/Unprocessable",
+            "x-error-codes": [
+              "FRIEND_SELF_NOT_ALLOWED"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/auth/refresh/web": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "refreshWebSession",
+        "security": [
+          {
+            "refreshCookie": []
+          }
+        ],
+        "description": "WEB must present the refresh credential only in the __Host-im_refresh Secure HttpOnly cookie. The required body supplies client metadata but cannot carry a refresh token. A successful refresh rotates and independently revokes the presented refresh token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebRefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "WEB refresh committed",
+            "headers": {
+              "Set-Cookie": {
+                "description": "The rotated __Host-im_refresh cookie is emitted with Secure, HttpOnly, Path=/, and SameSite=Strict attributes.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_REQUIRED",
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH",
+              "AUTH_REFRESH_REVOKED"
+            ]
+          },
+          "426": {
+            "$ref": "#/components/responses/UnsupportedProtocol",
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ]
+          }
+        }
+      }
+    },
+    "/v1/auth/refresh/native": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "refreshNativeSession",
+        "security": [],
+        "description": "DESKTOP and MOBILE must present a nonempty refresh token together with clientType, deviceId, clientVersion, and protocolVersion in the required JSON body. WEB is not representable on this operation. A successful refresh rotates and independently revokes the presented refresh token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NativeRefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Native refresh committed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "x-error-codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "x-error-codes": [
+              "AUTH_TOKEN_INVALID",
+              "AUTH_TOKEN_EXPIRED",
+              "AUTH_SESSION_REVOKED",
+              "AUTH_SESSION_EPOCH_STALE",
+              "AUTH_CLIENT_TYPE_MISMATCH",
+              "AUTH_REFRESH_REVOKED"
+            ]
+          },
+          "426": {
+            "$ref": "#/components/responses/UnsupportedProtocol",
+            "x-error-codes": [
+              "PROTOCOL_VERSION_UNSUPPORTED"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Short-lived access token carrying user_id, session_id, client_type, session_epoch, iat, and exp claims. It is accepted only from the Authorization header."
+      },
+      "refreshCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-im_refresh",
+        "description": "Long-lived WEB refresh token received only as a Secure HttpOnly SameSite cookie. The server persists only its hash and can revoke it independently."
+      }
+    },
+    "schemas": {
+      "Id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "Username": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 64,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+        "description": "Uniqueness is evaluated using the server's canonical lowercase normalization."
+      },
+      "Password": {
+        "type": "string",
+        "format": "password",
+        "minLength": 12,
+        "maxLength": 256,
+        "writeOnly": true
+      },
+      "ClientType": {
+        "type": "string",
+        "enum": [
+          "WEB",
+          "DESKTOP",
+          "MOBILE"
+        ]
+      },
+      "SessionStatus": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "REVOKED"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "username",
+          "password",
+          "displayName"
+        ],
+        "properties": {
+          "username": {
+            "$ref": "#/components/schemas/Username"
+          },
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "username",
+          "password",
+          "clientType",
+          "deviceId",
+          "clientVersion",
+          "protocolVersion"
+        ],
+        "properties": {
+          "username": {
+            "$ref": "#/components/schemas/Username"
+          },
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "clientType": {
+            "$ref": "#/components/schemas/ClientType"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "clientVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "protocolVersion": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "PublicUser": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "userId",
+          "username",
+          "displayName"
+        ],
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "username": {
+            "$ref": "#/components/schemas/Username"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "user"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/PublicUser"
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId",
+          "userId",
+          "clientType",
+          "sessionEpoch",
+          "status"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "clientType": {
+            "$ref": "#/components/schemas/ClientType"
+          },
+          "sessionEpoch": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus"
+          }
+        }
+      },
+      "WebTokens": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accessToken",
+          "accessTokenExpiresInSeconds",
+          "refreshTokenDelivery"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accessTokenExpiresInSeconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "refreshTokenDelivery": {
+            "const": "HTTP_ONLY_SECURE_COOKIE"
+          }
+        }
+      },
+      "NativeTokens": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accessToken",
+          "accessTokenExpiresInSeconds",
+          "refreshToken",
+          "refreshTokenExpiresInSeconds",
+          "refreshTokenDelivery"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accessTokenExpiresInSeconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "refreshTokenExpiresInSeconds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "refreshTokenDelivery": {
+            "const": "RESPONSE_BODY_FOR_OS_SECURE_STORAGE"
+          }
+        }
+      },
+      "AuthResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "session",
+          "tokens",
+          "replacedExistingSession"
+        ],
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/Session"
+          },
+          "tokens": {},
+          "replacedExistingSession": {
+            "type": "boolean"
+          }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "session": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Session"
+                  },
+                  {
+                    "properties": {
+                      "clientType": {
+                        "const": "WEB"
+                      }
+                    }
+                  }
+                ]
+              },
+              "tokens": {
+                "$ref": "#/components/schemas/WebTokens"
+              }
+            }
+          },
+          {
+            "properties": {
+              "session": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Session"
+                  },
+                  {
+                    "properties": {
+                      "clientType": {
+                        "enum": [
+                          "DESKTOP",
+                          "MOBILE"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "tokens": {
+                "$ref": "#/components/schemas/NativeTokens"
+              }
+            }
+          }
+        ]
+      },
+      "NormalizedUserPair": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lowUserId",
+          "highUserId"
+        ],
+        "properties": {
+          "lowUserId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "highUserId": {
+            "$ref": "#/components/schemas/Id"
+          }
+        },
+        "description": "lowUserId and highUserId are the deterministic ascending ordering of the two distinct user IDs."
+      },
+      "FriendshipResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "friendshipId",
+          "normalizedPair",
+          "directConversationId",
+          "memberUserIds",
+          "created"
+        ],
+        "properties": {
+          "friendshipId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "normalizedPair": {
+            "$ref": "#/components/schemas/NormalizedUserPair"
+          },
+          "directConversationId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "memberUserIds": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          "created": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FriendView": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "user",
+          "friendshipId",
+          "directConversationId"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/PublicUser"
+          },
+          "friendshipId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "directConversationId": {
+            "$ref": "#/components/schemas/Id"
+          }
+        }
+      },
+      "NativeClientType": {
+        "type": "string",
+        "enum": [
+          "DESKTOP",
+          "MOBILE"
+        ]
+      },
+      "WebRefreshRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clientType",
+          "deviceId",
+          "clientVersion",
+          "protocolVersion"
+        ],
+        "properties": {
+          "clientType": {
+            "const": "WEB"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "clientVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "protocolVersion": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      },
+      "NativeRefreshRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "refreshToken",
+          "clientType",
+          "deviceId",
+          "clientVersion",
+          "protocolVersion"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true
+          },
+          "clientType": {
+            "$ref": "#/components/schemas/NativeClientType"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "clientVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "protocolVersion": {
+            "type": "string",
+            "const": "1"
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Malformed or semantically invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication failed, expired, revoked, stale, or mismatched",
+        "headers": {
+          "WWW-Authenticate": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Authenticated principal is not authorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Unique identity or canonical state conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unprocessable": {
+        "description": "Well-formed request violates a domain rule",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      },
+      "UnsupportedProtocol": {
+        "description": "The requested protocol version is unsupported",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../errors/http-errors.schema.json#/$defs/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/websocket/sync-v1.schema.json",
+  "title": "Sync v1 request and response contract",
+  "description": "User cursor carries only low-frequency friend, conversation, membership and plugin state. Message history uses a per-conversation sequence. Cursor and materialized data commit atomically on a client.",
+  "oneOf": [
+    {"$ref":"#/$defs/UserRequest"}, {"$ref":"#/$defs/UserPage"},
+    {"$ref":"#/$defs/ConversationRequest"}, {"$ref":"#/$defs/ConversationPage"}
+  ],
+  "$defs": {
+    "Id": {"type":"string","format":"uuid"},
+    "Seq": {"type":"integer","minimum":0},
+    "PositiveSeq": {"type":"integer","minimum":1},
+    "Cursor": {"type":"string","minLength":1,"maxLength":256},
+    "UserRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","cursor","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.request"},"requestId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"limit":{"type":"integer","minimum":1}}},
+    "UserEvent": {"type":"object","additionalProperties":false,"required":["eventId","cursor","kind","subjectId","revision"],"properties":{"eventId":{"$ref":"#/$defs/Id"},"cursor":{"$ref":"#/$defs/Cursor"},"kind":{"enum":["friend.changed","conversation.changed","membership.changed","plugin.changed"]},"subjectId":{"$ref":"#/$defs/Id"},"revision":{"$ref":"#/$defs/PositiveSeq"}}},
+    "UserPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","events","nextCursor","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.user.page"},"requestId":{"$ref":"#/$defs/Id"},"events":{"type":"array","items":{"$ref":"#/$defs/UserEvent"}},"nextCursor":{"$ref":"#/$defs/Cursor"},"hasMore":{"type":"boolean"}}},
+    "ConversationRequest": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","afterSeq","limit"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.request"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"afterSeq":{"$ref":"#/$defs/Seq"},"limit":{"type":"integer","minimum":1}}},
+    "Message": {"type":"object","additionalProperties":false,"required":["conversationId","seq","messageId","senderId","requestId","createdAt","content"],"properties":{"conversationId":{"$ref":"#/$defs/Id"},"seq":{"$ref":"#/$defs/PositiveSeq"},"messageId":{"$ref":"#/$defs/Id"},"senderId":{"$ref":"#/$defs/Id"},"requestId":{"$ref":"#/$defs/Id"},"createdAt":{"type":"string","format":"date-time"},"content":{"type":"object","additionalProperties":false,"required":["kind","text"],"properties":{"kind":{"const":"TEXT"},"text":{"type":"string","minLength":1,"maxLength":4096}}}}},
+    "ConversationPage": {"type":"object","additionalProperties":false,"required":["syncVersion","type","requestId","conversationId","messages","hasMore"],"properties":{"syncVersion":{"const":"1.0"},"type":{"const":"sync.conversation.page"},"requestId":{"$ref":"#/$defs/Id"},"conversationId":{"$ref":"#/$defs/Id"},"messages":{"type":"array","items":{"$ref":"#/$defs/Message"}},"hasMore":{"type":"boolean"}}}
+  }
+}
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/websocket/envelope.schema.json",
+  "title": "WSS protocol v1 envelope",
+  "description": "TLS and WebSocket upgrade precede auth.bind. Access tokens are carried only in auth.bind payload, never a URL. Success message.ack is emitted only after atomic durable Message and Outbox commit. A retry under sender/conversation/requestId returns the same messageId, seq and createdAt.",
+  "oneOf": [
+    { "$ref": "#/$defs/AuthBind" },
+    { "$ref": "#/$defs/AuthAck" },
+    { "$ref": "#/$defs/MessageSend" },
+    { "$ref": "#/$defs/MessageAck" },
+    { "$ref": "#/$defs/MessageCreated" },
+    { "$ref": "#/$defs/SessionRevoked" },
+    { "$ref": "#/$defs/Ping" },
+    { "$ref": "#/$defs/Pong" }
+  ],
+  "$defs": {
+    "Id": { "type": "string", "format": "uuid" },
+    "Timestamp": { "type": "string", "format": "date-time" },
+    "Base": {
+      "type": "object",
+      "required": ["protocolVersion", "type", "requestId", "payload"],
+      "properties": {
+        "protocolVersion": { "const": "1.0" },
+        "type": { "type": "string" },
+        "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object" }
+      }
+    },
+    "Error": {
+      "type": "object", "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "enum": ["VALIDATION_FAILED", "AUTH_REQUIRED", "AUTH_TOKEN_INVALID", "AUTH_TOKEN_EXPIRED", "AUTH_SESSION_REVOKED", "AUTH_SESSION_EPOCH_STALE", "AUTH_CLIENT_TYPE_MISMATCH", "AUTHORIZATION_DENIED", "PROTOCOL_VERSION_UNSUPPORTED", "MESSAGE_REQUEST_CONFLICT", "MESSAGE_COMMIT_FAILED"] },
+        "message": { "type": "string", "minLength": 1 }
+      },
+      "description": "Must not include credentials, tokens or message content."
+    },
+    "AuthError": { "allOf": [{ "$ref": "#/$defs/Error" }, { "type": "object", "required": ["code"], "properties": { "code": { "enum": ["VALIDATION_FAILED", "AUTH_TOKEN_INVALID", "AUTH_TOKEN_EXPIRED", "AUTH_SESSION_REVOKED", "AUTH_SESSION_EPOCH_STALE", "AUTH_CLIENT_TYPE_MISMATCH", "PROTOCOL_VERSION_UNSUPPORTED"] } } }] },
+    "MessageError": { "allOf": [{ "$ref": "#/$defs/Error" }, { "type": "object", "required": ["code"], "properties": { "code": { "enum": ["VALIDATION_FAILED", "AUTH_REQUIRED", "AUTH_SESSION_REVOKED", "AUTHORIZATION_DENIED", "MESSAGE_REQUEST_CONFLICT", "MESSAGE_COMMIT_FAILED"] } } }] },
+    "AuthBind": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "auth.bind" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["accessToken"], "properties": { "accessToken": { "type": "string", "minLength": 1 } } }
+      }}]
+    },
+    "AuthAck": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "auth.ack" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "oneOf": [
+          { "type": "object", "additionalProperties": false, "required": ["status", "userId", "sessionId", "clientType", "sessionEpoch"], "properties": { "status": { "const": "bound" }, "userId": { "$ref": "#/$defs/Id" }, "sessionId": { "$ref": "#/$defs/Id" }, "clientType": { "enum": ["WEB", "DESKTOP", "MOBILE"] }, "sessionEpoch": { "type": "integer", "minimum": 1 } } },
+          { "type": "object", "additionalProperties": false, "required": ["status", "error"], "properties": { "status": { "const": "rejected" }, "error": { "$ref": "#/$defs/AuthError" } } }
+        ] }
+      }}]
+    },
+    "TextContent": { "type": "object", "additionalProperties": false, "required": ["kind", "text"], "properties": { "kind": { "const": "TEXT" }, "text": { "type": "string", "minLength": 1, "maxLength": 4096 } } },
+    "MessageSend": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "message.send" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["conversationId", "content"], "properties": { "conversationId": { "$ref": "#/$defs/Id" }, "content": { "$ref": "#/$defs/TextContent" } } }
+      }}]
+    },
+    "Committed": { "type": "object", "additionalProperties": false, "required": ["status", "conversationId", "messageId", "seq", "createdAt"], "properties": { "status": { "const": "committed" }, "conversationId": { "$ref": "#/$defs/Id" }, "messageId": { "$ref": "#/$defs/Id" }, "seq": { "type": "integer", "minimum": 1 }, "createdAt": { "$ref": "#/$defs/Timestamp" } } },
+    "MessageAck": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "message.ack" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "oneOf": [ { "$ref": "#/$defs/Committed" }, { "type": "object", "additionalProperties": false, "required": ["status", "error"], "properties": { "status": { "const": "rejected" }, "error": { "$ref": "#/$defs/MessageError" } } } ] }
+      }}]
+    },
+    "MessageCreated": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "message.created" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["conversationId", "messageId", "senderId", "seq", "createdAt", "content"], "properties": { "conversationId": { "$ref": "#/$defs/Id" }, "messageId": { "$ref": "#/$defs/Id" }, "senderId": { "$ref": "#/$defs/Id" }, "seq": { "type": "integer", "minimum": 1 }, "createdAt": { "$ref": "#/$defs/Timestamp" }, "content": { "$ref": "#/$defs/TextContent" } } }
+      }}]
+    },
+    "SessionRevoked": {
+      "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": {
+        "protocolVersion": { "const": "1.0" }, "type": { "const": "session.revoked" }, "requestId": { "$ref": "#/$defs/Id" },
+        "payload": { "type": "object", "additionalProperties": false, "required": ["sessionId", "reason"], "properties": { "sessionId": { "$ref": "#/$defs/Id" }, "reason": { "enum": ["LOGOUT", "REPLACED", "REVOKED"] } } }
+      }}]
+    },
+    "Ping": { "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": { "protocolVersion": { "const": "1.0" }, "type": { "const": "ping" }, "requestId": { "$ref": "#/$defs/Id" }, "payload": { "type": "object", "maxProperties": 0 } } }] },
+    "Pong": { "allOf": [{ "$ref": "#/$defs/Base" }, { "type": "object", "additionalProperties": false, "required": ["protocolVersion", "type", "requestId", "payload"], "properties": { "protocolVersion": { "const": "1.0" }, "type": { "const": "pong" }, "requestId": { "$ref": "#/$defs/Id" }, "payload": { "type": "object", "maxProperties": 0 } } }] }
+  }
+}
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/errors/http-errors.schema.json",
+  "title": "Canonical HTTP error contract",
+  "$defs": {
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "VALIDATION_FAILED",
+        "AUTH_REQUIRED",
+        "AUTH_INVALID_CREDENTIALS",
+        "AUTH_TOKEN_INVALID",
+        "AUTH_TOKEN_EXPIRED",
+        "AUTH_SESSION_REVOKED",
+        "AUTH_SESSION_EPOCH_STALE",
+        "AUTH_CLIENT_TYPE_MISMATCH",
+        "AUTH_REFRESH_REVOKED",
+        "AUTHORIZATION_DENIED",
+        "PROTOCOL_VERSION_UNSUPPORTED",
+        "USERNAME_ALREADY_EXISTS",
+        "USER_NOT_FOUND",
+        "FRIEND_SELF_NOT_ALLOWED",
+        "FRIENDSHIP_STATE_CONFLICT"
+      ]
+    },
+    "FieldViolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "reason"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error", "requestId"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "$ref": "#/$defs/ErrorCode" },
+            "message": { "type": "string", "minLength": 1 },
+            "violations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/FieldViolation" }
+            }
+          }
+        },
+        "requestId": { "type": "string", "minLength": 1 }
+      },
+      "description": "Messages and violations must never contain passwords, access tokens, refresh tokens, cookies, or other authentication material."
+    }
+  },
+  "$ref": "#/$defs/ErrorResponse"
+}
+
+# Canonical PostgreSQL schema
+
+`migrations/0001_initial.up.sql` is the shared schema for Go and Java profiles.
+Run the migration before application startup, using a normal PostgreSQL `psql`
+client and libpq connection settings (`PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE`,
+and secure credential handling outside the command line):
+
+```text
+python3 contracts/database/migrate.py status
+python3 contracts/database/migrate.py up
+python3 contracts/database/migrate.py down --allow-data-loss
+```
+
+The runner applies each SQL file and its checksum ledger entry in one transaction
+under a PostgreSQL advisory transaction lock. Applied SQL is immutable. The down
+migration drops all product tables and requires explicit data-loss acknowledgement;
+release rollback still requires a backup and compatibility assessment.
+
+`sessions` is one row per `(user_id, client_type)` slot. A replacement login must
+rotate `session_id`, increment `session_epoch`, and revoke the old session in one
+transaction. The server must validate both session ID and epoch against PostgreSQL.
+The database constraints reject duplicate normalized friendship and DIRECT pairs,
+request IDs and sequence numbers within a Conversation, and duplicate logical
+`message.created` outbox events. Message authorization, sequence allocation,
+matching Outbox insertion, friend/direct/membership/sync transaction assembly, and
+post-commit ACK remain application transaction obligations. A unique constraint
+alone cannot prove those multi-row operations occurred atomically.
+
+With a disposable PostgreSQL database configured through libpq variables, run
+`python3 -m unittest discover -s tests/database -v`. The integration test uses
+an isolated temporary schema and exercises forward, uniqueness, and rollback.
+
+"""Standalone PostgreSQL migration runner. Requires psql and normal libpq PG* environment.
+
+Run before starting either backend profile. `down` is destructive and requires an
+explicit flag; production rollback must also follow the release compatibility plan.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import pathlib
+import shutil
+import subprocess
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parent
+MIGRATIONS = ROOT / "migrations"
+VERSION = "0001_initial"
+LOCK = 481233001
+
+
+def psql(sql: str, *, capture: bool = False) -> str:
+    proc = subprocess.run(
+        ["psql", "-X", "-v", "ON_ERROR_STOP=1", "-q", "-A", "-t"],
+        input=sql, text=True, capture_output=True,
+    )
+    if proc.returncode:
+        raise RuntimeError(proc.stderr.strip() or f"psql exited {proc.returncode}")
+    if not capture and proc.stdout.strip():
+        print(proc.stdout.strip())
+    return proc.stdout.strip()
+
+
+def migration_sql(direction: str) -> str:
+    return (MIGRATIONS / f"{VERSION}.{direction}.sql").read_text(encoding="utf-8")
+
+
+def checksum() -> str:
+    return hashlib.sha256(migration_sql("up").encode("utf-8")).hexdigest()
+
+
+def applied() -> str | None:
+    result = psql("SELECT to_regclass('schema_migrations') IS NOT NULL;", capture=True)
+    if result != "t":
+        return None
+    result = psql(f"SELECT checksum FROM schema_migrations WHERE version = '{VERSION}';", capture=True)
+    return result or None
+
+
+def run(direction: str) -> None:
+    if not shutil.which("psql"):
+        raise RuntimeError("psql is required; set PGHOST/PGPORT/PGUSER/PGDATABASE as needed")
+    known = applied()
+    digest = checksum()
+    if known is not None and known != digest:
+        raise RuntimeError("applied migration checksum differs from the canonical SQL")
+    if direction == "up" and known == digest:
+        print(f"{VERSION}: already applied")
+        return
+    if direction == "down" and known is None:
+        print(f"{VERSION}: already rolled back")
+        return
+    prelude = (
+        "BEGIN;\n"
+        f"SELECT pg_advisory_xact_lock({LOCK});\n"
+        "CREATE TABLE IF NOT EXISTS schema_migrations ("
+        "version text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now());\n"
+    )
+    # Check again under the transaction lock, so concurrent runner attempts cannot
+    # apply or roll back a migration against stale inspection state.
+    expected = "false" if direction == "up" else "true"
+    guard = f"""DO $$ BEGIN
+      IF EXISTS (SELECT 1 FROM schema_migrations WHERE version = '{VERSION}') <> {expected} THEN
+        RAISE EXCEPTION 'migration state changed concurrently';
+      END IF;
+    END $$;
+    """
+    body = migration_sql(direction)
+    ledger = (
+        f"INSERT INTO schema_migrations(version, checksum) VALUES ('{VERSION}', '{digest}');"
+        if direction == "up" else
+        f"DELETE FROM schema_migrations WHERE version = '{VERSION}' AND checksum = '{digest}';"
+    )
+    psql(prelude + guard + body + "\n" + ledger + "\nCOMMIT;\n")
+    print(f"{VERSION}: {direction} complete")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("direction", choices=("up", "down", "status"))
+    parser.add_argument("--allow-data-loss", action="store_true", help="required for destructive down migration")
+    args = parser.parse_args()
+    try:
+        if args.direction == "down" and not args.allow_data_loss:
+            raise RuntimeError("down drops product tables; pass --allow-data-loss only after backup/compatibility review")
+        if args.direction == "status":
+            if not shutil.which("psql"):
+                raise RuntimeError("psql is required")
+            known = applied()
+            print(f"{VERSION}: {'applied' if known else 'pending'}")
+            if known and known != checksum():
+                raise RuntimeError("applied checksum differs from canonical SQL")
+        else:
+            run(args.direction)
+        return 0
+    except RuntimeError as exc:
+        print(f"migration error: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+CREATE TABLE users (
+    user_id uuid PRIMARY KEY,
+    username text NOT NULL UNIQUE,
+    display_name text NOT NULL,
+    password_hash text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CHECK (length(username) > 0),
+    CHECK (length(password_hash) > 0)
+);
+
+-- The slot row is replaced atomically on login: session_id rotates and epoch rises.
+CREATE TABLE sessions (
+    user_id uuid NOT NULL REFERENCES users(user_id),
+    client_type text NOT NULL CHECK (client_type IN ('WEB', 'DESKTOP', 'MOBILE')),
+    session_id uuid NOT NULL UNIQUE,
+    session_epoch bigint NOT NULL CHECK (session_epoch > 0),
+    refresh_token_hash text,
+    status text NOT NULL CHECK (status IN ('ACTIVE', 'REVOKED')),
+    device_id text NOT NULL,
+    expires_at timestamptz NOT NULL,
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, client_type),
+    CHECK (status <> 'ACTIVE' OR refresh_token_hash IS NOT NULL)
+);
+
+CREATE TABLE conversations (
+    conversation_id uuid PRIMARY KEY,
+    kind text NOT NULL CHECK (kind IN ('DIRECT', 'GROUP')),
+    direct_user_low_id uuid REFERENCES users(user_id),
+    direct_user_high_id uuid REFERENCES users(user_id),
+    next_seq bigint NOT NULL DEFAULT 1 CHECK (next_seq > 0),
+    created_by uuid NOT NULL REFERENCES users(user_id),
+    group_create_request_id uuid,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    CHECK ((kind = 'DIRECT' AND direct_user_low_id IS NOT NULL AND direct_user_high_id IS NOT NULL
+            AND direct_user_low_id < direct_user_high_id AND group_create_request_id IS NULL)
+        OR (kind = 'GROUP' AND direct_user_low_id IS NULL AND direct_user_high_id IS NULL
+            AND group_create_request_id IS NOT NULL)),
+    UNIQUE (conversation_id, direct_user_low_id, direct_user_high_id),
+    UNIQUE (direct_user_low_id, direct_user_high_id),
+    UNIQUE (created_by, group_create_request_id)
+);
+
+CREATE TABLE friendships (
+    user_low_id uuid NOT NULL REFERENCES users(user_id),
+    user_high_id uuid NOT NULL REFERENCES users(user_id),
+    direct_conversation_id uuid NOT NULL UNIQUE,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_low_id, user_high_id),
+    CHECK (user_low_id < user_high_id),
+    FOREIGN KEY (direct_conversation_id, user_low_id, user_high_id)
+        REFERENCES conversations(conversation_id, direct_user_low_id, direct_user_high_id)
+);
+
+CREATE TABLE conversation_members (
+    conversation_id uuid NOT NULL REFERENCES conversations(conversation_id),
+    user_id uuid NOT NULL REFERENCES users(user_id),
+    role text NOT NULL CHECK (role IN ('OWNER', 'MEMBER')),
+    joined_at timestamptz NOT NULL DEFAULT now(),
+    left_at timestamptz,
+    PRIMARY KEY (conversation_id, user_id)
+);
+
+CREATE TABLE plugin_artifacts (
+    plugin_id text NOT NULL,
+    version text NOT NULL,
+    package_hash text NOT NULL,
+    backend_hash text NOT NULL,
+    renderer_hash text NOT NULL,
+    manifest jsonb NOT NULL,
+    status text NOT NULL CHECK (status IN ('UPLOADED', 'VALIDATING', 'VERIFIED', 'REJECTED')),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (plugin_id, version),
+    CHECK (length(plugin_id) > 0 AND length(version) > 0),
+    CHECK (length(package_hash) > 0 AND length(backend_hash) > 0 AND length(renderer_hash) > 0)
+);
+
+CREATE FUNCTION reject_plugin_artifact_mutation() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    IF (OLD.plugin_id, OLD.version, OLD.package_hash, OLD.backend_hash, OLD.renderer_hash, OLD.manifest)
+       IS DISTINCT FROM
+       (NEW.plugin_id, NEW.version, NEW.package_hash, NEW.backend_hash, NEW.renderer_hash, NEW.manifest) THEN
+        RAISE EXCEPTION 'plugin artifact identity and bytes are immutable';
+    END IF;
+    RETURN NEW;
+END $$;
+CREATE TRIGGER plugin_artifact_immutable BEFORE UPDATE ON plugin_artifacts
+    FOR EACH ROW EXECUTE FUNCTION reject_plugin_artifact_mutation();
+
+CREATE FUNCTION reject_plugin_artifact_delete() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION 'plugin artifact versions cannot be deleted';
+END $$;
+CREATE TRIGGER plugin_artifact_no_delete BEFORE DELETE ON plugin_artifacts
+    FOR EACH ROW EXECUTE FUNCTION reject_plugin_artifact_delete();
+
+CREATE TABLE plugin_instances (
+    conversation_id uuid NOT NULL REFERENCES conversations(conversation_id),
+    plugin_id text NOT NULL,
+    active_version text,
+    desired_version text,
+    previous_version text,
+    status text NOT NULL CHECK (status IN ('INSTALLING', 'ENABLED', 'DISABLED', 'INSTALL_FAILED', 'AUTO_DISABLED', 'UNINSTALLED', 'RETAINED', 'PURGED')),
+    grants jsonb NOT NULL DEFAULT '{}'::jsonb,
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (conversation_id, plugin_id),
+    FOREIGN KEY (plugin_id, active_version) REFERENCES plugin_artifacts(plugin_id, version),
+    FOREIGN KEY (plugin_id, desired_version) REFERENCES plugin_artifacts(plugin_id, version),
+    FOREIGN KEY (plugin_id, previous_version) REFERENCES plugin_artifacts(plugin_id, version)
+);
+
+CREATE TABLE plugin_kv (
+    conversation_id uuid NOT NULL,
+    plugin_id text NOT NULL,
+    key text NOT NULL,
+    value jsonb NOT NULL,
+    schema_version integer NOT NULL CHECK (schema_version > 0),
+    PRIMARY KEY (conversation_id, plugin_id, key),
+    FOREIGN KEY (conversation_id, plugin_id) REFERENCES plugin_instances(conversation_id, plugin_id)
+);
+
+CREATE TABLE messages (
+    server_message_id uuid PRIMARY KEY,
+    conversation_id uuid NOT NULL REFERENCES conversations(conversation_id),
+    sender_id uuid NOT NULL REFERENCES users(user_id),
+    request_id uuid NOT NULL,
+    seq bigint NOT NULL CHECK (seq > 0),
+    kind text NOT NULL CHECK (kind IN ('TEXT', 'PLUGIN')),
+    text_body text,
+    plugin_id text,
+    plugin_version text,
+    fallback_text text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (conversation_id, request_id),
+    UNIQUE (sender_id, conversation_id, request_id),
+    UNIQUE (conversation_id, seq),
+    UNIQUE (server_message_id, conversation_id),
+    FOREIGN KEY (plugin_id, plugin_version) REFERENCES plugin_artifacts(plugin_id, version),
+    CHECK ((kind = 'TEXT' AND text_body IS NOT NULL AND plugin_id IS NULL AND plugin_version IS NULL)
+        OR (kind = 'PLUGIN' AND plugin_id IS NOT NULL AND plugin_version IS NOT NULL AND fallback_text IS NOT NULL))
+);
+
+CREATE TABLE outbox_events (
+    event_id uuid PRIMARY KEY,
+    aggregate_type text NOT NULL,
+    aggregate_id uuid NOT NULL,
+    event_type text NOT NULL,
+    conversation_id uuid REFERENCES conversations(conversation_id),
+    message_id uuid,
+    payload jsonb NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    published_at timestamptz,
+    attempts integer NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+    FOREIGN KEY (message_id, conversation_id) REFERENCES messages(server_message_id, conversation_id),
+    CHECK ((event_type = 'message.created' AND message_id IS NOT NULL AND conversation_id IS NOT NULL)
+        OR (event_type <> 'message.created' AND message_id IS NULL))
+);
+CREATE UNIQUE INDEX outbox_one_message_created ON outbox_events(message_id) WHERE event_type = 'message.created';
+CREATE INDEX outbox_unpublished ON outbox_events(created_at, event_id) WHERE published_at IS NULL;
+
+CREATE TABLE user_sync_events (
+    user_id uuid NOT NULL REFERENCES users(user_id),
+    cursor_id bigint GENERATED ALWAYS AS IDENTITY,
+    event_type text NOT NULL CHECK (event_type IN ('friend.changed', 'conversation.changed', 'membership.changed', 'plugin.changed', 'session.revoked')),
+    payload jsonb NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, cursor_id)
+);
+
+DROP TABLE user_sync_events;
+DROP TABLE outbox_events;
+DROP TABLE messages;
+DROP TABLE plugin_kv;
+DROP TABLE plugin_instances;
+DROP TRIGGER plugin_artifact_no_delete ON plugin_artifacts;
+DROP FUNCTION reject_plugin_artifact_delete();
+DROP TRIGGER plugin_artifact_immutable ON plugin_artifacts;
+DROP FUNCTION reject_plugin_artifact_mutation();
+DROP TABLE plugin_artifacts;
+DROP TABLE conversation_members;
+DROP TABLE friendships;
+DROP TABLE conversations;
+DROP TABLE sessions;
+DROP TABLE users;
+

@@ -1,0 +1,302 @@
+diff --git a/spec/progress/current.md b/spec/progress/current.md
+index 00ee153..24fcd4c 100644
+--- a/spec/progress/current.md
++++ b/spec/progress/current.md
+@@ -6,60 +6,53 @@ Current Gate: S2
+ Gate Status: OPEN
+ Current Batch: S2-SYNC-only
+ Current Task: LOOP1-SYNC-GO-001
+-Current Task State: review
+-Execution Status: WAITING_INDEPENDENT_GO_SYNC_REVIEW
++Current Task State: done
++Execution Status: WAITING_GO_ADMINISTRATIVE_ACCEPTANCE
+ 
+ ## Immediately Relevant Completed Work
+ 
+-Public Sync prerequisite product b820078/PR18 actualmain c2ff050 independently accepted with full13jobs105steps. Administrative3588/PR19 actualmain4d5fe1235e4f01111d78cc67b2880b52cac072f2 fresh independent Review and same-role new actual-main audit PASS; exact hosted37123550572/37124088012 each5applicablejobs37stepsSUCCESS with8correctinactive. Preservation-verified main synchronization PASS193adminpaths/781originalentries. Human saw the concrete Go proposal after acceptance and replied "同意"; Go implementation consent received.
++Go public Sync product accepted and synchronized at 6f9341276c6481e982c2a9b2f2d490b76bc1df96, candidatea78f7f9/PR20. Fresh independent candidate Review and new same-role actual-main audit PASS. Both exact hosted runs passed13jobs106steps. Evidence: spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md.
+ 
+ ## Current Blockers
+ 
+-No Go implementation-consent blocker remains. LOOP1-SYNC-001 remains unique backlog on actual independently accepted Go runtime input. Client activation follows Go acceptance and dependency reassessment. Final authorized endpoint is SYNC complete then stop; S1 PASS/S2 OPEN.
++No architecture/runtime/Go-consent blocker remains. This administrative discovery candidate awaits fresh independent Review/exact CI/protected integration/actual-main audit/main sync before client selection. LOOP1-SYNC-001 remains unique backlog. S1 PASS/S2 OPEN.
+ 
+ ## Verification
+ 
+ - Command: `python -B tools/verify_frozen_architecture.py`
+-  - Result: PASS at accepted4d5fe before new task activation, canonical ef90846/PDF provenance unchanged.
+-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
++  - Result: PASS canonical ef90846/PDF unchanged at accepted6f934 before closure writes.
++  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md`
+ - Command: `python -B ci/check_architecture.py --scope all --json`
+-  - Result: PASS zero violations at accepted4d5fe; prospective-resume Coordinator run records raw command/output.
+-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
+-- Command: `gh run view 37124088012 --json headSha,status,conclusion,jobs`
+-  - Result: Actualmain4d5fe exact applicable administrative CI PASS; independently verified, not Go runtime acceptance.
+-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
+-
+-- Command: `go test -race -count=1 ./...`
+-  - Result: Local PASS enabled migrated PostgreSQL16/NATS, final Core11.217s/tests79.662s; Go build/vet/test PASS.
+-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
+-- Command: `python -B tools/verify_sync_runtime.py`
+-  - Result: Local PASS actual strict TLS Gateway/Core/PG208metadata/205durableMessages, postterminal206thcommit, >64KiB numericdomain; no hosted acceptance claimed.
+-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
++  - Result: PASS zero violations before closure writes.
++  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md`
++- Command: `gh run view 37127820035 --json headSha,status,conclusion,jobs`
++  - Result: Independent exact actual-main CI PASS13jobs106steps; enabled PG/race/strict TLS and native regressions actually executed.
++  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md`
+ 
+ ## Changed Files or Migrations
+ 
+-Two Core public Sync handlers, bounded exact numeric decoding and account cursors; six auth assembly lines, new real PG tests, bounded strict TLS verifier and two-line existing deploy CI hook. No schema/migration/contract/frozen/producer changes.
++Only administrative Task/current/checkpoint/backlog recovery facts and byte-exact evidence archives in this closure. Accepted Go two public Core Sync handlers; no new schema/migration/contract/client changes.
+ 
+ ## Known Failures, Risks, and Assumptions
+ 
+-Go local runtime and final enabled build/vet/test/race PASS; strict TLS real deployment208metadata/205durableMessages plus postterminalcommit and >64KiB numeric proof PASS. Fresh independent Review/hostedCI/integration/main synchronization pending; local evidence is not acceptance. Historical transport and implementation failure evidence retained. Windows long-path Git revision:path synchronization verifier failure after successful FF was exposed and corrected by separate object-ID byte verifier; original781status/mode/size/hash unchanged. Research startup/read-only gaps disclosed; trace not claimed complete.
++Immutable implementation failures and instrumentation gaps retained. Local/Recorder PASS is not independent acceptance. ADR0004 friend-denial remains deferred. Client SYNC/S2 not accepted; terminal read excludes future writes. Full history belongs to durable acceptance evidence.
+ 
+ ## Next Exact Action
+ 
+-Fresh independent Reviewer examines clean committed Go candidate; exact hosted CI/protectedintegration/actual-main audit and mainsync precede runtime acceptance. Implementation released sole writer after commit. Then reassess and activate Desktop/MobileSYNC, complete and stop.
++Fresh independent administrative Review and exact applicable hosted CI, protected integration, new actual-main audit and safe main synchronization. Then reassess and activate existing LOOP1-SYNC-001; complete Desktop/Mobile SYNC and stop. No GUI/Web advancement.
+ 
+ ## Last Known Good Commit
+ 
+-`4d5fe1235e4f01111d78cc67b2880b52cac072f2` independently accepted and synchronized administrative closure; accepted product freeze c2ff050 beneath it.
++`6f9341276c6481e982c2a9b2f2d490b76bc1df96` independently accepted Go product, synchronized H:/IM-platform.
+ 
+ ## Latest Checkpoint
+ 
+-`spec/progress/checkpoints/2026-10-03-loop1-sync-transport-001-accepted.md`
++`spec/progress/checkpoints/2026-10-03-loop1-sync-go-001-accepted.md`
+ 
+ ## Uncommitted Changes / Ownership
+ 
+-Assigned root H:/.codex/worktrees/sync-resume/IM-platform; branch task/LOOP1-SYNC-001. Implementation /root/sync_go_implementation owns all current task changes until clean REVIEW commit, then releases sole writer to Coordinator /root. Main H:/IM-platform original781entries retained and recovery/s1-handoff-20261001 preserved.
++Assigned H:/.codex/worktrees/sync-resume/IM-platform; task/LOOP1-SYNC-001. Sole administrative writer /root/sync_go_closure_writer owns closure changes until committed/released. Main recovery/s1-handoff-20261001 original781entries protected. No other writer.
+ 
+ ## Architecture Conflicts / ACP / ADR
+ 
+-None presently. Accepted ADR0008 authorizes binding; Human separate Go consent recorded. Missing input for SYNC is real runtime, not contract authority. Any newly discovered conflict stops affected portion under existing architecture process.
++None. Accepted ADR0008 and separate Human Go consent effective. Reassess client task actual inputs/scope before implementation. Existing frozen/contracts remain authoritative.
+diff --git a/spec/tasks/backlog/LOOP1-SYNC-001.md b/spec/tasks/backlog/LOOP1-SYNC-001.md
+index 1507591..736045b 100644
+--- a/spec/tasks/backlog/LOOP1-SYNC-001.md
++++ b/spec/tasks/backlog/LOOP1-SYNC-001.md
+@@ -82,7 +82,7 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
+ 
+ # Next Action
+ 
+-Public Sync transport prerequisite now accepted/synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a. Await separate Human consent for concrete Go proposal and accepted actual Go User/Conversation Sync runtime; then reassess inputs and activate this existing SYNC task. Human endpoint remains SYNC done then stop; GUI/Web not selected.
++Go runtime independently accepted and synchronized at 6f9341276c6481e982c2a9b2f2d490b76bc1df96. Await Go administrative discovery acceptance, then reassess exact dependency/input readiness and activate this existing task. Human endpoint SYNC complete then stop; GUI/Web not selected.
+ 
+ # Authorized SYNC recovery and authority blocker (2026-10-03)
+ 
+@@ -104,3 +104,9 @@ Human authorizes minimal public Sync architecture/contract prerequisite LOOP1-SY
+ # Accepted transport prerequisite and remaining runtime input
+ 
+ LOOP1-SYNC-TRANSPORT-001 is independently accepted and synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a, evidence acceptance/acceptance.md under that task. Earlier BLOCKED_BY_ARCHITECTURE/public-binding statements are historical: binding gap resolved by ADR0008 and existing four-shape HTTP contract; current execution BLOCKED_BY_RUNTIME_INPUT, unique backlog retained. No accepted live User Sync endpoint exists. Go needs separate Human plan consent and narrow task approval/independent runtime Review-CI-main sync before client activation. Single-page min(limit,100); continuously commit/apply pages through terminal latest committed read without fixed total cutoff. SYNC acceptance and allowed product paths unchanged. Known good accepted freeze c2ff050; no client products implemented.
++
++# Accepted Go runtime recovery (2026-10-03)
++
++Earlier missing binding/runtime/consent statements are historical. Human separate Go consent received. LOOP1-SYNC-GO-001 product candidate a78f7f96227e25980c5a51255e92a2e6a34a1bf0 / protected PR20 actual main6f9341276c6481e982c2a9b2f2d490b76bc1df96 accepted by fresh independent Review and new same-role actual-main audit; exact37127049105/37127820035 each13jobs106stepsSUCCESS. Actual PG/race/strict TLS208metadata205messages plus postterminal206th/huge numbers executed. Safe main sync190paths/781originalentries verified. Evidence: spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md.
++
++Execution: WAITING_GO_ADMINISTRATIVE_ACCEPTANCE. Unique backlog retained until Go administrative closure acceptance and Coordinator readiness reassessment. No client product or scope changes in this note. min(limit,100) per-page; data/cursor transaction commits precede continuation to hasMore=false without total cutoff. S1PASS/S2OPEN, SYNC not accepted. Authorized final endpoint remains SYNC done then stop.
+diff --git a/spec/tasks/review/LOOP1-SYNC-GO-001.md b/spec/tasks/review/LOOP1-SYNC-GO-001.md
+deleted file mode 100644
+index 1c60f60..0000000
+--- a/spec/tasks/review/LOOP1-SYNC-GO-001.md
++++ /dev/null
+@@ -1,97 +0,0 @@
+----
+-task_id: LOOP1-SYNC-GO-001
+-title: Go Core public Sync runtime prerequisite
+-status: review
+-owner: /root/sync_go_implementation
+-stage: S2
+-gate: S2
+----
+-
+-# Goal
+-
+-Implement the two accepted public HTTPS Sync pull operations in Go Core, backed by real authoritative PostgreSQL reads, so the existing Desktop/Mobile SYNC task can consume an independently accepted runtime input. Human separately consented to the displayed Go proposal on 2026-10-03 with the exact reply "同意". This is a current proven prerequisite, not future-stage task selection. Final batch endpoint remains LOOP1-SYNC-001 complete then stop.
+-
+-# Inputs
+-
+-- spec/architecture/README.md -> baseline.md -> frozen-architecture.md, SHA ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03; canonical sections 2.3,3,6.1,7,10 SRC-01..SRC-07,11.
+-- Approved ADR-0005-client-technology-clarification.md, ADR-0006-client-ui-architecture.md, ADR-0007-client-mvp-task-planning.md, ADR-0008-sync-https-transport.md in spec/architecture/decisions/.
+-- spec/governance/minimality.md, execution-boundaries.md, independent-review.md, technology-selection.md.
+-- spec/domain/messaging.md, sync-plugin.md, auth-user-friend.md; spec/invariants/messaging.md, sync-plugin.md, auth-user-friend.md.
+-- spec/acceptance/s0-sync-plugin.md and s0-auth-user-friend.md; relevant Sync/Auth sections only, not plugin implementation.
+-- contracts/http/sync.openapi.json, auth-user-friend.openapi.json; contracts/websocket/sync-v1.schema.json, envelope.schema.json; contracts/errors/http-errors.schema.json; contracts/database/README.md, migrate.py and migrations/0001_initial.up.sql / 0001_initial.down.sql.
+-- spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md and acceptance/acceptance.md.
+-- spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md.
+-
+-# Technology Authorization
+-
+-Canonical sections 3/7/10 and accepted ADR-0008 authorize existing Go Core + PostgreSQL, existing pgx and existing crypto/token support. Use Go/Python standard libraries and existing approved infrastructure/test dependencies only. No new framework, library, service, DB object, signing key source/config or runtime. Gateway existing /v1/ proxy requires no product change. Core owns auth/session authorization and Sync queries.
+-
+-# Dependencies
+-
+-- LOOP1-SYNC-TRANSPORT-001: done, product b820078/c2ff050 independently accepted; administrative3588/actualmain4d5fe1235e4f01111d78cc67b2880b52cac072f2 independently accepted and preservation-verified synchronized.
+-- LOOP1-CLIENT-SEND-001: independently accepted main a0304fcc7be18b87f5986d014849d6b48b96a071.
+-- Explicit Human implementation consent after prerequisite acceptance/displayed proposal: received. No remaining Go consent hold.
+-
+-# Allowed Paths
+-
+-These allowed_paths are a hard write boundary under canonical SRC-07.
+-
+-- backend/go/core/sync.go
+-- backend/go/core/auth.go (two registrations plus exact two POST-path delegation before legacy generic query interceptor for canonical Sync UUID correlation; existing Auth semantics unchanged)
+-- backend/go/core/sync_test.go
+-- backend/go/core/sync_http_test.go
+-- backend/go/tests/sync_test.go
+-- backend/go/tests/sync_tls_test.go
+-- tools/verify_sync_runtime.py (bounded real entrypoint acceptance, reusing existing deployment harness where suitable)
+-- .github/workflows/ci.yml (only necessary explicit Sync runtime verification in existing Go/deploy jobs)
+-- spec/tasks/active/LOOP1-SYNC-GO-001.md
+-- spec/tasks/review/LOOP1-SYNC-GO-001.md
+-- spec/tasks/done/LOOP1-SYNC-GO-001.md
+-- spec/tasks/backlog/LOOP1-SYNC-001.md (runtime prerequisite recovery facts only; no activation before accepted runtime)
+-- spec/progress/current.md
+-- spec/progress/evidence/LOOP1-SYNC-GO-001/**
+-- spec/progress/checkpoints/*sync-go*.md
+-
+-Coordinator alone creates this task/current/evidence activation before delegating the sole writer. Every writer verifies exact assigned Git root H:/.codex/worktrees/sync-resume/IM-platform. Preserve H:/IM-platform unknown work. No blanket backend paths; actual producer/auth inspection outside write scope is read-only. No new worktree/clone needed.
+-
+-# Acceptance
+-
+-- Both two canonical HTTPS operations actually work through TLS proxy -> Gateway -> Core; auth derived solely from Bearer and authoritative Session checked per request including after blocking authorization locks.
+-- Exact existing four shapes, UUID correlation/error precedence, strict fields/types, no query parameters, canonical error/status codes, no credentials in logs/errors and no-store. Unexpected infrastructure failure non-2xx, never successful page.
+-- Any positive integer limit accepted exactly and capped min(limit,100) before conversion. Any nonnegative integer afterSeq accepted exactly; above committed head empty terminal. No integer overflow/loss.
+-- User initial0; opaque account-bound stable cursor reusable across same account Sessions, no expiry; invalid/fabricated/foreign/unknown positions rejected400. Four existing metadata kinds only, never Message/session.revoked. Empty retains input cursor; nonempty nextCursor last event token; additional committed eligible item determines hasMore.
+-- Existing producer paths audited for shared user-row serialization before ID allocation; read uses matching locks to ensure stable committed prefix. Real PostgreSQL blocked writers/concurrent commits prove no missed late lower IDs. No producer/schema rewrite.
+-- Current membership authorization each Conversation request; nonexistent/nonmember identical403. Single consistent query returns seq afterSeq+1 gap-free committed Messages plus correct hasMore. Read-only, no Message/Outbox/ACK writes.
+-- Real runtime fixtures for each stream >100 items page until terminal, per-page cap, complete total, dedupe and final position; terminal-after-new-commit subsequent pull observes new write. Replays, huge exact integers, auth/session negative cases, forged/foreign cursor, member isolation and old regressions actually executed.
+-- Fresh independent Review of clean committed candidate including logic/imports/minimality; exact-head applicable hosted CI with actual enabled PG/race/runtime checks, protected integration, independent actual-main audit/CI and preservation-verified H:/IM-platform synchronization. Local/Recorder PASS is not acceptance and runtime task acceptance is not SYNC/S2 PASS.
+-
+-# Forbidden
+-
+-No contracts/frozen/ADR changes, database/schema/migration/producer writes, shared codec/config rewrite, Gateway business, client/UI/Web/plugin product work, new sensitive dependency, ACK/security/compatibility change, key-expiry/retention/reset/future infrastructure. Existing private history endpoint consumers remain unchanged. Genuine architecture conflict stops affected work rather than being legalized by task scope.
+-
+-# Minimality
+-
+-Direct Core handlers and narrow Sync decoding/cursor projection/read queries. Reuse existing token key with domain-separated standard HMAC/base64url cursor; no new cryptographic authority/config. Shared user-row serialization is justified by approved stable committed-prefix requirement and observed BIGSERIAL allocation before commit; verify all producers and live concurrency before claiming safety. Avoid generic protocol/validation/query frameworks. Existing Go tests/harness and existing CI jobs supply acceptance; bounded extra runtime verifier only for real deployed TLS proof missing from existing tests.
+-
+-# Verification
+-
+-Minimum baseline: `tools/verify_frozen_architecture.py` and `ci/check_architecture.py` --scope all --json (Coordinator recorded PASS at accepted4d5fe before task activation).
+-Go checks from backend/go: gofmt, go build ./..., go vet ./..., go test -count=1 ./..., go test -race -count=1 ./... with DB_TEST_ENABLE=1, actual canonical migrated PostgreSQL and NATS_URL for relevant old tests; record environment presence/services, do not count unset-variable skips.
+-Bounded entrypoints: `tools/verify_sync_runtime.py` (if needed) and existing `tools/verify-loop1-ctrl-002.ps1` -Mode Acceptance, clean committed checkout.
+-Frozen verification, architecture --scope all and tests/architecture; existing contracts HTTP/WSS/Sync/plugin checks, Sync binding tests and Auth/social/message/ACK regressions.
+-Existing go hosted job already builds/vets/tests/races with real PostgreSQL16+NATS; deployment acceptance must use existing real Go roles/TLS proxy and strict CA verification. CI hook cannot simulate results or silently skip a necessary case.
+-Applicable exact candidate/actual-main hosted job set independently derived from unchanged classifier, actual selected job/step conclusions inspected.
+-
+-# Evidence
+-
+-Activation baseline: accepted4d5fe1235e4f01111d78cc67b2880b52cac072f2; assigned clean task/LOOP1-SYNC-001. Human consent and administrative closure references in human-consent.md. All new run history under this evidence root or Git-private Recorder root, sealed old evidence immutable.
+-
+-# Handoff
+-
+-Implementation local PASS, not acceptance. Two public Core Sync routes, readonly PG pages, account cursor, authoritative post-wait Session/membership checks and bounded streaming arbitrary JSON integers implemented. Existing contracts/schema/producers/private history/Gateway unchanged. Final enabled Go build/vet/test/race PASS; actual strict TLS Compose Sync PASS208metadata/205durableMessages plus206thpostterminalcommit and literal>64KiB numeric tokens. Frozen/architecture53/HTTP/WSS/SyncPlugin/SyncBinding checks PASS. Known failures and original logs retained in implementation/handoff.md and sealed Recorder. Clean candidate Acceptance is recorded by Git-private final observer after commit; no independent acceptance claimed.
+-
+-Last known good main4d5fe1235e4f01111d78cc67b2880b52cac072f2. Assigned task/LOOP1-SYNC-001, no migrations; task-owned implementation/metadata only. Main781unknownentries untouched. S1PASS/S2OPEN; clientSYNC remainsbacklog on independently accepted runtime.
+-
+-# Next Action
+-
+-Coordinator delegates a NEW independent Review on clean committed candidate, publishes exact candidate CI, repairs via fresh Fix/new Review if necessary, then protectedintegration/actual-main audit/CI and preservation-verified mainsync. Only after accepted Go runtime activate dependency-satisfied existing Desktop/MobileSYNC; complete thenstop.
+
+# Untracked paths observed; content intentionally not captured
+# ?? spec/progress/checkpoints/2026-10-03-loop1-sync-go-001-accepted.md
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/archive-manifest.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/closure-handoff.md
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/architecture.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/audit.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/classify.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/deploy.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/desktop.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/go.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/mobile.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/provider.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127049105/shared.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/architecture.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/audit.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/classify.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/deploy.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/desktop.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/go.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/mobile.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/provider.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/hosted/37127820035/shared.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/architecture.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/classify.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/delegation.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/deploy.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/desktop.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/go.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/mobile.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/pr.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/prompts/P-f0b6aff8-fd5f-4c80-a613-8502e7c49db0/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/prompts/P-f0b6aff8-fd5f-4c80-a613-8502e7c49db0/prompt.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/protection.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/provider.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/review.md
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-06f86ee4-9f6f-42b1-a1cb-2a721ef1c495.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-06f86ee4-9f6f-42b1-a1cb-2a721ef1c495.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-690644d4-25e9-434f-a09b-9eb4df806328.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-690644d4-25e9-434f-a09b-9eb4df806328.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-6e8d8034-613b-432e-b004-8fa001631d4c.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-6e8d8034-613b-432e-b004-8fa001631d4c.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-97d8289e-f8ba-43d3-aef6-d5e12eb4a204.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-97d8289e-f8ba-43d3-aef6-d5e12eb4a204.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-ecc2cb27-4a51-47dc-ae9f-aed69b7a863e.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/blobs/C-ecc2cb27-4a51-47dc-ae9f-aed69b7a863e.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/diff.patch
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/events.jsonl
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/final_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/initial_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/runs/R-20261003T135723Z-248c2564-5418-4450-a45d-be3420db53af/summary.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/actual-main/shared.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/classify.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/delegate.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/deploy.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/go.log
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/numeric_probe_test.go
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/prompts/P-6619d107-1a59-4576-8b45-014dfa798cac/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/prompts/P-6619d107-1a59-4576-8b45-014dfa798cac/prompt.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/prompts/P-85ade4b6-4d2e-469c-96f2-2c8443568e7d/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/prompts/P-85ade4b6-4d2e-469c-96f2-2c8443568e7d/prompt.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/provider.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/review.md
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-388be0bd-32a3-4e81-97ba-3724769ef4b6.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-388be0bd-32a3-4e81-97ba-3724769ef4b6.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-3eec706f-1f5e-45dd-ab2e-547bf0adc972.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-3eec706f-1f5e-45dd-ab2e-547bf0adc972.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-409b1bb6-166b-4d9b-b5ee-12e4a669edf8.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-409b1bb6-166b-4d9b-b5ee-12e4a669edf8.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-5debdeca-b5f5-41f5-92c0-cf1b2653aa28.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-5debdeca-b5f5-41f5-92c0-cf1b2653aa28.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-6366398d-cc20-4508-9376-ba0a743090cc.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-6366398d-cc20-4508-9376-ba0a743090cc.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-81ec8c1b-55cc-47f5-833e-ef4a9a3b5a64.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-81ec8c1b-55cc-47f5-833e-ef4a9a3b5a64.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-9ed6436b-9413-42ac-bebd-44f4698cbd29.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-9ed6436b-9413-42ac-bebd-44f4698cbd29.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-d32e165c-3d0b-400e-8edf-cf919043ae32.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-d32e165c-3d0b-400e-8edf-cf919043ae32.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-e1bdb7c2-63d4-4f42-9df9-42ab61049870.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-e1bdb7c2-63d4-4f42-9df9-42ab61049870.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-e7c16ef5-ca38-4c42-8d48-08bac7f8cb3c.stderr.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/blobs/C-e7c16ef5-ca38-4c42-8d48-08bac7f8cb3c.stdout.txt
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/diff.patch
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/events.jsonl
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/final_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/initial_state.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/metadata.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/independent-review/runs/R-20261003T134413Z-9f350a94-228f-47a5-b839-49d2ad20b4b5/summary.json
+# ?? spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/main-sync-receipt.json
+# ?? spec/tasks/done/LOOP1-SYNC-GO-001.md

@@ -1,0 +1,70 @@
+
+  tools\verify-loop1-ctrl-002.ps1:68:    'current diff',
+  tools\verify-loop1-ctrl-002.ps1:69:    'Recent commits',
+> tools\verify-loop1-ctrl-002.ps1:70:    'baseline verification'
+  tools\verify-loop1-ctrl-002.ps1:71:)
+  tools\verify-loop1-ctrl-002.ps1:72:$lastRuleIndex = -1
+  tools\verify-loop1-ctrl-002.ps1:73:foreach ($rule in $orderedRules) {
+  tools\verify-loop1-ctrl-002.ps1:110:    'Immediately Relevant Completed Work',
+  tools\verify-loop1-ctrl-002.ps1:111:    'Current Blockers',
+> tools\verify-loop1-ctrl-002.ps1:112:    'Verification',
+  tools\verify-loop1-ctrl-002.ps1:113:    'Changed Files or Migrations',
+  tools\verify-loop1-ctrl-002.ps1:114:    'Known Failures, Risks, and Assumptions',
+  tools\verify-loop1-ctrl-002.ps1:115:    'Next Exact Action',
+  tools\verify-loop1-ctrl-002.ps1:125:}
+  tools\verify-loop1-ctrl-002.ps1:126:
+> tools\verify-loop1-ctrl-002.ps1:127:$currentVerification = Get-CurrentSection $current 'Verification'
+> tools\verify-loop1-ctrl-002.ps1:128:if ($currentVerification -notmatch '(?m)^- Command:\s*`[^`]+`\s*$') { Add-Failure 'current.
+md Verification is missing an exact command.' }
+> tools\verify-loop1-ctrl-002.ps1:129:if ($currentVerification -notmatch '(?m)^\s+- Result:\s*\S.+$') { Add-Failure 'current.md V
+erification is missing a non-empty result.' }
+> tools\verify-loop1-ctrl-002.ps1:130:$currentEvidenceMatches = [regex]::Matches($currentVerification, '(?m)^\s+- Evidence:\s*`([
+^`]+)`\s*$')
+  tools\verify-loop1-ctrl-002.ps1:131:if ($currentEvidenceMatches.Count -eq 0) {
+> tools\verify-loop1-ctrl-002.ps1:132:    Add-Failure 'current.md Verification is missing a durable evidence path.'
+  tools\verify-loop1-ctrl-002.ps1:133:} else {
+  tools\verify-loop1-ctrl-002.ps1:134:    foreach ($evidenceMatch in $currentEvidenceMatches) {
+  tools\verify-loop1-ctrl-002.ps1:135:        $evidencePath = $evidenceMatch.Groups[1].Value
+  tools\verify-loop1-ctrl-002.ps1:136:        if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $evidencePath) -PathType Leaf
+)) {
+> tools\verify-loop1-ctrl-002.ps1:137:            Add-Failure "current.md Verification evidence does not exist: $evidencePath"
+  tools\verify-loop1-ctrl-002.ps1:138:        }
+  tools\verify-loop1-ctrl-002.ps1:139:    }
+  tools\verify-loop1-ctrl-002.ps1:140:}
+  tools\verify-loop1-ctrl-002.ps1:241:
+  tools\verify-loop1-ctrl-002.ps1:242:if ($currentTaskFile) {
+> tools\verify-loop1-ctrl-002.ps1:243:    $requiredHeadings = @('Goal', 'Inputs', 'Dependencies', 'Allowed Paths', 'Acceptance', 
+'Forbidden', 'Verification', 'Evidence', 'Handoff', 'Next Action')
+  tools\verify-loop1-ctrl-002.ps1:244:    foreach ($heading in $requiredHeadings) {
+  tools\verify-loop1-ctrl-002.ps1:245:        if ([string]::IsNullOrWhiteSpace((Get-Section $currentTaskContent $heading))) { Add
+-Failure "Current Task is missing a non-empty # $heading section." }
+  tools\verify-loop1-ctrl-002.ps1:246:    }
+  tools\verify-loop1-ctrl-002.ps1:266:    }
+  tools\verify-loop1-ctrl-002.ps1:267:
+> tools\verify-loop1-ctrl-002.ps1:268:    $verification = Get-Section $currentTaskContent 'Verification'
+> tools\verify-loop1-ctrl-002.ps1:269:    $entryPoints = @([regex]::Matches($verification, '`(?:&\s+)?(?:\.\\)?(tools[\\/][^`\s]+
+)') | ForEach-Object { $_.Groups[1].Value.Replace('\', '/') })
+  tools\verify-loop1-ctrl-002.ps1:270:    if ($entryPoints.Count -eq 0) {
+> tools\verify-loop1-ctrl-002.ps1:271:        Add-Failure 'Current Task verification exposes no discoverable tools/ entry point.'
+  tools\verify-loop1-ctrl-002.ps1:272:    } else {
+  tools\verify-loop1-ctrl-002.ps1:273:        foreach ($entryPoint in $entryPoints) {
+> tools\verify-loop1-ctrl-002.ps1:274:            if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $entryPoint) -PathType Le
+af)) { Add-Failure "Missing verification entry point: $entryPoint" }
+  tools\verify-loop1-ctrl-002.ps1:275:        }
+  tools\verify-loop1-ctrl-002.ps1:276:    }
+  tools\verify-loop1-ctrl-002.ps1:277:}
+  tools\verify-loop1-ctrl-002.ps1:297:if (Test-Path -LiteralPath (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1') -Pa
+thType Leaf) {
+  tools\verify-loop1-ctrl-002.ps1:298:    $architectureResult = @(& (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1') 
+2>&1)
+> tools\verify-loop1-ctrl-002.ps1:299:    if ($LASTEXITCODE -ne 0) { Add-Failure "Frozen Architecture migration verification fail
+ed: $($architectureResult -join ' ')" }
+  tools\verify-loop1-ctrl-002.ps1:300:}
+  tools\verify-loop1-ctrl-002.ps1:301:
+  tools\verify-loop1-ctrl-002.ps1:302:if ($failures.Count -gt 0) {
+> tools\verify-loop1-ctrl-002.ps1:303:    Write-Output "FAIL: recovery verification found $($failures.Count) issue(s)."
+  tools\verify-loop1-ctrl-002.ps1:304:    $failures | ForEach-Object { Write-Output " - $_" }
+  tools\verify-loop1-ctrl-002.ps1:305:    exit 1
+  tools\verify-loop1-ctrl-002.ps1:306:}
+
+

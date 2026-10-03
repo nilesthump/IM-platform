@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-SYNC-GO-001
 title: Go Core public Sync runtime prerequisite
-status: review
-owner: /root/sync_go_implementation
+status: done
+owner: /root
 stage: S2
 gate: S2
 ---
@@ -88,10 +88,10 @@ Activation baseline: accepted4d5fe1235e4f01111d78cc67b2880b52cac072f2; assigned 
 
 # Handoff
 
-Implementation local PASS, not acceptance. Two public Core Sync routes, readonly PG pages, account cursor, authoritative post-wait Session/membership checks and bounded streaming arbitrary JSON integers implemented. Existing contracts/schema/producers/private history/Gateway unchanged. Final enabled Go build/vet/test/race PASS; actual strict TLS Compose Sync PASS208metadata/205durableMessages plus206thpostterminalcommit and literal>64KiB numeric tokens. Frozen/architecture53/HTTP/WSS/SyncPlugin/SyncBinding checks PASS. Known failures and original logs retained in implementation/handoff.md and sealed Recorder. Clean candidate Acceptance is recorded by Git-private final observer after commit; no independent acceptance claimed.
+Product independently accepted and synchronized at actual main 6f9341276c6481e982c2a9b2f2d490b76bc1df96, candidate a78f7f96227e25980c5a51255e92a2e6a34a1bf0, task/LOOP1-SYNC-001, protected PR20. Fresh independent candidate Review PASS and same-role new actual-main audit PASS; exact hosted 37127049105/37127820035 each13jobs106stepsSUCCESS. Enabled PG/race/strict TLS208metadata205messages/postterminal206th and arbitrary numeric proof actually executed. Main190changedpaths exact; original781status/mode/size/hash preserved. No migrations. Task-owned PG/NATS removed; exact cleanup confirmed.
 
-Last known good main4d5fe1235e4f01111d78cc67b2880b52cac072f2. Assigned task/LOOP1-SYNC-001, no migrations; task-owned implementation/metadata only. Main781unknownentries untouched. S1PASS/S2OPEN; clientSYNC remainsbacklog on independently accepted runtime.
+Durable evidence: spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md and archive-manifest.json. Immutable implementation failure/trace evidence retained. Go product done does not mean clientSYNC or S2 PASS. Newly authored administrative closure still awaits fresh independent Review/exact CI/protected integration/actual-main audit/main synchronization before next task selection.
 
 # Next Action
 
-Coordinator delegates a NEW independent Review on clean committed candidate, publishes exact candidate CI, repairs via fresh Fix/new Review if necessary, then protectedintegration/actual-main audit/CI and preservation-verified mainsync. Only after accepted Go runtime activate dependency-satisfied existing Desktop/MobileSYNC; complete thenstop.
+Coordinator accepts this bounded administrative candidate through a NEW independent Reviewer and exact-head applicable hosted jobs, protected integration, actual-main audit and preservation-verified main synchronization. Then reassess accepted input dependencies and activate existing LOOP1-SYNC-001; finish Desktop/Mobile SYNC and stop. No GUI/Web selection.
