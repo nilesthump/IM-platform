@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CLIENT-GUI-001
 title: Desktop/Mobile complete Loop1 GUI
-status: backlog
+status: active
 owner: /root/gui_implementation
 stage: S2
 gate: S2
@@ -128,3 +128,11 @@ Development recovery verifier initially failed because Windows legacy PowerShell
 ## Native prerequisite dependency (2026-10-04)
 
 ADR-0009/LOOP1-CLIENT-NATIVE-ARCH-001 freezes already approved concrete minimal native/appearance plan. GUI remains backlog/BLOCKED_BY_ARCHITECTURE until prerequisite done/effective/synchronized, then reassess runtime readiness. Exact eight assembly-path consent preserved; dependency grants no extra product scope. No missing Human approval remains for same plan.
+
+## Latest Human unified local candidate authorization (2026-10-04)
+
+Exact latest instruction: 完成GUI任务后统一审查推送. Source: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/unified-batch.md; localized ADR-0009 timing exception. Human explicitly supersedes separate-native-acceptance-before-GUI candidate preparation for this exact batch. Other SQLITE/UI-ARCH/SEND/SYNC dependencies already accepted/done; required inputs and local frozen native choices exist. No missing same-plan approval. Native Task remains review pending whole-batch review/publication; no native Task done/effectiveness/Stage PASS asserted.
+
+GUI is now locally authorized candidate preparation, sequential backlog -> ready -> active. Previous BLOCKED_BY_ARCHITECTURE/backlog/standalone-acceptance statements above are historical before latest directive. Eight assembly paths/approved libraries/storage plan remain exact and unchanged; no new technology/contracts/backend/CORS/schema/ACK/security/business migration. Actual GUI readiness/verification/screenshot setup must be assessed by fresh implementation writer. Runtime screenshots -> Architect Review/fix/Approval remain mandatory, followed by fresh independent full-candidate Review/unified push/applicable exact-head hosted CI/protected integration/actual-main/safe sync. Native/GUI acceptance/done/main sync wait for their complete applicable evidence.
+
+Next exact action: fresh GUI implementation writer resumes combined candidate from clean timing handoff. No independent Review PASS/hosted acceptance/push has yet occurred.
