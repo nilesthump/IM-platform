@@ -1,0 +1,451 @@
+你是 `H:/IM-platform` 当前 Coordinator / Architecture + S2 Implementation Agent。
+
+本轮目标分两段：
+
+1. **按 MVP / minimum-task-count 原则补齐 Frozen Architecture 中缺失的客户端 GUI 任务规划；**
+2. **架构补充独立验收后，继续执行并完成下一个 S2 Task：`LOOP1-CLIENT-SEND-001`。**
+
+不得在本轮实现 GUI。
+
+---
+
+## 一、当前事实
+
+当前远程 main：
+
+`59dcf34e4538d2f35ccafde8104e860f8cf5cd7a`
+
+已接受：
+
+- S1 PASS
+- S2 OPEN
+- `LOOP1-CLIENT-SQLITE-001` 已完成并合入
+- `LOOP1-CLIENT-UI-ARCH-001` 已完成并合入
+- UI 架构、Adaptive Glass Workspace、截图驱动 Architect Review 已冻结
+- Web/Desktop/Mobile 技术栈已经冻结
+- 当前尚未启动 GUI implementation
+
+现有 Frozen Architecture 已包含 UI 规范，但 §19/§20 Task 规划表尚未完整反映 UI 执行任务。
+
+---
+
+# 二、MVP Task 原则
+
+严格遵守：
+
+> **能并入现有 Task acceptance 的要求，不新增独立 Task。**
+
+禁止为了“结构好看”拆出大量：
+
+- GUI E2E Task
+- Client parity UI Task
+- Plugin GUI Task
+- Client release UI Task
+- Client soak UI Task
+
+只有真正拥有独立实现边界、独立 acceptance、不能合理归入既有 Task 的工作，才新增 Task ID。
+
+---
+
+# 三、Frozen Architecture 最小补充
+
+## 3.1 S2 新增且仅新增一个产品 UI Task
+
+新增：
+
+`LOOP1-CLIENT-GUI-001`
+
+阶段：
+
+`S2`
+
+依赖：
+
+- `LOOP1-CLIENT-SQLITE-001`
+- `LOOP1-CLIENT-UI-ARCH-001`
+- `LOOP1-CLIENT-SEND-001`
+- `LOOP1-SYNC-001`
+
+目标：
+
+实现 Desktop / Mobile 的 Loop1 GUI，并遵守已经冻结的 UI Architecture。
+
+至少覆盖：
+
+- Login / session 状态
+- Chat
+- Friends
+- AI Placeholder
+- Plugin capability panel / unavailable state
+- Settings / Profile
+- Cold AI / Warm Creative theme switch
+- 本地字体/间距配置
+- Offline History
+- SENDING / SENT / FAILED
+- retry
+- Sync / reconnect 状态
+- Desktop notification / tray / shortcut
+- Mobile Android Studio Emulator runtime
+
+不得实现：
+
+- AI API / AI chat / Agent / RAG
+- Plugin runtime
+- Marketplace
+- S4 renderer
+- 新公共 API
+
+GUI Task acceptance 必须引用：
+
+`spec/acceptance/client-gui.md`
+
+并完成：
+
+真实运行截图
+→ Architect Review
+→ 修复
+→ 重新截图
+→ Architect Approval
+→ fresh independent Review
+→ exact-head hosted CI
+→ protected integration/main verification
+
+---
+
+## 3.2 保留现有 `LOOP1-WEB-001`
+
+不要新增 Web GUI Task。
+
+将现有：
+
+`LOOP1-WEB-001`
+
+明确解释为：
+
+> Web 的完整 Loop1 GUI 实现 Task。
+
+保留既有约束：
+
+- React + TypeScript
+- memory only
+- no SQLite
+- no offline history
+
+并补充其 acceptance 必须遵守：
+
+- CLIENT-UI-ARCH
+- client-gui screenshot acceptance
+- Chat / Friends / AI Placeholder / Plugin / Settings/Profile
+- 双主题及本地 UI 配置
+
+不得改变其 Web memory-only 边界。
+
+---
+
+# 四、S2 执行顺序
+
+Frozen Architecture 中明确 S2 最小依赖顺序：
+
+```text
+LOOP1-CLIENT-SQLITE-001       DONE
+        ↓
+LOOP1-CLIENT-UI-ARCH-001      DONE
+        ↓
+LOOP1-CLIENT-SEND-001
+        ↓
+LOOP1-SYNC-001
+        ↓
+LOOP1-CLIENT-GUI-001
+        ↓
+LOOP1-WEB-001
+        ↓
+S2 Gate
+```
+
+不要为了 GUI 改变 SQLite / SEND / Sync 的领域职责。
+
+---
+
+# 五、S3～S6 不新增 UI Task
+
+遵守 MVP 原则，只扩充既有 Task acceptance。
+
+## S3
+
+不新增 Client UI parity Task。
+
+把以下要求并入：
+
+`LOOP1-PARITY-001`
+
+Acceptance 增加：
+
+- 同一客户端制品/代码无需业务修改即可切换 Go / Java backend profile；
+- GUI 不因 backend profile 改写协议逻辑；
+- 当前客户端关键纵向流程对两 profile 均通过。
+
+---
+
+## S4
+
+不新增 Plugin GUI Task。
+
+继续使用：
+
+- `LOOP1-PLUGIN-UI-001`
+- `LOOP1-PLUGIN-FIX-001`
+
+Acceptance 增加：
+
+- 声明式 Plugin UI / Render Bundle 遵守冻结 CLIENT-UI-ARCH；
+- Plugin 不得控制一级导航；
+- Echo/Poll 在 Web/Desktop/Mobile 的真实宿主 UI 中验证；
+- 适用 UI 必须提供真实运行证据；
+- 视觉影响显著的实现按既有 Architect screenshot review 规则验收。
+
+---
+
+## S5
+
+不新增 Client compatibility / client release Task。
+
+继续使用：
+
+- `LOOP1-COMPAT-001`
+- `LOOP1-RELEASE-001`
+
+Acceptance 补充：
+
+- Web/Desktop/Android 客户端兼容矩阵；
+- SQLite migration；
+- UI/theme/local preference compatibility；
+- Plugin UI compatibility；
+- Desktop/Android 实际构建制品；
+- release manifest；
+- install/upgrade/rollback smoke。
+
+---
+
+## S6
+
+不新增 Client soak Task。
+
+继续使用：
+
+- `LOOP1-LOAD-001`
+- `LOOP1-LOAD-GO-001`
+- `LOOP1-LOAD-JAVA-001`
+- `LOOP1-RC-001`
+
+只在 `LOOP1-RC-001` 增加最终客户端 RC 要求：
+
+- 三端最终可运行制品；
+- 关键 GUI 流程 smoke；
+- 最终视觉若相对最近 Architect-approved screenshot set 有实质变化，则重新截图并获得 Architect Approval；
+- 不要求用真实 GUI 客户端制造全部 5000 WSS load，容量压测仍由 load harness 承担。
+
+禁止把 UI 自动化加入 5000 client load 热路径造成无意义成本。
+
+---
+
+# 六、Frozen Architecture 修改规则
+
+当前版本保持：
+
+`v1.1`
+
+不升级版本号。
+
+原因：
+
+这是已冻结 UI Architecture 的执行 Task 规划补全，不是重新定义产品架构。
+
+但必须：
+
+- 更新 canonical Markdown hash；
+- 更新 baseline manifest 对当前 revision 的真实记录；
+- 使用现有 ADR/decision 治理方式记录 Human-approved MVP task clarification；
+- 历史 PDF 保持 byte-for-byte 不变；
+- 不修改历史 PR7/PR8/FAIL/Recorder evidence。
+
+如现有治理要求必须建立新 ADR，则建立最小 ADR；
+如可作为 ADR-0006 的批准补充，按当前治理真实规则处理。
+
+不得为了方便绕过现有 architecture change protocol。
+
+---
+
+# 七、Task 表必须同步
+
+至少同步：
+
+- Frozen Architecture §19 第一批/现行 Task 规划
+- §20 后续依赖表
+- S2 Gate 描述
+- 必要的 acceptance / task dependency 文本
+
+确保机器和人类阅读结果一致：
+
+`CLIENT-GUI-001` 不能只存在于 prose 而不存在 Task dependency planning 中。
+
+---
+
+# 八、架构补充验收
+
+完成文档修改后必须：
+
+1. clean candidate
+2. frozen hash/integrity validation
+3. architecture checks
+4. task/dependency checks
+5. negative controls（确认不会多创造 UI Task）
+6. fresh independent Review
+7. exact-head applicable hosted CI
+8. protected merge/integration
+9. verify actual main
+
+在此之前：
+
+**不得开始 `LOOP1-CLIENT-SEND-001` 实现。**
+
+---
+
+# 九、架构补充完成后立即继续下一 S2 Task
+
+当上述架构补充正式进入 accepted main 后：
+
+选择并激活：
+
+`LOOP1-CLIENT-SEND-001`
+
+这是本轮最终产品执行 endpoint。
+
+不要停在“架构补充完成”后等待 Human。
+
+---
+
+# 十、LOOP1-CLIENT-SEND-001 实现目标
+
+严格按 Frozen Architecture / contracts / SQLite Repository 实现：
+
+```text
+用户发送
+  ↓
+生成不可变 request_id
+  ↓
+Repository 事务写 SENDING
+  ↓
+UI/application state 可观察 SENDING
+  ↓
+WSS message.send
+  ↓
+durable ACK
+  ↓
+Repository UPSERT SENT
+```
+
+失败：
+
+```text
+timeout / offline
+  ↓
+FAILED
+```
+
+重试：
+
+```text
+FAILED
+ ↓
+reuse SAME request_id
+ ↓
+SENDING
+```
+
+必须保证：
+
+- SENT 不倒退；
+- ACK / realtime / Sync 可将 SENDING/FAILED 收敛为 SENT；
+- retry 绝不生成新的 request_id；
+- ACK-before-durable-commit 不得发生；
+- 不在 UI 层直接修改 SQLite；
+- 不重复实现 SQLite Repository；
+- 不修改服务器 contract；
+- 不自行创建新的发送 HTTP route；
+- 使用现有 WSS canonical contract。
+
+---
+
+# 十一、三端范围纪律
+
+## Desktop
+
+可以实现真实 send orchestration。
+
+使用：
+
+- TypeScript application layer
+- existing Repository
+- existing Tauri boundary
+
+不得新增未批准核心依赖。
+
+---
+
+## Mobile
+
+使用已冻结：
+
+- Android Kotlin
+- ViewModel
+- StateFlow
+- Repository
+- existing SQLite implementation
+- canonical WSS protocol
+
+必须在适用情况下运行 Android Studio Emulator 验证。
+
+---
+
+## Web
+
+不要提前实现 `LOOP1-WEB-001`。
+
+如 SEND 共享协议层确有可复用代码，可在 Task 明确 allowed_paths 后进行最小 shared 工作，但不能借机启动 Web GUI。
+
+---
+
+# 十二、本轮停止条件
+
+本轮正常 endpoint 是：
+
+> **`LOOP1-CLIENT-SEND-001` 已经 fresh independent Review + exact-head CI + protected integration，并被正确记录为 done。**
+
+到达这个状态后停止。
+
+不要自动继续：
+
+- `LOOP1-SYNC-001`
+- GUI
+- Web
+
+除非 Human 另有明确授权。
+
+---
+
+# 十三、最终报告只需要
+
+1. 架构补充最终 main SHA；
+2. Frozen Architecture 是否仍为 v1.1；
+3. 新增 Task 是否只有 `LOOP1-CLIENT-GUI-001`；
+4. S3～S6 哪些既有 Task acceptance 被补充；
+5. S2 最终任务顺序；
+6. `LOOP1-CLIENT-SEND-001` candidate / merge SHA；
+7. Desktop/Mobile send 验证结果；
+8. independent Review / hosted CI；
+9. 当前 Gate；
+10. 下一 Task 是否为 `LOOP1-SYNC-001`，但**不要启动它**。
+
+现在开始。
+
+第一步：按 `AGENTS.md` 恢复 `main@59dcf34e4538d2f35ccafde8104e860f8cf5cd7a`，先完成最小架构 Task 规划补充；该补充被正式接受之前，不得实施 SEND。

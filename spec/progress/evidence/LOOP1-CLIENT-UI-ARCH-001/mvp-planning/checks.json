@@ -1,0 +1,88 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "tools/verify_frozen_architecture.py",
+      "--base-commit",
+      "59dcf34e4538d2f35ccafde8104e860f8cf5cd7a"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.172,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/check-0.txt"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.563,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/check-1.txt"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 6.125,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/check-2.txt"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/verify_planning.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.172,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/check-3.txt"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.046,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/check-4.txt"
+  },
+  {
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Development"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 6.797,
+    "result": "PASS",
+    "output": "spec/progress/evidence/LOOP1-CLIENT-UI-ARCH-001/mvp-planning/check-5.txt"
+  }
+]
