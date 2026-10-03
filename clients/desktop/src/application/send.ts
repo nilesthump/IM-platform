@@ -19,6 +19,9 @@ export class SendApplication {
   private queue: Promise<void>=Promise.resolve();
   private attempts=new Map<string,{message:LocalMessage; generation:number; timer:ReturnType<typeof setTimeout>|null; sent:boolean}>();
   private known=new Map<string,LocalMessage>();
+  // RID -> sole Conversation, or null once ambiguous on this connection. Keep
+  // settled identities until disconnect so delayed rejects remain unattributable.
+  private requestConversations=new Map<string,string|null>();
   private listeners=new Set<(state:SendState)=>void>();
   private conversation="";
   private current: SendState={connection:"offline",messages:[],error:null};
@@ -61,7 +64,7 @@ export class SendApplication {
   }
   private protocolFailure(): void { this.disconnect(); this.publish({...this.current,error:"protocol"}); }
   disconnect(): void {
-    const old=this.socket; this.socket=null; this.bound=false; this.generation++;
+    const old=this.socket; this.socket=null; this.bound=false; this.generation++; this.requestConversations.clear();
     if(old) { old.onopen=old.onmessage=old.onclose=old.onerror=null; try { old.close(); } catch { /* Already closed. */ } }
     this.publish({...this.current,connection:"offline"});
     for(const [key,attempt] of this.attempts) {
@@ -97,6 +100,8 @@ export class SendApplication {
     if(!this.bound || !this.socket) { await this.fail(key,attempt); return; }
     try { this.socket.send(envelope("message.send",message.requestId,{conversationId:message.conversationId,content:message.content})); attempt.sent=true; }
     catch { await this.fail(key,attempt); return; }
+    const priorConversation=this.requestConversations.get(message.requestId);
+    this.requestConversations.set(message.requestId,priorConversation===undefined || priorConversation===message.conversationId ? message.conversationId : null);
     attempt.timer=setTimeout(()=>{void this.serial(()=>this.fail(key,attempt)).catch(()=>{});},this.timeoutMs);
   }
   private async fail(key:string,attempt:{message:LocalMessage}): Promise<void> {
@@ -120,9 +125,10 @@ export class SendApplication {
     }
     if(frame.type==="message.ack") {
       if(p.status==="rejected") {
-        // Rejection has no Conversation; one request may be present only once
-        // among attempts issued on this authenticated connection.
-        for(const [key,a] of this.attempts) if(a.message.requestId===frame.requestId && a.sent && a.generation===generation) await this.fail(key,a);
+        // Rejection has no Conversation. Ambiguous identities must keep their
+        // independent confirmation/timeout paths instead of failing all sends.
+        const matches=[...this.attempts].filter(([,a])=>a.message.requestId===frame.requestId && a.sent && a.generation===generation);
+        if(matches.length===1 && this.requestConversations.get(frame.requestId)===matches[0][1].message.conversationId) await this.fail(matches[0][0],matches[0][1]);
       } else {
         const c=p.conversationId as string, key=c+"/"+frame.requestId;
         // An ACK only confirms a send issued by this application; retry reloads

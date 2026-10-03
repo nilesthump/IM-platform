@@ -7,40 +7,45 @@ Gate Status: OPEN
 Current Batch: S2-MVP-planning-then-SEND
 Current Task: LOOP1-CLIENT-SEND-001
 Current Task State: review
-Execution Status: SEND_REVIEW_READY
+Execution Status: SEND_FIX_REVIEW_READY
 
 ## Immediately Relevant Completed Work
 
-S1 PASS and SQLite/UIARCH planning are independently accepted and synchronized at actual main10b77b22386234c98409ca41b3622ad6d25f3884. Frozen v1.1/hash16e9c7b4/PDF546915 unchanged. Fresh SEND implementation now has actual Desktop SQLx/WSS and API34 Android SQLite/StateFlow/WSS local evidence, including real-Go PostgreSQL smoke. SEND remains unaccepted review candidate.
+S1 PASS and SQLite/UIARCH planning remain accepted/synchronized at main10b77b22386234c98409ca41b3622ad6d25f3884. Frozen v1.1/hash16e9c7b4/PDF546915 unchanged. Original SEND1822 independent Review FAIL is preserved despite its old hosted success. Fresh fix addresses its two confirmed P2 defects; new candidate remains unaccepted.
 
 ## Current Blockers
 
-No architecture or implementation blocker. Fresh independent Review, exact-head hosted required CI, protected integration and main synchronization remain pending acceptance steps.
+No architecture/external blocker. Fresh independent Review, NEW exact-head hosted required CI, protected integration and main synchronization remain mandatory. Original ReviewFAIL/old CI cannot accept this fix.
 
 ## Verification
 
 - Command: `python -B tools/verify_client_send.py --scope desktop`
-  - Result: PASS actual SQLx and TLS/WSS; shared strict codec/golden outputs also executed.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SEND-001/implementation/verification.md`
+  - Result: PASS final SQLx/TLS and shared strict codec; original and delayed ambiguous-rejection RED preserved.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SEND-001/fix-20261003/verification.md`
 - Command: `python -B tools/verify_client_send.py --scope mobile --serial emulator-5590`
-  - Result: PASS40 assertions actual API34; async closed-Repository timer liveness included.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SEND-001/implementation/verification.md`
+  - Result: PASS66 actual API34 SEND, retired empty observer/scope cleanup, same-RID independent timer/ACK convergence.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SEND-001/fix-20261003/verification.md`
+- Command: `python -B tests/clients/send/go_smoke.py H:/.codex/toolchains/client-sqlite/target-final/debug/storage_probe.exe`
+  - Result: PASS actual Desktop application/SQLx -> Go verified WSS -> exact PostgreSQL Message/Outbox; owned resources removed.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SEND-001/fix-20261003/commands.json`
+
+Original SQLx SQLite13/141/native atomic regression and API34 SQLite13/137 install/data-clear PASS. Sourceall/frozen/architecture53 PASS; CI33 includes4 Windows privilege skips explicitly unexecuted. Recovery Development and full accepted-main range diff check PASS; clean Acceptance/HEAD-range audit follow the committed handoff in immutable Recorder.
 
 ## Changed Files or Migrations
 
-Only SEND Task allowed application/codec/mobile adapters and tests, verifier, approved build dependencies/permission, selected CI/classifier controls and task-owned evidence/recovery metadata. No schema/migration/backend/contracts/native/Repository changes. No GUI/SYNC runner/Web.
+Fix changes only Desktop send.ts, Mobile SendViewModel.kt, their existing SEND regressions, task-owned evidence and current/review Task metadata. No new dependency, contracts/backend/Repository/native/schema/frozen/CI change; no GUI/Sync runner/Web.
 
 ## Known Failures, Risks, and Assumptions
 
-Initial tooling/test failures are durably preserved; ordinary failures repaired. Controlled TLS fixture is client-behavior evidence; separate Go smoke proves exact committed PostgreSQL rows. Four pre-existing Windows symlink tests cannot run without privilege and are explicitly skipped; hosted Linux is required. Local evidence is not Task or Stage acceptance.
+Original1822 Review FAIL: failed Mobile account retirement and cross-Conversation rejected-ACK attribution. Current local regressions are green; new independent Review/CI still required. Socket-lifetime RID ambiguity fact is necessary for the observed delayed-reject failure, clears on connection retirement, and never changes request identity. Controlled TLS fixture is distinct from real Go/PostgreSQL durability. Preparation and Recorder rejected-event failures are exposed; no evidence stream rewritten. Four pre-existing Windows symlink-privilege checks require hosted Linux.
 
 ## Next Exact Action
 
-Fresh independent Reviewer checks clean candidate logic/minimality/authority/scope and reruns appropriate actual behavior, especially Android async timer liveness. Coordinator handles fresh fix/review if necessary, exact-head hosted CI, protected integration/actual-main verification and H:/IM-platform synchronization. Mark done only after acceptance and stop at SEND accepted endpoint; do not activate SYNC/GUI/WEB.
+Release sole writer after recorded clean commit/Acceptance audit, then NEW fresh independent Review of exact final HEAD/full accepted-main range and new hosted CI through PR16. Coordinator handles protected integration/actual-main verification/main synchronization. Mark done only after all acceptance; stop at SEND accepted endpoint, keep SYNC/GUI/WEB backlog.
 
 ## Last Known Good Commit
 
-`10b77b22386234c98409ca41b3622ad6d25f3884` accepted actual main. SEND candidate is not promoted to known good.
+`10b77b22386234c98409ca41b3622ad6d25f3884` accepted main; SEND candidate is not known good. Main sync PENDING.
 
 ## Latest Checkpoint
 
@@ -48,8 +53,8 @@ Fresh independent Reviewer checks clean candidate logic/minimality/authority/sco
 
 ## Uncommitted Changes / Ownership
 
-Fresh SEND implementation agent owns all task changes on task/LOOP1-CLIENT-SEND-001 in assigned managed H:/.codex/worktrees/client-mvp-planning/IM-platform, base8b33571990241f91a676e15069b07b065697317a. Final candidate is committed clean before writer release; exact SHA in immutable Recorder final_state and implementation handoff. Main synchronization PENDING, original unknown781bytes and3old owned metadata backups untouched. Coordinator-owned accepted UIARCH closure metadata unchanged by implementer.
+Fresh Fix Agent /root/send_fix sole writer owns task changes on task/LOOP1-CLIENT-SEND-001 in verified assigned H:/.codex/worktrees/client-mvp-planning/IM-platform, fix base1822e29682eccafd75ee293c31a2d35e29746eb6. Final candidate committed clean before writer release; identity in fix handoff and immutable Recorder final_state. Main unknown781bytes/three old backups preserved. Root-owned accepted UIARCH/activation metadata unchanged.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Canonical v1.1 and approved ADR0005/6/7 remain authority; no new architecture-sensitive dependency. Android platform TLS plus approved ViewModel/StateFlow/coroutines and existing Desktop Tauri+SQLx used. Required independent Review/CI cannot be replaced by this implementer or Recorder.
+None. Canonical/ADR0005/6/7 unchanged; no new sensitive selection. Recorder instrumentation validity, local tests, Task acceptance and S2 Gate are separate.

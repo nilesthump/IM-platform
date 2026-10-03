@@ -1,0 +1,840 @@
+{
+  "run_id": "R-SEND-FIX-20261003",
+  "capture_mode": "prospective_resume",
+  "pre_recorder_trace_complete": false,
+  "export_through_event": 57,
+  "note": "Completed command snapshot includes preparation FAIL and actual RED/intermediate GREEN/final GREEN separately. Blobs are Recorder redacted UTF8; byte_exact_raw indicates raw-byte identity. Final clean commit/Acceptance/finish checks remain in immutable external Recorder for Coordinator closure archive; this snapshot is not a finished run or acceptance.",
+  "commands": [
+    {
+      "command_id": "C-f6c482b0-0dbd-435f-a5b3-b83463ce733f",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:32:59.309480Z",
+      "finished_at": "2026-10-03T08:32:59.861421Z",
+      "duration_ms": 531.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-f6c482b0-0dbd-435f-a5b3-b83463ce733f.stdout.txt.gz",
+        "recorder_raw_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f",
+        "exported_blob_sha256": "66cfaab538a082c57e01fcb2b5c699fab3f43d2ab752f9df7c0f15c0b3b7940b",
+        "byte_exact_raw": false,
+        "bytes": 89454
+      },
+      "stderr": {
+        "gzip": "outputs/C-f6c482b0-0dbd-435f-a5b3-b83463ce733f.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-74bd9065-3497-4ae7-8344-f984b482b4b9",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:32:59.950124Z",
+      "finished_at": "2026-10-03T08:33:00.041622Z",
+      "duration_ms": 94.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-74bd9065-3497-4ae7-8344-f984b482b4b9.stdout.txt.gz",
+        "recorder_raw_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+        "exported_blob_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+        "byte_exact_raw": true,
+        "bytes": 163
+      },
+      "stderr": {
+        "gzip": "outputs/C-74bd9065-3497-4ae7-8344-f984b482b4b9.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-0dfea2eb-1a4c-4385-ad00-e68a9cb4b521",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:35:39.622024Z",
+      "finished_at": "2026-10-03T08:35:43.472551Z",
+      "duration_ms": 3860.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-0dfea2eb-1a4c-4385-ad00-e68a9cb4b521.stdout.txt.gz",
+        "recorder_raw_sha256": "f168e84c5f06f93d65d71dfad9aa7dfd0c57c44bdca33578c4ebf2cd2083c66d",
+        "exported_blob_sha256": "f168e84c5f06f93d65d71dfad9aa7dfd0c57c44bdca33578c4ebf2cd2083c66d",
+        "byte_exact_raw": true,
+        "bytes": 610
+      },
+      "stderr": {
+        "gzip": "outputs/C-0dfea2eb-1a4c-4385-ad00-e68a9cb4b521.stderr.txt.gz",
+        "recorder_raw_sha256": "e7b3c34d65e174432acb200684abce1b48bed57d45c047c01097fd65563aa5f8",
+        "exported_blob_sha256": "e7b3c34d65e174432acb200684abce1b48bed57d45c047c01097fd65563aa5f8",
+        "byte_exact_raw": true,
+        "bytes": 54
+      }
+    },
+    {
+      "command_id": "C-14ef990c-7b84-4600-9939-4b3c144653dc",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:36:10.266226Z",
+      "finished_at": "2026-10-03T08:36:41.764737Z",
+      "duration_ms": 31500.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-14ef990c-7b84-4600-9939-4b3c144653dc.stdout.txt.gz",
+        "recorder_raw_sha256": "9a0cf20901a37a865a03d6934b8a2fc983fcc29877d8debe4bba6eb9f629cbb9",
+        "exported_blob_sha256": "9a0cf20901a37a865a03d6934b8a2fc983fcc29877d8debe4bba6eb9f629cbb9",
+        "byte_exact_raw": true,
+        "bytes": 743
+      },
+      "stderr": {
+        "gzip": "outputs/C-14ef990c-7b84-4600-9939-4b3c144653dc.stderr.txt.gz",
+        "recorder_raw_sha256": "96f665a65a197219f509626f4fb9a6f81762594f85b157bc81f803e9267705a9",
+        "exported_blob_sha256": "96f665a65a197219f509626f4fb9a6f81762594f85b157bc81f803e9267705a9",
+        "byte_exact_raw": true,
+        "bytes": 1146
+      }
+    },
+    {
+      "command_id": "C-c6d56d99-96df-4e77-817d-22d96d2a4c52",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:37:02.840823Z",
+      "finished_at": "2026-10-03T08:37:36.444860Z",
+      "duration_ms": 33609.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-c6d56d99-96df-4e77-817d-22d96d2a4c52.stdout.txt.gz",
+        "recorder_raw_sha256": "79015d37f57aaf45992d1f18b6f2c5dd57dde95f829d9581e1df85bf7267f2e6",
+        "exported_blob_sha256": "79015d37f57aaf45992d1f18b6f2c5dd57dde95f829d9581e1df85bf7267f2e6",
+        "byte_exact_raw": true,
+        "bytes": 5741
+      },
+      "stderr": {
+        "gzip": "outputs/C-c6d56d99-96df-4e77-817d-22d96d2a4c52.stderr.txt.gz",
+        "recorder_raw_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "exported_blob_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "byte_exact_raw": true,
+        "bytes": 52
+      }
+    },
+    {
+      "command_id": "C-cc87099d-1d93-4f2c-aa50-765fa6088e2d",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:38:05.027768Z",
+      "finished_at": "2026-10-03T08:38:25.219912Z",
+      "duration_ms": 20187.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-cc87099d-1d93-4f2c-aa50-765fa6088e2d.stdout.txt.gz",
+        "recorder_raw_sha256": "47d8ff07603e658eedced1e90a6d5cb000d538ea20c3323ac074e0a3a22b91b3",
+        "exported_blob_sha256": "47d8ff07603e658eedced1e90a6d5cb000d538ea20c3323ac074e0a3a22b91b3",
+        "byte_exact_raw": true,
+        "bytes": 5347
+      },
+      "stderr": {
+        "gzip": "outputs/C-cc87099d-1d93-4f2c-aa50-765fa6088e2d.stderr.txt.gz",
+        "recorder_raw_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "exported_blob_sha256": "d2db9a66dc693a66910d591bb34ddb45f8df48d78ca9b9f77a4f7af5f09e6028",
+        "byte_exact_raw": true,
+        "bytes": 52
+      }
+    },
+    {
+      "command_id": "C-e6fe1ea5-75ab-487f-bd6b-d922a677e807",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:39:04.374738Z",
+      "finished_at": "2026-10-03T08:39:20.278216Z",
+      "duration_ms": 15907.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-e6fe1ea5-75ab-487f-bd6b-d922a677e807.stdout.txt.gz",
+        "recorder_raw_sha256": "01917ad5eec762eccc5662aa2b85b5a6a3f5a9dbc4a83c203dd73955918955a2",
+        "exported_blob_sha256": "01917ad5eec762eccc5662aa2b85b5a6a3f5a9dbc4a83c203dd73955918955a2",
+        "byte_exact_raw": true,
+        "bytes": 1075
+      },
+      "stderr": {
+        "gzip": "outputs/C-e6fe1ea5-75ab-487f-bd6b-d922a677e807.stderr.txt.gz",
+        "recorder_raw_sha256": "4cf3bc64393454a8453fd1256b17d88cb83c98c142e1d1a1fa773fc219131671",
+        "exported_blob_sha256": "4cf3bc64393454a8453fd1256b17d88cb83c98c142e1d1a1fa773fc219131671",
+        "byte_exact_raw": true,
+        "bytes": 190
+      }
+    },
+    {
+      "command_id": "C-0c796334-09b4-426c-baa1-eeb5bb3ab380",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:40:21.572298Z",
+      "finished_at": "2026-10-03T08:40:45.818180Z",
+      "duration_ms": 24250.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-0c796334-09b4-426c-baa1-eeb5bb3ab380.stdout.txt.gz",
+        "recorder_raw_sha256": "d63756d95eb23ea97183e6099b0db17c35bee31d0e1cc2652f57b60f7184dd34",
+        "exported_blob_sha256": "d63756d95eb23ea97183e6099b0db17c35bee31d0e1cc2652f57b60f7184dd34",
+        "byte_exact_raw": true,
+        "bytes": 5336
+      },
+      "stderr": {
+        "gzip": "outputs/C-0c796334-09b4-426c-baa1-eeb5bb3ab380.stderr.txt.gz",
+        "recorder_raw_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "exported_blob_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "byte_exact_raw": true,
+        "bytes": 2
+      }
+    },
+    {
+      "command_id": "C-c0fad4ba-53ff-4299-84bf-fbdd4cb699be",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "H:/IM-platform/.git/worktrees/IM-platform4/send-fix-research/archive.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:41:05.002981Z",
+      "finished_at": "2026-10-03T08:41:05.120938Z",
+      "duration_ms": 109.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-c0fad4ba-53ff-4299-84bf-fbdd4cb699be.stdout.txt.gz",
+        "recorder_raw_sha256": "c5275f92a8dff0d19d309d0c04d85787bc142799566aa83ca11b6afc5a662a80",
+        "exported_blob_sha256": "c5275f92a8dff0d19d309d0c04d85787bc142799566aa83ca11b6afc5a662a80",
+        "byte_exact_raw": true,
+        "bytes": 101
+      },
+      "stderr": {
+        "gzip": "outputs/C-c0fad4ba-53ff-4299-84bf-fbdd4cb699be.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-87856f36-d59d-4903-aa49-518a0779adc6",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:42:01.337091Z",
+      "finished_at": "2026-10-03T08:42:14.174902Z",
+      "duration_ms": 12828.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-87856f36-d59d-4903-aa49-518a0779adc6.stdout.txt.gz",
+        "recorder_raw_sha256": "0e4299df9e04f26fa1e69c653e1e44da6ff84af09b83e531c1c1506bcde97f02",
+        "exported_blob_sha256": "0e4299df9e04f26fa1e69c653e1e44da6ff84af09b83e531c1c1506bcde97f02",
+        "byte_exact_raw": true,
+        "bytes": 743
+      },
+      "stderr": {
+        "gzip": "outputs/C-87856f36-d59d-4903-aa49-518a0779adc6.stderr.txt.gz",
+        "recorder_raw_sha256": "07bd235299ef412e45c270658595168ce5f37d12ef77a5a5a1f0a79f4e67e5bc",
+        "exported_blob_sha256": "07bd235299ef412e45c270658595168ce5f37d12ef77a5a5a1f0a79f4e67e5bc",
+        "byte_exact_raw": true,
+        "bytes": 901
+      }
+    },
+    {
+      "command_id": "C-9dab8bd4-b238-4568-974e-f6bfdd4b4360",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:43:02.247112Z",
+      "finished_at": "2026-10-03T08:43:16.397540Z",
+      "duration_ms": 14157.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-9dab8bd4-b238-4568-974e-f6bfdd4b4360.stdout.txt.gz",
+        "recorder_raw_sha256": "af8ec46ea45bbd239b50255eb76f7312fa9daa10bef678ee380bc7e7713db963",
+        "exported_blob_sha256": "af8ec46ea45bbd239b50255eb76f7312fa9daa10bef678ee380bc7e7713db963",
+        "byte_exact_raw": true,
+        "bytes": 1075
+      },
+      "stderr": {
+        "gzip": "outputs/C-9dab8bd4-b238-4568-974e-f6bfdd4b4360.stderr.txt.gz",
+        "recorder_raw_sha256": "84f04e2ad330d32ad73d83ce002cd9605efa0352486c4a55092c63e84dcd4bc6",
+        "exported_blob_sha256": "84f04e2ad330d32ad73d83ce002cd9605efa0352486c4a55092c63e84dcd4bc6",
+        "byte_exact_raw": true,
+        "bytes": 190
+      }
+    },
+    {
+      "command_id": "C-ef4f6aae-dd87-46c6-855b-ab08ffdd3896",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_send.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:43:44.706639Z",
+      "finished_at": "2026-10-03T08:44:11.256308Z",
+      "duration_ms": 26547.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-ef4f6aae-dd87-46c6-855b-ab08ffdd3896.stdout.txt.gz",
+        "recorder_raw_sha256": "b6aa57139af808147c9437978b10296412102594c4a038b4150c5ef6d39dea19",
+        "exported_blob_sha256": "b6aa57139af808147c9437978b10296412102594c4a038b4150c5ef6d39dea19",
+        "byte_exact_raw": true,
+        "bytes": 5336
+      },
+      "stderr": {
+        "gzip": "outputs/C-ef4f6aae-dd87-46c6-855b-ab08ffdd3896.stderr.txt.gz",
+        "recorder_raw_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "exported_blob_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "byte_exact_raw": true,
+        "bytes": 2
+      }
+    },
+    {
+      "command_id": "C-2e2d2154-8820-4804-b5c2-4f32fe4ff261",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_sqlite.py",
+        "--scope",
+        "desktop"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:44:46.968829Z",
+      "finished_at": "2026-10-03T08:45:14.434646Z",
+      "duration_ms": 27469.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-2e2d2154-8820-4804-b5c2-4f32fe4ff261.stdout.txt.gz",
+        "recorder_raw_sha256": "0af39ecff4a61dd70c41bf2c68714466c72d9646d82aee1c50a71f7130a80a34",
+        "exported_blob_sha256": "0af39ecff4a61dd70c41bf2c68714466c72d9646d82aee1c50a71f7130a80a34",
+        "byte_exact_raw": true,
+        "bytes": 1402
+      },
+      "stderr": {
+        "gzip": "outputs/C-2e2d2154-8820-4804-b5c2-4f32fe4ff261.stderr.txt.gz",
+        "recorder_raw_sha256": "e8ee5f7efb5ad83d47e7f96b64468ff2ce0aa047c0e783d5cb305a7bbd852c5c",
+        "exported_blob_sha256": "e8ee5f7efb5ad83d47e7f96b64468ff2ce0aa047c0e783d5cb305a7bbd852c5c",
+        "byte_exact_raw": true,
+        "bytes": 946
+      }
+    },
+    {
+      "command_id": "C-35b7ab37-37b6-467c-bded-d90ac6f12d54",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_client_sqlite.py",
+        "--scope",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:45:39.928777Z",
+      "finished_at": "2026-10-03T08:45:54.457725Z",
+      "duration_ms": 14531.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-35b7ab37-37b6-467c-bded-d90ac6f12d54.stdout.txt.gz",
+        "recorder_raw_sha256": "248de55a8ad9b7a0ade098e94928fb8bc23309fb439e92d0f57d89bb3f310ef5",
+        "exported_blob_sha256": "248de55a8ad9b7a0ade098e94928fb8bc23309fb439e92d0f57d89bb3f310ef5",
+        "byte_exact_raw": true,
+        "bytes": 5895
+      },
+      "stderr": {
+        "gzip": "outputs/C-35b7ab37-37b6-467c-bded-d90ac6f12d54.stderr.txt.gz",
+        "recorder_raw_sha256": "dba5166ad9db9ba648c1032ebbd34dcd0d085b50023b839ef5c68ca1db93a563",
+        "exported_blob_sha256": "dba5166ad9db9ba648c1032ebbd34dcd0d085b50023b839ef5c68ca1db93a563",
+        "byte_exact_raw": true,
+        "bytes": 4
+      }
+    },
+    {
+      "command_id": "C-1173ffb6-4d36-42bb-9b27-5e64192d863f",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tests/clients/send/go_smoke.py",
+        "H:/.codex/toolchains/client-sqlite/target-final/debug/storage_probe.exe"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:47:41.146673Z",
+      "finished_at": "2026-10-03T08:48:05.285663Z",
+      "duration_ms": 24140.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-1173ffb6-4d36-42bb-9b27-5e64192d863f.stdout.txt.gz",
+        "recorder_raw_sha256": "e7199c24696f16ff00ab9d30a4b80d1a4085b3c9fbc57f6f08b45958705df540",
+        "exported_blob_sha256": "e7199c24696f16ff00ab9d30a4b80d1a4085b3c9fbc57f6f08b45958705df540",
+        "byte_exact_raw": true,
+        "bytes": 269
+      },
+      "stderr": {
+        "gzip": "outputs/C-1173ffb6-4d36-42bb-9b27-5e64192d863f.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-0b7a139a-0787-44c8-b47f-b218def96d07",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "H:/IM-platform/.git/worktrees/IM-platform4/send-fix-research/cleanup.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:49:40.908274Z",
+      "finished_at": "2026-10-03T08:49:41.148112Z",
+      "duration_ms": 250.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-0b7a139a-0787-44c8-b47f-b218def96d07.stdout.txt.gz",
+        "recorder_raw_sha256": "fc29c1998e0a567fbc0f00ad105f157d0e8be5bda2a0b33fa5fb99c0dd08954b",
+        "exported_blob_sha256": "fc29c1998e0a567fbc0f00ad105f157d0e8be5bda2a0b33fa5fb99c0dd08954b",
+        "byte_exact_raw": true,
+        "bytes": 136
+      },
+      "stderr": {
+        "gzip": "outputs/C-0b7a139a-0787-44c8-b47f-b218def96d07.stderr.txt.gz",
+        "recorder_raw_sha256": "3975505a54748824ac2a6827d07c982403b6fe91e5d0b44b98aba296e54460fe",
+        "exported_blob_sha256": "3975505a54748824ac2a6827d07c982403b6fe91e5d0b44b98aba296e54460fe",
+        "byte_exact_raw": true,
+        "bytes": 321
+      }
+    },
+    {
+      "command_id": "C-606aa9d0-e576-412e-8ec3-1d7299e51852",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "H:/IM-platform/.git/worktrees/IM-platform4/send-fix-research/cleanup.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:50:20.247510Z",
+      "finished_at": "2026-10-03T08:50:20.808733Z",
+      "duration_ms": 563.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-606aa9d0-e576-412e-8ec3-1d7299e51852.stdout.txt.gz",
+        "recorder_raw_sha256": "767db9d286f627a921d333f96858d502a8b841ec5bb463fed6e81d2f9d4aa6a1",
+        "exported_blob_sha256": "767db9d286f627a921d333f96858d502a8b841ec5bb463fed6e81d2f9d4aa6a1",
+        "byte_exact_raw": true,
+        "bytes": 375
+      },
+      "stderr": {
+        "gzip": "outputs/C-606aa9d0-e576-412e-8ec3-1d7299e51852.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-83cd0783-fd4b-4167-8194-4844b666c169",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:50:23.028882Z",
+      "finished_at": "2026-10-03T08:50:23.928218Z",
+      "duration_ms": 875.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-83cd0783-fd4b-4167-8194-4844b666c169.stdout.txt.gz",
+        "recorder_raw_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f",
+        "exported_blob_sha256": "66cfaab538a082c57e01fcb2b5c699fab3f43d2ab752f9df7c0f15c0b3b7940b",
+        "byte_exact_raw": false,
+        "bytes": 89454
+      },
+      "stderr": {
+        "gzip": "outputs/C-83cd0783-fd4b-4167-8194-4844b666c169.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-6dab4869-f9b0-4417-956b-88b6600e420b",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:50:25.879233Z",
+      "finished_at": "2026-10-03T08:50:25.967304Z",
+      "duration_ms": 78.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-6dab4869-f9b0-4417-956b-88b6600e420b.stdout.txt.gz",
+        "recorder_raw_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+        "exported_blob_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+        "byte_exact_raw": true,
+        "bytes": 163
+      },
+      "stderr": {
+        "gzip": "outputs/C-6dab4869-f9b0-4417-956b-88b6600e420b.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-f405de46-d27d-41de-b948-ec1f1fc194b6",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture",
+        "-v"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:50:27.890641Z",
+      "finished_at": "2026-10-03T08:50:34.878736Z",
+      "duration_ms": 6984.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-f405de46-d27d-41de-b948-ec1f1fc194b6.stdout.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      },
+      "stderr": {
+        "gzip": "outputs/C-f405de46-d27d-41de-b948-ec1f1fc194b6.stderr.txt.gz",
+        "recorder_raw_sha256": "b0526789ca208464a5ea54b73abbc95397625e149fffbf424bb49436b2efa177",
+        "exported_blob_sha256": "b0526789ca208464a5ea54b73abbc95397625e149fffbf424bb49436b2efa177",
+        "byte_exact_raw": true,
+        "bytes": 8380
+      }
+    },
+    {
+      "command_id": "C-fb021e88-eb30-4807-921b-e874479bddbf",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:50:36.826742Z",
+      "finished_at": "2026-10-03T08:50:40.088285Z",
+      "duration_ms": 3266.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-fb021e88-eb30-4807-921b-e874479bddbf.stdout.txt.gz",
+        "recorder_raw_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52",
+        "exported_blob_sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52",
+        "byte_exact_raw": true,
+        "bytes": 389
+      },
+      "stderr": {
+        "gzip": "outputs/C-fb021e88-eb30-4807-921b-e874479bddbf.stderr.txt.gz",
+        "recorder_raw_sha256": "aedcc9cf99f89bebd399a6c2194b9a25c20af5f7a738fb65b10b5dd867addbc6",
+        "exported_blob_sha256": "aedcc9cf99f89bebd399a6c2194b9a25c20af5f7a738fb65b10b5dd867addbc6",
+        "byte_exact_raw": true,
+        "bytes": 6629
+      }
+    },
+    {
+      "command_id": "C-0b1fd1e6-853c-4eed-b6a7-8dd730f609ba",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:50:42.345382Z",
+      "finished_at": "2026-10-03T08:50:49.606375Z",
+      "duration_ms": 7250.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-0b1fd1e6-853c-4eed-b6a7-8dd730f609ba.stdout.txt.gz",
+        "recorder_raw_sha256": "eb19af325ec2cc055d288e0386e461db5af98c654b3f0d68bb147734ffbb613f",
+        "exported_blob_sha256": "eb19af325ec2cc055d288e0386e461db5af98c654b3f0d68bb147734ffbb613f",
+        "byte_exact_raw": true,
+        "bytes": 485
+      },
+      "stderr": {
+        "gzip": "outputs/C-0b1fd1e6-853c-4eed-b6a7-8dd730f609ba.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-789e9dcc-a695-4667-9359-8244098042e6",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:51:43.979100Z",
+      "finished_at": "2026-10-03T08:51:51.118005Z",
+      "duration_ms": 7140.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "stdout": {
+        "gzip": "outputs/C-789e9dcc-a695-4667-9359-8244098042e6.stdout.txt.gz",
+        "recorder_raw_sha256": "3633a6614060aaa8889cee4965e23a5d5a7b4881ec55f56ce5c7b8ef628e6f37",
+        "exported_blob_sha256": "3633a6614060aaa8889cee4965e23a5d5a7b4881ec55f56ce5c7b8ef628e6f37",
+        "byte_exact_raw": true,
+        "bytes": 542
+      },
+      "stderr": {
+        "gzip": "outputs/C-789e9dcc-a695-4667-9359-8244098042e6.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-ac13c60e-8eff-44af-98ae-2015a406bc94",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "H:/IM-platform/.git/worktrees/IM-platform4/send-fix-research/export.py"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:53:12.976857Z",
+      "finished_at": "2026-10-03T08:53:13.076183Z",
+      "duration_ms": 93.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-ac13c60e-8eff-44af-98ae-2015a406bc94.stdout.txt.gz",
+        "recorder_raw_sha256": "a6b28047a867171a0324173fbc92e2adb397e85bb74df1d65c02e4831fc66ecc",
+        "exported_blob_sha256": "a6b28047a867171a0324173fbc92e2adb397e85bb74df1d65c02e4831fc66ecc",
+        "byte_exact_raw": true,
+        "bytes": 78
+      },
+      "stderr": {
+        "gzip": "outputs/C-ac13c60e-8eff-44af-98ae-2015a406bc94.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-02920cc1-c38b-4702-806b-445920eac53e",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:53:15.645927Z",
+      "finished_at": "2026-10-03T08:53:23.632748Z",
+      "duration_ms": 7984.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-02920cc1-c38b-4702-806b-445920eac53e.stdout.txt.gz",
+        "recorder_raw_sha256": "0c28518a1e45e468f177cd53392888156ad568f1e4e52bf2dc1cfd48ebeb4317",
+        "exported_blob_sha256": "0c28518a1e45e468f177cd53392888156ad568f1e4e52bf2dc1cfd48ebeb4317",
+        "byte_exact_raw": true,
+        "bytes": 330
+      },
+      "stderr": {
+        "gzip": "outputs/C-02920cc1-c38b-4702-806b-445920eac53e.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    },
+    {
+      "command_id": "C-f4612a7a-c11c-45b3-8539-bcf856ed990d",
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "10b77b22386234c98409ca41b3622ad6d25f3884"
+      ],
+      "cwd": ".",
+      "started_at": "2026-10-03T08:53:25.592562Z",
+      "finished_at": "2026-10-03T08:53:25.672508Z",
+      "duration_ms": 78.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "stdout": {
+        "gzip": "outputs/C-f4612a7a-c11c-45b3-8539-bcf856ed990d.stdout.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      },
+      "stderr": {
+        "gzip": "outputs/C-f4612a7a-c11c-45b3-8539-bcf856ed990d.stderr.txt.gz",
+        "recorder_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exported_blob_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_exact_raw": true,
+        "bytes": 0
+      }
+    }
+  ]
+}

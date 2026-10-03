@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-SEND-001
 title: Desktop/Mobile optimistic send orchestration
 status: review
-owner: fresh Implementation Agent
+owner: fresh Fix Agent (new independent Review pending)
 stage: S2
 gate: S2
 ---
@@ -115,3 +115,17 @@ Evidence: spec/progress/evidence/LOOP1-CLIENT-SEND-001/implementation/verificati
 Next exact action: Coordinator delegates fresh independent Review of actual clean committed candidate and full10b77b2..HEAD scope (root-owned activation/UIARCH metadata separately identified). On FAIL fresh Fix then new Review. On PASS actual exact-head hosted required CI/SEND/Go E2E, protected integration/actual-main independent verification and protected synchronization back to H:/IM-platform; only then done. Stop at accepted SEND endpoint; SYNC/GUI/WEB remain backlog. Main unknown781bytes/old private3metadata backups untouched. Final candidate SHA supplied by implementation handoff and immutable Recorder final_state; no self-review acceptance.
 
 Committed implementation/product evidence SHA: `4d6e800ac32b328faacbe18d2e867e732efa0097`. Subsequent handoff-only commit records this identity; review final branch HEAD and full accepted-main diff. Sync result PENDING; main SHA remains10b77b22386234c98409ca41b3622ad6d25f3884.
+
+# Independent Review FAIL and fresh Fix handoff (2026-10-03)
+
+The original clean1822e29682eccafd75ee293c31a2d35e29746eb6 independent Review is FAIL, despite original hosted37109255423/37109294362 success. Its two P2 findings are Mobile dispose failing before retirement/observer clearing on closed storage, and rejected ACK incorrectly failing all same-RID different-Conversation attempts. Original report/Recorder/CI bytes are immutable, gzip archived and hash-manifested in spec/progress/evidence/LOOP1-CLIENT-SEND-001/fix-20261003/prior-candidate/. LF readability copy is explicitly separate from original raw bytes. Old CI does not accept the new candidate.
+
+Fresh Fix Agent /root/send_fix is sole writer in verified assigned root H:/.codex/worktrees/client-mvp-planning/IM-platform and branch task/LOOP1-CLIENT-SEND-001. Fix base1822; accepted main10b77b22386234c98409ca41b3622ad6d25f3884 remains last known good. Queue/status remains unique review; main synchronization PENDING. No push, PR change, merge, main write or done transition by this fixer; Coordinator handles the remaining acceptance cycle.
+
+Minimal product changes: Mobile retirement and empty account observation precede fallible storage work; direct finally closes owned Repository and cancels scope/timers even when disconnect/refresh throws; generic storage error remains observable. Desktop/Mobile reject only a sole attributable current-connection send. A tiny per-connection RID-to-soleCID/null fact retains ambiguity after one CID settles, because an actual SQLx delayed-reject RED proved pending-count alone can fail the other CID. It resets on disconnect/new generation/retirement; no scheduler, global uniqueness rule, wire field, persistence or future mechanism. Only two product files and two existing test files change, plus task-owned evidence/recovery metadata. Repository/native/schema/backend/contracts/frozen/dependencies/CI remain unchanged by this fix.
+
+Actual pre-fix RED: Desktop SQLx ambiguous reject FAILED vs expected SENDING; API34 closed-storage dispose leaves old messages (assertion37); API34 same-RID two-CID reject FAILED vs expected SENDING (assertion27). Intermediate pending-only fix's delayed reject also RED in actual SQLx after one CID committed. Final local SEND Desktop/shared PASS and API34 PASS66 prove ambiguity survives settlement, each timer survives, one CID can commit while the other times out then converges via late ACK, and closed-storage retirement clears observers/stops socket/retired=true/scope inactive with and without a live pending timer. Original SQLx SQLite13/141 plus native atomic/read-only regression and API34 SQLite13/137 install/data-clear PASS. Exact commands and remaining guard/recovery results are in fix-20261003/verification.md and commands.json.
+
+Recorder R-SEND-FIX-20261003, prompt P-SEND-FIX-20261003, metadata H:/IM-platform/.git/worktrees/IM-platform4/send-fix-research. prospective_resume labels initial read-only startup incomplete; launcher preparation failures and rejected unsupported semantic event type are exposed, not presented as behavioral RED or complete trace. Final immutable finish/validate follows clean commit, outside candidate to avoid self-referential archive; Coordinator archives it for closure.
+
+Next exact action: NEW fresh independent Reviewer inspects exact clean final branch HEAD and full10b77b2..HEAD, especially resource cleanup and socket-lifetime ambiguity ownership, actual SQLx/API34 regressions and authority/minimality; then Coordinator obtains NEW exact-head hosted required jobs, protected integration/actual-main verification and verified H:/IM-platform synchronization. Only accepted endpoint may become done. SYNC/GUI/WEB remain backlog and unstarted. Main unknown781bytes/three prior private backups untouched. Final source/evidence commit and clean handoff identity are recorded separately after commit.

@@ -37,6 +37,9 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
     private data class Attempt(val message:LocalMessage,val generation:Long,var sent:Boolean=false,var timer:Job?=null)
     private val attempts=mutableMapOf<String,Attempt>()
     private val known=mutableSetOf<String>()
+    // null means this RID has identified multiple Conversations on this socket;
+    // retain that fact after ACK/timeout until the connection is retired.
+    private val requestConversations=mutableMapOf<String,String?>()
     init { require(Wire.uuid(session.userId)==session.userId && Wire.uuid(session.sessionId)==session.sessionId && session.sessionEpoch.signum()>0 && session.accessToken.isNotEmpty() && timeoutMs>0) }
     private fun key(c:String,r:String)="$c/$r"
     private fun publish(value:SendState) { if(!retired) mutableState.value=value }
@@ -52,14 +55,23 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
             {raw -> callback { if(g==generation && !retired) receive(raw,g) }},{callback { if(g==generation && !retired) disconnectNow() }})
     }
     private fun disconnectNow() {
-        generation++; bound=false; val old=socket; socket=null; old?.close()
+        generation++; bound=false; requestConversations.clear(); val old=socket; socket=null; old?.close()
         publish(mutableState.value.copy(connection="offline"))
         val pending=attempts.values.toList(); attempts.clear(); pending.forEach { it.timer?.cancel(); repo.markFailed(it.message.conversationId,it.message.requestId) }; refresh()
     }
     suspend fun disconnect() = operation { disconnectNow() }
-    suspend fun dispose() = operation { disconnectNow(); retired=true; mutableState.value=SendState(); if(ownsRepository) repo.close(); scope.cancel() }
+    suspend fun dispose() = lock.withLock {
+        retired=true; mutableState.value=SendState(error=mutableState.value.error)
+        try {
+            try { disconnectNow() } finally { if(ownsRepository) repo.close() }
+        } catch(_:Exception) {
+            mutableState.value=SendState(error="storage"); throw IllegalStateException("Send storage operation failed")
+        } finally {
+            attempts.values.forEach { it.timer?.cancel() }; attempts.clear(); scope.cancel()
+        }
+    }
     override fun onCleared() {
-        socket?.close(); retired=true; mutableState.value=SendState()
+        socket?.close(); retired=true; requestConversations.clear(); mutableState.value=SendState()
         scope.launch { try { lock.withLock { if(ownsRepository) repo.close() } } finally { scope.cancel() } }
     }
     suspend fun send(c:String,text:String):String {
@@ -76,6 +88,8 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
         if(!bound || socket==null) { fail(k,a); return }
         try { socket!!.send(Wire.envelope("message.send",m.requestId,JSONObject().put("conversationId",m.conversationId).put("content",JSONObject().put("kind","TEXT").put("text",m.text)))); a.sent=true }
         catch(_:Exception) { fail(k,a); return }
+        val priorConversation=requestConversations[m.requestId]
+        requestConversations[m.requestId]=if(!requestConversations.containsKey(m.requestId) || priorConversation==m.conversationId) m.conversationId else null
         a.timer=scope.launch { delay(timeoutMs); try { operation { fail(k,a) } } catch(_:Exception) { /* Storage error is already observable; never crash the application timer. */ } }
     }
     private fun fail(k:String,a:Attempt) { if(attempts[k]!==a) return; attempts.remove(k); repo.markFailed(a.message.conversationId,a.message.requestId); refresh() }
@@ -96,7 +110,11 @@ class SendViewModel(private val repo:Repository, private val session:SendSession
             repo.syncMessages(listOf(m)); clear(m.conversationId,m.requestId!!); refresh(); return
         }
         if(f.type=="message.ack") {
-            if(p["status"]=="rejected") { attempts.toMap().forEach { (k,a) -> if(a.message.requestId==f.requestId && a.sent && a.generation==g) fail(k,a) } }
+            if(p["status"]=="rejected") {
+                // No Conversation is present: leave ambiguous attempts to their own ACK/timer.
+                val matches=attempts.filter { (_,a) -> a.message.requestId==f.requestId && a.sent && a.generation==g }
+                if(matches.size==1) { val (k,a)=matches.entries.single(); if(requestConversations[f.requestId]==a.message.conversationId) fail(k,a) }
+            }
             else { val c=p["conversationId"] as String; if(key(c,f.requestId) !in known) return
                 repo.committedAck(f.requestId,Committed(c,p["messageId"] as String,(p["seq"] as BigInteger).longValueExact(),p["createdAt"] as String)); clear(c,f.requestId); refresh() }
         }

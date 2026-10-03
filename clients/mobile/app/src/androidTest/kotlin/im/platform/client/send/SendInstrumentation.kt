@@ -4,6 +4,7 @@ import android.app.Instrumentation
 import android.os.Bundle
 import im.platform.client.storage.Repository
 import im.platform.client.storage.ServerMessage
+import im.platform.client.storage.LocalMessage
 import kotlinx.coroutines.*
 import java.math.BigInteger
 import java.util.UUID
@@ -21,7 +22,7 @@ class SendInstrumentation: Instrumentation() {
     private val user="10000000-0000-4000-8000-000000000001"
     private val session="20000000-0000-4000-8000-000000000001"
     private val conversation="30000000-0000-4000-8000-000000000001"
-    private fun equal(actual:Any?,expected:Any?) {check(actual==expected) { "Assertion $assertions failed" };assertions++}
+    private fun equal(actual:Any?,expected:Any?) {check(actual==expected) { "Assertion $assertions failed: actual=$actual expected=$expected" };assertions++}
     private suspend fun until(test:()->Boolean) { repeat(500) {if(test())return;delay(10)};error("Condition timed out") }
     private fun credentials()=SendSession(user,session,BigInteger.ONE,"fixture-mobile")
     private fun fakeFrame(type:String,id:String,p:JSONObject)=Wire.envelope(type,id,p)
@@ -29,7 +30,8 @@ class SendInstrumentation: Instrumentation() {
         var open:(()->Unit)?=null;var message:((String)->Unit)?=null;var end:(()->Unit)?=null
         val frames=mutableListOf<JSONObject>()
         override fun send(text:String){frames.add(JSONObject(text))}
-        override fun close(){}
+        var closed=false
+        override fun close(){closed=true}
         fun bound(user:String,session:String){val auth=frames.last();message!!(Wire.envelope("auth.ack",auth.getString("requestId"),JSONObject().put("status","bound").put("userId",user).put("sessionId",session).put("clientType","MOBILE").put("sessionEpoch",1)))}
     }
     private fun committed(c:String,id:String,seq:Long=9007199254740993L)=JSONObject().put("status","committed").put("conversationId",c).put("messageId",id).put("seq",seq).put("createdAt","2026-10-03T00:00:00Z")
@@ -80,12 +82,52 @@ class SendInstrumentation: Instrumentation() {
         val bad=vm.send(conversation,"persist failure");repo.close();socket.message!!(fakeFrame("message.ack",bad,committed(conversation,UUID.randomUUID().toString(),12)));until {vm.state.value.error=="storage"};equal(vm.state.value.messages.first {it[0]==bad}[3],"SENDING")
         delay(180);equal(vm.state.value.error,"storage");equal(vm.state.value.messages.first {it[0]==bad}[3],"SENDING")
         val count=socket.frames.size;try {vm.send(conversation,"before commit");error("Expected storage error")} catch(_:IllegalStateException){};equal(socket.frames.size,count)
-        // Closed Repository deliberately remains a failed storage fixture; retire
-        // via lifecycle to avoid attempting another transaction on closed DB.
-        val clear=SendViewModel::class.java.getDeclaredMethod("onCleared");clear.isAccessible=true;clear.invoke(vm);equal(vm.state.value.messages.size,0)
+        // Account retirement must finish even though querying closed SQLite fails.
+        var disposeFailed=false;try {vm.dispose()} catch(_:IllegalStateException) {disposeFailed=true}
+        equal(disposeFailed,true);equal(vm.state.value.messages.size,0);equal(vm.state.value.connection,"offline");equal(vm.state.value.error,"storage");equal(socket.closed,true)
+        val beforeRetired=socket.frames.size;oldMessage(fakeFrame("message.ack",bad,committed(conversation,UUID.randomUUID().toString(),12)));delay(150)
+        equal(vm.state.value.messages.size,0);equal(socket.frames.size,beforeRetired)
+        var retiredSendFailed=false;try {vm.send(conversation,"retired account")} catch(_:IllegalStateException) {retiredSendFailed=true};equal(retiredSendFailed,true)
+        val retired=SendViewModel::class.java.getDeclaredField("retired");retired.isAccessible=true;equal(retired.getBoolean(vm),true)
+        val ownedScope=SendViewModel::class.java.getDeclaredField("scope");ownedScope.isAccessible=true;equal((ownedScope.get(vm) as CoroutineScope).coroutineContext[Job]!!.isActive,false)
         Repository(targetContext,account).use {it.initialize();equal(it.messages(conversation).count {row->row[0]==request},1);equal(it.messages(conversation).first {row->row[0]==bad}[3],"SENDING")}
         Repository(targetContext,other).use {it.initialize();equal(it.messages(conversation).size,0)}
         targetContext.deleteDatabase("im-$account.sqlite");targetContext.deleteDatabase("im-$other.sqlite")
+    }
+    private suspend fun pendingRetirement() {
+        phase="closed-storage pending retirement"
+        val account=UUID.randomUUID().toString();val repo=Repository(targetContext,account);repo.initialize();lateinit var socket:Fake
+        val vm=SendViewModel(repo,credentials().copy(userId=account),{_,open,message,end->Fake().also {it.open=open;it.message=message;it.end=end;socket=it}},5000,ownsRepository=true)
+        vm.openConversation(conversation);vm.connect("wss://localhost/");socket.open!!();until {socket.frames.isNotEmpty()};socket.bound(account,session);until {vm.state.value.connection=="ready"}
+        vm.send(conversation,"pending retirement");equal(vm.state.value.messages.single()[3],"SENDING");repo.close()
+        var failed=false;try {vm.dispose()} catch(_:IllegalStateException) {failed=true};equal(failed,true);equal(vm.state.value.messages.size,0);equal(vm.state.value.error,"storage");equal(socket.closed,true)
+        val retired=SendViewModel::class.java.getDeclaredField("retired");retired.isAccessible=true;equal(retired.getBoolean(vm),true)
+        val ownedScope=SendViewModel::class.java.getDeclaredField("scope");ownedScope.isAccessible=true;equal((ownedScope.get(vm) as CoroutineScope).coroutineContext[Job]!!.isActive,false)
+        targetContext.deleteDatabase("im-$account.sqlite")
+    }
+    private suspend fun independentRejections() {
+        phase="same-RID independent Conversations"
+        val account=UUID.randomUUID().toString();val c1=UUID.randomUUID().toString();val c2=UUID.randomUUID().toString();val request=UUID.randomUUID().toString()
+        val repo=Repository(targetContext,account);repo.initialize()
+        for(c in listOf(c1,c2)) {repo.localSend(LocalMessage(c,request,account,c));repo.markFailed(c,request)}
+        lateinit var socket:Fake
+        val vm=SendViewModel(repo,credentials().copy(userId=account),{_,open,message,end->Fake().also {it.open=open;it.message=message;it.end=end;socket=it}},600)
+        vm.openConversation(c1);vm.connect("wss://localhost/");socket.open!!();until {socket.frames.isNotEmpty()};socket.bound(account,session);until {vm.state.value.connection=="ready"}
+        vm.retry(c1,request);vm.retry(c2,request)
+        socket.message!!(fakeFrame("message.ack",request,JSONObject().put("status","rejected").put("error",JSONObject().put("code","AUTHORIZATION_DENIED").put("message","Denied"))))
+        delay(100);equal(repo.messages(c1).single()[3],"SENDING");equal(repo.messages(c2).single()[3],"SENDING")
+        socket.message!!(fakeFrame("message.ack",request,committed(c1,UUID.randomUUID().toString(),1)));until {vm.state.value.messages.single()[3]=="SENT"}
+        socket.message!!(fakeFrame("message.ack",request,JSONObject().put("status","rejected").put("error",JSONObject().put("code","AUTHORIZATION_DENIED").put("message","Denied"))))
+        delay(100);equal(repo.messages(c2).single()[3],"SENDING")
+        delay(700);equal(repo.messages(c1).single()[3],"SENT");equal(repo.messages(c2).single()[3],"FAILED")
+        socket.message!!(fakeFrame("message.ack",request,committed(c2,UUID.randomUUID().toString(),1)));vm.openConversation(c2);until {vm.state.value.messages.single()[3]=="SENT"};equal(repo.messages(c2).single()[3],"SENT")
+        // Both timers must also survive when neither Conversation is confirmed.
+        val timed=UUID.randomUUID().toString()
+        for(c in listOf(c1,c2)) {repo.localSend(LocalMessage(c,timed,account,c));repo.markFailed(c,timed);vm.retry(c,timed)}
+        socket.message!!(fakeFrame("message.ack",timed,JSONObject().put("status","rejected").put("error",JSONObject().put("code","AUTHORIZATION_DENIED").put("message","Denied"))))
+        delay(100);equal(repo.messages(c1).first {it[0]==timed}[3],"SENDING");equal(repo.messages(c2).first {it[0]==timed}[3],"SENDING")
+        delay(700);equal(repo.messages(c1).first {it[0]==timed}[3],"FAILED");equal(repo.messages(c2).first {it[0]==timed}[3],"FAILED")
+        vm.dispose();repo.close();targetContext.deleteDatabase("im-$account.sqlite")
     }
     private fun wire() {
         val request=UUID.randomUUID().toString();val message=UUID.randomUUID().toString();val base=fakeFrame("message.ack",request,committed(conversation,message))
@@ -100,7 +142,7 @@ class SendInstrumentation: Instrumentation() {
     override fun onCreate(arguments:Bundle?) {super.onCreate(arguments);args=arguments ?: Bundle();start()}
     override fun onStart() {
         val result=Bundle()
-        try {runBlocking {wire();actualTls();racesAndStorage()};result.putString("result","PASS");result.putInt("assertions",assertions);result.putInt("sdkInt",android.os.Build.VERSION.SDK_INT);result.putString("engine","actual Android SDK SQLite + standard verified TLS WSS + StateFlow");finish(Activity.RESULT_OK,result)}
+        try {runBlocking {wire();actualTls();independentRejections();racesAndStorage();pendingRetirement()};result.putString("result","PASS");result.putInt("assertions",assertions);result.putInt("sdkInt",android.os.Build.VERSION.SDK_INT);result.putString("engine","actual Android SDK SQLite + standard verified TLS WSS + StateFlow");finish(Activity.RESULT_OK,result)}
         catch(error:Throwable) {result.putString("phase",phase);result.putString("failure",error.javaClass.simpleName+": "+error.message);result.putString("result","FAIL");result.putInt("assertions",assertions);finish(Activity.RESULT_CANCELED,result)}
     }
 }
