@@ -1,0 +1,7 @@
+# Clean committed local fix verification
+
+Exact product/fix candidate78ee723a4130d237d824b7d9c313dd77297fcbe8, detached clean H:/isf-sqlite (fresh absence proven; gitworktree), no copied caches/mocks. All actual commands/raw output/SHA/elapsed in clean-check-ledger.json plus .gz outputs. Evidence-only final commit follows; no source changes after this candidate. These are Fix actor local evidence, never independent acceptance.
+
+Recovery Acceptance23specs/status0/diff0 PASS16.422s; all-source guard zero violations PASS0.719s; frozen/hash/53controls PASS10.969s; architecture53PASS12.062s; CI31PASS5.594s with4 explicit Windows symlink privilege skips (actual Linux hosted must run them). WSS8positive10negative18schema26mutationsPASS0.156s; SyncPlugin79artifacts/16mutationsPASS0.156s. diffcheck0 and cleanstatus0 each0.094s. Canonical/PDF hashes unchanged. No Task done/StageGatePASS claim.
+
+Actual Desktop13cases106assertions/unit1 and stable minimumAPI34 AndroidSQLite3.39.2 first install and pm-clear each13cases105assertions are in fix-report.md and new Recorder command logs. Official Gradle wrapper Linux hosted remains required. OwnedAPI34 emulator18428/5584 stopped after positive command-line proof; retained external AVD. Prior first-runAPI37 FAIL is not rewritten. Next fresh independent Review and exactHEAD actualCI, then authorized currentSQLite PR/merge/safe originalsync/progress/STOP per Human.

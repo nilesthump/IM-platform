@@ -1,0 +1,129 @@
+[
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 10.125,
+    "stdout_path": "integer-clean-check-0.stdout",
+    "stderr_path": "integer-clean-check-0.stderr"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 0.422,
+    "stdout_path": "integer-clean-check-1.stdout",
+    "stderr_path": "integer-clean-check-1.stderr"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-File",
+      "tools/verify-frozen-architecture.ps1"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 6.062,
+    "stdout_path": "integer-clean-check-2.stdout",
+    "stderr_path": "integer-clean-check-2.stderr"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-v"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 5.938,
+    "stdout_path": "integer-clean-check-3.stdout",
+    "stderr_path": "integer-clean-check-3.stderr"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/ci",
+      "-v"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 3.062,
+    "stdout_path": "integer-clean-check-4.stdout",
+    "stderr_path": "integer-clean-check-4.stderr"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "contracts/websocket/verify.py"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 0.078,
+    "stdout_path": "integer-clean-check-5.stdout",
+    "stderr_path": "integer-clean-check-5.stderr"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "contracts/plugin-api/verify.py"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 0.063,
+    "stdout_path": "integer-clean-check-6.stdout",
+    "stderr_path": "integer-clean-check-6.stderr"
+  },
+  {
+    "argv": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--check"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 0.047,
+    "stdout_path": "integer-clean-check-7.stdout",
+    "stderr_path": "integer-clean-check-7.stderr"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1"
+    ],
+    "cwd": "H:\\if2i-sqlite",
+    "exit_code": 0,
+    "elapsed_seconds": 0.062,
+    "stdout_path": "integer-clean-check-8.stdout",
+    "stderr_path": "integer-clean-check-8.stderr"
+  }
+]

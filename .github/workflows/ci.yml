@@ -193,8 +193,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Desktop S0 skeleton boundary
-        run: python3 ci/check_s0_boundary.py desktop
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Native Tauri prerequisites and approved Rust compiler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Actual TypeScript Repository on SQLx SQLite
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/client-sqlite-target
+        run: python3 -B tools/verify_client_sqlite.py --scope desktop
 
   mobile:
     needs: classify
@@ -202,8 +215,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Mobile S0 skeleton boundary
-        run: python3 ci/check_s0_boundary.py mobile
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Enable hosted Linux KVM permissions
+        run: |
+          id
+          if [[ ! -c /dev/kvm ]]; then
+            printf '%s\n' 'ERROR: /dev/kvm is missing or is not a character device.' >&2
+            exit 1
+          fi
+          stat --format='KVM before: %F %a %U:%G' /dev/kvm
+          printf '%s\n' 'Granting disposable runner user read/write access to the existing KVM device.'
+          sudo chown "$(id -u):$(id -g)" /dev/kvm
+          sudo chmod 0600 /dev/kvm
+          stat --format='KVM after: %F %a %U:%G' /dev/kvm
+          if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+            printf '%s\n' 'ERROR: current runner user cannot read and write /dev/kvm.' >&2
+            exit 1
+          fi
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          disable-linux-hw-accel: false
+          pre-emulator-launch-script: '$ANDROID_HOME/emulator/emulator -accel-check'
+          script: python3 -B tools/verify_client_sqlite.py --scope mobile --serial emulator-5554
 
   shared:
     needs: classify
@@ -213,6 +258,13 @@ jobs:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Actual shared TypeScript storage compile
+        run: python3 -B tools/verify_client_sqlite.py --scope shared
       - name: HTTP, WSS, Sync and Plugin contracts
         shell: pwsh
         run: |
@@ -259,11 +311,10 @@ jobs:
           python3 contracts/websocket/verify.py
           python3 contracts/plugin-api/verify.py
           python3 -m unittest discover -s tests/database -v
-      - name: Future client and plugin fixture boundary
+      - name: Current client source and remaining Web skeleton boundary
         run: |
           python3 ci/check_s0_boundary.py web
-          python3 ci/check_s0_boundary.py desktop
-          python3 ci/check_s0_boundary.py mobile
+          python3 ci/check_architecture.py --scope clients --json
 
   deploy:
     needs: classify

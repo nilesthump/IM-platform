@@ -1,0 +1,3 @@
+# Historical subprocess and persisted blob hashes
+
+Original command-history and Recorder hashes remain byte-for-byte unchanged. They describe raw captured subprocess bytes. Recorder persists UTF8 replacement/redacted text; gzip archives preserve those persisted blob bytes exactly. This independent SHA256 manifest describes the decompressed persisted blobs, not a replacement for the historical hashes. All22 original gzip blobs match the original persisted blobs. C-790638b6-f9e9-42ae-81e6-5273a8292b19.stderr and C-f29009bd-da24-409d-b2d5-a13e63b1a61a.stdout differ from raw capture hashes, as documented by the retained independent FAIL/audit. Nothing was rewritten to imply agreement.

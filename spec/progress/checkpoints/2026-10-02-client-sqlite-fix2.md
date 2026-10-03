@@ -1,0 +1,5 @@
+# SQLite fresh Fix2 checkpoint
+
+Task LOOP1-CLIENT-SQLITE-001 review; independent Review2 Cursor FAIL and actual hosted36905605691 Mobile/Gate FAIL retained. Small codepoint guard correction and SDKsetup explicit platform-tools, no contract/schema/native authority change. ActualSQLx13/118/unit1PASS, actual minimumAndroid34 SQLite3.39.2 firstinstall+clear each13/116PASS. Acceptedmaina287 lastgood; final candidateSHA follows gitHEAD/handoff, local only. Clean Recovery/authority/source/contracts checks recorded separately. NEW fresh Review3 and actual exactHEAD hosted all selected checks before Taskdone. S1PASS/S2OPEN; Coordinator authorizedPR/merge/safe original sync/progress thenSTOP before SEND/SYNC/WEB. Original744unknownfiles/historicalGStringFAIL/waiver protected. Evidence fix2/fix-report.md and checks.md.
+
+Additional independently confirmed current integer precision repair: TS exactbigint+decimal/precisecontiguous, bothSQLiteprefixmaxguard, equivalentLongtests. NewactualSQLx13/141/unit1PASS; minimumAndroid34 two rounds13/137PASS; contracts/nativeadapter unchanged. Separate clean source checks follow; earliera8/89cursor evidence bounded and immutable.
