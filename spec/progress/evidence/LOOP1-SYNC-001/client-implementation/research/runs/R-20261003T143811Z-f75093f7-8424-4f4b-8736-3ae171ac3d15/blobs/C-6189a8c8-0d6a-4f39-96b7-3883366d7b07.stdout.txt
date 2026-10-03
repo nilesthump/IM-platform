@@ -1,0 +1,183 @@
+package im.platform.client.sync
+import im.platform.client.send.SendSession
+import java.net.URI
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
+import java.util.UUID
+import java.util.concurrent.atomic.AtomicReference
+import kotlinx.coroutines.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+
+class SyncHttps(endpoint:String,private val session:SendSession,
+    private val connection:(URL)->HttpsURLConnection={it.openConnection() as HttpsURLConnection},
+    private val id:()->String={UUID.randomUUID().toString()}) {
+    private val base:String
+    fun matchesSession(check:(SendSession)->Boolean)=check(session)
+    init {
+        val uri=try {URI(endpoint)} catch(_:Exception){throw SyncFailure("protocol")}
+        if(uri.scheme!="https" || uri.host==null || uri.rawUserInfo!=null || uri.rawQuery!=null || uri.rawFragment!=null || uri.rawPath !in listOf("","/") || session.accessToken.isEmpty() || session.accessToken.any {it=='\r' || it=='\n'}) throw SyncFailure("protocol")
+        base=URI("https",null,uri.host,uri.port,null,null,null).toString()
+    }
+    private suspend fun post(path:String,body:String,id:String):String=suspendCancellableCoroutine {continuation->
+        val current=AtomicReference<HttpsURLConnection?>()
+        val job=CoroutineScope(continuation.context).launch(Dispatchers.IO) {
+            try {
+                val c=connection(URL(base+path));current.set(c)
+                if(!continuation.isActive) return@launch
+                c.instanceFollowRedirects=false;c.requestMethod="POST";c.connectTimeout=15000;c.readTimeout=15000;c.useCaches=false;c.doOutput=true
+                c.setRequestProperty("Authorization","Bearer "+session.accessToken);c.setRequestProperty("Content-Type","application/json")
+                val bytes=body.toByteArray(Charsets.UTF_8);c.setFixedLengthStreamingMode(bytes.size);c.outputStream.use {it.write(bytes)}
+                val status=c.responseCode
+                if(c.getHeaderField("Cache-Control")!="no-store" || c.contentType?.matches(Regex("(?i)application/json(?:\\s*;.*)?"))!=true) throw SyncFailure(if(status>=500)"transport" else "protocol")
+                val stream=(if(status==200)c.inputStream else c.errorStream) ?: throw SyncFailure("transport")
+                val out=java.io.ByteArrayOutputStream()
+                stream.use {val buffer=ByteArray(8192);while(true){val count=it.read(buffer);if(count<0)break;if(out.size()+count>MAX_RESPONSE)throw SyncFailure("protocol");out.write(buffer,0,count)}}
+                val raw=Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(out.toByteArray())).toString()
+                if(status!=200) throw if(status in setOf(400,401,403,426))Wire.error(raw,id,status,path.endsWith("conversation")) else SyncFailure("transport")
+                if(continuation.isActive)continuation.resume(raw)
+            } catch(error:Exception) {if(continuation.isActive)continuation.resumeWithException(if(error is SyncFailure)error else SyncFailure("transport"))}
+            finally {current.getAndSet(null)?.disconnect()}
+        }
+        continuation.invokeOnCancellation {current.getAndSet(null)?.disconnect();job.cancel()}
+    }
+    suspend fun user(cursor:String):UserPage {val request=id();return Wire.user(post("/v1/sync/user",Wire.userRequest(request,cursor),request),request,cursor)}
+    suspend fun conversation(c:String,after:Long):ConversationPage {val request=id();return Wire.conversation(post("/v1/sync/conversation",Wire.conversationRequest(request,c,after),request),request,c,after)}
+}
+
+import {MAX_RESPONSE,SyncFailure,errorResponse,userRequest,conversationRequest,userPage,conversationPage} from "./wire.js";
+export interface SyncSession {userId:string;sessionId:string;sessionEpoch:bigint;accessToken[REDACTED]
+export class SyncHttp {
+  private readonly session:Readonly<SyncSession>;
+  matchesSession(check:(s:Readonly<SyncSession>)=>boolean):boolean{return check(this.session);}
+  private readonly base:string;private readonly token:string;
+  constructor(endpoint:string,session:SyncSession,private fetcher:typeof fetch=fetch,private id:()=>string=()=>crypto.randomUUID()) {
+    this.session=Object.freeze({...session});const accessToken[REDACTED];
+    let url:URL;try{url=new URL(endpoint);}catch{throw new SyncFailure("protocol");}
+    if(url.protocol!=="https:" || !url.hostname || url.username || url.password || url.search || url.hash || url.pathname!=="/" || !accessToken || /[\r\n]/.test(accessToken)) throw new SyncFailure("protocol");
+    this.base=url.origin;this.token=accessToken;
+  }
+  private async post(path:string,body:string,requestId:string,signal:AbortSignal):Promise<string> {
+    try {
+      const response=await this.fetcher(this.base+path,{method:"POST",headers:{"Authorization":"Bearer "+this.token,"Content-Type":"application/json"},body,signal,redirect:"error",credentials:"omit",cache:"no-store"});
+      if(response.redirected || response.headers.get("cache-control")!=="no-store" || !/^application\/json(?:\s*;|$)/i.test(response.headers.get("content-type")??"")) throw new SyncFailure(response.status>=500?"transport":"protocol");
+      const reader=response.body?.getReader();if(!reader) throw new SyncFailure("transport");
+      const decoder=new TextDecoder("utf-8",{fatal:true});let raw="",size=0;
+      try {for(;;){const item=await reader.read();if(item.done) break;size+=item.value.byteLength;if(size>MAX_RESPONSE) throw new SyncFailure("protocol");raw+=decoder.decode(item.value,{stream:true});}raw+=decoder.decode();}
+      finally {await reader.cancel().catch(()=>{});}
+      if(response.status!==200) {if([400,401,403,426].includes(response.status)) throw errorResponse(raw,requestId,response.status,path.endsWith("conversation"));throw new SyncFailure("transport");}
+      return raw;
+    } catch(error) {if(error instanceof SyncFailure) throw error;throw new SyncFailure("transport");}
+  }
+  async user(inputCursor:string,signal:AbortSignal) {const requestId=this.id();return userPage(await this.post("/v1/sync/user",userRequest(requestId,inputCursor),requestId,signal),requestId,inputCursor);}
+  async conversation(c:string,afterSeq:bigint,signal:AbortSignal) {const requestId=this.id();return conversationPage(await this.post("/v1/sync/conversation",conversationRequest(requestId,c,afterSeq),requestId,signal),requestId,c,afterSeq);}
+}
+
+      ./contracts/http/verify-auth-user-friend.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 -B tools/verify_sync_transport.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 -B -m unittest discover -s tests/contract -p test_sync_transport.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 contracts/websocket/verify.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 contracts/plugin-api/verify.py
+          exit $LASTEXITCODE
+
+  compatibility:
+    needs: classify
+    if: needs.classify.outputs.compatibility == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: im_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d im_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: ci-only-password
+      PGDATABASE: im_ci
+      PYTHONDONTWRITEBYTECODE: '1'
+      DB_TEST_ENABLE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Shared fixture compatibility and migration
+        run: |
+          python3 contracts/websocket/verify.py
+          python3 contracts/plugin-api/verify.py
+          python3 -m unittest discover -s tests/database -v
+      - name: Current client source and remaining Web skeleton boundary
+        run: |
+          python3 ci/check_s0_boundary.py web
+          python3 ci/check_architecture.py --scope clients --json
+
+  deploy:
+    needs: classify
+    if: needs.classify.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable Go profile configuration
+        shell: pwsh
+        env:
+          IM_GO_CONFIG_DIR: ${{ runner.temp }}/im-go-config
+        run: |
+          New-Item -ItemType Directory -Path $env:IM_GO_CONFIG_DIR -Force | Out-Null
+          Add-Content -Path $env:GITHUB_ENV -Value "IM_GO_CONFIG_DIR=$env:IM_GO_CONFIG_DIR"
+          Copy-Item backend/go/config.example.json (Join-Path $env:IM_GO_CONFIG_DIR 'config.json')
+          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'pg_password'), 'local-development-only')
+          $key = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+          [System.IO.File]::WriteAllText((Join-Path $env:IM_GO_CONFIG_DIR 'jwt_key'), $key)
+      - name: Validate both Compose profiles
+        run: |
+          docker compose -f deploy/compose.yaml --profile go config --quiet
+          docker compose -f deploy/compose.yaml --profile java config --quiet
+      - name: Frozen architecture integrity
+        shell: pwsh
+        run: ./tools/verify-frozen-architecture.ps1
+      - name: Go transport smoke
+        shell: pwsh
+        run: ./tests/infrastructure/smoke.ps1 -Profile go
+      - name: Go Auth actual roles and TLS event smoke
+        run: python3 tests/go/live_role_smoke.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Current shared Sync client actual Go TLS runtime
+        run: python3 -B tests/clients/sync/go_smoke.py
+      - name: Go public Sync strict TLS runtime
+        run: python3 -B tools/verify_sync_runtime.py
+      - name: Go S1 strict TLS messaging E2E
+        run: python3 -B tests/e2e/go_tls_messaging.py
+      - name: Java transport smoke
+        shell: pwsh
+        run: ./tests/infrastructure/smoke.ps1 -Profile java
+
+  gate:
+    if: always()
+    needs: [classify, architecture, source_go, source_java, go, java, web, desktop, mobile, shared, compatibility, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require every selected job to pass
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 ci/check_gate.py
+

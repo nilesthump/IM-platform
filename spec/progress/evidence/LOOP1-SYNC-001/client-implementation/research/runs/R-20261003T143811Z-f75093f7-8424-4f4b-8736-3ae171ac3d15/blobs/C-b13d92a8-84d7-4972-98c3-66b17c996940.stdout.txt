@@ -1,0 +1,333 @@
+contracts/errors/http-errors.schema.json {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://im.example/contracts/errors/http-errors.schema.json",
+  "title": "Canonical HTTP error contract",
+  "$defs": {
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "VALIDATION_FAILED",
+        "AUTH_REQUIRED",
+        "AUTH_INVALID_CREDENTIALS",
+        "AUTH_TOKEN_INVALID",
+        "AUTH_TOKEN_EXPIRED",
+        "AUTH_SESSION_REVOKED",
+        "AUTH_SESSION_EPOCH_STALE",
+        "AUTH_CLIENT_TYPE_MISMATCH",
+        "AUTH_REFRESH_REVOKED",
+        "AUTHORIZATION_DENIED",
+        "PROTOCOL_VERSION_UNSUPPORTED",
+        "USERNAME_ALREADY_EXISTS",
+        "USER_NOT_FOUND",
+        "FRIEND_SELF_NOT_ALLOWED",
+        "FRIENDSHIP_STATE_CONFLICT"
+      ]
+    },
+    "FieldViolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "reason"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error", "requestId"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "$ref": "#/$defs/ErrorCode" },
+            "message": { "type": "string", "minLength": 1 },
+            "violations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/FieldViolation" }
+            }
+          }
+        },
+        "requestId": { "type": "string", "minLength": 1 }
+      },
+      "description": "Messages and violations must never contain passwords, access tokens, refresh tokens, cookies, or other authentication material."
+    }
+  },
+  "$ref": "#/$defs/ErrorResponse"
+}
+
+clients/shared/protocol-sdk/src/send/wire.ts // Canonical schema: contracts/websocket/envelope.schema.json. No wire library.
+export type ObjectValue = { [key: string]: unknown };
+const invalid = (): never => { throw new Error("Invalid WSS frame"); };
+export function object(v: unknown, keys: string[]): ObjectValue {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return invalid();
+  const o = v as ObjectValue;
+  if (Object.keys(o).length !== keys.length || keys.some(k => !Object.hasOwn(o,k))) return invalid();
+  return o;
+}
+export function uuid(v: unknown): string {
+  if (typeof v !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)) return invalid();
+  return v.toLowerCase();
+}
+export function positive(v: unknown): bigint {
+  if (typeof v !== "bigint" || v < 1n) return invalid();
+  return v;
+}
+function timestamp(v: unknown): string {
+  if (typeof v !== "string" || !/^\d{4}-\d\d-\d\d[Tt]\d\d:\d\d:\d\d(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/.test(v) || !Number.isFinite(Date.parse(v))) return invalid();
+  const date = v.slice(0,10), day = Number(date.slice(8)), month = Number(date.slice(5,7)), year = Number(date.slice(0,4));
+  if (month<1 || month>12 || day<1 || day>new Date(Date.UTC(year,month,0)).getUTCDate()) return invalid();
+  return v;
+}
+export function content(v: unknown): {kind: "TEXT"; text: string} {
+  const o=object(v,["kind","text"]);
+  if(o.kind!=="TEXT" || typeof o.text!=="string" || [...o.text].length<1 || [...o.text].length>4096) return invalid();
+  return {kind:"TEXT",text:o.text};
+}
+// Parse integers before JavaScript Number can round them. Reject duplicate keys,
+// exponent/fraction values where the canonical fields require positive integers.
+function parse(raw: string): unknown {
+  if(raw.length>131072) return invalid();
+  let at=0, depth=0;
+  const whitespace=()=>{ while(/[\x20\t\r\n]/.test(raw[at]??"x")) at++; };
+  function string(): string {
+    const start=at++;
+    while(at<raw.length) {
+      if(raw[at]==='"') { at++; try { return JSON.parse(raw.slice(start,at)); } catch { return invalid(); } }
+      if(raw[at]==="\\") at++;
+      at++;
+    }
+    return invalid();
+  }
+  function value(): unknown {
+    whitespace(); if(++depth>32) return invalid();
+    let out: unknown;
+    if(raw[at]==='"') out=string();
+    else if(raw[at]==="{") {
+      at++; const o: ObjectValue=Object.create(null); whitespace();
+      if(raw[at]!=="}") for(;;) {
+        whitespace(); if(raw[at]!=='"') return invalid(); const k=string();
+        if(Object.hasOwn(o,k)) return invalid(); whitespace(); if(raw[at++]!==":") return invalid(); o[k]=value(); whitespace();
+        if(raw[at]!==",") break; at++;
+      }
+      if(raw[at++]!=="}") return invalid(); out=o;
+    } else {
+      const number=raw.slice(at).match(/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
+      if(number) { at+=number[0].length; const parts=number[0].toLowerCase().split("e"), exponent=Number(parts[1]??"0");
+        const [whole,fraction=""]=parts[0].split("."); const scale=fraction.length-exponent;
+        if(!Number.isSafeInteger(exponent) || Math.abs(exponent)>131072) return invalid();
+        const digits=BigInt(whole+fraction);
+        out=scale<=0?digits*10n**BigInt(-scale):digits%10n**BigInt(scale)===0n?digits/10n**BigInt(scale):Number(number[0]); }
+      else return invalid();
+    }
+    depth--; return out;
+  }
+  const out=value(); whitespace(); if(at!==raw.length) return invalid(); return out;
+}
+export interface Frame { type: string; requestId: string; payload: ObjectValue }
+const authErrors=["VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED"];
+const messageErrors=["VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED"];
+export function decode(raw: string): Frame {
+  const e=object(parse(raw),["protocolVersion","type","requestId","payload"]);
+  if(e.protocolVersion!=="1.0" || typeof e.type!=="string") return invalid();
+  const requestId=uuid(e.requestId); let p: ObjectValue;
+  function rejected(codes: string[]): ObjectValue {
+    const p=object(e.payload,["status","error"]), error=object(p.error,["code","message"]);
+    if(p.status!=="rejected" || !codes.includes(String(error.code)) || typeof error.message!=="string" || !error.message) return invalid();
+    return p;
+  }
+  switch(e.type) {
+    case "auth.ack":
+      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(authErrors);
+      else { p=object(e.payload,["status","userId","sessionId","clientType","sessionEpoch"]); if(p.status!=="bound" || !["WEB","DESKTOP","MOBILE"].includes(String(p.clientType))) return invalid(); p.userId=uuid(p.userId); p.sessionId=uuid(p.sessionId); p.sessionEpoch=positive(p.sessionEpoch); }
+      break;
+    case "message.ack":
+      if((e.payload as ObjectValue)?.status==="rejected") p=rejected(messageErrors);
+      else { p=object(e.payload,["status","conversationId","messageId","seq","createdAt"]); if(p.status!=="committed") return invalid(); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); }
+      break;
+    case "message.created":
+      p=object(e.payload,["conversationId","messageId","senderId","seq","createdAt","content"]); p.conversationId=uuid(p.conversationId); p.messageId=uuid(p.messageId); p.senderId=uuid(p.senderId); p.seq=positive(p.seq); p.createdAt=timestamp(p.createdAt); p.content=content(p.content); break;
+    case "session.revoked":
+      p=object(e.payload,["sessionId","reason"]); p.sessionId=uuid(p.sessionId); if(!["LOGOUT","REPLACED","REVOKED"].includes(String(p.reason))) return invalid(); break;
+    case "ping": case "pong": p=object(e.payload,[]); break;
+    default: return invalid();
+  }
+  return {type:e.type,requestId,payload:p};
+}
+export function envelope(type: "auth.bind" | "message.send" | "ping" | "pong", requestId: string, payload: unknown): string {
+  return JSON.stringify({protocolVersion:"1.0",type,requestId:uuid(requestId),payload});
+}
+
+clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt package im.platform.client.storage
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import java.io.Closeable
+
+class Repository(context: Context, accountId: String) : Closeable {
+    private val db: SQLiteDatabase
+    init {
+        require(accountId.matches(Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")))
+        val file = context.getDatabasePath("im-" + accountId.lowercase() + ".sqlite")
+        file.parentFile!!.mkdirs()
+        db = SQLiteDatabase.openOrCreateDatabase(file, null)
+    }
+    fun initialize(failMigration: Boolean = false) {
+        val version = db.version
+        require(version in 0..2) { "Unsupported schema version" }
+        if (version == 2) return
+        transaction {
+            if (version == 0) Schema.v1.forEach { db.execSQL(it) }
+            if (failMigration) db.execSQL("INSERT INTO __fault_missing_table VALUES(1)")
+            Schema.v2.forEach { db.execSQL(it) }
+        }
+    }
+    private fun transaction(block: () -> Unit) {
+        db.beginTransaction()
+        try { block(); db.setTransactionSuccessful() } finally { db.endTransaction() }
+    }
+    internal fun query(sql: String, args: Array<String> = emptyArray()): List<List<String?>> {
+        db.rawQuery(sql,args).use { cursor ->
+            val rows = mutableListOf<List<String?>>()
+            while (cursor.moveToNext()) rows.add((0 until cursor.columnCount).map { if(cursor.isNull(it)) null else cursor.getString(it) })
+            return rows
+        }
+    }
+    private fun checkText(text: String) { require(text.isNotEmpty() && text.codePointCount(0, text.length) <= 4096) }
+    private fun execute(sql: String, args: Array<out Any?> = emptyArray()) { db.execSQL(sql,args) }
+    private fun advance(c: String) {
+        execute("INSERT INTO conversations(conversation_id) VALUES(?) ON CONFLICT DO NOTHING", arrayOf(c))
+        execute("""WITH RECURSIVE prefix(n) AS (
+            SELECT contiguous_seq FROM conversations WHERE conversation_id=?
+            UNION ALL SELECT n+1 FROM prefix WHERE n<9223372036854775807 AND EXISTS(SELECT 1 FROM messages WHERE conversation_id=? AND server_seq=n+1)
+            ) UPDATE conversations SET contiguous_seq=(SELECT MAX(n) FROM prefix) WHERE conversation_id=?""",arrayOf(c,c,c))
+    }
+    fun localSend(m: LocalMessage) {
+        checkText(m.text)
+        transaction {
+            val old=query("SELECT sender_id,content FROM messages WHERE conversation_id=? AND request_id=?", arrayOf(m.conversationId,m.requestId))
+            require(old.isEmpty() || old[0]==listOf(m.senderId,m.text)) { "Local identity/content conflict" }
+            execute("""INSERT INTO messages(conversation_id,request_id,sender_id,content,state) VALUES(?,?,?,?,'SENDING')
+                ON CONFLICT(conversation_id,request_id) DO UPDATE SET state=CASE WHEN messages.state='SENT' THEN 'SENT' ELSE 'SENDING' END""",
+                arrayOf(m.conversationId,m.requestId,m.senderId,m.text))
+        }
+    }
+    fun markFailed(c: String, requestId: String) {
+        transaction {
+            require(query("SELECT 1 FROM messages WHERE conversation_id=? AND request_id=?",arrayOf(c,requestId)).size==1)
+            execute("UPDATE messages SET state=CASE WHEN state='SENT' THEN 'SENT' ELSE 'FAILED' END WHERE conversation_id=? AND request_id=?",arrayOf(c,requestId))
+        }
+    }
+    private fun materialize(m: ServerMessage) {
+        checkText(m.text); require(m.seq>0)
+        // Android rawQuery binds selectionArgs as non-null strings. Realtime
+        // has no request identity, so omit that predicate rather than fake one.
+        val identity = if (m.requestId != null) "(conversation_id=? AND request_id=?) OR " else ""
+        val binds = if (m.requestId != null) arrayOf(m.conversationId,m.requestId,m.messageId,m.conversationId,m.seq.toString())
+            else arrayOf(m.messageId,m.conversationId,m.seq.toString())
+        val rows = query("SELECT conversation_id,request_id,sender_id,content,server_message_id,server_seq,server_time " +
+            "FROM messages WHERE " + identity + "server_message_id=? OR (conversation_id=? AND server_seq=?)", binds)
+        rows.forEach { r ->
+            require(r[0]==m.conversationId && r[2]==m.senderId && r[3]==m.text &&
+                (r[1]==null || m.requestId==null || r[1]==m.requestId) &&
+                (r[4]==null || r[4]==m.messageId) && (r[5]==null || r[5]==m.seq.toString()) &&
+                (r[6]==null || r[6]==m.createdAt)) { "Durable identity/content conflict" }
+        }
+        if(m.requestId!=null) {
+            execute("""DELETE FROM messages WHERE server_message_id=? AND request_id IS NULL AND
+                EXISTS(SELECT 1 FROM messages WHERE conversation_id=? AND request_id=?)""",arrayOf(m.messageId,m.conversationId,m.requestId))
+            execute("UPDATE messages SET request_id=? WHERE server_message_id=? AND request_id IS NULL",arrayOf(m.requestId,m.messageId))
+        }
+        execute("""INSERT INTO messages(conversation_id,request_id,sender_id,content,state,server_message_id,server_seq,server_time)
+            VALUES(?,?,?,?,'SENT',?,?,?) ON CONFLICT DO UPDATE SET state='SENT',server_message_id=excluded.server_message_id,
+            server_seq=excluded.server_seq,server_time=excluded.server_time,request_id=COALESCE(messages.request_id,excluded.request_id)""",
+            arrayOf(m.conversationId,m.requestId,m.senderId,m.text,m.messageId,m.seq.toString(),m.createdAt))
+    }
+    fun syncMessages(messages: List<ServerMessage>, failBeforeAdvance: Boolean = false) {
+        require(messages.all { it.requestId!=null })
+        transaction {
+            messages.forEach { materialize(it) }
+            if(failBeforeAdvance) execute("INSERT INTO __fault_missing_table VALUES(1)")
+            messages.map { it.conversationId }.distinct().forEach { advance(it) }
+        }
+    }
+    fun realtime(m: ServerMessage, failBeforeAdvance: Boolean = false) {
+        require(m.requestId==null) { "Realtime payload has no send request identity" }
+        transaction {
+            materialize(m)
+            if(failBeforeAdvance) execute("INSERT INTO __fault_missing_table VALUES(1)")
+            advance(m.conversationId)
+        }
+    }
+    fun committedAck(requestId: String, ack: Committed) {
+        require(ack.seq>0)
+        transaction {
+            val local=query("SELECT sender_id,content,server_message_id,server_seq,server_time FROM messages WHERE conversation_id=? AND request_id=?",
+                arrayOf(ack.conversationId,requestId)).single()
+            val rows=query("""SELECT conversation_id,request_id,sender_id,content,server_message_id,server_seq,server_time
+                FROM messages WHERE server_message_id=? OR (conversation_id=? AND server_seq=?) OR (conversation_id=? AND request_id=?)""",
+                arrayOf(ack.messageId,ack.conversationId,ack.seq.toString(),ack.conversationId,requestId))
+            rows.forEach { r ->
+                require(r[0]==ack.conversationId && r[2]==local[0] && r[3]==local[1] &&
+                    (r[1]==null || r[1]==requestId) && (r[4]==null || r[4]==ack.messageId) &&
+                    (r[5]==null || r[5]==ack.seq.toString()) && (r[6]==null || r[6]==ack.createdAt))
+            }
+            execute("DELETE FROM messages WHERE server_message_id=? AND request_id IS NULL",arrayOf(ack.messageId))
+            execute("UPDATE messages SET state='SENT',server_message_id=?,server_seq=?,server_time=? WHERE conversation_id=? AND request_id=?",
+                arrayOf(ack.messageId,ack.seq.toString(),ack.createdAt,ack.conversationId,requestId))
+            advance(ack.conversationId)
+        }
+    }
+    fun userPage(events: List<UserEvent>, nextCursor: String, expectedCursor: String, failBeforeAdvance: Boolean=false) {
+        require(nextCursor.isNotEmpty() && nextCursor.codePointCount(0, nextCursor.length)<=256)
+        require(events.all { it.kind in listOf("friend.changed","conversation.changed","membership.changed","plugin.changed") && it.revision>0 })
+        transaction {
+            require(cursor()==expectedCursor) { "Stale user page" }
+            events.forEach { execute("""INSERT INTO user_state VALUES(?,?,?) ON CONFLICT(kind,subject_id)
+                DO UPDATE SET revision=MAX(user_state.revision,excluded.revision)""",arrayOf(it.kind,it.subjectId,it.revision.toString())) }
+            if(failBeforeAdvance) execute("INSERT INTO __fault_missing_table VALUES(1)")
+            execute("UPDATE user_cursor SET cursor=? WHERE singleton=1",arrayOf(nextCursor))
+        }
+    }
+    fun messages(c: String) = query("""SELECT request_id,sender_id,content,state,server_message_id,CAST(server_seq AS TEXT),server_time
+        FROM messages WHERE conversation_id=? ORDER BY server_seq IS NULL,server_seq,local_id""", arrayOf(c))
+    fun contiguous(c: String) = query("SELECT contiguous_seq FROM conversations WHERE conversation_id=?",arrayOf(c)).firstOrNull()?.first()?.toLong() ?: 0L
+    fun cursor() = query("SELECT cursor FROM user_cursor WHERE singleton=1").single().single()!!
+    override fun close() { db.close() }
+}
+
+clients/shared/protocol-sdk/src/storage/models.ts // Internal materialized models; wire authority remains contracts/.
+// Safe numeric inputs remain convenient; larger SQLite integers use exact bigint.
+export type Sequence = number | bigint;
+export type State = "SENDING" | "SENT" | "FAILED";
+export interface LocalMessage {
+  conversationId: string; requestId: string; senderId: string;
+  content: { kind: "TEXT"; text: string };
+}
+export interface ServerMessage extends LocalMessage {
+  messageId: string; seq: Sequence; createdAt: string;
+}
+export interface RealtimeMessage extends Omit<ServerMessage, "requestId"> {}
+export interface Committed {
+  status: "committed"; conversationId: string; messageId: string;
+  seq: Sequence; createdAt: string;
+}
+export interface UserEvent {
+  eventId: string; cursor: string;
+  kind: "friend.changed" | "conversation.changed" | "membership.changed" | "plugin.changed";
+  subjectId: string; revision: Sequence;
+}
+export interface UserPage {
+  syncVersion: "1.0"; type: "sync.user.page"; requestId: string;
+  events: UserEvent[]; nextCursor: string; hasMore: boolean;
+}
+export type Bind = string | null;
+// All steps go through ONE native transaction. expectedChanges is a generic
+// row-count assertion; a mismatch rolls back the entire intent.
+export type Statement = [sql: string, binds: Bind[], expectedChanges: number | null];
+export interface Database {
+  transaction(statements: Statement[]): Promise<void>;
+  query(sql: string, binds: Bind[]): Promise<(string | null)[][]>;
+}
+

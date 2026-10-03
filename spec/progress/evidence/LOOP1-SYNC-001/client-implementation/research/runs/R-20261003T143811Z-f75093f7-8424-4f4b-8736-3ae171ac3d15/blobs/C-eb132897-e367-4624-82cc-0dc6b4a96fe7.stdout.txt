@@ -1,0 +1,21 @@
+Enabled native verification mode=desktop
++ npm.cmd --prefix clients/shared/protocol-sdk ci --ignore-scripts --no-audit --no-fund
+
+added 1 package in 947ms
++ npm.cmd --prefix clients/shared/protocol-sdk run build
+
+> @im/protocol-sdk@0.1.0 build
+> tsc -p tsconfig.json
+
++ node tests/clients/sync/shared.mjs
+PASS: exact Sync correlation/shapes/gap/progress/kinds/numbers, 100x4096 escaped/literal Unicode bounded transport, WSS bound regression
++ npm.cmd --prefix clients/desktop ci --ignore-scripts --no-audit --no-fund
+
+added 2 packages in 635ms
++ npm.cmd --prefix clients/desktop run build
+
+> im-desktop@0.1.0 build
+> tsc -p tsconfig.json
+
++ cargo build --locked --bin storage_probe
++ node tests/clients/sync/desktop.mjs H:\.codex\toolchains\client-sqlite\target-final\debug\storage_probe.exe https://localhost:59537

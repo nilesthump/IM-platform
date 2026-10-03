@@ -1,0 +1,147 @@
+package im.platform.client.sync
+import androidx.lifecycle.ViewModel
+import im.platform.client.send.SendViewModel
+import im.platform.client.send.SendSession
+import im.platform.client.send.Wire as SendWire
+import im.platform.client.storage.Repository
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.atomic.AtomicBoolean
+
+data class SyncState(val status:String="idle",val error:String?=null,val unavailable:List<String> = emptyList())
+class SyncViewModel(val send:SendViewModel,private val repo:Repository,private val http:SyncHttps):ViewModel() {
+    private val scope=CoroutineScope(SupervisorJob()+Dispatchers.IO)
+    @Volatile private var opened=""
+    private val lock=Mutex();private val pending=AtomicBoolean(false)
+    @Volatile private var generation=0L
+    @Volatile private var retired=false
+    @Volatile private var stopped=false
+    @Volatile private var pull:Job?=null
+    private val mutableState=MutableStateFlow(SyncState())
+    val state:StateFlow<SyncState> = mutableState.asStateFlow()
+    private val detach:()->Unit
+    init {
+        require(send.matchesRepository(repo) && http.matchesSession {send.matchesSession(it)}) {"Mismatched Sync session"}
+        detach=send.observeDelivery {_,_->if(send.state.value.connection=="ready")enqueue()}
+        scope.launch {
+            var ready=false
+            send.state.collect {s->
+                val now=s.connection=="ready"
+                if(!now && ready){generation++;pull?.cancel()}
+                if(now && !ready && !stopped)enqueue()
+                ready=now
+            }
+        }
+    }
+    private fun enqueue(){scope.launch {try{synchronize()}catch(_:Exception){/* Failure already observable. */}}}
+    suspend fun openConversation(c:String){val selected=SendWire.uuid(c);send.openConversation(selected);opened=selected;synchronize()}
+    suspend fun synchronize() {
+        if(retired || stopped)return;pending.set(true)
+        lock.withLock {
+            if(!pending.getAndSet(false) || retired || stopped)return
+            val g=generation;val job=currentCoroutineContext()[Job];pull=job
+            fun active()=!retired && !stopped && generation==g && job?.isActive!=false
+            val unavailable=mutableListOf<String>();mutableState.value=SyncState("syncing")
+            try {
+                while(active()){
+                    val cursor=repo.cursor();val page=http.user(cursor);if(!active())return
+                    send.mergeUserPage(page.events,page.nextCursor,cursor,::active);if(!active())return
+                    if(!page.hasMore)break;if(repo.cursor()==cursor)throw SyncFailure("protocol")
+                }
+                for(c in (repo.conversationIds()+listOfNotNull(opened.takeIf {it.isNotEmpty()})).distinct()){
+                    try {
+                        while(active()){
+                            val after=repo.contiguous(c);val page=http.conversation(c,after);if(!active())return
+                            send.mergeMessages(page.messages,::active);if(!active())return
+                            if(!page.hasMore)break;if(repo.contiguous(c)<=after)throw SyncFailure("protocol")
+                        }
+                    }catch(error:SyncFailure){if(error.kind=="unavailable"){unavailable.add(c);continue};throw error}
+                }
+                if(active())mutableState.value=SyncState(unavailable=unavailable.toList())
+            }catch(error:Exception){
+                if(!active())return
+                val kind=if(error is SyncFailure)error.kind else "storage"
+                if(kind=="authentication"){stopped=true;generation++;send.disconnect()}
+                mutableState.value=SyncState("failed",kind,unavailable.toList());throw SyncFailure(kind)
+            }finally{if(pull===job)pull=null}
+        }
+    }
+    suspend fun dispose(){
+        if(retired)return;retired=true;generation++;detach();scope.coroutineContext[Job]?.cancelAndJoin()
+        pull?.cancelAndJoin();mutableState.value=SyncState("retired");send.dispose()
+    }
+    override fun onCleared(){retired=true;generation++;detach();pull?.cancel();scope.launch {try {send.dispose()} finally {scope.cancel()}}}
+}
+suspend fun accountSync(context:android.content.Context,session:SendSession,endpoint:String):SyncViewModel=withContext(Dispatchers.IO){
+    val http=SyncHttps(endpoint,session);val repository=Repository(context,session.userId)
+    try{repository.initialize();SyncViewModel(SendViewModel(repository,session,ownsRepository=true),repository,http)}
+    catch(_:Exception){repository.close();throw SyncFailure("storage")}
+}
+
+import {uuid} from "../../../../shared/protocol-sdk/src/send/wire.js";
+import {SendApplication} from "../send.js";
+import {SyncHttp} from "../../../../shared/protocol-sdk/src/sync/http.js";
+import {SyncFailure} from "../../../../shared/protocol-sdk/src/sync/wire.js";
+export interface SyncState {status:"idle"|"syncing"|"failed"|"retired";error:string|null;unavailable:readonly string[]}
+export class SyncApplication {
+  private opened="";
+  private generation=0;private retired=false;private stopped=false;private controller=new AbortController();
+  private queue:Promise<void>=Promise.resolve();private requested=false;private listeners=new Set<(s:SyncState)=>void>();
+  private detach:()=>void;private detachDelivery:()=>void;private wasReady=false;
+  private current:SyncState={status:"idle",error:null,unavailable:[]};
+  constructor(readonly send:SendApplication,private http:SyncHttp) {
+    if(!http.matchesSession(s=>send.matchesSession(s))) throw new SyncFailure("authentication");
+    this.detachDelivery=send.observeDelivery(()=>{if(send.state.connection==="ready") void this.synchronize().catch(()=>{});});
+    this.detach=send.observe(s=>{
+      const ready=s.connection==="ready";
+      if(!ready && this.wasReady){this.generation++;this.controller.abort();this.controller=new AbortController();}
+      if(ready && !this.wasReady && !this.stopped) void this.synchronize().catch(()=>{});
+      this.wasReady=ready;
+    });
+  }
+  get state():SyncState{return this.current;}
+  observe(listener:(s:SyncState)=>void):()=>void{this.listeners.add(listener);listener(this.current);return()=>this.listeners.delete(listener);}
+  private publish(s:SyncState){if(this.retired)return;this.current=Object.freeze({...s,unavailable:Object.freeze([...s.unavailable])});for(const l of this.listeners){try{l(this.current);}catch{/* Observer owns no commit. */}}}
+  async openConversation(c:string):Promise<void>{const selected=uuid(c);await this.send.openConversation(selected);this.opened=selected;await this.synchronize();}
+  synchronize():Promise<void>{
+    if(this.retired || this.stopped)return Promise.resolve();
+    this.requested=true;
+    const job=this.queue.then(async()=>{
+      if(!this.requested || this.retired || this.stopped)return;
+      this.requested=false;const g=this.generation,signal=this.controller.signal;
+      const active=()=>!this.retired && !this.stopped && this.generation===g && !signal.aborted;
+      this.publish({status:"syncing",error:null,unavailable:[]});
+      const unavailable:string[]=[];
+      try{
+        do{
+          if(!active())return;const cursor=await this.send.repository.cursor(),page=await this.http.user(cursor,signal);
+          if(!active())return;await this.send.mergeUserPage(page,cursor,active);if(!active())return;
+          if(!page.hasMore)break;
+          if(await this.send.repository.cursor()===cursor)throw new SyncFailure("protocol");
+        }while(active());
+        for(const c of new Set([...(await this.send.repository.conversationIds()),...(this.opened?[this.opened]:[])])){
+          try{
+            do{
+              if(!active())return;const after=await this.send.repository.contiguous(c),page=await this.http.conversation(c,after,signal);
+              if(!active())return;await this.send.mergeMessages(page.messages,active);if(!active())return;
+              if(!page.hasMore)break;
+              if(await this.send.repository.contiguous(c)<=after)throw new SyncFailure("protocol");
+            }while(active());
+          }catch(error){if(error instanceof SyncFailure && error.kind==="unavailable"){unavailable.push(c);continue;}throw error;}
+        }
+        if(active())this.publish({status:"idle",error:null,unavailable});
+      }catch(error){
+        if(!active())return;
+        const kind=error instanceof SyncFailure?error.kind:"storage";
+        if(kind==="authentication"){this.stopped=true;this.generation++;this.controller.abort();this.send.disconnect();}
+        this.publish({status:"failed",error:kind,unavailable});throw new SyncFailure(kind);
+      }
+    });
+    this.queue=job.catch(()=>{});return job;
+  }
+  async idle(){await this.queue;await this.send.idle();}
+  async close(){if(this.retired)return;this.retired=true;this.generation++;this.controller.abort();this.detach();this.detachDelivery();this.listeners.clear();this.current={status:"retired",error:null,unavailable:[]};this.send.close();await this.queue;await this.send.idle();}
+}
+

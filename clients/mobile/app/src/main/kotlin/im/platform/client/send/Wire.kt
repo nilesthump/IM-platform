@@ -25,18 +25,18 @@ object Wire {
         if(n.signum()<=0) invalid()
         return n
     }
-    private fun obj(v: Any?, keys: Set<String>): Map<String,Any> {
+    fun obj(v: Any?, keys: Set<String>): Map<String,Any> {
         if(v !is Map<*,*> || v.keys!=keys) invalid()
         return keys.associateWith { v[it] ?: invalid() }
     }
-    private fun time(v: Any?): String {
+    fun time(v: Any?): String {
         val s=v as? String ?: invalid()
         if(!s.matches(Regex("[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?(?:[Zz]|[+-][0-9]{2}:[0-9]{2})"))) invalid()
         val normalized=s.replace(Regex("(\\.[0-9]{9})[0-9]+"),"$1")
         try { OffsetDateTime.parse(normalized) } catch(_: Exception) { invalid() }
         return s
     }
-    private class Parser(val raw: String) {
+    private class Parser(val raw: String,val maxIntegerDigits:Int?=null) {
         var at=0
         fun space() { while(at<raw.length && raw[at] in " \t\r\n") at++ }
         fun string(): String {
@@ -70,12 +70,27 @@ object Wire {
                 }
                 if(at>=raw.length || raw[at++]!='}') invalid(); return out
             }
+            if(raw[at]=='[') {
+                at++; space(); val out=mutableListOf<Any>()
+                if(at<raw.length && raw[at]!=']') while(true) { out.add(value(depth+1)); space(); if(at>=raw.length || raw[at]!=',') break; at++ }
+                if(at>=raw.length || raw[at++]!=']') invalid(); return out
+            }
+            if(raw.startsWith("true",at)) {at+=4;return true}
+            if(raw.startsWith("false",at)) {at+=5;return false}
             val m=Regex("-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?").find(raw,at)
             if(m==null || m.range.first!=at) invalid(); at=m.range.last+1
-            return try { BigDecimal(m.value).toBigIntegerExact() } catch(_:Exception) { invalid() }
+            return try {
+                val number=BigDecimal(m.value)
+                if(maxIntegerDigits==null) number.toBigIntegerExact() else {
+                    val exact=number.stripTrailingZeros()
+                    if(exact.signum()!=0 && (exact.scale()>0 || exact.precision().toLong()-exact.scale().toLong()>maxIntegerDigits)) invalid()
+                    exact.toBigIntegerExact()
+                }
+            } catch(_:Exception) { invalid() }
         }
-        fun parse(): Any { if(raw.length>131072) invalid(); val v=value(); space(); if(at!=raw.length) invalid(); return v }
+        fun parse(maxLength:Int=131072): Any { if(raw.length>maxLength) invalid(); val v=value(); space(); if(at!=raw.length) invalid(); return v }
     }
+    fun parse(raw:String,maxLength:Int=131072,maxIntegerDigits:Int?=null):Any = Parser(raw,maxIntegerDigits).parse(maxLength)
     private val authErrors=setOf("VALIDATION_FAILED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH","PROTOCOL_VERSION_UNSUPPORTED")
     private val sendErrors=setOf("VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED","MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED")
     fun decode(raw: String): Frame {

@@ -1,0 +1,23 @@
+import os,subprocess,sys
+from pathlib import Path
+root=Path("H:/.codex/worktrees/sync-resume/IM-platform")
+env=os.environ.copy()
+env.update(JAVA_HOME="H:/.jdks/jdk17",ANDROID_HOME="H:/Android",ANDROID_SDK_ROOT="H:/Android",GRADLE_USER_HOME="H:/gradle",IM_CLIENT_GRADLE="H:/gradle/wrapper/dists/gradle-8.9-bin/78qddjpeqn5v6yec3xb8kv9ca/gradle-8.9/bin/gradle.bat",IM_CLIENT_ADB="H:/Android/platform-tools/adb.exe",CARGO_HOME="H:/.codex/toolchains/client-sqlite/cargo",RUSTUP_HOME="H:/.codex/toolchains/client-sqlite/rustup",RUSTUP_TOOLCHAIN="stable",CARGO_TARGET_DIR="H:/.codex/toolchains/client-sqlite/target-final",CARGO_BUILD_JOBS="1")
+if sys.argv[1] in ("desktop","send-desktop","sqlite-desktop"):
+    vc="C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvars64.bat"
+    output=subprocess.check_output('cmd.exe /d /s /c ""'+vc.replace("/", "\\\\")+'" >nul && set"',env=env,text=True)
+    for line in output.splitlines():
+        key,sep,value=line.partition("=")
+        if sep and key and not key.startswith("="):env[key]=value
+env["PATH"]=";".join([env["JAVA_HOME"]+"/bin",env["CARGO_HOME"]+"/bin","H:/Android/platform-tools",env.get("PATH","")])
+py="C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe"
+kind=sys.argv[1]
+if kind=="gradle":
+    argv=[env["IM_CLIENT_GRADLE"],"--no-daemon","-PimSendInstrumentation=im.platform.client.sync.SyncInstrumentation","assembleDebug","assembleDebugAndroidTest"];cwd=root/"clients/mobile"
+elif kind in ("desktop","mobile","shared"):
+    argv=[py,"-X","utf8","-B","tools/verify_client_sync.py","--scope",kind]+sys.argv[2:];cwd=root
+elif kind.startswith("send-") or kind.startswith("sqlite-"):
+    family,scope=kind.split("-",1);argv=[py,"-X","utf8","-B","tools/verify_client_"+family+".py","--scope",scope]+sys.argv[2:];cwd=root
+else:raise RuntimeError("Unexpected native mode")
+print("Enabled native verification mode="+kind,flush=True)
+raise SystemExit(subprocess.call(argv,cwd=cwd,env=env))

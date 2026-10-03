@@ -1,0 +1,180 @@
+clients/shared/protocol-sdk/tsconfig.json {
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": [
+    "src/storage/**/*.ts",
+    "src/send/**/*.ts", "src/sync/**/*.ts"
+  ]
+}
+
+clients/desktop/tsconfig.json {
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "src/storage/**/*.ts",
+    "../shared/protocol-sdk/src/storage/**/*.ts",
+    "src/application/**/*.ts",
+    "../shared/protocol-sdk/src/send/**/*.ts"
+  ]
+}
+
+tools/verify_client_send.py #!/usr/bin/env python3
+"""Fail-closed SEND verification on actual SQLx and Android TLS/SQLite runtimes."""
+from pathlib import Path
+import argparse, base64, importlib.util, os, subprocess, sys, tempfile
+ROOT=Path(__file__).resolve().parents[1]
+def run(argv,cwd=ROOT,env=None):
+    print('+',' '.join(map(str,argv)),flush=True);subprocess.run(list(map(str,argv)),cwd=cwd,env=env,check=True)
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--scope',choices=['shared','desktop','mobile'],required=True);p.add_argument('--serial');a=p.parse_args()
+    if a.scope in ('shared','desktop'):
+        npm='npm.cmd' if os.name=='nt' else 'npm'
+        run([npm,'--prefix','clients/shared/protocol-sdk','ci','--ignore-scripts','--no-audit','--no-fund']);run([npm,'--prefix','clients/shared/protocol-sdk','run','build']);run(['node','tests/clients/send/shared.mjs'])
+        if a.scope=='shared':return
+        run([npm,'--prefix','clients/desktop','ci','--ignore-scripts','--no-audit','--no-fund']);run([npm,'--prefix','clients/desktop','run','build'])
+        native=ROOT/'clients/desktop/src-tauri';run(['cargo','build','--locked','--bin','storage_probe'],native)
+        target=Path(os.environ.get('CARGO_TARGET_DIR',native/'target'));target=target if target.is_absolute() else native/target
+        probe=target/'debug'/('storage_probe.exe' if os.name=='nt' else 'storage_probe')
+    else:
+        if not a.serial or not a.serial.startswith('emulator-'):raise RuntimeError('Actual emulator serial required')
+        wrapper=os.environ.get('IM_CLIENT_GRADLE',ROOT/'clients/mobile'/('gradlew.bat' if os.name=='nt' else 'gradlew'))
+        if os.name!='nt':run(['chmod','+x',wrapper])
+        run([wrapper,'--no-daemon','-PimSendInstrumentation=im.platform.client.send.SendInstrumentation','assembleDebug','assembleDebugAndroidTest'],ROOT/'clients/mobile')
+        adb=os.environ.get('IM_CLIENT_ADB','adb');serial=a.serial
+        def shell(*args):return subprocess.check_output([adb,'-s',serial,'shell',*args],text=True,timeout=30).strip()
+        if shell('getprop','ro.build.version.sdk')!='34' or shell('getprop','sys.boot_completed')!='1' or shell('getprop','sys.user.0.ce_available')!='true':raise RuntimeError('Unlocked, fully booted minimum API34 emulator required')
+        for apk in ('debug/app-debug.apk','androidTest/debug/app-debug-androidTest.apk'):run([adb,'-s',serial,'install','-r',ROOT/'clients/mobile/app/build/outputs/apk'/apk])
+    with tempfile.TemporaryDirectory(prefix='im-send-tls-') as tmp:
+        tmp=Path(tmp);cert=tmp/'cert.pem';key=tmp/'key.pem'
+        openssl=os.environ.get('IM_CLIENT_OPENSSL','D:/Git/usr/bin/openssl.exe' if os.name=='nt' and Path('D:/Git/usr/bin/openssl.exe').exists() else 'openssl')
+        # Private ephemeral fixture credentials; never product trust overrides.
+        subprocess.run([openssl,'req','-x509','-newkey','rsa:2048','-nodes','-keyout',str(key),'-out',str(cert),'-days','1','-subj','/CN=localhost','-addext','subjectAltName=DNS:localhost,IP:127.0.0.1'],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        spec=importlib.util.spec_from_file_location('send_tls_fixture',ROOT/'tests/clients/send/tls_fixture.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        fixture=module.Fixture(cert,key)
+        try:
+            endpoint='wss://localhost:'+str(fixture.port)
+            if a.scope=='desktop':
+                env=os.environ.copy();env['NODE_EXTRA_CA_CERTS']=str(cert);run(['node','tests/clients/send/desktop.mjs',probe,endpoint],env=env)
+            else:
+                run([adb,'-s',serial,'reverse','tcp:'+str(fixture.port),'tcp:'+str(fixture.port)])
+                try:
+                    pem=cert.read_text();der=base64.b64encode(base64.b64decode(''.join(pem.splitlines()[1:-1]))).decode()
+                    argv=[adb,'-s',serial,'shell','am','instrument','-w','-e','endpoint',endpoint,'-e','certificate',der,'im.platform.client.test/im.platform.client.send.SendInstrumentation']
+                    # The certificate is public; omit its long argv from logs.
+                    print('+ actual API34 SendInstrumentation with private TLS fixture',flush=True)
+                    result=subprocess.run(argv,capture_output=True,text=True,timeout=180);print(result.stdout);print(result.stderr,file=sys.stderr)
+                    if result.returncode or 'INSTRUMENTATION_RESULT: result=PASS' not in result.stdout or 'INSTRUMENTATION_RESULT: sdkInt=34' not in result.stdout or 'INSTRUMENTATION_CODE: -1' not in result.stdout:raise RuntimeError('Actual Android SEND instrumentation failed')
+                finally:run([adb,'-s',serial,'reverse','--remove','tcp:'+str(fixture.port)])
+            if fixture.errors:raise RuntimeError('TLS fixture protocol assertions failed: '+str(fixture.errors))
+            if fixture.sends<5:raise RuntimeError('Actual WSS sends were not exercised')
+            print('PASS: controlled TLS fixture actual client behavior; this is distinct from Go durable-ACK E2E',flush=True)
+        finally:fixture.close()
+if __name__=='__main__':
+    try:main()
+    except (OSError,RuntimeError,subprocess.SubprocessError) as error:print('FAIL:',error,file=sys.stderr);sys.exit(1)
+
+tests/clients/send/desktop.mjs import assert from "node:assert/strict";
+import {spawnSync} from "node:child_process";
+import {mkdtempSync} from "node:fs";
+import {tmpdir} from "node:os";
+import {join,resolve} from "node:path";
+import {Repository} from "../../../clients/shared/protocol-sdk/dist/storage/repository.js";
+import {SendApplication} from "../../../clients/desktop/dist/desktop/src/application/send.js";
+const probe=resolve(process.argv[2]), endpoint=process.argv[3];
+const root=mkdtempSync(join(tmpdir(),'im-send-'));
+const user='10000000-0000-4000-8000-000000000001', sessionId='20000000-0000-4000-8000-000000000001', c='30000000-0000-4000-8000-000000000001';
+const session={userId:user,sessionId,sessionEpoch:1n,accessToken[REDACTED];
+const hex=s=>Buffer.from(s,'utf8').toString('hex'),bind=s=>s===null?'~':hex(s);
+function database(account=user) {
+  function call(input) {const r=spawnSync(probe,[root,account],{input,encoding:'utf8',maxBuffer:8*1024*1024});if(r.error)throw r.error;if(r.status)throw new Error('Native storage failed');return r.stdout;}
+  return {async transaction(steps){call(steps.map(([sql,args,changes])=>['T',changes??'-',hex(sql),...args.map(bind)].join('\t')).join('\n')+'\n');},async query(sql,args){const raw=call(['Q',hex(sql),...args.map(bind)].join('\t')+'\n').trimEnd();return raw?raw.split(/\r?\n/).map(line=>line.split('\t').map(v=>v==='~'?null:Buffer.from(v,'hex').toString('utf8'))):[];}};
+}
+const repo=new Repository(database());await repo.initialize();
+const delay=n=>new Promise(r=>setTimeout(r,n));
+async function until(check){for(let n=0;n<200;n++){if(await check())return;await delay(10);}throw new Error('Condition timed out');}
+function application(timeout=120){return new SendApplication(repo,session,undefined,timeout);}
+async function connect(app,mode='normal'){app.connect(endpoint+'/'+mode);await until(()=>app.state.connection==='ready');await app.openConversation(c);}
+let app=application();await app.openConversation(c);
+const offline=await app.send(c,'offline');assert.equal((await repo.messages(c)).find(row=>row[0]===offline)[3],'FAILED');
+await connect(app);const seen=[];app.observe(s=>seen.push(s.messages.find(row=>row[0]===offline)?.[3]));await app.retry(c,offline);await until(()=>app.state.messages.find(row=>row[0]===offline)?.[3]==='SENT');assert(seen.includes('SENDING'));assert.equal((await repo.messages(c)).find(row=>row[0]===offline)[5],'9007199254740993');
+app.close();app=application();await connect(app,'timeout');const timeout=await app.send(c,'retry after restart');await until(()=>app.state.messages.find(row=>row[0]===timeout)?.[3]==='FAILED');app.close();
+app=application();await connect(app);await app.retry(c,timeout);await until(()=>app.state.messages.find(row=>row[0]===timeout)?.[3]==='SENT');assert.equal((await repo.messages(c)).filter(row=>row[0]===timeout).length,1);app.close();
+app=application();await connect(app,'late');const late=await app.send(c,'late');await until(()=>app.state.messages.find(row=>row[0]===late)?.[3]==='FAILED');await until(()=>app.state.messages.find(row=>row[0]===late)?.[3]==='SENT');await delay(150);assert.equal(app.state.messages.find(row=>row[0]===late)[3],'SENT');app.close();
+app=application();await connect(app,'realtime');const realtime=await app.send(c,'event-first');await until(()=>app.state.messages.find(row=>row[0]===realtime)?.[3]==='SENT');assert.equal(app.state.messages.filter(row=>row[0]===realtime).length,1);app.close();
+app=application();await connect(app,'reject');const rejected=await app.send(c,'denied');await until(()=>app.state.messages.find(row=>row[0]===rejected)?.[3]==='FAILED');app.close();
+app=application();await connect(app,'invalid');const invalid=await app.send(c,'invalid-ACK');await until(()=>app.state.connection==='offline');await app.idle();assert.equal((await repo.messages(c)).find(row=>row[0]===invalid)[3],'FAILED');assert.equal(app.state.error,'protocol');app.close();
+app=application();await connect(app,'revoked');const revoked=await app.send(c,'revoked-session');await until(()=>app.state.connection==='offline');await app.idle();assert.equal((await repo.messages(c)).find(row=>row[0]===revoked)[3],'FAILED');const afterRevocation=await app.send(c,'offline after revoke');assert.equal((await repo.messages(c)).find(row=>row[0]===afterRevocation)[3],'FAILED');app.close();
+app=application();app.connect(endpoint+'/wrong-session');await until(()=>app.state.error==='protocol');assert.equal(app.state.connection,'offline');app.close();
+// Actual SQLx rollback before transmission and before SENT publication.
+let fault=false;const db=database();const faulty=new Repository({...db,transaction:steps=>db.transaction(fault?[...steps,['INSERT INTO __send_fault_missing_table VALUES(1)',[],null]]:steps)});await faulty.initialize();
+let socket, transmitted=0;const frames=[];
+const factory=()=>socket={onopen:null,onmessage:null,onclose:null,onerror:null,send(raw){frames.push(JSON.parse(raw));if(JSON.parse(raw).type==='message.send')transmitted++;},close(){}};
+app=new SendApplication(faulty,session,factory,60);await app.openConversation(c);app.connect('wss://localhost/');socket.onopen(new Event('open'));let auth;
+// Bind uses the application's own auth request identity.
+app.disconnect();await app.idle();app.connect('wss://localhost/');socket.onopen(new Event('open'));auth=frames.at(-1);
+const deliver=(s,type,r,p)=>s.onmessage?.(new MessageEvent('message',{data:JSON.stringify({protocolVersion:'1.0',type,requestId:r,payload:p})}));
+deliver(socket,'auth.ack',auth.requestId,{status:'bound',userId:user,sessionId,clientType:'DESKTOP',sessionEpoch:1});await app.idle();
+fault=true;await assert.rejects(app.send(c,'rollback'));assert.equal(transmitted,0);fault=false;
+const timer=await app.send(c,'new attempt timer');await delay(25);await app.retry(c,timer);await delay(40);await app.idle();assert.equal(app.state.messages.find(row=>row[0]===timer)[3],'SENDING');deliver(socket,'message.ack',timer,{status:'committed',conversationId:c,messageId:crypto.randomUUID(),seq:7,createdAt:'2026-10-03T00:00:00Z'});await app.idle();await delay(80);assert.equal(app.state.messages.find(row=>row[0]===timer)[3],'SENT');
+const failure=await app.send(c,'ack rollback');fault=true;deliver(socket,'message.ack',failure,{status:'committed',conversationId:c,messageId:crypto.randomUUID(),seq:3,createdAt:'2026-10-03T00:00:00Z'});await app.idle();assert.equal((await repo.messages(c)).find(row=>row[0]===failure)[3],'SENDING');assert.equal(app.state.messages.find(row=>row[0]===failure)[3],'SENDING');fault=false;
+const old=socket,oldCallback=socket.onmessage;app.disconnect();await app.idle();app.connect('wss://localhost/');oldCallback(new MessageEvent('message',{data:JSON.stringify({protocolVersion:'1.0',type:'message.ack',requestId:failure,payload:{status:'committed',conversationId:c,messageId:crypto.randomUUID(),seq:4,createdAt:'2026-10-03T00:00:00Z'}})}));await app.idle();assert.equal((await repo.messages(c)).find(row=>row[0]===failure)[3],'FAILED');app.close();
+// Persisted same-RID intents in distinct Conversations are independent.
+const c1=crypto.randomUUID(), c2=crypto.randomUUID(), sharedRequest=crypto.randomUUID();
+for(const conversationId of [c1,c2]) {
+  await repo.localSend({conversationId,requestId:sharedRequest,senderId:user,content:{kind:'TEXT',text:conversationId}});
+  await repo.markFailed(conversationId,sharedRequest);
+}
+app=new SendApplication(repo,session,factory,500);await app.openConversation(c1);app.connect('wss://localhost/');socket.onopen(new Event('open'));
+deliver(socket,'auth.ack',frames.at(-1).requestId,{status:'bound',userId:user,sessionId,clientType:'DESKTOP',sessionEpoch:1});await app.idle();
+await app.retry(c1,sharedRequest);await app.retry(c2,sharedRequest);
+deliver(socket,'message.ack',sharedRequest,{status:'rejected',error:{code:'AUTHORIZATION_DENIED',message:'Denied'}});await app.idle();
+assert.equal((await repo.messages(c1))[0][3],'SENDING','ambiguous reject must preserve first intent');
+assert.equal((await repo.messages(c2))[0][3],'SENDING','ambiguous reject must preserve second intent');
+deliver(socket,'message.ack',sharedRequest,{status:'committed',conversationId:c1,messageId:crypto.randomUUID(),seq:1,createdAt:'2026-10-03T00:00:00Z'});await app.idle();
+deliver(socket,'message.ack',sharedRequest,{status:'rejected',error:{code:'AUTHORIZATION_DENIED',message:'Denied'}});await app.idle();assert.equal((await repo.messages(c2))[0][3],'SENDING','settling one CID must not make a delayed rejection attributable to the other');
+await delay(600);await app.idle();assert.equal((await repo.messages(c1))[0][3],'SENT');assert.equal((await repo.messages(c2))[0][3],'FAILED','independent second timer must remain active');
+deliver(socket,'message.ack',sharedRequest,{status:'committed',conversationId:c2,messageId:crypto.randomUUID(),seq:1,createdAt:'2026-10-03T00:00:00Z'});await app.idle();assert.equal((await repo.messages(c2))[0][3],'SENT');app.close();
+// Neither timer may be removed by an ambiguous rejection.
+const timedRequest=crypto.randomUUID();
+for(const conversationId of [c1,c2]) {await repo.localSend({conversationId,requestId:timedRequest,senderId:user,content:{kind:'TEXT',text:conversationId}});await repo.markFailed(conversationId,timedRequest);}
+app=new SendApplication(repo,session,factory,500);app.connect('wss://localhost/');socket.onopen(new Event('open'));deliver(socket,'auth.ack',frames.at(-1).requestId,{status:'bound',userId:user,sessionId,clientType:'DESKTOP',sessionEpoch:1});await app.idle();
+await app.retry(c1,timedRequest);await app.retry(c2,timedRequest);deliver(socket,'message.ack',timedRequest,{status:'rejected',error:{code:'AUTHORIZATION_DENIED',message:'Denied'}});await app.idle();
+for(const cid of [c1,c2]) assert.equal((await repo.messages(cid)).find(row=>row[0]===timedRequest)[3],'SENDING');
+await delay(600);await app.idle();for(const cid of [c1,c2]) assert.equal((await repo.messages(cid)).find(row=>row[0]===timedRequest)[3],'FAILED');app.close();
+// Sync convergence calls the same existing Repository; no fetch runner.
+app=application();await app.openConversation(c);await app.mergeMessages([{conversationId:c,requestId:rejected,senderId:user,content:{kind:'TEXT',text:'denied'},messageId:crypto.randomUUID(),seq:99n,createdAt:'2026-10-03T00:00:00Z'}]);assert.equal(app.state.messages.find(row=>row[0]===rejected)[3],'SENT');await app.retry(c,rejected);assert.equal(app.state.messages.find(row=>row[0]===rejected)[3],'SENT');app.close();assert.deepEqual(app.state.messages,[]);
+const otherRepo=new Repository(database('10000000-0000-4000-8000-000000000002'));await otherRepo.initialize();assert.equal((await otherRepo.messages(c)).length,0);
+console.log('PASS: actual SQLx + builtin WSS TLS send, persisted SENDING, timeout/offline/reject, same-ID restart retry, late ACK/realtime/Sync terminal merge, strict invalid/session checks, transactional rollback, stale socket and account isolation');
+
+tests/clients/send/shared.mjs import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {decode,envelope} from "../../../clients/shared/protocol-sdk/dist/send/wire.js";
+const id="40000000-0000-4000-8000-000000000001", c="30000000-0000-4000-8000-000000000001", m="50000000-0000-4000-8000-000000000001";
+const payload={status:"committed",conversationId:c,messageId:m,seq:1,createdAt:"2026-10-03T00:00:00Z"};
+const frame=p=>JSON.stringify({protocolVersion:"1.0",type:"message.ack",requestId:id,payload:p});
+for(const n of ['9007199254740993','9007199254740993.0','90071992547409930e-1','9223372036854775808']) assert.equal(decode(frame(payload).replace('"seq":1','"seq":'+n)).payload.seq,BigInt(n.includes('.')?n.split('.')[0]:n.includes('e')?'9007199254740993':n));
+for(const p of [{...payload,extra:1},{...payload,seq:"1"},{...payload,seq:0},{...payload,seq:1.5},{...payload,messageId:"wrong"},{...payload,createdAt:"2026-02-30T00:00:00Z"}]) assert.throws(()=>decode(frame(p)));
+assert.throws(()=>decode(frame(payload).replace('"seq":1','"seq":1,"seq":2')));
+assert.throws(()=>decode(frame(payload).replace('"type":"message.ack"','"type":"hello"')));
+assert.throws(()=>decode(frame(payload).slice(0,-1)+',"extra":1}'));
+const created={conversationId:c,messageId:m,senderId:m,seq:2,createdAt:payload.createdAt,content:{kind:"TEXT",text:'quote "seq": 9007199254740993 and escaped \\ token'}};
+const decoded=decode(JSON.stringify({protocolVersion:"1.0",type:"message.created",requestId:id,payload:created}));assert.equal(decoded.payload.content.text,created.content.text);
+const schema=JSON.parse(readFileSync('contracts/websocket/envelope.schema.json'));
+assert.deepEqual(Object.keys(created).sort(),schema.$defs.MessageCreated.allOf[1].properties.payload.required.toSorted());
+assert.deepEqual(Object.keys(payload).sort(),schema.$defs.Committed.required.toSorted());
+assert.equal(JSON.parse(envelope('message.send',id,{conversationId:c,content:created.content})).requestId,id);
+const golden=JSON.parse(readFileSync('contracts/fixtures/websocket/golden.json'));let frames=0;for(const scenario of golden.scenarios)for(const step of scenario.steps)for(const frame of step.out??[]){decode(JSON.stringify(frame));frames++;}assert(frames>10);
+console.log('PASS: strict schema fields, duplicate keys, exact integer lexemes, invalid frames, escaped content');
+

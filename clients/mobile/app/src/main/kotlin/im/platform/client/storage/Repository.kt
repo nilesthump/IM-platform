@@ -131,6 +131,7 @@ class Repository(context: Context, accountId: String) : Closeable {
     fun messages(c: String) = query("""SELECT request_id,sender_id,content,state,server_message_id,CAST(server_seq AS TEXT),server_time
         FROM messages WHERE conversation_id=? ORDER BY server_seq IS NULL,server_seq,local_id""", arrayOf(c))
     fun contiguous(c: String) = query("SELECT contiguous_seq FROM conversations WHERE conversation_id=?",arrayOf(c)).firstOrNull()?.first()?.toLong() ?: 0L
+    fun conversationIds() = query("SELECT conversation_id FROM conversations UNION SELECT conversation_id FROM messages UNION SELECT subject_id FROM user_state WHERE kind IN ('conversation.changed','membership.changed') ORDER BY 1").map { it.single()!! }
     fun cursor() = query("SELECT cursor FROM user_cursor WHERE singleton=1").single().single()!!
     override fun close() { db.close() }
 }

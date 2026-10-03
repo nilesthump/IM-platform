@@ -1,0 +1,21 @@
+   Compiling vswhom-sys v0.1.3
+   Compiling vswhom v0.1.0
+   Compiling embed-resource v3.0.11
+   Compiling tauri-winres v0.3.6
+   Compiling tauri-build v2.7.1
+   Compiling libsqlite3-sys v0.30.1
+   Compiling tauri v2.12.1
+   Compiling sqlx-sqlite v0.8.6
+   Compiling im-client-storage v0.1.0 (H:\.codex\worktrees\sync-resume\IM-platform\clients\desktop\src-tauri)
+   Compiling sqlx v0.8.6
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 39.73s
+file:///H:/.codex/worktrees/sync-resume/IM-platform/tests/clients/sync/desktop.mjs:18
+async function until(check){for(let n=0;n<600;n++){if(await check())return;await delay(10);}throw new Error("Condition timed out");}
+                                                                                                  ^
+
+Error: Condition timed out
+    at until (file:///H:/.codex/worktrees/sync-resume/IM-platform/tests/clients/sync/desktop.mjs:18:99)
+    at async file:///H:/.codex/worktrees/sync-resume/IM-platform/tests/clients/sync/desktop.mjs:25:1
+
+Node.js v24.16.0
+FAIL: Command '['node', 'tests/clients/sync/desktop.mjs', 'H:\\.codex\\toolchains\\client-sqlite\\target-final\\debug\\storage_probe.exe', 'https://localhost:59537']' returned non-zero exit status 1.

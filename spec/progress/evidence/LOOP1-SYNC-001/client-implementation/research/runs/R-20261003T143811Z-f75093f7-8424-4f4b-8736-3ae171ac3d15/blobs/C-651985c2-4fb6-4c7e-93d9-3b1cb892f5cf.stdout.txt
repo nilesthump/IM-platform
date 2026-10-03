@@ -1,0 +1,77 @@
+= qualified or r.startswith(qualified + ".") or r == package + ".*" for r in references)
+            if present:
+                violation = dependency_violation(path, unit["owner"], target, unit["owner"] == "tests")
+                if violation:
+                    errors.append(violation + " (" + qualified + ")")
+        for dependency in references:
+            # Unresolved project service imports are rejected too; renaming/deleting
+            # the destination cannot erase a prohibited dependency classification.
+            for segment in dependency.split("."):
+                target = "plugin-host" if segment in {"pluginhost", "plugin_host"} else segment
+                if target in SERVICES:
+                    violation = dependency_violation(path, unit["owner"], target, unit["owner"] == "tests")
+                    if violation:
+                        errors.append(violation + " (" + dependency + ")")
+    return errors, [{k: v for k, v in u.items() if k != "code"} for u in units]
+
+
+
+def client_policy(root):
+    """Resolve hash-bound canonical policy; Task Specs cannot extend this policy."""
+    try:
+        manifest = (root / 'spec/architecture/baseline.md').read_text(encoding='utf-8')
+        fields = dict(re.findall(r'^- ([a-z_0-9]+): `([^`]+)`\s*$', manifest, re.M))
+        docpath = root / 'spec/architecture/frozen-architecture.md'
+        doc = docpath.read_text(encoding='utf-8')
+        if fields.get('repository_path') != 'spec/architecture/frozen-architecture.md' or fields.get('sha256') != hashlib.sha256(docpath.read_bytes()).hexdigest():
+            raise ValueError('canonical hash/resolver mismatch')
+        adrpath = 'spec/architecture/decisions/ADR-0005-client-technology-clarification.md'
+        if fields.get('revision_adr') != adrpath or 'Human-approved' not in (root / adrpath).read_text(encoding='utf-8'):
+            raise ValueError('approved ADR-0005 linkage missing')
+        match = re.search(r'<!-- client-technology-policy -->\s*```json\s*(.*?)\s*```', doc, re.S)
+        policy = json.loads(match.group(1)) if match else {}
+        if policy.get('decision') != 'ADR-0005-client-technology-clarification' or policy.get('mobile_framework') != 'Jetpack Compose' or policy.get('native_boundary') != 'clients/desktop/src-tauri/':
+            raise ValueError('client decision/boundary missing')
+        for key in ('languages', 'frameworks', 'runtimes', 'packages', 'native_packages', 'mobile_languages', 'mobile_frameworks', 'mobile_runtimes', 'mobile_plugins', 'mobile_dependencies', 'mobile_tooling', 'mobile_import_prefixes'):
+            if not isinstance(policy.get(key), list) or not all(isinstance(x, str) for x in policy[key]):
+                raise ValueError('invalid policy ' + key)
+        return policy, []
+    except (OSError, ValueError, AttributeError) as error:
+        return {}, ['CLIENT authority unavailable (never skipped): ' + str(error)]
+
+
+FORBIDDEN_CLIENT = re.compile(r'(?:dart-lang/setup-dart|subosito/flutter-action|\bflutter\b|\bdart\b|pubspec\.(?:yaml|lock))', re.I)
+CLIENT_SOURCE = {'.ts', '.tsx'}
+CLIENT_RESOURCES = {'.json', '.yaml', '.yml', '.toml', '.sql', '.md', '.css', '.scss', '.html', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.txt', '.lock'}
+
+
+def client_package_allowed(name, relative, policy, native=False):
+    if relative.startswith('clients/mobile/'):
+        return False  # Native Android Mobile never installs/reuses JS/TS runtime packages.
+    app
+ot)}: unapproved Android catalog plugin {name}')
+            for alias, values in catalog.get('bundles', {}).items():
+                if not isinstance(values, list) or any(re.sub(r'[-_]', '.', x) not in catalog_libraries for x in values):
+                    errors.append(f'CLIENT {path.relative_to(root)}: unresolved Android catalog bundle {alias}')
+                else:
+                    catalog_bundles.add(re.sub(r'[-_]', '.', alias))
+        except (ValueError, TypeError, AttributeError):
+            errors.append(f'CLIENT {path.relative_to(root)}: invalid Android version catalog')
+    for path in paths:
+        relative = path.relative_to(root).as_posix()
+        if path.suffix not in {'.kt', '.kts', '.gradle', '.toml', '.properties', '.xml', '.sh', '.bat', '.cmd', '.yml', '.yaml', '.json'} and path.name not in {'gradlew', 'Makefile', 'Dockerfile'}:
+            continue
+        code = uncomment_client(path.read_text(encoding='utf-8'))
+        if path.suffix == '.kt':
+            for dependency in re.findall(r'(?m)^\s*import\s+([\w.*]+)', code):
+                local = any(dependency.startswith(package + '.') for package in packages)
+                if not local and not any(dependency.startswith(prefix) for prefix in policy['mobile_import_prefixes']):
+                    errors.append(f'CLIENT {relative}: unapproved Kotlin import {dependency}')
+            if re.search(r'\b(?:addJavascriptInterface|evaluateJavascript|ReactNative|JavascriptEngine)\b|\bSystem\s*\.\s*load(?:Library)?\s*\(', code):
+                errors.append(f'CLIENT {relative}: unapproved Mobile JS/native bridge/runtime')
+        if path.suffix in {'.gradle', '.kts'}:
+            # Accept the entire selector argument, never an approved string prefix.
+            literal = r"(?:\"[\w.-]+\"|'[\w.-]+')"
+            selector = re.compile(r'\b(id|kotlin)\s*(?:\(\s*(' + literal +
+                                  r')\s*\)|[ \t]+(' + literal + r'))')
+            for declaration in re.finditer(r'\b(?:

@@ -128,5 +128,8 @@ export class Repository {
     const rows = await this.db.query("SELECT CAST(contiguous_seq AS TEXT) FROM conversations WHERE conversation_id=?",[conversationId]);
     return BigInt(rows[0]?.[0] ?? "0");
   }
+  async conversationIds(): Promise<string[]> {
+    return (await this.db.query("SELECT conversation_id FROM conversations UNION SELECT conversation_id FROM messages UNION SELECT subject_id FROM user_state WHERE kind IN ('conversation.changed','membership.changed') ORDER BY 1", [])).map(r=>r[0]!);
+  }
   async cursor(): Promise<string> { return (await this.db.query("SELECT cursor FROM user_cursor WHERE singleton=1",[]))[0][0]!; }
 }

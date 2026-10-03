@@ -1,0 +1,54 @@
+// Private test transport: hex strings preserve SQL/bind bytes, no dependencies,
+// business models, network listeners or product protocol. Each T input batch
+// invokes the SAME atomic adapter used by the Tauri command exactly once.
+use im_client_storage::database;
+use std::io::{self, Read};
+fn decode(value: &str) -> Result<String, String> {
+    if value.len()%2!=0 { return Err("Invalid hex".into()) }
+    let bytes: Result<Vec<u8>,_> = (0..value.len()).step_by(2).map(|i|u8::from_str_radix(&value[i..i+2],16)).collect();
+    String::from_utf8(bytes.map_err(|_|"Invalid hex")?).map_err(|_|"Invalid UTF8".into())
+}
+fn encode(value: &str) -> String { value.as_bytes().iter().map(|b|format!("{b:02x}")).collect() }
+async fn execute() -> Result<(),String> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len()!=3 { return Err("Expected isolated root and account".into()) }
+
+    let mut input=String::new(); io::stdin().read_to_string(&mut input).map_err(|_|"Input failed")?;
+    let lines: Vec<Vec<&str>> = input.lines().map(|l|l.split('\t').collect()).collect();
+    if lines.first().and_then(|l|l.first())==Some(&"Q") {
+        let mut connection=database::open_read_only(args[1].clone().into(),&args[2]).await?;
+        let line=&lines[0];
+        if lines.len()!=1 || line.len()<2 { return Err("Invalid query".into()) }
+        let sql=decode(line[1])?;
+        let binds: Result<Vec<_>,String>=line[2..].iter().map(|v| if *v=="~" { Ok(None) } else { decode(v).map(Some) }).collect();
+        for row in database::query(&mut connection,&sql,binds?).await? {
+            println!("{}",row.iter().map(|v|v.as_ref().map(|s|encode(s)).unwrap_or("~".into())).collect::<Vec<_>>().join("\t"));
+        }
+    } else {
+        let mut connection=database::open(args[1].clone().into(),&args[2]).await?;
+        let mut statements=Vec::new();
+        for line in lines {
+            if line.len()<3 || line[0]!="T" { return Err("Invalid transaction".into()) }
+            let expected=if line[1]=="-" { None } else { Some(line[1].parse().map_err(|_|"Invalid row assertion")?) };
+            let binds: Result<Vec<_>,String>=line[3..].iter().map(|v|if *v=="~" { Ok(None) } else { decode(v).map(Some) }).collect();
+            statements.push((decode(line[2])?,binds?,expected));
+        }
+        database::transaction(&mut connection,statements).await?;
+        println!("OK");
+    }
+    Ok(())
+}
+fn main() {
+    if let Err(error)=tauri::async_runtime::block_on(execute()) { eprintln!("{error}"); std::process::exit(1) }
+}
+
+import { invoke } from "@tauri-apps/api/core";
+import type { Bind, Database, Statement } from "../../../shared/protocol-sdk/src/storage/models.js";
+export function accountDatabase(accountId: string): Database {
+  // Account identity comes from the bound session, never a caller-selected path.
+  return {
+    transaction: statements => invoke<void>("database_transaction",{ accountId, statements }),
+    query: (sql: string, binds: Bind[]) => invoke<(string|null)[][]>("database_query",{ accountId, sql, binds }),
+  };
+}
+

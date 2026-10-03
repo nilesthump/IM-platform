@@ -1,0 +1,46 @@
+def check_clients(root):
+    policy, errors = client_policy(root)
+    if errors:
+        return errors
+    errors += check_android(root, policy)
+    files = []
+    for directory in ('clients', '.github/workflows'):
+        if (root / directory).is_symlink():
+            errors.append(f'CLIENT {directory}: symlink boundary bypass')
+    for area in ('shared', 'web', 'desktop', 'mobile'):
+        base = root / 'clients' / area
+        if base.is_symlink():
+            errors.append(f'CLIENT {base}: symlink boundary bypass')
+            continue
+        files.extend(base.rglob('*'))
+    # Active configuration only: immutable research/evidence/history not scanned.
+    files += list((root / '.github/workflows').glob('*'))
+    files += [root / p for p in ('package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'bun.lockb', 'tsconfig.json') if (root / p).exists()]
+    for path in files:
+        relative = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            errors.append(f'CLIENT {relative}: symlink boundary bypass')
+            continue
+        if not path.is_file():
+            continue
+        client = relative.startswith('clients/')
+        native = relative.startswith(policy['native_boundary'])
+        mobile = relative.startswith('clients/mobile/')
+        if path.name == '.gitkeep' and not path.read_bytes().strip():
+            continue
+        suffix = path.suffix.lower()
+        config_js = suffix in {'.js', '.mjs', '.cjs'} and ('.config.' in path.name or path.name.startswith('eslint.config.'))
+        allowed = suffix in CLIENT_SOURCE | CLIENT_RESOURCES or config_js or path.name in {'.gitignore', '.npmrc', 'Dockerfile', 'Makefile'}
+        if native and (suffix in {'.rs', '.rc', '.plist', '.manifest', '.icns'} or path.name == 'Cargo.lock'):
+            allowed = True
+        if mobile:
+            allowed = suffix in CLIENT_RESOURCES | {'.kt', '.xml', '.gradle', '.properties', '.sh', '.bat', '.cmd'} or path.name in {'.gitignore', 'gradlew', 'Makefile', 'Dockerfile'} or path.name in {'build.gradle.kts', 'settings.gradle.kts'}
+            if path.name == 'gradle-wrapper.jar' and relative.endswith('/gradle/wrapper/gradle-wrapper.jar'):
+                continue  # Standard Android Gradle tooling, semantic Review verifies artifact provenance.
+            if suffix == '.toml' and path.name != 'libs.versions.toml':
+                allowed = False
+            if path.name in {'package.json', 'tsconfig.json'} or suffix in {'.ts', '.tsx', '.js', '.mjs', '.cjs', '.rs'}:
+                allowed = False
+        if client and not allowed:
+            errors.append(f'CLIENT {relative}: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only')
+        if su

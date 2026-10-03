@@ -15,7 +15,7 @@ export function positive(v: unknown): bigint {
   if (typeof v !== "bigint" || v < 1n) return invalid();
   return v;
 }
-function timestamp(v: unknown): string {
+export function timestamp(v: unknown): string {
   if (typeof v !== "string" || !/^\d{4}-\d\d-\d\d[Tt]\d\d:\d\d:\d\d(?:\.\d+)?(?:[Zz]|[+-]\d\d:\d\d)$/.test(v) || !Number.isFinite(Date.parse(v))) return invalid();
   const date = v.slice(0,10), day = Number(date.slice(8)), month = Number(date.slice(5,7)), year = Number(date.slice(0,4));
   if (month<1 || month>12 || day<1 || day>new Date(Date.UTC(year,month,0)).getUTCDate()) return invalid();
@@ -28,8 +28,8 @@ export function content(v: unknown): {kind: "TEXT"; text: string} {
 }
 // Parse integers before JavaScript Number can round them. Reject duplicate keys,
 // exponent/fraction values where the canonical fields require positive integers.
-function parse(raw: string): unknown {
-  if(raw.length>131072) return invalid();
+export function parse(raw: string, maxLength=131072): unknown {
+  if(raw.length>maxLength) return invalid();
   let at=0, depth=0;
   const whitespace=()=>{ while(/[\x20\t\r\n]/.test(raw[at]??"x")) at++; };
   function string(): string {
@@ -53,6 +53,12 @@ function parse(raw: string): unknown {
         if(raw[at]!==",") break; at++;
       }
       if(raw[at++]!=="}") return invalid(); out=o;
+    } else if(raw[at]==="[") {
+      at++; const items: unknown[]=[]; whitespace();
+      if(raw[at]!=="]") for(;;) { items.push(value()); whitespace(); if(raw[at]!==",") break; at++; }
+      if(raw[at++]!=="]") return invalid(); out=items;
+    } else if(raw.startsWith("true",at)) { at+=4; out=true;
+    } else if(raw.startsWith("false",at)) { at+=5; out=false;
     } else {
       const number=raw.slice(at).match(/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
       if(number) { at+=number[0].length; const parts=number[0].toLowerCase().split("e"), exponent=Number(parts[1]??"0");

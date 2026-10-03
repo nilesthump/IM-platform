@@ -1,0 +1,6 @@
+ci/check_architecture.py:38:    for path in directory.rglob("*"):
+ci/check_architecture.py:287:    paths = [p for p in base.rglob('*') if p.is_file() and not p.is_symlink()]
+ci/check_architecture.py:417:            for url in re.findall(r'(?m)^distributionUrl\s*=\s*(\S+)', code):
+ci/check_architecture.py:418:                if not re.fullmatch(r'https\\?://services\.gradle\.org/distributions/gradle-[\w.\-]+-(?:bin|all)\.zip', url):
+ci/check_architecture.py:419:                    errors.append(f'CLIENT {relative}: unapproved Gradle wrapper distribution')
+ci/check_architecture.py:437:        files.extend(base.rglob('*'))

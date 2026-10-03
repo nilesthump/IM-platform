@@ -1,0 +1,20 @@
+   Compiling im-client-storage v0.1.0 (H:\.codex\worktrees\sync-resume\IM-platform\clients\desktop\src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.37s
+{
+  phase: 'initial',
+  sync: { status: 'failed', error: 'storage', unavailable: [] },
+  send: 'ready',
+  sendError: 'storage',
+  cursor: 'u-205',
+  contiguous: '205'
+}
+file:///H:/.codex/worktrees/sync-resume/IM-platform/tests/clients/sync/desktop.mjs:18
+async function until(check){for(let n=0;n<600;n++){if(await check())return;await delay(10);}throw new Error("Condition timed out");}
+                                                                                                  ^
+
+Error: Condition timed out
+    at until (file:///H:/.codex/worktrees/sync-resume/IM-platform/tests/clients/sync/desktop.mjs:18:99)
+    at async file:///H:/.codex/worktrees/sync-resume/IM-platform/tests/clients/sync/desktop.mjs:25:6
+
+Node.js v24.16.0
+FAIL: Command '['node', 'tests/clients/sync/desktop.mjs', 'H:\\.codex\\toolchains\\client-sqlite\\target-final\\debug\\storage_probe.exe', 'https://localhost:54401']' returned non-zero exit status 1.
