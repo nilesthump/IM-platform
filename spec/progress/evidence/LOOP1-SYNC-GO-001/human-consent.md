@@ -1,0 +1,14 @@
+# Human consent and verified prerequisite recovery
+
+Human exact reply on 2026-10-03: 同意.
+
+This follows the Coordinator's displayed Go implementation proposal after independently accepted and synchronized prerequisite. Authorized existing Core two HTTPS Sync routes, exact min(limit,100), complete multi-page runtime verification using real PostgreSQL/TLS, independent Review/CI/protected integration/main synchronization, then existing Desktop/Mobile SYNC; stop after SYNC completion. Existing publication/integration authorization persists. This record approves implementation within accepted authority, not contract or architecture changes.
+
+Proposal: spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md.
+Accepted frozen canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03.
+Accepted product b8200783ea3eadc1ed4e4050238f051a7ab708b3 / actualmainc2ff0502fdad80f463abe038a960ca1b798e6d7a. Product exact hosted37121974931/37122484526 full13jobs105steps allSUCCESS, durable source acceptance under prior task acceptance/.
+Administrative reviewed3588f0002587e6080a7fd775ad5c4cdb9fb39764 / PR19 actualmain4d5fe1235e4f01111d78cc67b2880b52cac072f2. Fresh /root/sync_closure_review37event candidate Review PASS and same independent Reviewer17event new actual-main audit PASS; exact37123550572/37124088012 selected5jobs37stepsSUCCESS, eight correctly inactive.
+Git-private exact reports H:/IM-platform/.git/worktrees/IM-platform5/sync-closure-review/review.md and actual-main/review.md; immutable sealed runs. Exact final local synchronization receipt H:/IM-platform/.git/worktrees/IM-platform5/sync-transport-publish-research/administrative-main-sync-receipt.json: PASS193adminpaths exact committed bytes, original781status/mode/size/hash protected, recovery branch preserved. First revision:path byte verifier failed after successful FF on Windows long path; retained error, separate ls-tree object-ID/cat-file verification PASS. No unknown work copied/published.
+Prior Coordinator publication Recorder R-20261003T114615Z-da3360fd-957a-4401-b167-93728b753e41 sealed159eventsPASS/validate; limitations disclosed, not product acceptance.
+New prospective-resume Coordinator Recorder root H:/IM-platform/.git/worktrees/IM-platform5/sync-go-coordinator-research; Human prompt P-c8c0b33c-9914-461d-a801-2766a52f8fde; run R-20261003T130041Z-fe4fcd8e-6378-48f7-80dd-7d62e097a0f9. Initial mandatory startup/authority and read-only state inspection before Recorder explicitly incomplete. Two read-only rg nonexistent guessed files failed and were corrected; no file creation from guessed paths.
+Before task activation at clean4d5fe: tools/verify_frozen_architecture.py PASS, ci/check_architecture.py --scope all --json PASS zero violations, exact assigned root verified. No Go runtime/client PASS claimed.
