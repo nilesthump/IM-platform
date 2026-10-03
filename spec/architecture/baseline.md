@@ -5,7 +5,7 @@
 - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03`
+- sha256: `a6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -96,3 +96,14 @@ Candidate only: fresh independent Review, exact-head hosted CI, protected integr
 ## Sync transport 接受发现 (2026-10-03)
 
 ADR-0008 / 公开 HTTPS Sync 绑定 已在 candidate b8200783ea3eadc1ed4e4050238f051a7ab708b3 / PR18 actual main c2ff0502fdad80f463abe038a960ca1b798e6d7a 通过 fresh independent Review 与 精确 HEAD CI 接受，并同步 H:/IM-platform。 canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 / v1.1 / 历史 PDF 不变。 证据：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/acceptance/acceptance.md。 此前 pending 段落为历史过程。 Go 产品仍待 方案展示后 Human 同意；SYNC backlog/S2 OPEN。 本收尾记录另待独立 Review/CI/同步。
+
+## Human 批准的最小原生 GUI 前置候选（2026-10-04）
+
+- native_revision_type: `human_approved_minimal_client_native_capabilities`
+- native_semantic_change: `true`
+- native_revision_task_id: `LOOP1-CLIENT-NATIVE-ARCH-001`
+- native_revision_adr: `spec/architecture/decisions/ADR-0009-client-native-capabilities.md`
+- native_approval_source: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/approval.md`
+- native_previous_sha256: `ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03`
+
+APPROVED_PENDING_FREEZE：当前 canonical 为窄原生能力候选；原 revision_adr/policy ADR-0005、UI/planning/Sync 谱系、v1.1/历史 PDF 保持。须经新独立 Review、适用 exact-head hosted CI、protected integration/actual-main 验证及安全主仓库同步。GUI backlog/S1 PASS/S2 OPEN，无产品/契约/schema 迁移。

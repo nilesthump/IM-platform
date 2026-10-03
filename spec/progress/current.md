@@ -5,61 +5,58 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-GUI-only
-Current Task: LOOP1-CLIENT-GUI-001
-Current Task State: backlog
-Execution Status: BLOCKED_BY_ARCHITECTURE
+Current Task: LOOP1-CLIENT-NATIVE-ARCH-001
+Current Task State: review
+Execution Status: APPROVED_PENDING_FREEZE
 
 ## Immediately Relevant Completed Work
 
-SYNC product/administrative closure independently accepted and synchronized at main ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597. Human starts GUI only, superseding historical SYNC stop endpoint. GUI dependency/readiness startup complete; Human approves eight exact assembly paths.
+Accepted SYNC actual main ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597. Human authorized next GUI, exact eight assembly paths, then concrete minimal native prerequisite. Sole fresh writer freezes ADR-0009/sections6.1/6.5/native policy; no GUI runtime work.
 
 ## Current Blockers
 
-Complete native GUI requires accepted HTTPS/OS-secure-refresh/notification/shortcut and persistent appearance choices under canonical 2.3/6.5. Proposed concrete adapters and alternatives: spec/progress/evidence/LOOP1-CLIENT-GUI-001/readiness/authority-gap.md. Scope authorization alone does not approve those technologies. Unique GUI backlog retained.
+Native candidate requires fresh independent Review/applicable exact-head hosted CI/protected integration/actual-main/safe synchronization before effective. GUI remains dependent backlog/BLOCKED_BY_ARCHITECTURE. No missing Human plan/scope approval remains.
 
 ## Verification
 
 - Command: `python -B ci/check_architecture.py --scope all --json`
-  - Result: PASS, zero violations, recorded baseline only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/readiness/authority-gap.md`
+  - Result: candidate local PASS; independent hosted acceptance pending.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
 - Command: `python -B tools/verify_frozen_architecture.py`
-  - Result: PASS; canonical ef90846/PDF546915 verified; local baseline only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/readiness/authority-gap.md`
+  - Result: candidate local PASS; independent hosted acceptance pending.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
 
+- Command: `python -B -m unittest discover -s tests/architecture -p test_*.py`
+  - Result: local PASS, all53 tests; independent acceptance pending.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
 - Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: PASS after disclosed legacy-shell and formatting failures; local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/readiness/authority-gap.md`
+  - Result: local PASS, unique current native task/31specs/fivequeues.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/verification.md`
 
 ## Changed Files or Migrations
 
-GUI Task backlog/current/readiness evidence/checkpoint only. No product/native/dependency/backend/contracts/schema/Send/Sync edits or migrations.
+Bounded architecture/ADR9/manifest/resolver, unique native Task, GUI dependency readiness, current/evidence/checkpoint only. No product/dependencies/contracts/schema/backend/CI/governance/checker change.
 
 ## Known Failures, Risks, and Assumptions
 
-S1 PASS/S2 OPEN. Full GUI not implemented, no runtime screenshot or Architect Approval. Native target/library proposals unapproved. Initial readonly Recorder capture incomplete and explicitly prospective_resume. Eight assembly scope additions approved; no hidden scope expansion.
+S1 PASS/S2 OPEN; native authority candidate only. Local/Recorder evidence does not establish Task/Gate PASS. Initial read-only Recorder capture incomplete and disclosed; one pre-execution JS tool parse failure and initial Task declaration/discovery and modified hash-line formatting failures repaired within scope; original runs preserved. Prior historical evidence immutable. Genuine Windows notification proof requires installed owned package.
 
 ## Next Exact Action
 
-Obtain smallest native/appearance architecture decision; freeze authority/policy, fresh independent Review and applicable exact-head hosted CI/protected integration/main sync; reassess GUI readiness then sequential backlog -> ready -> active. Recovery record itself awaits independent review/integration. Do not advance Web/later task or claim GUI acceptance.
+Commit clean review candidate; hand off to fresh independent Reviewer. Fresh independent Review -> actual required exact-head hosted jobs -> protected integration/actual-main verification -> safe synchronization preserving unknown main work. Only after prerequisite done/effective reassess GUI readiness; do not advance Web/later tasks.
 
 ## Last Known Good Commit
 
-`ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597` independently accepted SYNC administrative main and actually synchronized.
+`ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597` independently accepted SYNC administrative main, actually synchronized.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-04-loop1-client-gui-001-readiness.md`
+`spec/progress/checkpoints/2026-10-04-loop1-client-native-arch-001-freeze.md`
 
 ## Uncommitted Changes / Ownership
 
-Sole fresh /root/gui_implementation owns GUI recovery docs/private Recorder in assigned H:/.codex/worktrees/s/IM-platform task/LOOP1-CLIENT-GUI-001. Main unknown work untouched. Task commit/sync identity supplied by handoff; local recovery synchronization PENDING.
+Sole /root/native_architecture_freeze owns bounded prerequisite documents in assigned H:/.codex/worktrees/s/IM-platform task/LOOP1-CLIENT-NATIVE-ARCH-001. Git root exactly verified before writes. Main unknown work untouched. Task branch committed candidate SHA supplied by Git handoff; synchronization PENDING.
 
 ## Architecture Conflicts / ACP / ADR
 
-BLOCKED_BY_ARCHITECTURE: missing accepted native transport/secure credential/notification/shortcut/persistent appearance selection. Existing canonical React/Tauri/Kotlin/Compose/Navigation/StateFlow remains accepted. Authority gap does not reopen SYNC/S1 or authorize backend/CORS/public contract changes.
-
-## Approved prerequisite plan; freeze acceptance pending
-
-Human exact response: 批准该最小前置方案并继续. The named concrete minimal native/appearance prerequisite plan is approved: Windows Desktop reqwest strict HTTPS, keyring Windows Credential Manager, official Tauri notification/global-shortcut plugins and existing Tauri tray; Desktop app_data JSON appearance values; Android SharedPreferences appearance, Keystore AES/GCM protected refresh credential ciphertext. Earlier proposed/unapproved/no-consent wording describes inspection before this answer. Current status APPROVED_PENDING_FREEZE; GUI remains BLOCKED_BY_ARCHITECTURE/backlog until authority is frozen and independently accepted. No missing Human plan/scope consent remains; do not ask again.
-
-Next exact action is fresh prerequisite writer for LOOP1-CLIENT-NATIVE-ARCH-001/ADR-0009 with precise native responsibilities/policy markers, fresh independent Review/applicable exact-head CI/protected integration/actual-main/main sync. GUI sole writer releases after this clean recovery commit. Product implementation still waits for accepted prerequisite; no GUI agent writes frozen authority outside its allowed scope. Genuine Windows notification proof requires installed owned package, not development PowerShell identity/toast. Scope additions do not authorize backend CORS, public contract or native business migration. Main unchanged; recovery synchronization pending.
+ADR-0009 records already Human-approved strict native HTTPS/secure refresh/official notification/global shortcut/tray and scalar appearance plan. APPROVED_PENDING_FREEZE; no product authority before independent acceptance/main synchronization. TypeScript/Kotlin auth/business/Repository/protocol ownership preserved.

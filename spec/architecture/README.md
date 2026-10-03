@@ -40,3 +40,7 @@ Resolve sync_revision_adr/approval_source/previous_sha256 in baseline.md for Hum
 ## Sync transport 接受发现 (2026-10-03)
 
 ADR-0008 / 公开 HTTPS Sync 绑定 已在 candidate b8200783ea3eadc1ed4e4050238f051a7ab708b3 / PR18 actual main c2ff0502fdad80f463abe038a960ca1b798e6d7a 通过 fresh independent Review 与 精确 HEAD CI 接受，并同步 H:/IM-platform。 canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 / v1.1 / 历史 PDF 不变。 证据：spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/acceptance/acceptance.md。 此前 pending 段落为历史过程。 Go 产品仍待 方案展示后 Human 同意；SYNC backlog/S2 OPEN。 本收尾记录另待独立 Review/CI/同步。
+
+## 最小原生 GUI 前置候选发现（2026-10-04）
+
+通过 baseline.md 的 native_revision_adr/native_approval_source/native_previous_sha256 解析 Human 批准的 ADR-0009、§6.1/§6.5 与窄原生 policy。APPROVED_PENDING_FREEZE：新独立 Review、exact-head hosted CI、protected integration/actual-main 验证及安全同步待完成。ADR-0005 基础 policy、v1.1/PDF/历史不变；GUI backlog/S1 PASS/S2 OPEN。证据：spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/approval.md。

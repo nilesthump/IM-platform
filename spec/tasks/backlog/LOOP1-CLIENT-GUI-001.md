@@ -31,6 +31,8 @@ client_runtime: Android
 
 # Dependencies
 
+- LOOP1-CLIENT-NATIVE-ARCH-001 (Human-approved native/appearance freeze; independent acceptance/integration/main synchronization pending).
+
 - LOOP1-CLIENT-SQLITE-001 (必须独立接受并 done).
 - LOOP1-CLIENT-UI-ARCH-001 (必须独立接受并 done).
 - LOOP1-CLIENT-SEND-001 (必须独立接受并 done).
@@ -122,3 +124,7 @@ Next exact action is fresh prerequisite writer for LOOP1-CLIENT-NATIVE-ARCH-001/
 ## Recovery verification outcomes
 
 Development recovery verifier initially failed because Windows legacy PowerShell lacks Get-FileHash. Corrected to bundled PowerShell7; then failed four current.md required formatting controls (exact backtick Command/Evidence/SHA/checkpoint). Formatting repaired; rerun tools/verify-loop1-ctrl-002.ps1 -Mode Development exits0 PASS task GUI/backlog, queues5/task_specs30. Original failures remain in sealed command stream. Baseline architecture/frozen exit0 PASS. Development is local evidence only, not independent acceptance. All commands recorded; command summaries contain exact duration/output hashes. No Recorder failures.
+
+## Native prerequisite dependency (2026-10-04)
+
+ADR-0009/LOOP1-CLIENT-NATIVE-ARCH-001 freezes already approved concrete minimal native/appearance plan. GUI remains backlog/BLOCKED_BY_ARCHITECTURE until prerequisite done/effective/synchronized, then reassess runtime readiness. Exact eight assembly-path consent preserved; dependency grants no extra product scope. No missing Human approval remains for same plan.
