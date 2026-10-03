@@ -82,7 +82,7 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 
 # Next Action
 
-Public Sync transport prerequisite now accepted/synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a. Await separate Human consent for concrete Go proposal and accepted actual Go User/Conversation Sync runtime; then reassess inputs and activate this existing SYNC task. Human endpoint remains SYNC done then stop; GUI/Web not selected.
+Go runtime independently accepted and synchronized at 6f9341276c6481e982c2a9b2f2d490b76bc1df96. Await Go administrative discovery acceptance, then reassess exact dependency/input readiness and activate this existing task. Human endpoint SYNC complete then stop; GUI/Web not selected.
 
 # Authorized SYNC recovery and authority blocker (2026-10-03)
 
@@ -104,3 +104,9 @@ Human authorizes minimal public Sync architecture/contract prerequisite LOOP1-SY
 # Accepted transport prerequisite and remaining runtime input
 
 LOOP1-SYNC-TRANSPORT-001 is independently accepted and synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a, evidence acceptance/acceptance.md under that task. Earlier BLOCKED_BY_ARCHITECTURE/public-binding statements are historical: binding gap resolved by ADR0008 and existing four-shape HTTP contract; current execution BLOCKED_BY_RUNTIME_INPUT, unique backlog retained. No accepted live User Sync endpoint exists. Go needs separate Human plan consent and narrow task approval/independent runtime Review-CI-main sync before client activation. Single-page min(limit,100); continuously commit/apply pages through terminal latest committed read without fixed total cutoff. SYNC acceptance and allowed product paths unchanged. Known good accepted freeze c2ff050; no client products implemented.
+
+# Accepted Go runtime recovery (2026-10-03)
+
+Earlier missing binding/runtime/consent statements are historical. Human separate Go consent received. LOOP1-SYNC-GO-001 product candidate a78f7f96227e25980c5a51255e92a2e6a34a1bf0 / protected PR20 actual main6f9341276c6481e982c2a9b2f2d490b76bc1df96 accepted by fresh independent Review and new same-role actual-main audit; exact37127049105/37127820035 each13jobs106stepsSUCCESS. Actual PG/race/strict TLS208metadata205messages plus postterminal206th/huge numbers executed. Safe main sync190paths/781originalentries verified. Evidence: spec/progress/evidence/LOOP1-SYNC-GO-001/acceptance/acceptance.md.
+
+Execution: WAITING_GO_ADMINISTRATIVE_ACCEPTANCE. Unique backlog retained until Go administrative closure acceptance and Coordinator readiness reassessment. No client product or scope changes in this note. min(limit,100) per-page; data/cursor transaction commits precede continuation to hasMore=false without total cutoff. S1PASS/S2OPEN, SYNC not accepted. Authorized final endpoint remains SYNC done then stop.

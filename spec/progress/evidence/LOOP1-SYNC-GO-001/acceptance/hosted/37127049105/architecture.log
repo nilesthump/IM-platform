@@ -1,0 +1,415 @@
+architecture	Set up job	﻿2026-10-03T13:42:22.1328567Z Current runner version: '2.337.0'
+architecture	Set up job	2026-10-03T13:42:22.1352991Z ##[group]Runner Image Provisioner
+architecture	Set up job	2026-10-03T13:42:22.1354012Z Hosted Compute Agent
+architecture	Set up job	2026-10-03T13:42:22.1354600Z Version: 20260901.588
+architecture	Set up job	2026-10-03T13:42:22.1355274Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+architecture	Set up job	2026-10-03T13:42:22.1356016Z Build Date: 2026-09-01T19:56:44Z
+architecture	Set up job	2026-10-03T13:42:22.1356713Z Worker ID: {8c3ba90c-228c-4d7c-857e-477ed26bfcda}
+architecture	Set up job	2026-10-03T13:42:22.1357508Z Azure Region: westus
+architecture	Set up job	2026-10-03T13:42:22.1358630Z ##[endgroup]
+architecture	Set up job	2026-10-03T13:42:22.1360128Z ##[group]Operating System
+architecture	Set up job	2026-10-03T13:42:22.1360891Z Ubuntu
+architecture	Set up job	2026-10-03T13:42:22.1361413Z 24.04.5
+architecture	Set up job	2026-10-03T13:42:22.1362046Z LTS
+architecture	Set up job	2026-10-03T13:42:22.1362562Z ##[endgroup]
+architecture	Set up job	2026-10-03T13:42:22.1363091Z ##[group]Runner Image
+architecture	Set up job	2026-10-03T13:42:22.1363751Z Image: ubuntu-24.04
+architecture	Set up job	2026-10-03T13:42:22.1364326Z Version: 20260927.320.1
+architecture	Set up job	2026-10-03T13:42:22.1365437Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+architecture	Set up job	2026-10-03T13:42:22.1367213Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+architecture	Set up job	2026-10-03T13:42:22.1368706Z ##[endgroup]
+architecture	Set up job	2026-10-03T13:42:22.1369804Z ##[group]GITHUB_TOKEN Permissions
+architecture	Set up job	2026-10-03T13:42:22.1371806Z Contents: read
+architecture	Set up job	2026-10-03T13:42:22.1372427Z Metadata: read
+architecture	Set up job	2026-10-03T13:42:22.1373073Z ##[endgroup]
+architecture	Set up job	2026-10-03T13:42:22.1375184Z Secret source: Actions
+architecture	Set up job	2026-10-03T13:42:22.1376247Z Cache mode: write
+architecture	Set up job	2026-10-03T13:42:22.1376955Z Prepare workflow directory
+architecture	Set up job	2026-10-03T13:42:22.1780578Z Prepare all required actions
+architecture	Set up job	2026-10-03T13:42:22.1829975Z Getting action download info
+architecture	Set up job	2026-10-03T13:42:22.5580851Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+architecture	Set up job	2026-10-03T13:42:22.6582739Z Download action repository 'actions/setup-go@v5' (SHA:40f1582b2485089dde7abd97c1529aa768e1baff)
+architecture	Set up job	2026-10-03T13:42:23.1229586Z Download action repository 'actions/setup-java@v4' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+architecture	Set up job	2026-10-03T13:42:23.8166761Z Complete job name: architecture
+architecture	Run actions/checkout@v4	﻿2026-10-03T13:42:23.9144666Z ##[group]Run actions/checkout@v4
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9146169Z with:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9147105Z   repository: nilesthump/IM-platform
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9157110Z   token: ***
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9158137Z   ssh-strict: true
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9159046Z   ssh-user: git
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9159985Z   persist-credentials: true
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9161014Z   clean: true
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9161940Z   sparse-checkout-cone-mode: true
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9163044Z   fetch-depth: 1
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9163945Z   fetch-tags: false
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9164874Z   show-progress: true
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9165804Z   lfs: false
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9166679Z   submodules: false
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9167632Z   set-safe-directory: true
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9168821Z   allow-unsafe-pr-checkout: false
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9170213Z env:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9171104Z   PYTHONDONTWRITEBYTECODE: 1
+architecture	Run actions/checkout@v4	2026-10-03T13:42:23.9172146Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0261081Z Syncing repository: nilesthump/IM-platform
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0264588Z ##[group]Getting Git version info
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0266347Z Working directory is '/home/runner/work/IM-platform/IM-platform'
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0269239Z [command]/usr/bin/git version
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0328421Z git version 2.55.0
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0353656Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0369469Z Temporarily overriding HOME='/home/runner/work/_temp/3723b4a2-cdc7-444e-8e2b-2ba858e80b18' before making global git config changes
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0373156Z Adding repository directory to the temporary git global config as a safe directory
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0376746Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/IM-platform/IM-platform
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0429131Z Deleting the contents of '/home/runner/work/IM-platform/IM-platform'
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0434082Z ##[group]Initializing the repository
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0439369Z [command]/usr/bin/git init /home/runner/work/IM-platform/IM-platform
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0564551Z hint: Using 'master' as the name for the initial branch. This default branch name
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0568536Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0571936Z hint: to use in all of your new repositories, which will suppress this warning,
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0574619Z hint: call:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0575973Z hint:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0577959Z hint: 	git config --global init.defaultBranch <name>
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0580432Z hint:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0582475Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0585039Z hint: 'development'. The just-created branch can be renamed via this command:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0587609Z hint:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0589253Z hint: 	git branch -m <name>
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0590929Z hint:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0593121Z hint: Disable this message with "git config set advice.defaultBranchName false"
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0596919Z Initialized empty Git repository in /home/runner/work/IM-platform/IM-platform/.git/
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0603325Z [command]/usr/bin/git remote add origin https://github.com/nilesthump/IM-platform
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0638358Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0641513Z ##[group]Disabling automatic garbage collection
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0652703Z [command]/usr/bin/git config --local gc.auto 0
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0700582Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0703202Z ##[group]Setting up auth
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0709620Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.0746271Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1144338Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1204725Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1437433Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1475848Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1703341Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1746783Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1749712Z ##[group]Fetching the repository
+architecture	Run actions/checkout@v4	2026-10-03T13:42:24.1757625Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2b122413c4a16c0012a3610acaa39992b020e60d:refs/remotes/pull/20/merge
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0698242Z From https://github.com/nilesthump/IM-platform
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0699455Z  * [new ref]         2b122413c4a16c0012a3610acaa39992b020e60d -> pull/20/merge
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0704634Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0705324Z ##[group]Determining the checkout info
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0707274Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0716349Z [command]/usr/bin/git sparse-checkout disable
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0774849Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0811056Z ##[group]Checking out the ref
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.0815601Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/20/merge
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7455515Z Note: switching to 'refs/remotes/pull/20/merge'.
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7456291Z 
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7456688Z You are in 'detached HEAD' state. You can look around, make experimental
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7457607Z changes and commit them, and you can discard any commits you make in this
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7458811Z state without impacting any branches by switching back to a branch.
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7459384Z 
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7459800Z If you want to create a new branch to retain commits you create, you may
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7461015Z do so (now or later) by using -c with the switch command. Example:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7461576Z 
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7461802Z   git switch -c <new-branch-name>
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7462143Z 
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7462372Z Or undo this operation with:
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7462683Z 
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7537886Z   git switch -
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7538315Z 
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7538790Z Turn off this advice by setting config variable advice.detachedHead to false
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7539406Z 
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7539789Z HEAD is now at 2b12241 Merge a78f7f96227e25980c5a51255e92a2e6a34a1bf0 into 4d5fe1235e4f01111d78cc67b2880b52cac072f2
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7544426Z ##[endgroup]
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7573237Z [command]/usr/bin/git log -1 --format=%H
+architecture	Run actions/checkout@v4	2026-10-03T13:42:26.7573916Z 2b122413c4a16c0012a3610acaa39992b020e60d
+architecture	Run actions/setup-go@v5	﻿2026-10-03T13:42:26.7835609Z ##[group]Run actions/setup-go@v5
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7835926Z with:
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7836126Z   go-version: 1.23
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7836342Z   check-latest: false
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7839248Z   token: ***
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7839456Z   cache: true
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7839644Z env:
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7839874Z   PYTHONDONTWRITEBYTECODE: 1
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.7840123Z ##[endgroup]
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.9135429Z Setup go version spec 1.23
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.9368200Z Attempting to download 1.23...
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.9478624Z (node:2278) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:26.9479564Z (Use `node --trace-deprecation ...` to show where the warning was created)
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:27.5939338Z matching 1.23...
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:27.5984057Z Acquiring 1.23.12 from https://github.com/actions/go-versions/releases/download/1.23.12-16792118003/go-1.23.12-linux-x64.tar.gz
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:28.2256826Z Extracting Go...
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:28.2396272Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/0818a7bc-cc92-4228-824b-a39d8e5d2428 -f /home/runner/work/_temp/35102238-9282-4c07-990d-f1211504e29a
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:29.9158166Z Successfully extracted go to /home/runner/work/_temp/0818a7bc-cc92-4228-824b-a39d8e5d2428
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:29.9159067Z Adding to the cache ...
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2506567Z Successfully cached go to /opt/hostedtoolcache/go/1.23.12/x64
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2510080Z Added go to the path
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2512677Z Successfully set up Go version 1.23
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2731998Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOMODCACHE
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2771679Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOCACHE
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2813890Z /home/runner/go/pkg/mod
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2830076Z /home/runner/.cache/go-build
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2862250Z ##[warning]Restore cache failed: Dependencies file is not found in /home/runner/work/IM-platform/IM-platform. Supported file pattern: go.sum
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2889915Z go version go1.23.12 linux/amd64
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2890126Z 
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.2890407Z ##[group]go env
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9922180Z GO111MODULE=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9922649Z GOARCH='amd64'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9923013Z GOBIN=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9923391Z GOCACHE='/home/runner/.cache/go-build'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9923870Z GOENV='/home/runner/.config/go/env'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9924273Z GOEXE=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9924564Z GOEXPERIMENT=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9924877Z GOFLAGS=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9925185Z GOHOSTARCH='amd64'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9925507Z GOHOSTOS='linux'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9925846Z GOINSECURE=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9926196Z GOMODCACHE='/home/runner/go/pkg/mod'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9926621Z GONOPROXY=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9926923Z GONOSUMDB=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9927313Z GOOS='linux'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9927641Z GOPATH='/home/runner/go'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9928283Z GOPRIVATE=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9928759Z GOPROXY='https://proxy.golang.org,direct'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9929350Z GOROOT='/opt/hostedtoolcache/go/1.23.12/x64'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9929819Z GOSUMDB='sum.golang.org'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9930445Z GOTMPDIR=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9930756Z GOTOOLCHAIN='auto'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9931271Z GOTOOLDIR='/opt/hostedtoolcache/go/1.23.12/x64/pkg/tool/linux_amd64'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9931843Z GOVCS=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9932139Z GOVERSION='go1.23.12'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9932468Z GODEBUG=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9932764Z GOTELEMETRY='local'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9933191Z GOTELEMETRYDIR='/home/runner/.config/go/telemetry'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9933666Z GCCGO='gccgo'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9933959Z GOAMD64='v1'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9934241Z AR='ar'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9934515Z CC='gcc'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9934788Z CXX='g++'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9935078Z CGO_ENABLED='1'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9935384Z GOMOD='/dev/null'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9935681Z GOWORK=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9935973Z CGO_CFLAGS='-O2 -g'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9936293Z CGO_CPPFLAGS=''
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9936859Z CGO_CXXFLAGS='-O2 -g'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9937202Z CGO_FFLAGS='-O2 -g'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9937515Z CGO_LDFLAGS='-O2 -g'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9938118Z PKG_CONFIG='pkg-config'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9939229Z GOGCCFLAGS='-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build2843728482=/tmp/go-build -gno-record-gcc-switches'
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9940165Z 
+architecture	Run actions/setup-go@v5	2026-10-03T13:42:36.9940613Z ##[endgroup]
+architecture	Run actions/setup-java@v4	﻿2026-10-03T13:42:37.0231658Z ##[group]Run actions/setup-java@v4
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0231946Z with:
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0232137Z   distribution: temurin
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0232353Z   java-version: 21
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0232560Z   java-package: jdk
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0232767Z   check-latest: false
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0232978Z   server-id: github
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0233187Z   server-username: GITHUB_ACTOR
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0233435Z   server-password: GITHUB_TOKEN
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0233676Z   overwrite-settings: true
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0233898Z   job-status: success
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0236555Z   token: ***
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0236746Z env:
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0236945Z   PYTHONDONTWRITEBYTECODE: 1
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.0237204Z ##[endgroup]
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.1935626Z ##[warning]setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.1938021Z ##[group]Installed distributions
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2004853Z Resolved Java 21.0.12+1 from tool-cache
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2005460Z Setting Java 21.0.12+1 as the default
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2016333Z (node:2350) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2017261Z (Use `node --trace-deprecation ...` to show where the warning was created)
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2020819Z Creating toolchains.xml for JDK version 21 from temurin
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2106427Z Writing to /home/runner/.m2/toolchains.xml
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2106991Z 
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2107202Z Java configuration:
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2107654Z   Distribution: temurin
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2108254Z   Version: 21.0.12+1
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2108908Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2109461Z 
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2109945Z ##[endgroup]
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2123762Z Creating settings.xml with server-id: github
+architecture	Run actions/setup-java@v4	2026-10-03T13:42:37.2163842Z Writing to /home/runner/.m2/settings.xml
+architecture	Canonical integrity and authority structure	﻿2026-10-03T13:42:37.2306434Z ##[group]Run ./tools/verify-frozen-architecture.ps1
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:37.2306911Z ^[[36;1m./tools/verify-frozen-architecture.ps1^[[0m
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:37.2335237Z shell: /usr/bin/pwsh -command ". '{0}'"
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:37.2335541Z env:
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:37.2335743Z   PYTHONDONTWRITEBYTECODE: 1
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:37.2336111Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:37.2336603Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:37.2336973Z ##[endgroup]
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.1186034Z PASS: v1.1 current SHA/PDF provenance/ADR and section-bound semantic structure; historical migration semantic_change=false; current revision semantic_change=true
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.2811209Z test_android_complete_literal_plugin_notations_remain_approved (test_client_technology.ClientTechnologyControls.test_android_complete_literal_plugin_notations_remain_approved) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.3029512Z test_android_compose_gradle_source_and_tooling (test_client_technology.ClientTechnologyControls.test_android_compose_gradle_source_and_tooling) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.3143262Z test_android_literal_and_direct_catalog_plugins_remain_approved (test_client_technology.ClientTechnologyControls.test_android_literal_and_direct_catalog_plugins_remain_approved) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.3556735Z test_android_negative_real_gradle_catalog_import_build_workflow_controls (test_client_technology.ClientTechnologyControls.test_android_negative_real_gradle_catalog_import_build_workflow_controls) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.3657933Z test_android_plugin_block_shortcuts_and_generic_apply_fail_closed (test_client_technology.ClientTechnologyControls.test_android_plugin_block_shortcuts_and_generic_apply_fail_closed) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.3757214Z test_android_plugin_declarations_fail_closed (test_client_technology.ClientTechnologyControls.test_android_plugin_declarations_fail_closed) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.4063286Z test_android_plugin_selectors_require_complete_literal_arguments (test_client_technology.ClientTechnologyControls.test_android_plugin_selectors_require_complete_literal_arguments) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.4211487Z test_android_quoted_dispatch_text_remains_data (test_client_technology.ClientTechnologyControls.test_android_quoted_dispatch_text_remains_data) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.4377540Z test_android_quoted_member_dispatch_fails_closed (test_client_technology.ClientTechnologyControls.test_android_quoted_member_dispatch_fails_closed) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.4541321Z test_android_supported_apply_and_quoted_contexts_remain_approved (test_client_technology.ClientTechnologyControls.test_android_supported_apply_and_quoted_contexts_remain_approved) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.4709881Z test_android_unsupported_plugin_applications_fail_closed (test_client_technology.ClientTechnologyControls.test_android_unsupported_plugin_applications_fail_closed) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.4791997Z test_approved_ts_native_config_assets (test_client_technology.ClientTechnologyControls.test_approved_ts_native_config_assets) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.4808322Z test_authority_missing_or_mutated_is_failure (test_client_technology.ClientTechnologyControls.test_authority_missing_or_mutated_is_failure) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.5505082Z test_current_active_clients (test_client_technology.ClientTechnologyControls.test_current_active_clients) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.5705360Z test_forbidden_source_and_config_controls (test_client_technology.ClientTechnologyControls.test_forbidden_source_and_config_controls) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.5730611Z test_history_is_not_active_client_implementation (test_client_technology.ClientTechnologyControls.test_history_is_not_active_client_implementation) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.5753933Z test_symlink_cannot_bypass_boundary (test_client_technology.ClientTechnologyControls.test_symlink_cannot_bypass_boundary) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.5794264Z test_task_paths_and_passing_tests_cannot_approve_framework (test_client_technology.ClientTechnologyControls.test_task_paths_and_passing_tests_cannot_approve_framework) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.5951339Z test_unapproved_generic_dependencies_and_imports (test_client_technology.ClientTechnologyControls.test_unapproved_generic_dependencies_and_imports) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.6219881Z test_current_document (test_frozen_architecture.ArchitectureIntegrityTests.test_current_document) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.7511504Z test_hash_and_provenance_mutations (test_frozen_architecture.ArchitectureIntegrityTests.test_hash_and_provenance_mutations) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:42.7739463Z test_layout_flexibility_preserves_semantics (test_frozen_architecture.ArchitectureIntegrityTests.test_layout_flexibility_preserves_semantics) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:43.3619066Z test_semantic_negative_controls (test_frozen_architecture.ArchitectureIntegrityTests.test_semantic_negative_controls) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:43.3665467Z test_active_task_path_is_never_architecture_waiver (test_source_boundaries.SourceTests.test_active_task_path_is_never_architecture_waiver) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:47.8494623Z test_arbitrarily_named_go_root_assembly_helper_valid (test_source_boundaries.SourceTests.test_arbitrarily_named_go_root_assembly_helper_valid) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:47.8532176Z test_arbitrarily_named_java_root_assembly_helper_valid (test_source_boundaries.SourceTests.test_arbitrarily_named_java_root_assembly_helper_valid) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:47.9510787Z test_cross_service_alias_import_and_build_tag (test_source_boundaries.SourceTests.test_cross_service_alias_import_and_build_tag) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:47.9559806Z test_current_governance_and_task_migration_scope_valid (test_source_boundaries.SourceTests.test_current_governance_and_task_migration_scope_valid) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:47.9588323Z test_current_java_placeholder_valid_and_no_early_business_required (test_source_boundaries.SourceTests.test_current_java_placeholder_valid_and_no_early_business_required) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:47.9616400Z test_future_java_business_root_and_shared_disguise (test_source_boundaries.SourceTests.test_future_java_business_root_and_shared_disguise) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:47.9642195Z test_future_java_cross_service_shared_reverse_and_fully_qualified (test_source_boundaries.SourceTests.test_future_java_cross_service_shared_reverse_and_fully_qualified) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:50.9394787Z test_future_java_single_layout_compiles_and_imports_checked (test_source_boundaries.SourceTests.test_future_java_single_layout_compiles_and_imports_checked) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0369099Z test_gateway_cannot_write_session_or_outbox (test_source_boundaries.SourceTests.test_gateway_cannot_write_session_or_outbox) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0402457Z test_java_dynamic_jdbc_shared_repository_and_gateway_write_rejected (test_source_boundaries.SourceTests.test_java_dynamic_jdbc_shared_repository_and_gateway_write_rejected) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0428178Z test_java_gateway_dynamic_update_with_select_decoy_rejected (test_source_boundaries.SourceTests.test_java_gateway_dynamic_update_with_select_decoy_rejected) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0486020Z test_java_gateway_execute_cannot_borrow_unrelated_select_literal (test_source_boundaries.SourceTests.test_java_gateway_execute_cannot_borrow_unrelated_select_literal) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0516962Z test_java_gateway_executequery_and_connection_lifecycle_valid (test_source_boundaries.SourceTests.test_java_gateway_executequery_and_connection_lifecycle_valid) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0542213Z test_java_gateway_readonly_session_and_shared_token_primitive_valid (test_source_boundaries.SourceTests.test_java_gateway_readonly_session_and_shared_token_primitive_valid) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0719764Z test_java_noncore_jdbc_transaction_controls_rejected (test_source_boundaries.SourceTests.test_java_noncore_jdbc_transaction_controls_rejected) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0727477Z test_java_placeholder_cannot_grow_business (test_source_boundaries.SourceTests.test_java_placeholder_cannot_grow_business) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:51.0750884Z test_java_unicode_import_cannot_bypass_dependency (test_source_boundaries.SourceTests.test_java_unicode_import_cannot_bypass_dependency) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:52.9608348Z test_legal_single_module_go_runtime_and_blackbox_test (test_source_boundaries.SourceTests.test_legal_single_module_go_runtime_and_blackbox_test) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.0557570Z test_main_whitelisted_name_cannot_hide_business (test_source_boundaries.SourceTests.test_main_whitelisted_name_cannot_hide_business) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.0583385Z test_placeholder_exit_and_business_not_permanent_exception (test_source_boundaries.SourceTests.test_placeholder_exit_and_business_not_permanent_exception) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.0638798Z test_plain_bullet_task_path_checked_and_legal_core_accepted (test_source_boundaries.SourceTests.test_plain_bullet_task_path_checked_and_legal_core_accepted) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.1676076Z test_real_old_go_layout_rejected_without_name_hardcoding (test_source_boundaries.SourceTests.test_real_old_go_layout_rejected_without_name_hardcoding) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.2750485Z test_root_new_business_and_unapproved_internal (test_source_boundaries.SourceTests.test_root_new_business_and_unapproved_internal) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.3712368Z test_root_test_name_cannot_hide_business (test_source_boundaries.SourceTests.test_root_test_name_cannot_hide_business) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.4720170Z test_shared_generic_repository_call_rejected_without_sql_literal (test_source_boundaries.SourceTests.test_shared_generic_repository_call_rejected_without_sql_literal) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.4745660Z test_shared_java_connection_factory_is_support_not_repository (test_source_boundaries.SourceTests.test_shared_java_connection_factory_is_support_not_repository) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.5700342Z test_shared_reverse_dependency_and_moved_full_auth (test_source_boundaries.SourceTests.test_shared_reverse_dependency_and_moved_full_auth) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.6719360Z test_syntax_failure_cannot_be_skipped (test_source_boundaries.SourceTests.test_syntax_failure_cannot_be_skipped) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.6772169Z test_workflow_missing_commands_dependencies_and_suppression_rejected (test_source_boundaries.SourceTests.test_workflow_missing_commands_dependencies_and_suppression_rejected) ... ok
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.6773486Z 
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.6773952Z ----------------------------------------------------------------------
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.6774556Z Ran 53 tests in 11.439s
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.6774781Z 
+architecture	Canonical integrity and authority structure	2026-10-03T13:42:53.6774905Z OK
+architecture	Current governance references and task scopes	﻿2026-10-03T13:42:53.8565737Z ##[group]Run python3 ci/check_architecture.py --scope governance
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.8566237Z ^[[36;1mpython3 ci/check_architecture.py --scope governance^[[0m
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.8629230Z shell: /usr/bin/bash -e {0}
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.8629499Z env:
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.8629704Z   PYTHONDONTWRITEBYTECODE: 1
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.8630069Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.8630578Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.8630965Z ##[endgroup]
+architecture	Current governance references and task scopes	2026-10-03T13:42:53.9188672Z PASS: scope=governance violations=0; static checks supplement independent Review
+architecture	Active client technology/source/dependency/configuration guard	﻿2026-10-03T13:42:53.9272555Z ##[group]Run python3 ci/check_architecture.py --scope clients --json
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:53.9273063Z ^[[36;1mpython3 ci/check_architecture.py --scope clients --json^[[0m
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:53.9335100Z shell: /usr/bin/bash -e {0}
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:53.9335343Z env:
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:53.9335547Z   PYTHONDONTWRITEBYTECODE: 1
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:53.9335897Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:53.9336395Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:53.9336790Z ##[endgroup]
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:54.0676981Z {
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:54.0677920Z   "result": "PASS",
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:54.0679008Z   "scope": "clients",
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:54.0679744Z   "violations": [],
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:54.0680468Z   "graphs": {}
+architecture	Active client technology/source/dependency/configuration guard	2026-10-03T13:42:54.0681071Z }
+architecture	Checker positive and negative controls	﻿2026-10-03T13:42:54.0810315Z ##[group]Run python3 -m unittest discover -s tests/architecture -v
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.0811220Z ^[[36;1mpython3 -m unittest discover -s tests/architecture -v^[[0m
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.0902846Z shell: /usr/bin/bash -e {0}
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.0903273Z env:
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.0903624Z   PYTHONDONTWRITEBYTECODE: 1
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.0904271Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.0905178Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.12-1/x64
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.0905860Z ##[endgroup]
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.2137377Z test_android_complete_literal_plugin_notations_remain_approved (test_client_technology.ClientTechnologyControls.test_android_complete_literal_plugin_notations_remain_approved) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.2515320Z test_android_compose_gradle_source_and_tooling (test_client_technology.ClientTechnologyControls.test_android_compose_gradle_source_and_tooling) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.2655881Z test_android_literal_and_direct_catalog_plugins_remain_approved (test_client_technology.ClientTechnologyControls.test_android_literal_and_direct_catalog_plugins_remain_approved) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.3098669Z test_android_negative_real_gradle_catalog_import_build_workflow_controls (test_client_technology.ClientTechnologyControls.test_android_negative_real_gradle_catalog_import_build_workflow_controls) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.3200623Z test_android_plugin_block_shortcuts_and_generic_apply_fail_closed (test_client_technology.ClientTechnologyControls.test_android_plugin_block_shortcuts_and_generic_apply_fail_closed) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.3298108Z test_android_plugin_declarations_fail_closed (test_client_technology.ClientTechnologyControls.test_android_plugin_declarations_fail_closed) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.3584404Z test_android_plugin_selectors_require_complete_literal_arguments (test_client_technology.ClientTechnologyControls.test_android_plugin_selectors_require_complete_literal_arguments) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.3732200Z test_android_quoted_dispatch_text_remains_data (test_client_technology.ClientTechnologyControls.test_android_quoted_dispatch_text_remains_data) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.3895108Z test_android_quoted_member_dispatch_fails_closed (test_client_technology.ClientTechnologyControls.test_android_quoted_member_dispatch_fails_closed) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.4044044Z test_android_supported_apply_and_quoted_contexts_remain_approved (test_client_technology.ClientTechnologyControls.test_android_supported_apply_and_quoted_contexts_remain_approved) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.4219419Z test_android_unsupported_plugin_applications_fail_closed (test_client_technology.ClientTechnologyControls.test_android_unsupported_plugin_applications_fail_closed) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.4291643Z test_approved_ts_native_config_assets (test_client_technology.ClientTechnologyControls.test_approved_ts_native_config_assets) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.4306248Z test_authority_missing_or_mutated_is_failure (test_client_technology.ClientTechnologyControls.test_authority_missing_or_mutated_is_failure) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.5010389Z test_current_active_clients (test_client_technology.ClientTechnologyControls.test_current_active_clients) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.5212035Z test_forbidden_source_and_config_controls (test_client_technology.ClientTechnologyControls.test_forbidden_source_and_config_controls) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.5236207Z test_history_is_not_active_client_implementation (test_client_technology.ClientTechnologyControls.test_history_is_not_active_client_implementation) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.5259062Z test_symlink_cannot_bypass_boundary (test_client_technology.ClientTechnologyControls.test_symlink_cannot_bypass_boundary) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.5299533Z test_task_paths_and_passing_tests_cannot_approve_framework (test_client_technology.ClientTechnologyControls.test_task_paths_and_passing_tests_cannot_approve_framework) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.5458031Z test_unapproved_generic_dependencies_and_imports (test_client_technology.ClientTechnologyControls.test_unapproved_generic_dependencies_and_imports) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.5711961Z test_current_document (test_frozen_architecture.ArchitectureIntegrityTests.test_current_document) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.7023908Z test_hash_and_provenance_mutations (test_frozen_architecture.ArchitectureIntegrityTests.test_hash_and_provenance_mutations) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:54.7260996Z test_layout_flexibility_preserves_semantics (test_frozen_architecture.ArchitectureIntegrityTests.test_layout_flexibility_preserves_semantics) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.3045289Z test_semantic_negative_controls (test_frozen_architecture.ArchitectureIntegrityTests.test_semantic_negative_controls) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.3091481Z test_active_task_path_is_never_architecture_waiver (test_source_boundaries.SourceTests.test_active_task_path_is_never_architecture_waiver) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.4116750Z test_arbitrarily_named_go_root_assembly_helper_valid (test_source_boundaries.SourceTests.test_arbitrarily_named_go_root_assembly_helper_valid) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.4152085Z test_arbitrarily_named_java_root_assembly_helper_valid (test_source_boundaries.SourceTests.test_arbitrarily_named_java_root_assembly_helper_valid) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.5120513Z test_cross_service_alias_import_and_build_tag (test_source_boundaries.SourceTests.test_cross_service_alias_import_and_build_tag) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.5173379Z test_current_governance_and_task_migration_scope_valid (test_source_boundaries.SourceTests.test_current_governance_and_task_migration_scope_valid) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.5201516Z test_current_java_placeholder_valid_and_no_early_business_required (test_source_boundaries.SourceTests.test_current_java_placeholder_valid_and_no_early_business_required) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.5229908Z test_future_java_business_root_and_shared_disguise (test_source_boundaries.SourceTests.test_future_java_business_root_and_shared_disguise) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.5255673Z test_future_java_cross_service_shared_reverse_and_fully_qualified (test_source_boundaries.SourceTests.test_future_java_cross_service_shared_reverse_and_fully_qualified) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:55.9968629Z test_future_java_single_layout_compiles_and_imports_checked (test_source_boundaries.SourceTests.test_future_java_single_layout_compiles_and_imports_checked) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.0916254Z test_gateway_cannot_write_session_or_outbox (test_source_boundaries.SourceTests.test_gateway_cannot_write_session_or_outbox) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.0947007Z test_java_dynamic_jdbc_shared_repository_and_gateway_write_rejected (test_source_boundaries.SourceTests.test_java_dynamic_jdbc_shared_repository_and_gateway_write_rejected) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.0971633Z test_java_gateway_dynamic_update_with_select_decoy_rejected (test_source_boundaries.SourceTests.test_java_gateway_dynamic_update_with_select_decoy_rejected) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.1030250Z test_java_gateway_execute_cannot_borrow_unrelated_select_literal (test_source_boundaries.SourceTests.test_java_gateway_execute_cannot_borrow_unrelated_select_literal) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.1060408Z test_java_gateway_executequery_and_connection_lifecycle_valid (test_source_boundaries.SourceTests.test_java_gateway_executequery_and_connection_lifecycle_valid) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.1083946Z test_java_gateway_readonly_session_and_shared_token_primitive_valid (test_source_boundaries.SourceTests.test_java_gateway_readonly_session_and_shared_token_primitive_valid) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.1260827Z test_java_noncore_jdbc_transaction_controls_rejected (test_source_boundaries.SourceTests.test_java_noncore_jdbc_transaction_controls_rejected) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.1269176Z test_java_placeholder_cannot_grow_business (test_source_boundaries.SourceTests.test_java_placeholder_cannot_grow_business) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.1292068Z test_java_unicode_import_cannot_bypass_dependency (test_source_boundaries.SourceTests.test_java_unicode_import_cannot_bypass_dependency) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.3924248Z test_legal_single_module_go_runtime_and_blackbox_test (test_source_boundaries.SourceTests.test_legal_single_module_go_runtime_and_blackbox_test) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.4912271Z test_main_whitelisted_name_cannot_hide_business (test_source_boundaries.SourceTests.test_main_whitelisted_name_cannot_hide_business) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.4937958Z test_placeholder_exit_and_business_not_permanent_exception (test_source_boundaries.SourceTests.test_placeholder_exit_and_business_not_permanent_exception) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.4993230Z test_plain_bullet_task_path_checked_and_legal_core_accepted (test_source_boundaries.SourceTests.test_plain_bullet_task_path_checked_and_legal_core_accepted) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.5982952Z test_real_old_go_layout_rejected_without_name_hardcoding (test_source_boundaries.SourceTests.test_real_old_go_layout_rejected_without_name_hardcoding) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.6989993Z test_root_new_business_and_unapproved_internal (test_source_boundaries.SourceTests.test_root_new_business_and_unapproved_internal) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.7923797Z test_root_test_name_cannot_hide_business (test_source_boundaries.SourceTests.test_root_test_name_cannot_hide_business) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.8924339Z test_shared_generic_repository_call_rejected_without_sql_literal (test_source_boundaries.SourceTests.test_shared_generic_repository_call_rejected_without_sql_literal) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.8949830Z test_shared_java_connection_factory_is_support_not_repository (test_source_boundaries.SourceTests.test_shared_java_connection_factory_is_support_not_repository) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:56.9907576Z test_shared_reverse_dependency_and_moved_full_auth (test_source_boundaries.SourceTests.test_shared_reverse_dependency_and_moved_full_auth) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:57.0911584Z test_syntax_failure_cannot_be_skipped (test_source_boundaries.SourceTests.test_syntax_failure_cannot_be_skipped) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:57.0963103Z test_workflow_missing_commands_dependencies_and_suppression_rejected (test_source_boundaries.SourceTests.test_workflow_missing_commands_dependencies_and_suppression_rejected) ... ok
+architecture	Checker positive and negative controls	2026-10-03T13:42:57.0964518Z 
+architecture	Checker positive and negative controls	2026-10-03T13:42:57.0964830Z ----------------------------------------------------------------------
+architecture	Checker positive and negative controls	2026-10-03T13:42:57.0965456Z Ran 53 tests in 2.912s
+architecture	Checker positive and negative controls	2026-10-03T13:42:57.0965706Z 
+architecture	Checker positive and negative controls	2026-10-03T13:42:57.0965847Z OK
+architecture	Post Run actions/setup-java@v4	﻿2026-10-03T13:42:57.1159675Z Post job cleanup.
+architecture	Post Run actions/setup-java@v4	2026-10-03T13:42:57.2497530Z (node:5191) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+architecture	Post Run actions/setup-java@v4	2026-10-03T13:42:57.2498658Z (Use `node --trace-deprecation ...` to show where the warning was created)
+architecture	Post Run actions/setup-go@v5	﻿2026-10-03T13:42:57.2663772Z Post job cleanup.
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.3937030Z (node:5199) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.3938710Z (Use `node --trace-deprecation ...` to show where the warning was created)
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.4016949Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOMODCACHE
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.4065922Z [command]/opt/hostedtoolcache/go/1.23.12/x64/bin/go env GOCACHE
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.4106370Z /home/runner/go/pkg/mod
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.4128958Z /home/runner/.cache/go-build
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.4136309Z [warning]Cache folder path is retrieved but doesn't exist on disk: /home/runner/go/pkg/mod
+architecture	Post Run actions/setup-go@v5	2026-10-03T13:42:57.4137384Z Primary key was not generated. Please check the log messages above for more errors or information
+architecture	Post Run actions/checkout@v4	﻿2026-10-03T13:42:57.4404009Z Post job cleanup.
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5281386Z [command]/usr/bin/git version
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5326415Z git version 2.55.0
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5370804Z Temporarily overriding HOME='/home/runner/work/_temp/53140854-ca62-4d96-97ad-c6ba87e548dc' before making global git config changes
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5372158Z Adding repository directory to the temporary git global config as a safe directory
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5376617Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/IM-platform/IM-platform
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5418729Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5453916Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5719052Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5750428Z http.https://github.com/.extraheader
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5762636Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.5797627Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.6073486Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+architecture	Post Run actions/checkout@v4	2026-10-03T13:42:57.6124993Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+architecture	Complete job	﻿2026-10-03T13:42:57.6554557Z Cleaning up orphan processes
+architecture	Complete job	2026-10-03T13:42:57.6927174Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5, actions/setup-java@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

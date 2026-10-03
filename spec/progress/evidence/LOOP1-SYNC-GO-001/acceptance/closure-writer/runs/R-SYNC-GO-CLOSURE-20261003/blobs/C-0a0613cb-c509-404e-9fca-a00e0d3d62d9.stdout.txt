@@ -1,0 +1,237 @@
+# Independent Go Sync candidate Review: PASS
+
+Reviewer /root/sync_go_review is a newly delegated context and neither implementer nor fixer. Exact clean candidate a78f7f96227e25980c5a51255e92a2e6a34a1bf0, task/LOOP1-SYNC-001, full range accepted4d5fe1235e4f01111d78cc67b2880b52cac072f2..a78f7f9. Assigned Git root verified H:/.codex/worktrees/sync-resume/IM-platform; status/diff empty before actual checks. Unique Current Task LOOP1-SYNC-GO-001 review; client SYNC unique backlog, S1 PASS/S2 OPEN. No actionable findings.
+
+Authority startup inspected handoff/current/exact Task/resolver/hash and referenced contracts, domain, invariants, acceptance, approved ADRs, minimality/technology/execution/review governance. Canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 and historical PDF unchanged; section2.3/3/6.1/7/10SRC01..07/11 enforce existing Go Core/PG/pgx, no new language/framework/dependency/config/schema/service. Full190 changed paths are allowed. Contracts/frozen/classifier/shared/go.mod/go.sum/social/message producer bytes unchanged. Original private history types/handler/comment bytes unchanged. Auth exactly6 assembly/delegation lines and CI exactly2 new deploy hook lines.
+
+Logic inspected: exact two POST routes delegate before legacy Auth query interceptor for canonical body UUID correlation; every other method/path retains old guard. Strict required/unknown/version/type validation follows established error precedence. no-store on success/canonical/transport failures; unexpected failures non2xx, no invented canonical error. Initial and transaction-local post-wait authentication match existing Parse/sessionID/clientType/status/expiry/epoch error order. Session and current membership locks plus rechecks prevent stale authorization after waits. Transaction-local helper avoids borrowing a second pooled connection while holding a transaction; actual single-connection concurrent readers prove no pool deadlock.
+
+User read locks the same user row as every existing eligible production event path before reading at READ COMMITTED. social.go emits three metadata kinds under ordered user FOR UPDATE locks before identity allocation; plugin.changed has no present product producer and fixtures explicitly identify that fact. session.revoked excluded. User HMAC uses existing codec key with domain separation and account binding; only persisted eligible positions accepted, initial0/empty retention/nonempty last cursor, same-account crossSession replay, invalid/foreign rejection. Conversation read locks current membership and reads a single ordered limit+1 committed query, detects gap, above-head empty terminal, no writes to Message/Outbox/ACK.
+
+Bounded numeric scanner preserves original JSON number grammar, escaped strings and whitespace separators. Normalizes only magnitude/integrality semantics; all accepted numeric domain values remain exact for limit cap/above-head behavior. Coefficient/exponent state and normalized body buffer bounded; arbitrarily long coefficients/exponents accepted and no public numeric max introduced. Generic unknown/string garbage may fail bounded validation. Existing grammar/long tests execute; independent private Go overlay additionally compared8,000 deterministic coefficients/decimal/exponent/sign combinations against exact math/big.Rat classification and saturation: PASS. No repository probe file writes. Streaming reader is justified by required unbounded integer domain and rejected unbounded ReadAll alternative; no generic parser framework/future mechanism.
+
+Actual independent commands, exit0: frozen verifier0.078s; architecture --scope all zero violations0.516s; tests/architecture53cases6.609s; clean existing Acceptance8.514s, five queues30specs/status0/diff0; Go build1.312s/vet0.688s/full race88.687s with DB_TEST_ENABLE=1, canonical migrated PostgreSQL16 on task-owned55439 and NATS44229. Core11.058s/gateway2.444s/shared1.377s/tests83.502s. Enabled existing Auth/Social/Message/ACK/Outbox/security regressions, new pagination/concurrency/auth-afterwait/longnumeric tests actually executed. Fixture-only connection credentials were configured privately, not dumped. Existing ADR0004 friend-denial deferred case remains DEFERRED_BY_HUMAN, never canonical PASS.
+
+Independent actual tools/verify_sync_runtime.py PASS: strict trusted rootCA and hostname checks; untrustedCA rejection; real proxy->Gateway->Core/PostgreSQL;208metadata and205durable WSS messages, complete pages <=100, terminal/newcommit/replay/auth/query/foreign/version/read-only, coefficients/exponents >64KiB. Disposable Compose cleanup independently inspected by verifier. No offline oracle offered as runtime evidence.
+
+Hosted exact PR37127049105 independently fetched completedSUCCESS at exacta78f7f9: thirteen unique jobs,106steps allSUCCESS, no skipped/cancelled required work. Local unchanged classifier derives full matrix from workflow change; classify.log confirms every selector true. go.log shows Go1.23.12, actualPG16/NATS/migration and enabled tests/race; deploy.log shows new Go public Sync strict TLS runtime step and real runtime PASS. Raw provider/classify/go/deploy logs and hashes are stored beside this report. Candidate CI does not prove actual merge main.
+
+180 immutable archive entries independently match manifest SHA/size and Git-private originals byte-for-byte; primary181event and final-observer32event runs independently validate finished. Historical startup/compile/TLS/Social polling collision/memory/auto-review denial failures remain preserved. Observer is same implementation context, not independent. Original main remains4d5fe; all781 baseline entries independently matched original status/mode/size/hash. Unknown-work snapshot excluded from publication. No repository/main/branch/old evidence edits by reviewer.
+
+Own Recorder prospective_resume fresh=true registers exact Human consent separately and delegation public summary with truthful source; initial mandatory reads and selected later read/helper/collaboration gaps disclosed. Private helper failures are explicitly preserved/disclosed, corrected without touching candidate. No complete trace claimed. Own Recorder PASS means structural validity, not Stage or task acceptance.
+
+Next: protected exact-head integration, new-run actual-main audit/CI in this same reviewer context explicitly fresh=false, preservation-verified main synchronization. Only then runtime task acceptance and client dependency reassessment; SYNC/S2 acceptance still pending.
+
+# Independent actual-main Go Sync audit: PASS
+
+Exact protected PR20 main6f9341276c6481e982c2a9b2f2d490b76bc1df96. Parents4d5fe1235e4f01111d78cc67b2880b52cac072f2 / a78f7f96227e25980c5a51255e92a2e6a34a1bf0. Tree06c5d3bb31079377bfe0aa41c4f57c56681f851e equals independently reviewed candidate tree byte-for-byte; assigned worktree clean. Same independent Reviewer /root/sync_go_review in a NEW audit run fresh_context=false, not a new independence claim; prior27-event sealed candidate review remains intact and validates.
+
+Live PR20 stateMERGED/headexacta78/mergeexact6f934 verified. Live main protection enforces admins and strict required gate; Coordinator reports matched-head merge without admin bypass, independently confirmed resulting exact parents/tree and protected configuration. No conflicting main or other source changes. Existing clean candidate logic/authority, local enabled realPG/NATS full Go/race, strictTLS and8,000 exact differential numerical checks apply to identical merged bytes; no unnecessary unchanged local runtime/native reruns.
+
+Exact actual-main hosted push run37127820035 independently fetched completedSUCCESS:13unique expected jobs/106steps allSUCCESS, no skipped/cancelled necessary work. Independently derived unchanged classifier full matrix from full190path range; classify.log confirms selected full matrix and clean recovery CurrentGoReview/SYNCbacklog/S2OPEN. Independently downloaded seven actual job logs plus provider and hashes. go.log proves Go1.23.12, PostgreSQL16/NATS/migration, enabled tests and race; no unset database integration acceptance. deploy.log proves real three roles/TLS Auth, new public Sync stricttrustedCA runtime208metadata/205durable WSS messages, complete100-cap pages/terminal/newcommit/replay/auth/foreign/query/version/read-only, cleanup, S1 messaging and Java transport steps. desktop.log proves actual TypeScript Repository + SQLx SQLite/verifiedTLS WSS Storage/Send; mobile.log proves real Android SDK SQLite/emulator instrumentation/standardverifiedTLS WSS/StateFlow. shared.log proves oldHTTP/WSS/SyncPlugin and approved newtransport guard. These are actual regressions, not new clientSYNC acceptance. ADR0004 friend403 remains deferred, notPASS.
+
+Full190 changed paths stillallowed; original private history and contracts/frozen/producer/shared/dependency/classifier bytes unchanged from accepted4d5fe. Frozen verifier job passes canonicalef90846/PDF provenance unchanged.180archive entries hash/sizeverified and separately compared exactGit-private originals; primary181 and observer32 records independentlyfinished/validated. Candidate reviewer27record separatelyvalidated, remainsimmutable. Historical implementation failures/trace limits preserved.
+
+Before local main synchronization: H:/IM-platform still4d5fe, original781entries status/mode/size/hash independently preserved against private original snapshot. Snapshot/unknown work notpublished. Reviewer made no repo/main/branch/old evidence writes. Own exact newdelegation registered and new prospective_resume auditrun explicitlyfresh=false; startup/privatehelper/logread/collaboration gaps and a corrected readonlyencoding probe failure disclosed. Recorder validity does not claim complete trace or Task/Stage acceptance.
+
+Next authorized Coordinator action: preserve originalwork during safe main FF to6f934 and verify every changed object byte plus781baseline entries; then acceptedruntime administrative closure and dependency reassessment for Desktop/MobileSYNC. Go product acceptance is bounded, SYNC/S2 stillpending.
+
+{
+  "result": "PASS",
+  "task": "LOOP1-SYNC-GO-001",
+  "task_branch": "task/LOOP1-SYNC-001",
+  "candidate": "a78f7f96227e25980c5a51255e92a2e6a34a1bf0",
+  "previous_main_sha": "4d5fe1235e4f01111d78cc67b2880b52cac072f2",
+  "main_sha": "6f9341276c6481e982c2a9b2f2d490b76bc1df96",
+  "main_tree": "06c5d3bb31079377bfe0aa41c4f57c56681f851e",
+  "changed_paths_exact_committed_bytes_no_rename": 190,
+  "protected_unrelated_entries_status_mode_size_hash_unchanged": 781,
+  "branch_preserved": "recovery/s1-handoff-20261001",
+  "method": "safe FF with ls-tree object-ID/cat-file exact bytes and full original unknown-work preservation; independent Review/CI separately required"
+}
+
+---
+task_id: LOOP1-SYNC-001
+title: Desktop/Mobile two-level sync orchestration
+status: backlog
+owner: unassigned
+stage: S2
+gate: S2
+---
+
+# Goal
+
+鍩轰簬鏃㈡湁 Repository 瀹炵幇 user cursor 涓?per-conversation contiguous_seq 鍚屾銆佸疄鏃朵氦鍙夈€佺己鍙ｈˉ鍋垮強鏂嚎閲嶈繛锛涗笉鏀瑰瓨鍌ㄨ亴璐ｃ€?
+
+# Inputs
+
+- `spec/architecture/README.md` -> `spec/architecture/baseline.md` -> `spec/architecture/frozen-architecture.md`锛屄?.3/搂3/搂6/搂10 SRC-01 through SRC-07/搂11/搂19/搂20銆?
+- `spec/architecture/decisions/ADR-0005-client-technology-clarification.md`銆乣spec/architecture/decisions/ADR-0006-client-ui-architecture.md`銆乣spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md`銆?
+- `spec/governance/minimality.md`銆乣spec/governance/execution-boundaries.md`銆乣spec/governance/independent-review.md`銆乣spec/governance/technology-selection.md`銆?
+- `spec/domain/messaging.md`銆乣spec/invariants/messaging.md`銆乣spec/domain/sync-plugin.md`銆乣spec/invariants/sync-plugin.md`銆乣contracts/websocket/`銆?
+- `spec/architecture/decisions/client-ui/architecture.md`銆乣spec/architecture/decisions/client-ui/design-direction.md`銆乣spec/acceptance/client-gui.md`銆?
+
+# Technology Authorization
+
+宸叉帴鍙?canonical 搂6.1/搂6.5 涓?ADR-0005/0006 鎺堟潈锛涙湰澹版槑涓嶉€夋嫨鏂颁緷璧栵紝鏈槑鎶€鏈寜 搂2.3 鍋滄鍙楀奖鍝嶅疄鐜般€侻obile Kotlin 绛変环濂戠害琛屼负锛屼笉寮哄埗 TS 澶嶇敤锛汥esktop TypeScript application/Repository 涓?existing Tauri SQLx boundary銆?
+client_language: TypeScript
+client_language: Kotlin
+client_framework: Tauri
+client_framework: Jetpack Compose
+client_runtime: Tauri
+client_runtime: Android
+
+# Dependencies
+
+- LOOP1-CLIENT-SEND-001 (蹇呴』鐙珛鎺ュ彈骞?done).
+
+- ADR-0007 鏈疆瑙勫垝椤荤嫭绔?Review/绮剧‘ HEAD CI/闆嗘垚 main 鍚屾鎺ュ彈鎵嶅彲婵€娲汇€備緷璧栨湭婊¤冻淇濇寔 backlog锛汫UI/Web 鍦ㄦ湰杞?Human endpoint 涔嬪悗锛屾棤鏈疆婵€娲绘巿鏉冦€?
+
+# Allowed Paths
+
+- `clients/desktop/src/application/sync/**`
+- `clients/shared/protocol-sdk/src/sync/**`
+- `clients/mobile/app/src/main/kotlin/im/platform/client/sync/**`
+- `clients/mobile/app/src/androidTest/kotlin/im/platform/client/sync/**`
+- `tests/clients/sync/**`
+- `tools/verify_client_sync.py`
+- `.github/workflows/ci.yml`
+- `spec/tasks/backlog/LOOP1-SYNC-001.md`
+- `spec/tasks/ready/LOOP1-SYNC-001.md`
+- `spec/tasks/active/LOOP1-SYNC-001.md`
+- `spec/tasks/review/LOOP1-SYNC-001.md`
+- `spec/tasks/done/LOOP1-SYNC-001.md`
+- `spec/progress/current.md`
+- `spec/progress/evidence/LOOP1-SYNC-001/**`
+- `spec/progress/checkpoints/*loop1-sync-001*.md`
+
+# Acceptance
+
+涔卞簭/閲嶅/浜ゅ弶瀹炴椂娴佷笉瓒婅繃 gap锛涗簨鍔″洖婊?data/cursor 涓€鑷达紱FAILED 琚湇鍔＄娑堟伅鏀舵暃 SENT锛涙寜璐﹀彿闅旂锛孌esktop/Mobile 鐪熷疄杩愯銆傜嫭绔?Review銆乪xact-head CI銆乸rotected main sync銆?
+閫傜敤 architecture/source/dependency guard 涓庡疄闄呰亴璐?import/minimality Review 蹇呴渶銆俆ask allowed_paths 涓嶆巿鏉冩柊鏋舵瀯銆?
+
+# Forbidden
+
+涓嶅疄鐜?GUI/Web/Plugin/AI锛涗笉鏀瑰绾︺€佸畨鍏ㄣ€丄CK 鎴?Repository schema銆?
+
+# Minimality
+
+浠呭疄鐜板綋鍓嶇洰鏍囷紝鐢ㄥ凡鏈?Repository/瑙勮寖鍗忚/宸插喕缁撴妧鏈紱涓嶅鍔犳湭鏉ユ満鍒躲€傛縺娲诲墠璇诲疄闄呮簮鐮侊紝璺緞涓嶈冻鍏堟樉寮忔敹绐?琛ュ厖 task scope锛屼笉鍊熻寖鍥存硾鍖栥€?
+
+# Verification
+
+- Minimum baseline: python -B ci/check_architecture.py --scope all --json 涓?`tools/verify_frozen_architecture.py`銆?
+- `tools/verify-loop1-ctrl-002.ps1` -Mode Development锛涘€欓€?clean Acceptance锛涚嫭绔?exact-head applicable hosted jobs銆?
+- 婵€娲绘椂灏嗘柊澧炲疄鐜扮殑绮剧‘琛屼负楠岃瘉鍛戒护銆佽繍琛岀幆澧冦€佸惎鐢ㄦ潯浠跺拰璐熶緥鍐欏叆鏈妭锛涘皻鏈繍琛岀殑娴嬭瘯涓嶈 PASS銆?
+
+# Evidence
+
+spec/progress/evidence/LOOP1-SYNC-001/锛涙湰娆′粎瑙勫垝锛屾湭鐢熸垚浜у搧楠屾敹锛沺rospective Research Recorder 婵€娲绘椂鐙珛杩愯銆?
+
+# Handoff
+
+Backlog 瑙勬牸瀹炰緥鍖?canonical 宸叉壒鍑嗚鍒?ID锛汫UI 鏄敮涓€鏂板浜у搧 ID銆係1 PASS/S2 OPEN锛涙湭瀹炵幇銆佹湭楠屾敹銆佹湭鍚屾浜у搧锛沰nown good59dcf34e4538d2f35ccafde8104e860f8cf5cd7a銆傚綋鍓嶈鍒掓枃鏈?/root 鎵€鏈夛紱涓嶈鐩栦富浠撳簱鏈煡宸ヤ綔銆傚叿浣?code paths 鍦ㄦ縺娲绘椂鎸夎矗浠讳笌瀹為檯婧愮爜纭銆?
+
+# Next Action
+
+Public Sync transport prerequisite now accepted/synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a. Await separate Human consent for concrete Go proposal and accepted actual Go User/Conversation Sync runtime; then reassess inputs and activate this existing SYNC task. Human endpoint remains SYNC done then stop; GUI/Web not selected.
+
+# Authorized SYNC recovery and authority blocker (2026-10-03)
+
+Human exact authorization: [REDACTED] This supersedes the prior SEND-only execution endpoint for this new run; it authorizes SYNC only, not GUI/Web. Current dependency LOOP1-CLIENT-SEND-001 exists uniquely in done and is independently accepted/synchronized. Accepted main/base: a0304fcc7be18b87f5986d014849d6b48b96a071 (PR17 SEND administrative closure). No missing Human scope authorization remains.
+
+Execution status: BLOCKED_BY_ARCHITECTURE. Queue remains unique backlog/status backlog because runtime/authority inputs are incomplete; do not activate ready/active. Fresh Implementation Agent /root/sync_implementation independently verified assigned Codex Git root H:/.codex/worktrees/sync-resume/IM-platform and branch task/LOOP1-SYNC-001. No product implementation, contract, backend, Repository/schema, frozen authority or GUI/Web edit.
+
+Direct inspection establishes existing canonical Sync user metadata is sufficient for current Repository; no invented rich user payload is needed. The blocker is absent accepted public Sync transport binding and actual User Sync server entrypoint. sync-v1.schema.json defines four standalone wire shapes, but envelope.schema.json oneOf contains only AuthBind/AuthAck/MessageSend/MessageAck/MessageCreated/SessionRevoked/Ping/Pong. Current OpenAPI has only Auth/User/Friend routes. Gateway has no sync.user/sync.conversation/history routing. Core only privately serves Conversation history at POST /__core/history and explicitly excludes User Sync. Offline oracle/profile vectors cannot establish running Sync service acceptance.
+
+Smallest decision question: Approve a prerequisite public Sync transport binding (for the existing user and Conversation shapes, including authentication/correlation/error behavior) and a narrowly scoped Go Core/Gateway runtime task before client orchestration? The exact route/transport choice must come from Architect/Human through approved contract/architecture process; this record does not choose one. SYNC allowed_paths excludes backend/contracts; neither scope nor tests may silently authorize these changes. Once approved/frozen and independently reviewed/applicable exact-head hosted CI accepted, implement and accept actual service inputs, then reassess SYNC readiness.
+
+Verification: own recorded python -B ci/check_architecture.py --scope all --json PASS; own recorded python -B tools/verify_frozen_architecture.py PASS. Canonical SHA25616e9c7b488e00dd39c7c2b5da7286c22be6ac67c163f0e89733bbe00297d0a3c matches. Recorded corrected JSON inventory confirms missing binding. Earlier inspection used wrong envelope filename and had one missing gateway filename; corrected direct inventory succeeds. Windows Recorder pipeline/base64 registration and canonical-output encoding failures are disclosed in implementation/authority-blocker.md; prospective_resume explicitly marks incomplete initial read-only trace.
+
+Evidence: spec/progress/evidence/LOOP1-SYNC-001/implementation/authority-blocker.md and implementation-research/. Local PASS is baseline evidence only; no SYNC Task PASS, runtime acceptance, hosted candidate acceptance or synchronization claimed. Main H:/IM-platform untouched; unknown work preserved. Branch commit identity is supplied in implementation handoff; main sync PENDING for this recovery record. Independent Review of blocker recovery is next; do not mark done. Last known good a0304fcc7be18b87f5986d014849d6b48b96a071. Coordinator /root owns pre-existing evidence/research; implementer owns only this appended note/current recovery/implementation evidence/own Recorder. No other-agent stream edited.
+# Human-authorized prerequisite (2026-10-03)
+
+Human authorizes minimal public Sync architecture/contract prerequisite LOOP1-SYNC-TRANSPORT-001. This is current active task; SYNC remains backlog BLOCKED_BY_ARCHITECTURE awaiting accepted binding and actual accepted Go service inputs. Go product implementation requires prerequisite independent Review/CI acceptance and Human consent to concrete plan beforehand. GUI/Web not authorized. No change to SYNC product allowed_paths/acceptance.
+
+# Accepted transport prerequisite and remaining runtime input
+
+LOOP1-SYNC-TRANSPORT-001 is independently accepted and synchronized at c2ff0502fdad80f463abe038a960ca1b798e6d7a, evidence acceptance/acceptance.md under that task. Earlier BLOCKED_BY_ARCHITECTURE/public-binding statements are historical: binding gap resolved by ADR0008 and existing four-shape HTTP contract; current execution BLOCKED_BY_RUNTIME_INPUT, unique backlog retained. No accepted live User Sync endpoint exists. Go needs separate Human plan consent and narrow task approval/independent runtime Review-CI-main sync before client activation. Single-page min(limit,100); continuously commit/apply pages through terminal latest committed read without fixed total cutoff. SYNC acceptance and allowed product paths unchanged. Known good accepted freeze c2ff050; no client products implemented.
+
+# Human consent and verified prerequisite recovery
+
+Human exact reply on 2026-10-03: 鍚屾剰.
+
+This follows the Coordinator's displayed Go implementation proposal after independently accepted and synchronized prerequisite. Authorized existing Core two HTTPS Sync routes, exact min(limit,100), complete multi-page runtime verification using real PostgreSQL/TLS, independent Review/CI/protected integration/main synchronization, then existing Desktop/Mobile SYNC; stop after SYNC completion. Existing publication/integration authorization persists. This record approves implementation within accepted authority, not contract or architecture changes.
+
+Proposal: spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/go-implementation-proposal.md.
+Accepted frozen canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03.
+Accepted product b8200783ea3eadc1ed4e4050238f051a7ab708b3 / actualmainc2ff0502fdad80f463abe038a960ca1b798e6d7a. Product exact hosted37121974931/37122484526 full13jobs105steps allSUCCESS, durable source acceptance under prior task acceptance/.
+Administrative reviewed3588f0002587e6080a7fd775ad5c4cdb9fb39764 / PR19 actualmain4d5fe1235e4f01111d78cc67b2880b52cac072f2. Fresh /root/sync_closure_review37event candidate Review PASS and same independent Reviewer17event new actual-main audit PASS; exact37123550572/37124088012 selected5jobs37stepsSUCCESS, eight correctly inactive.
+Git-private exact reports H:/IM-platform/.git/worktrees/IM-platform5/sync-closure-review/review.md and actual-main/review.md; immutable sealed runs. Exact final local synchronization receipt H:/IM-platform/.git/worktrees/IM-platform5/sync-transport-publish-research/administrative-main-sync-receipt.json: PASS193adminpaths exact committed bytes, original781status/mode/size/hash protected, recovery branch preserved. First revision:path byte verifier failed after successful FF on Windows long path; retained error, separate ls-tree object-ID/cat-file verification PASS. No unknown work copied/published.
+Prior Coordinator publication Recorder R-20261003T114615Z-da3360fd-957a-4401-b167-93728b753e41 sealed159eventsPASS/validate; limitations disclosed, not product acceptance.
+New prospective-resume Coordinator Recorder root H:/IM-platform/.git/worktrees/IM-platform5/sync-go-coordinator-research; Human prompt P-c8c0b33c-9914-461d-a801-2766a52f8fde; run R-20261003T130041Z-fe4fcd8e-6378-48f7-80dd-7d62e097a0f9. Initial mandatory startup/authority and read-only state inspection before Recorder explicitly incomplete. Two read-only rg nonexistent guessed files failed and were corrected; no file creation from guessed paths.
+Before task activation at clean4d5fe: tools/verify_frozen_architecture.py PASS, ci/check_architecture.py --scope all --json PASS zero violations, exact assigned root verified. No Go runtime/client PASS claimed.
+
+# Go Sync 鍏ュ彛瀹炵幇鏂规锛堝緟 Human 鍚屾剰锛岄潪瀹炵幇鎺堟潈锛?
+
+鐘舵€侊細PROPOSAL_AWAITING_HUMAN_IMPLEMENTATION_CONSENT銆侫DR-0008/鍏紑濂戠害椤诲厛鐙珛 Review銆佺簿纭€欓€?actual-main CI銆佸彈淇濇姢闆嗘垚骞跺悓姝ヤ富浠撳簱锛涙鍚庡悜 Human 灞曠ず鏈柟妗堬紝鍙栧緱鍚屾剰鍐嶅垱寤轰骇鍝佽寖鍥淬€傚綋鍓嶆病鏈?Go 浜у搧淇敼銆?
+
+## 鏈€灏忚寖鍥翠笌鑱岃矗
+
+1. Core 鐨勭幇鏈?Auth public mux锛坆ackend/go/core/auth.go 鐨?handler 瑁呴厤锛夋敞鍐?POST /v1/sync/user 涓?/v1/sync/conversation锛涘悗缁换鍔″彧鍏佽姝ゅ蹇呰璺敱瑁呴厤銆乥ackend/go/core/sync.go 鍜屽繀瑕佹祴璇曘€傜幇鏈?backend/go/gateway/http.go 宸查€氱敤浠ｇ悊 /v1/锛岄粯璁ゆ棤闇€ Gateway 浜у搧淇敼锛涚湡瀹?TLS 鈫?Gateway 鈫?Core 浠嶈榛戠洅楠岃瘉銆傛牴 main/shared 涓嶅鍔犱笟鍔°€?
+2. Core Sync 鎸夌幇鏈夊洓褰㈢姸涓ユ牸瑙ｇ爜蹇呭～/鏈煡瀛楁锛岀増鏈?绫诲瀷銆乁UID 涓庢暣鏁扮鍚?canonical銆備娇鐢?Go 鏍囧噯搴?json.Number/math/big 绛夊繀瑕佺簿纭暣鏁板瓧娈佃В鏋愶細limit 鏃犳渶澶у€硷紝鍏?cap100 鍐嶈浆鎹紱afterSeq 瓒呭瓨鍌?head 杩斿洖绌?terminal锛岀姝?int64 overflow 鎴?double 涓㈠け銆傝姹備笉寰楁湁 query銆備笉淇敼閫氱敤 Auth decode/errors 浠ヨ縼灏?Sync銆?
+3. Core 澶嶇敤鏃㈡湁 Bearer/token/database-authoritative Session 鏍￠獙锛屾瘡璇锋眰妫€鏌?ID/epoch/client_type/revocation/expiry锛涚敤鎴蜂粠鍑嵁瀵煎嚭锛屼笉鎺ュ彈 userId銆係ession/Auth 鍐欒亴璐ｃ€乄SS/ACK/cache 涓嶅彉銆係ync 鐙珛鐨勭獎閿欒鍝嶅簲鍣?echo 宸叉湁鏁堣В鐮?requestId锛屽惁鍒?server UUID锛沜atalog/status涓庝紭鍏堢骇渚濇柊濂戠害锛屾湭鐭?xx鏃犱吉鎴愬姛椤点€?
+4. User Sync 璇诲彇褰撳墠 user 鐨勫凡鎻愪氦 user_sync_events锛岃繃婊や笖楠岃瘉鍥涚鐜版湁浣庨绫诲瀷锛屼笉鍔犲叆 Message/session.revoked銆傝捣鐐?锛汣ore 鍦?response杈圭晫灏?cursor_id 鎶曞奖涓鸿处鎴风粦瀹?opaque event.cursor/nextCursor銆傛渶灏忓叿浣撳€欓€夋槸鏍囧噯搴?HMAC + base64url 鐨?user/id token锛堝鐢ㄧ幇鏈夊彈鎺х鍚?key锛宒omain-separated cursor payload锛涙棤鏂板簱/DB琛?producer rewrite锛涙棤 expiry锛夛紝鍙鍙搴旂敤鎴锋湁鏁堝凡鎻愪氦浜嬩欢銆倀oken缂栫爜涓嶆槸鍏叡濂戠害锛屽鎴风涓嶈В鏋愶紱鍏朵粬鐢ㄦ埛/浼€?鏈煡浣嶇疆鎷掔粷400銆傛瀹炵幇缁嗚妭鍦ㄦ巿鏉冧骇鍝?Task 鍐呭啀鐙珛瀹℃煡銆?
+5. User BIGSERIAL 鍒嗛厤涓嶈兘琚褰撲綔 commit椤哄簭銆傜幇鏈?social.go 鍦ㄤ綆棰戜簨浠跺啓鍓嶉攣鎺ユ敹鐢ㄦ埛琛岋紱read绔彇寰楃浉鍚岀敤鎴疯搴忓垪鍖栭攣骞舵鏌ユ墍鏈夌幇鏈夊洓绫诲瀷 producer璺緞锛岀‘淇濋〉涓哄凡鎻愪氦绋冲畾鍓嶇紑锛屼笉璺宠繃杈冨皬id杩熸彁浜わ紱鏃燚B schema鏀瑰姩鎴栨柊worker銆俿ession.revoked涓嶅湪鐢ㄦ埛Sync鍥涚浜嬩欢閲屻€傚繀椤荤敤鐪熷疄PostgreSQL骞跺彂浜嬪姟璇佹槑锛屼笉鍑潤鎬佸垎鏋愭壙璇恒€?
+6. Conversation Sync 鍦–ore楠岃瘉鏈夋晥Session鍜屽綋鍓峬embership锛涗笉瀛樺湪/闈炴垚鍛樼粺涓€403锛涜鍙?afterSeq鍚庣殑鏈€澶?effectiveLimit+1 宸叉彁浜essage锛岃繑鍥炴湁鏁坙imit椤癸紝鎸塻eq浠巃fterSeq+1杩炵画銆備娇鐢ㄥ崟娆′竴鑷磋鍙栧緱鍒嗛〉/hasMore锛涘繀瑕佺幇鏈夋巿鏉冮攣鎸夌幇鏈夐『搴忥紝绂佹鏂版潈闄愮粫杩囥€俽ead-only鏃燤essage/Outbox/ACK鍐欏叆銆傚綋鍓嶇鏈?/__core/history 淇濈暀宸叉湁娑堣垂鑰呭強娴嬭瘯锛屼笉鎿呰嚜鍒犻櫎/鏀瑰彉绉佷汉杈圭晫锛涘鐢ㄥ眬閮ㄦ煡璇㈣兘鍔涗粎褰撲笉鎵╁ぇ鎶借薄銆?
+7. 杩斿洖鍥涚canonical page锛屼笉娣诲姞涓板瘜User payload/revision鏈哄埗銆俷o-store銆乥ody/error/log鏃燾redentials銆傜湡姝imit+1/item瀛樺湪鎬ц绠梙asMore锛岀┖椤典笉寰幆鎺ㄨ繘user cursor锛涘鎴风鏁版嵁/娓告爣浜嬪姟閫昏緫浠嶇敱鍚庣画SYNC璐熻矗銆?
+
+## 鎷熷厑璁镐骇鍝佽矾寰勶紙灏氭湭鐢熸晥锛?
+
+- backend/go/core/sync.go锛堢幇鏈夋湇鍔¤亴璐ｏ紝蹇呰 Sync 璇锋眰/page銆乧ursor projection銆乺ead鏌ヨ锛?
+- backend/go/core/auth.go锛堢幇鏈?handler 涓袱涓叕鍏辫矾鐢辩殑鏈€灏忚閰嶏紝鏃㈡湁Auth鍐欓€昏緫涓嶆敼锛?
+- backend/go/core/sync_test.go 涓庡繀瑕佹柊 backend/go/core/sync_http_test.go
+- backend/go/tests/sync_tls_test.go锛堣嫢鐜版湁 profile 榛戠洅 harness 閫傚悎鍒欏鐢ㄥ叾鏈€灏忚矾寰勶級
+- tools/verify_sync_runtime.py锛堜粎蹇呰鐪熷疄鍏ュ彛杩愯妫€鏌ワ級
+- .github/workflows/ci.yml锛堜粎鏂拌繍琛岄獙鏀舵鏌ユ帴鍏ワ級
+- 褰撳墠鏂?Go 浜у搧 Task/杩涘害/璇佹嵁鍙?checkpoint 鎵€闇€绮剧‘璺緞
+
+浠ヤ笂椤诲厛鐢辩嫭绔嬩骇鍝?Task 鍐欐垚鏄庣‘ allowed_paths锛屽疄闄呮枃浠?璐ｄ换妫€鏌ュ悗婵€娲伙紱闈?blanket backend/**銆備笉澧炲姞contracts/schema/producer/client/GUI璺緞锛涘嚭鐜版柊鏋舵瀯鍐茬獊鍏堝仠璇ラ儴鍒嗐€?
+
+## 蹇呴』閫氳繃鐨勮繍琛岃瘉鎹笌閫€鍑?
+
+鐪熷疄 PostgreSQL + Go Core/Gateway + TLS鍏ュ彛锛堝綋鍓嶆棦鏈夐儴缃?harness锛夛紝涓嶆槸 offline oracle/profile缁撴灉鏂囦欢銆傛祴璇曟湁鏁堝椤?绌洪〉/retry/闄愰/澶ф暣鏁?鍏宠仈锛涚己澶便€佹棤鏁堛€佽繃鏈熴€佹挙閿€銆佹棫epoch鍜宑lient mismatch锛涜法鐢ㄦ埛cursor/浼€?鏃犳潈闄愪細璇濓紱琚樆濉炲啓鑰呭拰骞跺彂commit涓嶅緱涓綆棰戜簨浠讹紱鏃爂ap娑堟伅椤点€乺eadonly/鏃犳柊Outbox锛泂ervice/source/import/minimality鍜屾棫Auth/social/message/ACK鍥炲綊銆傛瘡椤圭粦瀹氬疄闄卌andidate/environment/output锛屼笉鍒堕€犵粨鏋溿€?
+
+fresh independent Review 鈫?exact-head hosted applicable jobs 鈫?protected integration/actual-main Review鍜孋I 鈫?H:/IM-platform鍚屾涓嶴HA璁板綍銆侴o鍓嶇疆瀹為檯鏈嶅姟鎺ュ彈鍚庢墠璇勪及 LOOP1-SYNC-001 鐨勪緷璧?杈撳叆骞舵仮澶岲esktop/Mobile鍙屽眰鍚屾锛涘畬鎴怱YNC鍚屾牱闇€瑕佺嫭绔婻eview/CI/鐪熷疄瀹㈡埛绔繍琛屽拰涓讳粨搴撳悓姝ャ€傛渶缁堝湪SYNC瀹屾垚鍚庡仠姝紝GUI/Web涓嶇户缁紱Go浠诲姟PASS骞朵笉绛変簬SYNC/S2 PASS銆?
+
+## Human 鍒嗛〉淇涓庣湡瀹為獙鏀惰姹?
+
+100 浠呴檺鍒跺崟椤碉紝涓嶉檺鍒舵€诲悓姝ユ潯鏁版垨椤垫暟銆傚鎴风姣忛〉鏁版嵁涓庢父鏍?杩炵画搴忓彿浜嬪姟鎻愪氦鎴愬姛鍚庯紝鑻?hasMore=true锛岀敤鎴锋祦浣跨敤 nextCursor銆佷細璇濇祦浣跨敤宸叉彁浜ゆ棤 gap 鍓嶇紑鐨?afterSeq 缁х画鎷夊彇锛岀洿鍒?hasMore=false锛涗笉寰椾互鍥哄畾鎬绘潯鏁版垨鎬婚〉鏁版彁鍓嶆埅鏂€傜粓姝㈤〉琛ㄧず璇ユ璇诲彇鍙鐨勫凡鎻愪氦鏈€鏂扮姸鎬侊紝涓嶄繚璇佺粓姝㈠悗鐨勬柊鍐欏叆宸茬粡鍚屾锛涘悗缁疄鏃舵祦/鍐嶆鍚屾鎵挎媴鏂板彉鍖栥€?
+
+鐪熷疄 PostgreSQL + Go/Gateway/TLS 楠屾敹蹇呴』涓?user 涓?conversation 鍚勫噯澶囪秴杩?00椤圭殑宸叉彁浜ゆ暟鎹紝閫愰〉鎷夊埌 terminal锛屾柇瑷€姣忛〉涓嶈秴杩?min(limit,100)銆佸畬鏁存€绘暟銆佽韩浠藉幓閲嶄笌鏈€鍚?cursor/seq锛涜瘉鏄庢湭鍦ㄧ涓€椤垫垨鍥哄畾鎬婚〉鏁板鎴柇锛屽苟楠岃瘉 terminal 鍚庢柊鎻愪氦鐢卞啀娆″悓姝ヨ幏鍙栥€傜绾垮悜閲忓彧鍒ゅ畾濂戠害棰勬湡锛屼笉璇佹槑鏁版嵁搴撴煡璇€佷簨鍔℃垨杩愯鍏ュ彛姝ｇ‘锛涘悗缁?Desktop/Mobile SYNC 鍐嶈瘉鏄庢湰鍦颁簨鍔℃垚鍔熷悗鍒嗛〉鎺ㄨ繘銆?
+
+## 鍓嶇疆鎺ュ彈鍙戠幇
+
+鍓嶇疆宸茬嫭绔嬫帴鍙楀苟鍚屾 main c2ff0502fdad80f463abe038a960ca1b798e6d7a; 璇﹁ acceptance/acceptance.md銆?褰撳墠 Go 瀹炴柦浠嶅緟 Human 鍚屾剰銆?
+
+# Public Sync transport prerequisite acceptance
+
+Task LOOP1-SYNC-TRANSPORT-001: accepted architecture/contract prerequisite only.
+Branch: task/LOOP1-SYNC-001. Reviewed candidate b8200783ea3eadc1ed4e4050238f051a7ab708b3; full reviewed range a0304fcc7be18b87f5986d014849d6b48b96a071..b8200783ea3eadc1ed4e4050238f051a7ab708b3.
+Protected PR18 actual main c2ff0502fdad80f463abe038a960ca1b798e6d7a, parents a0304fc/b820078, tree c85c937c2dc1183e8f2c073f81caf4d7341c6cc7 equals candidate.
+
+Fresh independent candidate Review PASS; separate actual-main audit PASS in the same independent role with a new run, explicitly not a newly spawned context. Candidate Recorder35events and actual-main31events sealed/validated; byte-exact archives below.
+Candidate exact-head PR run37121974931 and actual-main run37122484526: each13requiredjobs/105steps SUCCESS, no required skips/cancellations. Live provider, exact-job logs and independent audit bind these exact SHAs. Native SQLx Desktop, Android API34 Storage/Send, real PostgreSQL Go/race and deployed strictTLS regressions actually ran. Existing ADR0004 deferred friend-denial case is not PASS. Offline Sync vectors are not proof of a live User Sync endpoint.
+
+H:/IM-platform safe FF a0304fc -> c2ff050 verified after actual-main independent acceptance. synchronization.json records260changedpaths exact committed bytes,781unrelated entries byte/size-preserved and original recovery/s1-handoff-20261001 branch retained. Private unknown-work snapshot/backups are not published. The independent audit also checked all781 status/size/mode/hashes before sync. No unknown work overwritten.
+
+Canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03; historical PDF546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510 unchanged. Two HTTPS POST bindings reuse the four existing shapes. Human correction freezes continued paging to the terminal read's latest committed data, per-page min(limit,100), no fixed total cutoff or future-write completion promise.
+
+Earlier8c672a2 hosted/fresh Review FAIL and publication auto-review hold remain immutable history. Explicit Human publication consent resolved the hold. Fresh narrow metadata fix8880ee22/b820078 and NEW independent Review eliminated the eight recovery errors without checker/CI/contract/product weakening. Failure provenance remains in recovery-fix/.
+
+Go/User Sync runtime and client SYNC are not implemented or accepted. S1 PASS/S2 OPEN; SYNC remains backlog on runtime input. Go proposal is inert until separately consented after this accepted prerequisite. No GUI/Web advancement.
+
+Administrative record boundary: these new records discover already independently accepted and synchronized c2ff050 facts. Their own final commit requires NEW independent administrative Review, applicable exact-head hosted jobs, protected integration, actual-main audit and verified main synchronization before ending. Later administrative SHA/run receipts are recorded by the independent final audit and private sync receipt, not fabricated inside a self-referential commit. Product acceptance remains anchored to c2ff050.
+
+Archives: independent-review/ contains original fresh candidate and actual-main reports, sealed Recorder and independently downloaded providers/logs; hosted-candidate/ and hosted-actual-main/ contain Coordinator original provider/log captures. administrative-review-3bdc/ and coordinator-approval-hold/ preserve sealed earlier records. archive-manifest.json binds exact file bytes. Current active Coordinator Recorder stays Git-private until finished; no evidence is edited to make a run pass.
+
