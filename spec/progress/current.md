@@ -20,8 +20,8 @@ LOOP1-SYNC-001 remains unique backlog BLOCKED_BY_ARCHITECTURE awaiting accepted 
 ## Verification
 
 - Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: FAIL at clean 8c672a22c5fb9fd640791117c919e1b5a1b8bf69, eight metadata issues reproduced; repair verification awaits clean commit.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/recovery-fix/failure-and-repair.md`
+  - Result: Local PASS at clean repair 8880ee22b16665ebddef042bedb6f6aaff4181f5; prior eight-issue FAIL preserved. Final archival candidate needs NEW independent Review and exact-head hosted CI.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/recovery-fix/handoff.md`
 - Command: `python -B tools/verify_frozen_architecture.py`
   - Result: PASS baseline; canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03 preserved. Local/Recorder PASS is not Task/Gate PASS.
   - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/paging-revision/handoff.md`
