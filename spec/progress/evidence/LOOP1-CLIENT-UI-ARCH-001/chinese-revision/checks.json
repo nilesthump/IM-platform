@@ -1,0 +1,75 @@
+[
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "tools/verify_frozen_architecture.py",
+      "--base-commit",
+      "9c0eba89219b3fab73fe9258a7cfc59831c499dc"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.245,
+    "output_raw_sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989",
+    "evidence": "check-1.log.gz",
+    "mode": "local; NOT acceptance"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.548,
+    "output_raw_sha256": "12cf58d5271153e4bf575c7c7697f8cb10b207a226961e18c0169195b93b9075",
+    "evidence": "check-2.log.gz",
+    "mode": "local; NOT acceptance"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 6.04,
+    "output_raw_sha256": "9f5ac2744610ec8c5e5fbb124b3801fac3f119c3b5fc92a0d2f0d37688ab6655",
+    "evidence": "check-3.log.gz",
+    "mode": "local; NOT acceptance"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "9c0eba89219b3fab73fe9258a7cfc59831c499dc"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.13,
+    "output_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence": "check-4.log.gz",
+    "mode": "local; NOT acceptance"
+  },
+  {
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Development"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.074,
+    "output_raw_sha256": "313cce0877c0cd34f82c17ebfbab931fd627619c0a7d49b638f885e9719465d6",
+    "evidence": "check-5.log.gz",
+    "mode": "local; NOT acceptance"
+  }
+]

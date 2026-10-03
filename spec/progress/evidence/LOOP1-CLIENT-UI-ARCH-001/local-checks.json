@@ -1,0 +1,55 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "tools/verify_frozen_architecture.py",
+      "--base-commit",
+      "9c0eba89219b3fab73fe9258a7cfc59831c499dc"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.203,
+    "output_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+    "evidence": "local-check-1.log.gz"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.625,
+    "output_sha256": "3b190fa12a6c40f5560090c1302cc133d717a033efb10b768c777cb8fa60fd9f",
+    "evidence": "local-check-2.log.gz"
+  },
+  {
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 6.766,
+    "output_sha256": "85076b113db0793330bdf4d511fe60a386b1676519826d7144ab817417781bb7",
+    "evidence": "local-check-3.log.gz"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 2,
+    "elapsed_seconds": 0.047,
+    "output_sha256": "33ba8c73f6b7eaaba3e75d9fed3ed0263f490df3229ac98a46523cbbc5140f8a",
+    "evidence": "local-check-4.log.gz"
+  }
+]

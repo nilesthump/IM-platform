@@ -447,7 +447,7 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
 #### 已批准客户端技术栈与边界（Human-approved v1.1 clarification）
 
 - Web = React + TypeScript；仅临时在线 Memory only；无 SQLite、无聊天历史持久化、无离线历史加载；通过 HTTPS + WSS 通信，页面生命周期结束后不保证消息状态保留。
-- Desktop = Tauri + React + TypeScript；UI 最大程度复用 Web；按账号 SQLite、离线历史、optimistic send、SENDING/SENT/FAILED、ACK 回写、retry 复用 request_id、Sync 收敛。
+- Desktop = Tauri + React + TypeScript；UI 独立实现；共享协议、模型、适用 hooks、Design Token 和 UI 语义，不共享完整 React 视觉组件（ADR-0006）；按账号 SQLite、离线历史、optimistic send、SENDING/SENT/FAILED、ACK 回写、retry 复用 request_id、Sync 收敛。
 - Desktop 必要 Rust/native 代码仅限 `clients/desktop/src-tauri/**`，仅作为 SQLite native access、OS secure storage、必要文件系统等系统能力的 native adapter；客户端业务层、Repository API、protocol/model/plugin SDK 仍为 TypeScript，不得迁入 Rust。Desktop SQLite native boundary 使用 Tauri + SQLx(SQLite)；TypeScript 持有共享 Repository、模型和事务意图，Rust 仅提供数据库连接、查询和原子 transaction adapter。不得通过多个独立 tauri-plugin-sql execute() 调用模拟跨调用事务。SQLx 以外的 SQLite crate/plugin/library 未批准。
 - Mobile = Android + Kotlin + Jetpack Compose；Human 明确移除 Mobile TypeScript 技术栈，具体 framework 不再 TBD。Android Studio emulator 为真实 Android 验证环境；按账号 SQLite、离线历史、optimistic send、ACK/retry/Sync 与其他客户端相同。
 - Mobile 在 `clients/mobile/**` 使用 Kotlin 等价模型、Repository 语义、协议/插件适配与 data/domain 行为，服从同一 canonical contracts/fixtures；不要求直接复用 TypeScript SDK。优先 Android SDK 自带 SQLite 事务能力，不授权 Room、第三方 SQLite/ORM/network library 或其他架构敏感依赖。不得为共享代码自行加入 JS runtime、TS/JS bridge、codegen 或把 shared 层改写成跨端 native。完整 Mobile acceptance 未满足时 S2 Gate OPEN；Desktop host/mock 不能冒充 Android emulator acceptance。
@@ -521,7 +521,12 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
     "androidx.compose.ui:ui-tooling-preview",
     "androidx.compose.foundation:foundation",
     "androidx.compose.animation:animation",
-    "androidx.compose.material3:material3"
+    "androidx.compose.material3:material3",
+    "androidx.lifecycle:lifecycle-viewmodel-compose",
+    "androidx.lifecycle:lifecycle-runtime-compose",
+    "androidx.navigation:navigation-compose",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-android"
   ],
   "mobile_tooling": [
     "Android SDK",
@@ -540,7 +545,10 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
     "org.xml.",
     "org.w3c.",
     "androidx.compose.",
-    "androidx.activity."
+    "androidx.activity.",
+    "androidx.lifecycle.",
+    "androidx.navigation.",
+    "kotlinx.coroutines."
   ]
 }
 ```
@@ -589,6 +597,22 @@ flowchart LR
 ### 6.4 双层 Cursor
 
 user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频用户状态。消息不进入用户级事件流，以避免群消息按成员写放大。每个会话维护 contiguous_seq，只有本地从旧值开始连续无缺口时才能前移。
+
+### 6.5 客户端 UI 架构与 GUI 验收（Human-approved ADR-0006 候选）
+
+以下 Human 决定待新独立 Review、精确候选 hosted CI、集成与实际 main 核验后生效；此前不得据候选启动产品实现。补充设计说明位于 `spec/architecture/decisions/client-ui/architecture.md` 和 `design-direction.md`；GUI 验收规约为 `spec/acceptance/client-gui.md`；这些从属于本正文和 ADR-0006，不是第二 canonical 或公共 wire/schema 权威。
+
+- 产品构界 IM+ / PlugWorldIM；Adaptive Glass Workspace；视觉重点 50% Future AI Communication / 30% Productivity Tool / 20% Developer Extensibility。简洁、玻璃层次、AI-native、模块化、可配置；该比例不是功能能力承诺。Minimal Glassmorphism 使用 translucent surface、subtle border、blur、layered depth 表达层次；禁止信息堆砌、复杂 Dashboard、过度 Cyber/HUD、重度发光/霓虹/粒子/复杂 3D 和为炫技添加视觉元素。
+- 两主题 Cold AI（冷蓝、紫色渐变、深色玻璃）和 Warm Creative（暖色渐变、柔和玻璃、亲和）。共享 Logo、品牌、Layout、Component semantic；主题切换只改变 Color token。用户独立本地设置 Typography/Spacing；插件不得修改主导航、品牌核心或基础 UI 语义。主题切换不得重置字体/间距；设计值/像素布局和具体偏好存储机制由后续受控 GUI Task 给出，不授权 Web 聊天持久化。可读性/焦点/状态不能仅靠颜色或透明效果表达。
+- Application Shell 拥有 Chat / Friends / AI / Plugin 一级导航；未来仅客户端受控任务可增加 Settings/Profile；插件不得新增一级导航或直接控制 Shell。Chat 负责 Conversation List/View/Message；好友搜索、关系、添加属 Friends。AI 仅入口/插图/施工中，不含 AI chat、Agent、RAG、Tool Calling、API 或假 AI 数据。Plugin 为 Installed Plugins/Status/Entry 个人能力面板；缺失能力诚实显示未开放，不制造假数据；不是商店或 Marketplace。
+- Web React/TypeScript 工程分层为 Shell/routing、定制业务组件、hooks/data/state 和 Repository/protocol adapter；默认 useState/useReducer/Context/custom hooks。不选择第三方 router/data/state 库；Zustand/Redux/MobX 或敏感库需单独 ADR 批准。基础 icon/accessibility/utility 类别并非具体包的 blanket approval；不得绑定完整业务 UI framework。
+- Desktop Tauri/React/TypeScript 独立 UI，定位舒适、高频、生产力，允许后续受控任务提供更丰富布局/交互/本地能力展示。共享 protocol-sdk/plugin-sdk/models、Repository 行为、适用平台中立 hooks、Design Token/UI semantic；不共享完整 Button/MessageBubble/ChatWindow。Mobile 分享规范和 canonical contracts/fixtures，通过 Kotlin 等价实现，不要求复用 TS hook/SDK/组件。现行 SQLx/TypeScript 原子适配边界不变。
+- Mobile Compose UI 向 ViewModel 发出意图；ViewModel 调用 Repository 并通过 StateFlow 暴露状态；Compose 生命周期感知地观察 StateFlow。Repository 委托 SDK SQLite 与授权 WSS/protocol adapter。Jetpack Navigation Compose 管理宿主导航；仅明确 state/navigation 所需依赖按本节 machine policy；Android Studio emulator 验收，不授权额外 Room/ORM/network/runtime/bridge/codegen。
+- UI 只显示观察状态并发出意图；Repository 拥有本地 materialized data/事务收敛，protocol 层遵循 contracts/；UI 不直连 SQLite、不自行推进 cursor/contiguous_seq、不伪造 ACK/SENT、不决定服务端权限。Desktop/Mobile 本地先显示再背景 Sync；SENDING/SENT/FAILED、retry 复用 request_id、SENT 不回退、失败与服务端事件收敛、数据与 cursor 原子性沿用 §6.2-6.4。Web memory only、无离线历史；账号切换不显示旧账号数据。
+- S2 不下载/执行插件 UI 代码、不动态加载/注入任意远程组件、不实现 Renderer/runtime/安装系统。未来声明式 poll 描述是方向，不是新契约。Human 明确上述代码执行禁令仅限 S2；S4 保留 §8.2 审查加沙箱 Custom Render Bundle/白名单 Bridge、签名/hash/schema/API/权限/CSP/资源/入口校验及历史版本绑定；本节不删除或放宽它们。插件不能控制宿主导航。
+- 后续 GUI 覆盖现有 contracts/ 的 Auth login/refresh/logout/session-expired、User info、Friend search/add、Conversation list/open、Message send/receive/state、Sync state；传输/字段来自现行 OpenAPI/WSS，不发明 HTTP route 或 AI/Plugin API。无 AI 功能、Plugin runtime、Marketplace 实现。
+- GUI Task acceptance 必须含真实运行截图 -> Architect Review -> 修复/重新截图 -> Architect Approval，并保留独立实现 Review、精确候选 CI 与集成/main 核验。Web 截图覆盖 Login/Chat/Friends/AI Placeholder/Plugin Page；Desktop 覆盖主窗口/Chat/Friends/Offline History/真实 Notification-Tray/Theme；Mobile 为真实 Android emulator Login/Chat/Friends/Offline History/Sync 状态/Theme。两主题/受支持字体间距变化与相关加载/空/错误/会话失效/离线状态需实际证据；局部任务明确剩余范围，不得宣称全客户端 PASS。
+- 截图绑定 Task、候选 SHA/build/runtime、屏幕状态/尺寸、theme/配置、可重复步骤、文件/hash；使用受控无秘密数据。Architect 决策绑定同一候选和截图集，失败留未完成；影响已批准视觉的改动必须重新截图批准。截图不能证明 ACK/事务/幂等，不替代行为/权限/契约/源码依赖测试；Task PASS 不等于 S2 Gate PASS。
 
 <a id="section-7"></a>
 ## 7. HTTPS/WSS/TLS 与认证协议

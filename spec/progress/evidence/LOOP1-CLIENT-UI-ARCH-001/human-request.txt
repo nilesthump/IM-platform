@@ -1,0 +1,921 @@
+你是 IM-platform 当前 `LOOP1-CLIENT-UI-ARCH-001` 架构设计 Agent。
+
+本任务目标：
+
+**冻结客户端 UI 架构、信息架构和初版 Design System 方向，为后续 GUI 实现 Task 提供权威输入。**
+
+本任务不是 GUI 实现任务。
+
+禁止：
+- 编写 Web/Desktop/Mobile UI 页面；
+- 创建 Chat/Friends/AI/Plugin 页面代码；
+- 引入 UI component library；
+- 引入状态管理框架；
+- 实现 Plugin UI runtime；
+- 实现 AI 功能；
+- 修改后端 API；
+- 修改 OpenAPI contract；
+- 修改 S2 产品代码。
+
+如果实现过程中发现必须新增 UI framework、状态库、组件库、插件 runtime、AI API 等架构级技术选择：
+
+必须：
+```
+BLOCKED_BY_ARCHITECTURE
+
+↓
+
+提出最小决策问题
+
+↓
+
+等待 Architect / Human 决策
+
+↓
+
+写入 Frozen Architecture / approved ADR
+
+↓
+
+独立 Review + CI
+
+↓
+
+继续实现
+```
+
+禁止自行选择。
+
+---
+
+# 一、当前恢复基线
+
+仓库：
+
+```
+H:/IM-platform
+```
+
+当前阶段：
+
+```
+S1 PASS
+S2 OPEN
+```
+
+当前状态：
+
+- PR7 Dart SQLite 实现已回退；
+- PR8 已恢复 main；
+- 客户端技术栈已经进入架构澄清阶段；
+- 本任务必须先冻结 UI 架构，再进入 GUI implementation。
+
+当前客户端技术栈：
+
+## Web
+
+```
+React + TypeScript
+```
+
+## Desktop
+
+```
+Tauri
++
+React
++
+TypeScript
+```
+
+## Mobile
+
+```
+Android Kotlin
++
+Jetpack Compose
+```
+
+验收：
+
+```
+Android Studio Emulator
+```
+
+---
+
+# 二、任务边界
+
+本 Task 只负责：
+
+## 1. UI Architecture
+
+冻结：
+
+- 三端 UI 分层；
+- 信息架构；
+- 数据流；
+- UI 与 Repository 边界；
+- Plugin UI 边界；
+- AI 页面边界。
+
+---
+
+## 2. Design Direction
+
+冻结：
+
+- 产品视觉方向；
+- Theme 系统；
+- Design Token 原则；
+- 配置能力边界。
+
+---
+
+## 3. GUI Acceptance Protocol
+
+冻结：
+
+- Screenshot-driven Architect Review。
+
+---
+
+不负责：
+
+- GUI 页面实现；
+- 视觉像素级设计；
+- 组件代码；
+- 页面交互实现。
+
+---
+
+# 三、总体 UI 产品定位
+
+产品：
+
+```
+构界 IM+
+PlugWorldIM
+```
+
+UI 风格：
+
+```
+Adaptive Glass Workspace
+```
+
+核心比例：
+
+```
+50% Future AI Communication
+30% Productivity Tool
+20% Developer Extensibility
+```
+
+关键词：
+
+- 简洁
+- 玻璃质感
+- 层次结构
+- AI-native
+- 模块化
+- 可配置
+
+禁止：
+
+- 信息堆砌；
+- 复杂 Dashboard；
+- 过度 Cyber/HUD 风格；
+- 为展示技术而增加视觉元素。
+
+---
+
+# 四、视觉系统
+
+## 4.1 Glass 风格
+
+采用：
+
+```
+Minimal Glassmorphism
+```
+
+原则：
+
+玻璃用于表达层次，不用于装饰。
+
+包含：
+
+- translucent surface；
+- subtle border；
+- blur；
+- layered depth。
+
+禁止：
+
+- 大量发光；
+- 霓虹；
+- 粒子效果；
+- 复杂 3D。
+
+---
+
+# 五、主题系统
+
+支持两个用户主题。
+
+## Theme A
+
+名称：
+
+Cold AI
+
+定位：
+
+```
+AI / Technology / Intelligence
+```
+
+方向：
+
+- 冷蓝；
+- 紫色渐变；
+- 深色玻璃。
+
+---
+
+## Theme B
+
+名称：
+
+Warm Creative
+
+定位：
+
+```
+Social / Creative / Human
+```
+
+方向：
+
+- 暖色渐变；
+- 柔和玻璃；
+- 更亲和。
+
+---
+
+两个主题必须共享：
+
+- Logo；
+- 品牌元素；
+- Layout；
+- Component semantic。
+
+只允许变化：
+
+- Color token。
+
+---
+
+# 六、配置系统
+
+Loop1 支持：
+
+用户本地配置：
+
+允许：
+
+- 字体；
+- 间距。
+
+例如：
+
+```
+Typography Token
+
+Spacing Token
+```
+
+存储：
+
+客户端本地。
+
+禁止：
+
+插件修改：
+
+- 主导航；
+- 品牌核心；
+- 基础 UI 语义。
+
+---
+
+# 七、三端 UI 架构
+
+---
+
+# 7.1 Web
+
+技术：
+
+```
+React + TypeScript
+```
+
+定位：
+
+```
+简洁、高效、在线通信
+```
+
+架构：
+
+工程化 React：
+
+包含：
+
+- Router；
+- Data layer；
+- Hooks；
+- State layer。
+
+---
+
+状态管理：
+
+默认：
+
+```
+useState
+useReducer
+Context
+custom hooks
+```
+
+未来如果需要：
+
+必须：
+
+```
+ADR
++
+Architect approval
+```
+
+不能 Task 自行引入：
+
+- Zustand；
+- Redux；
+- MobX。
+
+---
+
+组件：
+
+核心业务组件：
+
+```
+Custom Component
+```
+
+允许：
+
+基础第三方：
+
+- icon；
+- accessibility；
+- utility。
+
+禁止：
+
+直接绑定完整业务 UI framework。
+
+---
+
+# 7.2 Desktop
+
+技术：
+
+```
+Tauri
++
+React
++
+TypeScript
+```
+
+UI策略：
+
+独立 UI。
+
+共享：
+
+- Protocol；
+- Model；
+- Hooks；
+- Design Token；
+- UI contract。
+
+不共享：
+
+- 完整 React Component。
+
+---
+
+Desktop定位：
+
+```
+舒适
+高频
+生产力
+```
+
+允许：
+
+- 更丰富布局；
+- 更强交互；
+- 本地能力展示。
+
+---
+
+# 7.3 Mobile
+
+技术：
+
+```
+Android Kotlin
++
+Jetpack Compose
+```
+
+架构：
+
+```
+Compose UI
+
+↓
+
+ViewModel
+
+↓
+
+StateFlow
+
+↓
+
+Repository
+
+↓
+
+SQLite/WSS
+```
+
+Navigation：
+
+```
+Jetpack Navigation Compose
+```
+
+---
+
+验收：
+
+Android Studio Emulator。
+
+---
+
+# 八、Shared UI 边界
+
+原则：
+
+```
+共享设计规范，不共享 UI 组件
+```
+
+共享：
+
+```
+protocol-sdk
+plugin-sdk
+models
+design tokens
+UI contracts
+```
+
+不共享：
+
+```
+Button
+MessageBubble
+ChatWindow
+```
+
+原因：
+
+三个端体验目标不同。
+
+---
+
+# 九、信息架构
+
+统一产品信息架构：
+
+```
+Chat
+Friends
+AI
+Plugin
+```
+
+---
+
+# 9.1 Chat
+
+职责：
+
+通信。
+
+包含：
+
+- Conversation List；
+- Conversation View；
+- Message。
+
+不包含：
+
+好友管理。
+
+---
+
+# 9.2 Friends
+
+独立页面。
+
+包含：
+
+- 搜索用户；
+- 好友关系；
+- 添加好友。
+
+---
+
+# 9.3 AI
+
+当前无：
+
+- AI API；
+- AI contract；
+- AI architecture。
+
+因此：
+
+只实现未来入口概念。
+
+当前状态：
+
+```
+Placeholder only
+```
+
+允许：
+
+- 页面入口；
+- 插图；
+- “施工中”。
+
+禁止：
+
+- AI chat；
+- Agent；
+- RAG；
+- Tool Calling；
+- 假 AI 数据。
+
+---
+
+# 9.4 Plugin
+
+定位：
+
+个人能力面板。
+
+包含：
+
+```
+Installed Plugins
+Plugin Status
+Plugin Entry
+```
+
+不是：
+
+- 商店；
+- Marketplace。
+
+禁止：
+
+- Plugin runtime；
+- 动态加载；
+- 插件安装系统。
+
+---
+
+# 十、一级导航规则
+
+默认：
+
+```
+Chat
+Friends
+AI
+Plugin
+```
+
+允许：
+
+未来客户端代码增加：
+
+例如：
+
+```
+Settings
+Profile
+```
+
+但：
+
+禁止插件增加一级导航。
+
+插件不能控制：
+
+```
+Application Shell
+```
+
+---
+
+# 十一、Plugin UI 架构方向
+
+未来方向：
+
+声明式 UI。
+
+插件提供描述：
+
+例如：
+
+```json
+{
+ "type":"poll",
+ "data":{}
+}
+```
+
+客户端生成 UI。
+
+禁止：
+
+- 下载执行插件 UI 代码；
+- 任意远程组件注入；
+- 插件直接控制客户端导航。
+
+S2 不实现 Renderer。
+
+---
+
+# 十二、GUI Task 验收规则
+
+后续 GUI 实现必须采用：
+
+## Screenshot-driven Architect Review
+
+流程：
+
+```
+GUI Implementation
+
+↓
+
+运行截图
+
+↓
+
+Architect Review
+
+↓
+
+修改
+
+↓
+
+重新截图
+
+↓
+
+Architect Approval
+
+↓
+
+GUI Task PASS
+```
+
+截图审核属于：
+
+```
+GUI Task acceptance requirement
+```
+
+不是普通设计反馈。
+
+---
+
+截图要求：
+
+## Web
+
+覆盖：
+
+- Login
+- Chat
+- Friends
+- AI Placeholder
+- Plugin Page
+
+---
+
+## Desktop
+
+覆盖：
+
+- 主窗口；
+- Chat；
+- Friends；
+- Offline History；
+- Notification/Tray；
+- Theme。
+
+---
+
+## Mobile
+
+Android Emulator：
+
+覆盖：
+
+- Login；
+- Chat；
+- Friends；
+- Offline History；
+- Sync 状态；
+- Theme。
+
+---
+
+# 十三、Loop1 GUI API 范围
+
+后续 GUI 实现应覆盖 Loop1 OpenAPI：
+
+## Auth
+
+- login
+- refresh
+- logout
+- session expired
+
+## User
+
+- user info
+
+## Friend
+
+- search
+- add
+
+## Conversation
+
+- list
+- open
+
+## Message
+
+- send
+- receive
+- state
+
+## Sync
+
+- sync state
+
+---
+
+不包含：
+
+- AI 功能；
+- Plugin runtime；
+- Marketplace。
+
+---
+
+# 十四、输出要求
+
+完成本 Task 后提交：
+
+## 1. UI Architecture Document
+
+包含：
+
+- 三端 UI 架构；
+- 数据流；
+- 信息架构；
+- Plugin UI boundary；
+- AI boundary。
+
+---
+
+## 2. Design Direction Document
+
+包含：
+
+- Adaptive Glass Workspace；
+- 两套主题；
+- Design Token 原则；
+- 配置边界。
+
+---
+
+## 3. GUI Acceptance Specification
+
+包含：
+
+- Screenshot review；
+- Architect approval；
+- GUI Task acceptance criteria。
+
+---
+
+## 4. Architecture Changes
+
+如果需要修改：
+
+- Frozen Architecture；
+- ADR；
+- governance；
+
+必须：
+
+- 保持 v1.1；
+- 更新 hash；
+- 保留历史 PDF；
+- 保留 PR7/PR8 历史。
+
+---
+
+# 十五、最终禁止事项
+
+不得：
+
+- 实现 GUI；
+- 自行选择 UI library；
+- 自行选择状态管理库；
+- 自行实现 Plugin UI runtime；
+- 自行设计 AI 功能；
+- 修改 backend；
+- 修改 OpenAPI；
+- 用 Task Spec 代替架构授权。
+
+任何未知长期技术选择：
+
+```
+停止
+
+↓
+
+BLOCKED_BY_ARCHITECTURE
+
+↓
+
+Architect 决策
+
+↓
+
+冻结
+
+↓
+
+实现
+```
+
+---
+
+开始执行：
+
+第一步：
+
+恢复当前 main 状态，读取：
+
+- AGENTS.md
+- Frozen Architecture
+- current.md
+- technology-selection governance
+
+确认架构输入后，再创建 UI Architecture 文档。

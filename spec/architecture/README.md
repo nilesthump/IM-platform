@@ -16,3 +16,7 @@ Current client clarification accepted at e7c80c7: Android Kotlin/Jetpack Compose
 ## Accepted clarification discovery (2026-10-01)
 
 Fresh independent Review accepts clean e7c80c726d4799ba3ddab026266be638c9e6b252 under scoped Human GString waiver; original4b5 Review FAIL immutable. Exactpush36881391141 selected5SUCCESS/8correctinactive and PR36881397009 all13/every stepSUCCESS. Canonicalaa2398020beeda5f7f9456aac346da57bd8b75212192123c943c35dfdc80f84c/PDF546915 unchanged. ADR0005 effective at accepted prerequisite. Evidence: spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/2026-10-01-coordinator-resume/acceptance.md. Earlier pending paragraphs are historical; later administrative closure needs NEW independent Review/exactHEADCI before S2activation. No product/contract change; S1PASS/S2OPEN.
+
+## UI 修订候选（2026-10-03）
+
+ADR-0006 记录 Human 明确的客户端 UI、设计与截图验收决定，以及仅适用于 S2 的插件执行禁令。通过 baseline.md 的当前哈希和 ui_revision_adr 字段解析。候选仍待独立 Review、精确 HEAD 托管 CI 和集成后 main 验证；已接受 main 仍是最后已知良好提交。decisions/client-ui/ 和 spec/acceptance/client-gui.md 的从属说明不建立第二份规范权威或公共契约权威。ADR-0005 仍是基础技术来源；保留 S4 经审查的沙箱 Render Bundle。
