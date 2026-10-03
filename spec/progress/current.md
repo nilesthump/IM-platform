@@ -58,3 +58,5 @@ Sole `/root/gui_product_implementation` owns all task-scoped uncommitted GUI cha
 ## Architecture Conflicts / ACP / ADR
 
 ADR-0009 records already Human-approved bounded native families and appearance plan; localized unified-batch exception permits local candidate preparation before joint independent acceptance/publication/main sync. Native task remains review/pending. TypeScript/Kotlin retain auth/business/Repository/protocol ownership. Test-host trust proposal awaits distinct explicit approval; no product TLS bypass.
+
+Local continuation: stable candidate 7e6794e878a80b94e290ab6d87d566d23f5bd64d is committed on the assigned GUI branch. Follow-up Android large-appearance wrapping/scroll/IME instrumentation is task-owned work in progress; verification history remains in the linked GUI evidence. No trust approval has been received by the implementation agent; no trust installed.
