@@ -355,6 +355,8 @@ jobs:
         run: ./tests/infrastructure/smoke.ps1 -Profile go
       - name: Go Auth actual roles and TLS event smoke
         run: python3 tests/go/live_role_smoke.py
+      - name: Go public Sync strict TLS runtime
+        run: python3 -B tools/verify_sync_runtime.py
       - name: Go S1 strict TLS messaging E2E
         run: python3 -B tests/e2e/go_tls_messaging.py
       - name: Java transport smoke

@@ -132,6 +132,8 @@ func writeError(w http.ResponseWriter, r *http.Request, err error) {
 
 func (s *authService) handler() http.Handler {
 	m := http.NewServeMux()
+	m.HandleFunc("POST /v1/sync/user", s.syncUser)
+	m.HandleFunc("POST /v1/sync/conversation", s.syncConversation)
 	m.HandleFunc("POST /v1/auth/register", s.register)
 	m.HandleFunc("POST /v1/auth/login", s.login)
 	m.HandleFunc("POST /v1/auth/refresh/web", s.refreshWeb)
@@ -142,6 +144,10 @@ func (s *authService) handler() http.Handler {
 	m.HandleFunc("GET /v1/friends", s.listFriends)
 	m.HandleFunc("PUT /v1/friends/{friendUserId}", s.addFriend)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" && (r.URL.Path == "/v1/sync/user" || r.URL.Path == "/v1/sync/conversation") {
+			m.ServeHTTP(w, r)
+			return
+		}
 		for key := range r.URL.Query() {
 			lower := strings.ToLower(key)
 			if strings.Contains(lower, "token") || strings.Contains(lower, "password") || strings.Contains(lower, "secret") || lower == "authorization" || lower == "cookie" {

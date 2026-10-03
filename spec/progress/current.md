@@ -5,45 +5,52 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-SYNC-only
-Current Task: LOOP1-SYNC-TRANSPORT-001
-Current Task State: done
-Execution Status: WAITING_HUMAN_GO_PLAN_CONSENT
+Current Task: LOOP1-SYNC-GO-001
+Current Task State: review
+Execution Status: WAITING_INDEPENDENT_GO_SYNC_REVIEW
 
 ## Immediately Relevant Completed Work
 
-Public Sync architecture/contract prerequisite independently accepted at protected PR18 actual main c2ff0502fdad80f463abe038a960ca1b798e6d7a and synchronized H:/IM-platform. Candidate b820078 fresh Review PASS; actual-main independent new-run audit PASS. Human paging correction accepted: per-page min(limit,100), continue after atomic page commit until hasMore=false; latest is committed data at that terminal read. S1 PASS/S2 OPEN.
+Public Sync prerequisite product b820078/PR18 actualmain c2ff050 independently accepted with full13jobs105steps. Administrative3588/PR19 actualmain4d5fe1235e4f01111d78cc67b2880b52cac072f2 fresh independent Review and same-role new actual-main audit PASS; exact hosted37123550572/37124088012 each5applicablejobs37stepsSUCCESS with8correctinactive. Preservation-verified main synchronization PASS193adminpaths/781originalentries. Human saw the concrete Go proposal after acceptance and replied "同意"; Go implementation consent received.
 
 ## Current Blockers
 
-LOOP1-SYNC-001 remains unique backlog awaiting actual accepted Go User/Conversation Sync runtime. Public-binding architecture gap is resolved. Human explicitly requires the concrete Go proposal be shown after prerequisite acceptance and separately consented before product writes. Publication/PR/CI/protected integration authorization is already received; do not ask again. GUI/Web beyond authorized SYNC endpoint.
+No Go implementation-consent blocker remains. LOOP1-SYNC-001 remains unique backlog on actual independently accepted Go runtime input. Client activation follows Go acceptance and dependency reassessment. Final authorized endpoint is SYNC complete then stop; S1 PASS/S2 OPEN.
 
 ## Verification
 
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: Independent clean candidate b820078 and actual c2ff050 PASS; new administrative closure needs its own independent Review/CI.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/acceptance/acceptance.md`
-- Command: `python -B tools/verify_sync_transport.py`
-  - Result: Official OpenAPI/reference/guard PASS; 4 contract test groups/13 mutations,53architecture tests and old HTTP/WSS/SyncPlugin regressions independently PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/acceptance/independent-review/review.md`
-- Command: `gh run view 37122484526 --json headSha,status,conclusion,jobs`
-  - Result: Exact c2ff050 actual-main13requiredjobs/105steps SUCCESS; candidate37121974931 also13/105SUCCESS.
-  - Evidence: `spec/progress/evidence/LOOP1-SYNC-TRANSPORT-001/acceptance/independent-review/actual-main/review.md`
+- Command: `python -B tools/verify_frozen_architecture.py`
+  - Result: PASS at accepted4d5fe before new task activation, canonical ef90846/PDF provenance unchanged.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
+- Command: `python -B ci/check_architecture.py --scope all --json`
+  - Result: PASS zero violations at accepted4d5fe; prospective-resume Coordinator run records raw command/output.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
+- Command: `gh run view 37124088012 --json headSha,status,conclusion,jobs`
+  - Result: Actualmain4d5fe exact applicable administrative CI PASS; independently verified, not Go runtime acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/human-consent.md`
+
+- Command: `go test -race -count=1 ./...`
+  - Result: Local PASS enabled migrated PostgreSQL16/NATS, final Core11.217s/tests79.662s; Go build/vet/test PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
+- Command: `python -B tools/verify_sync_runtime.py`
+  - Result: Local PASS actual strict TLS Gateway/Core/PG208metadata/205durableMessages, postterminal206thcommit, >64KiB numericdomain; no hosted acceptance claimed.
+  - Evidence: `spec/progress/evidence/LOOP1-SYNC-GO-001/implementation/handoff.md`
 
 ## Changed Files or Migrations
 
-Accepted two HTTPS Sync bindings, bounded verifier/tests/shared hook, ADR0008/canonical11.5 plus manifest. Administrative closure adds accepted discovery/checkpoint/task/progress/immutable evidence. Existing four shapes, backend/client/native code, database/schema/ACK/compatibility and dependencies remain unchanged.
+Two Core public Sync handlers, bounded exact numeric decoding and account cursors; six auth assembly lines, new real PG tests, bounded strict TLS verifier and two-line existing deploy CI hook. No schema/migration/contract/frozen/producer changes.
 
 ## Known Failures, Risks, and Assumptions
 
-Historical8c672a2 recovery/fresh Review FAIL preserved; fresh metadata fix and NEW Review accepted b820078. Existing ADR0004 deferred fixture is not counted PASS. Offline oracle is not PostgreSQL/live Sync evidence. Go runtime/client SYNC absent. Research startup/encoding/tool gaps disclosed in sealed runs, not complete prospective traces.
+Go local runtime and final enabled build/vet/test/race PASS; strict TLS real deployment208metadata/205durableMessages plus postterminalcommit and >64KiB numeric proof PASS. Fresh independent Review/hostedCI/integration/main synchronization pending; local evidence is not acceptance. Historical transport and implementation failure evidence retained. Windows long-path Git revision:path synchronization verifier failure after successful FF was exposed and corrected by separate object-ID byte verifier; original781status/mode/size/hash unchanged. Research startup/read-only gaps disclosed; trace not claimed complete.
 
 ## Next Exact Action
 
-Finish this administrative record candidate's independent Review/applicable exact-head CI/protected integration/actual-main audit/safe synchronization. Then show the corrected concrete Go proposal and obtain separate Human implementation consent; only afterward define the narrow Go runtime task. Accepted Go runtime enables reassessment of SYNC inputs. Final endpoint remains SYNC complete then stop.
+Fresh independent Reviewer examines clean committed Go candidate; exact hosted CI/protectedintegration/actual-main audit and mainsync precede runtime acceptance. Implementation released sole writer after commit. Then reassess and activate Desktop/MobileSYNC, complete and stop.
 
 ## Last Known Good Commit
 
-`c2ff0502fdad80f463abe038a960ca1b798e6d7a` (independently accepted and synchronized public Sync freeze; administrative-only final SHA is resolved through its protected integration/private final receipt).
+`4d5fe1235e4f01111d78cc67b2880b52cac072f2` independently accepted and synchronized administrative closure; accepted product freeze c2ff050 beneath it.
 
 ## Latest Checkpoint
 
@@ -51,8 +58,8 @@ Finish this administrative record candidate's independent Review/applicable exac
 
 ## Uncommitted Changes / Ownership
 
-Assigned exact root H:/.codex/worktrees/sync-resume/IM-platform; branch task/LOOP1-SYNC-001. Coordinator /root owns only this administrative record increment; commit SHA/final clean state supplied by independent closure audit. Sealed prior evidence immutable. H:/IM-platform preserves781unrelated entries and recovery/s1-handoff-20261001; no unknown-work clean claim.
+Assigned root H:/.codex/worktrees/sync-resume/IM-platform; branch task/LOOP1-SYNC-001. Implementation /root/sync_go_implementation owns all current task changes until clean REVIEW commit, then releases sole writer to Coordinator /root. Main H:/IM-platform original781entries retained and recovery/s1-handoff-20261001 preserved.
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR0008/public HTTPS binding accepted at c2ff050; canonical ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03, PDF provenance unchanged. Remaining client block is runtime input, not permission to edit backend through SYNC allowed_paths. Go plan consent still required.
+None presently. Accepted ADR0008 authorizes binding; Human separate Go consent recorded. Missing input for SYNC is real runtime, not contract authority. Any newly discovered conflict stops affected portion under existing architecture process.
