@@ -53,7 +53,7 @@ Release sole writer after recorded clean commit/Acceptance audit, then NEW fresh
 
 ## Uncommitted Changes / Ownership
 
-Fresh Fix Agent /root/send_fix sole writer owns task changes on task/LOOP1-CLIENT-SEND-001 in verified assigned H:/.codex/worktrees/client-mvp-planning/IM-platform, fix base1822e29682eccafd75ee293c31a2d35e29746eb6. Final candidate committed clean before writer release; identity in fix handoff and immutable Recorder final_state. Main unknown781bytes/three old backups preserved. Root-owned accepted UIARCH/activation metadata unchanged.
+Fresh Fix Agent /root/send_fix sole writer owns task changes on task/LOOP1-CLIENT-SEND-001 in verified assigned H:/.codex/worktrees/client-mvp-planning/IM-platform, fix base1822e29682eccafd75ee293c31a2d35e29746eb6. Fix source/evidence committed at `9ffdaea6758bc4d310fff6e0eff0dfc1b14d088c`; subsequent handoff-only commit records identity. Final candidate committed clean before writer release; final HEAD in immutable Recorder final_state. Main unknown781bytes/three old backups preserved. Root-owned accepted UIARCH/activation metadata unchanged.
 
 ## Architecture Conflicts / ACP / ADR
 
