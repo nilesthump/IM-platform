@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: active
-Execution Status: AUTHORIZED_LOCAL_CANDIDATE_PREPARATION
+Execution Status: HUMAN_REQUESTED_AGENT_HANDOFF
 
 ## Immediately Relevant Completed Work
 
@@ -15,7 +15,7 @@ Desktop React/Tauri and Android Compose/Navigation/StateFlow GUI candidate is co
 
 ## Current Blockers
 
-Windows inventory succeeded; native activation/capture call returned `aborted by user after 286.7s`. Coordinator initiated cancellation through interrupt_agent, not a Human cancellation/approval. Activation/capture outcome is unknown; no native visual PASS. Node session reset completed; no UI retry or bypass. Windows notification/tray/shortcut and full runtime visual proof remain unfinished. Distinct Human fixture-trust decision remains PENDING; no trust installed or production TLS exception. Native freeze stays review/pending unified batch.
+Windows inventory succeeded; native activation/capture call returned `aborted by user after 286.7s`. Coordinator initiated cancellation through interrupt_agent, not a Human cancellation/approval. Activation/capture outcome is unknown; no native visual PASS. Node session reset completed; no UI retry or bypass. Windows notification/tray/shortcut and full runtime visual proof remain unfinished. Exact existing fixture-trust proposal is now Human-approved; no trust installed or production TLS exception. Native freeze stays review/pending unified batch.
 
 ## Verification
 
@@ -35,7 +35,7 @@ Windows continuation changes recovery/evidence only. No product source, backend/
 
 ## Next Exact Action
 
-Obtain working supported Windows app access and actual distinct Human trust decision. Resume with a new prospective run, finish installed Windows native/local visual proof, then regenerate owned Go fixture for authenticated screenshot matrix only after approved trust prerequisites. Architect approval -> fresh unified native+GUI Review -> applicable exact-head hosted CI/push/protected integration -> verified main synchronization remain mandatory. Do not move GUI/native to done or claim S2 PASS.
+Next agent restores archived managed worktree/saved branch, verifies root and approved CA fingerprint/expiry, and obtains supported Windows access. Resume with a new prospective run, finish installed Windows native/local visual proof, then regenerate owned Go fixture for authenticated screenshot matrix only after approved trust prerequisites. Architect approval -> fresh unified native+GUI Review -> applicable exact-head hosted CI/push/protected integration -> verified main synchronization remain mandatory. Do not move GUI/native to done or claim S2 PASS.
 
 ## Known Failures, Risks, and Assumptions
 
@@ -51,8 +51,10 @@ Original build/tool/test/diagnostic failures remain preserved. Child native UI r
 
 ## Uncommitted Changes / Ownership
 
-Only /root/gui_product_implementation owns this continuation's task/current/evidence/checkpoint changes, to be committed before writer release. Main unknown work untouched. No other writer work overwritten. Clean status and exact committed SHA are required in final handoff; synchronization remains pending.
+Implementation writer released. Coordinator commits handoff only before archive. No ongoing implementation ownership; main untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0009 and explicit latest Human unified-batch instruction authorize bounded local preparation; no new architecture decision. Approved native/appearance families and exact eight assembly files remain unchanged. Fixture trust requires its separate pending decision; native architecture acceptance remains pending unified review.
+ADR-0009 and explicit latest Human unified-batch instruction authorize bounded local preparation; no new architecture decision. Approved native/appearance families and exact eight assembly files remain unchanged. Exact existing fixture trust is Human-approved; native architecture acceptance remains pending unified review.
+
+Latest release handoff: spec/progress/evidence/LOOP1-CLIENT-GUI-001/agent-release.md; private preservation H:/.codex/gui-handoffs/20261004-4f866046/. Human requested another agent take over.

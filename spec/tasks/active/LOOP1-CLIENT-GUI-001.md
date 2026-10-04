@@ -148,3 +148,7 @@ Actual Android local continuation: 26 API34 assertions PASS for both themes at m
 Recovery endpoint: current clean-source local Android matrix PASS26 is saved under runtime/7f84da199ef5a2ee14dcf70a4a00e4cd811cb8d0. Exact unused owned Go fixture was stopped with verified cleanup; no OS trust installed. Await actual bounded trust decision and Coordinator Windows UI release, then resume prospective authenticated/runtime proof. Task remains active, all review/CI/integration/synchronization mechanisms pending.
 
 Windows continuation recovery: current-source baedd997 NSIS build/owned installation exit0; exact expected NSS bundle-patched installed bytes verified, original raw-hash assertion failure preserved. Supported inventory succeeded, next native capture call Coordinator-cancelled with exact tool text aborted by user after 286.7s; outcome unknown, session reset, no UI retry. Windows native visual proof and distinct Human fixture-trust approval remain pending. GUI stays active; no acceptance/push/main sync. See windows-continuation.md/package JSON and current recovery.
+
+## Latest Human-approved handoff
+
+2026-10-04 exact existing trust proposal approved; release to another agent requested. No trust installed, no push/sync; GUI active. Earlier pending-trust status historical. Next exact action/risks/private paths: spec/progress/evidence/LOOP1-CLIENT-GUI-001/agent-release.md.

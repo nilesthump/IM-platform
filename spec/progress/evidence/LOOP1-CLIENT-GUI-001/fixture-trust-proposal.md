@@ -1,3 +1,4 @@
+<!-- Exact plan Human-approved2026-10-04; no trust installed; expiry unchanged. Earlier pending wording historical. See agent-release.md. -->
 # Bounded local GUI fixture trust proposal — pending Human approval
 
 This proposal changes test-host trust temporarily. No trust has been installed. Local compilation and unauthenticated UI verification continue. Production client TLS verification and hostname checking remain enabled; no client trust bypass, network library, manifest exception or production APK special trust configuration is proposed.
