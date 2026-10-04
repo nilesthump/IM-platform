@@ -152,3 +152,7 @@ Windows continuation recovery: current-source baedd997 NSIS build/owned installa
 ## Latest Human-approved handoff
 
 2026-10-04 exact existing trust proposal approved; release to another agent requested. No trust installed, no push/sync; GUI active. Earlier pending-trust status historical. Next exact action/risks/private paths: spec/progress/evidence/LOOP1-CLIENT-GUI-001/agent-release.md.
+
+
+## Approved takeover recovery 2026-10-04
+Sole writer /root/gui_resume_implementation, assigned managed gui-resume root, branch task/LOOP1-CLIENT-GUI-001. Anonymous desktop login guard fixed9032ad6; Windows native build/install and partial actual local GUI proof PASS. Both temporary trust environments fully rolled back with exact baselines/default TLS rejection. Android read-only overlay unavailable; Windows system certificate confirmation inaccessible, so authenticated matrix and native capability proof remain BLOCKED_EXTERNAL_ACCESS. Original failures/proofs preserved. Current Task remains active; no Architect acceptance/full independent Review/exact-head CI/push/main synchronization. Source/frozen/53 architecture/Development recovery PASS after owned ignored-output isolation/restoration. Next exact action, risks, commit provenance and Recorder limitations: spec/progress/evidence/LOOP1-CLIENT-GUI-001/resume-20261004/handoff.md; spec/progress/current.md. All pending files task-owned; release after final recovery commit. Main last-known-good ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597 unchanged.

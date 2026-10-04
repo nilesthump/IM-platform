@@ -3,7 +3,7 @@ from pathlib import Path
 import importlib.util,json,os,secrets,ssl,subprocess,sys,time,urllib.request,uuid
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parents[3]
-PRIVATE=Path('H:/IM-platform/.git/worktrees/IM-platform3/gui-runtime')
+PRIVATE=Path(os.environ.get('IM_GUI_PRIVATE_RUNTIME','H:/IM-platform/.git/worktrees/IM-platform3/gui-runtime')).resolve()
 TLS=PRIVATE/'tls-v2';WORK=PRIVATE/('go-'+str(os.getpid()))
 project='im-gui-product-20261004-'+str(os.getpid())
 docker='C:/Program Files/Docker/Docker/resources/bin/docker.exe'

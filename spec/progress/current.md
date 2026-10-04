@@ -7,54 +7,49 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: active
-Execution Status: HUMAN_REQUESTED_AGENT_HANDOFF
+Execution Status: BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
-Desktop React/Tauri and Android Compose/Navigation/StateFlow GUI candidate is committed on task/LOOP1-CLIENT-GUI-001 in exact assigned root H:/.codex/worktrees/s/IM-platform. Product source is unchanged since baedd9975d28e2ae9f9931dfd48a66dc5036dd9f. Android local runtime matrix has 26 actual API34 assertions and 11 unaltered source-bound images. Existing native SQLite/Send/Sync regressions and GUI lifecycle controls passed locally. Windows current-source NSIS build and owned silent installation exited0; exact installed bytes match the official Tauri NSS bundle-type patch. No acceptance or synchronization claimed.
+Assigned managed root H:/.codex/worktrees/gui-resume/IM-platform, task/LOOP1-CLIENT-GUI-001, resumed a64646f. Minimal anonymous desktop sign-in guard fixed in9032ad6; native Windows build/install and actual empty/partial/populated/post-submit checks passed locally. Six repaired-source unchanged images and one earlier-source settings image saved with full provenance. Both temporary certificate trust environments fully rolled back; original baselines restored and default Android SDK/Windows TLS rejection verified. All three exact owned Go fixture projects stopped and cleaned.
 
 ## Current Blockers
 
-Windows inventory succeeded; native activation/capture call returned `aborted by user after 286.7s`. Coordinator initiated cancellation through interrupt_agent, not a Human cancellation/approval. Activation/capture outcome is unknown; no native visual PASS. Node session reset completed; no UI retry or bypass. Windows notification/tray/shortcut and full runtime visual proof remain unfinished. Exact existing fixture-trust proposal is now Human-approved; no trust installed or production TLS exception. Native freeze stays review/pending unified batch.
+Authenticated matrix BLOCKED_EXTERNAL_ACCESS: Android approved read-only bind actually rw, remount Device or resource busy; Windows system certificate confirmation not reliably targetable. Native app access works. Actual notification OS toast/tray visual and shortcut proof unfinished; shortcut Computer Use app approval timed out. No positive login/message/session/isolation proof asserted.
 
 ## Verification
 
 - Command: `python tests/clients/gui/check_sources.py --development`
-  - Result: local PASS resumed unchanged source/frozen/architecture/recovery checks; all owned ignored outputs restored.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/verification.md`
+  - Result: local source/frozen/all architecture zero violations/53 tests/Development recovery PASS with IM_GUI_ASSIGNED_ROOT exact assigned root; owned ignored outputs isolated and restored. Recovery required literal code delimiters as well as headings; original failures preserved, final schema recheck PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/resume-20261004/handoff.md`
 - Command: `python tests/clients/gui/native.py package --debug --bundles nsis`
-  - Result: Windows local build PASS; owned installation exit0. Original raw-hash assertion FAIL preserved; exactly three official UNK-to-NSS packaging marker bytes account for the difference, and expected packaged bytes equal installed bytes.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-continuation-package.json`
-- Command: `python tests/clients/gui/native.py gui-mobile --serial emulator-5590 --capture`
-  - Result: previous clean-source actual API34 local PASS26, not repeated during Windows continuation.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/runtime/7f84da199ef5a2ee14dcf70a4a00e4cd811cb8d0/android-local/manifest.json`
+  - Result: local PASS; owned installer exit0, exact NSS package bytes equal installed. This was not a clean full-tree acceptance build.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/resume-20261004/manifest.json`
 
 ## Changed Files or Migrations
 
-Windows continuation changes recovery/evidence only. No product source, backend/contracts/schema/security/ACK/accepted Send/Sync or main changes. Original R-GUI-PRODUCT-20261004 is sealed BLOCKED/validated, 207 events. R-GUI-WINDOWS-20261004 records the exact Coordinator cancellation and is sealed CANCELLED/validated before final writer release. Final event count/hashes and exact recovery HEAD are recorded in handoff and private final_state.json; original streams unchanged.
-
-## Next Exact Action
-
-Next agent restores archived managed worktree/saved branch, verifies root and approved CA fingerprint/expiry, and obtains supported Windows access. Resume with a new prospective run, finish installed Windows native/local visual proof, then regenerate owned Go fixture for authenticated screenshot matrix only after approved trust prerequisites. Architect approval -> fresh unified native+GUI Review -> applicable exact-head hosted CI/push/protected integration -> verified main synchronization remain mandatory. Do not move GUI/native to done or claim S2 PASS.
+Only task-owned UI guard, trust/fixture/source-check helpers, Android rollback instrumentation and recovery/evidence. No public contracts/backend/schema/ACK/security exception. Product fix9032ad6 unaccepted. Initial newline churn corrected without rewriting commits. Native remains review pending unified batch.
 
 ## Known Failures, Risks, and Assumptions
 
-Original build/tool/test/diagnostic failures remain preserved. Child native UI result is cancellation, not an invented timeout; Coordinator's earlier emulator `Computer Use app approval timed out` is a separate reported event. No mock screenshots or unknown user-data capture. Owned Go fixture stopped with verified cleanup; no live endpoint remains. Named owned emulator/user AVD and main unknown work preserved.
+Original trust/import false negatives, addstore exit0 without actual installation, root-dialog Coordinator cancellation, shortcut approval timeout, fixture stdin EOF and unknown up-build exit1 cause preserved. Direct architecture failures on generated outputs/GBK and final recovery heading failure preserved then repaired. Original approved CA expires2026-10-04T19:20:46.586064Z; no replacement approved. Recorder initial condensed prompt mislabeled full and tool/startup gaps exposed immutably, exact authorizing messages registered late, no complete prospective trace claimed.
+
+## Next Exact Action
+
+Provide supported Windows system confirmation/native capability access and approved Android trust/environment decision. Finish authenticated matrix and full source-bound GUI/native proof, then Architect approval -> fresh unified independent Review -> exact-head hosted CI/protected integration -> verified safe main synchronization. Existing exact-plan approval persists; no broader trust or architecture authority inferred.
 
 ## Last Known Good Commit
 
-`ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597` independently accepted/synchronized SYNC main. Current product source candidate baedd9975d28e2ae9f9931dfd48a66dc5036dd9f is unaccepted. Actual recovery HEAD resolves through branch task/LOOP1-CLIENT-GUI-001 and sealed final_state.json; exact final SHA is reported in handoff, avoiding self-reference.
+Independently accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597` unchanged. Current unaccepted desktop repair9032ad63bf4843e86d85264b3de8d93552b9d938; manifest records full candidate provenance. No push/synchronization or done/S2 PASS.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-04-loop1-client-gui-001-local-product.md`
+`spec/progress/checkpoints/2026-10-04-loop1-client-gui-resume-blocked.md`
 
 ## Uncommitted Changes / Ownership
 
-Implementation writer released. Coordinator commits handoff only before archive. No ongoing implementation ownership; main untouched.
+Sole writer /root/gui_resume_implementation owns all listed task-scope files until recovery commit, releases after final handoff. No unknown changes overwritten. Final committed recovery SHA reported externally to avoid self-reference. Private prospective_resume Recorder R-GUI-RESUME-20261004 seal/validation result reported at handoff.
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0009 and explicit latest Human unified-batch instruction authorize bounded local preparation; no new architecture decision. Approved native/appearance families and exact eight assembly files remain unchanged. Exact existing fixture trust is Human-approved; native architecture acceptance remains pending unified review.
-
-Latest release handoff: spec/progress/evidence/LOOP1-CLIENT-GUI-001/agent-release.md; private preservation H:/.codex/gui-handoffs/20261004-4f866046/. Human requested another agent take over.
+ADR-0009 and explicit Human unified-batch authorization remain bounded candidate authority. No new architectural choice or system protection changes; affected trust methods stop at exact approval boundaries. Task active, native review, S2 OPEN; independent acceptance mechanisms and main synchronization still pending.

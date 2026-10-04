@@ -2,7 +2,7 @@
 from pathlib import Path
 import os,shutil,subprocess,sys,time
 ROOT=Path(__file__).resolve().parents[3]
-expected=Path('H:/.codex/worktrees/s/IM-platform').resolve()
+expected=Path(os.environ.get('IM_GUI_ASSIGNED_ROOT','H:/.codex/worktrees/s/IM-platform')).resolve()
 if ROOT.resolve()!=expected:raise RuntimeError('Assigned worktree root mismatch')
 resolved=subprocess.check_output(['git','rev-parse','--show-toplevel'],cwd=ROOT,text=True).strip()
 if Path(resolved).resolve()!=expected:raise RuntimeError('Resolved Git root mismatch')

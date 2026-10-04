@@ -2,9 +2,9 @@
 No fake ACK, product source change, persisted mutation or host trust change.
 """
 from pathlib import Path
-import argparse,json,queue,subprocess,threading,time,uuid
+import argparse,json,os,queue,subprocess,threading,time,uuid
 ROOT=Path(__file__).resolve().parents[3]
-PRIVATE=Path("H:/IM-platform/.git/worktrees/IM-platform3/gui-runtime").resolve()
+PRIVATE=Path(os.environ.get("IM_GUI_PRIVATE_RUNTIME","H:/IM-platform/.git/worktrees/IM-platform3/gui-runtime")).resolve()
 p=argparse.ArgumentParser();p.add_argument("--public",required=True);p.add_argument("--seconds",type=float,default=8);a=p.parse_args()
 public=Path(a.public).resolve()
 if not public.is_relative_to(PRIVATE) or public.name!="public.json" or not .5<=a.seconds<=10:raise RuntimeError("Exact owned fixture and bounded duration required")
