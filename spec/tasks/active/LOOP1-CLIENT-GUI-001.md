@@ -93,11 +93,11 @@ spec/progress/evidence/LOOP1-CLIENT-GUI-001/；本次仅规划，未生成产品
 
 # Handoff
 
-Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品 ID。S1 PASS/S2 OPEN；未实现、未验收、未同步产品；known good59dcf34e4538d2f35ccafde8104e860f8cf5cd7a。当前规划文本 /root 所有；不覆盖主仓库未知工作。具体 code paths 在激活时按责任与实际源码确认。
+Current state active; sole writer /root/gui_product_implementation, exact assigned root H:/.codex/worktrees/s/IM-platform, branch task/LOOP1-CLIENT-GUI-001. Product source baedd9975d28e2ae9f9931dfd48a66dc5036dd9f remains a local unaccepted candidate. Android actual API34 local matrix PASS26/11 original images; Windows current package expected official NSS-marker bytes verified, native visual access interrupted by Coordinator with unknown capture outcome. Original failures preserved. Owned Go fixture stopped, no trust installed; both prospective runs are sealed/validated before writer release. Actual final recovery SHA is recorded in sealed final_state.json and handoff; main unknown work untouched.
 
 # Next Action
 
-等待依赖与规划独立接受；本轮仅 SEND 允许随后激活，SYNC/GUI/WEB 保持 backlog。
+Obtain supported Windows app access and actual pending Human fixture-trust decision, then new prospective run for unfinished Windows native/local visuals and approved authenticated fixture proof. Architect approval and fresh unified native+GUI Review/exact-head hosted CI/push/protected integration/actual-main synchronization remain required. No task review/done or S2 PASS before full applicable proof/acceptance/synchronization. Historical readiness and authorization chronology below remains provenance.
 
 # Authorized GUI readiness recovery (2026-10-04)
 
@@ -146,3 +146,5 @@ Local continuation: stable GUI candidate 7e6794e878a80b94e290ab6d87d566d23f5bd64
 Actual Android local continuation: 26 API34 assertions PASS for both themes at minimum/default/maximum independent appearance values; preserved 7ed032e source-bound local captures and new matrix instrumentation. Full authenticated screenshots, Windows installed capability proof, Architect approval and unified review/CI/integration remain pending.
 
 Recovery endpoint: current clean-source local Android matrix PASS26 is saved under runtime/7f84da199ef5a2ee14dcf70a4a00e4cd811cb8d0. Exact unused owned Go fixture was stopped with verified cleanup; no OS trust installed. Await actual bounded trust decision and Coordinator Windows UI release, then resume prospective authenticated/runtime proof. Task remains active, all review/CI/integration/synchronization mechanisms pending.
+
+Windows continuation recovery: current-source baedd997 NSIS build/owned installation exit0; exact expected NSS bundle-patched installed bytes verified, original raw-hash assertion failure preserved. Supported inventory succeeded, next native capture call Coordinator-cancelled with exact tool text aborted by user after 286.7s; outcome unknown, session reset, no UI retry. Windows native visual proof and distinct Human fixture-trust approval remain pending. GUI stays active; no acceptance/push/main sync. See windows-continuation.md/package JSON and current recovery.
