@@ -1,0 +1,263 @@
+package im.platform.client.ui
+import android.app.Activity
+import android.app.Instrumentation
+import android.content.Intent
+import android.os.Bundle
+import android.view.accessibility.AccessibilityNodeInfo
+import im.platform.client.MainActivity
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
+
+/** Real Compose UI/default SDK TLS against task-owned actual Go fixture. */
+class GuiAuthenticatedInstrumentation:Instrumentation(){
+ private val deliveries=mutableListOf<String>()
+ private var args=Bundle();private var activity:Activity?=null;private var count=0
+ private val captureRun=System.currentTimeMillis().toString()
+ private val sentText="GUI Android actual send "+captureRun
+ private val retryText="GUI Android retry identity "+captureRun
+ private val sendingText="GUI Android controlled sending "+captureRun
+ private fun verify(v:Boolean){check(v){"Actual GUI assertion "+count+" failed"};count++}
+ private fun actualRoot():AccessibilityNodeInfo?{uiAutomation.clearCache();return uiAutomation.rootInActiveWindow}
+ private fun find(n:AccessibilityNodeInfo?,text:String,prefix:Boolean=false):AccessibilityNodeInfo?{
+  if(n==null)return null;val v=n.text?.toString()?:n.contentDescription?.toString()
+  if(v==text || prefix&&v?.startsWith(text)==true)return n
+  for(i in 0 until n.childCount)find(n.getChild(i),text,prefix)?.let{return it};return null
+ }
+ private fun await(text:String,prefix:Boolean=false):AccessibilityNodeInfo{
+  repeat(300){find(actualRoot(),text,prefix)?.let{return it};Thread.sleep(100)}
+  error("Actual control missing: "+text)
+ }
+ private fun scroll(n:AccessibilityNodeInfo?):Boolean{
+  fun collection(v:AccessibilityNodeInfo?):Boolean{
+   if(v==null)return false
+   if(v.collectionInfo!=null&&v.isScrollable&&v.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD))return true
+   for(i in 0 until v.childCount)if(collection(v.getChild(i)))return true
+   return false
+  }
+  if(collection(n))return true
+  if(n==null)return false;if(n.isScrollable&&n.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD))return true
+  for(i in 0 until n.childCount)if(scroll(n.getChild(i)))return true;return false
+ }
+ private fun click(text:String,prefix:Boolean=false){
+  fun actionable(n:AccessibilityNodeInfo?,parent:AccessibilityNodeInfo?):AccessibilityNodeInfo?{
+   if(n==null)return null
+   val next=if(n.isClickable)n else parent
+   val value=n.text?.toString()?:n.contentDescription?.toString()
+   if(value==text||prefix&&value?.startsWith(text)==true)if(next!=null)return next
+   for(i in 0 until n.childCount)actionable(n.getChild(i),next)?.let{return it}
+   return null
+  }
+  var target:AccessibilityNodeInfo?=null
+  repeat(300){if(target==null){target=actionable(actualRoot(),null);if(target==null)Thread.sleep(100)}}
+  val n=target?:error("Actual clickable control missing "+text)
+  verify(n.isEnabled);verify(n.performAction(AccessibilityNodeInfo.ACTION_CLICK));waitForIdleSync();Thread.sleep(650);uiAutomation.waitForIdle(200,5000)
+ }
+ private fun reach(text:String){
+  var diagnostic="absent"
+  repeat(10){
+   var n=find(actualRoot(),text)
+   while(n!=null){
+    val r=android.graphics.Rect();n.getBoundsInScreen(r)
+    val b=uiAutomation.takeScreenshot()
+    if(b!=null){
+     diagnostic="bounds="+r+" viewport="+b.width+"x"+b.height+" clickable="+n.isClickable
+     val visible=r.width()>0&&r.height()>0&&r.left>=0&&r.top>=0&&r.right<=b.width&&r.bottom<=b.height
+     b.recycle();if(visible)return
+    }
+    n=n.parent
+   }
+   scroll(actualRoot());waitForIdleSync();Thread.sleep(650);uiAutomation.waitForIdle(200,5000)
+  }
+  fun describe(n:AccessibilityNodeInfo?):String{
+   if(n==null)return "root-null"
+   val here=if(n.isPassword||n.isEditable) "[edit]" else "[text="+n.text+" desc="+n.contentDescription+" clickable="+n.isClickable+"]"
+   return here+(0 until n.childCount).joinToString(""){describe(n.getChild(it))}
+  }
+  error("Control unreachable "+text+" "+diagnostic+" activityFinishing="+activity?.isFinishing+" activityDestroyed="+activity?.isDestroyed+" rootPackage="+actualRoot()?.packageName+" windows="+uiAutomation.windows.joinToString{it.id.toString()+":"+it.type+":"+it.isActive}+" tree="+describe(actualRoot()))
+ }
+ private fun fill(label:String,value:String){
+  reach(label);var n=await(label);while(n.actionList.none{it.id==AccessibilityNodeInfo.ACTION_SET_TEXT})n=n.parent?:error("No edit "+label)
+  val b=Bundle();b.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,value)
+  verify(n.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,b));waitForIdleSync();Thread.sleep(200)
+ }
+ private fun capture(name:String){
+  Thread.sleep(250);val d=java.io.File(targetContext.getExternalFilesDir(null),"gui-auth/$captureRun").apply{mkdirs()}
+  val b=checkNotNull(uiAutomation.takeScreenshot());java.io.File(d,name+".png").outputStream().use{check(b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it))};b.recycle()
+ }
+ private fun delivery(text:String,status:String):List<String?>{
+  val account=checkNotNull(Auth("https://localhost:18443",Preferences(targetContext)).savedAccount())
+  val file=targetContext.getDatabasePath("im-"+account.lowercase()+".sqlite");check(file.isFile)
+  android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY).use{db->
+   repeat(300){
+    db.rawQuery("SELECT request_id,sender_id,content,state,server_message_id FROM messages WHERE content=? AND state=? ORDER BY local_id DESC LIMIT 1",arrayOf(text,status)).use{c->
+     if(c.moveToFirst()){val row=(0 until c.columnCount).map{if(c.isNull(it))null else c.getString(it)};deliveries.add(text+"|"+status+"|"+row[0]+"|"+row[4]);return row}
+    }
+    Thread.sleep(100)
+   }
+  }
+  val db=android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY)
+  val observed=try{db.rawQuery("SELECT content,state FROM messages ORDER BY local_id DESC LIMIT 8",null).use{c->val rows=mutableListOf<String>();while(c.moveToNext()){val content=c.getString(0);if(content.startsWith("GUI Android"))rows.add(content+":"+c.getString(1))};rows.joinToString("|")}}finally{db.close()}
+  error("Actual read-only repository delivery missing "+text+" "+status+" observed="+observed)
+ }
+ private fun actualViewModel():WorkspaceViewModel{
+  val owner=activity as MainActivity;val key=owner.viewModelStore.keys().single{it.endsWith("WorkspaceViewModel")}
+  return androidx.lifecycle.ViewModelProvider(owner)[key,WorkspaceViewModel::class.java]
+ }
+ private fun showMessage(text:String){
+  fun list(n:AccessibilityNodeInfo?,composerTop:Int,minHeight:Int):AccessibilityNodeInfo?{
+   if(n==null)return null;val r=android.graphics.Rect();n.getBoundsInScreen(r)
+   if(n.isScrollable&&r.height()>minHeight&&r.bottom<=composerTop)return n
+   for(i in 0 until n.childCount)list(n.getChild(i),composerTop,minHeight)?.let{return it};return null
+  }
+  repeat(40){
+   val root=actualRoot();val composer=android.graphics.Rect();var editor=find(root,"Message")
+   while(editor!=null){editor.getBoundsInScreen(composer);if(!composer.isEmpty)break;editor=editor.parent}
+   val screen=checkNotNull(uiAutomation.takeScreenshot());val height=screen.height;screen.recycle()
+   val viewport=android.graphics.Rect();val n=checkNotNull(list(root,composer.top,height/6)){"Actual vertical message viewport absent"};n.getBoundsInScreen(viewport)
+   val target=find(root,text);val r=android.graphics.Rect();target?.getBoundsInScreen(r)
+   if(target!=null&&!r.isEmpty&&r.top>=viewport.top+8&&r.bottom<=viewport.bottom-36)return
+   val messages=actualViewModel().state.value.messages
+   val targetIndex=messages.indexOfFirst{it[2]==text}
+   val visible=messages.mapIndexedNotNull{index,row->val v=find(root,row[2]?:"");val bounds=android.graphics.Rect();v?.getBoundsInScreen(bounds);if(v!=null&&!bounds.isEmpty&&bounds.intersects(viewport.left,viewport.top,viewport.right,viewport.bottom))index else null}
+   val above=visible.isNotEmpty()&&targetIndex>=0&&targetIndex<visible.min()
+   val delta=if(above)viewport.height()/3 else if(target!=null&&!r.isEmpty&&r.top<viewport.top+8)kotlin.math.min(viewport.height()/3,kotlin.math.max(20,viewport.top+8-r.top))
+    else -kotlin.math.min(viewport.height()/3,if(target==null||r.isEmpty)viewport.height()/3 else kotlin.math.max(20,r.bottom-(viewport.bottom-36)))
+   val x=viewport.centerX().toFloat();val y=viewport.centerY().toFloat();val down=android.os.SystemClock.uptimeMillis()
+   fun event(action:Int,step:Int){val e=android.view.MotionEvent.obtain(down,android.os.SystemClock.uptimeMillis(),action,x,y+delta*step/6f,0);e.source=android.view.InputDevice.SOURCE_TOUCHSCREEN;try{verify(uiAutomation.injectInputEvent(e,true))}finally{e.recycle()}}
+   event(android.view.MotionEvent.ACTION_DOWN,0);for(i in 1..6){Thread.sleep(25);event(android.view.MotionEvent.ACTION_MOVE,i)};event(android.view.MotionEvent.ACTION_UP,6)
+   Thread.sleep(250);uiAutomation.waitForIdle(100,3000)
+  }
+  error("Actual complete message viewport unavailable "+text)
+ }
+ private fun retryMessage(text:String){
+  showMessage(text);val body=android.graphics.Rect();await(text).getBoundsInScreen(body)
+  val candidates=mutableListOf<Pair<AccessibilityNodeInfo,android.graphics.Rect>>()
+  fun scan(n:AccessibilityNodeInfo?,parent:AccessibilityNodeInfo?){
+   if(n==null)return;val click=if(n.isClickable)n else parent
+   if(n.text?.toString()=="Retry"&&click!=null){val r=android.graphics.Rect();click.getBoundsInScreen(r);if(r.top>=body.bottom)candidates.add(click to r)}
+   for(i in 0 until n.childCount)scan(n.getChild(i),click)
+  }
+  scan(actualRoot(),null);val n=checkNotNull(candidates.minByOrNull{it.second.top}){"Current message Retry unavailable"}.first
+  verify(n.isEnabled);verify(n.performAction(AccessibilityNodeInfo.ACTION_CLICK));Thread.sleep(650);uiAutomation.waitForIdle(200,5000)
+ }
+ private fun actualState():String{
+  val owner=activity as MainActivity
+  val keys=owner.viewModelStore.keys().filter{it.endsWith("WorkspaceViewModel")}
+  val vm=androidx.lifecycle.ViewModelProvider(owner)[keys.single(),WorkspaceViewModel::class.java]
+  val f=WorkspaceViewModel::class.java.getDeclaredField("sync").apply{isAccessible=true}
+  val sync=f.get(vm) as? im.platform.client.sync.SyncViewModel
+  val send=sync?.send
+  fun read(name:String):Any?=send?.javaClass?.getDeclaredField(name)?.apply{isAccessible=true}?.get(send)
+  return "keys="+keys.joinToString()+" workspaceConnection="+vm.state.value.connection+" messages="+vm.state.value.messages.size+" error="+vm.state.value.error+" sendConnection="+send?.state?.value?.connection+" sendError="+send?.state?.value?.error+" bound="+read("bound")+" socketPresent="+(read("socket")!=null)+" attempts="+((read("attempts") as? Map<*,*>)?.size)+" sentRequestCount="+((read("requestConversations") as? Map<*,*>)?.size)+" wssClosed="+read("socket")?.let{it.javaClass.getDeclaredField("closed").apply{isAccessible=true}.get(it)}
+ }
+ private fun mainNetworkProbe():String{
+  val owner=activity as MainActivity;val key=owner.viewModelStore.keys().single{it.endsWith("WorkspaceViewModel")}
+  val vm=androidx.lifecycle.ViewModelProvider(owner)[key,WorkspaceViewModel::class.java]
+  val sync=WorkspaceViewModel::class.java.getDeclaredField("sync").apply{isAccessible=true}.get(vm) as im.platform.client.sync.SyncViewModel
+  val socket=sync.send.javaClass.getDeclaredField("socket").apply{isAccessible=true}.get(sync.send) as im.platform.client.send.SendSocket
+  var observed="unavailable"
+  runOnMainSync{try{socket.send(im.platform.client.send.Wire.envelope("ping",java.util.UUID.randomUUID().toString(),org.json.JSONObject()));observed="NO_EXCEPTION"}catch(e:Throwable){observed=e.javaClass.name}}
+  return observed
+ }
+ private fun backKeyboard(){uiAutomation.injectInputEvent(android.view.KeyEvent(0,android.view.KeyEvent.KEYCODE_BACK),true);uiAutomation.injectInputEvent(android.view.KeyEvent(1,android.view.KeyEvent.KEYCODE_BACK),true);Thread.sleep(650);uiAutomation.waitForIdle(200,5000)}
+ private fun login(user:String){
+  fill("Server","https://localhost:18443");fill("Username",user);fill("Password","fixture-password-not-a-real-secret");backKeyboard();reach("Sign in");click("Sign in");await("Connected")
+ }
+ private fun settingsControl(name:String){click("Settings");reach(name);click(name)}
+ override fun onCreate(arguments:Bundle?){super.onCreate(arguments);args=arguments?:Bundle();start()}
+ override fun onStart(){
+  val result=Bundle();val prefs=Preferences(targetContext);val appearance=prefs.loadAppearance()
+  try{
+   verify(android.os.Build.VERSION.SDK_INT==34)
+   val c=URL("https://localhost:18443/__infra/health").openConnection() as HttpsURLConnection
+   c.connectTimeout=10000;c.readTimeout=10000;c.instanceFollowRedirects=false
+   try{verify(c.responseCode==200);c.inputStream.close()}finally{c.disconnect()}
+   result.putString("defaultSDKHTTPS","PASS")
+   val plain=java.net.Socket();plain.connect(java.net.InetSocketAddress("127.0.0.1",18443),10000)
+   val wrong=(javax.net.ssl.SSLSocketFactory.getDefault() as javax.net.ssl.SSLSocketFactory).createSocket(plain,"fixture-hostname-mismatch.invalid",18443,true) as javax.net.ssl.SSLSocket
+   try{wrong.soTimeout=10000;val parameters=wrong.sslParameters;parameters.endpointIdentificationAlgorithm="HTTPS";wrong.sslParameters=parameters
+    var rejected=false;try{wrong.startHandshake()}catch(_:javax.net.ssl.SSLHandshakeException){rejected=true};verify(rejected)
+   }finally{wrong.close()}
+   result.putString("defaultHostnameMismatch","PASS");prefs.saveAppearance(Appearance("cold",14,.8f))
+   activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));await("Chat")
+   val phase=args.getString("phase")?:"matrix"
+   if(phase=="expiry"){
+    fill("Server","https://localhost:18443");backKeyboard();reach("Resume securely saved session");click("Resume securely saved session")
+    await("Session expired. Sign in again.");verify(prefs.read("https://localhost:18443/current")==null)
+    verify(actualViewModel().state.value.session==null&&actualViewModel().state.value.offlineAccount==null);capture("session-expired-cleared")
+   }else if(phase=="diagnose"||phase=="diagnose-red"){
+    login(args.getString("avery")!!);click("GUI Fixture Morgan");fill("Message",sentText);backKeyboard()
+    result.putString("beforeSend",actualState());capture("diagnose-before-send")
+    click("Send ",true);result.putString("afterSend",actualState());capture("diagnose-after-send")
+    if(phase=="diagnose-red"){delivery(sentText,"FAILED");result.putString("mainThreadBenignPingException",mainNetworkProbe());error("Actual immediate FAILED; sentRequestCount distinguishes pre-ACK socket send failure")}
+    delivery(sentText,"SENT");result.putString("afterCommitted",actualState());showMessage(sentText);capture("diagnose-sent")
+   }else if(phase=="matrix"){
+    capture("cold-login");login(args.getString("avery")!!);click("GUI Fixture Morgan");await("Welcome to the GUI fixture. This message crossed the actual Go services.");capture("cold-chat-history")
+    click("Friends");await("Your friends");capture("cold-friends");fill("Username",args.getString("riley")!!);backKeyboard();reach("Search");click("Search");await("GUI Fixture Riley");capture("friend-search-result");click("Add friend");await("Connected")
+    click("Chat");click("GUI Fixture Morgan");fill("Message",sentText);backKeyboard();click("Send ",true);delivery(sentText,"SENT");showMessage(sentText);capture("sent")
+    settingsControl("Go offline");click("Chat");await("Offline");await(sentText);capture("offline-history")
+    fill("Message",retryText);backKeyboard();click("Send ",true);val retryId=delivery(retryText,"FAILED")[0];showMessage(retryText);capture("failed")
+    click("Reconnect");await("Connected");retryMessage(retryText);verify(delivery(retryText,"SENT")[0]==retryId);showMessage(retryText);capture("retry-sent")
+    settingsControl("Refresh session");await("GUI Fixture Avery");capture("profile-refreshed")
+    click("Cold AI");verify(actualViewModel().state.value.appearance.theme=="warm");click("Chat");await(sentText);capture("warm-chat-history")
+   }else{
+    if(prefs.read("https://localhost:18443/current")==null)login(args.getString("avery")!!) else {fill("Server","https://localhost:18443");backKeyboard();reach("Resume securely saved session");click("Resume securely saved session");await("Connected")}
+    click("GUI Fixture Morgan");await("GUI Android actual send",true);capture("restart-resume")
+    if(phase=="refresh"){
+     val slot=checkNotNull(prefs.read("https://localhost:18443/current"));val before=prefs.read(slot)
+     settingsControl("Refresh session");repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)}
+     verify(!actualViewModel().state.value.busy&&actualViewModel().state.value.connection=="ready")
+     verify(prefs.read(slot)!=before);await("GUI Fixture Avery");capture("profile-refreshed")
+    }else if(phase=="appearance"){
+     click("Cold AI");verify(actualViewModel().state.value.appearance.theme=="warm");click("Settings");await("Font size: 14px");capture("warm-settings-14-compact")
+     repeat(8){click("+")};reach("Comfort");click("Comfort");verify(actualViewModel().state.value.appearance==Appearance("warm",22,1.2f));capture("warm-settings-22-comfort")
+     click("Chat");val latest=actualViewModel().state.value.messages.firstOrNull{it[2]?.startsWith("GUI Android retry identity")==true&&it[3]=="SENT"}!![2]!!
+     capture("warm-chat-22-comfort")
+     click("Warm Creative");verify(actualViewModel().state.value.appearance==Appearance("cold",22,1.2f));capture("cold-chat-22-comfort")
+     click("Settings");reach("−");repeat(6){click("−")};reach("Standard");click("Standard");verify(actualViewModel().state.value.appearance==Appearance("cold",16,1f));capture("cold-settings-16-standard")
+     click("Warm Creative");verify(actualViewModel().state.value.appearance==Appearance("warm",16,1f));capture("warm-settings-16-standard")
+    }else if(phase=="retry"||phase=="retry-existing"){
+     val target=if(phase=="retry")retryText else args.getString("retryText")!!
+     if(phase=="retry"){
+      settingsControl("Go offline");click("Chat");await("Offline");fill("Message",target);backKeyboard();click("Send ",true)
+      val request=delivery(target,"FAILED")[0];showMessage(target);capture("existing-failed")
+      click("Reconnect");await("Connected");retryMessage(target);verify(delivery(target,"SENT")[0]==request)
+     }
+     val committed=delivery(target,"SENT")
+     result.putString("retryRequestId",committed[0]);result.putString("retryServerMessageId",committed[4]);try{showMessage(target);capture("retry-sent")}catch(e:IllegalStateException){result.putString("retryCaptureGap",e.message);capture("retry-capture-gap")}
+     val slot=checkNotNull(prefs.read("https://localhost:18443/current"));val before=prefs.read(slot)
+     settingsControl("Refresh session");repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)}
+     verify(!actualViewModel().state.value.busy&&actualViewModel().state.value.connection=="ready")
+     verify(prefs.read(slot)!=before);await("GUI Fixture Avery");capture("profile-refreshed")
+     click("Warm Creative");verify(actualViewModel().state.value.appearance.theme=="warm");click("Chat");capture("warm-chat-history")
+    }else if(phase=="isolation"){
+     settingsControl("Sign out");click("Chat");await("Open your workspace");capture("logout");login(args.getString("riley")!!);Thread.sleep(1000);verify(find(actualRoot(),"GUI Android actual send",true)==null);verify(Auth("https://localhost:18443",prefs).savedAccount()==args.getString("rileyId"))
+     val isolated=targetContext.getDatabasePath("im-"+args.getString("rileyId")+".sqlite")
+     android.database.sqlite.SQLiteDatabase.openDatabase(isolated.path,null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY).use{db->db.rawQuery("SELECT count(*) FROM messages WHERE content LIKE 'GUI Android%'",null).use{rows->verify(rows.moveToFirst()&&rows.getInt(0)==0)}}
+     capture("second-account-isolated");settingsControl("Sign out");click("Chat");await("Open your workspace");verify(prefs.read("https://localhost:18443/current")==null);capture("second-account-logout")
+     login(args.getString("avery")!!);capture("expiry-prepared")
+    }else if(phase=="offline-logout"){
+     val directory=java.io.File(targetContext.getExternalFilesDir(null),"gui-auth/$captureRun").apply{mkdirs()}
+     java.io.File(directory,"logout-ready").writeText(captureRun)
+     val proceed=java.io.File(directory,"logout-continue");repeat(1200){if(!proceed.exists())Thread.sleep(50)};verify(proceed.exists())
+     settingsControl("Sign out");click("Chat");await("Open your workspace")
+     repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)}
+     verify(!actualViewModel().state.value.busy&&actualViewModel().state.value.session==null&&actualViewModel().state.value.offlineAccount==null)
+     verify(prefs.read("https://localhost:18443/current")==null);capture("offline-logout-cleared")
+    }else if(phase=="sending"){
+     click("GUI Fixture Riley");verify(actualViewModel().state.value.messages.isEmpty())
+     fill("Message",sendingText);backKeyboard()
+     val directory=java.io.File(targetContext.getExternalFilesDir(null),"gui-auth/$captureRun").apply{mkdirs()}
+     java.io.File(directory,"send-ready").writeText(captureRun)
+     val proceed=java.io.File(directory,"send-continue");repeat(1200){if(!proceed.exists())Thread.sleep(50)};verify(proceed.exists())
+     click("Send ",true);val pending=delivery(sendingText,"SENDING");await(sendingText);await("Sending",true);capture("sending")
+     verify(delivery(sendingText,"SENT")[0]==pending[0]);await(sendingText);capture("controlled-send-sent")
+    }
+   }
+   result.putString("result","PASS");result.putInt("assertions",count);result.putString("phase",phase);result.putString("captureRun",captureRun);result.putStringArrayList("deliveries",java.util.ArrayList(deliveries))
+  }catch(e:Throwable){try{capture("failure")}catch(_:Throwable){};result.putString("result","FAIL");result.putString("failure",e.toString());result.putInt("assertions",count);result.putString("captureRun",captureRun)}
+  finally{activity?.let{runOnMainSync{it.finish()}};prefs.saveAppearance(appearance)}
+  result.putStringArrayList("deliveries",java.util.ArrayList(deliveries))
+  finish(if(result.getString("result")=="PASS")Activity.RESULT_OK else Activity.RESULT_CANCELED,result)
+ }
+}
