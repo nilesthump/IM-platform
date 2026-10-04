@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-GUI-001
 title: Desktop/Mobile complete Loop1 GUI
 status: active
-owner: /root/gui_product_implementation
+owner: /root/gui_second_resume
 stage: S2
 gate: S2
 ---
@@ -156,3 +156,6 @@ Windows continuation recovery: current-source baedd997 NSIS build/owned installa
 
 ## Approved takeover recovery 2026-10-04
 Sole writer /root/gui_resume_implementation, assigned managed gui-resume root, branch task/LOOP1-CLIENT-GUI-001. Anonymous desktop login guard fixed9032ad6; Windows native build/install and partial actual local GUI proof PASS. Both temporary trust environments fully rolled back with exact baselines/default TLS rejection. Android read-only overlay unavailable; Windows system certificate confirmation inaccessible, so authenticated matrix and native capability proof remain BLOCKED_EXTERNAL_ACCESS. Original failures/proofs preserved. Current Task remains active; no Architect acceptance/full independent Review/exact-head CI/push/main synchronization. Source/frozen/53 architecture/Development recovery PASS after owned ignored-output isolation/restoration. Next exact action, risks, commit provenance and Recorder limitations: spec/progress/evidence/LOOP1-CLIENT-GUI-001/resume-20261004/handoff.md; spec/progress/current.md. All pending files task-owned; release after final recovery commit. Main last-known-good ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597 unchanged.
+
+## Second continuation recovery 2026-10-04
+Fresh sole writer /root/gui_second_resume; root exactly verified managed gui-resume, branch task/LOOP1-CLIENT-GUI-001, recovered a801553. Product unchanged9032ad6, actual shortcut restoration PASS with original saved source-bound screenshot. Notification action exercised; OS toast/tray visual and full authenticated matrix unfinished. Exact Windows CA remained absent after CLI false-success and two normal-wizard access attempts; transient visible handle disappeared before action, no Human cancellation claimed. Final both trust baselines/root/non-root/Enforcing cleanup PASS. No fixture started. Source/frozen/53architecture tests PASS; Development result and Recorder validation at new handoff. Concrete unexecuted optional Android helper requires new explicit method approval; same Windows trust plan already approved. New handoff/decision: spec/progress/evidence/LOOP1-CLIENT-GUI-001/second-resume-20261004/. GUI active/BLOCKED_EXTERNAL_ACCESS; no Architect/full independent Review/CI/push/main sync/done/S2 PASS. Last accepted mainffd6b63 unchanged. All new changes task-owned; writer releases on clean committed recovery.

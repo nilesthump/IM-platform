@@ -11,13 +11,19 @@ Execution Status: BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
+Second resume from a801553: installed9032ad6 unchanged, actual global shortcut restores minimized client from owned emulator. One source-bound original screenshot saved. Native notification action exercised; OS toast/tray visuals remain unproved. Fresh Windows exact CA absent/baseline equal after bounded standard CLI and normal-wizard attempts; Android original CA hashes/non-root/Enforcing/temp/reverse clean. New evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/second-resume-20261004/handoff.md`.
+
 Assigned managed root H:/.codex/worktrees/gui-resume/IM-platform, task/LOOP1-CLIENT-GUI-001, resumed a64646f. Minimal anonymous desktop sign-in guard fixed in9032ad6; native Windows build/install and actual empty/partial/populated/post-submit checks passed locally. Six repaired-source unchanged images and one earlier-source settings image saved with full provenance. Both temporary certificate trust environments fully rolled back; original baselines restored and default Android SDK/Windows TLS rejection verified. All three exact owned Go fixture projects stopped and cleaned.
 
 ## Current Blockers
 
-Authenticated matrix BLOCKED_EXTERNAL_ACCESS: Android approved read-only bind actually rw, remount Device or resource busy; Windows system certificate confirmation not reliably targetable. Native app access works. Actual notification OS toast/tray visual and shortcut proof unfinished; shortcut Computer Use app approval timed out. No positive login/message/session/isolation proof asserted.
+Authenticated matrix BLOCKED_EXTERNAL_ACCESS: Android approved read-only bind actually rw, remount Device or resource busy; Windows system certificate confirmation not reliably targetable. Native app access works. Actual OS toast/tray visual proof unfinished; new real Ctrl+Shift+Space proof PASS. Windows normal wizard transient handle then disappeared; no actual import input issued, cause unavailable. Fresh addstore success text contradicted by .NET/certutil/physical-store absence. No positive login/message/session/isolation proof asserted.
 
 ## Verification
+
+- Command: `python -X utf8 -B tests/clients/gui/check_sources.py --development`
+  - Result: second resume local architecture/frozen/53tests/Development recovery PASS, exit0; no acceptance. Proposed fixed-path test helper crosscompile Werror PASS locally, never pushed/executed.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/second-resume-20261004/manifest.json`
 
 - Command: `python tests/clients/gui/check_sources.py --development`
   - Result: local source/frozen/all architecture zero violations/53 tests/Development recovery PASS with IM_GUI_ASSIGNED_ROOT exact assigned root; owned ignored outputs isolated and restored. Recovery required literal code delimiters as well as headings; original failures preserved, final schema recheck PASS.
@@ -36,7 +42,7 @@ Original trust/import false negatives, addstore exit0 without actual installatio
 
 ## Next Exact Action
 
-Provide supported Windows system confirmation/native capability access and approved Android trust/environment decision. Finish authenticated matrix and full source-bound GUI/native proof, then Architect approval -> fresh unified independent Review -> exact-head hosted CI/protected integration -> verified safe main synchronization. Existing exact-plan approval persists; no broader trust or architecture authority inferred.
+Resume using concrete remaining-proof-decision.md: same approved Windows manual/stable CurrentUser confirmation; explicitly approve proposed test-only Android mount helper or compatible environment. Finish authenticated matrix and full source-bound GUI/native proof, then Architect approval -> fresh unified independent Review -> exact-head hosted CI/protected integration -> verified safe main synchronization. Existing exact-plan approval persists; no broader trust or architecture authority inferred.
 
 ## Last Known Good Commit
 
@@ -44,11 +50,11 @@ Independently accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d5
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-04-loop1-client-gui-resume-blocked.md`
+`spec/progress/checkpoints/2026-10-04-loop1-client-gui-001-second-resume.md`
 
 ## Uncommitted Changes / Ownership
 
-Sole writer /root/gui_resume_implementation owns all listed task-scope files until recovery commit, releases after final handoff. No unknown changes overwritten. Final committed recovery SHA reported externally to avoid self-reference. Private prospective_resume Recorder R-GUI-RESUME-20261004 seal/validation result reported at handoff.
+Sole writer /root/gui_second_resume owns all listed task-scope files until recovery commit, releases after final handoff. No unknown changes overwritten. Final committed recovery SHA reported externally to avoid self-reference. New private prospective_resume Recorder R-GUI-SECOND-RESUME-20261004 seal/validation result reported at handoff.
 
 ## Architecture Conflicts / ACP / ADR
 
