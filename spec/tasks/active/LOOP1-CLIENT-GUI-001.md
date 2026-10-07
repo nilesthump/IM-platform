@@ -225,3 +225,7 @@ Human Connection unavailable request: same project im-gui-product-20261004-39112
 ## Explicit certificate import awaiting native wizard
 
 Human requests 导入. Standard certutil/native.NET attempts show success only inside process, independent Root/physicalHKCU still absent and systemTLS PartialChain. Exact certificate viewer opened; awaiting Human manual current-user Root import/已导入, then normal TLS and exact74baseline checks. No trust success or GUI login claimed. Owned39112/session58647 remains live for inspection, exact rollback/cleanup after finish. Evidence window-rows-20261007/certificate-import.md.
+
+## Certificate persistence diagnostic result
+
+Human twice reports wizard import success; actual IM login still Connection unavailable. Exact valid self-issuedCA absent freshRoot/physicalHKCU/explicitSID32+64; systemTLS PartialChain, server healthy. Await Start-menu Manage User Certificates exactRoot-name/thumb visibility; no further repeated import/config/security changes. Owned inspection project39112/session58647 still live. Recorder/root diagnostic evidence current certificate-import.md; taskactive/S2OPEN.
