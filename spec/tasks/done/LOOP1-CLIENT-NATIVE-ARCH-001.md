@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-CLIENT-NATIVE-ARCH-001
 title: Freeze minimal native GUI capabilities and appearance storage
-status: review
+status: done
 owner: /root/native_architecture_freeze
 stage: S2
 gate: S2
@@ -117,3 +117,10 @@ Independent ec0f776 Review FAIL is preserved in completion-20261007/archive-fix-
 ## Resumed publication and repaired Review (2026-10-08)
 
 PR25 exists at ec0f776; exact ec push13/PR5 required jobs PASS, but independent ec Review FAIL (raw archive whitespace) is preserved. Fresh Fix40fe535ac579d4e75117d8474169fa5aa6bc212a received NEW independent Review PASS (full diffcheck/53tests/cleanAcceptance/exact16rawbytes). Repaired SHA push still fails remote500/reset; its hosted acceptance/main integration/sync not performed. Root owns subsequent evidence-only handoff in spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/resume-20261008/handoff.md; Taskreview/S2OPEN. Source Review does not accept later metadatahead. Next restore actual write connectivity and finalhead independent acceptance/protected integration/main safe sync, then done and Windows retry. Last accepted mainffd6b63/unknown781files preserved.
+
+
+## Accepted Native source and administrative closure (2026-10-08)
+
+Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c13779e99f9f463d2c6f8`, protected PR25 actual main `6a87751087de5b4063445d0fba9fe94534507a57` and safe main synchronization PASS. Exact candidate push37656041487/PR37656059375 and actual-main37657410444:5selected jobs SUCCESS,8classifier-false normally inactive, nofailedsteps. Fresh candidate Review and new same-role actual-main audit are independently bound to their exact SHA; canonical a6b1670/PDF546915/v1.1 unchanged. Task branch task/LOOP1-CLIENT-NATIVE-ARCH-001-close; receipt preserves781unknown files/status/index and recovery/s1-handoff-20261001 branch. Source approval choices unchanged; no product/contract/schema/ACK/security change, no GUI/Windows/S2 PASS. Earlier pending/blocked statements are preserved historical snapshots. Evidence: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/acceptance-20261008/acceptance.md.
+
+Core source Task acceptance/synchronization satisfied before queue transition. This administrative record remains subject to its own independent final controls before overall completion. Coordinator root sole writer; no unknown main work modified. Next exact action independent administrative Review/hosted/protected integration/actual-main/safe sync, then Windows retry in GUIg.
