@@ -217,3 +217,7 @@ Human allows this Windows desktop UI outside sandbox. Existing installed app lau
 ## Human manual inspection runtime
 
 Latest request only login/self-inspection. Fresh owned local project im-gui-product-20261004-39112 intentionally live, session58647; private go-39112, endpointlocalhost8443. GUI form unavailable to automation; actual login not verified. Windows temporary trust attempts report success but fresh74roots/noCA and PartialChain show trust absent. Await Human manual import/form; stop exact owned fixture after inspection and roll back exact manually installedCA with74root baseline. Detailed manual-inspection.md under current window-rows evidence. No product edits/main sync; taskactive/S2OPEN.
+
+## Owned local service restart
+
+Human Connection unavailable request: same project im-gui-product-20261004-39112 restarted; repaired dependency-start race by starting exact core/gateway after DB healthy. TLS health200 with exact fixtureCA, data/account retained. Windows default TLS still fails missing issuer/root; no GUI login proof. Service remains live for requested manual inspection, cleanup session58647 afterward. Evidence window-rows-20261007/service-restart.md. No product/main change; taskactive/S2OPEN.
