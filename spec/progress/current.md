@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: INDEPENDENT_REVIEW_PENDING
+Execution Status: REPAIRING_INDEPENDENT_REVIEW_FINDINGS
 
 ## Immediately Relevant Completed Work
 
@@ -16,6 +16,8 @@ Final arrow-only back button enlarged1.5 from current label font; source71082674
 Human Mobile request implemented: all-page logo/IM+ header and global theme row removed, only compact Settings theme entry retained; title/connection/back/nav remain, app icon still exact project logo. Actual API34 PASS46 anonymous plus PASS105 authenticated;28 original screenshots/APK/source hashes, reversible theme/font/density retention. Android full temporary trust rollback and owned emulator/Go50508 cleanup PASS. No Desktop change; previous Human Windows style PASS retained. Desktop missing React useRef export repaired in3f90349; actual compiled render PASS12 and native exact installed package bound in desktop-render evidence. Prior full Android/desktop records retained.
 
 ## Current Blockers
+
+Fresh independent full candidate37f613e Review FAIL: CI workflow env indentation and legacy Android acceptance navigation/theme assumptions. Final16-image Mobile header Architect slice PASS. Fresh Fix then new Review required; report final-review-20261007/review-37f613e-fail.md.
 
 Human final Mobile instruction is implemented and explicitly requires continuing without another Human visual confirmation. Full remaining native/Architect matrix, fresh independent Review/exact-head CI/protected integration/main synchronization pending. Windows UI host setup/approval-channel tool failure persists; actual desktop Root CA remains invisible to tools, cleanup must verify in same actual desktop context, no inference from tool-side absence.
 

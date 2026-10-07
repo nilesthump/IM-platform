@@ -253,3 +253,7 @@ Exact request removes logo/IM+ global row from all Mobile pages, keeps only narr
 ## Final arrow and direct next workflow
 
 Human final instruction removes visible Chat label and enlarges sole ← by1.5; no more Human visual confirmation requested. Product710826740c287333389937c1eeefaf472e68a43d, actualAPI34 PASS107 and16 source/APK-bound raw screenshots; complete Android trust rollback and owned runtime cleanup. Evidence mobile-back-20261007/verification.md. Candidate enters review for fresh independent Architect/full unified candidate examination; acceptance is pending, full Windows native matrix and actual-context WindowsCA cleanup remain explicitly unresolved. Do not infer complete Task/GatePASS or synchronize unaccepted candidate. Current managed worktree/branch retained, mainffd unchanged, sole writer/root owns only declared refinement/evidence/progress.
+
+## Fresh independent review37f613e
+
+/root/final_gui_review fresh context reviewed clean exact37f613ef8e0c8af6030f821dd410c493e44cbbd1 full range mainffd..candidate. Scoped final Android16-image header ArchitectPASS; unified code ReviewFAIL P1 CI env YAML indentation, P2 legacy actual instrumentation navigation/theme assumptions. Report final-review-20261007/review-37f613e-fail.md. Fresh Fix/new Review next, Task remainsreview/S2OPEN; no push/main sync. Recorder disclosure corrected without modifying old streams.
