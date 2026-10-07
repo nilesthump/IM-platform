@@ -457,6 +457,14 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
 
 机器检查读取下列已批准技术标识；标准包名仅对应上述显式栈及必要 type/build bindings，不授权额外框架、runtime、数据库驱动或原生依赖。每个架构敏感新依赖仍须独立 Review 追溯授权。Android SDK、Gradle、Kotlin/Compose compiler/plugin、标准 Compose UI 与 Android activity binding 是所选栈的必要工程标识，仅限 Mobile；不授权其他 Kotlin frameworks、ORM、网络或 plugin runtimes。
 
+#### 最小原生 GUI 能力与外观存储（Human-approved ADR-0009；接受待完成）
+
+Desktop 首次真实验收目标为 Windows。必要 Rust 仍限定在 clients/desktop/src-tauri/**：reqwest 提供原生 HTTPS，使用系统证书与主机名验证、只允许 HTTPS、禁止重定向、保持应用序列化的请求 bytes/headers 与返回 status/headers/body bytes，不解释业务协议；keyring 通过 Windows Credential Manager 持久化 app/account/session 隔离的 refresh credential；官方 tauri-plugin-notification 与 tauri-plugin-global-shortcut 提供 OS 通知/输入，tray 使用已有 Tauri tray feature。TypeScript UI/auth application 通过既有 SyncHttp injected-fetch 与规范 auth 调用组合传输；原生层不拥有认证编排、Repository、protocol schema、授权或 ACK/retry/Sync 决策。禁止证书绕过、credential query/logging、明文凭据降级及 backend/CORS/public API 改动。具体版本/features 在产品实现时写入 Cargo.lock 并独立 Review；只批准列出的 crate families，不批准额外前端 plugin package。
+
+Android 使用 SDK HttpsURLConnection 提供等价的系统证书/主机名验证、HTTPS-only、禁重定向及 exact serialized bytes 传输；使用 Android Keystore AES/GCM 非导出密钥保护 refresh credential，SDK SharedPreferences 仅存 ciphertext 与必要 IV/metadata。Kotlin 保有 auth lifecycle/cleanup intent/account isolation 与同一 contracts/fixtures 下的 Repository/protocol/model 行为。Desktop/Android 凭据存储失败不得明文降级；access credential 保持临时，替换/logout/expiry 清理语义仍由应用层决定。
+
+外观持久化仅允许 Desktop app-owned app_data JSON 与 Android SDK SharedPreferences 中的 Cold AI/Warm Creative theme、font-size/density 标量，不存 credential/message/sync cursor/account Repository data。SQLx/SDK SQLite 原子事务、WSS、公共契约、安全边界及依赖方向不变；不授权其他 OS parity、network/ORM/JS bridge 或未来 plugin runtime。ADR-0009 须经新独立 Review、适用 exact-head hosted CI、protected integration/actual-main 验证及主仓库同步才生效；候选不是产品实施权威。
+
 <!-- client-technology-policy -->
 ```json
 {
@@ -488,7 +496,11 @@ lost committed messages = 0；duplicate logical messages = 0；wrong conversatio
   "native_packages": [
     "tauri",
     "tauri-build",
-    "sqlx"
+    "sqlx",
+    "reqwest",
+    "keyring",
+    "tauri-plugin-notification",
+    "tauri-plugin-global-shortcut"
   ],
   "mobile_framework": "Jetpack Compose",
   "native_boundary": "clients/desktop/src-tauri/",
@@ -614,6 +626,8 @@ user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频
 - 后续 GUI 覆盖现有 contracts/ 的 Auth login/refresh/logout/session-expired、User info、Friend search/add、Conversation list/open、Message send/receive/state、Sync state；传输/字段来自现行 OpenAPI/WSS，不发明 HTTP route 或 AI/Plugin API。无 AI 功能、Plugin runtime、Marketplace 实现。
 - GUI Task acceptance 必须含真实运行截图 -> Architect Review -> 修复/重新截图 -> Architect Approval，并保留独立实现 Review、精确候选 CI 与集成/main 核验。Web 截图覆盖 Login/Chat/Friends/AI Placeholder/Plugin Page；Desktop 覆盖主窗口/Chat/Friends/Offline History/真实 Notification-Tray/Theme；Mobile 为真实 Android emulator Login/Chat/Friends/Offline History/Sync 状态/Theme。两主题/受支持字体间距变化与相关加载/空/错误/会话失效/离线状态需实际证据；局部任务明确剩余范围，不得宣称全客户端 PASS。
 - 截图绑定 Task、候选 SHA/build/runtime、屏幕状态/尺寸、theme/配置、可重复步骤、文件/hash；使用受控无秘密数据。Architect 决策绑定同一候选和截图集，失败留未完成；影响已批准视觉的改动必须重新截图批准。截图不能证明 ACK/事务/幂等，不替代行为/权限/契约/源码依赖测试；Task PASS 不等于 S2 Gate PASS。
+
+GUI 原生/外观实现遵守 §6.1 / ADR-0009 的窄适配边界。Desktop 首次验收为 Windows；真实通知证据必须来自已安装且有自身身份的客户端包，开发 PowerShell toast 不可代替。tray/global shortcut 需真实客户端行为，Mobile 仍需 Android Studio emulator。该选型不豁免截图/Architect Review/Approval、独立实现 Review 与 exact-head CI。
 
 <a id="section-7"></a>
 ## 7. HTTPS/WSS/TLS 与认证协议

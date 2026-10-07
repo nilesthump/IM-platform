@@ -1,0 +1,71 @@
+[
+  {
+    "name": "diff-full",
+    "argv": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--check",
+      "ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597",
+      "40fe535ac579d4e75117d8474169fa5aa6bc212a"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.25
+  },
+  {
+    "name": "frozen",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "tools/verify_frozen_architecture.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.313
+  },
+  {
+    "name": "architecture",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.891
+  },
+  {
+    "name": "tests",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_*.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.062
+  },
+  {
+    "name": "acceptance",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.188
+  }
+]
