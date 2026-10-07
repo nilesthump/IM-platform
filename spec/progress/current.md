@@ -43,7 +43,7 @@ Resume real native UI proof when supported host capture/input available; actual 
 
 ## Last Known Good Commit
 
-Accepted synchronized main last observed `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`. Latest pre-refinement recovery2ce8a00; unaccepted local candidate `e5484617d0dcfcad036e8cd784e7321f88a96fff`, installed artifact binding in desktop-polish final-state.json. Original snapshotfac0c8fc205d44a2889f56ae12f1e67c83edb3da remains historical. Main unchanged by this agent.
+Accepted synchronized main last observed `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`. Latest pre-refinement recovery2ce8a00; unaccepted repaired local candidate `3f9034978a1e5fd13f62271a7ce18e1f774b514a`, installed artifact binding in desktop-render-20261007/final-state.json; previous e548461 startup failure superseded. Original snapshotfac0c8fc205d44a2889f56ae12f1e67c83edb3da remains historical. Main unchanged by this agent.
 
 ## Latest Checkpoint
 
