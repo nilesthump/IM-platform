@@ -85,7 +85,7 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
   val b=checkNotNull(uiAutomation.takeScreenshot());java.io.File(d,name+".png").outputStream().use{check(b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it))};b.recycle()
  }
  private fun delivery(text:String,status:String):List<String?>{
-  val account=checkNotNull(Auth("https://localhost:18443",Preferences(targetContext)).savedAccount())
+  val account=checkNotNull(Auth("https://localhost:8443",Preferences(targetContext)).savedAccount())
   val file=targetContext.getDatabasePath("im-"+account.lowercase()+".sqlite");check(file.isFile)
   android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY).use{db->
    repeat(300){
@@ -161,7 +161,7 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
  }
  private fun backKeyboard(){uiAutomation.injectInputEvent(android.view.KeyEvent(0,android.view.KeyEvent.KEYCODE_BACK),true);uiAutomation.injectInputEvent(android.view.KeyEvent(1,android.view.KeyEvent.KEYCODE_BACK),true);Thread.sleep(650);uiAutomation.waitForIdle(200,5000)}
  private fun login(user:String){
-  fill("Server","https://localhost:18443");fill("Username",user);fill("Password","fixture-password-not-a-real-secret");backKeyboard();reach("Sign in");click("Sign in");await("Connected")
+  fill("Username",user);fill("Password","fixture-password-not-a-real-secret");backKeyboard();reach("Sign in");click("Sign in");await("Connected")
  }
  private fun settingsControl(name:String){click("Settings");reach(name);click(name)}
  override fun onCreate(arguments:Bundle?){super.onCreate(arguments);args=arguments?:Bundle();start()}
@@ -169,21 +169,30 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
   val result=Bundle();val prefs=Preferences(targetContext);val appearance=prefs.loadAppearance()
   try{
    verify(android.os.Build.VERSION.SDK_INT==34)
-   val c=URL("https://localhost:18443/__infra/health").openConnection() as HttpsURLConnection
+   val c=URL("https://localhost:8443/__infra/health").openConnection() as HttpsURLConnection
    c.connectTimeout=10000;c.readTimeout=10000;c.instanceFollowRedirects=false
    try{verify(c.responseCode==200);c.inputStream.close()}finally{c.disconnect()}
    result.putString("defaultSDKHTTPS","PASS")
-   val plain=java.net.Socket();plain.connect(java.net.InetSocketAddress("127.0.0.1",18443),10000)
-   val wrong=(javax.net.ssl.SSLSocketFactory.getDefault() as javax.net.ssl.SSLSocketFactory).createSocket(plain,"fixture-hostname-mismatch.invalid",18443,true) as javax.net.ssl.SSLSocket
+   val plain=java.net.Socket();plain.connect(java.net.InetSocketAddress("127.0.0.1",8443),10000)
+   val wrong=(javax.net.ssl.SSLSocketFactory.getDefault() as javax.net.ssl.SSLSocketFactory).createSocket(plain,"fixture-hostname-mismatch.invalid",8443,true) as javax.net.ssl.SSLSocket
    try{wrong.soTimeout=10000;val parameters=wrong.sslParameters;parameters.endpointIdentificationAlgorithm="HTTPS";wrong.sslParameters=parameters
     var rejected=false;try{wrong.startHandshake()}catch(_:javax.net.ssl.SSLHandshakeException){rejected=true};verify(rejected)
    }finally{wrong.close()}
    result.putString("defaultHostnameMismatch","PASS");prefs.saveAppearance(Appearance("cold",14,.8f))
-   activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));await("Chat")
+   activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));await("Open your workspace")
    val phase=args.getString("phase")?:"matrix"
-   if(phase=="expiry"){
-    fill("Server","https://localhost:18443");backKeyboard();reach("Resume securely saved session");click("Resume securely saved session")
-    await("Session expired. Sign in again.");verify(prefs.read("https://localhost:18443/current")==null)
+   if(phase=="ui-revision"){
+    verify(find(actualRoot(),"Friends")==null&&find(actualRoot(),"Settings")==null&&find(actualRoot(),"Server")==null);capture("anonymous-login")
+    click("New here? Create an account");fill("Username","gui_ui_"+captureRun);fill("Password","fixture-password-not-a-real-secret");fill("Confirm password","fixture-password-not-a-real-secret");backKeyboard();reach("Create account");capture("registration");click("Create account");await("Account created. Sign in to continue.");capture("registration-success")
+    login(args.getString("avery")!!);await("GUI Fixture Morgan");verify(actualViewModel().state.value.selected.isEmpty());verify(find(actualRoot(),"Message")==null);capture("cold-chat-list")
+    click("Friends");await("Your friends");capture("cold-friends");click("Chat");click("GUI Fixture Morgan");await("Welcome to the GUI fixture. This message crossed the actual Go services.");verify(find(actualRoot(),"Friends")==null&&find(actualRoot(),"Settings")==null);capture("cold-conversation")
+    fill("Message",sentText);backKeyboard();click("Send ",true);delivery(sentText,"SENT");reach(sentText);capture("sent")
+    click("← Chat");await("GUI Fixture Morgan");verify(actualViewModel().state.value.selected.isEmpty());capture("back-to-chat-list")
+    click("Cold AI");click("Friends");await("Your friends");capture("warm-friends");click("Settings");repeat(8){click("+")};reach("Comfort");click("Comfort");verify(actualViewModel().state.value.appearance==Appearance("warm",22,1.2f));capture("warm-settings-22")
+    click("Chat");await("GUI Fixture Morgan");capture("warm-chat-list-22");click("GUI Fixture Morgan");reach(sentText);capture("warm-conversation-22");click("← Chat");click("Settings");reach("Sign out");click("Sign out");await("Open your workspace");verify(find(actualRoot(),"Friends")==null);capture("logout-22")
+   }else if(phase=="expiry"){
+    backKeyboard();reach("Resume saved session");click("Resume saved session")
+    await("Session expired. Sign in again.");verify(prefs.read("https://localhost:8443/current")==null)
     verify(actualViewModel().state.value.session==null&&actualViewModel().state.value.offlineAccount==null);capture("session-expired-cleared")
    }else if(phase=="diagnose"||phase=="diagnose-red"){
     login(args.getString("avery")!!);click("GUI Fixture Morgan");fill("Message",sentText);backKeyboard()
@@ -201,10 +210,10 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
     settingsControl("Refresh session");await("GUI Fixture Avery");capture("profile-refreshed")
     click("Cold AI");verify(actualViewModel().state.value.appearance.theme=="warm");click("Chat");await(sentText);capture("warm-chat-history")
    }else{
-    if(prefs.read("https://localhost:18443/current")==null)login(args.getString("avery")!!) else {fill("Server","https://localhost:18443");backKeyboard();reach("Resume securely saved session");click("Resume securely saved session");await("Connected")}
+    if(prefs.read("https://localhost:8443/current")==null)login(args.getString("avery")!!) else {backKeyboard();reach("Resume saved session");click("Resume saved session");await("Connected")}
     click("GUI Fixture Morgan");await("GUI Android actual send",true);capture("restart-resume")
     if(phase=="refresh"){
-     val slot=checkNotNull(prefs.read("https://localhost:18443/current"));val before=prefs.read(slot)
+     val slot=checkNotNull(prefs.read("https://localhost:8443/current"));val before=prefs.read(slot)
      settingsControl("Refresh session");repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)}
      verify(!actualViewModel().state.value.busy&&actualViewModel().state.value.connection=="ready")
      verify(prefs.read(slot)!=before);await("GUI Fixture Avery");capture("profile-refreshed")
@@ -225,16 +234,16 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
      }
      val committed=delivery(target,"SENT")
      result.putString("retryRequestId",committed[0]);result.putString("retryServerMessageId",committed[4]);try{showMessage(target);capture("retry-sent")}catch(e:IllegalStateException){result.putString("retryCaptureGap",e.message);capture("retry-capture-gap")}
-     val slot=checkNotNull(prefs.read("https://localhost:18443/current"));val before=prefs.read(slot)
+     val slot=checkNotNull(prefs.read("https://localhost:8443/current"));val before=prefs.read(slot)
      settingsControl("Refresh session");repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)}
      verify(!actualViewModel().state.value.busy&&actualViewModel().state.value.connection=="ready")
      verify(prefs.read(slot)!=before);await("GUI Fixture Avery");capture("profile-refreshed")
      click("Warm Creative");verify(actualViewModel().state.value.appearance.theme=="warm");click("Chat");capture("warm-chat-history")
     }else if(phase=="isolation"){
-     settingsControl("Sign out");click("Chat");await("Open your workspace");capture("logout");login(args.getString("riley")!!);Thread.sleep(1000);verify(find(actualRoot(),"GUI Android actual send",true)==null);verify(Auth("https://localhost:18443",prefs).savedAccount()==args.getString("rileyId"))
+     settingsControl("Sign out");click("Chat");await("Open your workspace");capture("logout");login(args.getString("riley")!!);Thread.sleep(1000);verify(find(actualRoot(),"GUI Android actual send",true)==null);verify(Auth("https://localhost:8443",prefs).savedAccount()==args.getString("rileyId"))
      val isolated=targetContext.getDatabasePath("im-"+args.getString("rileyId")+".sqlite")
      android.database.sqlite.SQLiteDatabase.openDatabase(isolated.path,null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY).use{db->db.rawQuery("SELECT count(*) FROM messages WHERE content LIKE 'GUI Android%'",null).use{rows->verify(rows.moveToFirst()&&rows.getInt(0)==0)}}
-     capture("second-account-isolated");settingsControl("Sign out");click("Chat");await("Open your workspace");verify(prefs.read("https://localhost:18443/current")==null);capture("second-account-logout")
+     capture("second-account-isolated");settingsControl("Sign out");click("Chat");await("Open your workspace");verify(prefs.read("https://localhost:8443/current")==null);capture("second-account-logout")
      login(args.getString("avery")!!);capture("expiry-prepared")
     }else if(phase=="offline-logout"){
      val directory=java.io.File(targetContext.getExternalFilesDir(null),"gui-auth/$captureRun").apply{mkdirs()}
@@ -243,7 +252,7 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
      settingsControl("Sign out");click("Chat");await("Open your workspace")
      repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)}
      verify(!actualViewModel().state.value.busy&&actualViewModel().state.value.session==null&&actualViewModel().state.value.offlineAccount==null)
-     verify(prefs.read("https://localhost:18443/current")==null);capture("offline-logout-cleared")
+     verify(prefs.read("https://localhost:8443/current")==null);capture("offline-logout-cleared")
     }else if(phase=="sending"){
      click("GUI Fixture Riley");verify(actualViewModel().state.value.messages.isEmpty())
      fill("Message",sendingText);backKeyboard()

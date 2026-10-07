@@ -7,11 +7,13 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLHandshakeException
 /** Rollback proof only: default SDK TLS must reject the approved fixture after CA removal. */
 class GuiTrustRollbackInstrumentation:Instrumentation(){
- override fun onCreate(arguments:Bundle?){super.onCreate(arguments);start()}
+ private var args=Bundle()
+ override fun onCreate(arguments:Bundle?){super.onCreate(arguments);args=arguments?:Bundle();start()}
  override fun onStart(){val result=Bundle();try{
   check(android.os.Build.VERSION.SDK_INT==34)
-  check(!java.io.File("/apex/com.android.conscrypt/cacerts/132339d5.0").exists())
-  val c=URL("https://localhost:18443/__infra/health").openConnection() as HttpsURLConnection
+  val caFile=args.getString("caFile")?:"132339d5.0";check(Regex("[0-9a-f]{8}\\.0").matches(caFile));check(!java.io.File("/apex/com.android.conscrypt/cacerts/"+caFile).exists())
+  val port=args.getString("port")?:"18443";check(port=="8443"||port=="18443")
+  val c=URL("https://localhost:"+port+"/__infra/health").openConnection() as HttpsURLConnection
   c.connectTimeout=10000;c.readTimeout=10000;c.instanceFollowRedirects=false
   try{c.inputStream.close();error("Default TLS unexpectedly accepted removed fixture")}
   catch(expected:SSLHandshakeException){result.putString("tlsRejection",expected.javaClass.simpleName)}finally{c.disconnect()}

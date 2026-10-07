@@ -43,6 +43,7 @@ class Auth(val endpoint:String,private val preferences:Preferences) {
         try {preferences.write(newSlot,refresh);preferences.write(endpoint+"/current",newSlot);if(slot.isNotEmpty() && slot!=newSlot)preferences.remove(slot)}catch(_:Exception){session=null;throw ApiFailure("Secure credential storage unavailable")}
         slot=newSlot;session=next;expires=System.currentTimeMillis()+seconds*1000;return next
     }
+    suspend fun register(username:String,password:String):User = user(Wire.obj(request("/v1/auth/register","POST",JSONObject().put("username",username).put("password",password).put("displayName",username),false),setOf("user"))["user"])
     suspend fun login(username:String,password:String):SendSession {val g=generation;return accept(request("/v1/auth/login","POST",metadata().put("username",username).put("password",password),false),g)}
     suspend fun restore():SendSession? {slot=preferences.read(endpoint+"/current")?:return null;return refresh()}
     @Synchronized fun savedAccount():String? {val saved=preferences.read(endpoint+"/current")?:return null;require(saved.startsWith(endpoint+"/"));val parts=saved.removePrefix(endpoint+"/").split('/');require(parts.size==2);Wire.uuid(parts[1]);slot=saved;return Wire.uuid(parts[0])}

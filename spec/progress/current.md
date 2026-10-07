@@ -11,47 +11,45 @@ Execution Status: BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
-Human approved `批准执行临时挂载工具` following bounded independent helper review `5bf9c3e`. Actual readonly/topmost CA overlays and default Android SDK TLS passed. Observed UI defects repaired: send/retry network work on IO (`14e0cc3`), logout IO/remote operational failure containment with cancellation preserved (`e39e190de4add266f4f28aa9542625f4facbd7ec`). Final installed APK `ca74da4b9e1462215b073c5d0d6ae85a87aefc2156f45f1e22f2aff960a19428` matched device. Real SENT/Go persistence, same-UUID FAILED/Retry/SENT, real PG-delay SENDING/ACK, restart/refresh, account isolation/logout, unavailable-server logout, expiry cleanup and appearance combinations have local evidence. Failed whole phases and capture gaps distinguished in `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mount-approved-20261004/`.
-
-Full Android rollback PASS: original 134-cert hash sets in fresh init/zygote/app, no owned mount/path/CA/reverse, Enforcing, uid2000; default SDK SSLHandshakeException against same still-live fixture. Owned runtime27180 normal stop/cleanup and no labelled containers/volumes. Windows original74 Root set equal, exact CA API/physical entry absent, owned import process absent.
+Human UI revision and exact supplied logo applied Desktop/Mobile; restored archive fac0c8fc to assigned managed gui-ui-update. Both builds, Desktop GUI auth/lifecycle/register/list race controls PASS; actual API34 anonymous/registration theme/font extrema PASS46. Windows actual package installed; Android authenticated PASS66 with13 raw screenshots and full temporary trust rollback verified; Windows authenticated proof pending.
 
 ## Current Blockers
 
-Windows authenticated and actual native toast/tray visual proof remain `BLOCKED_EXTERNAL_ACCESS`: normal certutil/X509Store Add reported success/no exception but exact CA remained absent; same OS user/session verified. Standard wizard/certmgr surfaces unstable/inaccessible. Cause unknown; no policy or Human cancellation inferred. Human request `你自行导入` remains within original same-CA CurrentUser Root authorization; no manual import pending. Shortcut restoration previously passed. Android trust/message/logout external blocker resolved.
+Windows authenticated proof requires Human completion of the OS security confirmation. Computer-use forbids acting on security requests. The task-owned waiting import has been stopped and exact74Root baseline restored; CA absent. Android rollback and owned Go fixture cleanup complete. New same-scope24h certificate approved2026-10-07; old expired original unchanged.
 
 ## Verification
 
-- Command: `python -X utf8 -B tests/clients/gui/check_sources.py --development`
-  - Result: final wrapper PASS: source all0violations/Frozen/53 architecture tests/Development recovery, exit0; own ignored outputs isolated/restored. Prior encoding/missing-evidence/direct-generated-output failures preserved; no acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mount-approved-20261004/handoff.md`
-- Commands: actual Gradle build/API34 instrumentation; exact SQLite/Go queries; approved trust rollback/fresh default SDK rejection.
-  - Result: individual results and source/APK-bound raw hashes in manifest. No hosted CI or independent GUI acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mount-approved-20261004/manifest.json`
+- Command: `npm --prefix clients/desktop run build; node tests/clients/gui/auth.mjs`
+  - Result: PASS, including canonical registration/confirmation/conflict, private+group recency, retired account guards and selected-row close.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/ui-update-20261007/local-verification.md`
+- Command: `python -X utf8 -B tests/clients/gui/native.py gui-mobile --serial emulator-5590 --capture`
+  - Result: actualAPI34 PASS46; run1791349616429. Earlier FAIL preserved. Authenticated ui-revision PASS66 run1791350426041; thirteen original PNGs. Full Android trust rollback PASS. Local proof only, not accepted.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/ui-update-20261007/artifacts.json`
 
 ## Changed Files or Migrations
 
-Only task-owned GUI send/retry/logout repair, Android test instrumentation, approved helper lifecycle, bounded actual fixture row-lock helper and recovery/evidence. Desktop source `9032ad63bf4843e86d85264b3de8d93552b9d938` unchanged. No contract/backend/schema/ACK/TLS verification/security policy change.
+Declared Desktop/Android UI/auth assembly/icons and GUI test/evidence paths only. No schema/backend/contracts/ACK/Sync/security verification changes. Exact original supplied logo exported; no redesign.
 
 ## Known Failures, Risks, and Assumptions
 
-Original failed assertions, CLI false-success/UI access failures and product red reproductions preserved. Default-GBK write truncated owned untracked verifier; 25 original recorded mutations replayed only in memory then explicitly UTF-8 restored; recovery hash documented, unavailable old hash not claimed equal. Empty-source build was not installed/count as verifier. Mixed-encoding owned Task/current additions recovered from committed UTF-8 authority plus current facts; initial guard failure preserved. Recorder tool/direct/startup gaps exposed; no complete prospective trace. Original CA expiry `2026-10-04T19:20:46.586064Z`, no replacement approved.
+Original failed runs/scripts and recording gaps retained, including three new Android failed phases. Required top-left return passes; hardware-back after composer focus is not claimed. No Human Windows security confirmation observed; task-owned import stopped and full rollback verified. Group metadata names absent use conversation ID. Server selection uses existing client configured origin; no gateway assignment API invented. UI local activity ordering uses durable server timestamps plus current-run activity. No Architect approval/full independent review/hosted acceptance yet.
 
 ## Next Exact Action
 
-Obtain stable supported native Windows access and verify actual same-CA CurrentUser Root installation within approved plan, then finish Windows authenticated/OS toast/tray proof. No equivalent blind import retry or unsafe bypass. After required GUI evidence: Architect approval -> fresh unified independent Review -> exact-head hosted CI/protected integration -> verified main synchronization. Task active; no push or sync.
+Resume bounded fixture/import with Human takeover of Windows OS security confirmation; finish actual Windows authenticated captures/matrix and full rollback; Architect approval then fresh independent unified Review/exact-head hosted CI/protected integration/actual-main audit/safe main synchronization. Do not mark done before main synchronization.
 
 ## Last Known Good Commit
 
-Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597` unchanged. Unaccepted product checkpoints desktop `9032ad63bf4843e86d85264b3de8d93552b9d938`, Android `14e0cc363596d556a16bbcb0dc5f90b887a99805` then `e39e190de4add266f4f28aa9542625f4facbd7ec`. Final recovery SHA external to avoid self-reference. No done/S2 PASS.
+Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; unaccepted recovery `fac0c8fc205d44a2889f56ae12f1e67c83edb3da`. Main unchanged by this agent.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-04-loop1-client-gui-001-mount-approved.md`
+`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-ui-update.md`
 
 ## Uncommitted Changes / Ownership
 
-Sole writer `/root/gui_second_resume` owns all task-scope pending files until clean recovery commit, then releases. No unknown work overwritten. Private Recorder `R-GUI-MOUNT-APPROVED-20261004` seal BLOCKED for remaining Windows access and validation reported externally. Recorder validation is not Task/Gate PASS.
+Branch `task/LOOP1-CLIENT-GUI-001-ui-update`; sole writer `/root/gui_ui_update` owns declared UI revision files/new tests/evidence in managed gui-ui-update. Six screenshot moves in snapshot are unknown-origin preserved paths/bytes, not new UI edits. No unknown main work touched.
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0009 and explicit Human unified-batch authorization remain bounded candidate authority. No new architectural choice or system protection changes; affected trust methods stop at exact approval boundaries. Task active, native review, S2 OPEN; independent acceptance mechanisms and main synchronization still pending.
+No new technology/contract/security decisions; ADR0009 unified candidate preparation remains bounded. Taskactive/native review pending/S2OPEN.

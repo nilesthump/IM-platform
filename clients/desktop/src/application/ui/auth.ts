@@ -32,6 +32,7 @@ export class Auth {
     this.storage=write.catch(()=>{});try{await write;}catch(error){this.session=null;throw error instanceof ApiFailure?error:new ApiFailure("Secure credential storage unavailable");}
     if(g!==this.generation)throw new ApiFailure("Session expired");this.session=next;this.expires=Date.now()+expires*1000;return next;
   }
+  async register(username:string,password:string){const result=object(await this.request("/v1/auth/register","POST",{username,password,displayName:username},false),["user"]);return user(result.user);}
   async login(username:string,password:string){const g=this.generation;return this.accept(await this.request("/v1/auth/login","POST",{username,password,...metadata},false),g);}
   async restore():Promise<Session|null>{return await this.savedAccount()?this.refresh():null;}
   async savedAccount():Promise<string|null>{const g=this.generation,slot=await secure.read(this.endpoint+"/current");if(g!==this.generation)throw new ApiFailure("Session expired");if(!slot)return null;if(!slot.startsWith(this.endpoint+"/"))throw new ApiFailure("Secure credential metadata invalid");const parts=slot.slice(this.endpoint.length+1).split("/");if(parts.length!==2)throw new ApiFailure("Secure credential metadata invalid");uuid(parts[1]);this.slot=slot;return uuid(parts[0]);}

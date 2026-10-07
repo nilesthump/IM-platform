@@ -45,6 +45,17 @@ pub fn appearance_load(app:tauri::AppHandle)->Result<Appearance,String>{let p=ap
 pub fn appearance_save(app:tauri::AppHandle,mut value:Appearance)->Result<(),String>{if !valid_appearance(&value){return Err("Appearance invalid".into());}value.2=[0.8,1.0,1.2].into_iter().find(|v|(value.2-v).abs()<0.001).ok_or("Appearance invalid")?;let p=appearance_path(&app)?;std::fs::create_dir_all(p.parent().ok_or("Appearance unavailable")?).map_err(|_|"Appearance unavailable")?;std::fs::write(p,appearance_bytes(&value)).map_err(|_|"Appearance unavailable".into())}
 #[tauri::command]
 pub fn native_notify(app:tauri::AppHandle,title:String,body:String)->Result<(),String>{if title.chars().count()>80||body.chars().count()>300{return Err("Notification invalid".into());}app.notification().builder().title(title).body(body).show().map_err(|_|"Notification unavailable".into())}
+#[tauri::command]
+pub fn window_control(window:tauri::WebviewWindow,action:String)->Result<(),String>{
+    let result=match action.as_str(){
+        "minimize"=>window.minimize(),
+        "maximize"=>if window.is_maximized().map_err(|_|"Window unavailable")?{window.unmaximize()}else{window.maximize()},
+        "close"=>window.close(),
+        "drag"=>window.start_dragging(),
+        _=>return Err("Window action invalid".into()),
+    };
+    result.map_err(|_|"Window unavailable".into())
+}
 fn show(app:&tauri::AppHandle){if let Some(w)=app.get_webview_window("main"){let _=w.show();let _=w.unminimize();let _=w.set_focus();}}
 pub fn setup(app:&mut tauri::App)->Result<(),Box<dyn std::error::Error>>{
     app.global_shortcut().on_shortcut("Ctrl+Shift+Space",|app,_,event|{if event.state==ShortcutState::Pressed{show(app);}})?;

@@ -8,12 +8,29 @@
     "beforeBuildCommand": "npm run build"
   },
   "app": {
-    "windows": [{"label":"main","title":"IM+ · PlugWorldIM","width":1280,"height":840,"minWidth":960,"minHeight":700}],
-    "security": {"csp":"default-src 'self'; script-src 'self' 'sha256-8b4+TnTdj4cDg7tTNA5r/fKSwKctexYPojz4jEsFEFg='; style-src 'self' 'unsafe-inline'; img-src 'self' asset: data:; connect-src ipc: http://ipc.localhost wss:; object-src 'none'; frame-src 'none'"}
+    "windows": [
+      {
+        "label": "main",
+        "title": "IM+ · PlugWorldIM",
+        "width": 1280,
+        "height": 840,
+        "minWidth": 960,
+        "minHeight": 700,
+        "decorations": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'sha256-8b4+TnTdj4cDg7tTNA5r/fKSwKctexYPojz4jEsFEFg='; style-src 'self' 'unsafe-inline'; img-src 'self' asset: data:; connect-src ipc: http://ipc.localhost wss:; object-src 'none'; frame-src 'none'"
+    }
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
-    "icon": ["icons/icon.ico","icons/icon.png"]
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
   }
 }

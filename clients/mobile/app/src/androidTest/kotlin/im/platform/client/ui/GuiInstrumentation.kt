@@ -40,7 +40,7 @@ class GuiInstrumentation:Instrumentation() {
     private fun verify(value:Boolean){check(value){"GUI assertion $assertions failed"};assertions++}
     private fun find(node:AccessibilityNodeInfo?,text:String):AccessibilityNodeInfo? {
         if(node==null)return null
-        if(node.text?.toString()==text || node.contentDescription?.toString()==text)return node
+        if(node.text?.toString()?.trim()==text || node.contentDescription?.toString()?.trim()==text)return node
         for(i in 0 until node.childCount)find(node.getChild(i),text)?.let{return it}
         return null
     }
@@ -49,7 +49,7 @@ class GuiInstrumentation:Instrumentation() {
         error("Actual Compose control missing: $text")
     }
     private fun click(text:String){var node=await(text);while(!node.isClickable){node=node.parent?:error("Control not clickable: $text")};verify(node.performAction(AccessibilityNodeInfo.ACTION_CLICK));waitForIdleSync();Thread.sleep(650)}
-    private fun launch(){activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));waitForIdleSync();await("Settings")}
+    private fun launch(){activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));waitForIdleSync();await("Open your workspace")}
     private fun close(){activity?.let{runOnMainSync{it.finish()}};activity=null;waitForIdleSync()}
     override fun onCreate(arguments:Bundle?){super.onCreate(arguments);capture=arguments?.getString("capture")=="true";start()}
     override fun onStart(){
@@ -61,12 +61,18 @@ class GuiInstrumentation:Instrumentation() {
             verify(!saved.contains("fixture-only-secure-value"));verify(saved.split(':').size==2)
             val store=java.security.KeyStore.getInstance("AndroidKeyStore");store.load(null);verify(store.getKey("im-platform-refresh",null).encoded==null)
             prefs.remove(slot);verify(prefs.read(slot)==null)
-            prefs.saveAppearance(Appearance("cold",14,.8f));launch();click("Settings");await("Appearance");capture("cold-settings-14-compact");close();prefs.saveAppearance(Appearance("warm",16,1f));launch();click("Settings");await("Appearance");capture("warm-settings-16-standard");close();prefs.saveAppearance(Appearance("cold",16,1f));launch();click("Settings");await("Appearance");await("Color, type and spacing are independent.");capture("cold-settings-16-standard")
-            click("AI");await("Intelligence, in conversation.");capture("cold-ai-unavailable");click("Plugin");await("Your workspace, extended.");capture("cold-plugin-unavailable");click("Chat");await("Open your workspace")
-            close();prefs.saveAppearance(Appearance("warm",22,1.2f));launch();click("Settings");await("Appearance");await("Font size: 22px");verify(prefs.loadAppearance()==Appearance("warm",22,1.2f));capture("warm-settings-22-comfort");click("Cold AI");verify(prefs.loadAppearance()==Appearance("cold",22,1.2f));capture("cold-settings-22-comfort");click("Warm Creative");verify(prefs.loadAppearance()==Appearance("warm",22,1.2f))
-            // Actual scroll accessibility verifies sign-in reachability at the largest approved appearance.
-            click("Chat");await("Open your workspace");verify(uiAutomation.takeScreenshot()!=null);capture("warm-login-22-comfort");verify(scroll(uiAutomation.rootInActiveWindow));waitForIdleSync();Thread.sleep(650);fill("Username","local-ui-only");fill("Password","local-reachability-only");repeat(6){if(!visible("Sign in")){if(!scroll(uiAutomation.rootInActiveWindow)){val b=android.graphics.Rect();find(uiAutomation.rootInActiveWindow,"Sign in")?.getBoundsInScreen(b);error("Scroll ended; sign-in bounds=$b display="+targetContext.resources.displayMetrics.widthPixels+"x"+targetContext.resources.displayMetrics.heightPixels)};assertions++;waitForIdleSync();Thread.sleep(650)}};verify(visible("Sign in"));capture("warm-login-scrolled-22-comfort");click("Password");capture("warm-login-ime-22-comfort");uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN,android.view.KeyEvent.KEYCODE_BACK),true);uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP,android.view.KeyEvent.KEYCODE_BACK),true);Thread.sleep(650);close();prefs.saveAppearance(Appearance("warm",14,.8f));launch();click("Settings");await("Appearance");capture("warm-settings-14-compact")
-            result.putString("result","PASS");result.putInt("sdkInt",android.os.Build.VERSION.SDK_INT);result.putInt("assertions",assertions);result.putString("engine","actual Compose Navigation/Android Keystore/SharedPreferences")
+            for(theme in listOf("cold","warm"))for(font in listOf(14,16,22)){
+                close();prefs.saveAppearance(Appearance(theme,font,if(font==22)1.2f else .8f));launch()
+                verify(find(uiAutomation.rootInActiveWindow,"Settings")==null)
+                verify(find(uiAutomation.rootInActiveWindow,"Friends")==null)
+                verify(find(uiAutomation.rootInActiveWindow,"Server")==null)
+                verify(find(uiAutomation.rootInActiveWindow,"IM+ logo")!=null)
+                capture("$theme-login-$font")
+                repeat(6){if(!visible("New here? Create an account")){scroll(uiAutomation.rootInActiveWindow);waitForIdleSync();Thread.sleep(200)}}
+                click("New here? Create an account");repeat(4){if(find(uiAutomation.rootInActiveWindow,"Confirm password")==null){scroll(uiAutomation.rootInActiveWindow);waitForIdleSync();Thread.sleep(250)}};await("Confirm password");capture("$theme-register-$font")
+                if(font==16){fill("Username","fixture-confirm-only");fill("Password","fixture-only-password-value");fill("Confirm password","mismatch");uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN,android.view.KeyEvent.KEYCODE_BACK),true);uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP,android.view.KeyEvent.KEYCODE_BACK),true);repeat(6){if(!visible("Create account"))scroll(uiAutomation.rootInActiveWindow)};click("Create account");await("Passwords do not match");verify(find(uiAutomation.rootInActiveWindow,"Settings")==null)}
+            }
+            result.putString("result","PASS");result.putInt("sdkInt",android.os.Build.VERSION.SDK_INT);result.putInt("assertions",assertions);result.putString("engine","actual anonymous/registration UI and Android Keystore/SharedPreferences")
         }catch(error:Throwable){capture("failure-state");result.putString("result","FAIL");result.putString("failure",error.toString())}
         finally{close();prefs.remove(slot);prefs.saveAppearance(baseline)}
         finish(if(result.getString("result")=="PASS")Activity.RESULT_OK else Activity.RESULT_CANCELED,result)

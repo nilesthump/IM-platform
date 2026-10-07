@@ -68,3 +68,30 @@ console.log("PASS GUI workspace: delayed close/bind, refresh and profile cannot 
 const font=workspace.preferences({...workspace.state.appearance,fontSize:22});const theme=workspace.preferences({...workspace.state.appearance,theme:"warm"});const density=workspace.preferences({...workspace.state.appearance,density:1.2});await Promise.all([font,theme,density]);
 assert.deepEqual(appearanceSaves,[["cold",22,1],["warm",22,1],["warm",22,1.2]]);assert.deepEqual(workspace.state.appearance,{theme:"warm",fontSize:22,density:1.2});
 console.log("PASS GUI appearance: rapid font/theme/density changes preserve independent intent and serialized native writes");
+
+// Registration reuses the canonical endpoint, never sends confirmation.
+reply={status:201,data:{user:{userId:A,username:"fixture-register",displayName:"fixture-register"}}};
+const registeredUser=await new Auth("https://localhost:8443").register("fixture-register","fixture-register-only-input");
+assert.equal(registeredUser.userId,A);
+const registration=requests.at(-1);assert(registration.url.endsWith("/v1/auth/register"));
+assert.deepEqual(JSON.parse(new TextDecoder().decode(new Uint8Array(registration.body))),{username:"fixture-register",password:"fixture-register-only-input",displayName:"fixture-register"});
+assert(!Object.hasOwn(registration.headers,"authorization"));assert.equal(credentials.size,0);
+const beforeRegistration=requests.length;
+assert.equal(await workspace.register("fixture-register","fixture-register-only-input","different"),false);
+assert.equal(requests.length,beforeRegistration);assert.equal(workspace.state.error,"Passwords do not match");
+assert.equal(await workspace.register("fixture-register","short","short"),false);assert.equal(requests.length,beforeRegistration);
+assert.equal(await workspace.register("fixture-register","fixture-register-only-input","fixture-register-only-input"),true);
+assert.equal(workspace.state.session,null);
+reply={status:409,data:{error:{code:"USERNAME_ALREADY_EXISTS"}}};
+assert.equal(await workspace.register("fixture-register","fixture-register-only-input","fixture-register-only-input"),false);
+assert.equal(workspace.state.error,"USERNAME_ALREADY_EXISTS");
+// List includes all existing Repository identities (private + group), deterministic recency.
+const direct=S,group="22222222-2222-4222-8222-222222222222";
+const rows=new Map([[direct,[[null,A,"older","SENT",S,"1","2026-10-01T12:00:00Z"]]],[group,[[null,B,"newer","SENT",group,"1","2026-10-02T12:00:00Z"]]]]);
+const projection={conversationIds:async()=>[direct,group],messages:async id=>rows.get(id)};
+await workspace.updateList(projection,workspace.generation);assert.deepEqual(workspace.state.conversations,[group,direct]);
+workspace.activity.set(direct,Date.parse("2026-10-03T12:00:00Z"));await workspace.updateList(projection,workspace.generation);assert.deepEqual(workspace.state.conversations,[direct,group]);
+workspace.state={...workspace.state,selected:direct,page:"Chat",messages:rows.get(direct)};await workspace.open(direct);assert.equal(workspace.state.selected,"");assert.equal(workspace.state.messages.length,0);
+let listRelease;const retiredList=workspace.updateList({conversationIds:()=>new Promise(r=>{listRelease=r;}),messages:async()=>rows.get(direct)},workspace.generation);
+await workspace.logout();listRelease([direct]);await retiredList;assert.equal(workspace.state.conversations.length,0);assert.deepEqual(workspace.state.previews,{});
+console.log("PASS registration canonical body/confirmation/malformed/conflict; private+group latest-first and retired-account list guard; desktop selected row closes detail");

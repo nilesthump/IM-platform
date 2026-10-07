@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-GUI-001
 title: Desktop/Mobile complete Loop1 GUI
 status: active
-owner: /root/gui_second_resume
+owner: /root/gui_ui_update
 stage: S2
 gate: S2
 ---
@@ -41,6 +41,10 @@ client_runtime: Android
 - ADR-0007 本轮规划须独立 Review/精确 HEAD CI/集成 main 同步接受才可激活。依赖未满足保持 backlog；GUI/Web 在本轮 Human endpoint 之后，无本轮激活授权。
 
 # Allowed Paths
+
+- `clients/desktop/src-tauri/icons/**` (Human exact supplied logo, app icon only.)
+- `clients/mobile/app/src/main/res/**` (Same logo for app icon/brand only.)
+- `clients/mobile/app/src/main/AndroidManifest.xml` (App icon/label wiring only.)
 
 - `clients/desktop/package.json` (Human-authorized GUI assembly only; no new sensitive technology authority.)
 - `clients/desktop/package-lock.json` (Human-authorized GUI assembly only; no new sensitive technology authority.)
@@ -168,3 +172,21 @@ Human approved temporary helper (批准执行临时挂载工具), following boun
 Observed actual send/network-on-Main and logout async-parent crash repaired only allowed UI in14e0cc3/e39e190. Actual new APKca74da4b9e1462215b073c5d0d6ae85a87aefc2156f45f1e22f2aff960a19428: source-bound send/Go persistence, sameUUID FAILED→Retry→SENT, real PG-delay SENDING→sameUUID SENT, restart/refresh, isolation/logout, server-unavailable logout, server-expired secure cleanup and appearance combinations have local proof. Whole failed phases and screenshot gaps retained separately. Required final guards/Recorder results in handoff; coding/instrumentation/UTF-8 recovery failures remain durable, no self-acceptance.
 
 Windows authenticated/native toast/tray proof remains BLOCKED_EXTERNAL_ACCESS after normal authorized API/UI attempts; cause unknown, no unsafe bypass/manual import pending. Task active, native review pending, S2 OPEN; no Architect/full independent Review/hosted CI/push/main sync/done. Accepted mainffd6b63 unchanged. Exact next action/source/APK/run/capture provenance: spec/progress/evidence/LOOP1-CLIENT-GUI-001/mount-approved-20261004/handoff.md and manifest.json. Sole writer releases after clean recovery commit; SHA external.
+
+
+## Human UI revision 2026-10-04
+
+Resume authorized from archive fac0c8fc205d44a2889f56ae12f1e67c83edb3da in assigned managed H:/.codex/worktrees/gui-ui-update/IM-platform. Sole writer /root/gui_ui_update. Snapshot preserves six unknown-origin screenshot renames byte-for-byte; do not reverse or alter them. Main remains unsynchronized.
+
+Current acceptance additions: anonymous clients show only authentication; username/password/confirmation registration via existing canonical register with displayName=username; no server input (client-owned configured origin); unified latest-first private/group local conversation list; Desktop Nav/list/detail, initially blank detail and selected-row toggles close; Mobile list/detail with back and no navigation while in detail; original project logo required; Windows fixed-size auth adapts 14..22px without page scroll; frameless top-right native controls. No new protocol, storage, ACK, Sync or native technology. Original logo is absent from snapshot (icon is solid placeholder); original asset location requested, do not invent replacement. App icon asset/manifest paths require that exact asset and explicit scope before writes. Real Windows authenticated Chat/Friends plus changed Android UI captures remain required, Architect approval and independent full review/exact-head CI/main sync pending.
+
+
+## UI update local evidence 2026-10-07
+
+Exact supplied Human logo received and used byte-exact as source with deterministic platform icon resizes; prior absent-logo text above is historical. New bounded same-scope24h localhost/127.0.0.1 test certificate explicitly approved by Human. Assigned managed root H:/.codex/worktrees/gui-ui-update/IM-platform verified; sole writer /root/gui_ui_update; branch task/LOOP1-CLIENT-GUI-001-ui-update.
+
+UI requested changes implemented; Desktop build/auth/registration/private+group recency/race tests PASS, Windows package/install PASS; actualAPI34 anonymous theme/font matrix PASS46 and authenticated revised UI PASS66 with13 raw screenshots. Original failed phases retained; hardware-back from focused composer remains unverified (top-left requested back is verified). Android temporary trust fully rolled back and default TLS rejection/134CA set/nonroot/Enforcing verified. Current Windows OS confirmation pending; authenticated Chat/Friends/native full proof remains unfinished. Evidence: spec/progress/evidence/LOOP1-CLIENT-GUI-001/ui-update-20261007/.
+
+No Architect approval/unified independent Review/exact-head hosted CI/protected integration/main synchronization/taskdone/S2PASS asserted. Next exact action: supported Human completion of Windows security confirmation -> actual revised Windows captures -> rollback -> Architect screenshot approval -> fresh unified independent Review and applicable exact-head CI/protected integration/safe verified main synchronization. No unknown main changes touched; six recovery screenshot moves byte-exact preserved.
+
+Final Windows status: security confirmation not observed, task-owned exact import process3428 stopped after command/path/fingerprint verification; original74Root set equal, exact owned CA absent API/physicalstore, no import process. Windows anonymous login and three-field registration screenshots captured via supported native tool; custom maximize then restore exercised. Windows authenticated Chat/Friends, full native matrix and14..22 actual Windows layout remain unverified. Node filesystem save EPERM preserved; exact native image/jpeg bytes saved through authorized shell without image transformation. Owned Go fixture85266 normal stop PASS label-bounded cleanup; no unrelated operation. Both temporary trust environments fully rolled back.

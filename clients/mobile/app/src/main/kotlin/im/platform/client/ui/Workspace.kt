@@ -1,5 +1,8 @@
 package im.platform.client.ui
 import androidx.compose.runtime.*
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.res.painterResource
+import im.platform.client.R
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +26,15 @@ import androidx.navigation.compose.*
     val typography=Typography(bodyLarge=Typography().bodyLarge.copy(fontSize=prefs.fontSize.sp),bodyMedium=Typography().bodyMedium.copy(fontSize=(prefs.fontSize-2).sp),titleLarge=Typography().titleLarge.copy(fontSize=(prefs.fontSize+6).sp),titleMedium=Typography().titleMedium.copy(fontSize=(prefs.fontSize+2).sp),labelLarge=Typography().labelLarge.copy(fontSize=(prefs.fontSize-2).sp))
     MaterialTheme(colorScheme=scheme,typography=typography) {
         val nav=rememberNavController();val entry by nav.currentBackStackEntryAsState();val page=entry?.destination?.route?:"Chat"
-        Scaffold(containerColor=scheme.background,topBar={Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp)){Row(verticalAlignment=Alignment.CenterVertically){Text("IM+",fontSize=27.sp,fontWeight=FontWeight.ExtraBold,color=scheme.primary);Spacer(Modifier.weight(1f));TextButton(onClick={vm.appearance(prefs.copy(theme=if(warm)"cold" else "warm"))}){Text(if(warm)"Warm Creative" else "Cold AI")}};Row(verticalAlignment=Alignment.CenterVertically){Text(if(state.session==null && state.offlineAccount==null && page in listOf("Chat","Friends"))"Your workspace" else page,Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Text(if(state.sync=="syncing")"Syncing…"else if(state.connection=="ready")"Connected"else"Offline",fontSize=12.sp,modifier=Modifier.padding(start=8.dp))}}},bottomBar={NavigationBar{listOf("Chat","Friends","AI","Plugin","Settings").forEachIndexed {i,p->NavigationBarItem(selected=page==p,onClick={nav.navigate(p){launchSingleTop=true;popUpTo("Chat"){saveState=true};restoreState=true}},icon={Text(listOf("◫","♧","✧","⊞","⚙")[i])},label={Text(p,maxLines=1,fontSize=12.sp)})}}}) {padding->
+        val authenticated=state.session!=null||state.offlineAccount!=null
+        val inConversation=page=="Chat"&&state.selected.isNotEmpty()
+        BackHandler(enabled=inConversation){vm.closeConversation()}
+        if(!authenticated){Column(Modifier.fillMaxSize().background(scheme.background).statusBarsPadding().navigationBarsPadding().padding(20.dp)){
+            Row(verticalAlignment=Alignment.CenterVertically){Image(painterResource(R.drawable.project_logo),"IM+ logo",Modifier.size(56.dp));Text("IM+",fontSize=27.sp,fontWeight=FontWeight.ExtraBold,color=scheme.primary)}
+            state.error?.let{Text(it,color=scheme.error,modifier=Modifier.padding(vertical=8.dp))}
+            Login(state,vm)
+        };return@MaterialTheme}
+        Scaffold(containerColor=scheme.background,topBar={Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp)){Row(verticalAlignment=Alignment.CenterVertically){Image(painterResource(R.drawable.project_logo),"IM+ logo",Modifier.size(40.dp));Text("IM+",fontSize=27.sp,fontWeight=FontWeight.ExtraBold,color=scheme.primary);Spacer(Modifier.weight(1f));TextButton(onClick={vm.appearance(prefs.copy(theme=if(warm)"cold" else "warm"))}){Text(if(warm)"Warm Creative" else "Cold AI")}};Row(verticalAlignment=Alignment.CenterVertically){if(inConversation)TextButton(onClick=vm::closeConversation){Text("← Chat")};Text(if(inConversation)state.friends.find{it.directConversationId==state.selected}?.user?.displayName?:"Conversation" else page,Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Text(if(state.sync=="syncing")"Syncing…"else if(state.connection=="ready")"Connected"else"Offline",fontSize=12.sp,modifier=Modifier.padding(start=8.dp))}}},bottomBar={if(!inConversation)NavigationBar{listOf("Chat","Friends","AI","Plugin","Settings").forEachIndexed {i,p->NavigationBarItem(selected=page==p,onClick={nav.navigate(p){launchSingleTop=true;popUpTo("Chat"){saveState=true};restoreState=true}},icon={Text(listOf("◫","♧","✧","⊞","⚙")[i])},label={Text(p,maxLines=1,fontSize=12.sp)})}}}) {padding->
             Column(Modifier.fillMaxSize().padding(padding).padding(horizontal=16.dp)) {
                 state.error?.let{Surface(color=scheme.errorContainer,shape=RoundedCornerShape(12.dp),modifier=Modifier.fillMaxWidth().padding(bottom=12.dp)){Column(Modifier.padding(12.dp)){Text(it,color=scheme.onErrorContainer);if(state.session!=null || state.offlineAccount!=null)TextButton(onClick=vm::reconnect,enabled=state.session!=null){Text("Reconnect")}}}}
                 NavHost(navController=nav,startDestination="Chat",modifier=Modifier.weight(1f)) {
@@ -39,18 +50,34 @@ import androidx.navigation.compose.*
 }
 @Composable private fun Panel(modifier:Modifier=Modifier,appearance:Appearance,content:@Composable ColumnScope.()->Unit){Surface(modifier=modifier,shape=RoundedCornerShape(20.dp),color=MaterialTheme.colorScheme.surface,border=BorderStroke(1.dp,MaterialTheme.colorScheme.outlineVariant)){Column(Modifier.padding((20*appearance.density).dp),verticalArrangement=Arrangement.spacedBy((12*appearance.density).dp),content=content)}}
 @Composable private fun Login(state:WorkspaceState,vm:WorkspaceViewModel) {
-    var endpoint by remember{mutableStateOf(state.endpoint)};var username by remember{mutableStateOf("")};var password by remember{mutableStateOf("")}
-    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(18.dp)){
-        Text("Stay close. Think beyond.",fontSize=(state.appearance.fontSize+12).sp,fontWeight=FontWeight.Bold);Text("Conversations, people and a little room for what comes next.",style=MaterialTheme.typography.bodyMedium)
-        Panel(Modifier.fillMaxWidth(),state.appearance){Text("Open your workspace",style=MaterialTheme.typography.titleLarge);Text("Sign in to your trusted IM server.",style=MaterialTheme.typography.bodyMedium);OutlinedTextField(value=endpoint,onValueChange={endpoint=it},label={Text("Server")},singleLine=true,modifier=Modifier.fillMaxWidth());OutlinedTextField(value=username,onValueChange={username=it},label={Text("Username")},singleLine=true,modifier=Modifier.fillMaxWidth());OutlinedTextField(value=password,onValueChange={password=it},label={Text("Password")},visualTransformation=PasswordVisualTransformation(),singleLine=true,modifier=Modifier.fillMaxWidth());Button(onClick={vm.login(endpoint,username,password);password=""},enabled=!state.busy && username.isNotEmpty() && password.isNotEmpty(),modifier=Modifier.fillMaxWidth()){Text(if(state.busy)"Opening workspace…"else"Sign in")};TextButton(onClick={vm.restore(endpoint)},enabled=!state.busy,modifier=Modifier.fillMaxWidth()){Text("Resume securely saved session")};Text("Refresh credentials are protected by Android Keystore.",style=MaterialTheme.typography.bodyMedium)}
-        Spacer(Modifier.height(16.dp))
+    var registering by remember{mutableStateOf(false)};var username by remember{mutableStateOf("")};var password by remember{mutableStateOf("")};var confirmation by remember{mutableStateOf("")}
+    LaunchedEffect(state.registered){if(state.registered){registering=false;password="";confirmation=""}}
+    Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(14.dp)){
+        Text("Stay close. Think beyond.",fontSize=(state.appearance.fontSize+10).sp,fontWeight=FontWeight.Bold)
+        Panel(Modifier.fillMaxWidth(),state.appearance){
+            Text(if(registering)"Create your account"else"Open your workspace",style=MaterialTheme.typography.titleLarge)
+            if(state.registered&&!registering)Text("Account created. Sign in to continue.")
+            OutlinedTextField(value=username,onValueChange={username=it},label={Text("Username")},singleLine=true,modifier=Modifier.fillMaxWidth())
+            OutlinedTextField(value=password,onValueChange={password=it},label={Text("Password")},visualTransformation=PasswordVisualTransformation(),singleLine=true,modifier=Modifier.fillMaxWidth())
+            if(registering){OutlinedTextField(value=confirmation,onValueChange={confirmation=it},label={Text("Confirm password")},visualTransformation=PasswordVisualTransformation(),singleLine=true,modifier=Modifier.fillMaxWidth());Text("Use 12–256 characters for your password.",style=MaterialTheme.typography.bodyMedium)}
+            Button(onClick={if(registering)vm.register(username,password,confirmation)else{vm.login(state.endpoint,username,password);password=""}},enabled=!state.busy&&username.isNotEmpty()&&password.isNotEmpty()&&(!registering||confirmation.isNotEmpty()),modifier=Modifier.fillMaxWidth()){Text(if(state.busy)"Please wait…"else if(registering)"Create account"else"Sign in")}
+            TextButton(onClick={registering=!registering;password="";confirmation=""},enabled=!state.busy,modifier=Modifier.fillMaxWidth()){Text(if(registering)"Already have an account? Sign in"else"New here? Create an account")}
+            if(!registering)TextButton(onClick={vm.restore(state.endpoint)},enabled=!state.busy,modifier=Modifier.fillMaxWidth()){Text("Resume saved session")}
+        }
     }
 }
 @Composable private fun Chat(state:WorkspaceState,vm:WorkspaceViewModel) {
+    if(state.selected.isEmpty()){
+        LazyColumn(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(8.dp)){
+            if(state.conversations.isEmpty())item{Panel(Modifier.fillMaxWidth(),state.appearance){Text("Your next conversation starts here",style=MaterialTheme.typography.titleLarge);Text("Find a friend to open a private chat.")}}
+            items(state.conversations,key={it}){id->Surface(onClick={vm.open(id)},shape=RoundedCornerShape(16.dp),color=MaterialTheme.colorScheme.surface,modifier=Modifier.fillMaxWidth()){
+                Column(Modifier.padding((16*state.appearance.density).dp)){Text(state.friends.find{it.directConversationId==id}?.user?.displayName?:"Conversation "+id.take(8),fontWeight=FontWeight.SemiBold);Text(if(state.unavailable.contains(id))"Access unavailable"else state.previews[id]?.text?:"No messages yet",maxLines=1,style=MaterialTheme.typography.bodyMedium)}
+            }}
+        };return
+    }
     var draft by remember(state.session?.userId){mutableStateOf("")};val selected=state.friends.find{it.directConversationId==state.selected};val spacing=(10*state.appearance.density).dp
     Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(spacing)){
         if(state.conversations.isEmpty()){Panel(Modifier.fillMaxWidth(),state.appearance){Text("Your next conversation starts here",style=MaterialTheme.typography.titleLarge);Text("Find a friend to open a private chat.")}}else {
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)){state.conversations.forEach {id->FilterChip(selected=state.selected==id,onClick={vm.open(id)},label={Text(state.friends.find{it.directConversationId==id}?.user?.displayName?:"Chat "+id.take(8))})}}
             Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(selected?.user?.displayName?:"Conversation",style=MaterialTheme.typography.titleMedium);Text(if(state.connection=="ready")"Messages sync automatically"else"Offline · Showing saved history",style=MaterialTheme.typography.bodyMedium)};TextButton(onClick=vm::reconnect,enabled=state.session!=null){Text("Reconnect")}}
         }
         LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(spacing)) {
