@@ -221,3 +221,7 @@ Latest request only login/self-inspection. Fresh owned local project im-gui-prod
 ## Owned local service restart
 
 Human Connection unavailable request: same project im-gui-product-20261004-39112 restarted; repaired dependency-start race by starting exact core/gateway after DB healthy. TLS health200 with exact fixtureCA, data/account retained. Windows default TLS still fails missing issuer/root; no GUI login proof. Service remains live for requested manual inspection, cleanup session58647 afterward. Evidence window-rows-20261007/service-restart.md. No product/main change; taskactive/S2OPEN.
+
+## Explicit certificate import awaiting native wizard
+
+Human requests 导入. Standard certutil/native.NET attempts show success only inside process, independent Root/physicalHKCU still absent and systemTLS PartialChain. Exact certificate viewer opened; awaiting Human manual current-user Root import/已导入, then normal TLS and exact74baseline checks. No trust success or GUI login claimed. Owned39112/session58647 remains live for inspection, exact rollback/cleanup after finish. Evidence window-rows-20261007/certificate-import.md.
