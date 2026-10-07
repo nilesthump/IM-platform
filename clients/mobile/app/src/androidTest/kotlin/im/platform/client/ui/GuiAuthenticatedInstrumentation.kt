@@ -17,6 +17,10 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
  private val retryText="GUI Android retry identity "+captureRun
  private val sendingText="GUI Android controlled sending "+captureRun
  private fun verify(v:Boolean){check(v){"Actual GUI assertion "+count+" failed"};count++}
+ private fun headerAbsent(themeInSettings:Boolean=false){
+  verify(find(actualRoot(),"IM+ logo")==null&&find(actualRoot(),"IM+")==null)
+  verify((find(actualRoot(),"Cold AI")!=null||find(actualRoot(),"Warm Creative")!=null)==themeInSettings)
+ }
  private fun actualRoot():AccessibilityNodeInfo?{uiAutomation.clearCache();return uiAutomation.rootInActiveWindow}
  private fun find(n:AccessibilityNodeInfo?,text:String,prefix:Boolean=false):AccessibilityNodeInfo?{
   if(n==null)return null;val v=n.text?.toString()?:n.contentDescription?.toString()
@@ -182,14 +186,14 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
    activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));await("Open your workspace")
    val phase=args.getString("phase")?:"matrix"
    if(phase=="ui-revision"){
-    verify(find(actualRoot(),"Friends")==null&&find(actualRoot(),"Settings")==null&&find(actualRoot(),"Server")==null);capture("anonymous-login")
+    verify(find(actualRoot(),"Friends")==null&&find(actualRoot(),"Settings")==null&&find(actualRoot(),"Server")==null);headerAbsent();capture("anonymous-login")
     click("New here? Create an account");fill("Username","gui_ui_"+captureRun);fill("Password","fixture-password-not-a-real-secret");fill("Confirm password","fixture-password-not-a-real-secret");backKeyboard();reach("Create account");capture("registration");click("Create account");await("Account created. Sign in to continue.");capture("registration-success")
-    login(args.getString("avery")!!);await("GUI Fixture Morgan");verify(actualViewModel().state.value.selected.isEmpty());verify(find(actualRoot(),"Message")==null);capture("cold-chat-list")
-    click("Friends");await("Your friends");capture("cold-friends");click("Chat");click("GUI Fixture Morgan");await("Welcome to the GUI fixture. This message crossed the actual Go services.");verify(find(actualRoot(),"Friends")==null&&find(actualRoot(),"Settings")==null);capture("cold-conversation")
+    login(args.getString("avery")!!);await("GUI Fixture Morgan");verify(actualViewModel().state.value.selected.isEmpty());verify(find(actualRoot(),"Message")==null);headerAbsent();capture("cold-chat-list")
+    click("Friends");await("Your friends");headerAbsent();capture("cold-friends");click("AI");headerAbsent();capture("cold-ai");click("Plugin");headerAbsent();capture("cold-plugin");click("Chat");click("GUI Fixture Morgan");await("Welcome to the GUI fixture. This message crossed the actual Go services.");verify(find(actualRoot(),"Friends")==null&&find(actualRoot(),"Settings")==null);headerAbsent();capture("cold-conversation")
     fill("Message",sentText);backKeyboard();click("Send ",true);delivery(sentText,"SENT");reach(sentText);capture("sent")
     click("← Chat");await("GUI Fixture Morgan");verify(actualViewModel().state.value.selected.isEmpty());capture("back-to-chat-list")
-    click("Cold AI");click("Friends");await("Your friends");capture("warm-friends");click("Settings");repeat(8){click("+")};reach("Comfort");click("Comfort");verify(actualViewModel().state.value.appearance==Appearance("warm",22,1.2f));capture("warm-settings-22")
-    click("Chat");await("GUI Fixture Morgan");capture("warm-chat-list-22");click("GUI Fixture Morgan");reach(sentText);capture("warm-conversation-22");click("← Chat");click("Settings");reach("Sign out");click("Sign out");await("Open your workspace");verify(find(actualRoot(),"Friends")==null);capture("logout-22")
+    click("Settings");reach("Cold AI");headerAbsent(true);capture("cold-settings-theme");click("Cold AI");verify(actualViewModel().state.value.appearance.theme=="warm");headerAbsent(true);click("Warm Creative");verify(actualViewModel().state.value.appearance==Appearance("cold",14,.8f));click("Cold AI");verify(actualViewModel().state.value.appearance==Appearance("warm",14,.8f));click("Friends");await("Your friends");headerAbsent();capture("warm-friends");click("Settings");repeat(8){click("+")};reach("Comfort");click("Comfort");verify(actualViewModel().state.value.appearance==Appearance("warm",22,1.2f));headerAbsent(true);capture("warm-settings-22")
+    click("Chat");await("GUI Fixture Morgan");headerAbsent();capture("warm-chat-list-22");click("GUI Fixture Morgan");reach(sentText);headerAbsent();capture("warm-conversation-22");click("← Chat");click("Settings");reach("Sign out");click("Sign out");await("Open your workspace");verify(find(actualRoot(),"Friends")==null);headerAbsent();capture("logout-22")
    }else if(phase=="expiry"){
     backKeyboard();reach("Resume saved session");click("Resume saved session")
     await("Session expired. Sign in again.");verify(prefs.read("https://localhost:8443/current")==null)

@@ -66,7 +66,7 @@ class GuiInstrumentation:Instrumentation() {
                 verify(find(uiAutomation.rootInActiveWindow,"Settings")==null)
                 verify(find(uiAutomation.rootInActiveWindow,"Friends")==null)
                 verify(find(uiAutomation.rootInActiveWindow,"Server")==null)
-                verify(find(uiAutomation.rootInActiveWindow,"IM+ logo")!=null)
+                verify(find(uiAutomation.rootInActiveWindow,"IM+ logo")==null && find(uiAutomation.rootInActiveWindow,"IM+")==null && find(uiAutomation.rootInActiveWindow,"Cold AI")==null && find(uiAutomation.rootInActiveWindow,"Warm Creative")==null)
                 capture("$theme-login-$font")
                 repeat(6){if(!visible("New here? Create an account")){scroll(uiAutomation.rootInActiveWindow);waitForIdleSync();Thread.sleep(200)}}
                 click("New here? Create an account");repeat(4){if(find(uiAutomation.rootInActiveWindow,"Confirm password")==null){scroll(uiAutomation.rootInActiveWindow);waitForIdleSync();Thread.sleep(250)}};await("Confirm password");capture("$theme-register-$font")
