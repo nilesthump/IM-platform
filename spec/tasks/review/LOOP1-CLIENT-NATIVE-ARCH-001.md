@@ -112,3 +112,8 @@ Independent Review PASS at clean `7dc3e8a3939ec618b4f1618c705b26ff18990a5f`; rep
 ## Native publication archive repair (2026-10-08)
 
 Independent ec0f776 Review FAIL is preserved in completion-20261007/archive-fix-20261008/report.md. Fresh Fix Agent /root/native_archive_fix replaces only new public failure-log text copies with exact-byte JSON base64 archives; all16 decoded streams match original Recorder SHA/bytes and original command events remain unchanged. Scope/sourceauthority/product/main unchanged. Local full diffcheck/Development and clean committed Acceptance are recorded in private R-NATIVE-ARCHIVE-FIX-20261008; fresh independent Review/exact repaired-head hosted CI/protected integration/main sync remain pending. Sole tracked writer currently /root/native_archive_fix; task review/S2 OPEN; Windows retry follows verified Native completion.
+
+
+## Resumed publication and repaired Review (2026-10-08)
+
+PR25 exists at ec0f776; exact ec push13/PR5 required jobs PASS, but independent ec Review FAIL (raw archive whitespace) is preserved. Fresh Fix40fe535ac579d4e75117d8474169fa5aa6bc212a received NEW independent Review PASS (full diffcheck/53tests/cleanAcceptance/exact16rawbytes). Repaired SHA push still fails remote500/reset; its hosted acceptance/main integration/sync not performed. Root owns subsequent evidence-only handoff in spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/resume-20261008/handoff.md; Taskreview/S2OPEN. Source Review does not accept later metadatahead. Next restore actual write connectivity and finalhead independent acceptance/protected integration/main safe sync, then done and Windows retry. Last accepted mainffd6b63/unknown781files preserved.

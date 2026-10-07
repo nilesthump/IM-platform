@@ -11,44 +11,39 @@ Execution Status: BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
-Original bounded native500f820 freeze implements Human-approved ADR0009/sections6.1/6.5/native policy. Original unified timing0d220e9 documents preserved. Latest Human selects Native first, then Windows retry. GUI9159804/PR24 remains independent pending product candidate in managedg; its exact14-instance CI passes do not accept this separate native HEAD.
+GitHub CLI relogin restored initial push/PR25 at ec0f776; its exact push13/PR5 selected checks pass. Fresh ec Review FAIL on raw archive whitespace preserved; fresh Fix40fe535 followed by NEW independent repaired Review PASS. Original approved Native freeze/hash/PDF unchanged; GUI915/PR24 remains separate/unmerged.
 
 ## Current Blockers
 
-Independent native source Review PASS at clean7dc3e8a; publication blocked by actual Git/API write connectivity errors. Own exact-head hosted CI, protected integration/actual-main audit and safe main synchronization pending. No missing Human technology/scope approval. GUI occupied Windows validation and same-account CA/defaultTLS machine proof remain pending; CA deletion is Human-reported.
+Repaired40fe535 repeated push receives remote Internal Server Error / connection reset; remote remains ec and repaired SHA has no hosted CI. Final independent acceptance, protected integration/actual-main audit/CI and safe main synchronization pending. No missing Human approval or architecture conflict. Windows retry ordered after actual Native completion and not started; GUI/CA machine proof pending.
 
 ## Verification
 
-- Command: independent clean candidate Acceptance/architecture/frozen/53 tests/scope/history.
-  - Result: source Review PASS at `7dc3e8a3939ec618b4f1618c705b26ff18990a5f`; actual publication BLOCKED_EXTERNAL_ACCESS. No hosted CI/integration/sync.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/completion-20261007/publication-blocker.md`
-
-- Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: clean500f820 baseline PASS/zero violations; Recorder retains original raw output.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/completion-20261007/local-verification.json`
-- Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: clean500f820 baseline PASS; canonical a6b1670/PDF546915/v1.1 unchanged.
-  - Evidence: same completion evidence; prospective private R-NATIVE-COMPLETE-20261007 retains actual command.
-
-- Command: `python -Xutf8 -B -m unittest discover -s tests/architecture -p test_*.py` and `tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: 53 tests PASS; original Development formatting FAIL preserved, corrected Development PASS. No independent acceptance inferred.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/completion-20261007/local-verification.json`
+- Command: `git diff --check ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597 40fe535ac579d4e75117d8474169fa5aa6bc212a --`
+  - Result: fresh independent PASS; 16 JSON archive streams exact originalbytes/hash.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/resume-20261008/independent-repaired-review/verification.json`
+- Command: `python -B ci/check_architecture.py --scope all --json`; `python -B tools/verify_frozen_architecture.py`; `python -B -m unittest discover -s tests/architecture`; `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+  - Result: independent repaired40fe PASS,53tests/clean committed Acceptance31specs/fivequeues/status0. Not hosted acceptance or TaskPASS.
+  - Evidence: same independent command/verification originals.
+- Command: exact GitHub provider run/job inspection
+  - Result: ec37654370406 full13SUCCESS/ec37654421117 required5SUCCESS and8normalinactive; cannot accept repaired40fe.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/resume-20261008/handoff.md`
 
 ## Changed Files or Migrations
 
-Authority-only original13paths plus bounded Human-order/ADR/Task/current/native evidence. No product/dependency/install/contracts/backend/CI/checker/governance change or data migration. Exact original500/0d provenance preserved; no unknown main copy.
+Bounded Native archive repair and recovery/evidence only. No product/authority body/contracts/CI/checker/governance/global configuration change or data migration. Original FAIL/source/provenance retained.
 
 ## Known Failures, Risks, and Assumptions
 
-Historical native baseline failures and canceled old review remain original evidence, never PASS. Startup/directread/app allocation/script preparation gaps and truncated large graph output disclosed; Recorder is not product acceptance. Native freeze does not require GUI runtime approval to accept this authority-only Task under latest standalone-first order. GUI remains review externally, historical backlog here reflects pre-product ancestor. Main recovery branch31unknown entries must be preserved.
+Observed write failures persist despite initial successful relogin push. Their cause is unproven. Reviewer/fixer/coordinator are separate contexts; later metadata must be reviewed independently. Startup/directreads/truncation/private script preparation gaps disclosed in Recorder; raw failure streams preserved. Main unknown work must remain unchanged.
 
 ## Next Exact Action
 
-Restore actual Git/API write connectivity; independently review the subsequent evidence-only final head, publish exact head and verify own classifier-selected hosted jobs, protected merge, actual-main independent audit/hosted verification and safe main synchronization. Record accepted evidence and done administratively through same controls. Only after verified Native completion retry Windows using existing GUI worktreeg; do not merge GUI or advance Web/S2Gate.
+Restore actual Git/API write connectivity; fresh review final evidence head, publish and inspect exact selected hosted jobs, protected integration/actual-main independent audit/CI, safe main sync. Complete administrative closure through same controls; only then retry Windows in assigned GUI worktreeg. Keep GUI PR24 unmerged/S2 OPEN.
 
 ## Last Known Good Commit
 
-Accepted actual/synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`. Original native500f820 and timing0d220e9 are local provenance, not accepted task completion.
+Accepted actual/synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`. Repaired local40fe/sourceReviewPASS is not integrated accepted Taskcompletion.
 
 ## Latest Checkpoint
 
@@ -56,13 +51,8 @@ Accepted actual/synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`. Or
 
 ## Uncommitted Changes / Ownership
 
-Root sole writer owns bounded native recovery metadata in assigned verified H:/.codex/worktrees/n/IM-platform, branch task/LOOP1-CLIENT-NATIVE-ARCH-001-close. Original native/GUI worktrees and PR24 retained; main recovery/s1-handoff-20261001/31unknown entries untouched. Synchronization PENDING.
+Root coordinator sole writer owns this bounded evidence-only recovery handoff in assigned verified H:/.codex/worktrees/n/IM-platform, branch task/LOOP1-CLIENT-NATIVE-ARCH-001-close. Fixer released writes; GUIg/PR24 retained. Main recovery branch31status/781protected files untouched; synchronization PENDING.
 
 ## Architecture Conflicts / ACP / ADR
 
-No new technical choice/conflict; existing approved ADR0009 freeze. Latest direct Human order supersedes prior standalone/unified scheduling history only. Canonical hash/body, PDF and original approval/historical evidence remain unchanged. S1PASS/S2OPEN.
-
-
-## Native publication archive repair (2026-10-08)
-
-Independent ec0f776 Review FAIL is preserved in completion-20261007/archive-fix-20261008/report.md. Fresh Fix Agent /root/native_archive_fix replaces only new public failure-log text copies with exact-byte JSON base64 archives; all16 decoded streams match original Recorder SHA/bytes and original command events remain unchanged. Scope/sourceauthority/product/main unchanged. Local full diffcheck/Development and clean committed Acceptance are recorded in private R-NATIVE-ARCHIVE-FIX-20261008; fresh independent Review/exact repaired-head hosted CI/protected integration/main sync remain pending. Sole tracked writer currently /root/native_archive_fix; task review/S2 OPEN; Windows retry follows verified Native completion.
+None. Existing approved ADR0009 and canonical a6b1670/PDF546915/v1.1 unchanged. Latest Native-first/Windows-next Human order applies; S1PASS/S2OPEN.
