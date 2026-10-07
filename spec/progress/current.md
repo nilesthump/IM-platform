@@ -67,3 +67,7 @@ Recorder final validation disclosure: finished run44events validates individuall
 ## Human-authorized outside-sandbox Windows verification
 
 Human allows this Windows desktop UI outside sandbox. Existing installed app launched and official sky inventory identifies real window; screenshot/action APIs FAIL application approval elicitation unavailable in standalone host. No captured Windows proof, login, renewed trust or product change. Current blocker is supported host UI initialization/approval channel, not missing Human authorization. Details window-rows-20261007/outside-sandbox.md; taskactive/S2OPEN, worktree retained/main untouched.
+
+## Human manual inspection runtime
+
+Latest request only login/self-inspection. Fresh owned local project im-gui-product-20261004-39112 intentionally live, session58647; private go-39112, endpointlocalhost8443. GUI form unavailable to automation; actual login not verified. Windows temporary trust attempts report success but fresh74roots/noCA and PartialChain show trust absent. Await Human manual import/form; stop exact owned fixture after inspection and roll back exact manually installedCA with74root baseline. Detailed manual-inspection.md under current window-rows evidence. No product edits/main sync; taskactive/S2OPEN.
