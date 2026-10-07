@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -32,7 +34,7 @@ import androidx.navigation.compose.*
             state.error?.let{Text(it,color=scheme.error,modifier=Modifier.padding(vertical=8.dp))}
             Login(state,vm)
         };return@MaterialTheme}
-        Scaffold(containerColor=scheme.background,topBar={Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp)){Row(verticalAlignment=Alignment.CenterVertically){if(inConversation)TextButton(onClick=vm::closeConversation){Text("← Chat")};Text(if(inConversation)state.friends.find{it.directConversationId==state.selected}?.user?.displayName?:"Conversation" else page,Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Text(if(state.sync=="syncing")"Syncing…"else if(state.connection=="ready")"Connected"else"Offline",fontSize=12.sp,modifier=Modifier.padding(start=8.dp))}}},bottomBar={if(!inConversation)NavigationBar{listOf("Chat","Friends","AI","Plugin","Settings").forEachIndexed {i,p->NavigationBarItem(selected=page==p,onClick={nav.navigate(p){launchSingleTop=true;popUpTo("Chat"){saveState=true};restoreState=true}},icon={Text(listOf("◫","♧","✧","⊞","⚙")[i])},label={Text(p,maxLines=1,fontSize=12.sp)})}}}) {padding->
+        Scaffold(containerColor=scheme.background,topBar={Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp)){Row(verticalAlignment=Alignment.CenterVertically){if(inConversation)TextButton(onClick=vm::closeConversation,modifier=Modifier.semantics{contentDescription="Back to chats"}){Text("←",fontSize=MaterialTheme.typography.labelLarge.fontSize*1.5f)};Text(if(inConversation)state.friends.find{it.directConversationId==state.selected}?.user?.displayName?:"Conversation" else page,Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Text(if(state.sync=="syncing")"Syncing…"else if(state.connection=="ready")"Connected"else"Offline",fontSize=12.sp,modifier=Modifier.padding(start=8.dp))}}},bottomBar={if(!inConversation)NavigationBar{listOf("Chat","Friends","AI","Plugin","Settings").forEachIndexed {i,p->NavigationBarItem(selected=page==p,onClick={nav.navigate(p){launchSingleTop=true;popUpTo("Chat"){saveState=true};restoreState=true}},icon={Text(listOf("◫","♧","✧","⊞","⚙")[i])},label={Text(p,maxLines=1,fontSize=12.sp)})}}}) {padding->
             Column(Modifier.fillMaxSize().padding(padding).padding(horizontal=if(page=="Chat"&&!inConversation)0.dp else 16.dp)) {
                 state.error?.let{Surface(color=scheme.errorContainer,shape=RoundedCornerShape(12.dp),modifier=Modifier.fillMaxWidth().padding(bottom=12.dp)){Column(Modifier.padding(12.dp)){Text(it,color=scheme.onErrorContainer);if(state.session!=null || state.offlineAccount!=null)TextButton(onClick=vm::reconnect,enabled=state.session!=null){Text("Reconnect")}}}}
                 NavHost(navController=nav,startDestination="Chat",modifier=Modifier.weight(1f)) {
