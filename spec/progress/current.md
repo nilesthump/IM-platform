@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: BLOCKED_EXTERNAL_ACCESS
+Execution Status: REVIEW_WITH_WINDOWS_TOOL_VERIFICATION_DEFERRED_TO_S2_GATE
 
 ## Immediately Relevant Completed Work
 
@@ -19,7 +19,7 @@ New fresh independent /root/gui_repaired_review reviewed clean cf476663e482ddc72
 
 ## Current Blockers
 
-Supported Windows native host fails after standard reset: skyimport kernel50780 exits1, windows sandbox orchestrator_helper_exit_nonzero/setuphelperSome1; prior sharing32/standalone approval-channel failure persists. Actual Windows full Chat/Friends/offline/themes/notification/tray matrix and same-actual-desktop-user Root CA5C2B8129A44043C0912E4CE413B4799570E92733 rollback proof unavailable. Tool-store invisibility is not rollback. Full applicable Architect coverage/exact-head hosted CI/protected integration/main verification/synchronization remain pending. No further Human visual confirmation needed for final request.
+Windows tool verification is PENDING_VERIFICATION_AT_S2_GATE by latest Human instruction; immediate helper repair/retries stopped. Original runtime ACL/image conflict remains unresolved. Actual Windows GUI matrix/same-desktop-user exact CA rollback/full applicable Architect coverage/exact-head hosted CI/protected integration/main verification/synchronization retain pending statuses. No further Human visual confirmation requested. Deferral evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-tools-deferred-20261007/decision.md`.
 
 ## Verification
 
@@ -41,7 +41,7 @@ Windows native/actual-contextCA external access unresolved. Historical Recorder 
 
 ## Next Exact Action
 
-Restore supported actual Windows native inspection and same-context exactCA cleanup access; capture full required native matrix with approved bounded fixture/trust workflow; finish applicable Architect coverage. Reassess final exact unified candidate with fresh independent Review where affected, required exact-head hosted jobs, protected integration/actualmain verification and safe synchronization H:/IM-platform. Remain review/S2OPEN until complete; no push/fullacceptance/sync claimed from scoped decisions.
+Continue applicable GUI review/evidence work independently of Windows tooling; do not resume helper repair or Windows tool verification in the current step. At S2 Gate, complete deferred normal sandbox/native-tool regression with actual results before Gate PASS. Existing GUI acceptance/Architect/independent Review/exact-head CI/protected integration/actual-main safe synchronization remain required and pending; task stays review/S2 OPEN. Latest exact Human timing decision: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-tools-deferred-20261007/decision.md`.
 
 ## Last Known Good Commit
 
@@ -53,7 +53,7 @@ Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; local fin
 
 ## Uncommitted Changes / Ownership
 
-Branch task/LOOP1-CLIENT-GUI-001-resume; sole writer /root owns explicit Human-authorized AGENTS.md short-name retry clarification and current/task/new recovery evidence only. Assigned managed root H:/.codex/worktrees/g/IM-platform exactly verified; original GUI root archived. Unknown main work and six snapshot screenshot moves preserved. Commit identity and independent scoped review follow in recovery evidence; main synchronization PENDING.
+Branch task/LOOP1-CLIENT-GUI-001-resume; assigned managed root H:/.codex/worktrees/g/IM-platform exactly verified. Sole /root owns only new Windows-tool timing decision/current/task recovery metadata in this run. Pre-change clean HEAD `ea64e7bc70d27f6db489df5b7b5e413c1d022985`. Original history/evidence/unknown main work and six screenshot moves preserved; main synchronization PENDING. Commit this recovery decision before ending.
 
 ## Architecture Conflicts / ACP / ADR
 
