@@ -7,45 +7,44 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: REVIEW_WITH_WINDOWS_TOOL_VERIFICATION_DEFERRED_TO_S2_GATE
+Execution Status: FRESH_REVIEW_PENDING_WITH_OCCUPIED_WINDOWS_VALIDATION_DEFERRED_TO_S2_GATE
 
 ## Immediately Relevant Completed Work
 
-Final Mobile arrow-only back button uses current label font times1.5, no visible Chat, same back action. Mobile global logo/IM+ and theme header removed; only narrow Settings theme entry. Product710826740c287333389937c1eeefaf472e68a43d, actualAPI34 PASS107/16 raw captures, fresh scoped Architect header PASS. Human final instruction explicitly requires proceeding without another Human visual confirmation. Desktop previous Human style PASS retained.
+Final Mobile arrow-only back/header/layout source710826740c287333389937c1eeefaf472e68a43d and earlier nine realAPI34 phases remain historical evidence. Independent completion reviewer inspected32new images/224artifacts and sealed P2FAIL for anonymous wrong-password expired message; other31presentations had no defect.
 
-Fresh Fixa7ab9c479e6cacc6cfe02071880ada96f149ffec repairs CI env indentation and existing Android test navigation/scroll helpers only; all Mobile/Desktop product byte-unchanged7108267. Nine affected actualAPI34 phases PASS170/70/72/15/62/27/7/19/16; actual PG4 identities each oneMessage/Outbox;74 originalPNG/17attempts with all failures preserved. Android complete trust rollback/ownedGo37212/emulator/container/volume cleanup PASS.
-
-New fresh independent /root/gui_repaired_review reviewed clean cf476663e482ddc72d116b89b064a8d6d105b703: scoped source/repair PASS, no ordinary findings; full acceptance BLOCKED_EXTERNAL_ACCESS. All144artifact hashes/74PNGs/9phase source bindings, real YAML parse,53architecture/source/frozen and clean recovery Acceptance PASS. Bounded12-image Android state Architect PASS; prior16-header approval reused because production unchanged. Neither establishes full GUI/Stage acceptance.
+Fresh Fix2aa61c77e27cfe79b422e7b55903239f30ece7f4 maps canonical AUTH_INVALID_CREDENTIALS to safe invalid username/password on Desktop/Mobile, preserving other401 expiry cleanup. Desktop compile/auth controls PASS; actualAndroid PASS73/5newraw images at capture source3a5001228d6d3eb3f3b5dcbda468f270202554fb, true Refresh cleanup bothsecure slots absent. Default SDK HTTPS/hostname negatives, complete original134CA two-namespace/same-liveTLSreject/uid2000/Enforcing and all own28780/emulator cleanup PASS. All source/APK hashes, old failures and method correction preserved. These are local Fix results pending new independent Review/Architect approval.
 
 ## Current Blockers
 
-Windows tool verification is PENDING_VERIFICATION_AT_S2_GATE by latest Human instruction; immediate helper repair/retries stopped. Original runtime ACL/image conflict remains unresolved. Actual Windows GUI matrix/same-desktop-user exact CA rollback/full applicable Architect coverage/exact-head hosted CI/protected integration/main verification/synchronization retain pending statuses. No further Human visual confirmation requested. Deferral evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-tools-deferred-20261007/decision.md`.
+Only verification blocked by occupied Windows runtime/native host is deferred to S2 Gate by exact Human clarification `仅推迟被占用导致的验证`. GUI/native Windows proof remains PENDING_VERIFICATION_AT_S2_GATE. Same desktop-account CA is Human-reported removed (`已删除`); machine same-account Root/defaultTLS rollback proof pending. Full applicable independent acceptance, exact-head hosted CI, protected integration and verified safe main synchronization pending; no done/S2PASS.
 
 ## Verification
 
-- Command: `GuiAuthenticatedInstrumentation` matrix/appearance/retry/refresh/retry-existing/isolation/expiry/sending/offline-logout; `GuiTrustRollbackInstrumentation`
-  - Result: nine actual phases PASS; real PG4 identities; Android134CA exact baseline/nonroot/Enforcing/freshSDK rejection and owned cleanup PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/review-fix-20261007/fix-report.md`
+Environment: assigned root H:/.codex/worktrees/g/IM-platform; IM_GUI_ASSIGNED_ROOT resolves exactly there; bundled Python3.12 UTF8, JDK17/Gradle8.9/API34.
 
-- Command: `IM_GUI_ASSIGNED_ROOT=<assigned root> python -Xutf8 -B tests/clients/gui/check_sources.py --development`
-  - Result: scoped source/repair PASS; full acceptance BLOCKED_EXTERNAL_ACCESS. Initial ignored-output/encoding/fixture failures preserved, not promoted.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/final-review-20261007/review-cf47666-blocked.md`
+- Command: `python -Xutf8 -B tests/clients/gui/check_sources.py --development`
+  - Result: Fix local architectureall/frozen/53tests/Development PASS through existing owned-output isolate/restore; earlier ignored-output failures retained.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/auth-error-fix-20261007/fix-report.md`
+- Command: `GuiAuthenticatedInstrumentation` auth-error-fix focused phase; `GuiTrustRollbackInstrumentation`
+  - Result: actualPASS73/five new PASS originals, real expiry dual-slot cleanup; full134CA/defaultSDK rejection and ownresource cleanup PASS; independent binding review pending.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/auth-error-fix-20261007/manifest.json`
 
 ## Changed Files or Migrations
 
-Final UI Workspace.kt plus existing instrumentation; fresh repair only CI workflow and same test class. Allowed task/progress/checkpoint/evidence updates owned by root. No new product dependencies/contract/security/backend/schema/business change; no product change after7108267. Full earlier task ownership and original evidence remain durable.
+Only existing Desktop/Mobile Auth invalid-credentials branches and existing tests changed in this repair. Workspace/layout/native/other401 cleanup/storage/Send/Sync paths unchanged. Root owns Task/current/new recovery evidence. No dependency/framework/contract/security/schema/ACK change.
 
 ## Known Failures, Risks, and Assumptions
 
-Windows native/actual-contextCA external access unresolved. Historical Recorder gaps and both rejected semantic submissions immutable/disclosed; final review/fix/coordinator runs expose incomplete traces. Structural Recorder validation is not complete trace, TaskPASS or GatePASS. Original six screenshot moves and unrelated unknown main work preserved. All owned Android/test services stopped; do not assume earlier39112/50508/38684/37212 remains live.
+Original independent P2FAIL and FAIL66 WSS cleanup race/absent-runner failures preserved; old incorrect auth-error is excluded. Precise31+67layout reuse still awaits fresh Auth-only source-impact review; no all-product-byte-unchanged claim after Auth Fix. Original capture clean3a5001228d6d3eb3f3b5dcbda468f270202554fb is not later evidenceHEAD. Recorder/directread/view/summaryprompt gaps disclosed; structuralvalidation is not fulltrace/Task/Gate acceptance. Six historical screenshot moves and unknown main work preserved. All ownedAndroid/Go services stopped; no stale process assumed live.
 
 ## Next Exact Action
 
-Continue applicable GUI review/evidence work independently of Windows tooling; do not resume helper repair or Windows tool verification in the current step. At S2 Gate, complete deferred normal sandbox/native-tool regression with actual results before Gate PASS. Existing GUI acceptance/Architect/independent Review/exact-head CI/protected integration/actual-main safe synchronization remain required and pending; task stays review/S2 OPEN. Latest exact Human timing decision: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-tools-deferred-20261007/decision.md`.
+Commit this recovery-only metadata and give new /root/auth_final_review the exact clean combined candidate; independently inspect source/5affectedrawcaptures/APKs/methodcorrection/old-slice reuse/guards. Continue existing unified candidate review/publication/exact-head CI chain while keeping occupation-blocked Windows verification at S2 Gate. At Gate require actual deferred normal sandbox/native matrix and same-desktop-account machine CA rollback proof before PASS. Protected integration/actual-main audit/safe synchronization still pending.
 
 ## Last Known Good Commit
 
-Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; local final UI `710826740c287333389937c1eeefaf472e68a43d`; repair `a7ab9c479e6cacc6cfe02071880ada96f149ffec`; independently reviewed clean candidate `cf476663e482ddc72d116b89b064a8d6d105b703`. Main untouched, synchronization pending. Recovery snapshotfac0c8fc205d44a2889f56ae12f1e67c83edb3da retained.
+Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; latest local Fix `2aa61c77e27cfe79b422e7b55903239f30ece7f4`; actual capture/product-test source `3a5001228d6d3eb3f3b5dcbda468f270202554fb`. Main untouched and synchronization PENDING; no local candidate is final accepted product.
 
 ## Latest Checkpoint
 
@@ -53,38 +52,8 @@ Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; local fin
 
 ## Uncommitted Changes / Ownership
 
-Branch task/LOOP1-CLIENT-GUI-001-resume; assigned managed root H:/.codex/worktrees/g/IM-platform exactly verified. Sole /root owns only new Windows-tool timing decision/current/task recovery metadata in this run. Pre-change clean HEAD `ea64e7bc70d27f6db489df5b7b5e413c1d022985`. Original history/evidence/unknown main work and six screenshot moves preserved; main synchronization PENDING. Commit this recovery decision before ending.
+Assigned/verified managed root H:/.codex/worktrees/g/IM-platform, branch task/LOOP1-CLIENT-GUI-001-resume. Root sole writer owns only new android-review-resume evidence and Task/current recovery metadata. Fix released clean2aa61c77e27cfe79b422e7b55903239f30ece7f4; root commits metadata before new independent review. Main observedffd6b63ac9396e577f0bb5c3d3ac02ee4915d597/31unknown status entries unchanged; no synchronization.
 
 ## Architecture Conflicts / ACP / ADR
 
-No new architecture conflict/choice; frozen authorization and ADR0009 bounded local-batch timing remain. Native prerequisite/GUI effectiveness/Taskdone/StagePASS/integration/main sync not established. Exact review/report records limits and next action.
-
-
-## 2026-10-07 User-requested archive handoff
-
-Human requests archive and release to a new agent. Task remains review/BLOCKED_EXTERNAL_ACCESS, S2 OPEN; no push, protected integration or main synchronization claimed. Portable Chinese handoff and hash-verified final APK copies saved at C:/Users/21441/AppData/Local/Temp/IM-platform-GUI-handoff-20261007-archive-final/handoff.zh-CN.md. Next exact action: allocate/restore an authorized managed worktree from the app archive result, then resume existing Windows native/same-user CA rollback/full Architect/exact-head CI/integration/main-sync requirements. Writer releases after archive; no repository writes after removal. Unknown main changes and original six screenshot moves preserved. Prior clean recovery HEAD00182f28f5eb9c75ec060bd0797563798dd26bbc; accepted mainffd6b63ac9396e577f0bb5c3d3ac02ee4915d597 unchanged. Archive snapshot and deletion verification are recorded in the external handoff after app completion.
-
-
-## Short-name recovery (2026-10-07)
-
-Long-name app creation failed Filename too long; short name g succeeded from21a4b82 snapshot and assigned Git root exactly matches. AGENTS.md now requires this routine short-name retry. Architecture/frozen baseline PASS. Supported Windows tool standard reset then sky Initialize failed kernel56148 exit1/setup refresh had errors; original Windows native/same-accountCA/fullArchitect/CI/integration/main-sync blockers remain. No product changes or Task/Gate acceptance. New evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/short-resume-20261007/recovery.md`. Next exact action remains supported Windows host repair and existing full acceptance chain.
-
-
-## Scoped recovery review continuation
-
-Fresh independent /root/short_recovery_review PASS on clean exact2aff3f4660a39d59454edb7e56c114b018c4406c, base21a4b82; four recovery/workflow files only, no findings. Independent architecture/frozen/clean recoveryAcceptance and CR-aware diff checks PASS; full GUI acceptance still BLOCKED_EXTERNAL_ACCESS. Original CRLF convention retained after unnecessary normalization was reverted; original command history retained. Report: spec/progress/evidence/LOOP1-CLIENT-GUI-001/short-resume-20261007/independent-review.md; parent completed-command index in same folder. This later report-preservation metadata is not selfaccepted or part of that exact reviewed SHA. Actual main observedffd6b63ac9396e577f0bb5c3d3ac02ee4915d597; synchronization PENDING. Keep review/S2OPEN; next exact action supported Windows host recovery and existing full acceptance chain. /root sole writer owns only new recovery metadata; product/unknown main/history untouched.
-
-
-## User-requested log-driven host repair (2026-10-07)
-
-Article23600 approach inspected: actual sandbox target is runtime node_repl.exe then VCRUNTIME140_1.dll sharing violation32, not repository.git ACL denial. Exact target ownership/current-userFullControl already present; no takeown/grant/reset/sandbox bypass. ACL/hash backup plus bounded exact6node_repl workers/native30244 restart attempted; normal sandbox still fails because Codex auto-respawns native29164 loading DLL before setup. New evidence: spec/progress/evidence/LOOP1-CLIENT-GUI-001/host-minimal-20261007/repair-attempt.md. No restorednative/fullGUI/TaskPASS/GatePASS/push/main sync; remainreview/BLOCKED_EXTERNAL_ACCESS/S2OPEN. Next exact action supported offline runtime lifecycle/initialization repair after orderly full app exit, then normal sandbox+supported sky regression; do not repeatedly retry or promise reopen alone. Prior goodd5f23da/mainffd6b63 preserved. /root owns only new recoverymetadata/evidence; Recorder R-GUI-HOST-MIN-20261007 prospective_resume discloses initial read-only and raw app/tool capture gaps.
-
-
-## Runtime occupation cause clarified (2026-10-07)
-
-Current exactVCRUNTIME140_1.dll is loaded by nativehelper29164 under CodexDesktop parent53016; former node_repl workers remainstopped. Same-liveDLL nonmutating handle probes: READ_CONTROL and READ_CONTROL|WRITE_DAC PASS, MAXIMUM_ALLOWED FAIL32 with identical sharing/source flags. Localcore0.162.0-alpha.2 matching publictag opensMAXIMUM_ALLOWED before root-only ACL/no-op check while traversingruntime files; evidence strongly supports runtimeACL access-mask conflict, not missing permissions. Actual installedhelper CreateFile flags not debugger-captured. New evidence: spec/progress/evidence/LOOP1-CLIENT-GUI-001/lock-cause-20261007/diagnosis.md. No mutation/repair/acceptance claimed thisrun. Next exact action supported corrected sandboxhelper implementation/build (minimum ACL handle access, security checks retained), then ordinaryshell/native regression and original fullGUI chain; do not promise reboot alone. Taskreview/BLOCKED_EXTERNAL_ACCESS/S2OPEN, no push/main sync; /root owns only newdiagnostic recoverymetadata/evidence. RecorderR-GUI-LOCK-CAUSE-20261007 prospective_resume initialreadonly/web gaps explicit.
-
-
-## Workspace-write retry2026-10-07 19:51
-
-Human重试: ordinaryshell before-process FAILsetuprefresh; standardnode reset plusInitialize/one rerun trustedNodeexitFAIL. Newlog processes3writeroots but root-only runtimeACL fails32 atnode_repl.exe; newworkers34444/53796 started19:50:44, native29164 stilllive. Thus prior stoppednode observation historical; helperMAXIMUM_ALLOWED implementation unchanged, no READ_CONTROL|WRITE_DAC patch/ACL/process/security modification. Evidence: spec/progress/evidence/LOOP1-CLIENT-GUI-001/lock-cause-20261007/retry-1951.md. Keepreview/BLOCKED_EXTERNAL_ACCESS/S2OPEN; next supportedhelper fix thennative regression/fullGUI acceptance; no push/main sync. /root owns recoverymetadata; prospective_resumeRecorderR-GUI-RETRY1951-20261007 initialtooltrace incompleteexplicit.
+No new architectural choice/conflict. Canonical hash a6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72/ADR0009 bounded Human unified candidate timing preserved. Native prerequisite/GUI Taskdone/StagePASS/formal effectiveness/integration/main sync remain pending.
