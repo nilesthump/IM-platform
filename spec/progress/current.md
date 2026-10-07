@@ -7,9 +7,11 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: REPAIRING_INDEPENDENT_REVIEW_FINDINGS
+Execution Status: REPAIRED_CANDIDATE_INDEPENDENT_REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
+
+Fresh Fixa7ab9c479e6cacc6cfe02071880ada96f149ffec repairs CI env indentation and existing actual Android navigation/scroll helpers only; product UI unchanged7108267. Full YAML parser/9 actualAPI34 phases PASS170/70/72/15/62/27/7/19/16, real4 Message/Outbox identities, full temporary Android trust rollback/ownedGo37212+emulator cleanup. Original17 attempts/74 PNGs and all failed records source-bound in review-fix-20261007/. New independent Review next.
 
 Final arrow-only back button enlarged1.5 from current label font; source710826740c287333389937c1eeefaf472e68a43d. ActualAPI34 PASS107/16 raw screenshots, cold14/warm22 navigation/send/theme/logout verified; full Android trust rollback/owned runtime cleanup. Human says no further visual confirmation; proceeding to independent Review. Evidence mobile-back-20261007/verification.md.
 
@@ -17,11 +19,15 @@ Human Mobile request implemented: all-page logo/IM+ header and global theme row 
 
 ## Current Blockers
 
-Fresh independent full candidate37f613e Review FAIL: CI workflow env indentation and legacy Android acceptance navigation/theme assumptions. Final16-image Mobile header Architect slice PASS. Fresh Fix then new Review required; report final-review-20261007/review-37f613e-fail.md.
+Historical fresh candidate37f613e Review FAIL repaired in fresh Fixa7ab9c4; new independent Review required. Final16-image Mobile header Architect slice PASS retained, product unchanged; full Windows native matrix and actual-context CA cleanup unresolved.
 
 Human final Mobile instruction is implemented and explicitly requires continuing without another Human visual confirmation. Full remaining native/Architect matrix, fresh independent Review/exact-head CI/protected integration/main synchronization pending. Windows UI host setup/approval-channel tool failure persists; actual desktop Root CA remains invisible to tools, cleanup must verify in same actual desktop context, no inference from tool-side absence.
 
 ## Verification
+
+- Command: `GuiAuthenticatedInstrumentation` matrix/appearance/retry/refresh/retry-existing/isolation/expiry/sending/offline-logout; `GuiTrustRollbackInstrumentation`
+  - Result: nine actual phases PASS; real PG4 identities/Outbox; Android134CA baseline/nonroot/Enforcing/defaultTLS rejection and exact owned cleanup PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/review-fix-20261007/fix-report.md`
 
 - Command: `GuiAuthenticatedInstrumentation phase ui-revision`; `GuiTrustRollbackInstrumentation`
   - Result: PASS107; rollback134CA baseline/nonroot/Enforcing/defaultSDK rejection.
@@ -45,7 +51,7 @@ Native Windows host tool sharing/approval-channel failure and exact desktop-cont
 
 ## Next Exact Action
 
-Fresh independent Architect and unified candidate Review of committed final Mobile arrow7108267/evidence mobile-back-20261007; assess required full GUI matrix without treating Human no-confirmation instruction as independent acceptance. Complete remaining full GUI/Architect matrix, Windows exact desktop Root CA cleanup, fresh unified independent Review, applicable exact-head hosted CI/protected integration/actual-main verified synchronization. No done/S2PASS before required acceptance/main sync. Current emulator and owned Go50508 stopped; do not assume older runtime39112 still active.
+New fresh independent Review of repaira7ab9c4/full candidate and review-fix-20261007 evidence; assess required full GUI matrix without treating Human no-confirmation instruction as independent acceptance. Complete remaining full GUI/Architect matrix, Windows exact desktop Root CA cleanup, fresh unified independent Review, applicable exact-head hosted CI/protected integration/actual-main verified synchronization. No done/S2PASS before required acceptance/main sync. Current emulator and owned Go37212 stopped; do not assume older runtime39112 still active.
 
 ## Last Known Good Commit
 
@@ -53,7 +59,7 @@ Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; current u
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-mobile-back.md`
+`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-reviewed-repair.md`
 
 ## Uncommitted Changes / Ownership
 

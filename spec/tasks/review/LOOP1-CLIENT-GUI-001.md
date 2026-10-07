@@ -257,3 +257,7 @@ Human final instruction removes visible Chat label and enlarges sole ← by1.5; 
 ## Fresh independent review37f613e
 
 /root/final_gui_review fresh context reviewed clean exact37f613ef8e0c8af6030f821dd410c493e44cbbd1 full range mainffd..candidate. Scoped final Android16-image header ArchitectPASS; unified code ReviewFAIL P1 CI env YAML indentation, P2 legacy actual instrumentation navigation/theme assumptions. Report final-review-20261007/review-37f613e-fail.md. Fresh Fix/new Review next, Task remainsreview/S2OPEN; no push/main sync. Recorder disclosure corrected without modifying old streams.
+
+## Fresh repair and full affected actual Android branches
+
+Fresh /root/gui_review_fix author owns ONLY CI workflow/env indentation and existing actual instrumentation navigation/scroll helpers; a7ab9c479e6cacc6cfe02071880ada96f149ffec clean commit. Product Mobile/Desktop unchanged7108267, prior16-image scoped ArchitectPASS remains bound, old manifest retained. Nine affected actualAPI34 phases PASS170/70/72/15/62/27/7/19/16, four real durable Message/Outbox identities, same-live fixture defaultTLS rejection/full134CA trust rollback and exact37212/emulator cleanup PASS. Public17 attempts/74 originalPNG/source/APK hashes/failedlogs in review-fix-20261007. Required new different independent Reviewer next; Taskreview/S2OPEN, no fullacceptance/push/CI/main sync. Parent/root retakes sole writer after fixer release.
