@@ -61,3 +61,8 @@ Root sole writer owns bounded native recovery metadata in assigned verified H:/.
 ## Architecture Conflicts / ACP / ADR
 
 No new technical choice/conflict; existing approved ADR0009 freeze. Latest direct Human order supersedes prior standalone/unified scheduling history only. Canonical hash/body, PDF and original approval/historical evidence remain unchanged. S1PASS/S2OPEN.
+
+
+## Native publication archive repair (2026-10-08)
+
+Independent ec0f776 Review FAIL is preserved in completion-20261007/archive-fix-20261008/report.md. Fresh Fix Agent /root/native_archive_fix replaces only new public failure-log text copies with exact-byte JSON base64 archives; all16 decoded streams match original Recorder SHA/bytes and original command events remain unchanged. Scope/sourceauthority/product/main unchanged. Local full diffcheck/Development and clean committed Acceptance are recorded in private R-NATIVE-ARCHIVE-FIX-20261008; fresh independent Review/exact repaired-head hosted CI/protected integration/main sync remain pending. Sole tracked writer currently /root/native_archive_fix; task review/S2 OPEN; Windows retry follows verified Native completion.

@@ -107,3 +107,8 @@ Fresh local native completion checks: architecture all/frozen PASS, 53 architect
 ## Independent source Review and publication blocker (2026-10-07)
 
 Independent Review PASS at clean `7dc3e8a3939ec618b4f1618c705b26ff18990a5f`; report/commands/hashes in completion-20261007/independent-review/. Exact hosted publication BLOCKED_EXTERNAL_ACCESS; Git pushes fail reset/connect, API write transports fail integration403/empty500. Full details: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/completion-20261007/publication-blocker.md. No hosted run/main integration/sync/done. Root owns this subsequent evidence-only handoff; do not extend source Review PASS to it. Resume actual publication/independent acceptance/main sync before Windows retry. Last accepted main remains ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597; all unknown main work untouched.
+
+
+## Native publication archive repair (2026-10-08)
+
+Independent ec0f776 Review FAIL is preserved in completion-20261007/archive-fix-20261008/report.md. Fresh Fix Agent /root/native_archive_fix replaces only new public failure-log text copies with exact-byte JSON base64 archives; all16 decoded streams match original Recorder SHA/bytes and original command events remain unchanged. Scope/sourceauthority/product/main unchanged. Local full diffcheck/Development and clean committed Acceptance are recorded in private R-NATIVE-ARCHIVE-FIX-20261008; fresh independent Review/exact repaired-head hosted CI/protected integration/main sync remain pending. Sole tracked writer currently /root/native_archive_fix; task review/S2 OPEN; Windows retry follows verified Native completion.
