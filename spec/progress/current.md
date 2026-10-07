@@ -82,3 +82,11 @@ Native prerequisite is done/independently accepted/protected-integrated/synchron
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-retry-20261008/baseline.json`
 
 Next exact action: supported Windows host restoration, ordinary/native regression and current-source runtime/CA proof, then remaining fullGUI acceptance/protected integration/actual-main safe sync. Recovery metadata needs own fresh independent Review/exacthead CI. Last accepted synchronizedmain7088ecd5c905dceadae8ed2f504d54d6585ca3dc; prior reviewedGUI91598049dfb0bf4360b0ce8bdbc4598606db1407/CI37635585688 remains historical candidate scope only. Root solewriter owns only new retry evidence/GUI Task/current; main/unknown work unchanged. Native receipt/report private paths linked in retry.md. Recorder trace gaps disclosed; no Task/GatePASS.
+
+## 2026-10-08 Reversible helper read-only trial
+
+- Command: `temporary config sandbox_mode=read-only; standard node reset; supported @oai/sky initialization; ordinary Get-Location; one follow-up; finally restore`
+  - Result: BLOCKED_EXTERNAL_ACCESS/setup refresh had errors before native inventory. Persisted value changed, effective live policy reload unproven. Rollback PASS original/restored fullSHAf53b244ff95edeefac974b966f063508cb452eb35e81ee58adef4b37b4c426f9, original workspace-write/SDDL unchanged, credential-containing backups removed. No binary/ACL/security implementation change.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/helper-readonly-20261008/trial.md`
+
+Native remains done/synchronizedmain7088ecd5c905dceadae8ed2f504d54d6585ca3dc; GUI review/S2OPEN/PR24draftunmergedconflicting. Latest reviewed GUIdf61c1d06498dc0bf15238c957155f048dbd5210 incremental pushCI37662388912 PASS5/8inactive; new fullPRCI absent. Next supportedhost activation/repair then actual current-source nativeGUI/same-accountCA proof and remaining fullacceptance/integration/safe-sync; no Task/GatePASS. Root owns only new trial evidence/GUI Task/current; original helper/config restored, main/unknown work unchanged. New recovery metadata independent review/exactHEADCI pending.
