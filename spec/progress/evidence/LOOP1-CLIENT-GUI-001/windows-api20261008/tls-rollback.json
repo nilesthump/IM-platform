@@ -1,0 +1,42 @@
+{
+  "same_desktop_account": true,
+  "session_id": 1,
+  "explorer_count": 1,
+  "current_user_root_matches": 0,
+  "local_machine_root_matches": 0,
+  "temporary_ca_absent": true,
+  "fixture_url": "https://localhost:58802/",
+  "trust_store_modified": false,
+  "default_https_rejected": true,
+  "exception_chain": [
+    {
+      "message": "Exception calling \"GetResult\" with \"0\" argument(s): \"The SSL connection could not be established, see inner exception.\"",
+      "type": "System.Management.Automation.MethodInvocationException"
+    },
+    {
+      "message": "The SSL connection could not be established, see inner exception.",
+      "type": "System.Net.Http.HttpRequestException"
+    },
+    {
+      "message": "The remote certificate is invalid because of errors in the certificate chain: UntrustedRoot",
+      "type": "System.Security.Authentication.AuthenticationException"
+    }
+  ],
+  "result": "PASS",
+  "positive_control": "same live TLS endpoint returns200 with explicitly scoped originalfixture CA, no OS trust modification",
+  "ca_der_sha256": "567914623580f1cf36dcc943794481c0472eac8294d3601818d3de7650a54946",
+  "server_der_sha256": "aaf79ccf6ede806f76819626a4b67b1b96a298a9fcdf1e52ff3eed5a91437afd",
+  "host_tls_stack": "fresh Windows .NET HttpClient default certificate validation; no callback override",
+  "argv": [
+    "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+    "-NoProfile",
+    "-File",
+    "H:\\.codex\\gui-handoffs\\20261008-windows-outside\\windows-trust.ps1",
+    "-FixtureUrl",
+    "https://localhost:58802/"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 3.25,
+  "output_sha256": "9378202a2df474bf203eda85e8d5b6b44d30b540167e9262ace1800126f1f1cd",
+  "owned_fixture_stopped_and_port_closed": true
+}

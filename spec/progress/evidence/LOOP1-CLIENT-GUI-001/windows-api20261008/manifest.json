@@ -1,0 +1,615 @@
+{
+  "capture_source_sha": "cc13ba1284e3c11a44203377b3ac7adb3d0e25d6",
+  "assigned_root": "H:\\.codex\\worktrees\\g\\IM-platform",
+  "branch": "task/LOOP1-CLIENT-GUI-001-resume",
+  "platform": "Windows; actual installed Tauri x64; Win32 user32 API through PInvoke outside sandbox",
+  "theme": "Warm Creative",
+  "font_size": 14,
+  "density": 0.8,
+  "window_pixels": [
+    1942,
+    1273
+  ],
+  "pid": 15920,
+  "hwnd": 330300,
+  "fixture": "anonymous blank controls; no user/password/token shown",
+  "api_operations": [
+    "target PID/path/creation-time and window owner checks",
+    "PrintWindow target-only raw image",
+    "SetForegroundWindow/GetForegroundWindow + WindowFromPoint/GetAncestor guard",
+    "SendInput mouse down/up changed Login to Register",
+    "WM_CLOSE app handler hides real window; Ctrl+Shift+Space SendInput restores visibility and foreground"
+  ],
+  "reproduction": "Launch current installed package; capture Login; click observed New here? Create an account at window-relative1260,811; capture Register; request WM_CLOSE; assert hidden; emit Ctrl+Shift+Space; assert same HWND visible/foreground",
+  "partial_only": true,
+  "architect_approval": "pending",
+  "whole_gui_acceptance": "pending",
+  "artifacts": [
+    {
+      "file": "current-login.png",
+      "sha256": "76492e33f2c81c30bcb3bae83770410c1bbcad15c1c9d87eae6193fd126655f8",
+      "bytes": 500542
+    },
+    {
+      "file": "current-register.png",
+      "sha256": "99d2530fc2b56a492f28f0704cf02b525b517811e72dd487ac65310b3ae216bd",
+      "bytes": 499306
+    }
+  ],
+  "source_files": [
+    {
+      "path": "clients/desktop/.gitignore",
+      "sha256": "790e3169bc19b046fe55ba1da6d13b976c28363c8c00462a2195fe5faf260910"
+    },
+    {
+      "path": "clients/desktop/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "clients/desktop/README.md",
+      "sha256": "7bc4b810f2989a1fb786093a351cf95176c990ddfb30dd213d21e5507f6f0ccc"
+    },
+    {
+      "path": "clients/desktop/package-lock.json",
+      "sha256": "16f453c2beed2a1bc0ba7becaf3457a1bc310d1faa3451331ef9bff0685ff376"
+    },
+    {
+      "path": "clients/desktop/package.json",
+      "sha256": "e052f11dc52945220cc0d5a334db753e4d41d0fe8d338e9267730cf85a2e8881"
+    },
+    {
+      "path": "clients/desktop/src-tauri/.gitignore",
+      "sha256": "f879bb710d6f5a2934e0b564fe2451a971f16969a268bb6ad040291177c33c97"
+    },
+    {
+      "path": "clients/desktop/src-tauri/Cargo.lock",
+      "sha256": "0af591b07840a2b7ad57d4413a065b78158f7d2b9d4eb688930ee2853b0a0f58"
+    },
+    {
+      "path": "clients/desktop/src-tauri/Cargo.toml",
+      "sha256": "71e8f5feecf92aef9fc37af4b125463fb696ab4bb2de0823461a671773a196fe"
+    },
+    {
+      "path": "clients/desktop/src-tauri/build.rs",
+      "sha256": "8af41c0062014fc594e4bb9899e60ee9930ab57d4cf0c73041ff557d6ec736e6"
+    },
+    {
+      "path": "clients/desktop/src-tauri/icons/icon.ico",
+      "sha256": "73b1fc32c2612d63e14a6d6c0baf2878af39f47a685822e6e62170441454a405"
+    },
+    {
+      "path": "clients/desktop/src-tauri/icons/icon.png",
+      "sha256": "8a0f65d1aeea5c1ed41071bd36f26e8a5c9e9eb9772debabd98c08375fa97350"
+    },
+    {
+      "path": "clients/desktop/src-tauri/src/bin/storage_probe.rs",
+      "sha256": "2e0385845a09feaa8b508f72d1a42449c02e69d2d47f4f6f19a3c18020a0eaa9"
+    },
+    {
+      "path": "clients/desktop/src-tauri/src/database.rs",
+      "sha256": "ce29e04035be6c1b729abd49cd7926504468d575beb5c7159a8b757d4241d3ad"
+    },
+    {
+      "path": "clients/desktop/src-tauri/src/desktop_capabilities.rs",
+      "sha256": "97a75833d104b334a83301a96ff0246a8e956f6d84cfcc2179d24e4613ccc0f6"
+    },
+    {
+      "path": "clients/desktop/src-tauri/src/lib.rs",
+      "sha256": "a7bdc765a242f33d9c2bdf52a230a989cf0822b7ede94d354722704caece569c"
+    },
+    {
+      "path": "clients/desktop/src-tauri/src/main.rs",
+      "sha256": "56602b9b5147eaa2b143228d5bc0d5118291297930e06b716a408a44b499ec2b"
+    },
+    {
+      "path": "clients/desktop/src-tauri/tauri.conf.json",
+      "sha256": "a2a5f2dd54d0168b6733fdb0642f5a347bd4454300a37a81d12a713da43447df"
+    },
+    {
+      "path": "clients/desktop/src-tauri/tests/storage.rs",
+      "sha256": "dae647505007876b53f332d2b73791fa28b7b115189bfa3aa7ba4053b903aa67"
+    },
+    {
+      "path": "clients/desktop/src/application/accountSend.ts",
+      "sha256": "4a4cf3b8a2e94ab0952f15ef53d69d6193e8243a8d5fa142c20f70784b70a1ab"
+    },
+    {
+      "path": "clients/desktop/src/application/send.ts",
+      "sha256": "81a5b4370ae1ed8f3d3250aea183592f71cf7ed7917088797a693d1c62348121"
+    },
+    {
+      "path": "clients/desktop/src/application/sync/accountSync.ts",
+      "sha256": "0f542e8af6dae019911169dfe1ff0ddae90cfb944584e8f38b421e0c3035c0e6"
+    },
+    {
+      "path": "clients/desktop/src/application/sync/application.ts",
+      "sha256": "a6c5bde9923175fa64bc6aaa8ad870d64b77d6e916be8cc64e7ce2b97d24ecec"
+    },
+    {
+      "path": "clients/desktop/src/application/ui/auth.ts",
+      "sha256": "e5f45c604521f3cf2ad5535332af6e75004ff0b62b4d829e3565e57f484738d7"
+    },
+    {
+      "path": "clients/desktop/src/application/ui/native.ts",
+      "sha256": "d7a0f13dbe9a1ba66636f37d098401faf936bd2dea306edd6173e9116481b4ba"
+    },
+    {
+      "path": "clients/desktop/src/application/ui/workspace.ts",
+      "sha256": "15b9e9dac7d479b9d876e6860adef3f84a71774a2414379adb361d9cf09552ee"
+    },
+    {
+      "path": "clients/desktop/src/storage/database.ts",
+      "sha256": "bc40daf644784fb43b60abb8d3f9afc5522c36d735664c8bb75affef4693f6f4"
+    },
+    {
+      "path": "clients/desktop/src/ui/build.config.mjs",
+      "sha256": "4acccc55c794b734f391f81468e7e978a6420dd05c64cb9f2ba3955b2c3a5f0d"
+    },
+    {
+      "path": "clients/desktop/src/ui/composer.ts",
+      "sha256": "c4da6d567a3e8c088d7c20baa5f51a86c118e8c72ec3b4a4f8c1d17146157992"
+    },
+    {
+      "path": "clients/desktop/src/ui/index.html",
+      "sha256": "46103c9c5f35c1a4fdd47fae440faafa0fe5a3a81b3c9aa649ae589696996e76"
+    },
+    {
+      "path": "clients/desktop/src/ui/logo.png",
+      "sha256": "efd0954b42c77ef103995a03eeabd6db2ce2b28cc8648d36247b2f23c25bf0a2"
+    },
+    {
+      "path": "clients/desktop/src/ui/main.tsx",
+      "sha256": "26d84a7dcef2e626ab88a3edadc3fefd3b6182745ca50ace5fa6e152f1732516"
+    },
+    {
+      "path": "clients/desktop/src/ui/react-dom.config.mjs",
+      "sha256": "676d0a9dbebac371cdfd90821411b4582ce495ae95a6ac17bbe5eaf950afc1f5"
+    },
+    {
+      "path": "clients/desktop/src/ui/react.config.mjs",
+      "sha256": "8c483c11d9f779d78da8981e7e65dd0be91b2ec4c698e7101d389aa09ed6f576"
+    },
+    {
+      "path": "clients/desktop/src/ui/style.css",
+      "sha256": "e4683775c81f1dd0e64dec66c910f31a5947579ff7bcc2a13e69f9e91905ff0b"
+    },
+    {
+      "path": "clients/desktop/tsconfig.json",
+      "sha256": "6619b81336f0c10b451c60bd196573599edaf99bb79c9a3daff7a615e49f4502"
+    },
+    {
+      "path": "clients/shared/plugin-sdk/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/.gitignore",
+      "sha256": "790e3169bc19b046fe55ba1da6d13b976c28363c8c00462a2195fe5faf260910"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/README.md",
+      "sha256": "a0a877295c2374071e07f8983e26b3a1a59ebd8b9f3b1a0f5c9ef7f2c870e9d1"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/package-lock.json",
+      "sha256": "910009362f0710052831610dcc0036a53721d107c38db56fea45a006622de897"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/package.json",
+      "sha256": "9e6e79aeb6dbd4010dbe6392272f77e9b1df085ab726c81cc57b635738435bd4"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/src/send/wire.ts",
+      "sha256": "d980a2fba55ad1c192701e951e3c475df25f0ec3c6b1dd3f1fc7584657bae452"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/src/storage/models.ts",
+      "sha256": "6ad58c5240d036ad70b20795ed2fcc015fdbafd5926e453702159327f03463e3"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/src/storage/repository.ts",
+      "sha256": "647f45b9589fb91c79ab5b7a9de96c779ce6b575b868d84334773ad9d0f3e09f"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/src/storage/schema.ts",
+      "sha256": "5761dbc44f0c96ab59b4d28c4a38814de5023ff37220d4864a54e7618c5fb0cd"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/src/sync/http.ts",
+      "sha256": "73129567d48826d9da6870b48e0bc4558289eab12df8acf26ab0f75f7589d393"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/src/sync/wire.ts",
+      "sha256": "0b1381654dc78a2a029c3232831213fc63ade370690cdbd0414dddb4e30876d2"
+    },
+    {
+      "path": "clients/shared/protocol-sdk/tsconfig.json",
+      "sha256": "b61e27b76b179cf1b127a30bed6645e21df1085ebfcbd536e2c19635b3fa1cea"
+    },
+    {
+      "path": "clients/shared/ui/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    }
+  ],
+  "frontend_files": [
+    {
+      "path": "dist\\desktop\\src\\application\\accountSend.js",
+      "sha256": "d1868e74bbb9ea39a39a135e2732f45506155bb7430704d268f056a107c29903"
+    },
+    {
+      "path": "dist\\desktop\\src\\application\\send.js",
+      "sha256": "9f625045217a7e3a6a36668138a33ca6a731e950b839afc928336f0e323a2c8d"
+    },
+    {
+      "path": "dist\\desktop\\src\\application\\sync\\accountSync.js",
+      "sha256": "cca957da680f1fdc749a6b7a363a3755c14001de568536a67c278f12d7c46d9d"
+    },
+    {
+      "path": "dist\\desktop\\src\\application\\sync\\application.js",
+      "sha256": "f2128e78cb528935b7c6cca6afc373b251b6dcc8b373d0c38ca804040d351f2c"
+    },
+    {
+      "path": "dist\\desktop\\src\\application\\ui\\auth.js",
+      "sha256": "b6680db660fd40b6506c82a78a09f09a3b80f196703d915513b81ab85046289b"
+    },
+    {
+      "path": "dist\\desktop\\src\\application\\ui\\native.js",
+      "sha256": "8f22b40c77f9e5bcfd0496b31421b43929882e598b523fa600e16f82ccae67ad"
+    },
+    {
+      "path": "dist\\desktop\\src\\application\\ui\\workspace.js",
+      "sha256": "93d901881fecf5cdd9f46db0a47a9f86d56e2b1f9931fb5b1403e98aa3bc624b"
+    },
+    {
+      "path": "dist\\desktop\\src\\storage\\database.js",
+      "sha256": "1f10756b20930f83ab3762100b42ce79eb53e2fad4de19ae900e7b44687bd88d"
+    },
+    {
+      "path": "dist\\desktop\\src\\ui\\composer.js",
+      "sha256": "42923deee86318e6910ae6442e1693bc5c589e12adbd398dadf309e6d090ece5"
+    },
+    {
+      "path": "dist\\desktop\\src\\ui\\main.js",
+      "sha256": "793d9731fc3ab4b94424ab01553a3308522f16a66959a9de36b75c45b48387be"
+    },
+    {
+      "path": "dist\\index.html",
+      "sha256": "46103c9c5f35c1a4fdd47fae440faafa0fe5a3a81b3c9aa649ae589696996e76"
+    },
+    {
+      "path": "dist\\logo.png",
+      "sha256": "efd0954b42c77ef103995a03eeabd6db2ce2b28cc8648d36247b2f23c25bf0a2"
+    },
+    {
+      "path": "dist\\react-dom.mjs",
+      "sha256": "676d0a9dbebac371cdfd90821411b4582ce495ae95a6ac17bbe5eaf950afc1f5"
+    },
+    {
+      "path": "dist\\react.mjs",
+      "sha256": "8c483c11d9f779d78da8981e7e65dd0be91b2ec4c698e7101d389aa09ed6f576"
+    },
+    {
+      "path": "dist\\shared\\protocol-sdk\\src\\send\\wire.js",
+      "sha256": "a6c191658c4b4f94cb931ebb06f0c80b91db5860ff7fcb3887603b7e2d4350fb"
+    },
+    {
+      "path": "dist\\shared\\protocol-sdk\\src\\storage\\models.js",
+      "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+    },
+    {
+      "path": "dist\\shared\\protocol-sdk\\src\\storage\\repository.js",
+      "sha256": "ab7801997e462c147a84db38346632e4dc3e82a2cd993894c7fbee825aebd73f"
+    },
+    {
+      "path": "dist\\shared\\protocol-sdk\\src\\storage\\schema.js",
+      "sha256": "1504572e00733dd6ccdacf1cb1506ec9671c33a6f6e2e1d9afbbc7284a818920"
+    },
+    {
+      "path": "dist\\shared\\protocol-sdk\\src\\sync\\http.js",
+      "sha256": "8ca2b32070f2ed2da1eaed46a3f02e68fc48e3c0224c1f56ec00636b60a7b1fc"
+    },
+    {
+      "path": "dist\\shared\\protocol-sdk\\src\\sync\\wire.js",
+      "sha256": "1d20e4d72015da38dde3dfda48a56537b959e8dfbc6c665f254b0302b636abff"
+    },
+    {
+      "path": "dist\\style.css",
+      "sha256": "e4683775c81f1dd0e64dec66c910f31a5947579ff7bcc2a13e69f9e91905ff0b"
+    },
+    {
+      "path": "dist\\vendor\\react-dom.js",
+      "sha256": "35f4f974f4b2bcd44da73963347f8952e341f83909e4498227d4e26b98f66f0d"
+    },
+    {
+      "path": "dist\\vendor\\react.js",
+      "sha256": "d949f1c3687aedadcedac85261865f29b17cd273997e7f6b2bfc53b2f9d4c4dd"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\app.cjs",
+      "sha256": "8a0d0c1c7c0ecdf9fc293ba089ba6406d49354541f6f94cd9f397dd838ab77ca"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\app.d.ts",
+      "sha256": "1ffaca1f7fc78980978725e05be0cbf10c3ae4ba76ae29e7d0ae0640e7bbb4b1"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\app.js",
+      "sha256": "535d48a2d56c085c32607afdca6624bb301fcfc8f8e21652075f5cd67666aa11"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\CHANGELOG.md",
+      "sha256": "33ec2f7768e3b2d1c854485081f015531eb8cfded4fbf638e3836ab459fffe93"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\core.cjs",
+      "sha256": "2933f17aa916f2a96d2c3372980099d332fe2de515cc3fef0860215dd7298def"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\core.d.ts",
+      "sha256": "5f32c4bd93cd5c24bd3254bf3b505564a2e783ea221f0d678ae15b9c9ab62230"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\core.js",
+      "sha256": "9ec3f310ca2e8450a186592d28dcbf005a5404d23f34d0ea775f86fe3d5d93a3"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\dpi.cjs",
+      "sha256": "3a84fd1f29a19af206f15295ffc60fe74fb593f80c02ebc410c434487bc99eca"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\dpi.d.ts",
+      "sha256": "70ba88f79e8ee85142e0693b54c8380c21317921a220b286be0ba127788db73d"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\dpi.js",
+      "sha256": "988c1d81a96804e68403b925746f7eed1757527102750b0d9bad0891d50f28e7"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\event.cjs",
+      "sha256": "8e8612749b45df3668e811be6558bf0307adc103e2c4f600ba13315c4c5ad6b9"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\event.d.ts",
+      "sha256": "f0c7bb4ee63a35ebd640eb7a1c1f62fec30a3bba138e8e80326c31f606ae9491"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\event.js",
+      "sha256": "4821bdb52d09bebc0deb56c613673dd07d0e6bae873d0b7b1ab3ab32c5db8f62"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\external\\tslib\\tslib.es6.cjs",
+      "sha256": "99538c3cad42cec65178bb2849cea75c6721aea2359422fbf95ea803ade0d004"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\external\\tslib\\tslib.es6.js",
+      "sha256": "88571c39817ebe327cfb45cf2d5ff9e68c544523d526f09ac2cc99acfc8fcf1b"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\image.cjs",
+      "sha256": "2c8b6a06b7fb64477d33b4ba05f8e49e037d1800f74109c33f2913b1debf3d78"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\image.d.ts",
+      "sha256": "764a1731ad3a3bed00c3d9f7dd9e424a57a1e0c711346ba34ddfcf64fe7182e8"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\image.js",
+      "sha256": "b3685137585dd476c1cb52c1a72b086a31d2ee387b0f6c3db3a08b12d77bd38d"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\index.cjs",
+      "sha256": "09e8aa4b57ea790cab6c1c688100666d49bd184b2e91fad093c935aac71f140f"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\index.d.ts",
+      "sha256": "5af87ddbf48680fb229aa42b5737dcc9798f7cc74374192fc261b18f8d039614"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\index.js",
+      "sha256": "65414de06a44521ac03ee1e8695e639751eb22e8832147c2ba191b5987f21d73"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\LICENSE-APACHE-2.0",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\LICENSE-MIT",
+      "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\LICENSE.spdx",
+      "sha256": "5e834fe9788c524210deda859c46a550ffa5aa0cba9ea0572f0d81120e97c008"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\base.cjs",
+      "sha256": "d84f6d28b1143deb29475f853bdb57d1869b1324efdc7406d1365ba4520f4159"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\base.d.ts",
+      "sha256": "dee8fa58bad0f1b644e9ca9cf0665121b99d3ad5653c7b8b7c11eeae884f216a"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\base.js",
+      "sha256": "d07fec73c0d77adc64545d5f4e9623aec50c74ed4ccac4854f3c74470ef402b8"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\checkMenuItem.cjs",
+      "sha256": "4fc1f6c91a8b2af32ffe5d80a868188f0255fdbe4f6f48bd415367c3e475489d"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\checkMenuItem.d.ts",
+      "sha256": "663051e910637eb0d03a49ef16135a1eeacc9836b9c1a54c9b9014450376c83c"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\checkMenuItem.js",
+      "sha256": "3c56656ff9574ea05cef5f7b2545f88ff174b5806d22fb76556b187b64bec9b2"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\iconMenuItem.cjs",
+      "sha256": "f8d38fc84c37f102749db4c0173a627f3ee1610d7b2821015a7ee21f3b0fa779"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\iconMenuItem.d.ts",
+      "sha256": "5c886e8d9c1b21c35fb8ebab20f6c5e4a59beb2a75538543376ce955501bc2d1"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\iconMenuItem.js",
+      "sha256": "957beb42fadfa4968a09eea18f20075ca7aba68e6091878a731870b495f90c3e"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\menu.cjs",
+      "sha256": "168b90857e1fcaa9fe2a6a169400f646a2a9c4293f2113d32403a1cd7d391944"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\menu.d.ts",
+      "sha256": "9c93366fb221e9f5a2fdeecf0cfe6c2cceb02cad4bf0915d2c679195813b3f83"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\menu.js",
+      "sha256": "92d588a4e30f4e76aaf76b254195e0cd790317a5c1ab4dc4cad6763622401e5e"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\menuItem.cjs",
+      "sha256": "79586bd36121fa9b570ac4f4e4b5bb33e1e7ffef55c8750862182ce6381887d0"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\menuItem.d.ts",
+      "sha256": "a4b50718b1d7d9f93ccaf81be9d33c3c3e3f13049199fe108fd646421e308e2f"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\menuItem.js",
+      "sha256": "02d64ae8296d5f0e351a351a5b0e486be3e42d0fdb1c25fa9d695301bc9f3969"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\predefinedMenuItem.cjs",
+      "sha256": "f235ed6b26351003902f95cfd2f40da7cea35c3cef370d78aab84617d6d13914"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\predefinedMenuItem.d.ts",
+      "sha256": "31ac81e7e09fb93ab36bbf0c96d2cd55ce0960d5f7e04f7abbc220cb37ba3e13"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\predefinedMenuItem.js",
+      "sha256": "406774a4bdb9c31911602fcdd7a24c993422efbcffa360cbc93b7fa7ab9d702b"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\submenu.cjs",
+      "sha256": "8f17af14f65abe8435ee9b9c474e57b8857e27debdda06db9f52f2f761eb9bc3"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\submenu.d.ts",
+      "sha256": "63ecfc4fa851b124610db66f595969bc24b9654c6f049d675c7c9a7dd216a8cc"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu\\submenu.js",
+      "sha256": "3be903cf5c34362f8f5735c77897c0f99c12ea9163a494342252a1fe932df3d6"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu.cjs",
+      "sha256": "745f5742fb304baea101df519ab1a67c384a9c6777b1204b24d199056b2fc5d6"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu.d.ts",
+      "sha256": "5f2b29512f6e805868979e9ca2b5565696375258d2d9b70f2097059c0df45e8a"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\menu.js",
+      "sha256": "0b738858464b0731368fbe8fee40ee1788b2266b32349b6acc4d96a2bf4a0853"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\mocks.cjs",
+      "sha256": "b2c661262523a4c1501e950b22c58b0224e9b0db5975afe203ee473983aaad31"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\mocks.d.ts",
+      "sha256": "e3e64c239b149e72b3663359b2912ef07842a712dd63e8b9cd7f9fdd29bce50e"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\mocks.js",
+      "sha256": "fffe0f92e0546c1c799bf36686701c8947cc1ffcee632f88501fa96fbdf647bc"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\package.json",
+      "sha256": "52a3d61f09c5ca713356fbc5cef7cba8f10fd2e6f1f9ea269307809d42ee8b40"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\path.cjs",
+      "sha256": "df155b19cd972c91cff0af7e6ead4927b94efca291af9e201f52764ab2fdf2e6"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\path.d.ts",
+      "sha256": "da022250130fa122fcd6bdc7fd84de0042c0477684485594f8c129c2411a0553"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\path.js",
+      "sha256": "fca44ad96831479f2f2e1c8d70e8579a5ff4078abd04f18defb46cbd399b6e43"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\README.md",
+      "sha256": "7bd6b04ac2b62058cc8f201be5af47b4e41a5d28b6bc79f409bb9986cb8a2447"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\tray.cjs",
+      "sha256": "d9c5f1f94eff1a575941122c97d4a5a3a4aaa0527bd6f3a794b062ac40825453"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\tray.d.ts",
+      "sha256": "49d7f21fc208199fa8048ed602de911c4b85c74502f1be3bed9f48bd4d4c0586"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\tray.js",
+      "sha256": "ba628fed50aefff25d0bf0725a3fef04ab92bc8bbd35d12e176b1354df2060d2"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\webview.cjs",
+      "sha256": "22b44909e504451e15d37ad6e42b772f810dec113d8d982f31759ff2e7b1157c"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\webview.d.ts",
+      "sha256": "6e22d16599b3472db7c6ce230f10430f7e9d004b0d07fa9ef502d79de0f983ad"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\webview.js",
+      "sha256": "01edfb4c4501e6cd3642f7705a56fdacdb8ba587d7dd82be7b224fa1c4ada0d6"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\webviewWindow.cjs",
+      "sha256": "2fbe9475fc8936473514caedce0896e6d9c3a2196650623927aa91798fe7ec15"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\webviewWindow.d.ts",
+      "sha256": "9a83ddde9550c4a2d3829badd20cc9146e912983c0257d0b0d406d2d8048d4f9"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\webviewWindow.js",
+      "sha256": "bdf7cb3a2498c85d3570e257d832fcdfbb26c7d9565ea532e71509639fb9f0f3"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\window.cjs",
+      "sha256": "2b5100cf758b04e609cf1fbecc7fe9a92f826e86b85006485a0522c312804464"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\window.d.ts",
+      "sha256": "4ac308f975a0372408435c23bc84248387ec66888f833943a475d79e4f866ae5"
+    },
+    {
+      "path": "dist\\vendor\\tauri\\window.js",
+      "sha256": "b21aa36fa489872aadad8c9f8015163ca090b91b61d478d603e1fdb838e68e0f"
+    }
+  ],
+  "installer": {
+    "private_path": "H:\\.codex\\toolchains\\client-gui\\target\\release\\bundle\\nsis\\IM Plus_0.1.0_x64-setup.exe",
+    "sha256": "0d99691df6edae719d4502a0859d82b953a328655fdee678b332a3148785527e",
+    "bytes": 5935109
+  },
+  "installed": {
+    "private_path": "H:\\.codex\\toolchains\\client-gui\\installed\\im-client-storage.exe",
+    "sha256": "6707f9d5d5b1c1d2fc195b5c9ef91f11fa86b195e20f83b0dc046864ae9f8b8c",
+    "bytes": 15500288
+  },
+  "platform_version": "Windows10.0.26200, build26200",
+  "appearance_source": "Read exact app-owned appearance.json scalar-only after capture; warm14compact0.8, no preference write this run"
+}
