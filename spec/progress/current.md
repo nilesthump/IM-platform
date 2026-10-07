@@ -53,7 +53,7 @@ Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; local fin
 
 ## Uncommitted Changes / Ownership
 
-Branch task/LOOP1-CLIENT-GUI-001-ui-update; parent/root retakes sole writer after fresh Fix release. Only final recovery/report metadata now task-owned; commit before ending. Managed worktree H:/.codex/worktrees/gui-ui-update/IM-platform retained/attached. Unknown main work untouched, six snapshot screenshot moves byte-exact preserved.
+Branch task/LOOP1-CLIENT-GUI-001-resume; sole writer /root owns explicit Human-authorized AGENTS.md short-name retry clarification and current/task/new recovery evidence only. Assigned managed root H:/.codex/worktrees/g/IM-platform exactly verified; original GUI root archived. Unknown main work and six snapshot screenshot moves preserved. Commit identity and independent scoped review follow in recovery evidence; main synchronization PENDING.
 
 ## Architecture Conflicts / ACP / ADR
 
@@ -63,3 +63,8 @@ No new architecture conflict/choice; frozen authorization and ADR0009 bounded lo
 ## 2026-10-07 User-requested archive handoff
 
 Human requests archive and release to a new agent. Task remains review/BLOCKED_EXTERNAL_ACCESS, S2 OPEN; no push, protected integration or main synchronization claimed. Portable Chinese handoff and hash-verified final APK copies saved at C:/Users/21441/AppData/Local/Temp/IM-platform-GUI-handoff-20261007-archive-final/handoff.zh-CN.md. Next exact action: allocate/restore an authorized managed worktree from the app archive result, then resume existing Windows native/same-user CA rollback/full Architect/exact-head CI/integration/main-sync requirements. Writer releases after archive; no repository writes after removal. Unknown main changes and original six screenshot moves preserved. Prior clean recovery HEAD00182f28f5eb9c75ec060bd0797563798dd26bbc; accepted mainffd6b63ac9396e577f0bb5c3d3ac02ee4915d597 unchanged. Archive snapshot and deletion verification are recorded in the external handoff after app completion.
+
+
+## Short-name recovery (2026-10-07)
+
+Long-name app creation failed Filename too long; short name g succeeded from21a4b82 snapshot and assigned Git root exactly matches. AGENTS.md now requires this routine short-name retry. Architecture/frozen baseline PASS. Supported Windows tool standard reset then sky Initialize failed kernel56148 exit1/setup refresh had errors; original Windows native/same-accountCA/fullArchitect/CI/integration/main-sync blockers remain. No product changes or Task/Gate acceptance. New evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/short-resume-20261007/recovery.md`. Next exact action remains supported Windows host repair and existing full acceptance chain.
