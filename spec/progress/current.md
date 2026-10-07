@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: SOURCE_ANDROID_AND_CANDIDATE_HOSTED_CI_PASS_WITH_OCCUPIED_WINDOWS_VALIDATION_DEFERRED_TO_S2_GATE
+Execution Status: NATIVE_ACCEPTED_AND_WINDOWS_RETRY_BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
@@ -68,3 +68,17 @@ Assigned/verified managed root H:/.codex/worktrees/g/IM-platform, branch task/LO
 ## Architecture Conflicts / ACP / ADR
 
 No new architectural choice/conflict. Canonical hash a6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72/ADR0009 bounded Human unified candidate timing preserved. Native prerequisite/GUI Taskdone/StagePASS/formal effectiveness/integration/main sync remain pending.
+
+## 2026-10-08 Native completion and actual Windows retry
+
+Native prerequisite is done/independently accepted/protected-integrated/synchronized at main7088ecd5c905dceadae8ed2f504d54d6585ca3dc, PR25/26, exact finalmainCI37658953916 PASS. Earlier pending Native/mainffd statements above are historical. GUI remains unique review and PR24 unmerged; S2 OPEN.
+
+- Command: `supported @oai/sky initialization; ordinary sandbox git rev-parse --show-toplevel; standard node reset; initialize and one instructed rerun`
+  - Result: BLOCKED_EXTERNAL_ACCESS before any inventory/capture/input; helper_unknown_error/setup refresh had errors, kernel39644/36800 exited1, reset succeeded. No current error32/file/process re-diagnosis, helper repair or current-source Windows GUI/CA machine proof claimed. Occupation-only deferred checks remain PENDING_VERIFICATION_AT_S2_GATE; CA已删除 remains Human-reported.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-retry-20261008/retry.md`
+
+- Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json` and `python -Xutf8 -B tools/verify_frozen_architecture.py`
+  - Result: local exit0 PASS; canonicala6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72 unchanged. Exactargv/duration/outputhash recorded.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-retry-20261008/baseline.json`
+
+Next exact action: supported Windows host restoration, ordinary/native regression and current-source runtime/CA proof, then remaining fullGUI acceptance/protected integration/actual-main safe sync. Recovery metadata needs own fresh independent Review/exacthead CI. Last accepted synchronizedmain7088ecd5c905dceadae8ed2f504d54d6585ca3dc; prior reviewedGUI91598049dfb0bf4360b0ce8bdbc4598606db1407/CI37635585688 remains historical candidate scope only. Root solewriter owns only new retry evidence/GUI Task/current; main/unknown work unchanged. Native receipt/report private paths linked in retry.md. Recorder trace gaps disclosed; no Task/GatePASS.
