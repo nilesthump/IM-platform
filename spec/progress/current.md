@@ -63,3 +63,7 @@ Recorder final validation disclosure: finished run44events validates individuall
 ## Complete app restart regression
 
 2026-10-07 actual new Codex/process creation verified14:20-14:21; ordinary shell still fails sharing violation32 on node_repl.exe, supported native list_windows fails trusted Node exited. Full restart is insufficient. No new product/trust/config changes; next action requires supported host runtime lifecycle repair, then native tool regression and actual Windows captures. Detailed evidence window-rows-20261007/restart-check.md. Worktree retained, main unchanged, taskactive/S2OPEN.
+
+## Human-authorized outside-sandbox Windows verification
+
+Human allows this Windows desktop UI outside sandbox. Existing installed app launched and official sky inventory identifies real window; screenshot/action APIs FAIL application approval elicitation unavailable in standalone host. No captured Windows proof, login, renewed trust or product change. Current blocker is supported host UI initialization/approval channel, not missing Human authorization. Details window-rows-20261007/outside-sandbox.md; taskactive/S2OPEN, worktree retained/main untouched.
