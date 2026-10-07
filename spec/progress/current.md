@@ -7,15 +7,17 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: active
-Execution Status: AWAITING_HUMAN_INSPECTION
+Execution Status: AWAITING_ANDROID_UI_APPROVAL
 
 ## Immediately Relevant Completed Work
+
+Human accepts this-round Windows Desktop styles. Fresh actual Android14/API34 UI tests PASS46+66, 25 original screenshot hashes/APK/source bound; register/login/Chat/Friends/send/back/no-nav-detail/Cold14/Warm22 verified. Android temporary trust fully rolled back; owned emulator and Go fixture cleaned. No product source change this round.
 
 Self-check found and fixed missing useRef export in existing React module shim; rebuilt/installed. Actual compiled frontend render regression PASS12 grouped checks (synthetic presentation fixture, not native acceptance). Four latest Human Desktop requirements implemented and packaged/installed: hidden scrollbars/native wheel scrolling, account Session Online separate from realtime connection, grey Minimize/Maximize hover, composer handle grows upward/shrinks downward with42..150px bounds. Frontend/auth controls and focused7direction/bounds controls PASS. Prior login/registration/logo/full-width rows and AndroidAPI34 PASS66 preserved. Human previously imported matchingCA via actual desktop Root and launched IM via Explorer, confirmed Chat; current four Human screenshots preserved as originals.
 
 ## Current Blockers
 
-Self-check render proof completed; actual native latest-build full matrix and Friends proof pending. Supported integrated native tool initialization remains unavailable; standalone API inventory works but capture/input lacks approval elicitation channel. No fake capture or security bypass. Prior tool-side root absence conflicts with actual desktop Root and successful manual login; mechanism unconfirmed, do not repeat import.
+Android captured UI set awaits Human visual approval. Windows this-round styles Human PASS; formal remaining native/full-matrix proof gaps remain. Supported integrated native tool initialization remains unavailable; standalone API inventory works but capture/input lacks approval elicitation channel. No fake capture or security bypass. Prior tool-side root absence conflicts with actual desktop Root and successful manual login; mechanism unconfirmed, do not repeat import.
 
 ## Verification
 
@@ -29,6 +31,10 @@ Desktop npm build, tests/clients/gui/auth.mjs, tests/clients/gui/composer.mjs PA
   - Result: PASS actual compiled frontend render12 grouped checks and rebuilt/installed artifact; native window commands not covered.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/desktop-render-20261007/verification.md`
 
+- Command: `python -Xutf8 -B tests/clients/gui/native.py gui-mobile --serial emulator-5590 --capture`; real `GuiAuthenticatedInstrumentation` phase `ui-revision`
+  - Result: PASS46 anonymous plus PASS66 authenticated, 25 raw emulator screenshots; full Android trust rollback PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-acceptance-20261007/verification.md`
+
 ## Changed Files or Migrations
 
 Desktop src/ui main.tsx, style.css, composer.ts; focused tests/clients/gui/composer.mjs and declared task/progress/evidence/checkpoint. Self-check adds one useRef named export and focused tests/clients/gui/desktop_render.mjs; no mobile/backend/contracts/storage/ACK/security changes or new dependencies. Writer owns these revisions; no unknown uncommitted changes overwritten.
@@ -39,7 +45,7 @@ Native tool sandbox sharing violation32/approval channel persists; manual actual
 
 ## Next Exact Action
 
-Resume real native UI proof when supported host capture/input available; actual render self-check PASS and hook export repaired. User may inspect rebuilt installed IM from normal desktop context; complete actual screenshot/Architect acceptance matrix. After inspection finish, stop only owned project im-gui-product-20261004-39112 via session58647 and remove exact temporaryCA5C2B8129A44043C0912E4CE413B4799570E92733 in actual desktop Root, verify normal TLS rejection. Then fresh unified independent Review, applicable exact-head hosted CI, protected integration/actual-main audit and safe verified synchronization; no done before sync.
+Human review fresh Android screenshots in android-acceptance-20261007/manifest.json. Windows styles already Human PASS for this round; apply any bounded Android feedback, then complete remaining exact GUI/Architect matrix and fresh unified independent Review/exact-head hosted CI/protected integration/verified main synchronization. Owned emulator/Go fixture stopped and Android trust restored. Windows actual desktop Root exactCA cleanup still requires supported same-context access (tool store invisible), do not infer rollback. No taskdone/S2PASS before full acceptance/sync.
 
 ## Last Known Good Commit
 
@@ -47,7 +53,7 @@ Accepted synchronized main last observed `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d5
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-desktop-render.md`
+`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-android-acceptance.md`
 
 ## Uncommitted Changes / Ownership
 

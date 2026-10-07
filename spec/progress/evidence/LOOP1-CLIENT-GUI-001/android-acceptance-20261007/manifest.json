@@ -1,0 +1,273 @@
+{
+  "task": "LOOP1-CLIENT-GUI-001",
+  "candidate_sha": "0663073f7dc239a9ae190224fd176a311f8ccece",
+  "branch": "task/LOOP1-CLIENT-GUI-001-ui-update",
+  "platform": "Android14 API34 x86_64 Android Studio AVD IMClientSend34",
+  "serial": "emulator-5590",
+  "pixel_size": [
+    320,
+    640
+  ],
+  "capture": "Actual Instrumentation.uiAutomation.takeScreenshot PNG, adb pull; byte-exact remote SHA256, no image editing",
+  "fixture": "task-owned real Go/Postgres/NATS project im-gui-product-20261004-39112; synthetic Avery/Morgan/Riley accounts",
+  "anonymous_checks": 46,
+  "authenticated_checks": 66,
+  "apk_sha256": "8e014ae641be542004aa4ab6e9e6161755d6c2d0c29787285eaec1844dbfe1df",
+  "test_apk_sha256": "0b6cd4719a2743eb2636ccf420f055b48aaae00f916f86c8ce2ee5c6451a47dc",
+  "sources": {
+    "clients/mobile/build.gradle.kts": "6a31d62bd097db83ac71cf4deb9a920443c3d7ccd1abf8087eff12740a2decf7",
+    "clients/mobile/app/build.gradle.kts": "af31715673b09b952790f05244a2cbb5187144e6e8d92e1a049c2a1b7941d077",
+    "clients/mobile/app/src/main/AndroidManifest.xml": "fdeed8b057bfdefbe2889d0e0f8f748db3b162af0b7fadd037d3481feb0ff82f",
+    "clients/mobile/app/src/androidTest/assets/golden.json": "711dfe2dbb513df45d2b75c5ee9184ae221602ce74c93a1092bcd4a8b834db8d",
+    "clients/mobile/app/src/androidTest/assets/v1.sql": "83e21518dca5c83d46594d980b565f4f6082a2f9ecafc3ee171db58a1056e0a9",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/send/SendInstrumentation.kt": "b8f501f9b97f2181da8e26c38d6e7a5c758d481b36a9eae08ff966c049c14937",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/storage/StorageInstrumentation.kt": "740082dac717a26a0dc2209252a0cceb56a1e789b79421cf013daedfd1284659",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/sync/SyncInstrumentation.kt": "1368acd6420dab333263010ddcf91d2bc1528bdb7d1b341579fa839a25afe2fb",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiAuthenticatedInstrumentation.kt": "f17b0bbd3a0c1080df8e47e72dee7b22c4cff665919d804dd6a92ef29306d142",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiInstrumentation.kt": "c6bf2f94b866b5da3d673e850809e3eafb71f402feb5dc6c0e784e253729de41",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiTrustRollbackInstrumentation.kt": "93ed19f5eee3989107282ad20cd7b0b767bcd076bb94cc2447ee22b57f81a303",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/MainActivity.kt": "5caa0062bc3a749015bd3cce4aa8c37c0996248dba59999ba85a50d8fd53800c",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/send/SendViewModel.kt": "d345181d1862f0b670e8ec8f8ec6121e60982b2827fecfce05ca3e5d02c8f089",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/send/Wire.kt": "6c97efb635df0dfcea56f8150dc13c37e29735678a02f60ba5c1c7a080565518",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/send/Wss.kt": "f30cc16abfb35aec50db52b48fc856bf3bd124c58e8d20ea0ac778261c5d3c21",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/storage/Models.kt": "42fecb529611f684de99404922938e70148f77b9f19a253f3d7f84457cf93b3e",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt": "bbbf179336e1bd358212ebe6dce7a59e226c14b6318b3702d56b2c658d686a6f",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/storage/Schema.kt": "4c9453e8ad6c47d46edfa6f61538dc5911d9461c9391509353b8701c29211d05",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/sync/Https.kt": "333a234e450bb0daed6c6162bd35f874e4785427e89c322fa066976907555db2",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/sync/SyncViewModel.kt": "f682133b71e067e66714258588b316c0f6305edc4be5f76d023cee757cc23f3e",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/sync/Wire.kt": "2f9eb481482c184fe80e68a2aa58db126c74df62da3f52bb099ccba68572d05b",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/ui/Auth.kt": "28a1bfe5cb6a38c9fe903f4ecec467b6dce7e80bfa36ed4598a8e39c7bb6e886",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/ui/Preferences.kt": "bba627c4bd76c2521ef5140ec7c4dcd317ab635c66df688bd90e124081c37c62",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/ui/Workspace.kt": "065c41606477662c66262b90fd5f0ed5731ab5d1024b804c6d6c8574d0aca48d",
+    "clients/mobile/app/src/main/kotlin/im/platform/client/ui/WorkspaceViewModel.kt": "f4c0eb574eb5130df8d30c340a4af84d143d777666d4334d4603b21c840a1051",
+    "clients/mobile/app/src/main/res/drawable/project_logo.png": "92f649d217cf503ff0665ce0715e2257402aa881b0f1776eeaa58f8d0cbf07d5"
+  },
+  "screenshots": [
+    {
+      "file": "anonymous/cold-login-14.png",
+      "sha256": "1ca70b2dc701de25bd4b808fe2d6f7c9b9a02c5416b9d410d1aa03dc25e3a909",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/cold-login-16.png",
+      "sha256": "f5e044c3becbeda9e1f626141c52ecc450f6c663ac0265ebbcda898ae6e3f104",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/cold-login-22.png",
+      "sha256": "45ce98f52bbf1e6f0f498803c117cf2072b3b6a20d534102e1969fb702ef69d6",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/cold-register-14.png",
+      "sha256": "2d2fe9c40a063ec6ed4514550b85f2021b55e6700e6abb1da4122e0661cc996d",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/cold-register-16.png",
+      "sha256": "aea3866b18e81f87c38244fcd9ebc0debc4905c476e0a31a2cdf3ccb73d3d2c2",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/cold-register-22.png",
+      "sha256": "27c5ddfbbe8770f60d7917dc20375564965acdfd08d4db52f0fbbe37270f8465",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/warm-login-14.png",
+      "sha256": "3d5192ea3bd0cce9ba2add159e0be78e874a46a189ae002dd44a76de1b6b59b1",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/warm-login-16.png",
+      "sha256": "bbe91350aef82038173f911a94fea781515f64ade63d9e9707db27aa0e9c4a24",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/warm-login-22.png",
+      "sha256": "5806d707c9fe1e35a107de0ca6c8b95cb286476510c8a4f01a2e9e5655c7312e",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/warm-register-14.png",
+      "sha256": "5c0de5390b10705a88601bf28c90aeb2634d62446455c8078513a31e94604886",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/warm-register-16.png",
+      "sha256": "7371568c7910146281169c443c07d7b8549961501280c973ca4b2f4f721fb903",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "anonymous/warm-register-22.png",
+      "sha256": "80fcc6661f9734856242955c2eae8d79c0a736ab524819095d89c57f95ccf642",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791359906735"
+    },
+    {
+      "file": "authenticated/anonymous-login.png",
+      "sha256": "c5a7fcef60305630face8cd2be1376766182cb5f2ca5e53dc915d5ed4a6c1c34",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/back-to-chat-list.png",
+      "sha256": "ec218e2ae200614d953cc0977b1a5472cd1aaf4906bef87df3dd5f6af6ce6a13",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/cold-chat-list.png",
+      "sha256": "67861b5957e9398e02df6631773c83829a5400af947324eaf868f8aa53288b12",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/cold-conversation.png",
+      "sha256": "e88c2d59aa6711911cc07342f5e7749bf2c0c61f48bcb869ac1b9af7903913a7",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/cold-friends.png",
+      "sha256": "1ac1e10eec1a85e7675d023038853a3ec51216c2435e5d216fd05340de3db5a5",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/logout-22.png",
+      "sha256": "bc7ddca062883589a40f98ab358c20e4e28b6f96e027498d901361dc3ec393ea",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/registration-success.png",
+      "sha256": "e4a1eda71efbda37f09fe413156bfb8e6c0038d76ddc7e9ce951ab47a3bf023b",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/registration.png",
+      "sha256": "f378c68aa7f24f7ef16b8128593ef699718b8cc8605a1c1bee6181724838a2e3",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/sent.png",
+      "sha256": "0f66de340b85b95a46ed5bcc0570bedfac053fbd7f16cd5cd17c9b213b3320f7",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/warm-chat-list-22.png",
+      "sha256": "1044c98a7a49cb9c908b8bb592309059c19ecfa84bd2d00384d46dc9eea65b6e",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/warm-conversation-22.png",
+      "sha256": "8c5c9350b4de400a80b8a63976bbcb2cd71113a150d10738f07223ea46e519fc",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/warm-friends.png",
+      "sha256": "8ac3002322d4d1e7dcfaeb521f882890df9e6a47962ffae92d981d382330321e",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    },
+    {
+      "file": "authenticated/warm-settings-22.png",
+      "sha256": "5a3dc30adee168f30218d613245a2e62f27539218b69ea1cf24829cf66c53467",
+      "size": [
+        320,
+        640
+      ],
+      "captureRun": "1791360047143"
+    }
+  ],
+  "scope": "Latest requested UI verification; not independent Reviewer/CI or entire GUI acceptance"
+}
