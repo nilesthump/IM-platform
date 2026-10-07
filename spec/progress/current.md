@@ -58,3 +58,8 @@ Branch task/LOOP1-CLIENT-GUI-001-ui-update; parent/root retakes sole writer afte
 ## Architecture Conflicts / ACP / ADR
 
 No new architecture conflict/choice; frozen authorization and ADR0009 bounded local-batch timing remain. Native prerequisite/GUI effectiveness/Taskdone/StagePASS/integration/main sync not established. Exact review/report records limits and next action.
+
+
+## 2026-10-07 User-requested archive handoff
+
+Human requests archive and release to a new agent. Task remains review/BLOCKED_EXTERNAL_ACCESS, S2 OPEN; no push, protected integration or main synchronization claimed. Portable Chinese handoff and hash-verified final APK copies saved at C:/Users/21441/AppData/Local/Temp/IM-platform-GUI-handoff-20261007-archive-final/handoff.zh-CN.md. Next exact action: allocate/restore an authorized managed worktree from the app archive result, then resume existing Windows native/same-user CA rollback/full Architect/exact-head CI/integration/main-sync requirements. Writer releases after archive; no repository writes after removal. Unknown main changes and original six screenshot moves preserved. Prior clean recovery HEAD00182f28f5eb9c75ec060bd0797563798dd26bbc; accepted mainffd6b63ac9396e577f0bb5c3d3ac02ee4915d597 unchanged. Archive snapshot and deletion verification are recorded in the external handoff after app completion.
