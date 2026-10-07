@@ -1,0 +1,270 @@
+[
+  {
+    "timestamp": "2026-10-07T15:01:00.297905Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-Command",
+      "Get-Content -Raw spec/architecture/decisions/ADR-0005-client-technology-clarification.md; Get-Content -Raw spec/architecture/decisions/ADR-0006-client-ui-architecture.md; Get-Content -Raw spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md; Get-Content -Raw spec/architecture/decisions/ADR-0008-sync-https-transport.md; Get-Content spec/architecture/frozen-architecture.md | Select-Object -Skip 198 -First 112; Get-Content spec/architecture/frozen-architecture.md | Select-Object -Skip 437 -First 195; Get-Content spec/architecture/frozen-architecture.md | Select-Object -Skip 764 -First 109"
+    ],
+    "command_id": "C-e7f048c9-852c-4bf1-acfb-995be82e7d63",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 781.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-e7f048c9-852c-4bf1-acfb-995be82e7d63.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-e7f048c9-852c-4bf1-acfb-995be82e7d63.stdout.txt",
+    "stdout_sha256": "3a2bbfbaf6469a86dfa9baad459b140b1a4f30d6a3c85520ae0bce4864fec0a7"
+  },
+  {
+    "timestamp": "2026-10-07T15:02:31.451147Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-Command",
+      "Get-Content spec/architecture/frozen-architecture.md | Select-Object -Skip 237 -First 48; Get-Content spec/architecture/frozen-architecture.md | Select-Object -Skip 438 -First 133; Get-Content research/INSTRUMENTATION_EPOCH.json"
+    ],
+    "command_id": "C-34c45da8-5160-4bba-bb40-a4fb4b43258f",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 766.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-34c45da8-5160-4bba-bb40-a4fb4b43258f.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-34c45da8-5160-4bba-bb40-a4fb4b43258f.stdout.txt",
+    "stdout_sha256": "f1752ce235b47f837ea988cd0879b6f41cbec6002a06356047a0f4e77c402839"
+  },
+  {
+    "timestamp": "2026-10-07T15:05:31.043157Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-Command",
+      "git rev-parse --show-toplevel; git rev-parse HEAD; git branch --show-current; git status --porcelain=v1; git diff; git log -5 --oneline; git diff --stat ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597..HEAD; git diff --name-only ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597..HEAD; Get-Content -Raw spec/progress/current.md; Get-Content -Raw spec/tasks/review/LOOP1-CLIENT-NATIVE-ARCH-001.md"
+    ],
+    "command_id": "C-99964ac4-a884-411c-b509-1e3a3cf8a1d7",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1266.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-99964ac4-a884-411c-b509-1e3a3cf8a1d7.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-99964ac4-a884-411c-b509-1e3a3cf8a1d7.stdout.txt",
+    "stdout_sha256": "be00ac56778c15ad2da78b91689885f124f1fb8ed2008ef9029f1a046dae2f9e"
+  },
+  {
+    "timestamp": "2026-10-07T15:05:47.930052Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "command_id": "C-bc182d64-8e06-4ef9-a0d5-3500aa278e4f",
+    "cwd": ".",
+    "secret_redaction_applied": true,
+    "duration_ms": 1578.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-bc182d64-8e06-4ef9-a0d5-3500aa278e4f.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-bc182d64-8e06-4ef9-a0d5-3500aa278e4f.stdout.txt",
+    "stdout_sha256": "4671093541e151efd306ef7d0c2badc8004f46c62570fe6f25018038f75adb4b"
+  },
+  {
+    "timestamp": "2026-10-07T15:05:49.495270Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "tools/verify_frozen_architecture.py"
+    ],
+    "command_id": "C-726f691d-44a8-4dc5-921f-04c864176ead",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 297.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-726f691d-44a8-4dc5-921f-04c864176ead.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-726f691d-44a8-4dc5-921f-04c864176ead.stdout.txt",
+    "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+  },
+  {
+    "timestamp": "2026-10-07T15:06:01.176162Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture",
+      "-p",
+      "test_*.py"
+    ],
+    "command_id": "C-c4c2b9bd-fe2b-4f35-b4de-67b02f22c5cf",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 10422.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-c4c2b9bd-fe2b-4f35-b4de-67b02f22c5cf.stderr.txt",
+    "stderr_sha256": "a9fd1b11169bb3331a2eabbf7d2a3e67bbbc76c5ce0762667194c47d9c9c823f",
+    "stdout_blob": "blobs/C-c4c2b9bd-fe2b-4f35-b4de-67b02f22c5cf.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "timestamp": "2026-10-07T15:06:26.509831Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance",
+      "-EvidenceDir",
+      "C:/Users/21441/AppData/Local/Temp/native-freeze-review-20261007/acceptance"
+    ],
+    "command_id": "C-b6166770-5a33-4c7e-94c9-f86fd075c4ab",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 2578.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-b6166770-5a33-4c7e-94c9-f86fd075c4ab.stderr.txt",
+    "stderr_sha256": "808c6b358b9a207d29db84cb330991fbce2444331c0ec4a92ce2451bc0620dcd",
+    "stdout_blob": "blobs/C-b6166770-5a33-4c7e-94c9-f86fd075c4ab.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "timestamp": "2026-10-07T15:06:27.797105Z",
+    "argv": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--check",
+      "ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597..HEAD"
+    ],
+    "command_id": "C-4af7a676-65b6-4a27-a4cf-7f5d864c3c22",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 63.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-4af7a676-65b6-4a27-a4cf-7f5d864c3c22.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-4af7a676-65b6-4a27-a4cf-7f5d864c3c22.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "timestamp": "2026-10-07T15:06:29.282459Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-Command",
+      "git diff ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597..HEAD -- spec/architecture/frozen-architecture.md spec/architecture/baseline.md spec/architecture/decisions/ADR-0009-client-native-capabilities.md; Get-Content -Raw spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/completion-20261007/original-provenance.json; Get-Content -Raw spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/completion-20261007/human-order.md; Get-Content -Raw spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/unified-batch.md"
+    ],
+    "command_id": "C-3fbc005b-b821-4ce8-a892-d34c4fcab734",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 922.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-3fbc005b-b821-4ce8-a892-d34c4fcab734.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-3fbc005b-b821-4ce8-a892-d34c4fcab734.stdout.txt",
+    "stdout_sha256": "9fe12a52095f1d92bb954f3bbd40a4e4ec381b278eb151224f0693b8766a4aef"
+  },
+  {
+    "timestamp": "2026-10-07T15:07:10.305673Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Acceptance"
+    ],
+    "command_id": "C-79ab5c3f-2c65-491d-bcfd-77345ede5b35",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 11718.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-79ab5c3f-2c65-491d-bcfd-77345ede5b35.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-79ab5c3f-2c65-491d-bcfd-77345ede5b35.stdout.txt",
+    "stdout_sha256": "d50a7267896d44fffbc49e613567dda729c532f6cb8c404d0daeecaa2c2b52fe"
+  },
+  {
+    "timestamp": "2026-10-07T15:08:58.005700Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "C:/Users/21441/AppData/Local/Temp/native-freeze-review-20261007/verify-bindings.py"
+    ],
+    "command_id": "C-43bac291-06d6-4ee1-86ac-91fd6d6547ea",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 688.0,
+    "exit_code": 1,
+    "result": "FAIL",
+    "stderr_blob": "blobs/C-43bac291-06d6-4ee1-86ac-91fd6d6547ea.stderr.txt",
+    "stderr_sha256": "4a6351ff60439eae411e7f29c627d2796c508e01cde2eb1917a9e40487771b0f",
+    "stdout_blob": "blobs/C-43bac291-06d6-4ee1-86ac-91fd6d6547ea.stdout.txt",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "timestamp": "2026-10-07T15:09:00.330581Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "ci/classify.py",
+      "--base",
+      "ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597",
+      "--head",
+      "7dc3e8a3939ec618b4f1618c705b26ff18990a5f"
+    ],
+    "command_id": "C-88c422cf-f295-4650-b8b3-38b01cd85d75",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1016.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-88c422cf-f295-4650-b8b3-38b01cd85d75.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-88c422cf-f295-4650-b8b3-38b01cd85d75.stdout.txt",
+    "stdout_sha256": "4f1257cc5f936fed64f915fad89bd746d3f1f6599f32305d906f70122a3567e3"
+  },
+  {
+    "timestamp": "2026-10-07T15:09:21.503050Z",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-Xutf8",
+      "-B",
+      "C:/Users/21441/AppData/Local/Temp/native-freeze-review-20261007/verify-bindings.py"
+    ],
+    "command_id": "C-361f2c4e-8747-4035-9aad-89e0c1114afa",
+    "cwd": ".",
+    "secret_redaction_applied": false,
+    "duration_ms": 1969.0,
+    "exit_code": 0,
+    "result": "PASS",
+    "stderr_blob": "blobs/C-361f2c4e-8747-4035-9aad-89e0c1114afa.stderr.txt",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_blob": "blobs/C-361f2c4e-8747-4035-9aad-89e0c1114afa.stdout.txt",
+    "stdout_sha256": "29f61074e526a837e5766b5ca64eefc0f26294af117445763ea4f1dbb561218b"
+  }
+]

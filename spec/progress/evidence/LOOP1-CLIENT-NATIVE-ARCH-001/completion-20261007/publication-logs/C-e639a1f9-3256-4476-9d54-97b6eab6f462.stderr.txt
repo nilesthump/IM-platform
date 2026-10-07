@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "H:\.codex\gui-handoffs\20261007-native-completion\upload-exact-objects.py", line 34, in <module>
+    r=api('/git/blobs',{'content':base64.b64encode(git('cat-file','blob',sha)).decode(),'encoding':'base64'})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\gui-handoffs\20261007-native-completion\upload-exact-objects.py", line 11, in api
+    if p.returncode: raise RuntimeError(p.stderr.decode(errors='replace'))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: unexpected end of JSON input
+
