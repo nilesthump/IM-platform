@@ -68,3 +68,8 @@ Human requests archive and release to a new agent. Task remains review/BLOCKED_E
 ## Short-name recovery (2026-10-07)
 
 Long-name app creation failed Filename too long; short name g succeeded from21a4b82 snapshot and assigned Git root exactly matches. AGENTS.md now requires this routine short-name retry. Architecture/frozen baseline PASS. Supported Windows tool standard reset then sky Initialize failed kernel56148 exit1/setup refresh had errors; original Windows native/same-accountCA/fullArchitect/CI/integration/main-sync blockers remain. No product changes or Task/Gate acceptance. New evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/short-resume-20261007/recovery.md`. Next exact action remains supported Windows host repair and existing full acceptance chain.
+
+
+## Scoped recovery review continuation
+
+Fresh independent /root/short_recovery_review PASS on clean exact2aff3f4660a39d59454edb7e56c114b018c4406c, base21a4b82; four recovery/workflow files only, no findings. Independent architecture/frozen/clean recoveryAcceptance and CR-aware diff checks PASS; full GUI acceptance still BLOCKED_EXTERNAL_ACCESS. Original CRLF convention retained after unnecessary normalization was reverted; original command history retained. Report: spec/progress/evidence/LOOP1-CLIENT-GUI-001/short-resume-20261007/independent-review.md; parent completed-command index in same folder. This later report-preservation metadata is not selfaccepted or part of that exact reviewed SHA. Actual main observedffd6b63ac9396e577f0bb5c3d3ac02ee4915d597; synchronization PENDING. Keep review/S2OPEN; next exact action supported Windows host recovery and existing full acceptance chain. /root sole writer owns only new recovery metadata; product/unknown main/history untouched.
