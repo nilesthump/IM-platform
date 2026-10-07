@@ -1,0 +1,7 @@
+from pathlib import Path
+import ssl,urllib.request,json,secrets,datetime
+P=Path('H:/.codex/gui-handoffs/20261007-android-evidence-fix');pub=json.loads((P/'public.json').read_text());root=Path(pub['privateRuntime']);assert root.name=='go-24884';name='gui_riley_'+secrets.token_hex(3)
+c=ssl.create_default_context(cafile='H:/.codex/gui-handoffs/20261004-4f866046/gui-runtime/tls-ui-20261007/ca.pem')
+q=urllib.request.Request(pub['endpoint']+'/v1/auth/register',data=json.dumps({'username':name,'password':'fixture-password-not-a-real-secret','displayName':'GUI Fixture Riley'}).encode(),headers={'Content-Type':'application/json'},method='POST')
+with urllib.request.urlopen(q,context=c,timeout=15) as r:u=json.loads(r.read())['user']
+pub['accounts'].append(u);(P/'public-next.json').write_text(json.dumps(pub,indent=2));print('Registered additional owned actual empty account '+u['username'])

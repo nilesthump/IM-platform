@@ -1,0 +1,9 @@
+s_glBindAttribLocation: bind attrib 0 name position
+s_glBindAttribLocation: bind attrib 1 name color
+s_glBindAttribLocation: bind attrib 2 name localCoord
+/sdcard/Android/data/im.platform.client/files/gui-auth/1791375784250/: 5 files pulled, 0 skipped. 2.7 MB/s (50939 bytes in 0.018s)
+Traceback (most recent call last):
+  File "H:\.codex\gui-handoffs\20261007-android-evidence-fix\phase.py", line 39, in <module>
+    (out/'run.json').write_text(json.dumps({'phase':'evidence-complete','elapsedSeconds':time.monotonic()-start,'captureRun':m[1] if m else None,'sourceHEAD':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'sourceDirtyAtCapture':bool(subprocess.check_output(['git','status','--porcelain'],text=True).strip()),'apkHashes':json.loads((P/'apk-hashes.json').read_text()),'sourceHashes':{str(p).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest() for p in src},'publicFixture':pub,'runtime':'actual API34 x86_64 IMClientSend34 emulator5590'},indent=2));print(text);print('Evidence attempt '+str(out));assert 'INSTRUMENTATION_RESULT: result=PASS' in text and 'INSTRUMENTATION_CODE: -1' in text
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

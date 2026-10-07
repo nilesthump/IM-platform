@@ -1,0 +1,14 @@
+error: no such object: im-gui-product-20261004-48388-postgres-1
+Traceback (most recent call last):
+  File "H:\.codex\gui-handoffs\20261007-android-evidence-fix\phase.py", line 8, in <module>
+    labels=json.loads(dc('inspect',container))[0]['Config']['Labels'];assert labels['com.docker.compose.project']==project and labels['com.docker.compose.service']==service
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\gui-handoffs\20261007-android-evidence-fix\phase.py", line 6, in dc
+    def dc(*a):return subprocess.check_output([D,*a],text=True,timeout=60)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:/Program Files/Docker/Docker/resources/bin/docker.exe', 'inspect', 'im-gui-product-20261004-48388-postgres-1']' returned non-zero exit status 1.
