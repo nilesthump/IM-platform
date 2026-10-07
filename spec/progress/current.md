@@ -7,55 +7,45 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: REPAIRED_CANDIDATE_INDEPENDENT_REVIEW_PENDING
+Execution Status: BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
-Fresh Fixa7ab9c479e6cacc6cfe02071880ada96f149ffec repairs CI env indentation and existing actual Android navigation/scroll helpers only; product UI unchanged7108267. Full YAML parser/9 actualAPI34 phases PASS170/70/72/15/62/27/7/19/16, real4 Message/Outbox identities, full temporary Android trust rollback/ownedGo37212+emulator cleanup. Original17 attempts/74 PNGs and all failed records source-bound in review-fix-20261007/. New independent Review next.
+Final Mobile arrow-only back button uses current label font times1.5, no visible Chat, same back action. Mobile global logo/IM+ and theme header removed; only narrow Settings theme entry. Product710826740c287333389937c1eeefaf472e68a43d, actualAPI34 PASS107/16 raw captures, fresh scoped Architect header PASS. Human final instruction explicitly requires proceeding without another Human visual confirmation. Desktop previous Human style PASS retained.
 
-Final arrow-only back button enlarged1.5 from current label font; source710826740c287333389937c1eeefaf472e68a43d. ActualAPI34 PASS107/16 raw screenshots, cold14/warm22 navigation/send/theme/logout verified; full Android trust rollback/owned runtime cleanup. Human says no further visual confirmation; proceeding to independent Review. Evidence mobile-back-20261007/verification.md.
+Fresh Fixa7ab9c479e6cacc6cfe02071880ada96f149ffec repairs CI env indentation and existing Android test navigation/scroll helpers only; all Mobile/Desktop product byte-unchanged7108267. Nine affected actualAPI34 phases PASS170/70/72/15/62/27/7/19/16; actual PG4 identities each oneMessage/Outbox;74 originalPNG/17attempts with all failures preserved. Android complete trust rollback/ownedGo37212/emulator/container/volume cleanup PASS.
 
-Human Mobile request implemented: all-page logo/IM+ header and global theme row removed, only compact Settings theme entry retained; title/connection/back/nav remain, app icon still exact project logo. Actual API34 PASS46 anonymous plus PASS105 authenticated;28 original screenshots/APK/source hashes, reversible theme/font/density retention. Android full temporary trust rollback and owned emulator/Go50508 cleanup PASS. No Desktop change; previous Human Windows style PASS retained. Desktop missing React useRef export repaired in3f90349; actual compiled render PASS12 and native exact installed package bound in desktop-render evidence. Prior full Android/desktop records retained.
+New fresh independent /root/gui_repaired_review reviewed clean cf476663e482ddc72d116b89b064a8d6d105b703: scoped source/repair PASS, no ordinary findings; full acceptance BLOCKED_EXTERNAL_ACCESS. All144artifact hashes/74PNGs/9phase source bindings, real YAML parse,53architecture/source/frozen and clean recovery Acceptance PASS. Bounded12-image Android state Architect PASS; prior16-header approval reused because production unchanged. Neither establishes full GUI/Stage acceptance.
 
 ## Current Blockers
 
-Historical fresh candidate37f613e Review FAIL repaired in fresh Fixa7ab9c4; new independent Review required. Final16-image Mobile header Architect slice PASS retained, product unchanged; full Windows native matrix and actual-context CA cleanup unresolved.
-
-Human final Mobile instruction is implemented and explicitly requires continuing without another Human visual confirmation. Full remaining native/Architect matrix, fresh independent Review/exact-head CI/protected integration/main synchronization pending. Windows UI host setup/approval-channel tool failure persists; actual desktop Root CA remains invisible to tools, cleanup must verify in same actual desktop context, no inference from tool-side absence.
+Supported Windows native host fails after standard reset: skyimport kernel50780 exits1, windows sandbox orchestrator_helper_exit_nonzero/setuphelperSome1; prior sharing32/standalone approval-channel failure persists. Actual Windows full Chat/Friends/offline/themes/notification/tray matrix and same-actual-desktop-user Root CA5C2B8129A44043C0912E4CE413B4799570E92733 rollback proof unavailable. Tool-store invisibility is not rollback. Full applicable Architect coverage/exact-head hosted CI/protected integration/main verification/synchronization remain pending. No further Human visual confirmation needed for final request.
 
 ## Verification
 
 - Command: `GuiAuthenticatedInstrumentation` matrix/appearance/retry/refresh/retry-existing/isolation/expiry/sending/offline-logout; `GuiTrustRollbackInstrumentation`
-  - Result: nine actual phases PASS; real PG4 identities/Outbox; Android134CA baseline/nonroot/Enforcing/defaultTLS rejection and exact owned cleanup PASS.
+  - Result: nine actual phases PASS; real PG4 identities; Android134CA exact baseline/nonroot/Enforcing/freshSDK rejection and owned cleanup PASS.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/review-fix-20261007/fix-report.md`
 
-- Command: `GuiAuthenticatedInstrumentation phase ui-revision`; `GuiTrustRollbackInstrumentation`
-  - Result: PASS107; rollback134CA baseline/nonroot/Enforcing/defaultSDK rejection.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mobile-back-20261007/verification.md`
-
-- Command: `python -Xutf8 -B tests/clients/gui/native.py gui-mobile --serial emulator-5590 --capture`; actual `GuiAuthenticatedInstrumentation` phase `ui-revision`
-  - Result: PASS46+105, actual UI/real fixture/defaultTLS/wronghostname;28 byte-exact images; complete Android trust rollback and owned runtime cleanup PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mobile-header-20261007/verification.md`
-
 - Command: `IM_GUI_ASSIGNED_ROOT=<assigned root> python -Xutf8 -B tests/clients/gui/check_sources.py --development`
-  - Result: baseline and final source/frozen/architecture/recovery PASS, bound in latest evidence. Local development checks, not CI acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mobile-header-20261007/verification.md`
+  - Result: scoped source/repair PASS; full acceptance BLOCKED_EXTERNAL_ACCESS. Initial ignored-output/encoding/fixture failures preserved, not promoted.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/final-review-20261007/review-cf47666-blocked.md`
 
 ## Changed Files or Migrations
 
-This refinement owns Mobile UI Workspace.kt, existing GuiInstrumentation.kt/GuiAuthenticatedInstrumentation.kt plus allowed task/progress/checkpoint/evidence. Single direct Settings theme toggle, no new dependencies, Desktop/business/schema/protocol/security changes. Previous work/source ownership remains in earlier evidence.
+Final UI Workspace.kt plus existing instrumentation; fresh repair only CI workflow and same test class. Allowed task/progress/checkpoint/evidence updates owned by root. No new product dependencies/contract/security/backend/schema/business change; no product change after7108267. Full earlier task ownership and original evidence remain durable.
 
 ## Known Failures, Risks, and Assumptions
 
-Native Windows host tool sharing/approval-channel failure and exact desktop-context trust cleanup access remain. Prior Recorder cross-link/child-start gaps immutable in historical runs; latest run uses prospective_resume with initial read/harness prep and interactive Go session observations explicitly exposed. Android temporary trust fully removed and default SDK rejection verified. Task review/S2OPEN, no independent acceptance/main sync.
+Windows native/actual-contextCA external access unresolved. Historical Recorder gaps and both rejected semantic submissions immutable/disclosed; final review/fix/coordinator runs expose incomplete traces. Structural Recorder validation is not complete trace, TaskPASS or GatePASS. Original six screenshot moves and unrelated unknown main work preserved. All owned Android/test services stopped; do not assume earlier39112/50508/38684/37212 remains live.
 
 ## Next Exact Action
 
-New fresh independent Review of repaira7ab9c4/full candidate and review-fix-20261007 evidence; assess required full GUI matrix without treating Human no-confirmation instruction as independent acceptance. Complete remaining full GUI/Architect matrix, Windows exact desktop Root CA cleanup, fresh unified independent Review, applicable exact-head hosted CI/protected integration/actual-main verified synchronization. No done/S2PASS before required acceptance/main sync. Current emulator and owned Go37212 stopped; do not assume older runtime39112 still active.
+Restore supported actual Windows native inspection and same-context exactCA cleanup access; capture full required native matrix with approved bounded fixture/trust workflow; finish applicable Architect coverage. Reassess final exact unified candidate with fresh independent Review where affected, required exact-head hosted jobs, protected integration/actualmain verification and safe synchronization H:/IM-platform. Remain review/S2OPEN until complete; no push/fullacceptance/sync claimed from scoped decisions.
 
 ## Last Known Good Commit
 
-Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; current unaccepted Mobile product `1f8e6953da40c7ee58b40360b003d07230dda08a`, same-source APK/current captures bound in mobile-header manifest. Desktop repaired candidate3f90349 retained/Windows Human style PASS; original recovery snapshotfac0c8fc205d44a2889f56ae12f1e67c83edb3da retained. Main unchanged by agent.
+Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; local final UI `710826740c287333389937c1eeefaf472e68a43d`; repair `a7ab9c479e6cacc6cfe02071880ada96f149ffec`; independently reviewed clean candidate `cf476663e482ddc72d116b89b064a8d6d105b703`. Main untouched, synchronization pending. Recovery snapshotfac0c8fc205d44a2889f56ae12f1e67c83edb3da retained.
 
 ## Latest Checkpoint
 
@@ -63,8 +53,8 @@ Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; current u
 
 ## Uncommitted Changes / Ownership
 
-Branch task/LOOP1-CLIENT-GUI-001-ui-update; sole writer/root owns current declared refinement/docs; commit only owned paths before handoff. Original six screenshot moves unknown-origin preserved byte-exact in archived recovery; unknown main work untouched. Managed worktree H:/.codex/worktrees/gui-ui-update/IM-platform retained/attached.
+Branch task/LOOP1-CLIENT-GUI-001-ui-update; parent/root retakes sole writer after fresh Fix release. Only final recovery/report metadata now task-owned; commit before ending. Managed worktree H:/.codex/worktrees/gui-ui-update/IM-platform retained/attached. Unknown main work untouched, six snapshot screenshot moves byte-exact preserved.
 
 ## Architecture Conflicts / ACP / ADR
 
-No new technology/contract/security decision. Both themes keep same layout/meaning and application logo; user requested only all-page brand-row removal/Settings-only theme presentation. ADR0009 unified local candidate authorization remains bounded; independent acceptance pending.
+No new architecture conflict/choice; frozen authorization and ADR0009 bounded local-batch timing remain. Native prerequisite/GUI effectiveness/Taskdone/StagePASS/integration/main sync not established. Exact review/report records limits and next action.
