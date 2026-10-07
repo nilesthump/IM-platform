@@ -7,13 +7,13 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: FRESH_REVIEW_PENDING_WITH_OCCUPIED_WINDOWS_VALIDATION_DEFERRED_TO_S2_GATE
+Execution Status: SOURCE_AND_ANDROID_REVIEWED_WITH_OCCUPIED_WINDOWS_VALIDATION_DEFERRED_TO_S2_GATE
 
 ## Immediately Relevant Completed Work
 
 Final Mobile arrow-only back/header/layout source710826740c287333389937c1eeefaf472e68a43d and earlier nine realAPI34 phases remain historical evidence. Independent completion reviewer inspected32new images/224artifacts and sealed P2FAIL for anonymous wrong-password expired message; other31presentations had no defect.
 
-Fresh Fix2aa61c77e27cfe79b422e7b55903239f30ece7f4 maps canonical AUTH_INVALID_CREDENTIALS to safe invalid username/password on Desktop/Mobile, preserving other401 expiry cleanup. Desktop compile/auth controls PASS; actualAndroid PASS73/5newraw images at capture source3a5001228d6d3eb3f3b5dcbda468f270202554fb, true Refresh cleanup bothsecure slots absent. Default SDK HTTPS/hostname negatives, complete original134CA two-namespace/same-liveTLSreject/uid2000/Enforcing and all own28780/emulator cleanup PASS. All source/APK hashes, old failures and method correction preserved. These are local Fix results pending new independent Review/Architect approval.
+Fresh Fix2aa61c77e27cfe79b422e7b55903239f30ece7f4 maps canonical AUTH_INVALID_CREDENTIALS to safe invalid username/password on Desktop/Mobile, preserving other401 expiry cleanup. Desktop compile/auth controls PASS; actualAndroid PASS73/5newraw images at capture source3a5001228d6d3eb3f3b5dcbda468f270202554fb, true Refresh cleanup current session pointer and former owned credential slot absent. Default SDK HTTPS/hostname negatives, complete original134CA two-namespace/same-liveTLSreject/uid2000/Enforcing and all own28780/emulator cleanup PASS. All source/APK hashes, old failures and method correction preserved. Fresh independent /root/auth_final_review reviewed clean1700cf0a3d3cc89d521c52fac2720a706827195f: source/standards/spec/minimality PASS, Android Architect APPROVED5new +98precise unaffected references. Original report/coverage/bindings/provenance/commands/Recorder sealed and preserved; fullTask remains pending.
 
 ## Current Blockers
 
@@ -27,8 +27,15 @@ Environment: assigned root H:/.codex/worktrees/g/IM-platform; IM_GUI_ASSIGNED_RO
   - Result: Fix local architectureall/frozen/53tests/Development PASS through existing owned-output isolate/restore; earlier ignored-output failures retained.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/auth-error-fix-20261007/fix-report.md`
 - Command: `GuiAuthenticatedInstrumentation` auth-error-fix focused phase; `GuiTrustRollbackInstrumentation`
-  - Result: actualPASS73/five new PASS originals, real expiry dual-slot cleanup; full134CA/defaultSDK rejection and ownresource cleanup PASS; independent binding review pending.
+  - Result: actualPASS73/five new PASS originals, real expiry current pointer/former credential cleanup; full134CA/defaultSDK rejection and ownresource cleanup PASS; independent binding review PASS; fullTask Windows/hosted/integration proof pending.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/auth-error-fix-20261007/manifest.json`
+
+- Command: `node tests/clients/gui/auth.mjs`
+  - Result: fresh independent locked TypeScript compile and invalid-credential/refresh-revoked/rotation/generation/isolation controls PASS; native mocks are host controls only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-review-resume-20261007/final-review/report.md`
+- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
+  - Result: new independent clean1700cf0 architecture/frozen/53tests/recovery PASS18.547s through unchanged checked owned-output isolation/restore.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-review-resume-20261007/final-review/acceptance-result.json`
 
 ## Changed Files or Migrations
 
@@ -36,19 +43,19 @@ Only existing Desktop/Mobile Auth invalid-credentials branches and existing test
 
 ## Known Failures, Risks, and Assumptions
 
-Original independent P2FAIL and FAIL66 WSS cleanup race/absent-runner failures preserved; old incorrect auth-error is excluded. Precise31+67layout reuse still awaits fresh Auth-only source-impact review; no all-product-byte-unchanged claim after Auth Fix. Original capture clean3a5001228d6d3eb3f3b5dcbda468f270202554fb is not later evidenceHEAD. Recorder/directread/view/summaryprompt gaps disclosed; structuralvalidation is not fulltrace/Task/Gate acceptance. Six historical screenshot moves and unknown main work preserved. All ownedAndroid/Go services stopped; no stale process assumed live.
+Original independent P2FAIL and FAIL66 WSS cleanup race/absent-runner failures preserved; old incorrect auth-error is excluded. Precise31+67layout reuse independently approved with Auth-only source-impact proof; no all-product-byte-unchanged claim after Auth Fix. Original capture clean3a5001228d6d3eb3f3b5dcbda468f270202554fb is not later evidenceHEAD. Recorder/directread/view/summaryprompt gaps disclosed; structuralvalidation is not fulltrace/Task/Gate acceptance. Six historical screenshot moves and unknown main work preserved. All ownedAndroid/Go services stopped; no stale process assumed live.
 
 ## Next Exact Action
 
-Commit this recovery-only metadata and give new /root/auth_final_review the exact clean combined candidate; independently inspect source/5affectedrawcaptures/APKs/methodcorrection/old-slice reuse/guards. Continue existing unified candidate review/publication/exact-head CI chain while keeping occupation-blocked Windows verification at S2 Gate. At Gate require actual deferred normal sandbox/native matrix and same-desktop-account machine CA rollback proof before PASS. Protected integration/actual-main audit/safe synchronization still pending.
+Commit preserved fresh source/Android approval, independently check recovery-only metadata extension (product/test unchanged), then perform existing Human-authorized unified candidate branch publication/exact-head hosted CI. Fullrange selects14outputs mapped to13actual jobs; missing/failed/cancelled/anomalously skipped requiredjobs cannot PASS. Keep review/S2OPEN; branch/CI publication is not protected integration/main synchronization or Task acceptance. At S2Gate complete occupation-blocked actualWindows normal sandbox/native matrix and machine same-desktop-account Root/defaultTLS proof before fullacceptance/GatePASS.
 
 ## Last Known Good Commit
 
-Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; latest local Fix `2aa61c77e27cfe79b422e7b55903239f30ece7f4`; actual capture/product-test source `3a5001228d6d3eb3f3b5dcbda468f270202554fb`. Main untouched and synchronization PENDING; no local candidate is final accepted product.
+Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; latest local Fix `2aa61c77e27cfe79b422e7b55903239f30ece7f4`, independently source/Android reviewed `1700cf0a3d3cc89d521c52fac2720a706827195f`; actual capture/product-test source `3a5001228d6d3eb3f3b5dcbda468f270202554fb`. Main untouched and synchronization PENDING; no local candidate is final accepted product.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-reviewed-repair.md`
+`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-android-auth-reviewed.md`
 
 ## Uncommitted Changes / Ownership
 
