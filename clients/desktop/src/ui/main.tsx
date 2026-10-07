@@ -1,16 +1,17 @@
 import React,{useEffect,useState,useSyncExternalStore} from "react";
 import {createRoot} from "react-dom/client";
 import {Workspace} from "../application/ui/workspace.js";
-import {windowControl} from "../application/ui/native.js";
+import {windowControl,windowMaximized} from "../application/ui/native.js";
 const app=new Workspace();
 function UI(){
-  const s=useSyncExternalStore(app.observe,app.snapshot),[registering,setRegistering]=useState(false),[confirmation,setConfirmation]=useState(""),[registered,setRegistered]=useState(false),[username,setUsername]=useState(""),[password,setPassword]=useState(""),[query,setQuery]=useState(""),[draft,setDraft]=useState("");
+  const s=useSyncExternalStore(app.observe,app.snapshot),[registering,setRegistering]=useState(false),[confirmation,setConfirmation]=useState(""),[registered,setRegistered]=useState(false),[username,setUsername]=useState(""),[password,setPassword]=useState(""),[query,setQuery]=useState(""),[draft,setDraft]=useState(""),[maximized,setMaximized]=useState(false);
   useEffect(()=>{void app.start();},[]);
+  useEffect(()=>{let active=true;const refresh=()=>{void windowMaximized().then(value=>{if(active)setMaximized(value);}).catch(()=>{});};refresh();window.addEventListener("resize",refresh);return()=>{active=false;window.removeEventListener("resize",refresh);};},[]);
   const prefs=s.appearance,friend=s.friends.find(f=>f.directConversationId===s.selected),title=friend?.user.displayName??(s.selected?"Conversation "+s.selected.slice(0,8):"Your conversations");
   const run=(p:Promise<unknown>)=>{void p.catch(()=>{});};
   const authenticated=!!(s.session||s.offlineAccount);
   return <div className={"app-window "+prefs.theme} style={{"--font":prefs.fontSize+"px","--density":prefs.density} as React.CSSProperties}>
-    <div className="window-bar"><div className="window-drag" onPointerDown={e=>{if(e.button===0)run(windowControl("drag"));}} onDoubleClick={()=>run(windowControl("maximize"))}><img src="logo.png" alt=""/><span>IM+ · PlugWorldIM</span></div><div className="window-actions"><button aria-label="Minimize" onClick={()=>run(windowControl("minimize"))}>−</button><button aria-label="Maximize or restore" onClick={()=>run(windowControl("maximize"))}>□</button><button className="window-close" aria-label="Close" onClick={()=>run(windowControl("close"))}>×</button></div></div>
+    <div className="window-bar"><div className="window-drag" onPointerDown={e=>{if(e.button===0)run(windowControl("drag"));}} onDoubleClick={()=>run(windowControl("maximize"))}><img src="logo.png" alt=""/><span>IM+ · PlugWorldIM</span></div><div className="window-actions"><button title="Minimize" aria-label="Minimize" onClick={()=>run(windowControl("minimize"))}>−</button><button title={maximized?"Restore":"Maximize"} aria-label={maximized?"Restore":"Maximize"} onClick={()=>run(windowControl("maximize"))}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{maximized?<><path d="M8 5V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-1"/><rect x="4" y="7" width="13" height="13" rx="1"/></>:<rect x="5" y="5" width="14" height="14" rx="1"/>}</svg></button><button className="window-close" aria-label="Close" onClick={()=>run(windowControl("close"))}>×</button></div></div>
     <div className={"workspace "+(authenticated?"authenticated":"anonymous")}>
     {authenticated&&<aside className="rail"><div className="brand" aria-label="IM plus"><img src="logo.png" alt="IM+ logo"/>IM<span>+</span></div><div className="brand-caption">PLUGWORLDIM</div>
       <nav aria-label="Main navigation">{(["Chat","Friends","AI","Plugin"] as const).map((page,i)=><button key={page} className={s.page===page?"nav selected":"nav"} onClick={()=>app.page(page)}><span className="nav-icon" aria-hidden="true">{["◫","♧","✧","⊞"][i]}</span>{page}{page==="AI"&&<small>SOON</small>}</button>)}</nav>

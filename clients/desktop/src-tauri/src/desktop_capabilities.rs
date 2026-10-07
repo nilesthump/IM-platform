@@ -46,6 +46,8 @@ pub fn appearance_save(app:tauri::AppHandle,mut value:Appearance)->Result<(),Str
 #[tauri::command]
 pub fn native_notify(app:tauri::AppHandle,title:String,body:String)->Result<(),String>{if title.chars().count()>80||body.chars().count()>300{return Err("Notification invalid".into());}app.notification().builder().title(title).body(body).show().map_err(|_|"Notification unavailable".into())}
 #[tauri::command]
+pub fn window_maximized(window:tauri::WebviewWindow)->Result<bool,String>{window.is_maximized().map_err(|_|"Window unavailable".into())}
+#[tauri::command]
 pub fn window_control(window:tauri::WebviewWindow,action:String)->Result<(),String>{
     let result=match action.as_str(){
         "minimize"=>window.minimize(),

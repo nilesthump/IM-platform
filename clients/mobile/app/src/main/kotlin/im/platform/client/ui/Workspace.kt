@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,7 @@ import androidx.navigation.compose.*
             Login(state,vm)
         };return@MaterialTheme}
         Scaffold(containerColor=scheme.background,topBar={Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp)){Row(verticalAlignment=Alignment.CenterVertically){Image(painterResource(R.drawable.project_logo),"IM+ logo",Modifier.size(40.dp));Text("IM+",fontSize=27.sp,fontWeight=FontWeight.ExtraBold,color=scheme.primary);Spacer(Modifier.weight(1f));TextButton(onClick={vm.appearance(prefs.copy(theme=if(warm)"cold" else "warm"))}){Text(if(warm)"Warm Creative" else "Cold AI")}};Row(verticalAlignment=Alignment.CenterVertically){if(inConversation)TextButton(onClick=vm::closeConversation){Text("← Chat")};Text(if(inConversation)state.friends.find{it.directConversationId==state.selected}?.user?.displayName?:"Conversation" else page,Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);Text(if(state.sync=="syncing")"Syncing…"else if(state.connection=="ready")"Connected"else"Offline",fontSize=12.sp,modifier=Modifier.padding(start=8.dp))}}},bottomBar={if(!inConversation)NavigationBar{listOf("Chat","Friends","AI","Plugin","Settings").forEachIndexed {i,p->NavigationBarItem(selected=page==p,onClick={nav.navigate(p){launchSingleTop=true;popUpTo("Chat"){saveState=true};restoreState=true}},icon={Text(listOf("◫","♧","✧","⊞","⚙")[i])},label={Text(p,maxLines=1,fontSize=12.sp)})}}}) {padding->
-            Column(Modifier.fillMaxSize().padding(padding).padding(horizontal=16.dp)) {
+            Column(Modifier.fillMaxSize().padding(padding).padding(horizontal=if(page=="Chat"&&!inConversation)0.dp else 16.dp)) {
                 state.error?.let{Surface(color=scheme.errorContainer,shape=RoundedCornerShape(12.dp),modifier=Modifier.fillMaxWidth().padding(bottom=12.dp)){Column(Modifier.padding(12.dp)){Text(it,color=scheme.onErrorContainer);if(state.session!=null || state.offlineAccount!=null)TextButton(onClick=vm::reconnect,enabled=state.session!=null){Text("Reconnect")}}}}
                 NavHost(navController=nav,startDestination="Chat",modifier=Modifier.weight(1f)) {
                     composable("Chat"){if(state.session==null && state.offlineAccount==null)Login(state,vm)else Chat(state,vm)}
@@ -68,9 +69,9 @@ import androidx.navigation.compose.*
 }
 @Composable private fun Chat(state:WorkspaceState,vm:WorkspaceViewModel) {
     if(state.selected.isEmpty()){
-        LazyColumn(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(8.dp)){
+        LazyColumn(Modifier.fillMaxSize()){
             if(state.conversations.isEmpty())item{Panel(Modifier.fillMaxWidth(),state.appearance){Text("Your next conversation starts here",style=MaterialTheme.typography.titleLarge);Text("Find a friend to open a private chat.")}}
-            items(state.conversations,key={it}){id->Surface(onClick={vm.open(id)},shape=RoundedCornerShape(16.dp),color=MaterialTheme.colorScheme.surface,modifier=Modifier.fillMaxWidth()){
+            items(state.conversations,key={it}){id->Surface(onClick={vm.open(id)},shape=RectangleShape,color=MaterialTheme.colorScheme.surface,modifier=Modifier.fillMaxWidth()){
                 Column(Modifier.padding((16*state.appearance.density).dp)){Text(state.friends.find{it.directConversationId==id}?.user?.displayName?:"Conversation "+id.take(8),fontWeight=FontWeight.SemiBold);Text(if(state.unavailable.contains(id))"Access unavailable"else state.previews[id]?.text?:"No messages yet",maxLines=1,style=MaterialTheme.typography.bodyMedium)}
             }}
         };return

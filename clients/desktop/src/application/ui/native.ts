@@ -12,5 +12,6 @@ export const nativeFetch:typeof fetch=async(input,init)=>{
 export const appearance={load:async()=>{const [theme,fontSize,density]=await invoke<[Appearance["theme"],number,number]>("appearance_load");return {theme,fontSize,density};},save:(value:Appearance)=>invoke<void>("appearance_save",{value:[value.theme,value.fontSize,value.density]})};
 // No token is stored in appearance, localStorage or the account database.
 export const secure={read:(slot:string)=>invoke<string|null>("credential_read",{slot}),write:(slot:string,value:string)=>invoke<void>("credential_write",{slot,value}),remove:(slot:string)=>invoke<void>("credential_remove",{slot})};
+export const windowMaximized=()=>invoke<boolean>("window_maximized");
 export const windowControl=(action:"minimize"|"maximize"|"close"|"drag")=>invoke<void>("window_control",{action});
 export const notify=(title:string,body:string)=>invoke<void>("native_notify",{title,body});

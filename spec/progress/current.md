@@ -11,11 +11,11 @@ Execution Status: BLOCKED_EXTERNAL_ACCESS
 
 ## Immediately Relevant Completed Work
 
-Human UI revision and exact supplied logo applied Desktop/Mobile; restored archive fac0c8fc to assigned managed gui-ui-update. Both builds, Desktop GUI auth/lifecycle/register/list race controls PASS; actual API34 anonymous/registration theme/font extrema PASS46. Windows actual package installed; Android authenticated PASS66 with13 raw screenshots and full temporary trust rollback verified; Windows authenticated proof pending.
+Latest Human window/row revision implemented: Windows Minimize/Maximize hover tips and native-state square/overlap icons; both clients contiguous full-width rectangle conversation rows. Desktop/frontend/auth/list tests and native release/NSIS/exact installed bytes PASS. Actual AndroidAPI34 revised UI PASS66 run1791352772357, thirteen raw screenshots, cold14/warm22 two-friend rows visually verified. Earlier UI revision and original logo remain preserved.
 
 ## Current Blockers
 
-Windows authenticated proof requires Human completion of the OS security confirmation. Computer-use forbids acting on security requests. The task-owned waiting import has been stopped and exact74Root baseline restored; CA absent. Android rollback and owned Go fixture cleanup complete. New same-scope24h certificate approved2026-10-07; old expired original unchanged.
+Windows native UI tool kernel cannot initialize: windows sandbox failed: helper_unknown_error: setup refresh had errors, after retry/reset/final attempt. Human 已确认 completed certificate confirmation; authorization is not missing. Actual Windows authenticated Chat/Friends/hover/icon/max-font visual proof still unavailable. Both temporary trusts have been rolled back; owned fixture cleanup evidence follows. No unsafe UI fallback or fake screenshot.
 
 ## Verification
 
@@ -23,8 +23,8 @@ Windows authenticated proof requires Human completion of the OS security confirm
   - Result: PASS, including canonical registration/confirmation/conflict, private+group recency, retired account guards and selected-row close.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/ui-update-20261007/local-verification.md`
 - Command: `python -X utf8 -B tests/clients/gui/native.py gui-mobile --serial emulator-5590 --capture`
-  - Result: actualAPI34 PASS46; run1791349616429. Earlier FAIL preserved. Authenticated ui-revision PASS66 run1791350426041; thirteen original PNGs. Full Android trust rollback PASS. Local proof only, not accepted.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/ui-update-20261007/artifacts.json`
+  - Result: latest actualAPI34 authenticated ui-revision PASS66 run1791352772357; thirteen original PNGs, exact APK/test APK hashes saved. Full trust rollback PASS. Earlier runs preserved; local proof only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/window-rows-20261007/capture-manifest.json`
 
 ## Changed Files or Migrations
 
@@ -32,11 +32,11 @@ Declared Desktop/Android UI/auth assembly/icons and GUI test/evidence paths only
 
 ## Known Failures, Risks, and Assumptions
 
-Original failed runs/scripts and recording gaps retained, including three new Android failed phases. Required top-left return passes; hardware-back after composer focus is not claimed. No Human Windows security confirmation observed; task-owned import stopped and full rollback verified. Group metadata names absent use conversation ID. Server selection uses existing client configured origin; no gateway assignment API invented. UI local activity ordering uses durable server timestamps plus current-run activity. No Architect approval/full independent review/hosted acceptance yet.
+Original and current failures retained under task evidence: ordinary sandbox/Node kernel initialization, Recorder registration ordering, unpatched-vs-NSIS raw hash check, absent Android emulator/GBK error decoding before trust mutation, certificate-provider deletion UI-not-allowed resolved by exact standard X509Store.Remove. No current native Windows visual verification claimed. Group names use conversation ID when metadata absent; configured client server origin remains as before. Full Architect/unified Review/hosted acceptance pending.
 
 ## Next Exact Action
 
-Resume bounded fixture/import with Human takeover of Windows OS security confirmation; finish actual Windows authenticated captures/matrix and full rollback; Architect approval then fresh independent unified Review/exact-head hosted CI/protected integration/actual-main audit/safe main synchronization. Do not mark done before main synchronization.
+Restore supported Windows native interface tool initialization; resume same bounded fixture/trust workflow to capture actual Windows authenticated Chat/Friends, hover/icon state and font matrix; full rollback; Architect screenshot approval then fresh independent unified Review/exact-head hosted CI/protected integration/actual-main audit/safe main synchronization. No new approval needed for the unchanged approved test scope. Do not mark done before main synchronization.
 
 ## Last Known Good Commit
 
@@ -44,7 +44,7 @@ Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; unaccepte
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-ui-update.md`
+`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-window-rows.md`
 
 ## Uncommitted Changes / Ownership
 
