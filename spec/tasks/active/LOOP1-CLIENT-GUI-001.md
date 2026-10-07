@@ -229,3 +229,7 @@ Human requests 导入. Standard certutil/native.NET attempts show success only i
 ## Certificate persistence diagnostic result
 
 Human twice reports wizard import success; actual IM login still Connection unavailable. Exact valid self-issuedCA absent freshRoot/physicalHKCU/explicitSID32+64; systemTLS PartialChain, server healthy. Await Start-menu Manage User Certificates exactRoot-name/thumb visibility; no further repeated import/config/security changes. Owned inspection project39112/session58647 still live. Recorder/root diagnostic evidence current certificate-import.md; taskactive/S2OPEN.
+
+## Latest Human manual login success
+
+Human confirms matchingCA visible in real user Root and fresh Explorer-launched IM PID6940 entered Chat. UI operations stopped, owned39112/session58647 remains live for self-inspection. Wait interface feedback/completion; then exact fixture cleanup and actual desktop-context exactCA rollback/rejection. Tool-side root invisibility remains context discrepancy, mechanism not proven; user-observed login is not captured screenshot/independent acceptance. No product/main changes; taskactive/S2OPEN.

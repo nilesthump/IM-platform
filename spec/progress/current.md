@@ -7,9 +7,11 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: active
-Execution Status: BLOCKED_EXTERNAL_ACCESS
+Execution Status: AWAITING_HUMAN_INSPECTION
 
 ## Immediately Relevant Completed Work
+
+Latest: Human manually imported exact approvedCA in real desktop user Root, launched fresh installed IM via Explorer (PID6940/15:04), confirms 已进入 Chat. Interface automation stopped per Human request; same owned local service remains live for self-inspection. Tool-side trust visibility differs; do not repeat import or claim full rollback from tool-only observations.
 
 Latest Human window/row revision implemented: Windows Minimize/Maximize hover tips and native-state square/overlap icons; both clients contiguous full-width rectangle conversation rows. Desktop/frontend/auth/list tests and native release/NSIS/exact installed bytes PASS. Actual AndroidAPI34 revised UI PASS66 run1791352772357, thirteen raw screenshots, cold14/warm22 two-friend rows visually verified. Earlier UI revision and original logo remain preserved.
 
@@ -83,3 +85,7 @@ Human requests 导入. Standard certutil/native.NET attempts show success only i
 ## Certificate persistence diagnostic result
 
 Human twice reports wizard import success; actual IM login still Connection unavailable. Exact valid self-issuedCA absent freshRoot/physicalHKCU/explicitSID32+64; systemTLS PartialChain, server healthy. Await Start-menu Manage User Certificates exactRoot-name/thumb visibility; no further repeated import/config/security changes. Owned inspection project39112/session58647 still live. Recorder/root diagnostic evidence current certificate-import.md; taskactive/S2OPEN.
+
+## Latest manual login handoff
+
+Human confirmed desktop Chat entered after direct Explorer launch. Wait for Human interface feedback/inspection completion; do not operate UI further. Owned project39112/session58647 stays live; after completion stop exact fixture and remove exactCA in same real desktop context with verified rejection. Full screenshot/Architect acceptance/fresh independent Review/exact-head CI/main sync still pending; taskactive/S2OPEN.
