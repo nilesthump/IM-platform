@@ -229,7 +229,7 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
     login(args.getString("avery")!!);toggleTheme();verify(actualViewModel().state.value.appearance==Appearance("warm",22,1.2f));settingsControl("Sign out");await("Open your workspace")
     invalid("warm-auth-invalid-22")
     login(args.getString("avery")!!);val slot=checkNotNull(prefs.read("https://localhost:8443/current"));verify(prefs.read(slot)!=null)
-    navigate("Settings");reach("Refresh session");capture("real-session-before-expiry");controlled("expiry");click("Refresh session");await("Session expired. Sign in again.")
+    settingsControl("Go offline");await("Offline");navigate("Settings");reach("Refresh session");verify(prefs.read(slot)!=null);capture("real-session-before-expiry");controlled("expiry");click("Refresh session");await("Session expired. Sign in again.")
     val expired=actualViewModel().state.value;verify(expired.session==null&&expired.offlineAccount==null&&!expired.busy&&expired.connection=="offline")
     verify(prefs.read("https://localhost:8443/current")==null&&prefs.read(slot)==null);top();reach("Session expired. Sign in again.");capture("real-session-expired-cleared")
     result.putString("expiredSecureSlotAbsent","PASS current and former owned session credential absent")
