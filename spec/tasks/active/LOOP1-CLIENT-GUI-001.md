@@ -233,3 +233,7 @@ Human twice reports wizard import success; actual IM login still Connection unav
 ## Latest Human manual login success
 
 Human confirms matchingCA visible in real user Root and fresh Explorer-launched IM PID6940 entered Chat. UI operations stopped, owned39112/session58647 remains live for self-inspection. Wait interface feedback/completion; then exact fixture cleanup and actual desktop-context exactCA rollback/rejection. Tool-side root invisibility remains context discrepancy, mechanism not proven; user-observed login is not captured screenshot/independent acceptance. No product/main changes; taskactive/S2OPEN.
+
+## Desktop scroll/presence/hover/composer refinements
+
+Human four screenshot requirements implemented in Desktop UI only; hidden bars/native wheel preserved, Session Online separate from actual connection, grey window-control hover, upward-growing captured composer handle42..150px. Build/auth and focused7controls regression PASS, native package/exact installed NSIS bytes PASS. Actual latest visual checks pending Human; references copied original not fabricated capture. Final source/architecture/frozen/recovery development guards PASS. Current service39112/session58647 and Human-installedCA remain for inspection; cleanup afterward in real desktop context. Evidence desktop-polish-20261007/verification.md. Four task-owned product/test paths, no dependencies/business changes; taskactive/S2OPEN, independent acceptance/main sync pending.

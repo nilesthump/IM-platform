@@ -14,3 +14,8 @@ main{flex:1;width:auto;min-width:0;min-height:0;padding:clamp(16px,2vh,28px)}.ra
 
 /* Conversation rows touch and fill their list column. */
 .conversation-list{padding:0;border-radius:0}.conversation-list .section-heading{padding:20px 20px 0}.conversation-list .list-caption{margin:10px 20px 20px}.conversation,.conversation.active{width:100%;margin:0;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:calc(16px * var(--density))}.window-actions button svg{vertical-align:middle}
+
+/* Keep native wheel scrolling without visible scrollbars. */
+.app-window,.app-window *{scrollbar-width:none}.app-window::-webkit-scrollbar,.app-window *::-webkit-scrollbar{display:none}
+.window-actions button:hover,.window-actions button:focus-visible{background:rgba(0,0,0,.08);color:var(--ink)}.window-actions .window-close:hover{background:#b32a3b;color:white}
+.composer-editor{position:relative;display:flex;flex:1;min-width:0}.composer textarea{resize:none;width:100%;padding-right:24px}.composer .composer-resize{position:absolute;right:3px;bottom:3px;width:20px;height:20px;padding:0;border:0;border-radius:2px;background:transparent;color:var(--muted);cursor:ns-resize;touch-action:none}.composer-resize svg{pointer-events:none}
