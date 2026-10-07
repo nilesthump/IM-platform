@@ -221,8 +221,8 @@ jobs:
       - name: Approved Windows GUI assembly and auth controls
         if: runner.os == 'Windows'
         shell: pwsh
-          env:
-            CARGO_TARGET_DIR: ${{ runner.temp }}/client-gui-target
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/client-gui-target
         run: |
           npm --prefix clients/desktop ci --ignore-scripts --no-audit --no-fund
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
