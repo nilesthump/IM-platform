@@ -30,7 +30,7 @@ class Auth(val endpoint:String,private val preferences:Preferences) {
             val output=java.io.ByteArrayOutputStream();val stream=if(status in 200..299)connection.inputStream else connection.errorStream
             (stream?:throw ApiFailure("Connection unavailable")).use{val buffer=ByteArray(8192);while(true){val n=it.read(buffer);if(n<0)break;if(output.size()+n>1048576)throw ApiFailure("Invalid server response");output.write(buffer,0,n)}}
             val raw=Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(output.toByteArray())).toString();val result=Wire.parse(raw,1048576)
-            if(status !in 200..299){val code=((result as? Map<*,*>)?.get("error") as? Map<*,*>)?.get("code") as? String;throw ApiFailure(if(status==401)"Session expired" else code?:"Request failed")};result
+            if(status !in 200..299){val code=((result as? Map<*,*>)?.get("error") as? Map<*,*>)?.get("code") as? String;throw ApiFailure(if(status==401 && code=="AUTH_INVALID_CREDENTIALS")"Invalid username or password" else if(status==401)"Session expired" else code?:"Request failed")};result
         }catch(e:ApiFailure){throw e}catch(_:Exception){throw ApiFailure("Connection unavailable")}finally{connection.disconnect()}
     }
     private fun user(v:Any?):User {val o=Wire.obj(v,setOf("userId","username","displayName"));return User(Wire.uuid(o["userId"]),o["username"] as String,o["displayName"] as String)}

@@ -36,6 +36,14 @@ reply={raw:encode(authResult(A)).replace('"sessionEpoch":9007199254740993','"ses
 console.log("PASS GUI auth: exact epoch, canonical native metadata, rotation, OS storage intent, logout, delayed retired login isolation, account switch, expired cleanup, HTTPS origin and malformed response controls");
 const {Workspace}=await import("../../../clients/desktop/dist/desktop/src/application/ui/workspace.js");
 const workspace=new Workspace();
+reply={status:401,data:{error:{code:"AUTH_INVALID_CREDENTIALS",message:"Server detail must not be echoed"},requestId:S}};
+const anonymous=new Auth("https://localhost:8443");
+await assert.rejects(anonymous.login("fixture-user","incorrect-fixture-input"),error=>error.kind==="Invalid username or password");
+assert.equal(anonymous.session,null);assert.equal(credentials.size,0);
+await workspace.login("https://localhost:8443","fixture-user","incorrect-fixture-input");
+assert.equal(workspace.state.error,"Invalid username or password");assert.equal(workspace.state.session,null);assert.equal(workspace.state.offlineAccount,null);assert.equal(workspace.state.busy,false);assert.equal(credentials.size,0);
+console.log("PASS canonical invalid credentials remain anonymous with safe login error; no false session expiry or stored credential");
+
 reply={status:204,raw:""};delayedPath="/v1/auth/login";delayed=new Promise(r=>{release=r;});
 const retiredLogin=workspace.login("https://localhost:8443","fixture-a","fixture-only-input");await new Promise(r=>setTimeout(r,0));await workspace.logout();
 release([200,{"content-type":"application/json"},Array.from(new TextEncoder().encode(encode(authResult(A))))]);await retiredLogin;

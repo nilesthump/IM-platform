@@ -17,7 +17,7 @@ export class Auth {
     if(response.status===204)return null;
     if(!/^application\/json(?:\s*;|$)/i.test(response.headers.get("content-type")??""))throw new ApiFailure("Invalid server response");
     const raw=await response.text();let data:unknown;try{data=parse(raw,1048576);}catch{throw new ApiFailure("Invalid server response");}
-    if(!response.ok){const code=(data as {error?:{code?:unknown}})?.error?.code;throw new ApiFailure(response.status===401?"Session expired":typeof code==="string"?code:"Request failed");}
+    if(!response.ok){const code=(data as {error?:{code?:unknown}})?.error?.code;throw new ApiFailure(response.status===401&&code==="AUTH_INVALID_CREDENTIALS"?"Invalid username or password":response.status===401?"Session expired":typeof code==="string"?code:"Request failed");}
     return data;
   }
   private async accept(data:unknown,g:number):Promise<Session>{

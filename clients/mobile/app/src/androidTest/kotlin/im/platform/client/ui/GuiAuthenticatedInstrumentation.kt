@@ -87,9 +87,9 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
  private fun capture(name:String){
   Thread.sleep(250);val d=java.io.File(targetContext.getExternalFilesDir(null),"gui-auth/$captureRun").apply{mkdirs()}
   val b=checkNotNull(uiAutomation.takeScreenshot());java.io.File(d,name+".png").outputStream().use{check(b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it))}
-  if(args.getString("phase")=="evidence-complete"){
+  if(args.getString("phase") in listOf("evidence-complete","auth-errors")){
    val s=actualViewModel().state.value
-   java.io.File(d,name+".json").writeText(org.json.JSONObject().put("theme",s.appearance.theme).put("fontSize",s.appearance.fontSize).put("spacingDensity",s.appearance.density).put("busy",s.busy).put("error",s.error).put("connection",s.connection).put("sync",s.sync).put("conversationCount",s.conversations.size).put("friendCount",s.friends.size).put("resultCount",s.results.size).put("messageCount",s.messages.size).put("conversationSelected",s.selected.isNotEmpty()).put("width",b.width).put("height",b.height).toString(2))
+   java.io.File(d,name+".json").writeText(org.json.JSONObject().put("theme",s.appearance.theme).put("fontSize",s.appearance.fontSize).put("spacingDensity",s.appearance.density).put("busy",s.busy).put("error",s.error).put("connection",s.connection).put("sync",s.sync).put("conversationCount",s.conversations.size).put("friendCount",s.friends.size).put("resultCount",s.results.size).put("messageCount",s.messages.size).put("conversationSelected",s.selected.isNotEmpty()).put("sessionPresent",s.session!=null).put("offlineAccountPresent",s.offlineAccount!=null).put("secureCurrentPresent",Preferences(targetContext).read("https://localhost:8443/current")!=null).put("width",b.width).put("height",b.height).toString(2))
   };b.recycle()
  }
  private fun delivery(text:String,status:String):List<String?>{
@@ -217,8 +217,24 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
    result.putString("defaultHostnameMismatch","PASS");prefs.saveAppearance(Appearance("cold",14,.8f))
    activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));await("Open your workspace")
    val phase=args.getString("phase")?:"matrix"
-   if(phase=="evidence-complete"){
-    fill("Username",args.getString("riley")!!);fill("Password","wrong-fixture-password");backKeyboard();reach("Sign in");click("Sign in");await("Session expired. Sign in again.");capture("auth-error")
+   if(phase=="auth-errors"){
+    fun invalid(name:String){
+     fill("Username",args.getString("avery")!!);fill("Password","wrong-fixture-password");backKeyboard();reach("Sign in");click("Sign in");await("Invalid username or password")
+     val s=actualViewModel().state.value;verify(s.session==null&&s.offlineAccount==null&&!s.busy&&s.connection=="offline"&&s.error=="Invalid username or password")
+     verify(prefs.read("https://localhost:8443/current")==null);verify(find(actualRoot(),"Session expired. Sign in again.")==null);top();reach("Invalid username or password");capture(name)
+    }
+    invalid("cold-auth-invalid-14")
+    login(args.getString("avery")!!);navigate("Settings");top();repeat(8){click("+")};reach("Comfort");click("Comfort");verify(actualViewModel().state.value.appearance==Appearance("cold",22,1.2f));settingsControl("Sign out");await("Open your workspace")
+    invalid("cold-auth-invalid-22")
+    login(args.getString("avery")!!);toggleTheme();verify(actualViewModel().state.value.appearance==Appearance("warm",22,1.2f));settingsControl("Sign out");await("Open your workspace")
+    invalid("warm-auth-invalid-22")
+    login(args.getString("avery")!!);val slot=checkNotNull(prefs.read("https://localhost:8443/current"));verify(prefs.read(slot)!=null)
+    navigate("Settings");reach("Refresh session");capture("real-session-before-expiry");controlled("expiry");click("Refresh session");await("Session expired. Sign in again.")
+    val expired=actualViewModel().state.value;verify(expired.session==null&&expired.offlineAccount==null&&!expired.busy&&expired.connection=="offline")
+    verify(prefs.read("https://localhost:8443/current")==null&&prefs.read(slot)==null);top();reach("Session expired. Sign in again.");capture("real-session-expired-cleared")
+    result.putString("expiredSecureSlotAbsent","PASS current and former owned session credential absent")
+   }else if(phase=="evidence-complete"){
+    fill("Username",args.getString("riley")!!);fill("Password","wrong-fixture-password");backKeyboard();reach("Sign in");click("Sign in");await("Invalid username or password");capture("auth-error")
     fill("Password","fixture-password-not-a-real-secret");backKeyboard();reach("Sign in");controlled("auth");click("Sign in");await("Please wait…");verify(actualViewModel().state.value.busy);capture("auth-loading");await("Connected")
     repeat(100){if(actualViewModel().state.value.busy||actualViewModel().state.value.sync!="idle")Thread.sleep(100)}
     verify(actualViewModel().state.value.conversations.isEmpty());await("Your next conversation starts here");capture("empty-chat-list")
