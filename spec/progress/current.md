@@ -6,18 +6,24 @@ Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
-Current Task State: active
-Execution Status: AWAITING_ANDROID_UI_APPROVAL
+Current Task State: review
+Execution Status: INDEPENDENT_REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
+
+Final arrow-only back button enlarged1.5 from current label font; source710826740c287333389937c1eeefaf472e68a43d. ActualAPI34 PASS107/16 raw screenshots, cold14/warm22 navigation/send/theme/logout verified; full Android trust rollback/owned runtime cleanup. Human says no further visual confirmation; proceeding to independent Review. Evidence mobile-back-20261007/verification.md.
 
 Human Mobile request implemented: all-page logo/IM+ header and global theme row removed, only compact Settings theme entry retained; title/connection/back/nav remain, app icon still exact project logo. Actual API34 PASS46 anonymous plus PASS105 authenticated;28 original screenshots/APK/source hashes, reversible theme/font/density retention. Android full temporary trust rollback and owned emulator/Go50508 cleanup PASS. No Desktop change; previous Human Windows style PASS retained. Desktop missing React useRef export repaired in3f90349; actual compiled render PASS12 and native exact installed package bound in desktop-render evidence. Prior full Android/desktop records retained.
 
 ## Current Blockers
 
-Fresh Mobile set awaits Human visual review. Full remaining native/Architect matrix, fresh independent Review/exact-head CI/protected integration/main synchronization pending. Windows UI host setup/approval-channel tool failure persists; actual desktop Root CA remains invisible to tools, cleanup must verify in same actual desktop context, no inference from tool-side absence.
+Human final Mobile instruction is implemented and explicitly requires continuing without another Human visual confirmation. Full remaining native/Architect matrix, fresh independent Review/exact-head CI/protected integration/main synchronization pending. Windows UI host setup/approval-channel tool failure persists; actual desktop Root CA remains invisible to tools, cleanup must verify in same actual desktop context, no inference from tool-side absence.
 
 ## Verification
+
+- Command: `GuiAuthenticatedInstrumentation phase ui-revision`; `GuiTrustRollbackInstrumentation`
+  - Result: PASS107; rollback134CA baseline/nonroot/Enforcing/defaultSDK rejection.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mobile-back-20261007/verification.md`
 
 - Command: `python -Xutf8 -B tests/clients/gui/native.py gui-mobile --serial emulator-5590 --capture`; actual `GuiAuthenticatedInstrumentation` phase `ui-revision`
   - Result: PASS46+105, actual UI/real fixture/defaultTLS/wronghostname;28 byte-exact images; complete Android trust rollback and owned runtime cleanup PASS.
@@ -33,11 +39,11 @@ This refinement owns Mobile UI Workspace.kt, existing GuiInstrumentation.kt/GuiA
 
 ## Known Failures, Risks, and Assumptions
 
-Native Windows host tool sharing/approval-channel failure and exact desktop-context trust cleanup access remain. Prior Recorder cross-link/child-start gaps immutable in historical runs; latest run uses prospective_resume with initial read/harness prep and interactive Go session observations explicitly exposed. Android temporary trust fully removed and default SDK rejection verified. Task active/S2OPEN, no independent acceptance/main sync.
+Native Windows host tool sharing/approval-channel failure and exact desktop-context trust cleanup access remain. Prior Recorder cross-link/child-start gaps immutable in historical runs; latest run uses prospective_resume with initial read/harness prep and interactive Go session observations explicitly exposed. Android temporary trust fully removed and default SDK rejection verified. Task review/S2OPEN, no independent acceptance/main sync.
 
 ## Next Exact Action
 
-Human review current Mobile original screenshots in mobile-header-20261007/index.md. Apply bounded feedback then complete remaining full GUI/Architect matrix, Windows exact desktop Root CA cleanup, fresh unified independent Review, applicable exact-head hosted CI/protected integration/actual-main verified synchronization. No done/S2PASS before required acceptance/main sync. Current emulator and owned Go50508 stopped; do not assume older runtime39112 still active.
+Fresh independent Architect and unified candidate Review of committed final Mobile arrow7108267/evidence mobile-back-20261007; assess required full GUI matrix without treating Human no-confirmation instruction as independent acceptance. Complete remaining full GUI/Architect matrix, Windows exact desktop Root CA cleanup, fresh unified independent Review, applicable exact-head hosted CI/protected integration/actual-main verified synchronization. No done/S2PASS before required acceptance/main sync. Current emulator and owned Go50508 stopped; do not assume older runtime39112 still active.
 
 ## Last Known Good Commit
 
@@ -45,7 +51,7 @@ Accepted synchronized main `ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597`; current u
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-mobile-header.md`
+`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-mobile-back.md`
 
 ## Uncommitted Changes / Ownership
 
