@@ -1,0 +1,762 @@
+{
+  "status": "local uncommitted preparation, not independent acceptance",
+  "runId": "R-GUI-PRODUCT-20261004",
+  "commands": [
+    {
+      "commandId": "C-c7c2753e-10ff-44fb-a320-47adbf6da0a7",
+      "startedAt": "2026-10-03T18:37:55.435111Z",
+      "finishedAt": "2026-10-03T18:37:55.481092Z",
+      "argv": [
+        "git",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "cwd": ".",
+      "durationMs": 47.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "55afde438efebd015024a6454688dfaf550cf62cd139cd7d0d345b15110e5a81",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-8ab8ccb6-2de6-4deb-b230-c092a4d31eb5",
+      "startedAt": "2026-10-03T18:39:01.122055Z",
+      "finishedAt": "2026-10-03T18:39:01.852756Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": ".",
+      "durationMs": 703.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "4671093541e151efd306ef7d0c2badc8004f46c62570fe6f25018038f75adb4b",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-da7fcaab-f261-4f6f-9796-daa7dc75196b",
+      "startedAt": "2026-10-03T18:39:06.249120Z",
+      "finishedAt": "2026-10-03T18:39:06.462315Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "cwd": ".",
+      "durationMs": 219.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-1a6781ac-c81b-4430-821a-9772ab1009cb",
+      "startedAt": "2026-10-03T18:46:36.186756Z",
+      "finishedAt": "2026-10-03T18:46:45.257490Z",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "install",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": ".",
+      "durationMs": 9078.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "945700a34b772479a0dbf8693ca6020092980270de77240e69afa0482fb38595",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-383eb887-9b3b-487f-acb2-8486f6503d3f",
+      "startedAt": "2026-10-03T18:47:36.111633Z",
+      "finishedAt": "2026-10-03T18:47:37.837377Z",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "durationMs": 1735.0,
+      "exitCode": 2,
+      "result": "FAIL",
+      "stdoutSHA256": "a0155f21faaea852674fc7cf93771a88989dbfaf941a49da4ca255eecb21e252",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-33c2100b-13a7-4b08-829c-066d4b60d9ea",
+      "startedAt": "2026-10-03T18:49:35.086015Z",
+      "finishedAt": "2026-10-03T18:49:39.669345Z",
+      "argv": [
+        "cargo",
+        "update",
+        "--manifest-path",
+        "clients/desktop/src-tauri/Cargo.toml"
+      ],
+      "cwd": ".",
+      "durationMs": 4578.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "0a7ee4d4e51f8b6b76897866788ae44d84b893cbe984147200e8939e355a523b"
+    },
+    {
+      "commandId": "C-96f06253-3e67-4ebd-aaf2-faf600141f87",
+      "startedAt": "2026-10-03T18:50:13.954724Z",
+      "finishedAt": "2026-10-03T18:51:58.508807Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "rust",
+        "check",
+        "--locked"
+      ],
+      "cwd": ".",
+      "durationMs": 104562.0,
+      "exitCode": 101,
+      "result": "FAIL",
+      "stdoutSHA256": "1bc1ba273f1929ae002d6cc71be17d2313da728b85060e838ec840f3e7718eaf",
+      "stderrSHA256": "d09d0317e021c587a94f2ce80dd9caa14482ffcd67bb6b11d1759b7451130805"
+    },
+    {
+      "commandId": "C-4395e2ec-13b3-46a3-bf12-56844ec22b17",
+      "startedAt": "2026-10-03T18:53:34.188979Z",
+      "finishedAt": "2026-10-03T18:53:39.695194Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "rust",
+        "check",
+        "--locked"
+      ],
+      "cwd": ".",
+      "durationMs": 5516.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "1bc1ba273f1929ae002d6cc71be17d2313da728b85060e838ec840f3e7718eaf",
+      "stderrSHA256": "dce8c88a7a6a346db0ba6c312b477b0954175613abbcdc11d352c73e64c20e75"
+    },
+    {
+      "commandId": "C-f320aa12-d1f8-4aed-8f63-bfe172fe1ac7",
+      "startedAt": "2026-10-03T18:57:27.706430Z",
+      "finishedAt": "2026-10-03T18:57:31.305236Z",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "durationMs": 3593.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "d5e3d8e34c712b189aa719a16dfb04a3aaaec96a017aa30408e9d59facc3bafe",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-16cb8577-66ab-41c9-90ac-c7304c0df3e2",
+      "startedAt": "2026-10-03T18:56:58.992515Z",
+      "finishedAt": "2026-10-03T18:57:43.538606Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "gradle",
+        "assembleDebug"
+      ],
+      "cwd": ".",
+      "durationMs": 44547.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "0dff18cad9b85320d09a99284469f9d60ad812f993a433247b7b88a1629ce4b5",
+      "stderrSHA256": "f3f4fd8eafc3042a4cd4421336bc25b661e699374665897f4e221f435e05ac55"
+    },
+    {
+      "commandId": "C-d64a1cf4-b4f7-4ff3-a342-a0089451a6c0",
+      "startedAt": "2026-10-03T18:57:39.636139Z",
+      "finishedAt": "2026-10-03T18:57:48.500282Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "package",
+        "--debug"
+      ],
+      "cwd": ".",
+      "durationMs": 8860.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "eda6ed11cee0dabd43a35bd238c8360358ce5a2f82eb0056dd85653233a89970",
+      "stderrSHA256": "13a172d712b5e98ff5fe2eb09192f5f5442d0be596c74f33187d9bf49abf1b5d"
+    },
+    {
+      "commandId": "C-44c86970-ac44-4c65-91e0-331dde95e44a",
+      "startedAt": "2026-10-03T18:58:24.406106Z",
+      "finishedAt": "2026-10-03T18:58:25.719281Z",
+      "argv": [
+        "npm.cmd",
+        "view",
+        "@tauri-apps/api",
+        "version"
+      ],
+      "cwd": ".",
+      "durationMs": 1313.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "6d83386e2438a41efc82d6b4018bf4aaa95b0ccc405ba835d779ff08a31bac80",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-5a08e6e3-559e-4ead-9733-73c6340891d8",
+      "startedAt": "2026-10-03T18:58:32.383651Z",
+      "finishedAt": "2026-10-03T18:58:56.845997Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "gradle",
+        "assembleDebug"
+      ],
+      "cwd": ".",
+      "durationMs": 24454.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "e8e2ec25273c47502457b35727fdd9e1b80cf4b455a900aabf76377c7f0e0996",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-5430dedc-5543-4061-a1f8-b11e76b2f38d",
+      "startedAt": "2026-10-03T18:59:19.492873Z",
+      "finishedAt": "2026-10-03T18:59:21.111532Z",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "install",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": ".",
+      "durationMs": 1609.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "f44c4ed1a9fc1d11e559b25f9821753a9f9e3d3f8bee57e0ea7ac4d4abe6cb5d",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-6dea409f-9513-40c4-884e-4693c5cbd7fe",
+      "startedAt": "2026-10-03T18:59:26.477287Z",
+      "finishedAt": "2026-10-03T18:59:32.924407Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "package",
+        "--debug"
+      ],
+      "cwd": ".",
+      "durationMs": 6438.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "906f8f0f7e6cbfa21db50179899e3b90ea6e980de628f7b922dfd6e64c1c01a6",
+      "stderrSHA256": "da14862dce2b2b5876766d62d8a54873c7d65ba076c4e89e236639edac1b2b0c"
+    },
+    {
+      "commandId": "C-d56ff8d2-5222-47f4-bcec-605bef7161a6",
+      "startedAt": "2026-10-03T19:00:00.058049Z",
+      "finishedAt": "2026-10-03T19:00:02.262352Z",
+      "argv": [
+        "H:/Android/platform-tools/adb.exe",
+        "devices",
+        "-l"
+      ],
+      "cwd": ".",
+      "durationMs": 2203.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "bbfcc7239a6f1be3544814ebdc6bcc9b66bf5b1f0b03baa3340808f19265a630",
+      "stderrSHA256": "1ac362b61180a2afbeeabec06aed462ae82740149358c7a2ec926be3e1b1ecff"
+    },
+    {
+      "commandId": "C-a1466061-0725-4da8-92d2-0f4e6ea65250",
+      "startedAt": "2026-10-03T19:00:08.868164Z",
+      "finishedAt": "2026-10-03T19:02:15.516505Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "package",
+        "--debug"
+      ],
+      "cwd": ".",
+      "durationMs": 126640.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "52c4fdfae4a278672d3d61d3b89159394e9a35e9c90d9a1cd73ad53341eac092",
+      "stderrSHA256": "07f833ecdfa422f7cee7131d0b2a8bb914d801f15a5a07e1b165084bf0776a62"
+    },
+    {
+      "commandId": "C-3adaac63-b41c-4759-8a33-690cf8eb72b6",
+      "startedAt": "2026-10-03T19:03:56.236505Z",
+      "finishedAt": "2026-10-03T19:04:28.904523Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "package",
+        "--debug"
+      ],
+      "cwd": ".",
+      "durationMs": 32656.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "52c4fdfae4a278672d3d61d3b89159394e9a35e9c90d9a1cd73ad53341eac092",
+      "stderrSHA256": "f33007f8f2afaae1125973d0711edc8dc6d1e32f2ddb0c49f77bdfba302be1da"
+    },
+    {
+      "commandId": "C-aa6902c5-053b-49da-8d02-082224cdf5dc",
+      "startedAt": "2026-10-03T19:04:34.051689Z",
+      "finishedAt": "2026-10-03T19:04:34.179838Z",
+      "argv": [
+        "H:/Android/platform-tools/adb.exe",
+        "-s",
+        "emulator-5590",
+        "shell",
+        "getprop",
+        "sys.boot_completed"
+      ],
+      "cwd": ".",
+      "durationMs": 125.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-9b39b664-4d1c-411f-a6e8-02e2b1afcf40",
+      "startedAt": "2026-10-03T19:05:56.561781Z",
+      "finishedAt": "2026-10-03T19:05:58.429653Z",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "durationMs": 1875.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "d5e3d8e34c712b189aa719a16dfb04a3aaaec96a017aa30408e9d59facc3bafe",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-cdc95871-755d-4935-ba1a-14a0a0b342da",
+      "startedAt": "2026-10-03T19:06:05.222221Z",
+      "finishedAt": "2026-10-03T19:06:05.359255Z",
+      "argv": [
+        "node",
+        "tests/clients/gui/auth.mjs"
+      ],
+      "cwd": ".",
+      "durationMs": 125.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "18085d47020c4111feec81738bc975289a2239ee7033dc7cb80d6141159910c9",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-678763e4-a513-4848-85f0-67e478c15525",
+      "startedAt": "2026-10-03T19:06:24.584126Z",
+      "finishedAt": "2026-10-03T19:06:50.262725Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "tests/clients/gui/native.py",
+        "gradle",
+        "assembleDebug"
+      ],
+      "cwd": ".",
+      "durationMs": 25671.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "8178436250c8764d9ec649cfc630d6b31964ef878443d25ee216e3ab5a04e9db",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-906756f4-9953-4752-b090-bc0a0b89c437",
+      "startedAt": "2026-10-03T19:07:41.441298Z",
+      "finishedAt": "2026-10-03T19:07:42.398811Z",
+      "argv": [
+        "H:/Android/platform-tools/adb.exe",
+        "-s",
+        "emulator-5590",
+        "install",
+        "-r",
+        "clients/mobile/app/build/outputs/apk/debug/app-debug.apk"
+      ],
+      "cwd": ".",
+      "durationMs": 937.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-541915e9-b032-4109-8ce8-15ced26fdff3",
+      "startedAt": "2026-10-03T19:08:13.007649Z",
+      "finishedAt": "2026-10-03T19:08:13.240567Z",
+      "argv": [
+        "H:/Android/platform-tools/adb.exe",
+        "-s",
+        "emulator-5590",
+        "shell",
+        "am",
+        "start",
+        "-n",
+        "im.platform.client/.MainActivity"
+      ],
+      "cwd": ".",
+      "durationMs": 219.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "e84956ab029642ba33f1d0d3ad283d2a83528bc9220d6bc4b9112b0abcdd6e2b",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-83ab842c-a4d2-4364-9faa-8f99ef0fe346",
+      "startedAt": "2026-10-03T19:08:20.617490Z",
+      "finishedAt": "2026-10-03T19:08:25.231300Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "clients",
+        "--json"
+      ],
+      "cwd": ".",
+      "durationMs": 4609.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "1b74aaf19d3f9e0f49e7cb89406194c228b15546c629dbc6d8eda8975e2ba070"
+    },
+    {
+      "commandId": "C-4a54a1d8-b627-4d9a-b030-130820fbbccd",
+      "startedAt": "2026-10-03T19:09:55.588423Z",
+      "finishedAt": "2026-10-03T19:09:59.658430Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "clients",
+        "--json"
+      ],
+      "cwd": ".",
+      "durationMs": 4015.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "b45d50a7cf1b79c01cfc8321d7511ea9a027cd5245221244d59d1d7543510ea6",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-375f184c-0ee6-405a-acd3-9622ffd897e5",
+      "startedAt": "2026-10-03T19:17:03.708599Z",
+      "finishedAt": "2026-10-03T19:17:07.390034Z",
+      "argv": [
+        "npm.cmd",
+        "--prefix",
+        "clients/desktop",
+        "run",
+        "build"
+      ],
+      "cwd": ".",
+      "durationMs": 3671.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "d5e3d8e34c712b189aa719a16dfb04a3aaaec96a017aa30408e9d59facc3bafe",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-312b61b1-d9a4-424e-aa64-2868e0eeff17",
+      "startedAt": "2026-10-03T19:17:22.712142Z",
+      "finishedAt": "2026-10-03T19:17:52.459843Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/native.py",
+        "gradle",
+        ":app:assembleDebug"
+      ],
+      "cwd": ".",
+      "durationMs": 29734.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "30fc6ec2e2fbfaee9ba170ebd680c0f3a2b0251babe8503b289626b458ed16fb",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-c4a2be0f-ce4e-4a23-9a92-34f33f0d4da4",
+      "startedAt": "2026-10-03T19:18:35.569681Z",
+      "finishedAt": "2026-10-03T19:19:03.830281Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/native.py",
+        "package",
+        "--debug",
+        "--bundles",
+        "nsis"
+      ],
+      "cwd": ".",
+      "durationMs": 28250.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "3256cc11c062cd5e38fd3cdfa4535e1671be4e796965c18e288fdf84e60dcb4e",
+      "stderrSHA256": "c7469305be358c45d50700ecfe9fbcaaca0225151767bda0b705cd6d5a18e257"
+    },
+    {
+      "commandId": "C-492314fd-c889-43db-8a72-6bf1d8881142",
+      "startedAt": "2026-10-03T19:19:28.058268Z",
+      "finishedAt": "2026-10-03T19:19:28.511785Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/certificates.py",
+        "H:/IM-platform/.git/worktrees/IM-platform3/gui-runtime/tls"
+      ],
+      "cwd": ".",
+      "durationMs": 453.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "c97591ebb8e79d15c17333f277b32ec5198e35b5dddd4306347955c88938aadb",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-2abde29c-1181-4391-a59d-0148824c96ba",
+      "startedAt": "2026-10-03T19:20:46.342940Z",
+      "finishedAt": "2026-10-03T19:20:46.657159Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/certificates.py",
+        "H:/IM-platform/.git/worktrees/IM-platform3/gui-runtime/tls-v2"
+      ],
+      "cwd": ".",
+      "durationMs": 312.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "cbf9fd6795ac2f37ea5b765e06adb9941b7fa3272d895bb6cda0cc8bfb89a41f",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-81ec7be5-4834-4834-9e92-cab2cab9d4b8",
+      "startedAt": "2026-10-03T19:23:06.516890Z",
+      "finishedAt": "2026-10-03T19:23:37.248519Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/native.py",
+        "gui-mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "durationMs": 30735.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "a0f1398a3eb86cfcbdee499b5ae03d28d0914d7c1a8c02afcd80121cb91c86ac",
+      "stderrSHA256": "2d61abb8af6d3b1159818c564ac60704536ee408b851d244c32b01fc76c22215"
+    },
+    {
+      "commandId": "C-83d30a97-6250-4c07-bdd4-6fe80b308520",
+      "startedAt": "2026-10-03T19:24:46.014280Z",
+      "finishedAt": "2026-10-03T19:25:08.561157Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/native.py",
+        "gui-mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "durationMs": 22547.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "a491fc6d22ff196c69d830fb3c17b08f99e3e9cbb067f34d0af4e8d5c775a55a",
+      "stderrSHA256": "273e5d3075ddc25a1f594374ae803be46cf8f956b692dd03fb1270fc311542f0"
+    },
+    {
+      "commandId": "C-60ecd34a-704b-4f57-99e3-bd03eea79b16",
+      "startedAt": "2026-10-03T19:25:21.653477Z",
+      "finishedAt": "2026-10-03T19:25:21.880736Z",
+      "argv": [
+        "H:/node.js/node.exe",
+        "tests/clients/gui/auth.mjs"
+      ],
+      "cwd": ".",
+      "durationMs": 219.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "a222605f3e3960b52cf62fd416e681380ed85fee56a6c557b73c40dbe6204817",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-ae1d30f7-6627-4867-b7d4-23e919176f13",
+      "startedAt": "2026-10-03T19:25:58.076483Z",
+      "finishedAt": "2026-10-03T19:25:58.590303Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/check_sources.py"
+      ],
+      "cwd": ".",
+      "durationMs": 516.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "9485617242846b82a3f5a428b8099f0645acb32aa327d7a805aaf3739d24b71f",
+      "stderrSHA256": "10d836da8649dfc23b3e5708756168fbbbd9750d3468742f9b21ce54163b3acb"
+    },
+    {
+      "commandId": "C-d85ccb4a-b8ee-4438-a409-83807fa55e75",
+      "startedAt": "2026-10-03T19:26:45.395791Z",
+      "finishedAt": "2026-10-03T19:26:47.307944Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/check_sources.py"
+      ],
+      "cwd": ".",
+      "durationMs": 1891.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "b53b8bf73cc010b5d5e65669073a3a18dc1fe1c44fde78dfeb938715e5d170b3",
+      "stderrSHA256": "82f7186b213870d079bafea520958263e3c55c6f8a630619f433286c048732cc"
+    },
+    {
+      "commandId": "C-e4d253d7-655a-4fc8-9de8-6aee42a6221b",
+      "startedAt": "2026-10-03T19:32:36.776921Z",
+      "finishedAt": "2026-10-03T19:32:41.428557Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/native.py",
+        "shared"
+      ],
+      "cwd": ".",
+      "durationMs": 4641.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "faed79cc29db08ad6a3bba4c0dbc075a394b8a68f5cf340742e383e5d2bbab5a",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "commandId": "C-81fff36a-a813-40ce-a417-34c74ac27c10",
+      "startedAt": "2026-10-03T19:32:49.336071Z",
+      "finishedAt": "2026-10-03T19:33:33.516822Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/native.py",
+        "mobile",
+        "--serial",
+        "emulator-5590"
+      ],
+      "cwd": ".",
+      "durationMs": 44171.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "f63047bf9a08a438a94ab3b2f69308ef709a77abac9ba3a94256fbe6b9266855",
+      "stderrSHA256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "commandId": "C-4b20f478-aa31-4a9e-82ab-3dec1702d20d",
+      "startedAt": "2026-10-03T19:30:14.990326Z",
+      "finishedAt": "2026-10-03T19:33:48.911247Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/native.py",
+        "package",
+        "--debug",
+        "--bundles",
+        "nsis"
+      ],
+      "cwd": ".",
+      "durationMs": 213906.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "4cf34afa5905e43a6d85ec47172affe892f3fc874c449f9b6f74a2dbee7e616e",
+      "stderrSHA256": "5feca1e4f1f6a209fea27e5d4c28137620e2e70b07217ab4776d441b01a7f323"
+    },
+    {
+      "commandId": "C-d96ae97e-e398-48ea-b1c2-65935384042d",
+      "startedAt": "2026-10-03T19:34:33.169522Z",
+      "finishedAt": "2026-10-03T19:34:46.877257Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/check_sources.py"
+      ],
+      "cwd": ".",
+      "durationMs": 13687.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "338d3b542a508a394d5081407058fbc0e2bb03cd08705326536ec5cb59f48035",
+      "stderrSHA256": "f2365a64724b683fa481efc1784ef619766aaae8b59c735a7ad34b46db5a06f6"
+    },
+    {
+      "commandId": "C-a76c5395-6b36-4b8a-8f6d-bed58d5d0028",
+      "startedAt": "2026-10-03T19:35:21.124224Z",
+      "finishedAt": "2026-10-03T19:35:25.391562Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/capture_android.py",
+        "H:/.codex/worktrees/s/IM-platform/spec/progress/evidence/LOOP1-CLIENT-GUI-001/preliminary/android-login-navigation-fixed.png"
+      ],
+      "cwd": ".",
+      "durationMs": 4265.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "01fb20a2cf21c7bdeff8f0fd601ff75baf4c0aa0d8f829b6b07096fe7ec56ee8"
+    },
+    {
+      "commandId": "C-4272dce9-27c7-4bfc-86ef-9d4b422fb098",
+      "startedAt": "2026-10-03T19:36:15.271969Z",
+      "finishedAt": "2026-10-03T19:36:18.113405Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/capture_android.py",
+        "H:/.codex/worktrees/s/IM-platform/spec/progress/evidence/LOOP1-CLIENT-GUI-001/preliminary/android-login-navigation-fixed.png"
+      ],
+      "cwd": ".",
+      "durationMs": 2828.0,
+      "exitCode": 1,
+      "result": "FAIL",
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "38152db587b95ba41be3b84cb3ece33948f711e6daca132891c28d4a2b235fa9"
+    },
+    {
+      "commandId": "C-386a8849-1aa9-4539-be36-f319ae4b58ca",
+      "startedAt": "2026-10-03T19:37:02.857573Z",
+      "finishedAt": "2026-10-03T19:37:05.682051Z",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "tests/clients/gui/capture_android.py",
+        "H:/.codex/worktrees/s/IM-platform/spec/progress/evidence/LOOP1-CLIENT-GUI-001/preliminary/android-login-navigation-fixed-v2.png"
+      ],
+      "cwd": ".",
+      "durationMs": 2828.0,
+      "exitCode": 0,
+      "result": "PASS",
+      "stdoutSHA256": "14f9faa5f797b093013addea399cbf30d906981ec94c9cd3089c1850ccaa28d5",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

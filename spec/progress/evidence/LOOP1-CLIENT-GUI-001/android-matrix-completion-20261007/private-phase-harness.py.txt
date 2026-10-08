@@ -1,0 +1,39 @@
+from pathlib import Path
+import subprocess,json,re,sys,time,threading,hashlib,os,uuid
+P=Path('H:/.codex/gui-handoffs/20261007-android-evidence-fix');A='H:/Android/platform-tools/adb.exe';S='emulator-5590';D='C:/Program Files/Docker/Docker/resources/bin/docker.exe'
+public=Path(sys.argv[1]);pub=json.loads(public.read_text());(P/'public.json').write_text(json.dumps(pub,indent=2));users={u['displayName'].split()[-1]:u for u in pub['accounts']};project=pub['project'];pg=project+'-postgres-1';tls=project+'-tls-go-1'
+def cmd(*a,timeout=300):return subprocess.check_output([A,'-s',S,*a],text=True,timeout=timeout)
+def dc(*a):return subprocess.check_output([D,*a],text=True,timeout=60)
+for container,service in [(pg,'postgres'),(tls,'tls-go')]:
+ labels=json.loads(dc('inspect',container))[0]['Config']['Labels'];assert labels['com.docker.compose.project']==project and labels['com.docker.compose.service']==service
+out=P/('attempt-'+str(time.time_ns()));out.mkdir();events=[];fail=[]
+def controller():
+ try:
+  for name,table in [('auth','users'),('search','users'),('error',None),('restore',None),('sync','user_sync_events')]:
+   for _ in range(360):
+    paths=cmd('shell','if [ -d /sdcard/Android/data/im.platform.client/files/gui-auth ]; then find /sdcard/Android/data/im.platform.client/files/gui-auth -name '+name+'-ready; fi',timeout=10).splitlines()
+    if paths:break
+    time.sleep(.5)
+   else:raise RuntimeError('Readiness marker absent '+name)
+   marker=paths[-1];proceed=marker.replace(name+'-ready',name+'-continue');lock=None
+   if table:
+    sql='BEGIN; LOCK TABLE '+table+' IN ACCESS EXCLUSIVE MODE; SELECT pg_sleep(6); ROLLBACK;'
+    log=(out/(name+'-lock.txt')).open('w');lock=subprocess.Popen([D,'exec',pg,'psql','-U','im','-d','im','-v','ON_ERROR_STOP=1','-Atc',sql],stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW)
+    for _ in range(50):
+     n=dc('exec',pg,'psql','-U','im','-d','im','-Atc',"SELECT count(*) FROM pg_stat_activity WHERE wait_event='PgSleep' AND query LIKE 'BEGIN; LOCK TABLE "+table+" IN ACCESS EXCLUSIVE MODE;%'").strip()
+     if n=='1':break
+     time.sleep(.1)
+    else:raise RuntimeError('Owned lock not observed '+name)
+   elif name=='error':dc('stop',tls)
+   else:dc('start',tls)
+   cmd('shell','touch '+proceed,timeout=10);events.append({'step':name,'ownedProject':project,'pgSleepObserved':table is not None,'table':table,'seconds':6 if table else None,'tlsControl':'stop' if name=='error' else 'start' if name=='restore' else None})
+   if lock:assert lock.wait(timeout=15)==0;log.close()
+ except Exception as e:fail.append(repr(e))
+cmd('shell','am','force-stop','im.platform.client');cmd('shell','pm','clear','im.platform.client');cmd('logcat','-c')
+t=threading.Thread(target=controller,daemon=True);t.start();start=time.monotonic()
+argv=['am','instrument','-w','-e','phase','evidence-complete','-e','avery',users['Avery']['username'],'-e','riley',users['Riley']['username'],'-e','rileyId',users['Riley']['userId'],'im.platform.client.test/im.platform.client.ui.GuiAuthenticatedInstrumentation']
+text=cmd('shell',__import__('shlex').join(argv),timeout=600);(out/'instrumentation.txt').write_text(text);(out/'androidruntime.txt').write_text(cmd('logcat','-d','-s','AndroidRuntime:E'));m=re.search(r'captureRun=(\d+)',text)
+if m:cmd('pull','/sdcard/Android/data/im.platform.client/files/gui-auth/'+m[1],str(out/'screens'))
+(out/'controls.json').write_text(json.dumps({'events':events,'failures':fail},indent=2))
+src=[Path('clients/mobile/app/src/main/kotlin/im/platform/client/ui/Workspace.kt'),Path('clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiAuthenticatedInstrumentation.kt')]
+(out/'run.json').write_text(json.dumps({'phase':'evidence-complete','elapsedSeconds':time.monotonic()-start,'captureRun':m[1] if m else None,'sourceHEAD':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'sourceDirtyAtCapture':bool(subprocess.check_output(['git','status','--porcelain'],text=True).strip()),'apkHashes':json.loads((P/'apk-hashes.json').read_text()),'sourceHashes':{str(p).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest() for p in src},'publicFixture':pub,'runtime':'actual API34 x86_64 IMClientSend34 emulator5590'},indent=2));print(text);print('Evidence attempt '+str(out));assert 'INSTRUMENTATION_RESULT: result=PASS' in text and 'INSTRUMENTATION_CODE: -1' in text

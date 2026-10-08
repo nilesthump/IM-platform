@@ -1,0 +1,34 @@
+{
+  "task": "LOOP1-CLIENT-GUI-001",
+  "sourceSHA": "baedd9975d28e2ae9f9931dfd48a66dc5036dd9f",
+  "sourceCleanAtBuild": true,
+  "buildCommand": "python tests/clients/gui/native.py package --debug --bundles nsis",
+  "buildExitCode": 0,
+  "ownedSilentInstallerExitCode": 0,
+  "paths": {
+    "installer": "H:/.codex/toolchains/client-gui/target/x86_64-pc-windows-msvc/debug/bundle/nsis/IM Plus_0.1.0_x64-setup.exe",
+    "builtExecutable": "H:/.codex/toolchains/client-gui/target/x86_64-pc-windows-msvc/debug/im-client-storage.exe",
+    "installedExecutable": "H:/.codex/toolchains/client-gui/installed/im-client-storage.exe"
+  },
+  "sha256": {
+    "installer": "0aae361a905455b80be78e682278bd2e249418280dc40664776d3136963e91e4",
+    "builtExecutable": "a10f4ae9b073c6e68f7993dc966edd627cb30368303f1e40d7a0f8b378fa79c8",
+    "installedExecutable": "743749fe62e2a38131ac37bcafd90e412d9368d3eabda770c5bf9e32e98955bb"
+  },
+  "expectedNsisExecutableSHA256": "743749fe62e2a38131ac37bcafd90e412d9368d3eabda770c5bf9e32e98955bb",
+  "packagedInstalledBytesEqual": true,
+  "rawTargetInstalledBytesEqual": false,
+  "rawDifference": {
+    "count": 3,
+    "offsets": [
+      15848104,
+      15848105,
+      15848106
+    ],
+    "meaning": "Official Tauri build bundle-type marker UNK->NSS in .rdata; NSS denotes Nsis. No file was changed by this verification."
+  },
+  "authoritySource": "installed approved Tauri-utils2.10.1 src/platform.rs lines351-371 plus recorded package log Patching bundle type information nsis",
+  "originalFailure": "Full raw target/installed SHA assertion failed; preserved in Recorder. It compared unpatched target to correctly bundle-patched NSIS installed artifact.",
+  "nativeVisualProof": "PENDING; inventory succeeded, capture was Coordinator-cancelled with unknown activation/capture outcome",
+  "trustInstalled": false
+}

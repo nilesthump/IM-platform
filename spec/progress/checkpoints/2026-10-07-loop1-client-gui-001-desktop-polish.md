@@ -1,0 +1,5 @@
+# Desktop UI refinement recovery, 2026-10-07
+
+LOOP1-CLIENT-GUI-001 active/S2OPEN, task/LOOP1-CLIENT-GUI-001-ui-update in assigned managed gui-ui-update. Parent2ce8a00. Four Human current Desktop corrections packaged/installed, frontend/auth tests and focused direction/bounds7controls PASS. Evidence spec/progress/evidence/LOOP1-CLIENT-GUI-001/desktop-polish-20261007/, candidateSHA in final-state after commit. No new native visual assertion/independent acceptance/main sync. Six original screenshot moves and unknown main work preserved.
+
+User ordinary desktop launch previously logged in; updated exe selected in Explorer for next manual check. Same fixture project39112/live session58647 left for user inspection; exact owned cleanup and real desktop-context root rollback/rejection after user finishes. Tool-side root view discrepancy persists, not security bypass. Next Human visual feedback/full acceptance, then fresh unified independent Review/exact-headCI/protected safe main integration/synchronization. Keep attached worktree.

@@ -1,0 +1,5 @@
+# GUI approved-mount local recovery checkpoint, 2026-10-04
+
+Assigned managed gui-resume root, task/LOOP1-CLIENT-GUI-001; input5bf9c3e bounded helper review. Product checkpoints14e0cc3/e39e190; final actual Android APKca74da4b9e1462215b073c5d0d6ae85a87aefc2156f45f1e22f2aff960a19428. Local actual GUI results and all failures in mount-approved-20261004 manifest/handoff. Exact approved trust fully rolled back: full134-cert fresh namespace baseline, defaultTLS rejection, Enforcing/uid2000, no owned path/reverse. Windows original74 Root unchanged/CA absent; owned fixture containers/volumes absent.
+
+Recovery only, not acceptance. Task active/BLOCKED_EXTERNAL_ACCESS for Windows authenticated/native toast/tray; native review pending, S2 OPEN. No Architect/full independent Review/CI/push/sync. Main accepted ffd6b63ac9396e577f0bb5c3d3ac02ee4915d597 unchanged. Final clean recovery SHA/Recorder validation external. Next exact action: remaining approved Windows proof through stable supported native access, then unified approval/review/CI/integration/sync.

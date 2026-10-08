@@ -1,0 +1,9 @@
+# Corrected bounded Windows WSS Origin proposal
+
+Human approval remains exact http://tauri.localhost and the named ADR/Gateway/test paths. This proposal is text only; Gateway product bytes remain unchanged. A fresh independent authority Review and applicable exact-head hosted CI are required before implementation. No ADR-0009 timing exception applies.
+
+Retain websocket.Upgrader{} and leave CheckOrigin nil for every request except exactly one Origin header value equal to http://tauri.localhost. Only that request receives a constant true callback. All other Origin processing delegates to the unchanged locked Gorilla v1.5.3 implementation, including its ASCII-only host comparison, absent/same-host and existing multiple-value behavior. No copied parser, strings.EqualFold, dependency, wildcard or generalized policy is needed.
+
+The original independent P2 FAIL and original proposal are preserved byte-for-byte under windows-origin-fix20261008 with source/hash bindings. Kelvin-sign Origin http://K.local against Host k.local remains HTTP403. Local proposal-only probe uses actual locked Gorilla upgrade/dial and proves 18 controls: absent, same-host, ASCII case, exact Tauri, unrelated, lookalike, Kelvin, multiple Tauri and non-exact Tauri. Only exact Tauri changes from403 to101. This probe does not run Gateway auth.bind or establish product/native GUI acceptance.
+
+After authority acceptance, focused Gateway tests must additionally prove accepted connections remain unauthenticated until valid auth.bind, query-token prohibition and unchanged existing authentication/protocol behavior. Actual native committed SEND/retry convergence/reconnect/default TLS and full GUI acceptance/integration/main synchronization remain pending. Task remains review/S2 OPEN; affected product repair remains BLOCKED_BY_ARCHITECTURE pending authority Review/hosted CI.

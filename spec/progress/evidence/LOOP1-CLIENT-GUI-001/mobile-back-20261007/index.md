@@ -1,0 +1,18 @@
+# Android final arrow capture set
+
+- [screenshots/anonymous-login.png](screenshots/anonymous-login.png)
+- [screenshots/back-to-chat-list.png](screenshots/back-to-chat-list.png)
+- [screenshots/cold-ai.png](screenshots/cold-ai.png)
+- [screenshots/cold-chat-list.png](screenshots/cold-chat-list.png)
+- [screenshots/cold-conversation.png](screenshots/cold-conversation.png)
+- [screenshots/cold-friends.png](screenshots/cold-friends.png)
+- [screenshots/cold-plugin.png](screenshots/cold-plugin.png)
+- [screenshots/cold-settings-theme.png](screenshots/cold-settings-theme.png)
+- [screenshots/logout-22.png](screenshots/logout-22.png)
+- [screenshots/registration-success.png](screenshots/registration-success.png)
+- [screenshots/registration.png](screenshots/registration.png)
+- [screenshots/sent.png](screenshots/sent.png)
+- [screenshots/warm-chat-list-22.png](screenshots/warm-chat-list-22.png)
+- [screenshots/warm-conversation-22.png](screenshots/warm-conversation-22.png)
+- [screenshots/warm-friends.png](screenshots/warm-friends.png)
+- [screenshots/warm-settings-22.png](screenshots/warm-settings-22.png)

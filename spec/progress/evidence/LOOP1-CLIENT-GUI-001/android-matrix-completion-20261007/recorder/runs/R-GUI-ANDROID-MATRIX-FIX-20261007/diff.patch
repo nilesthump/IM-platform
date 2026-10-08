@@ -1,0 +1,196 @@
+diff --git a/clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiAuthenticatedInstrumentation.kt b/clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiAuthenticatedInstrumentation.kt
+index 1fd0445..c93a31d 100644
+--- a/clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiAuthenticatedInstrumentation.kt
++++ b/clients/mobile/app/src/androidTest/kotlin/im/platform/client/ui/GuiAuthenticatedInstrumentation.kt
+@@ -86,7 +86,11 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
+  }
+  private fun capture(name:String){
+   Thread.sleep(250);val d=java.io.File(targetContext.getExternalFilesDir(null),"gui-auth/$captureRun").apply{mkdirs()}
+-  val b=checkNotNull(uiAutomation.takeScreenshot());java.io.File(d,name+".png").outputStream().use{check(b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it))};b.recycle()
++  val b=checkNotNull(uiAutomation.takeScreenshot());java.io.File(d,name+".png").outputStream().use{check(b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it))}
++  if(args.getString("phase")=="evidence-complete"){
++   val s=actualViewModel().state.value
++   java.io.File(d,name+".json").writeText(org.json.JSONObject().put("theme",s.appearance.theme).put("fontSize",s.appearance.fontSize).put("spacingDensity",s.appearance.density).put("busy",s.busy).put("error",s.error).put("connection",s.connection).put("sync",s.sync).put("conversationCount",s.conversations.size).put("friendCount",s.friends.size).put("resultCount",s.results.size).put("messageCount",s.messages.size).put("conversationSelected",s.selected.isNotEmpty()).put("width",b.width).put("height",b.height).toString(2))
++  };b.recycle()
+  }
+  private fun delivery(text:String,status:String):List<String?>{
+   val account=checkNotNull(Auth("https://localhost:8443",Preferences(targetContext)).savedAccount())
+@@ -190,6 +194,12 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
+   repeat(10){if(scroll(actualRoot(),AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD)){waitForIdleSync();Thread.sleep(100)}}
+   reach(current);click(current)
+  }
++ private fun controlled(name:String){
++  val directory=java.io.File(targetContext.getExternalFilesDir(null),"gui-auth/$captureRun").apply{mkdirs()}
++  java.io.File(directory,name+"-ready").writeText(captureRun)
++  val proceed=java.io.File(directory,name+"-continue");repeat(1200){if(!proceed.exists())Thread.sleep(50)};verify(proceed.exists())
++ }
++ private fun top(){repeat(10){if(scroll(actualRoot(),AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD)){waitForIdleSync();Thread.sleep(100)}}}
+  override fun onCreate(arguments:Bundle?){super.onCreate(arguments);args=arguments?:Bundle();start()}
+  override fun onStart(){
+   val result=Bundle();val prefs=Preferences(targetContext);val appearance=prefs.loadAppearance()
+@@ -207,7 +217,29 @@ class GuiAuthenticatedInstrumentation:Instrumentation(){
+    result.putString("defaultHostnameMismatch","PASS");prefs.saveAppearance(Appearance("cold",14,.8f))
+    activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));await("Open your workspace")
+    val phase=args.getString("phase")?:"matrix"
+-   if(phase=="ui-revision"){
++   if(phase=="evidence-complete"){
++    fill("Username",args.getString("riley")!!);fill("Password","wrong-fixture-password");backKeyboard();reach("Sign in");click("Sign in");await("Session expired. Sign in again.");capture("auth-error")
++    fill("Password","fixture-password-not-a-real-secret");backKeyboard();reach("Sign in");controlled("auth");click("Sign in");await("Please wait…");verify(actualViewModel().state.value.busy);capture("auth-loading");await("Connected")
++    repeat(100){if(actualViewModel().state.value.busy||actualViewModel().state.value.sync!="idle")Thread.sleep(100)}
++    verify(actualViewModel().state.value.conversations.isEmpty());await("Your next conversation starts here");capture("empty-chat-list")
++    navigate("Friends");await("Your circle is waiting to grow.");capture("empty-friends")
++    fill("Username","gui_absent_"+captureRun);backKeyboard();reach("Search");click("Search");repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)};reach("No matching user shown.");verify(actualViewModel().state.value.results.isEmpty());capture("friend-not-found")
++    fill("Username",args.getString("avery")!!);backKeyboard();reach("Search");controlled("search");click("Search");await("Searching…");verify(actualViewModel().state.value.busy);capture("friends-search-loading");await("GUI Fixture Avery");capture("friends-search-success");reach("Add friend");click("Add friend");repeat(300){if(actualViewModel().state.value.busy)Thread.sleep(100)}
++    navigate("Chat");if(find(actualRoot(),"←")==null)click("GUI Fixture Avery");await("No messages yet. Say hello.");verify(actualViewModel().state.value.messages.isEmpty()&&actualViewModel().state.value.selected.isNotEmpty());capture("empty-conversation")
++    settingsControl("Go offline");await("Offline");navigate("Friends");top();fill("Username",args.getString("avery")!!);backKeyboard();reach("Search");controlled("error");click("Search");await("Connection unavailable");verify(!actualViewModel().state.value.busy&&actualViewModel().state.value.results.isEmpty());capture("friends-transport-error");controlled("restore")
++    navigate("Settings");reach("Reconnect");controlled("sync");click("Reconnect");await("Syncing…");verify(actualViewModel().state.value.sync=="syncing");capture("sync-reconnecting");await("Connected")
++    toggleTheme();verify(actualViewModel().state.value.appearance.theme=="warm");navigate("AI");reach("No AI service is connected. Your conversations are not sent to an AI provider.");capture("warm-ai");navigate("Plugin");reach("No plugin runtime or installation service is connected in this release.");capture("warm-plugin")
++    navigate("Settings");top();repeat(8){click("+")};reach("Comfort");click("Comfort");verify(actualViewModel().state.value.appearance==Appearance("warm",22,1.2f))
++    for(theme in listOf("warm","cold")){
++     if(actualViewModel().state.value.appearance.theme!=theme)toggleTheme()
++     navigate("Settings");top();reach("Font size: 22px");capture(theme+"-settings-22-top");reach("Profile & session");capture(theme+"-profile-22");reach("Sign out");capture(theme+"-session-22-bottom")
++     navigate("Friends");top();fill("Username",args.getString("avery")!!);backKeyboard();reach("Search");click("Search");await("GUI Fixture Avery");reach("Add friend");capture(theme+"-friends-22-search");reach("Your friends");reach("Message");capture(theme+"-friends-22-bottom")
++     navigate("AI");top();capture(theme+"-ai-22-top");reach("No AI service is connected. Your conversations are not sent to an AI provider.");capture(theme+"-ai-22-bottom")
++     navigate("Plugin");top();capture(theme+"-plugin-22-top");reach("No plugin runtime or installation service is connected in this release.");capture(theme+"-plugin-22-bottom")
++    }
++    settingsControl("Sign out");await("Open your workspace");click("New here? Create an account");fill("Username","gui_confirm_"+captureRun);fill("Password","fixture-password-not-a-real-secret");fill("Confirm password","different-fixture-password");backKeyboard();reach("Create account");click("Create account");await("Passwords do not match");capture("registration-mismatch-22");reach("Already have an account? Sign in");capture("registration-22-bottom")
++   }else if(phase=="ui-revision"){
++
+     verify(find(actualRoot(),"Friends")==null&&find(actualRoot(),"Settings")==null&&find(actualRoot(),"Server")==null);headerAbsent();capture("anonymous-login")
+     click("New here? Create an account");fill("Username","gui_ui_"+captureRun);fill("Password","fixture-password-not-a-real-secret");fill("Confirm password","fixture-password-not-a-real-secret");backKeyboard();reach("Create account");capture("registration");click("Create account");await("Account created. Sign in to continue.");capture("registration-success")
+     login(args.getString("avery")!!);await("GUI Fixture Morgan");verify(actualViewModel().state.value.selected.isEmpty());verify(find(actualRoot(),"Message")==null);headerAbsent();capture("cold-chat-list")
+
+# Untracked paths observed; content intentionally not captured
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/androidruntime.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/capture-test-source-reconstructed.kt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/controls.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/instrumentation.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/run.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/screens/auth-error.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/screens/auth-error.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/screens/auth-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/screens/failure.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a1/screens/failure.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/androidruntime.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/auth-lock.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/capture-test-source-reconstructed.kt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/controls.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/instrumentation.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/run.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/auth-continue
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/auth-error.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/auth-error.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/auth-loading.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/auth-loading.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/auth-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/empty-chat-list.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/empty-chat-list.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/empty-friends.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/empty-friends.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/failure.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/failure.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/friend-not-found.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/friend-not-found.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/friends-search-loading.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/friends-search-loading.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/friends-search-success.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/friends-search-success.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/search-continue
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/screens/search-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a2/search-lock.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/androidruntime.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/auth-lock.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/controls.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/instrumentation.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/run.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/auth-continue
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/auth-error.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/auth-error.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/auth-loading.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/auth-loading.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/auth-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-ai-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-ai-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-ai-22-top.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-ai-22-top.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-friends-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-friends-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-friends-22-search.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-friends-22-search.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-plugin-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-plugin-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-plugin-22-top.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-plugin-22-top.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-profile-22.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-profile-22.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-session-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-session-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-settings-22-top.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/cold-settings-22-top.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/empty-chat-list.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/empty-chat-list.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/empty-conversation.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/empty-conversation.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/empty-friends.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/empty-friends.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/error-continue
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/error-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friend-not-found.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friend-not-found.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friends-search-loading.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friends-search-loading.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friends-search-success.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friends-search-success.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friends-transport-error.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/friends-transport-error.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/registration-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/registration-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/registration-mismatch-22.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/registration-mismatch-22.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/restore-continue
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/restore-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/search-continue
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/search-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/sync-continue
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/sync-ready
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/sync-reconnecting.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/sync-reconnecting.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-ai-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-ai-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-ai-22-top.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-ai-22-top.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-ai.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-ai.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-friends-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-friends-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-friends-22-search.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-friends-22-search.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-plugin-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-plugin-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-plugin-22-top.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-plugin-22-top.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-plugin.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-plugin.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-profile-22.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-profile-22.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-session-22-bottom.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-session-22-bottom.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-settings-22-top.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/screens/warm-settings-22-top.png
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/search-lock.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/a3/sync-lock.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/apk-hashes.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/cleanup.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/fix-report.md
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/fixture.stderr.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/fixture.stdout.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/manifest.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/private-fixture-harness.py.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/private-next-account.py.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/private-phase-harness.py.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/public.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/rollback-apk-hash.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/rollback-tls.txt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/rollback.json
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/test-source-at-capture.kt
+# ?? spec/progress/evidence/LOOP1-CLIENT-GUI-001/android-matrix-completion-20261007/tls-identity.json

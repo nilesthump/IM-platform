@@ -1,0 +1,19 @@
+case=absent candidate=false status=101 expected=101 error=<nil>
+case=absent candidate=true status=101 expected=101 error=<nil>
+case=same-host candidate=false status=101 expected=101 error=<nil>
+case=same-host candidate=true status=101 expected=101 error=<nil>
+case=ASCII-case candidate=false status=101 expected=101 error=<nil>
+case=ASCII-case candidate=true status=101 expected=101 error=<nil>
+case=exact-Tauri candidate=false status=403 expected=403 error=websocket: bad handshake
+case=exact-Tauri candidate=true status=101 expected=101 error=<nil>
+case=unrelated candidate=false status=403 expected=403 error=websocket: bad handshake
+case=unrelated candidate=true status=403 expected=403 error=websocket: bad handshake
+case=lookalike candidate=false status=403 expected=403 error=websocket: bad handshake
+case=lookalike candidate=true status=403 expected=403 error=websocket: bad handshake
+case=Kelvin candidate=false status=403 expected=403 error=websocket: bad handshake
+case=Kelvin candidate=true status=403 expected=403 error=websocket: bad handshake
+case=multiple-Tauri candidate=false status=403 expected=403 error=websocket: bad handshake
+case=multiple-Tauri candidate=true status=403 expected=403 error=websocket: bad handshake
+case=non-exact-Tauri candidate=false status=403 expected=403 error=websocket: bad handshake
+case=non-exact-Tauri candidate=true status=403 expected=403 error=websocket: bad handshake
+PASS locked Gorilla v1.5.3 18 handshake controls; only exact Tauri admission changes. Proposal probe only, no Gateway implementation/auth-bind acceptance.

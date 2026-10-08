@@ -1,0 +1,11 @@
+# Accepted-main integration fix
+
+Fresh Fix Agent /root/gui_main_integration_fix; assigned root H:/.codex/worktrees/g/IM-platform, branch task/LOOP1-CLIENT-GUI-001-resume. Normal merge GUI `25ec0f596d1c3ae591f6f9e295935d3cbe11811f` with independently accepted main `7088ecd5c905dceadae8ed2f504d54d6585ca3dc`; no main workspace writes, push, UI/trust/helper/fixture operations.
+
+Resolve only the three expected metadata conflicts: accepted-main ADR0009 bytes, accepted Native done task with obsolete review deletion, retained new GUI recovery state. Auto-merged Native authority/evidence is checked against accepted main. Prior conflicting snapshots archived byte-exact with Git commit provenance. Product, contracts and canonical bytes remain unchanged.
+
+Initial readonly architecture baseline failed on known ignored generated outputs. Checked reversible isolation restored1579 files byte-exact and architecture/frozen passed (baseline-before.json). Initial archive path comparison failed before copying; normal merge nevertheless began because the invocation did not stop on that child failure. Committed historical bytes were then recovered byte-exact from both immutable parent objects before any conflict resolution. This sequence limitation is disclosed; initial failure remains in Recorder.
+
+Fresh full independent Review and exact merged-head hosted CI/protected integration/actual-main/safe synchronization remain required. GUI review/S2 OPEN; helper occupation regression alone deferred S2 Gate.
+
+Resolved-candidate architecture/frozen and Development recovery PASS (resolved-local-verification.json), with53 architecture controls and1579 original ignored files restored byte-exact. An initial direct Development run failed only because ignored generated outputs were present; corrected owned-output isolation passes. CRLF-aware authored-text diffcheck PASS; byte-exact historical archives retain original whitespace and are excluded from authored-text cleanliness claims. Derived Windows manifest actor labels corrected for five local Evidence Fix baseline receipts; original manifest archived unchanged. Private Recorder command gaps for direct path/status/Development invocations are disclosed; structural validation is not Task acceptance.

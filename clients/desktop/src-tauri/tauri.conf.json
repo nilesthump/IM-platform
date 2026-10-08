@@ -1,14 +1,36 @@
 {
-  "productName": "IM Storage",
+  "productName": "IM Plus",
+  "mainBinaryName": "im-client-storage",
   "version": "0.1.0",
   "identifier": "im.platform.desktop",
   "build": {
-    "frontendDist": "../dist"
+    "frontendDist": "../dist",
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
-    "windows": []
+    "windows": [
+      {
+        "label": "main",
+        "title": "IM+ · PlugWorldIM",
+        "width": 1280,
+        "height": 840,
+        "minWidth": 960,
+        "minHeight": 700,
+        "decorations": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'sha256-8b4+TnTdj4cDg7tTNA5r/fKSwKctexYPojz4jEsFEFg='; style-src 'self' 'unsafe-inline'; img-src 'self' asset: data:; connect-src ipc: http://ipc.localhost wss:; object-src 'none'; frame-src 'none'"
+    }
   },
   "bundle": {
-    "active": false
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
   }
 }

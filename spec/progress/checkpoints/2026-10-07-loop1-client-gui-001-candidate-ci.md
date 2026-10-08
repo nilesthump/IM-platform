@@ -1,0 +1,17 @@
+# LOOP1-CLIENT-GUI-001 candidate CI recovery point
+
+# Unified GUI candidate publication and hosted acceptance snapshot
+
+Ordinary task branch `task/LOOP1-CLIENT-GUI-001-resume` was pushed under prior Human unified-review/publication authorization; draft PR24 remains OPEN. Its independently reviewed candidate `6db3a60ece381ce5120b754beec4fb9edd4d9c2f` passed exact pull_request Loop 1 CI run37632756512. Raw API evidence verifies PR HEAD, remote task ref, workflow path/event, every required instance and final run success.
+
+The workflow has 13 logical job groups and 14 actual instances: Desktop expands Ubuntu and Windows. classify/go/java/web/desktop(ubuntu)/desktop(windows)/mobile/shared/compatibility/deploy/architecture/source_go/source_java/gate all completed success; none missing, failed, cancelled or skipped. Earlier readiness phrase '13 actual jobs' is corrected by actual matrix instances; its old zero-run snapshots remain historical, unchanged. Classifier log is preserved.
+
+Original independent metadata extension at clean6db passed with eight original indexed files copied byte-for-byte plus its untouched index and additive newline disclosure. Clean recovery Acceptance exited0 in20.265s, architecture/frozen/53tests PASS, all owned outputs restored. The report does not review a later recovery HEAD.
+
+Initial Git push stalled; only its identified owned HTTPS transport was stopped. Subsequent OpenSSL issuer-chain and Schannel connection-reset failures remain in command evidence. Successful ordinary push explicitly used sslVerify=true, Schannel, HTTP/1.1, bounded low-speed timeout and per-command existing gh credential helper. No global Git config or trust-store mutation. A preexisting user Git sslVerify=false setting was observed; the successful command explicitly overrode it to true. No token is copied into evidence.
+
+Task remains review/S2 OPEN. Human deferred only local validation actually blocked by occupied Windows files to S2 Gate. Actual native GUI/notification/tray/shortcut checks and same-desktop-account machine CA/defaultTLS rollback remain pending; '已删除' is Human-reported CA removal. Hosted Windows build/tests do not replace local native GUI proof. No Taskdone, protected integration or main synchronization. Main remainsffd6b63/31 unknown status entries, preserved.
+
+This snapshot binds candidate6db, not the later evidence commit that stores it. Subsequent metadata HEAD must receive separate independent review and exact-head hosted verification; PR24 and linked hosted runs provide durable actual-head evidence without self-referential commit claims. Root Recorder remains private at H:/.codex/gui-handoffs/20261007-gui-android-review-resume/research, with original failures and disclosed trace gaps; final sealing/validation is separate from product acceptance.
+
+Evidence: spec/progress/evidence/LOOP1-CLIENT-GUI-001/hosted-publication-20261007/. Previous Android/source slice checkpoint remains unchanged.

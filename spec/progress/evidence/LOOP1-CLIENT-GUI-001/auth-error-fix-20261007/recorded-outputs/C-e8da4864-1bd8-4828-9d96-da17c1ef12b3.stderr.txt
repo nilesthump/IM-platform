@@ -1,0 +1,21 @@
+android.util.AndroidException: INSTRUMENTATION_FAILED: im.platform.client.test/im.platform.client.ui.GuiAuthenticatedInstrumentation
+	at com.android.commands.am.Instrument.run(Instrument.java:535)
+	at com.android.commands.am.Am.runInstrument(Am.java:208)
+	at com.android.commands.am.Am.onRun(Am.java:85)
+	at com.android.internal.os.BaseCommand.run(BaseCommand.java:62)
+	at com.android.commands.am.Am.main(Am.java:54)
+	at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+	at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:359)
+Traceback (most recent call last):
+  File "H:\.codex\gui-handoffs\20261007-auth-error-fix\phase.py", line 31, in <module>
+    text=cmd('shell',shlex.join(argv),timeout=600);(out/'instrumentation.txt').write_text(text,encoding='utf-8');(out/'androidruntime.txt').write_text(cmd('logcat','-d','-s','AndroidRuntime:E'),encoding='utf-8');m=re.search(r'captureRun=(\d+)',text)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\.codex\gui-handoffs\20261007-auth-error-fix\phase.py", line 5, in cmd
+    def cmd(*a,timeout=300):return subprocess.check_output([A,'-s',S,*a],text=True,timeout=timeout)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\21441\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['H:/Android/platform-tools/adb.exe', '-s', 'emulator-5590', 'shell', 'am instrument -w -e phase auth-errors -e avery gui_avery_f2ad69 im.platform.client.test/im.platform.client.ui.GuiAuthenticatedInstrumentation']' returned non-zero exit status 1.

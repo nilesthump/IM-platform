@@ -1,0 +1,13 @@
+--- a/backend/go/gateway/gateway.go
++++ b/backend/go/gateway/gateway.go
+@@ -89,6 +89,10 @@
+ 		return
+ 	}
+ 	upgrader := websocket.Upgrader{}
++	origins := r.Header["Origin"]
++	if len(origins) == 1 && origins[0] == "http://tauri.localhost" {
++		upgrader.CheckOrigin = func(*http.Request) bool { return true }
++	}
+ 	ws, err := upgrader.Upgrade(w, r, nil)
+ 	if err != nil {
+ 		return

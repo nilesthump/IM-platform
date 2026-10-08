@@ -89,6 +89,9 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	upgrader := websocket.Upgrader{}
+	if origins := r.Header["Origin"]; len(origins) == 1 && origins[0] == "http://tauri.localhost" {
+		upgrader.CheckOrigin = func(*http.Request) bool { return true }
+	}
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return

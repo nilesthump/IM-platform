@@ -1,0 +1,42 @@
+[
+  {
+    "tool": "node_repl.js_reset",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "js kernel reset"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "tool": "node_repl.js",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "node_repl kernel exited unexpectedly\n\nnode_repl diagnostics: {\"kernel_pid\":8912,\"kernel_status\":\"exited(code=1)\",\"kernel_stderr_tail\":\"windows sandbox failed: helper_unknown_error: setup refresh had errors\",\"reason\":\"stdout_eof\",\"stream_error\":null}"
+        }
+      ],
+      "isError": true
+    }
+  },
+  {
+    "tool": "ordinary_exec",
+    "error": "exec_command failed: CreateProcess { message: \"Rejected(\\\"Failed to create unified exec process: helper_unknown_error: setup refresh had errors\\\")\" }"
+  },
+  {
+    "tool": "node_repl.js_retry",
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "trusted Node process exited unexpectedly; kernel reset, rerun your request"
+        }
+      ],
+      "isError": true
+    }
+  }
+]
