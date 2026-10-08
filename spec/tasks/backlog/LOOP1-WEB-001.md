@@ -2,7 +2,7 @@
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
 status: backlog
-owner: unassigned
+owner: /root
 stage: S2
 gate: S2
 ---
@@ -76,4 +76,17 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 
 # Next Action
 
-等待依赖与规划独立接受；本轮仅 SEND 允许随后激活，SYNC/GUI/WEB 保持 backlog。
+Human/Architect decide the concrete minimal prerequisite in `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/proposal.md`; approve its exact seven-path scope and freeze/independently accept the Web appearance decision and applicable CI. Reassess readiness before backlog -> ready -> active. Earlier SEND-only endpoint text is historical; latest Human request authorizes Web selection, not missing technology.
+
+
+## Authorized next-task readiness (2026-10-08)
+
+Latest exact Human request: 执行下一个task. Canonical ADR-0007 order selects LOOP1-WEB-001 after GUI; GUI dependency is independently accepted/done at synchronized actual main 6a6e97e6b7d5e19d8607c6800877187e70b4bd36. Original accepted final-sync report/binding/receipt and prior current snapshot are byte-preserved at readiness-20261008. Prior no-Web/SEND-only endpoint statements are historical. No missing consent to select Web remains.
+
+Execution Status: BLOCKED_BY_ARCHITECTURE; status backlog and unique backlog queue retained. Required Web appearance storage decision is absent; current Web/compatibility CI rejects every product file and needed workflow/guard controls are outside allowed_paths. Present authority, current guard and seven-path scope request are concrete in `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/proposal.md`. Proposed localStorage stores only theme/font/density; it is not approved or implemented. Do not broaden scope or activate until inputs satisfy the required decision/freeze/independent acceptance chain.
+
+Minimum baseline in assigned managed root H:/.codex/worktrees/w/IM-platform: bundled Python -Xutf8 -B ci/check_architecture.py --scope all --json exit0/3141ms; -Xutf8 -B tools/verify_frozen_architecture.py exit0/187ms. Exact argv/exits/hash receipts: `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/baseline-result.json`. Canonical a6b1670/PDF546915 verified. Local readiness evidence is not Task/S2 acceptance. Web runtime/browser/screenshots/behavior/hosted product tests have not run. S1 PASS/S2 OPEN; only former occupation-blocked helper regression remains deferred at S2 Gate.
+
+Sole writer /root owns only Task/current/new Web readiness evidence, assigned Git root exactly verified and branch task/LOOP1-WEB-001-readiness. Last known good main6a6e97e6b7d5e19d8607c6800877187e70b4bd36; main31 unknown status entries/781 files untouched. Readiness metadata commit/independent Review/applicable exact-head CI/synchronization remain separately pending, not Web product completion. Prospective_resume Recorder R-WEB-COORDINATOR-20261008 registers actual visible prompt; startup/direct read/delegated-read instrumentation gaps and read-only missing-path/glob errors are disclosed. No product, contract, canonical, workflow, guard, dependency, helper or trust writes.
+
+Local recovery Development exits0 for unique Web/backlog. Initial authored diff check exits2 on Windows CRLF; fixed authored outputs to LF, preserved original failed command and archived accepted GUI originals byte-exact in accepted-gui-originals.zip with original-bindings.json. Corrected diff/architecture all exits0; local-validation.json preserves real command outcomes. No verifier or acceptance assertion weakened. Readiness candidate requires fresh independent Review/hosted acceptance before its separate metadata synchronization; no Web product acceptance.

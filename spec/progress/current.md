@@ -4,61 +4,57 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: S2-GUI-only
-Batch Status: COMPLETE_PRODUCT_ACCEPTED
-Current Task: LOOP1-CLIENT-GUI-001
-Current Task State: done
-Execution Status: GUI_PRODUCT_ACCEPTED_SYNCED
+Current Batch: S2-WEB-001-readiness
+Batch Status: BLOCKED_BY_ARCHITECTURE
+Current Task: LOOP1-WEB-001
+Current Task State: backlog
+Execution Status: BLOCKED_BY_ARCHITECTURE
 
 ## Immediately Relevant Completed Work
 
-GUI-only product is independently accepted: minimal Mobile test-only stale accessibility cache repair `d37626427b96fc7040280a0fe5a5cda8a700cb16`, full PR37737318185 all14 instances/13 groups PASS, protected PR24 actual main `b14bf1070ba26ac368488e2c6ea15a7936e2de89` tree-identical, fresh independent actual-main Review/clean Acceptance/exact-main CI37738345509 PASS. Guarded FF-only main synchronization preserves781 unknown files/status/index flags and exact task-owned objects. No product/canonical/contracts change in this administrative closure.
-
-Windows43 approved originals/native notification/tray/shortcut/restart/auth/SEND/retry/Sync and same-desktop CA rollback/owned cleanup remain bound. Android accepted evidence and hosted actual API34 anonymous46 PASS remain distinct. Original hosted/cache FAIL and Recorder failures/gaps are preserved.
+Human latest request 执行下一个task authorizes selection of Web after uniquely done GUI. GUI product and administrative closure independently accepted/integrated/synchronized at actual main 6a6e97e6b7d5e19d8607c6800877187e70b4bd36. Original final-sync report/binding/receipt preserved in Web readiness evidence; earlier GUI current snapshot archived byte-exact. ADR-0007 planning is accepted; canonical order selects Web. Assigned managed Web root is exact-root verified with clean accepted-main baseline.
 
 ## Current Blockers
 
-No unfinished GUI product work. Administrative recovery Review of clean `c1633901c82ee2295c4ffc1c1e608c62a9b40759` failed15 mandatory current.md formatting controls. Fresh format Fix restores the established ten sections without weakening controls. Its new independent Review/applicable exact-head hosted CI/protected integration/final safe main synchronization remain pending. Only occupation-blocked helper regression is PENDING_VERIFICATION_AT_S2_GATE; helper restored unchanged. S2 Gate OPEN; Web backlog not activated.
+BLOCKED_BY_ARCHITECTURE: no accepted Web appearance persistence selection. Current storage guard rejects localStorage/IndexedDB/SQLite in Web source. Web/compatibility hosted jobs still enforce an empty Web skeleton; needed workflow/guard/test/freeze changes are outside current allowed_paths. Concrete minimal decision and exact seven-path prerequisite scope are in readiness-20261008/proposal.md. Task remains uniquely backlog until required inputs are accepted.
 
 ## Verification
 
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: fresh clean c163 Fix baseline exit0 PASS; frozen verification and53 architecture controls also exit0. All1582 owned generated files restored byte-exact; clean before/after. Exact argv, exits, durations and output hashes are bound in the result.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure-format-fix20261008/baseline/clean-acceptance-result.json`
-- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: independent c163 Review and fresh Fix baseline exit1 FAIL15 recovery-format controls; originals preserved. This prior failure is not product rejection or final Fix acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure-format-fix20261008/failed-review/report.md`
-- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: fresh independent accepted product actual-main clean Acceptance PASS at b14; exact-main CI37738345509 all14 actual jobs PASS. Prior product acceptance does not accept this administrative candidate.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure20261008/actual-main-review/report.md`
-- Command: `guarded FF-only main synchronization with protected-file, status/index and exact-object verification`
-  - Result: PASS actual main b14;781 unknown files and original status/index flags preserved. Future administrative synchronization is separate and pending.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure20261008/product-main-sync.json`
+  - Result: assigned clean accepted-main baseline exit0 PASS /3141ms; local readiness evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/baseline-result.json`
+- Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
+  - Result: exit0 PASS /187ms; canonical a6b1670/PDF546915 match accepted manifest.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/baseline-result.json`
+
+- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: local metadata PASS for unique Web/backlog; initial CRLF diff failure repaired in authored files while original evidence remains byte-exact archived.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/local-validation.json`
 
 ## Changed Files or Migrations
 
-Administrative current/task recovery formatting and immutable original failed-review/Fix baseline evidence only. No product code, schema, contract, canonical architecture, workflow, helper, trust or dependency changes. Previous current.md is archived byte-exact in closure-format-fix20261008/prior-current.md; earlier product-review current remains in closure20261008/prior-current.md.
+Only selected Web Task/current/readiness evidence metadata. Proposed browser appearance adapter, frozen decision, guards and workflow are not implemented. No product, public contract, schema, dependency, canonical or trust/helper changes. Main unknown work preserved.
 
 ## Known Failures, Risks, and Assumptions
 
-Only occupation-blocked helper regression remains PENDING_VERIFICATION_AT_S2_GATE. Original full hosted/cache FAIL, independent administrative FAIL15 and earlier Recorder gaps/failures remain immutable. Local checks and research structural validation are not independent Task/Gate acceptance. GUI product done/S2 OPEN remain distinct; future administrative Review/CI/integration/sync results must not be inferred or prewritten.
+Web mandatory storage decision and CI scope are unsatisfied. No Web runtime/screenshots/Architect Approval/hosted product acceptance or Task/S2 PASS claimed. Prior GUI product/cache/recovery FAIL and Recorder gaps remain immutable. Former occupation-blocked helper regression remains pending at S2 Gate. Initial read-only missing-path/glob errors and direct/delegated Recorder gaps are disclosed; local checks do not supply independent acceptance.
 
 ## Next Exact Action
 
-Fresh independent Review of the committed minimal formatting Fix, clean Acceptance and immutable failed-review/baseline bindings; then applicable exact-head hosted CI/protected integration/final safe main synchronization. Final administrative publication/sync status remains separately recorded at H:/.codex/gui-handoffs/20261008-ca-native/final-admin-sync.json only when actual receipts exist, avoiding a self-referential future SHA. After those receipts PASS, GUI-only closure has no remaining product work. Await authorized work or deferred helper S2Gate check; do not activate Web or another product task or modify helper/trust.
+Human/Architect decide `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/proposal.md`: localStorage only for theme/font/density and exact seven prerequisite paths. After actual approval, freeze narrow authority/policy and CI controls, obtain fresh independent Review/applicable exact-head hosted CI/protected integration/actual-main safe sync, then reassess inputs and sequentially backlog -> ready -> active with a fresh implementation writer. Do not implement before accepted authority or invent missing approval. Readiness metadata independently reviewed/published/synced status is separate from product acceptance.
 
 ## Last Known Good Commit
 
-`b14bf1070ba26ac368488e2c6ea15a7936e2de89` actual main independently accepted and safely synchronized. Current administrative candidate is not yet independently accepted/integrated/synchronized.
+`6a6e97e6b7d5e19d8607c6800877187e70b4bd36` independently accepted GUI-only actual main and final safe synchronization. New Web readiness metadata is not product acceptance.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md` records the accepted product recovery point and separate pending administrative publication.
+`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md` remains the latest accepted product recovery checkpoint. Web selection is a blocked prerequisite discovery, not a new product milestone.
 
 ## Uncommitted Changes / Ownership
 
-Assigned managed root `H:/.codex/worktrees/g/IM-platform`, branch `task/LOOP1-CLIENT-GUI-001-resume`, exact Git root verified. Fresh sole Fix writer /root/gui_closure_format_fix owns only this current/task/GUI evidence administrative delta until clean commit and lease release. Main H:/IM-platform stays accepted b14;31 unknown status entries/781 files preserved by prior sync, with no main writes by this Fix. All other actors read-only; no unknown work overwritten.
+Assigned managed root `H:/.codex/worktrees/w/IM-platform`, branch `task/LOOP1-WEB-001-readiness`, exact Git root verified. Sole writer /root owns only this Web task/current/readiness metadata until clean commit and lease release. Main accepted6a6 retains31 unrelated status entries/781 files; no main task writes. Read-only preflight agent has no write lease. Readiness candidate synchronization is pending its own applicable review/CI chain; no unknown work copied or overwritten.
 
 ## Architecture Conflicts / ACP / ADR
 
-No new conflict, technology selection or authority change. Canonical/public contracts/approved ADRs unchanged; no product/runtime/native mechanism added. Accepted S1 PASS/S2 OPEN retained.
+BLOCKED_BY_ARCHITECTURE smallest question: approve host-owned browser localStorage only for three appearance scalars and the seven exact freeze/guard/CI paths in the concrete proposal? Current Web memory-only chat/security/ACK/public contracts remain effective. Proposal is not a frozen or accepted decision. No canonical/ADR/guard/workflow edits before explicit approval.
