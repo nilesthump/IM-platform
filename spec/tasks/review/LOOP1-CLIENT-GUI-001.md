@@ -412,3 +412,14 @@ Current branch task/LOOP1-CLIENT-GUI-001-resume/source79ec; last accepted synchr
 ## Accepted-main integration candidate (2026-10-08)
 
 Normal merge of accepted/synchronized main `7088ecd5c905dceadae8ed2f504d54d6585ca3dc` into GUI evidence candidate `25ec0f596d1c3ae591f6f9e295935d3cbe11811f`: accepted ADR0009 and Native done state retained byte-exact, obsolete Native review Task removed; GUI remains unique current review/S2 OPEN. Three metadata conflicts and immutable prior bytes documented in integration20261008. No product/canonical/contracts changes. Next exact action fresh independent full merged-candidate Review, full-range exact-head hosted CI, protected integration/actual-main/safe main sync preserving31 unknown status entries/781 protected files. No completion claim before that chain. Sole integration Fix writer releases after clean commit; Coordinator owns subsequent closure.
+
+
+## Full independent candidate Review discovery (2026-10-08)
+
+Fresh independent /root/gui_final_candidate_review accepted clean merged744d943e3128edd847b4d351588612acbb6e45ce against acceptedmain7088: actual source/standards/spec/minimality, 43 Windows raws and precise Android references, original/derived protocol-storage evidence, scoped native/CA cleanup and original integration bindings PASS. Clean Acceptance architecture/frozen/53 controls, fresh Desktop compile/auth/composer, corrected standard-dispatch lifecycle host control and uncached Gateway tests PASS. One disabled live-DB test remains explicitly skipped; no local DB or hosted acceptance inferred.
+
+- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`; fresh compiled Desktop `auth.mjs`/`composer.mjs`; uncached Gateway tests and independent evidence verifier.
+  - Result: independent local PASS at744d943; all1579 owned outputs restored byte-exact and clean after verification. Exact argv, exits, durations and output hashes are in final-review20261008/commands.json and clean-acceptance-result.json.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/final-review20261008/report.md` (original SHA2569cfceeedd6990ef41aaf05f9dce4dd7d70e1b23df839aea00fff0a21ae96e3e6).
+
+Initial direct invocation of a CLOSED WebSocket handler failed a private host assertion; independent review checked actual synchronous close ordering and primary WHATWG OPEN-only message dispatch, withdrew the unreachable product finding, and preserved both original invalid host negative and corrected PASS. No product guard or source change was made for that invalid test. Recorder32events structuralPASS manifestaeaa28001494f2ea0524a715db5175d43e3e05a6b9692aaba679197238967ed8; incomplete trace remains disclosed. GUI review/S2OPEN, actual main7088 unchanged. This publication-only metadata gets exact independent binding/hosted verification; no Taskdone or main-sync claim.

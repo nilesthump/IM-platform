@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: WINDOWS_RUNTIME_SCOPED_PASS_FULL_CANDIDATE_ACCEPTANCE_PENDING
+Execution Status: FULL_IMPLEMENTATION_REVIEW_PASS_HOSTED_ACCEPTANCE_PENDING
 
 ## Immediately Relevant Completed Work
 
@@ -29,7 +29,7 @@ Real Windows runtime evidence now includes43 independently approved originals, a
 
 ## Current Blockers
 
-Accepted main has been integrated into the GUI branch; fresh full candidate Review/CI/protected integration/safe synchronization remain pending. Only occupation-blocked helper regression is deferred S2Gate.
+Accepted main is integrated in clean candidate744d943. Fresh independent full implementation Review and local Acceptance PASS; full-range exact-head CI/protected integration/actual-main verification/safe synchronization remain pending. Only occupation-blocked helper regression is deferred S2Gate.
 
 ## Changed Files or Migrations
 
@@ -37,11 +37,11 @@ Evidence-only export and GUI recovery/ADR0010 acceptance discovery; no product, 
 
 ## Known Failures, Risks, and Assumptions
 
-Only occupation-blocked helper/native-host regression remains PENDING_VERIFICATION_AT_S2_GATE per Human exact clarification; helper/config original restored unchanged. Real GUI/CA evidence is completed within scope, not deferred. Full candidate independent Review, full-range exact-head hosted CI, exact merged-candidate hosted CI, protected integration and verified safe main sync pending. No Taskdone/S2PASS. Matrix is not every Login/Register tuple or successful new registration. Misnamed/unselected images, failed native probes, early metadata failures and trace gaps remain explicit in result.md; sealed originals untouched. Research structuralPASS is not acceptance.
+Only occupation-blocked helper/native-host regression remains PENDING_VERIFICATION_AT_S2_GATE per Human exact clarification; helper/config original restored unchanged. Real GUI/CA evidence is completed within scope, not deferred. Full candidate independent Review accepted744d943; full-range exact-head hosted CI, exact merged-candidate hosted CI, protected integration and verified safe main sync pending. No Taskdone/S2PASS. Matrix is not every Login/Register tuple or successful new registration. Misnamed/unselected images, failed native probes, early metadata failures and trace gaps remain explicit in result.md; sealed originals untouched. Research structuralPASS is not acceptance.
 
 ## Next Exact Action
 
-Review the committed merge of accepted main7088 with this GUI candidate; fresh independent full candidate Review and applicable full-range exact-head hosted CI; protected integration/actual main checks and safe synchronization preserving unknown main work. Do not move GUI to done before this chain completes. Do not modify helper/trust/live resources for administrative integration.
+Publish the reviewed candidate plus this byte-exact review-evidence discovery after independent metadata binding; verify applicable full-range exact-head hosted CI; protected integration/actual main checks and safe synchronization preserving unknown main work. Do not move GUI to done before this chain completes. Do not modify helper/trust/live resources for administrative integration.
 
 ## Last Known Good Commit
 
@@ -49,11 +49,11 @@ Accepted synchronized actual main `7088ecd5c905dceadae8ed2f504d54d6585ca3dc`; sc
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-07-loop1-client-gui-001-candidate-ci.md` (historical stable candidate, not later-head acceptance).
+`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-windows-reviewed.md` (stable local reviewed recovery, hosted/integration pending).
 
 ## Uncommitted Changes / Ownership
 
-Assigned managed root `H:/.codex/worktrees/g/IM-platform`, branch `task/LOOP1-CLIENT-GUI-001-resume`, verified exact Git root. Exclusive Fix Agent /root/gui_main_integration_fix owns only accepted-main conflict resolution and integration recovery evidence until clean commit, then writer release to Coordinator. Main H:/IM-platform remains7088/31 unknown status entries/781 protected files; no main writes or synchronization.
+Assigned managed root `H:/.codex/worktrees/g/IM-platform`, branch `task/LOOP1-CLIENT-GUI-001-resume`, verified exact Git root. Coordinator /root owns only fresh review-evidence publication/recovery metadata; integration Fix writer is released. Reviewed744d943 was clean. No other repository writer. Main H:/IM-platform remains7088/31 unknown status entries/781 protected files; no main writes or synchronization.
 
 ## Architecture Conflicts / ACP / ADR
 
@@ -67,3 +67,14 @@ Normal merge parents: GUI evidence candidate `25ec0f596d1c3ae591f6f9e295935d3cbe
 - Command: `normal git merge --no-commit --no-ff origin/main; exact accepted metadata resolution; architecture/frozen verification`
   - Result: three expected conflicts resolved within accepted-main integration; local controls only, no Task or Gate PASS.
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/integration20261008/report.md`
+
+
+## Full independent candidate Review discovery (2026-10-08)
+
+Fresh independent /root/gui_final_candidate_review accepted clean merged744d943e3128edd847b4d351588612acbb6e45ce against acceptedmain7088: actual source/standards/spec/minimality, 43 Windows raws and precise Android references, original/derived protocol-storage evidence, scoped native/CA cleanup and original integration bindings PASS. Clean Acceptance architecture/frozen/53 controls, fresh Desktop compile/auth/composer, corrected standard-dispatch lifecycle host control and uncached Gateway tests PASS. One disabled live-DB test remains explicitly skipped; no local DB or hosted acceptance inferred.
+
+- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`; fresh compiled Desktop `auth.mjs`/`composer.mjs`; uncached Gateway tests and independent evidence verifier.
+  - Result: independent local PASS at744d943; all1579 owned outputs restored byte-exact and clean after verification. Exact argv, exits, durations and output hashes are in final-review20261008/commands.json and clean-acceptance-result.json.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/final-review20261008/report.md` (original SHA2569cfceeedd6990ef41aaf05f9dce4dd7d70e1b23df839aea00fff0a21ae96e3e6).
+
+Initial direct invocation of a CLOSED WebSocket handler failed a private host assertion; independent review checked actual synchronous close ordering and primary WHATWG OPEN-only message dispatch, withdrew the unreachable product finding, and preserved both original invalid host negative and corrected PASS. No product guard or source change was made for that invalid test. Recorder32events structuralPASS manifestaeaa28001494f2ea0524a715db5175d43e3e05a6b9692aaba679197238967ed8; incomplete trace remains disclosed. GUI review/S2OPEN, actual main7088 unchanged. This publication-only metadata gets exact independent binding/hosted verification; no Taskdone or main-sync claim.
