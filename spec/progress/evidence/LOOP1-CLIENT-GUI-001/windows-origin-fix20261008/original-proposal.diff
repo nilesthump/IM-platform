@@ -1,0 +1,25 @@
+--- a/backend/go/gateway/gateway.go
++++ b/backend/go/gateway/gateway.go
+@@ -6,6 +6,7 @@
+ 	"encoding/json"
+ 	"io"
+ 	"net/http"
++	"net/url"
+ 	"regexp"
+ 	"strings"
+ 	"sync"
+@@ -88,7 +89,13 @@
+ 		writeError(w, r, shared.Fail(400, "VALIDATION_FAILED", "Query parameters are not permitted on WebSocket upgrade."))
+ 		return
+ 	}
+-	upgrader := websocket.Upgrader{}
++	upgrader := websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
++        origins := r.Header["Origin"]
++        if len(origins) == 0 { return true }
++        if len(origins) == 1 && origins[0] == "http://tauri.localhost" { return true }
++        u, err := url.Parse(origins[0])
++        return err == nil && strings.EqualFold(u.Host, r.Host)
++    }}
+ 	ws, err := upgrader.Upgrade(w, r, nil)
+ 	if err != nil {
+ 		return

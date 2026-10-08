@@ -1,0 +1,29 @@
+# Independent bounded authority Review
+
+Result: FAIL, one P2 proposal preservation finding. Architecture/security decision content is otherwise consistent with the explicit Human approval; this is not product, GUI Task, Gate, hosted CI, formal integrated authority or main synchronization acceptance.
+
+Reviewer: fresh /root/windows_origin_authority_review, neither implementer nor fixer. Assigned clean committed worktree H:/.codex/worktrees/g/IM-platform, branch task/LOOP1-CLIENT-GUI-001-resume. Exact reviewed SHA36691c56ddc296948b0a24401e70ae4cb53a3b91, range247bdf6..36691c5. Nine changed documentation/evidence files; Gateway/client/product bytes unchanged. Root remains sole repository writer; reviewer writes private review artifacts only.
+
+## Finding
+
+[P2] Preserve Gorilla ASCII host comparison in the fallback. spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-origin20261008/origin-proposal.diff:21 uses strings.EqualFold(u.Host,r.Host). Locked gorilla/websocket v1.5.3 checkSameOrigin uses equalASCIIFold, so this proposal broadens existing admission beyond the single approved Windows Origin. Concrete Go reproduction: Origin http://K.local, request Host k.local gives proposalEqualFold=true, originalASCIIFold=false. The extra admission violates ADR0010's preservation requirement even though mandatory auth.bind still protects identity. Use the original ASCII comparison behavior for the fallback; add this Unicode mismatch negative along with absent/same-host/exact Tauri/unrelated/lookalike tests. No need to change approved scope, trust, dependencies or public contracts. Attached fold.go and Recorder command receipt reproduce the discrepancy with installed Go.
+
+The proposal is unimplemented text, so this is a decision-candidate evidence repair, not an existing product vulnerability claim. Unified-diff context contains expected space-plus-tab formatting; git diff --check flags these embedded patch lines, which is not an independent code-style finding.
+
+## Authority, responsibility and evidence
+
+Read agent-context/current/unique review Task; architecture README/baseline and canonical relevant sections2.3/3/6.1/7/10 SRC01-07/11; minimality, execution, technology and independent review rules; ADR0009, client UI authority/acceptance and messaging/Sync domain/invariants/contracts. Canonical SHAa6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72 verified. Frozen body/manifest/PDF/contracts/dependencies/backend/client/workflow files have no diff in this range. Exactly one current GUI Task in review. No new language/framework/runtime/dependency; Gateway owns connection/transport admission under canonical3.1/SRC01, not Core persistence/business.
+
+Human explicitly approved exactly http://tauri.localhost plus named ADR/Gateway/test paths; approval.json preserves that answer. The ADR retains absent/same-host, auth.bind signature/session/epoch validation, query-token prohibition, TLS/hostname, durable ACK/retry/Sync, rejects wildcards/proxy stripping/TLS bypass and broader Origins. Existing Gateway actual logic inspected: query prohibition precedes upgrade, only ping/pong/auth.bind before binding, unauthenticated message.send rejected, authoritative validator and expiration/revocation remain. No cookie credential auth/CORS/new entry point proposed. Focused Origin negatives and unauthenticated accepted connections are required before product acceptance; full native committed SEND/reconnect remains pending. Narrow constant exception needs no new configuration/framework.
+
+Actual Explorer-launched scripts independently inspected: default HttpClient has no custom CA/validation callback and public result200; ClientWebSocket has no callback, absent-Origin opens while exact Tauri Origin403. Public JSON bytes match private original files inspected. Desktop Root75 evidence and Human close/reopen/full fingerprint confirmation supersede cache-only/global-absence claims; launch-path Root74 versus Root75 mechanism remains UNKNOWN. This review does not independently rerun live desktop/CA operations, approve uncertain screenshot preference labels, or reinterpret old sealed evidence.
+
+Primary source inspection: locked Gorilla1.5.3 server.go checkSameOrigin and util.go equalASCIIFold at https://raw.githubusercontent.com/gorilla/websocket/v1.5.3/server.go and https://raw.githubusercontent.com/gorilla/websocket/v1.5.3/util.go. Official Tauri Windows configuration references http://tauri.localhost at https://v2.tauri.app/reference/config/. These corroborate technical behavior; local evidence determines this candidate's observed facts.
+
+## Independent baseline
+
+Private clean-verify.py reused the previously ownership-checked isolation method for existing ignored generated outputs only. Resolved source/destination bounds checked, ignored status checked, hash inventory compared before/after; all1579 files restored exactly, git clean before/after. Architecture all PASS exit0 0.563s; frozen verification PASS exit0 0.078s. clean-acceptance-result.json records exact argv/output hashes and restoration receipt; owned-hash-inventory.json retains per-file hashes. No product/UI/trust/process writes or external publication performed.
+
+Research R-ORIGIN-AUTHORITY-REVIEW-20261008 is prospective_resume/pre-Recorder work disclosed; initial read-only startup and direct file/source reads not fully command-wrapped. prompt.txt is a dispatch/Human-approval summary, not verbatim Human text despite Recorder default source label; explicit instrumentation_warning preserves this limitation. No sealed history edited. Recorder structural validation cannot establish acceptance.
+
+Next: fresh Fix context repairs proposal preservation only; new independent Review of exact repaired clean SHA, then applicable exact-head hosted CI before dependent Gateway implementation. Root updates Task/current and performs publication/acceptance chain. Full GUI remains review/S2 OPEN/main synchronization pending.
