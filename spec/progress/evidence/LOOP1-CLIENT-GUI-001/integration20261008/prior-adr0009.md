@@ -37,13 +37,3 @@ GUI 依赖本任务，在独立接受、集成、actual-main 验证及安全同�
 此指令只对本次已明确批准的 native/appearance freeze + LOOP1-CLIENT-GUI-001 授权统一本地候选准备：GUI 可以使用本 ADR 已批准并写入本地 frozen candidate 的具体选择继续实现，不等待单独 native Task 接受/推送。此前“GUI 保持 backlog 直到前置独立接受”时序被本精确指令取代；不是取消独立 Review/CI，也不是认定候选权威已正式生效。canonical §6.1 候选待接受及 §2.3 全局流程不改，本窄 ACP/ADR 指令不扩展到其他任务。
 
 native Task 仍为 review/pending，GUI 按实际输入经过 backlog -> ready -> active；已接受 SQLITE/UI-ARCH/SEND/SYNC 依赖不变，native 同批候选依赖例外明确追溯到上述 Human 指令。既有八个装配路径、选型、契约/存储/安全/ACK/职责边界不变，不新增技术。完成完整 GUI 与截图/Architect 审阅后，对精确完整候选进行 fresh independent Review，统一推送、适用 exact-head hosted CI、protected integration/actual-main 验证与安全主仓库同步；两任务 done、正式生效及 S2 Gate 判断均延后到各自适用接受条件满足。此前独立 native Review 已取消，不能记为 PASS；无 hosted 接受或推送事实。
-
-
-## Latest Human standalone-first order (2026-10-07)
-
-Human selected LOOP1-CLIENT-NATIVE-ARCH-001 and instructed: 先完成这项任务，然后再次尝试Windows验证. Evidence: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/completion-20261007/human-order.md and exact human-order.txt. This supersedes only the preceding unified native/GUI batch acceptance/publication timing: independently complete this authority-only native freeze, protected integration/actual-main audit/safe main synchronization, then retry Windows validation. Existing GUI candidate91598049dfb0bf4360b0ce8bdbc4598606db1407/PR24 remains review, not integrated or accepted. Original approved native choices and canonical a6b1670/PDF546915/v1.1 remain unchanged; no new technical or product authority. Original timing evidence is historical and preserved. Task remains review until applicable independent acceptance and synchronization; S2 remains OPEN.
-
-
-## Native freeze accepted discovery (2026-10-08)
-
-Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c13779e99f9f463d2c6f8`, protected PR25 actual main `6a87751087de5b4063445d0fba9fe94534507a57` and safe main synchronization PASS. Exact candidate push37656041487/PR37656059375 and actual-main37657410444:5selected jobs SUCCESS,8classifier-false normally inactive, nofailedsteps. Fresh candidate Review and new same-role actual-main audit are independently bound to their exact SHA; canonical a6b1670/PDF546915/v1.1 unchanged. Task branch task/LOOP1-CLIENT-NATIVE-ARCH-001-close; receipt preserves781unknown files/status/index and recovery/s1-handoff-20261001 branch. Source approval choices unchanged; no product/contract/schema/ACK/security change, no GUI/Windows/S2 PASS. Earlier pending/blocked statements are preserved historical snapshots. Evidence: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/acceptance-20261008/acceptance.md.

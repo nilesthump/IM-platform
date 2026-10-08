@@ -107,3 +107,8 @@ ADR-0008 / 公开 HTTPS Sync 绑定 已在 candidate b8200783ea3eadc1ed4e4050238
 - native_previous_sha256: `ef90846ba380df14086795a3c58aef43f6503447fe0cb83ee2d0772d725d8e03`
 
 APPROVED_PENDING_FREEZE：当前 canonical 为窄原生能力候选；原 revision_adr/policy ADR-0005、UI/planning/Sync 谱系、v1.1/历史 PDF 保持。须经新独立 Review、适用 exact-head hosted CI、protected integration/actual-main 验证及安全主仓库同步。GUI backlog/S1 PASS/S2 OPEN，无产品/契约/schema 迁移。
+
+
+## Native freeze accepted discovery (2026-10-08)
+
+Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c13779e99f9f463d2c6f8`, protected PR25 actual main `6a87751087de5b4063445d0fba9fe94534507a57` and safe main synchronization PASS. Exact candidate push37656041487/PR37656059375 and actual-main37657410444:5selected jobs SUCCESS,8classifier-false normally inactive, nofailedsteps. Fresh candidate Review and new same-role actual-main audit are independently bound to their exact SHA; canonical a6b1670/PDF546915/v1.1 unchanged. Task branch task/LOOP1-CLIENT-NATIVE-ARCH-001-close; receipt preserves781unknown files/status/index and recovery/s1-handoff-20261001 branch. Source approval choices unchanged; no product/contract/schema/ACK/security change, no GUI/Windows/S2 PASS. Earlier pending/blocked statements are preserved historical snapshots. Evidence: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/acceptance-20261008/acceptance.md.

@@ -29,7 +29,7 @@ Real Windows runtime evidence now includes43 independently approved originals, a
 
 ## Current Blockers
 
-Accepted main has been integrated into the GUI branch; fresh full candidate Review/CI/protected integration/safe synchronization remain pending. Only occupation-blocked helper regression is deferred S2Gate.
+Full candidate Review/CI/integration/safe synchronization remain pending; only occupation-blocked helper regression is deferred S2Gate.
 
 ## Changed Files or Migrations
 
@@ -37,11 +37,11 @@ Evidence-only export and GUI recovery/ADR0010 acceptance discovery; no product, 
 
 ## Known Failures, Risks, and Assumptions
 
-Only occupation-blocked helper/native-host regression remains PENDING_VERIFICATION_AT_S2_GATE per Human exact clarification; helper/config original restored unchanged. Real GUI/CA evidence is completed within scope, not deferred. Full candidate independent Review, full-range exact-head hosted CI, exact merged-candidate hosted CI, protected integration and verified safe main sync pending. No Taskdone/S2PASS. Matrix is not every Login/Register tuple or successful new registration. Misnamed/unselected images, failed native probes, early metadata failures and trace gaps remain explicit in result.md; sealed originals untouched. Research structuralPASS is not acceptance.
+Only occupation-blocked helper/native-host regression remains PENDING_VERIFICATION_AT_S2_GATE per Human exact clarification; helper/config original restored unchanged. Real GUI/CA evidence is completed within scope, not deferred. Full candidate independent Review, full-range exact-head hosted CI, PR24 conflict resolution, protected integration and verified safe main sync pending. No Taskdone/S2PASS. Matrix is not every Login/Register tuple or successful new registration. Misnamed/unselected images, failed native probes, early metadata failures and trace gaps remain explicit in result.md; sealed originals untouched. Research structuralPASS is not acceptance.
 
 ## Next Exact Action
 
-Review the committed merge of accepted main7088 with this GUI candidate; fresh independent full candidate Review and applicable full-range exact-head hosted CI; protected integration/actual main checks and safe synchronization preserving unknown main work. Do not move GUI to done before this chain completes. Do not modify helper/trust/live resources for administrative integration.
+Integrate accepted main7088 inside assigned g worktree, resolve only known metadata conflicts while preserving accepted Native authority/done; fresh independent full candidate Review and applicable full-range exact-head hosted CI; protected integration/actual main checks and safe synchronization preserving unknown main work. Do not move GUI to done before this chain completes. Do not modify helper/trust/live resources for administrative integration.
 
 ## Last Known Good Commit
 
@@ -53,17 +53,8 @@ Accepted synchronized actual main `7088ecd5c905dceadae8ed2f504d54d6585ca3dc`; sc
 
 ## Uncommitted Changes / Ownership
 
-Assigned managed root `H:/.codex/worktrees/g/IM-platform`, branch `task/LOOP1-CLIENT-GUI-001-resume`, verified exact Git root. Exclusive Fix Agent /root/gui_main_integration_fix owns only accepted-main conflict resolution and integration recovery evidence until clean commit, then writer release to Coordinator. Main H:/IM-platform remains7088/31 unknown status entries/781 protected files; no main writes or synchronization.
+Assigned managed root `H:/.codex/worktrees/g/IM-platform`, branch `task/LOOP1-CLIENT-GUI-001-resume`, verified exact Git root. Exclusive Fix Agent /root/windows_evidence_finalize owns only win20261008 evidence, GUI Task/current and ADR0010 status discovery until commit, then writer release to Coordinator. Main H:/IM-platform remains7088/31 unknown status entries/781 protected files; no main writes or synchronization.
 
 ## Architecture Conflicts / ACP / ADR
 
 No new selection or authority change. ADR0010 exact origin admission independently acceptedf2; product scopedReview/CI79ec accepted. Canonical/public contracts unchanged. FullGUI integration acceptance still pending; S1 remains accepted PASS/S2 OPEN.
-
-
-## Accepted-main integration candidate (2026-10-08)
-
-Normal merge parents: GUI evidence candidate `25ec0f596d1c3ae591f6f9e295935d3cbe11811f` and accepted synchronized main `7088ecd5c905dceadae8ed2f504d54d6585ca3dc`. Only three metadata conflicts: ADR0009 adopted accepted-main bytes exactly; obsolete Native review Task removed in favor of accepted done Task; currentGUI recovery retained with this discovery. All prior conflict bytes archived in integration20261008/premerge-bindings.json. No product/canonical/contracts/dependency changes. Local minimum baseline architecture/frozen PASS with1579 owned ignored files restored byte-exact; fresh full independent Review/exact merged-head CI/protected integration/actual-main/safe-sync pending. S2 OPEN/GUI review.
-
-- Command: `normal git merge --no-commit --no-ff origin/main; exact accepted metadata resolution; architecture/frozen verification`
-  - Result: three expected conflicts resolved within accepted-main integration; local controls only, no Task or Gate PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/integration20261008/report.md`
