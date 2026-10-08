@@ -13,6 +13,8 @@ gate: S2
 
 # Inputs
 
+- `spec/architecture/decisions/ADR-0010-windows-tauri-wss-origin.md` (Human-approved exact Windows WSS Origin decision; independent authority acceptance pending).
+
 - `spec/architecture/README.md` -> `spec/architecture/baseline.md` -> `spec/architecture/frozen-architecture.md`，§2.3/§3/§6/§10 SRC-01 through SRC-07/§11/§19/§20。
 - `spec/architecture/decisions/ADR-0005-client-technology-clarification.md`、`spec/architecture/decisions/ADR-0006-client-ui-architecture.md`、`spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md`。
 - `spec/governance/minimality.md`、`spec/governance/execution-boundaries.md`、`spec/governance/independent-review.md`、`spec/governance/technology-selection.md`。
@@ -41,6 +43,10 @@ client_runtime: Android
 - ADR-0007 本轮规划须独立 Review/精确 HEAD CI/集成 main 同步接受才可激活。依赖未满足保持 backlog；GUI/Web 在本轮 Human endpoint 之后，无本轮激活授权。
 
 # Allowed Paths
+
+- `spec/architecture/decisions/ADR-0010-windows-tauri-wss-origin.md` (2026-10-08 explicit Human decision/path approval only).
+- `backend/go/gateway/gateway.go` (exact approved Windows Tauri Origin admission exception only; pending authority acceptance).
+- `backend/go/gateway/origin_test.go` (focused approved Origin admission/auth-boundary verification only).
 
 - `clients/desktop/src-tauri/icons/**` (Human exact supplied logo, app icon only.)
 - `clients/mobile/app/src/main/res/**` (Same logo for app icon/brand only.)
@@ -365,3 +371,10 @@ Human exact5C2B8129A44043C0912E4CE413B4799570E92733 is visibly present in old MM
 
 
 Independent fresh /root/ca_native_review clean918dabc diagnostic recovery Review PASS (original report9d8f3714987467cd88fd26b03af5a82232797caecfc022e46c5459330de4de68; clean architecture/frozenPASS,1579owned generated files restored byte-exact, initial generated-output failures retained). Bindings at ca-native20261008/review-binding.json. FullTask/GUI/S2/hosted/integration/sync still pending. Human now manually imported originalCA; immediate new Root74/72/noCA persists, actual HKCU hive matches actualTokenUser. Await close-all/reopen Certificate Manager observation; user manual import report preserved, exact underlying persistence cause UNKNOWN. Evidence ca-manual20261008/result.md. No fixture/client restart or new trust writes; original validity13:05:13 today must be rechecked before retry. Root owns only this recovery metadata; new extension Review pending.
+
+
+## 2026-10-08 Actual desktop context and approved WSS repair decision
+
+Human confirms CA remains visible after close/reopen. Actual desktop Explorer17236 dispatch launches fresh reader45132: CurrentUser Root75/expectedCApresent, LocalMachine72; no trust writes. Thus earlier cache-only explanation does not explain all observations and import failure/global absence must not be inferred from tool-launched74-root view. Underlying isolation mechanism remains unknown; supported actual-desktop launch is operationally successful. Default Windows HttpClient from Explorer40716 health200/no custom CA; exact installed current package from Explorer client21720 logs into owned Avery and loads real HTTP history. Earlier Windows preference labels based on tool-visible file are not actual-desktop preference proof; new Settings visibly reports Cold14/Comfortable before UI changes. New raw captures/actual scalar bindings will supersede uncertain earlier Windows preference annotations without editing sealed histories.
+
+Actual WSS default TLS absent-Origin opens, exact Tauri Windows http://tauri.localhost returns403; native Chat remains Offline/local history, no SENT/reconnect PASS. Human approves bounded Origin exception and ADR/Gateway paths; ADR0010 freeze candidate plus approval/proposal/defaultTLS/WSS evidence at windows-origin20261008. Canonical/contract bytes unchanged, no product fix yet. Affected repair BLOCKED_BY_ARCHITECTURE pending fresh authority Review/exact-head hosted CI; accepted decision then fresh Fix/Review/fullGUI chain. Only occupied helper checks deferredS2Gate. Current live owned fixture im-gui-product-20261004-18484/wrapper6912 and client21720/HWND527312; original approved CA actual desktop Root present until owned full rollback, expiry13:05:13 today. Root sole writer owns bounded decision/evidence/Task/current; main7088/unknown work untouched, GUIreview/S2OPEN/PR24draftunmerged. Last scoped independent reviewed247bdf6 extension report60bc314d0169b21f0ed8758ec4d964ed1883b0ee241e8e53fc582f8717e3b2a3 private ca-review/extension; new authority candidate needs separate Review.
