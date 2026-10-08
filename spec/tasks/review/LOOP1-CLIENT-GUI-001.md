@@ -13,7 +13,7 @@ gate: S2
 
 # Inputs
 
-- `spec/architecture/decisions/ADR-0010-windows-tauri-wss-origin.md` (Human-approved exact Windows WSS Origin decision; independent authority acceptance pending).
+- `spec/architecture/decisions/ADR-0010-windows-tauri-wss-origin.md` (exact Windows WSS Origin authority f2 independently accepted/run37725245354; bounded product79ec reviewed/run37726202795; full GUI integration pending).
 
 - `spec/architecture/README.md` -> `spec/architecture/baseline.md` -> `spec/architecture/frozen-architecture.md`，§2.3/§3/§6/§10 SRC-01 through SRC-07/§11/§19/§20。
 - `spec/architecture/decisions/ADR-0005-client-technology-clarification.md`、`spec/architecture/decisions/ADR-0006-client-ui-architecture.md`、`spec/architecture/decisions/ADR-0007-client-mvp-task-planning.md`。
@@ -45,7 +45,7 @@ client_runtime: Android
 # Allowed Paths
 
 - `spec/architecture/decisions/ADR-0010-windows-tauri-wss-origin.md` (2026-10-08 explicit Human decision/path approval only).
-- `backend/go/gateway/gateway.go` (exact approved Windows Tauri Origin admission exception only; pending authority acceptance).
+- `backend/go/gateway/gateway.go` (exact accepted Windows Tauri Origin admission exception only).
 - `backend/go/gateway/origin_test.go` (focused approved Origin admission/auth-boundary verification only).
 
 - `clients/desktop/src-tauri/icons/**` (Human exact supplied logo, app icon only.)
@@ -105,7 +105,9 @@ spec/progress/evidence/LOOP1-CLIENT-GUI-001/；本次仅规划，未生成产品
 
 # Handoff
 
-Current state active; sole writer /root/gui_product_implementation, exact assigned root H:/.codex/worktrees/s/IM-platform, branch task/LOOP1-CLIENT-GUI-001. Product source baedd9975d28e2ae9f9931dfd48a66dc5036dd9f remains a local unaccepted candidate. Android actual API34 local matrix PASS26/11 original images; Windows current package expected official NSS-marker bytes verified, native visual access interrupted by Coordinator with unknown capture outcome. Original failures preserved. Owned Go fixture stopped, no trust installed; both prospective runs are sealed/validated before writer release. Actual final recovery SHA is recorded in sealed final_state.json and handoff; main unknown work untouched.
+Current recovery discovery: GUI review/S2 OPEN; see latest 2026-10-08 Windows recovery below and current.md. Following paragraph is historical implementation recovery.
+
+Historical state active; sole writer /root/gui_product_implementation, exact assigned root H:/.codex/worktrees/s/IM-platform, branch task/LOOP1-CLIENT-GUI-001. Product source baedd9975d28e2ae9f9931dfd48a66dc5036dd9f remains a local unaccepted candidate. Android actual API34 local matrix PASS26/11 original images; Windows current package expected official NSS-marker bytes verified, native visual access interrupted by Coordinator with unknown capture outcome. Original failures preserved. Owned Go fixture stopped, no trust installed; both prospective runs are sealed/validated before writer release. Actual final recovery SHA is recorded in sealed final_state.json and handoff; main unknown work untouched.
 
 # Next Action
 
@@ -397,3 +399,11 @@ Fresh authority Review accepts f2f35f26089bc27d4bebe665327f36b2496ee4b8 and exac
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/gateway-origin-fix20261008/fix-report.md`
 
 Next exact action: fresh independent product Review/applicable exact-head hostedCI, then root only-owned Gateway fixture restart and actual Windows bind/SEND/retry/reconnect plus full pending native matrix/rollback/Architect/acceptance/protected integration/safe main sync. GUIreview/S2OPEN; main7088 unchanged. Sole fixer owns bounded source/test/ADR/evidence/Task/current changes until clean commit; writer returns root afterward. Research invocation failures and trace gaps disclosed.
+
+## Latest Windows runtime and recovery discovery (2026-10-08)
+
+Exclusive evidence Fix Agent /root/windows_evidence_finalize exported43 byte-exact approved originals and sealed Architect/addon/Gateway Review/CI receipts at `spec/progress/evidence/LOOP1-CLIENT-GUI-001/win20261008/`. Installed cc13 Desktop unchanged through79ec; exact source/package/fixture/platform/raw hashes in manifest/result. Real SEND/retry/reconnect scoped read-only convergence, actual notification/tray/restart/auth cleanup and original appearance restoration supported. Same actual desktop CA removed while valid; fresh strict TLS rejection/live original-CA positive and otherRootset unchanged; own clients/services/volumes cleaned. Only occupation-blocked helper regression deferred S2Gate, helper original unchanged. Native already done/synchronizedmain7088; earlier pending paragraphs historical.
+
+Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`; `python -Xutf8 -B tools/verify_frozen_architecture.py`. Local baseline exit0/1579ownedoutputs byte-exactrestore PASS; independent Gateway uncached Go and exactpush37726202795 accept79ec scopedonly. Export verifies43 approvedraws and selectedreceipt hashes/derivedcontrolledconvergence PASS. Research prospective_resume is explicitly incomplete and separate from acceptance.
+
+Current branch task/LOOP1-CLIENT-GUI-001-resume/source79ec; last accepted synchronizedmain7088ecd5c905dceadae8ed2f504d54d6585ca3dc; no mainwrites/sync. Evidence Fix Agent owns only new allowed evidence/Task/current/ADR status metadata until committed, then releases. Next exact action acceptedmainintegration in assignedg -> fresh full independent candidate Review -> exactfullrange hostedCI -> protected integration/actualmain verification/safe sync, preserving main31unknownentries/781files. GUI remains review/S2OPEN; full Task/Stage PASS not established. Missing Login/Register Cartesian tuple/newregistration proof and all exclusions/trace gaps remain explicit in result.md; screenshot approval is presentation scope only.

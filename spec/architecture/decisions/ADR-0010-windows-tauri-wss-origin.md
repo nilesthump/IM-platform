@@ -1,6 +1,6 @@
 # ADR-0010: Windows Tauri WSS Origin exception
 
-Status: Human-approved frozen decision candidate; independent Review and applicable exact-head hosted CI pending. No product implementation yet. Date: 2026-10-08. Task: LOOP1-CLIENT-GUI-001. Exact Human approval and bounded path expansion: spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-origin20261008/approval.json.
+Status: Exact bounded authority f2f35f26089bc27d4bebe665327f36b2496ee4b8 independently accepted (run37725245354); bounded Gateway product79ec independently reviewed and scoped hosted CI accepted (run37726202795). Full GUI candidate/integration/main synchronization pending. Date: 2026-10-08. Task: LOOP1-CLIENT-GUI-001. Exact Human approval and bounded path expansion: spec/progress/evidence/LOOP1-CLIENT-GUI-001/windows-origin20261008/approval.json.
 
 ## Present requirement and observed failure
 
@@ -25,3 +25,7 @@ Rollback removes only this exact Origin admission exception after approval and i
 ## Independent authority acceptance discovery (2026-10-08)
 
 The bounded decision/proposal at clean f2f35f26089bc27d4bebe665327f36b2496ee4b8 is accepted by fresh /root/origin_authority_final_review and exact hosted push run37725245354: five selected jobs success, eight correctly inactive. Original report/CI receipt hashes and exact copies: spec/progress/evidence/LOOP1-CLIENT-GUI-001/gateway-origin-fix20261008/authority-binding.json. Earlier pending status describes the pre-acceptance candidate. Dependent bounded Gateway implementation may proceed; product fix still requires new independent Review and applicable exact-head CI, and full GUI/integration/synchronization before task completion. Canonical/public contracts remain unchanged.
+
+## Bounded product acceptance discovery (2026-10-08)
+
+Fresh independent Gateway Review accepts79ec62c73b6681b4a544869051722a85521b9b4e and exact incremental push37726202795 selected6success/7correctinactive. Original report/hosted addendum/CI and classify receipts preserved byte-exact in GUI evidence win20261008/gateway-review. Actual native strict TLS/WSS SEND/retry/reconnect and presentation evidence follow in win20261008; this discovery does not replace fullGUI Review/full-range CI/protected integration/actual-main/safe-sync. Earlier implementation-pending descriptions retain historical ordering; exact decision scope and canonical/contracts unchanged. S2 OPEN.
