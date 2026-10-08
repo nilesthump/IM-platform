@@ -25,7 +25,7 @@ class GuiInstrumentation:Instrumentation() {
         val args=Bundle();args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,value);verify(node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,args));waitForIdleSync();Thread.sleep(300)
     }
     private fun visible(text:String):Boolean {
-        val node=find(uiAutomation.rootInActiveWindow,text)?:return false
+        val node=find(actualRoot(),text)?:return false
         val bounds=android.graphics.Rect();node.getBoundsInScreen(bounds)
         val display=targetContext.resources.displayMetrics
         return !bounds.isEmpty && bounds.centerX() in 0 until display.widthPixels && bounds.top>=0 && bounds.bottom<=display.heightPixels
@@ -38,6 +38,8 @@ class GuiInstrumentation:Instrumentation() {
     }
     private var activity:Activity?=null
     private fun verify(value:Boolean){check(value){"GUI assertion $assertions failed"};assertions++}
+    // Compose transitions can leave the accessibility cache on the previous form.
+    private fun actualRoot():AccessibilityNodeInfo?{uiAutomation.clearCache();return uiAutomation.rootInActiveWindow}
     private fun find(node:AccessibilityNodeInfo?,text:String):AccessibilityNodeInfo? {
         if(node==null)return null
         if(node.text?.toString()?.trim()==text || node.contentDescription?.toString()?.trim()==text)return node
@@ -45,7 +47,7 @@ class GuiInstrumentation:Instrumentation() {
         return null
     }
     private fun await(text:String):AccessibilityNodeInfo {
-        repeat(100){find(uiAutomation.rootInActiveWindow,text)?.let{return it};Thread.sleep(50)}
+        repeat(100){find(actualRoot(),text)?.let{return it};Thread.sleep(50)}
         error("Actual Compose control missing: $text")
     }
     private fun click(text:String){var node=await(text);while(!node.isClickable){node=node.parent?:error("Control not clickable: $text")};verify(node.performAction(AccessibilityNodeInfo.ACTION_CLICK));waitForIdleSync();Thread.sleep(650)}
@@ -63,14 +65,14 @@ class GuiInstrumentation:Instrumentation() {
             prefs.remove(slot);verify(prefs.read(slot)==null)
             for(theme in listOf("cold","warm"))for(font in listOf(14,16,22)){
                 close();prefs.saveAppearance(Appearance(theme,font,if(font==22)1.2f else .8f));launch()
-                verify(find(uiAutomation.rootInActiveWindow,"Settings")==null)
-                verify(find(uiAutomation.rootInActiveWindow,"Friends")==null)
-                verify(find(uiAutomation.rootInActiveWindow,"Server")==null)
-                verify(find(uiAutomation.rootInActiveWindow,"IM+ logo")==null && find(uiAutomation.rootInActiveWindow,"IM+")==null && find(uiAutomation.rootInActiveWindow,"Cold AI")==null && find(uiAutomation.rootInActiveWindow,"Warm Creative")==null)
+                verify(find(actualRoot(),"Settings")==null)
+                verify(find(actualRoot(),"Friends")==null)
+                verify(find(actualRoot(),"Server")==null)
+                verify(find(actualRoot(),"IM+ logo")==null && find(actualRoot(),"IM+")==null && find(actualRoot(),"Cold AI")==null && find(actualRoot(),"Warm Creative")==null)
                 capture("$theme-login-$font")
-                repeat(6){if(!visible("New here? Create an account")){scroll(uiAutomation.rootInActiveWindow);waitForIdleSync();Thread.sleep(200)}}
-                click("New here? Create an account");repeat(4){if(find(uiAutomation.rootInActiveWindow,"Confirm password")==null){scroll(uiAutomation.rootInActiveWindow);waitForIdleSync();Thread.sleep(250)}};await("Confirm password");capture("$theme-register-$font")
-                if(font==16){fill("Username","fixture-confirm-only");fill("Password","fixture-only-password-value");fill("Confirm password","mismatch");uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN,android.view.KeyEvent.KEYCODE_BACK),true);uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP,android.view.KeyEvent.KEYCODE_BACK),true);repeat(6){if(!visible("Create account"))scroll(uiAutomation.rootInActiveWindow)};click("Create account");await("Passwords do not match");verify(find(uiAutomation.rootInActiveWindow,"Settings")==null)}
+                repeat(6){if(!visible("New here? Create an account")){scroll(actualRoot());waitForIdleSync();Thread.sleep(200)}}
+                click("New here? Create an account");repeat(4){if(find(actualRoot(),"Confirm password")==null){scroll(actualRoot());waitForIdleSync();Thread.sleep(250)}};await("Confirm password");capture("$theme-register-$font")
+                if(font==16){fill("Username","fixture-confirm-only");fill("Password","fixture-only-password-value");fill("Confirm password","mismatch");uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN,android.view.KeyEvent.KEYCODE_BACK),true);uiAutomation.injectInputEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP,android.view.KeyEvent.KEYCODE_BACK),true);repeat(6){if(!visible("Create account"))scroll(actualRoot())};click("Create account");await("Passwords do not match");verify(find(actualRoot(),"Settings")==null)}
             }
             result.putString("result","PASS");result.putInt("sdkInt",android.os.Build.VERSION.SDK_INT);result.putInt("assertions",assertions);result.putString("engine","actual anonymous/registration UI and Android Keystore/SharedPreferences")
         }catch(error:Throwable){capture("failure-state");result.putString("result","FAIL");result.putString("failure",error.toString())}

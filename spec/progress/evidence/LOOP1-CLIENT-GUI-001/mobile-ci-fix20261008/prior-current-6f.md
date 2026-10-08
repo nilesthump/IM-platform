@@ -7,7 +7,7 @@ Gate Status: OPEN
 Current Batch: S2-GUI-only
 Current Task: LOOP1-CLIENT-GUI-001
 Current Task State: review
-Execution Status: MOBILE_HOSTED_FAIL_LOCAL_CAUSAL_REPAIR_REVIEW_PENDING
+Execution Status: FULL_IMPLEMENTATION_REVIEW_PASS_HOSTED_ACCEPTANCE_PENDING
 
 ## Immediately Relevant Completed Work
 
@@ -29,11 +29,11 @@ Real Windows runtime evidence now includes43 independently approved originals, a
 
 ## Current Blockers
 
-Accepted main is integrated in candidate744d943, historically independently reviewed. Full PR hosted37733952699 exact6f FAIL: Mobile stale accessibility cache / gate, twelve other instances success. Fresh Fix locally reproduces cached Login vs actual Register, repairs only anonymous test root observations, capture46/three no-capture46 PASS. New independent exact-candidate Review/full hosted CI/integration/main synchronization pending. Only occupation-blocked helper regression is deferred S2Gate.
+Accepted main is integrated in clean candidate744d943. Fresh independent full implementation Review and local Acceptance PASS; full-range exact-head CI/protected integration/actual-main verification/safe synchronization remain pending. Only occupation-blocked helper regression is deferred S2Gate.
 
 ## Changed Files or Migrations
 
-Mobile GuiInstrumentation test-only fresh-root cache repair plus original hosted/reproduction/cleanup evidence and recovery metadata. No product, dependency, contract, schema or canonical changes.
+Evidence-only export and GUI recovery/ADR0010 acceptance discovery; no product, dependency, contract, schema or canonical changes.
 
 ## Known Failures, Risks, and Assumptions
 
@@ -41,7 +41,7 @@ Only occupation-blocked helper/native-host regression remains PENDING_VERIFICATI
 
 ## Next Exact Action
 
-Fresh independent Review of committed minimal Mobile test repair and original FAIL/bindings; publish reviewed repair and verify all applicable full-range exact-head hosted jobs. Then protected integration/actual main checks and safe synchronization preserving unknown main work. Do not move GUI to done before this chain completes. Do not modify helper or trust.
+Publish the reviewed candidate plus this byte-exact review-evidence discovery after independent metadata binding; verify applicable full-range exact-head hosted CI; protected integration/actual main checks and safe synchronization preserving unknown main work. Do not move GUI to done before this chain completes. Do not modify helper/trust/live resources for administrative integration.
 
 ## Last Known Good Commit
 
@@ -78,14 +78,3 @@ Fresh independent /root/gui_final_candidate_review accepted clean merged744d943e
   - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/final-review20261008/report.md` (original SHA2569cfceeedd6990ef41aaf05f9dce4dd7d70e1b23df839aea00fff0a21ae96e3e6).
 
 Initial direct invocation of a CLOSED WebSocket handler failed a private host assertion; independent review checked actual synchronous close ordering and primary WHATWG OPEN-only message dispatch, withdrew the unreachable product finding, and preserved both original invalid host negative and corrected PASS. No product guard or source change was made for that invalid test. Recorder32events structuralPASS manifestaeaa28001494f2ea0524a715db5175d43e3e05a6b9692aaba679197238967ed8; incomplete trace remains disclosed. GUI review/S2OPEN, actual main7088 unchanged. This publication-only metadata gets exact independent binding/hosted verification; no Taskdone or main-sync claim.
-
-
-## Mobile hosted failure repair discovery (2026-10-08)
-
-Exact6f full PR37733952699 failed Mobile Confirm password/gate,12 other actual instances succeeded. Prior scoped/local PASS is retained; original full FAIL is mandatory, not deferred. Fresh Fix reproduced warm16 failure: cached rootLogin; cache-clear fresh rootRegister/visibleConfirm; original native pixels confirm correct form. Only anonymous instrumentation actualRoot() cache refresh changed; every original assertion, timing limit and PASS rule retained. Same capture46 and three exact no-capture46 PASS, app APK byte-identical; temporary diagnostics removed.
-
-- Command: `tests/clients/gui/android.py --serial emulator-5592 --capture`; exact `am instrument -w im.platform.client.test/im.platform.client.ui.GuiInstrumentation` three runs
-  - Result: local causal repair PASS46 each; owned emulator stopped, reverse empty, original appearance/fixture slot cleanup PASS. New independent Review/full exact-head hosted CI pending.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mobile-ci-fix20261008/report.md`
-
-Fresh exclusive writer /root/gui_mobile_ci_fix owns this test/evidence/recovery delta until clean commit/release. Assigned root g verified; base6f, accepted main7088 unchanged. No product/helper/Windows trust/main edits. Source hashes/APK/immutable original receipts bind tests; no self-acceptance/Taskdone/S2PASS.
