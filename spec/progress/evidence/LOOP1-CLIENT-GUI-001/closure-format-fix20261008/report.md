@@ -1,0 +1,23 @@
+# Minimal GUI administrative recovery format Fix
+
+Fresh Fix actor: /root/gui_closure_format_fix; independent from c163 metadata author and failed Reviewer, not an acceptance Reviewer. Assigned root H:/.codex/worktrees/g/IM-platform and branch task/LOOP1-CLIENT-GUI-001-resume verified exactly; initial clean HEAD c1633901c82ee2295c4ffc1c1e608c62a9b40759. Prior review lease released and exclusive sole-writer lease granted before tests/writes. Main H:/IM-platform was not written.
+
+## Repair
+
+Independent c163 Review FAIL15 identifies ten missing current.md sections plus exact Command/Result/Evidence, full40SHA and checkpoint path. Restored exactly the established ten-section structure from archived prior-current.md, retaining concise current accepted-product facts and the administrative acceptance boundary. No checker, product, runtime, workflow, authority, contract, dependency, helper or trust changes. Task only gains the narrow failure/repair handoff. Existing product checkpoint remains valid and linked; no speculative new mechanism or checkpoint.
+
+GUI product is independently accepted and synchronized at actual main b14bf1070ba26ac368488e2c6ea15a7936e2de89 after d376/fullPR37737318185, protected PR24 and exactmain37738345509. Existing product sync preserves781 unknown files/status/index flags. S2 remains OPEN; Web is not activated; only occupation-blocked helper regression remains pending at S2 Gate. This Fix does not claim future administrative independent Review/CI/integration/final-sync PASS. Final administrative receipts remain separate at H:/.codex/gui-handoffs/20261008-ca-native/final-admin-sync.json only upon actual outcomes, avoiding a self-referential candidate SHA.
+
+## Evidence preservation and local verification
+
+All17 prior Reviewer public-safe allowlisted originals plus allowlist copied byte-exact into failed-review/. Hash/length bindings are in export-bindings.json; failed report SHA e1ed72c77144a4672d8dc3881d39e4532b203af7dcdb858592ebf3b3dbc35bc9. Current c163 current.md archived byte-exact in prior-current.md. No original receipt or failure was normalized or amended.
+
+Own clean c163 baseline confirms architecture all, frozen and53 architecture controls exit0; unchanged clean Recovery Acceptance exits1 with exactly15 known format failures. Original outputs/argv/exits/durations/hashes are in baseline/clean-acceptance-result.json; generated-file inventory ce7e838da91f840e38c84588a485d0e05f285ca433c3feb09cf401631db4fd64 and1582 restored files match. Wrapper exit1 preserves the genuine baseline failure.
+
+After formatting, isolated Development controls all exit0, architecture/frozen/53 controls PASS;1582 known generated files restored byte-exact. See development/clean-acceptance-result.json. One earlier direct Development invocation omitted known generated-output isolation, causing architecture test_current_active_clients failure on2182 existing generated sources and Recovery FAIL1. That Fix tooling error and raw recorder output remain private, not hidden or reclassified as product failure; corrected run uses the unchanged established seven-path isolation/finally restore. Whole architecture raw stdout is not exported because fixture literals are not automatically public-safe. Authored current/task/report diff check is clean; immutable original receipt whitespace is not normalized or claimed authored-clean.
+
+Clean Acceptance requires a committed checkout. Following local Development PASS, this minimal delta is committed first and checked from its exact clean HEAD; resulting exact SHA and clean local Acceptance receipt remain private for the new independent Reviewer to bind. This report does not substitute its future result. New independent Review/clean Acceptance, applicable exact-head hosted CI/protected integration and final safe main sync are the next exact actions. No push or self-acceptance.
+
+## Research Recorder
+
+Own R-GUI-CLOSURE-FORMAT-FIX-20261008 uses prospective_resume/fresh_context=true linked to failed R-GUI-CLOSURE-REVIEW-20261008. Exact visible human prompt 能看到 is registered as human_latest_visible_continuing_GUI; old full-GUI authorization continues by delegation, not a fabricated new Human plan. Startup read-only/preparation and limited direct reads/private sealing are explicit gaps; initial normal sandbox was not retried because parent reports setup-refresh failure, escalated tools were used under existing authorization. Commands/tests use Recorder where possible. Genuine baseline FAIL15 and direct Development generated-output FAIL1 are preserved. Research structural validation is not independent Task/Gate acceptance; final run/validation receipts are sealed privately after exact clean verification.

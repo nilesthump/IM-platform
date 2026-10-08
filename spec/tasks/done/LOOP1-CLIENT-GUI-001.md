@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CLIENT-GUI-001
 title: Desktop/Mobile complete Loop1 GUI
-status: review
-owner: /root/gui_ui_update
+status: done
+owner: /root
 stage: S2
 gate: S2
 ---
@@ -434,3 +434,17 @@ Fresh exclusive Fix /root/gui_mobile_ci_fix reproduced actual warm-register-16 S
 Command: `tests/clients/gui/android.py --serial emulator-5592 --capture`; three exact `am instrument -w im.platform.client.test/im.platform.client.ui.GuiInstrumentation`. Baseline architecture/frozen/53controls/cleanAcceptance PASS; exact argv/exits/durations/private raw hashes and original safe receipts in `spec/progress/evidence/LOOP1-CLIENT-GUI-001/mobile-ci-fix20261008/commands.json` / report.md. No hosted acceptance of this causal repair yet.
 
 Next exact action: fresh independent Review of committed repair, full-range exact-head hosted CI including Linux API34 and Windows/Ubuntu Desktop, protected integration/actual-main checks and verified safe main sync. Accepted main7088/31unknown status entries/781files preserved. Prior43Windows/accepted Android visuals remain applicable because production bytes unchanged; new anonymous captures are regression proof only. No Taskdone/S2PASS.
+
+
+## Accepted product and protected synchronization closure (2026-10-08)
+
+Independent minimal Mobile repair Review accepts d376264; full PR37737318185 all14 actual instances/13 groups PASS, actual API34 anonymous46 assertions PASS. Original full6f FAIL and reproduced stale-cache FAIL remain immutable. PR24 protected merge actualmain b14bf1070ba26ac368488e2c6ea15a7936e2de89 is tree-identical to reviewed d376; fresh independent actual-main Review/clean Acceptance and exactmain37738345509 PASS establish product acceptance. Guarded FF-only main sync preserves all781 unknown files/status/index flags and task-owned blobs. Original sealed reports/allowlists/receipts are at closure20261008.
+
+GUI-only product scope is independently accepted, protected-integrated and synchronized; status done. S2 Gate remains OPEN. Only occupation-blocked helper regression is PENDING_VERIFICATION_AT_S2_GATE; helper restored unchanged. Web is not activated. Existing Windows43 approval/runtime/CA rollback and exact Android evidence remain bound; no new product/ADR/contracts/technology changes. This administrative publication needs fresh independent metadata Review/applicable exact-head CI/protected integration/final safe-sync; it does not retroactively manufacture future outcomes.
+
+
+## Administrative recovery format repair (2026-10-08)
+
+Independent clean c163 closure Review FAIL15 concerns only mandatory current.md recovery structure. Fresh Fix restores ten established sections plus exact Command/Result/Evidence, full accepted-main SHA and existing checkpoint path; no verifier/product/authority changes. Original17 allowlisted failed-review artifacts and allowlist are archived byte-exact at spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure-format-fix20261008/failed-review/. Own clean c163 minimum baseline confirms architecture/frozen/53 controls PASS and unchanged Recovery FAIL15;1582 known generated files restored byte-exact.
+
+Accepted GUI product remains done and safely synchronized at b14bf1070ba26ac368488e2c6ea15a7936e2de89; S2 OPEN/helper regression deferred/Web not activated. Fresh format Fix is local administrative work only. Next exact action: new independent Review/clean Acceptance, applicable exact-head CI/protected integration and separately receipted final safe main synchronization; no self-acceptance or future PASS. Last accepted product SHA and checkpoint remain in current.md. Sole Fix owns only current/task/GUI evidence delta until clean commit/release; main unknown work untouched.
