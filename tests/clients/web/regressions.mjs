@@ -54,6 +54,24 @@ for(const late of [99,103]){
   assert.deepEqual(pulls.map(v=>v.afterSeq),late===99?[101,99]:[101,101]);assert.equal(client.repository.after(c),late===99?101n:103n);assert.deepEqual(client.repository.snapshot(c).map(v=>Number(v.seq)),late===99?[99,100,101]:[101,102,103]);
  }finally{hold.resolve();client.dispose();}
 }
+// Durable ACKs alone can expose a live gap. Both an idle Sync and a held
+// terminal response must compensate it without realtime/reconnect/timeout.
+for(const held of [false,true]){
+ const hold=deferred(),began=deferred(),pulls=[];let second;
+ const {client,socket}=await setup(async(url,options)=>{assert(url.endsWith('/sync/conversation'));const request=JSON.parse(options.body);pulls.push(request);
+  if(pulls.length===1){began.resolve();if(held)await hold.promise;return page(request,[]);}
+  return page(request,[message(102),second]);
+ });
+ try{
+  const ack=(rid,seq,n)=>socket.onmessage({data:frame('message.ack',rid,{status:'committed',conversationId:c,messageId:id(n),seq,createdAt:'2026-10-09T09:00:00Z'})});
+  const first=client.send('first ACK');ack(first,101,901);await began.promise;
+  if(!held)await observe(client,()=>client.view().sync==='本页在线消息已同步 · 不补历史');
+  const rid=client.send('second ACK');second={...message(103),requestId:rid,messageId:id(903),senderId:u,content:{kind:'TEXT',text:'second ACK'}};
+  socket.onmessage({data:frame('message.ack',id(999),{status:'committed',conversationId:c,messageId:id(999),seq:103,createdAt:'2026-10-09T09:00:00Z'})});assert.equal(pulls.length,1);
+  const done=observe(client,()=>client.repository.after(c)===103n&&client.view().sync==='本页在线消息已同步 · 不补历史');ack(rid,103,903);if(held)hold.resolve();await done;
+  assert.deepEqual(pulls.map(v=>v.afterSeq),[101,101]);assert.deepEqual(client.repository.snapshot(c).map(v=>Number(v.seq)),[101,102,103]);
+ }finally{hold.resolve();client.dispose();}
+}
 // Legal multi-page response commits each page; malformed later page is atomic
 // and must leave both rows/prefix from the prior committed page unchanged.
 {

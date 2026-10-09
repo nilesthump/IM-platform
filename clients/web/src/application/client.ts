@@ -47,6 +47,7 @@ export class WebClient {
           this.repository.ack(f.requestId,p as unknown as Committed);
         }else {if(!pending)return;this.repository.fail(pending.conversation,f.requestId);}
         if(pending)clearTimeout(pending.timer);this.pending.delete(f.requestId);this.publish();
+        if(p.status==='committed'&&this.opened.has(p.conversationId as string))void this.sync(p.conversationId as string);
       }
       else if(this.state.connection==='在线'&&f.type==='message.created'){const c=p.conversationId as string;if(!this.state.friends.some(v=>v.directConversationId===c))return;this.repository.realtime(f.requestId,p as unknown as RealtimeMessage);const pending=this.pending.get(f.requestId);if(pending&&pending.conversation===c){clearTimeout(pending.timer);this.pending.delete(f.requestId);}this.publish();if(this.opened.has(c))void this.sync(c);}
     }catch{socket.close();this.publish({connection:'协议错误',sync:'无效响应未改变已确认消息'});}};
