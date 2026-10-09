@@ -5,43 +5,46 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-WEB-001-product
-Batch Status: IMPLEMENTING
+Batch Status: REVIEW_PENDING
 Current Task: LOOP1-WEB-001
-Current Task State: active
-Execution Status: IMPLEMENTING
+Current Task State: review
+Execution Status: REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
-Approved bounded appearance prerequisite accepted at e15f43f9 / PR28 actual main d4bb8200e7f5410d101a27ad58f8abb5eaa80f8f, independently audited exact candidate/main hosted CI and safely synchronized. GUI done and ADR-0007 accepted. Web dependency-satisfied backlog -> ready -> active; full product underway.
+Full approved memory-only Web candidate implemented in assigned worktree; original HTTP/WSS/Sync operations and three-field bounded appearance. Latest genuine non-Edge Chromium run exit0 generated38 original screenshots and executable state proof. Human canceled Edge/plugin QA; prior failure/blocker records remain immutable history and no current blocker. Source 2aa37ad/build exact provenance, screenshot manifest and accepted prerequisite chain are durable under product-20261009.
 
 ## Current Blockers
 
-None for approved implementation. Architect screenshots and independent product acceptance remain outstanding.
+None for independent review. Architect Approval, fresh semantic implementation Review, exact-head hosted CI/protected integration/actual-main/safe sync remain required.
 
 ## Verification
 
+- Command: `python -Xutf8 -B tests/clients/web/verify.py`
+  - Result: actual locked install/build/behavior/appearance/source PASS on 2aa37ad; no skeleton fallback.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/local-verification-latest.json`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: minimum baseline exit0/PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/local-checks-initial.json`.
-- Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: exit0 canonical2ba864fc/PDF546915 verified.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/local-checks-initial.json`.
+  - Result: exit0/PASS; frozen canonical2ba864fc/PDF546915 intact;14 Web controls PASS.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/local-verification-latest.json`
+- Command: `node tests/clients/web/browser.mjs`
+  - Result: exit0, genuine Chromium151.0.7922.34,38 unedited controlled-fixture screenshots; no Architect/selfReview acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/screens/chromium-c/manifest.json`
 
 ## Changed Files or Migrations
 
-Web product original allowed scope only. No migration, contract, backend or prerequisite authority writes.
+Original Web source/package/lock/tsconfig, bounded Web tests and Task/current/evidence only. No public contract/backend/shared/authority/prerequisite guard/workflow writes or migrations.
 
 ## Known Failures, Risks, and Assumptions
 
-Local implementation does not establish Task acceptance; real screenshot Architect Approval and fresh Review/exact CI/integration/sync pending. Recorder startup direct reads/output truncation/wrong path gaps declared.
+Initial recovery Evidence-format failures, browser fetch receiver/Settings reachability failures and superseded screenshots are archived. Corrected product passes local executable checks, but source/runtime/protocol/minimality and visuals still await independent acceptance. Recorder startup/direct read/file-tool/probe gaps disclosed; owned fixture run ended exit1 after authorized cleanup, no fake finish. Browser tooling download retained real DNS/stream retries, final exit0 via existing per-process system proxy; no trust/host changes.
 
 ## Next Exact Action
 
-Complete memory-only Web and real browser matrix, seal clean candidate for fresh Architect and implementation Review. Full accepted/synced Web then stop before S2 Stage Gate; no Gate selection/evaluation/helper regression.
+Seal clean candidate and Recorder, release lease; root delegates fresh Architect Review/Approval then fresh implementation Review/exact-head hosted CI/protected integration/actual-main/safe main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
 
 ## Last Known Good Commit
 
-`d4bb8200e7f5410d101a27ad58f8abb5eaa80f8f`, accepted actual main and safe sync.
+`d4bb8200e7f5410d101a27ad58f8abb5eaa80f8f`, accepted prerequisite actual main safely synchronized; product main sync PENDING.
 
 ## Latest Checkpoint
 
@@ -49,8 +52,8 @@ Complete memory-only Web and real browser matrix, seal clean candidate for fresh
 
 ## Uncommitted Changes / Ownership
 
-/root/web_product_impl sole writer and verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product. Main unknown work untouched.
+/root/web_product_impl sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-implementation/report.md. Main unknown work untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
-None; accepted ADR-0011 now effective as sealed acceptance chain establishes. Historical pending authority bytes preserved. S1 PASS/S2 OPEN.
+None; accepted ADR-0011 prerequisite now effective via sealed chain. Historical authority pending bytes preserved. S1 PASS/S2 OPEN; candidate screenshots/local Recorder do not establish Task or Gate PASS.

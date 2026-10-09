@@ -1,0 +1,3 @@
+# Latest Human steering
+
+Exact visible Human reply: 失败那就不验证edge. This cancels the added Edge/plugin validation requirement, supersedes temporary BLOCKED_EXTERNAL_ACCESS and permits continuing original full Web implementation/real browser screenshots/Architect/independent Review/exact CI/integration/safe sync. No new Edge validation will be run. Prior actual plugin failures and failed real Edge screenshots remain immutable historical evidence, not accepted QA. Use a different actual browser; a validation-only Playwright Chromium installation does not add a product runtime/dependency or system trust. Chrome and default Playwright browser cache are absent on the observed host. User endpoint remains full Web acceptance/sync then STOP before S2 Gate.

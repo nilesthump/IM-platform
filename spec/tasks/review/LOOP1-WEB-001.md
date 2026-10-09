@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
-status: active
+status: review
 owner: /root/web_product_impl
 stage: S2
 gate: S2
@@ -146,3 +146,37 @@ Real browser entry: built index.html served from controlled same-origin HTTPS fi
 Exact verification: python -Xutf8 -B tests/clients/web/verify.py requires locked npm ci, actual TypeScript build and node tests/clients/web/behavior.mjs plus appearance.mjs; architecture all/frozen; unittest tests/clients/web; tools/verify-loop1-ctrl-002.ps1 Development then clean candidate Acceptance; real browser harness tests/clients/web/browser.mjs with installed Edge and controlled HTTPS fixture. Negative coverage includes malformed wire/auth/session identity, late account callbacks, request retry identity/SENT terminal, sequence gaps/realtime duplicates, failed pagination, no business persistence and preference validation/unavailable storage. No product fallback or skip.
 
 Sole writer/verification /root/web_product_impl; assigned managed root verified exact, branch task/LOOP1-WEB-001-product; last good synchronized main d4bb820. Product uncommitted files belong only to this writer; main unknown work untouched. Fresh Architect/implementation independent Review, exact-head hosted CI, protected integration/actual-main and safe sync remain required. Recorder R-WEB-PRODUCT-IMPL-20261009 prospective_resume captures product; incomplete pre-Recorder direct startup declared. Next: implement approved full Web, local behavior and genuine browser matrix, clean committed candidate for root to delegate Architect and independent implementation Review.
+
+## Latest product checkpoint: required Edge plugin runtime blocked
+
+Execution Status: BLOCKED_EXTERNAL_ACCESS
+
+User now explicitly requires validation using the Edge plugin. Root's actual CUA getState attempts yielded trusted Node/kernel exit1 and helper_unknown_error setup refresh had errors, including after successful reset; no Edge surface was available. This genuine platform-runtime blocker prevents required plugin QA and final real screenshot approval. Existing Playwright Edge failure-run screenshots do not fulfill it. Product source candidate c785ef39bb1e66c90587a3288ce819584e05fcfc is frozen and real artifact/long-lived controlled fixture is bound in product-20261009/edge-plugin-server-binding.json; root holds browser verification lease. This state supersedes the earlier IMPLEMENTING execution label, not the active queue.
+
+Full source/scope/local checks and final candidate SHA are sealed by private product-implementation/report.md and public local-verification-final.json after final clean commit. Product remains unaccepted; no done/Architect Approval/independent Review/hosted/new PR/main synchronization. Last good main d4bb820; all product changes are this implementation's owned scope; main unknown work untouched. Immutable failed run bytes at failed-browser-runs-originals.zip; exact failure provenance/next action browser-blocker.md. Recorder run has explicitly pending long-lived fixture command and incomplete prior startup; no fake trace completion.
+
+Next: restore Edge-plugin runtime then root uses original https://127.0.0.1:52497 fixture to complete genuine Edge-plugin matrix, Architect/fresh Review/exact CI/integration/main sync. Final endpoint remains Web fully accepted/synchronized before S2 Gate; no Stage Gate/helper regression.
+
+Fixture lifecycle correction: root explicitly authorized cleanup; exact-owned PID32808 stopped with corrected stop exit0 and original long-run exit1, Recorder command_finished preserved. Service is STOPPED, old URL is historical. Restart recipe and source/build binding: product-20261009/edge-plugin-server-stopped.json. No detached replacement, no user browser process or OS trust changed. Root original CUA failures and exact Human prompt are byte-preserved in root-edge-plugin-originals.zip/hash bindings; no auto-approval rejection and no tab/HTTPS interstitial ever observed.
+
+## Latest Human cancellation of Edge validation
+
+Execution Status: IN_PROGRESS
+
+Human exact reply“失败那就不验证edge”撤销新增Edge/插件验证要求，supersede临时BLOCKED_EXTERNAL_ACCESS；保留原真实浏览器截图/Architect/独立Review/CI/integration/main sync链，改用validation-only Chromium，不继续Edge。原阻塞/失败原件immutable保留。旧fixture已按显式授权真实结束，无新detached服务；重新运行不同浏览器时绑定新的精确source/build/URL。所有产品与Task仍未独立接受，S1 PASS/S2 OPEN，完成Web后Gate前停止。Next: complete latest-source localchecks and genuine Chromium matrix, clean source-mapped screenshots candidate for root Architect and fresh implementationReview.
+
+## Product candidate for independent Architect and implementation Review
+
+Execution Status: REVIEW_PENDING
+
+Full approved memory-only Web Shell/Login/session/Chat/Friends/AI-placeholder/Plugin-unavailable/Settings/Profile implemented; only fixed three-field appearance persistence. Original public HTTP friend/search/profile/auth and canonical shared WSS/Sync wire adapters, pure memory Repository, retry identity/SENT terminal/window gaps and account isolation. No initial history backfill: first authority seq establishes this page realtime window; earlier late frames expand it and expose gaps; after checkpoint denotes only gap-free prefix in this window, never global contiguous_seq or old history materialization. No timestamp filtering.
+
+Source c785ef39bb1e66c90587a3288ce819584e05fcfc and exact actual build bytes bound by product-20261009/build-provenance.json. Final follow-up changes only QA capture wait/evidence/recovery metadata; reviewer must verify actual source tree equality, not infer from SHA labels. Genuine non-Edge Chromium151.0.7922.34/locked Playwright captured38 original PNGs with manifest/protocol-proof under product-20261009/screens/chromium-b; delayed color-transition captures superseded, original bytes preserved. User canceled Edge/plugin QA; its failures stay historical, current blocker removed. ControlledHTTPS/WSS fixtures only, no real credentials/system trust change. Screenshot self-check/test success is not Architect Approval.
+
+Verification: strict tests/clients/web/verify.py actual locked npm ci/build/behavior/appearance/source checks; architecture all/frozen;14 Web phase controls; Recovery Development and clean committed Acceptance; diff/scope/provenance. Exact observed argv/exits/ms/outputhashes in local-verification-latest.json and sealed private report. Initial Evidence-format FAILs archived and corrected without checker edits. No selfReview/Architect approval/hosted/product main sync/done. Last accepted synchronized main d4bb820; task-owned branch task/LOOP1-WEB-001-product, final SHA and lease release private report. All screenshots/hash originals and known failures immutable.
+
+Next exact action: root delegates fresh independent Architect Review/Approval of latest38 screenshots and full candidate; repair/newshots onFAIL then fresh implementation Review/exact-head hosted CI/protected integration/actual-main/safe sync. Full accepted/synced Web thenSTOP before S2 Gate, no Gate/helper actions. Sole writer/verification lease releases only after clean candidate/local acceptance and Recorder sealing.
+
+## Final source strict-scalar revision and latest screenshot set
+
+Latest product source 2aa37ad5b3b19cf1f50c03aa6e1029beb867431b fixes ADR-required strict theme/density string validation (reject custom toString objects), with targeted negative tests; no broader storage/interface/visual behavior. New exact-source actual build and38 genuine Chromium screenshots re-captured at product-20261009/screens/chromium-c/manifest.json. This supersedes earlier source/set claims without changing their immutable originals. Latest tree/hash binding product-source-binding.json, actual full build provenance build-provenance.json. Updated full applicable local checks and clean committed Recovery Acceptance are sealed in private final report; current Task remains review pending genuine Architect/fresh independent implementationReview/hosted/integration/actual-main/safe sync. User canceled Edge QA, S2 endpoint unchanged.
