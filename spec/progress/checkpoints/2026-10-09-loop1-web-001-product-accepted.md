@@ -1,0 +1,19 @@
+# Stable Web product recovery point
+
+# Web product accepted and safely synchronized
+
+LOOP1-WEB-001 product is independently approved and accepted, and synchronized to H:/IM-platform at a1b154d06c0a9d191ec8dca514fff3ab1b46ee25. Candidate615cb06c70581aa474281b2dd9be80e59be88ec8 on task/LOOP1-WEB-001-product was ordinarily protected-merged through PR29 at2026-10-09T14:35:04Z; actual main has ordered parents[d4bb8200e7f5410d101a27ad58f8abb5eaa80f8f,615] and its whole tree equals candidate. No admin/force/bypass.
+
+Product source52c9762e1e8a943a3b513aa428182c339c9787ca and harnessbc989a51bd14a15788b170b8623dd3e922f2eaf2 retain independently accepted semantic ReviewB, delta ReviewC, formal ArchitectE52 original Chromium images and approval-metadata Review. Cold matches accepted Desktop; logo PNG is byte-identical with unified IM+/PLUGWORLDIM wordmark. Valid late durableACK, crossing current live-window gaps, ACK-only gap triggers and canonical logout204 are regression-covered. No initial history backfill/business persistence/new authority/dependency/native/guard/workflow changes. User waived Edge after actual startup failures.
+
+Candidate push37942242079 attempt1 requiredLinuxDesktop/aggregate FAIL is retained; Compose cause remains unclassified. One normal failed-job rerun at unchangedhead: attempt2 effective14SUCCESS comprises12 reused successful executions with byte-identical logs/timestamps and actual LinuxDesktop/gate reruns. PR37942252613 six selectedSUCCESS/seven properinactive. Independent retry reportf006f6fc2b87013aefba20eec64f6217055f6e035b147c2301cb06df91a941ed; seal f843ec4b539646be33173be8ee1050e543b8a5c36dc79fe895d33e0cc52a78ec. No failed result erased or called transient without evidence.
+
+Own actual-main run37945266468 exacta1 attempt1 six actualrequiredSUCCESS/seven actualflagfalse skips, actual checkouts exacta1. Locked Web npmci/build/behavior/regressions/appearance/source, Linux architecture56 semantic/56 checker controls, CI34/RecoveryAcceptance/sourceguards/aggregatePASS. Independent main report63f9aaab0c23b5fe538ee30cf546fdf65ccf8c9186554b1857251e78f0284499; seal df6608533bc457ab4d6d4126bdea2c30dc08cc073f63951c331d4e7c2e930b9f. Actor independent of implementers/fixers; same hosted auditor/new runs truthfully, not fresh-context claims.
+
+Guarded FF-only local-main sync PASS: befored4, targeta1; all781 unrelated file bytes/status/index/stage/flags preserved, overlap0; branch recovery/s1-handoff-20261001 preserved; task changed objects exactly verified. Receipt bytes and exact count are in archive/coordinator/product-main-sync-receipt.json. No unknown file names/contents exported or copied.
+
+Original raw logs/receipts/reports/seals/Recorder streams preserved byte-exact in acceptance-originals.zip with per-entry original-bindings.json. CR/CRCRLF originals remain raw ZIP bytes, authored metadata LF. Research structural validation is not Task/Stage acceptance; startup/direct/private-authoring/orphan/inspection error gaps retained. Coordinator Recorder remains active until administrative closure sync, hence no claim of complete finalized root trace in this archive.
+
+Task enters done only after this independent product acceptance and verified main sync. This new administrative closure/checkpoint/current metadata still needs fresh independent Review, applicable exact-head CI, protected integration/actual-main audit and preservation-aware synchronization. Product source/harness and authority trees remain unchanged. No S2 Stage Gate evaluation/helper regression/nexttask; Human endpoint stops before Gate. S1 accepted/S2 OPEN.
+
+Evidence: spec/progress/evidence/LOOP1-WEB-001/product-closure-20261009/original-bindings.json
