@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
-status: backlog
-owner: /root/web_freeze_fix_a
+status: active
+owner: /root/web_product_impl
 stage: S2
 gate: S2
 ---
@@ -131,3 +131,18 @@ Local architecture all/frozen exit0、architecture56/CI34/Web14 tests exit0，4�
 Recovery Development本fix真实exit0/7953.0ms，仅local非接受验证；source/control修复待clean commit后由新独立Reviewer审查，最终clean Recovery Acceptance结果与SHA在私有report封存。
 
 Immutable FAIL原件以ZIP保持entry原字节与original-bindings.json哈希：原negative-zero.log含CRCRLF，直接复制导致cached diff-check exit1；序列控制错误随后产生1d832e5，未amend，失败Recorder保留。新纠正commit仅封装task-owned复制证据与metadata，原review原件不动，源代码修复不变。
+
+## Product activated after accepted prerequisite (2026-10-09)
+
+Execution Status: IMPLEMENTING
+web_verification_phase: product
+
+This current record supersedes all historical pending/paused/no-Web endpoint wording above. GUI dependency done, accepted ADR-0007, accepted prerequisite e15f43f9 / protected PR28 actual main d4bb8200e7f5410d101a27ad58f8abb5eaa80f8f / independently audited exact-head hosted candidate and actual-main / safe main synchronization satisfy inputs. Immutable receipts and independent reports are byte-bound in product-20261009/accepted-freeze-originals.zip. Transition backlog -> ready -> active is dependency-satisfied in this activation; unique queue remains active. Seven extra prerequisite paths are not product write scope. No S2 Stage Gate work; full accepted/synced Web then stop.
+
+Concrete product responsibilities: application auth/HTTP/WSS orchestration and memory Repository in clients/web/src/application; independent Web visual Shell/pages and fixed appearance adapter in src/ui; reuse only approved shared protocol/model leaves, no native Repository. React18.3.1/react-dom18.3.1/TypeScript5.9.3 and corresponding type bindings are canonical §6.1 policy packages, same accepted Desktop family; no new runtime/router/state/data/network library.
+
+Real browser entry: built index.html served from controlled same-origin HTTPS fixture at loopback, WSS /ws; installed Microsoft Edge via bundled Playwright validation tooling. Runtime/version/fixture/build provenance recorded by screenshot manifest, no production dependency. 1280x900 and narrow viewport; Cold AI/Warm Creative, font14/20, compact/spacious. Screens: Login idle/loading/error/refresh/logout/expired; Chat empty/SENDING/SENT/FAILED/retry/disconnect/reconnect; Friends loading/empty/error/search/add success; Profile loading/error/success; AI construction and Plugin unavailable; Settings themes and independent preference extremes. Only controlled fixture identities; original unchanged screenshots under product-20261009/screens. Candidate commit SHA, source/build hash, exact steps and PNG SHA bind the set. Screenshot approval is outstanding.
+
+Exact verification: python -Xutf8 -B tests/clients/web/verify.py requires locked npm ci, actual TypeScript build and node tests/clients/web/behavior.mjs plus appearance.mjs; architecture all/frozen; unittest tests/clients/web; tools/verify-loop1-ctrl-002.ps1 Development then clean candidate Acceptance; real browser harness tests/clients/web/browser.mjs with installed Edge and controlled HTTPS fixture. Negative coverage includes malformed wire/auth/session identity, late account callbacks, request retry identity/SENT terminal, sequence gaps/realtime duplicates, failed pagination, no business persistence and preference validation/unavailable storage. No product fallback or skip.
+
+Sole writer/verification /root/web_product_impl; assigned managed root verified exact, branch task/LOOP1-WEB-001-product; last good synchronized main d4bb820. Product uncommitted files belong only to this writer; main unknown work untouched. Fresh Architect/implementation independent Review, exact-head hosted CI, protected integration/actual-main and safe sync remain required. Recorder R-WEB-PRODUCT-IMPL-20261009 prospective_resume captures product; incomplete pre-Recorder direct startup declared. Next: implement approved full Web, local behavior and genuine browser matrix, clean committed candidate for root to delegate Architect and independent implementation Review.
