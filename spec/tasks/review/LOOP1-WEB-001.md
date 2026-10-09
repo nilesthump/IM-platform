@@ -2,7 +2,7 @@
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
 status: review
-owner: /root/web_product_impl
+owner: /root/web_product_fix_a
 stage: S2
 gate: S2
 ---
@@ -180,3 +180,9 @@ Next exact action: root delegates fresh independent Architect Review/Approval of
 ## Final source strict-scalar revision and latest screenshot set
 
 Latest product source 2aa37ad5b3b19cf1f50c03aa6e1029beb867431b fixes ADR-required strict theme/density string validation (reject custom toString objects), with targeted negative tests; no broader storage/interface/visual behavior. New exact-source actual build and38 genuine Chromium screenshots re-captured at product-20261009/screens/chromium-c/manifest.json. This supersedes earlier source/set claims without changing their immutable originals. Latest tree/hash binding product-source-binding.json, actual full build provenance build-provenance.json. Updated full applicable local checks and clean committed Recovery Acceptance are sealed in private final report; current Task remains review pending genuine Architect/fresh independent implementationReview/hosted/integration/actual-main/safe sync. User canceled Edge QA, S2 endpoint unchanged.
+
+## Fresh Architect FAIL repair (2026-10-09)
+
+Execution Status: REPAIRING_AFTER_ARCHITECT_FAIL
+
+Latest Human directs Cold to accepted Desktop theme. Fresh Fix aligns actual light-blue/white-glass/deep-blue color hierarchy, keeps independent font/density and Web UI. Bounded Friends input/action CSS reserves readable idle/busy labels. Genuine Chromium matrix now adds both themes560x90020px/spacious Chat sending/sent/input and all host nav, Friends search/busy/error. Original Architect FAIL and all previous screenshot bytes immutable at fix-20261009-a; no Desktop/authority/contract/dependency changes. Local checks/new bound screenshots/clean candidate pending; new fresh Architect Approval and independent implementationReview/hosted/integration/main sync required. Sole lease /root/web_product_fix_a; accepted main d4bb820 remains lastgood. Edge canceled, Web endpoint before S2 Gate unchanged.

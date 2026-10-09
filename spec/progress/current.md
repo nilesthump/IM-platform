@@ -5,10 +5,10 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-WEB-001-product
-Batch Status: REVIEW_PENDING
+Batch Status: REPAIRING_AFTER_ARCHITECT_FAIL
 Current Task: LOOP1-WEB-001
 Current Task State: review
-Execution Status: REVIEW_PENDING
+Execution Status: REPAIRING_AFTER_ARCHITECT_FAIL
 
 ## Immediately Relevant Completed Work
 
@@ -16,7 +16,7 @@ Full approved memory-only Web candidate implemented in assigned worktree; origin
 
 ## Current Blockers
 
-None for independent review. Architect Approval, fresh semantic implementation Review, exact-head hosted CI/protected integration/actual-main/safe sync remain required.
+Independent Architect FAIL on Cold direction, Friends action squeezing and missing narrow max evidence. Fresh bounded Fix in progress; new Architect Approval, semantic Review and hosted/integration/main sync remain required.
 
 ## Verification
 
@@ -40,7 +40,7 @@ Initial recovery Evidence-format failures, browser fetch receiver/Settings reach
 
 ## Next Exact Action
 
-Seal clean candidate and Recorder, release lease; root delegates fresh Architect Review/Approval then fresh implementation Review/exact-head hosted CI/protected integration/actual-main/safe main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
+Finish Desktop-aligned Cold/search repair, recapture Chromium full matrix plus narrow maxima, seal clean candidate/Recorder and release lease; root delegates NEW Architect and implementation Review then hosted/integration/main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
 
 ## Last Known Good Commit
 
@@ -52,7 +52,7 @@ Seal clean candidate and Recorder, release lease; root delegates fresh Architect
 
 ## Uncommitted Changes / Ownership
 
-/root/web_product_impl sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-implementation/report.md. Main unknown work untouched.
+/root/web_product_fix_a sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-implementation/report.md. Main unknown work untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
