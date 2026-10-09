@@ -36,7 +36,7 @@ Original Web source/package/lock/tsconfig, bounded Web tests and Task/current/ev
 
 ## Known Failures, Risks, and Assumptions
 
-Initial recovery Evidence-format failures, browser fetch receiver/Settings reachability failures and superseded screenshots are archived. Corrected product passes local executable checks, but source/runtime/protocol/minimality and visuals still await independent acceptance. Recorder startup/direct read/file-tool/probe gaps disclosed; owned fixture run ended exit1 after authorized cleanup, no fake finish. Browser tooling download retained real DNS/stream retries, final exit0 via existing per-process system proxy; no trust/host changes.
+Private B verification initial wrong build-logo path caused genuine exit1; corrected only private probe, new screenshot bytes unchanged and all7 latest checks exit0. Initial recovery Evidence-format failures, browser fetch receiver/Settings reachability failures and superseded screenshots are archived. Corrected product passes local executable checks, but source/runtime/protocol/minimality and visuals still await independent acceptance. Recorder startup/direct read/file-tool/probe gaps disclosed; owned fixture run ended exit1 after authorized cleanup, no fake finish. Browser tooling download retained real DNS/stream retries, final exit0 via existing per-process system proxy; no trust/host changes.
 
 ## Next Exact Action
 
