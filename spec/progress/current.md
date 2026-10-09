@@ -5,14 +5,14 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-WEB-001-product
-Batch Status: REPAIR_IN_PROGRESS
+Batch Status: REVIEW_PENDING
 Current Task: LOOP1-WEB-001
 Current Task State: review
-Execution Status: REPAIR_IN_PROGRESS
+Execution Status: REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
-Independent ReviewA reproduced three FAILs: late ACK timeout correlation, crossing terminal Sync and legal logout204. Fresh FixC repairs bounded Web logic/contract fixtures, preserves approved Cold Desktop colors and unified Logo; new regressions and browser capture pending. Original FAIL and old-source ArchitectC Approval archived byteexact.
+Independent ReviewA reproduced three FAILs: late ACK timeout correlation, crossing terminal Sync and legal logout204. Fresh FixC repairs bounded Web logic/contract fixtures, preserves approved Cold Desktop colors and unified Logo; new regressions passed and complete52 Chromium originals captured. Original FAIL and old-source ArchitectC Approval archived byteexact.
 
 ## Current Blockers
 
@@ -21,14 +21,14 @@ NEW independent Architect Approval and implementation Review; exact-head hosted 
 ## Verification
 
 - Command: `python -Xutf8 -B tests/clients/web/verify.py`
-  - Result: actual local argv/exit/timing/hash receipts; independent acceptance pending
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-b/local-verification.json`
+  - Result: locked actual build/behavior/appearance/source plus meaningful three-failure and crossing regressions; receipts record actual exits
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/local-verification.json`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
   - Result: all/frozen/Web14/Recovery Development results in durable receipt
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-b/local-verification.json`
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/local-verification.json`
 - Command: `node tests/clients/web/browser.mjs`
-  - Result: exit0 actualChromium48; same-send SENDING/SENT plus expected seq and older-SENT negative control
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-b/screens/chromium-c/manifest.json`
+  - Result: actual Chromium52 originals, prior48 plus lateACK/crossingSync; real logout204; own fixture/browser closed
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/screens/chromium-c/manifest.json`
 
 ## Changed Files or Migrations
 
@@ -36,11 +36,11 @@ Original Web source/package/lock/tsconfig, bounded Web tests and Task/current/ev
 
 ## Known Failures, Risks, and Assumptions
 
-Private B verification initial wrong build-logo path caused genuine exit1; corrected only private probe, new screenshot bytes unchanged and all7 latest checks exit0. Initial recovery Evidence-format failures, browser fetch receiver/Settings reachability failures and superseded screenshots are archived. Corrected product passes local executable checks, but source/runtime/protocol/minimality and visuals still await independent acceptance. Recorder startup/direct read/file-tool/probe gaps disclosed; owned fixture run ended exit1 after authorized cleanup, no fake finish. Browser tooling download retained real DNS/stream retries, final exit0 via existing per-process system proxy; no trust/host changes.
+Independent ReviewA three real FAILs reproduced then repaired with targeted behavior regressions. First52 browser attempt failed at legal204 because Chromium exposes empty stream rather than null; original source/screens/provenance ZIP retained. Strict zero-body stream repair plus null/empty/nonempty/read-failure controls passed; fresh full52 actual browser passed. Prior failures immutable. Local checks/screenshots/Recorder are not independent acceptance; new source needs NEW Architect Approval and implementation Review/hosted acceptance/main sync.
 
 ## Next Exact Action
 
-Seal clean same-send evidence candidate; release lease to root for NEW Architect Approval and independent implementation Review then hosted/integration/main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
+Seal clean semantic repair candidate; release lease to root for NEW Architect Approval and independent implementation Review then hosted/integration/main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
 
 ## Last Known Good Commit
 

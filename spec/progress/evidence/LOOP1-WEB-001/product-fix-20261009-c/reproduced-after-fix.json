@@ -1,0 +1,38 @@
+{
+  "observed": [
+    {
+      "case": "canonical-logout-204",
+      "notice": "已退出登录。",
+      "session": false,
+      "expectedNotice": "已退出登录。",
+      "pass": true
+    },
+    {
+      "case": "late-durable-ack-after-timeout",
+      "state": "SENT",
+      "requestId": "141671d5-59ac-4f88-9c04-f694dbd94062",
+      "expectedState": "SENT",
+      "pass": true
+    },
+    {
+      "case": "late-realtime-crosses-terminal-sync",
+      "pullAfterSeq": [
+        101,
+        99
+      ],
+      "sequences": [
+        "99",
+        "100",
+        "101"
+      ],
+      "after": "101",
+      "sync": "本页在线消息已同步 · 不补历史",
+      "expectedSequences": [
+        "99",
+        "100",
+        "101"
+      ],
+      "pass": true
+    }
+  ]
+}
