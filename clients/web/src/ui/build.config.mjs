@@ -4,7 +4,7 @@ const out=process.env.WEB_BUILD_DIR;
 if(!out||!path.isAbsolute(out))throw new Error('WEB_BUILD_DIR must be an explicit absolute build destination');
 await mkdir(path.join(out,'vendor'),{recursive:true});
 await cp('dist',out,{recursive:true});
-for(const name of ['index.html','style.css'])await copyFile('src/ui/'+name,path.join(out,name));
+for(const name of ['index.html','style.css','logo.png'])await copyFile('src/ui/'+name,path.join(out,name));
 for(const name of ['react','react-dom'])await copyFile('src/ui/'+name+'.config.mjs',path.join(out,name+'.mjs'));
 await copyFile('node_modules/react/umd/react.production.min.js',path.join(out,'vendor/react.js'));
 await copyFile('node_modules/react-dom/umd/react-dom.production.min.js',path.join(out,'vendor/react-dom.js'));

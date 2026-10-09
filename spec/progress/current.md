@@ -12,23 +12,23 @@ Execution Status: REPAIRING_AFTER_ARCHITECT_FAIL
 
 ## Immediately Relevant Completed Work
 
-Full approved memory-only Web candidate implemented in assigned worktree; original HTTP/WSS/Sync operations and three-field bounded appearance. Latest genuine non-Edge Chromium run exit0 generated38 original screenshots and executable state proof. Human canceled Edge/plugin QA; prior failure/blocker records remain immutable history and no current blocker. Source 2aa37ad/build exact provenance, screenshot manifest and accepted prerequisite chain are durable under product-20261009.
+Bounded fresh visual repair: Cold aligns accepted Desktop light-blue/white-glass/deep-blue tokens and restrained radial depth. Friends input flex/min-width plus nonshrinking nowrap primary action. Genuine Chromium151.0.7922.34 captured48 original images, including both themes560x90020px/spacious Chat sending/sent/typed input, six navigation targets, Friends search/busy/error. Source bd0838a; product tree equality and build provenance explicit. Original Architect FAIL preserved; source and screenshots still require NEW independent Approval.
 
 ## Current Blockers
 
-Independent Architect FAIL on Cold direction, Friends action squeezing and missing narrow max evidence. Fresh bounded Fix in progress; new Architect Approval, semantic Review and hosted/integration/main sync remain required.
+Fresh Architect Approval and implementation Review, exact-head hosted CI/protected integration/actual-main/safe sync pending; no Edge blocker after Human cancellation.
 
 ## Verification
 
 - Command: `python -Xutf8 -B tests/clients/web/verify.py`
-  - Result: actual locked install/build/behavior/appearance/source PASS on 2aa37ad; no skeleton fallback.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/local-verification-latest.json`
+  - Result: fresh repaired-source locked install/build/behavior/appearance/source guard results in durable receipt
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification.json`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: exit0/PASS; frozen canonical2ba864fc/PDF546915 intact;14 Web controls PASS.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/local-verification-latest.json`
+  - Result: repaired-source all/frozen, Web14 controls and Recovery Development results in durable receipt
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification.json`
 - Command: `node tests/clients/web/browser.mjs`
-  - Result: exit0, genuine Chromium151.0.7922.34,38 unedited controlled-fixture screenshots; no Architect/selfReview acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-20261009/screens/chromium-c/manifest.json`
+  - Result: exit0 genuineChromium48 originals; actual fixture/browser closed; local evidence only
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/screens/chromium-a/manifest.json`
 
 ## Changed Files or Migrations
 
@@ -52,7 +52,7 @@ Finish Desktop-aligned Cold/search repair, recapture Chromium full matrix plus n
 
 ## Uncommitted Changes / Ownership
 
-/root/web_product_fix_a sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-implementation/report.md. Main unknown work untouched.
+/root/web_product_fix_a sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-fix-a/report.md. Main unknown work untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
