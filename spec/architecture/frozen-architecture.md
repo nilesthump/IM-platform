@@ -562,7 +562,39 @@ Android 使用 SDK HttpsURLConnection 提供等价的系统证书/主机名验�
     "androidx.lifecycle.",
     "androidx.navigation.",
     "kotlinx.coroutines."
-  ]
+  ],
+  "web_appearance": {
+    "decision": "ADR-0011-web-appearance-storage",
+    "adapter": "clients/web/src/ui/appearance.ts",
+    "storage": "localStorage",
+    "key": "plugworldim.appearance.v1",
+    "fields": [
+      "theme",
+      "fontSize",
+      "density"
+    ],
+    "themes": [
+      "cold",
+      "warm"
+    ],
+    "font_sizes": [
+      14,
+      16,
+      18,
+      20
+    ],
+    "densities": [
+      "compact",
+      "comfortable",
+      "spacious"
+    ],
+    "max_serialized_length": 128,
+    "defaults": {
+      "theme": "cold",
+      "fontSize": 16,
+      "density": "comfortable"
+    }
+  }
 }
 ```
 
@@ -628,6 +660,12 @@ user_sync_cursor 只承载 friend、conversation、membership、plugin 等低频
 - 截图绑定 Task、候选 SHA/build/runtime、屏幕状态/尺寸、theme/配置、可重复步骤、文件/hash；使用受控无秘密数据。Architect 决策绑定同一候选和截图集，失败留未完成；影响已批准视觉的改动必须重新截图批准。截图不能证明 ACK/事务/幂等，不替代行为/权限/契约/源码依赖测试；Task PASS 不等于 S2 Gate PASS。
 
 GUI 原生/外观实现遵守 §6.1 / ADR-0009 的窄适配边界。Desktop 首次验收为 Windows；真实通知证据必须来自已安装且有自身身份的客户端包，开发 PowerShell toast 不可代替。tray/global shortcut 需真实客户端行为，Mobile 仍需 Android Studio emulator。该选型不豁免截图/Architect Review/Approval、独立实现 Review 与 exact-head CI。
+
+#### Web 外观存储（Human-approved ADR-0011；APPROVED_PENDING_FREEZE）
+
+Human 已批准最小前置方案并继续。Web 仅允许宿主适配器 `clients/web/src/ui/appearance.ts` 使用浏览器原生 localStorage，固定且唯一 key 为 `plugworldim.appearance.v1`；记录恰好三个标量 `theme`、`fontSize`、`density`，不含版本字段（版本由 key 标识）。Cold AI/Warm Creative 的内部值为 `cold`/`warm`，fontSize 为 14/16/18/20，density 为 compact/comfortable/spacious；默认 cold/16/comfortable。读写都验证 exact keys 与枚举，序列化最多 128 个字符；非法、超长、不可用存储回退内存默认值，不清理其他 origin key。主题切换只改变 theme，不重置字体或密度。适配器不接收/写入消息、历史、用户、会话、凭据、端点、业务状态或 Sync cursor；禁止 SQLite、IndexedDB、其他浏览器持久化及任意 key/额外属性。Web Repository/消息仍仅内存，无离线历史；不授权任何新依赖、router/state/data 框架或 runtime/bridge。
+
+机器守卫绑定本节 policy、baseline Web ADR/批准来源、唯一适配器、固定 key、直接 getItem/setItem 及三个字段投影；行为验收还须执行真实适配器的正负例、不可用存储/重启与主题独立性检查，并由独立 Reviewer 检查实际逻辑。前置 CI 只在 Web 完全空骨架、Task backlog/明确外观前置、可信被比较 base 无产品时允许 PREREQUISITE_SKELETON_ONLY；任何产品/部分脚手架或删除既有产品都不能降级为空骨架。产品 CI 必须锁定依赖、实际 build、行为/外观与源码守卫。新独立 Review、精确 HEAD hosted CI、受保护集成/actual-main 验证和主仓库安全同步前，此候选不生效、不实施 Web 产品。
 
 <a id="section-7"></a>
 ## 7. HTTPS/WSS/TLS 与认证协议

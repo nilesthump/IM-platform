@@ -14,7 +14,7 @@ class ClientTechnologyControls(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        for name in ('spec/architecture/baseline.md', 'spec/architecture/frozen-architecture.md', 'spec/architecture/decisions/ADR-0005-client-technology-clarification.md'):
+        for name in ('spec/architecture/baseline.md', 'spec/architecture/frozen-architecture.md', 'spec/architecture/decisions/ADR-0005-client-technology-clarification.md', 'spec/architecture/decisions/ADR-0011-web-appearance-storage.md', 'spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt'):
             destination = self.root/name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT/name, destination)
@@ -24,6 +24,58 @@ class ClientTechnologyControls(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding='utf-8')
         return path
+
+    def appearance_source(self):
+        return ('const APPEARANCE_KEY = "plugworldim.appearance.v1";\n'
+                'const raw = window.localStorage.getItem(APPEARANCE_KEY);\n'
+                'window.localStorage.setItem(APPEARANCE_KEY, JSON.stringify({theme: valid.theme, fontSize: valid.fontSize, density: valid.density}));')
+
+    def test_only_authorized_appearance_record_receives_bounded_storage_exception(self):
+        self.put('clients/web/src/ui/appearance.ts', self.appearance_source())
+        self.assertEqual([], checker.check_clients(self.root))
+        for relative in ('clients/web/src/state.ts', 'clients/web/src/ui/nested/appearance.ts'):
+            with self.subTest(relative=relative):
+                p = self.put(relative, self.appearance_source())
+                self.assertTrue(checker.check_clients(self.root))
+                p.unlink()
+
+    def test_appearance_storage_rejects_other_keys_arbitrary_data_and_business_payloads(self):
+        positive = self.appearance_source()
+        mutations = (
+            positive.replace('plugworldim.appearance.v1', 'messages'),
+            positive.replace('getItem(APPEARANCE_KEY)', 'getItem("history")'),
+            positive.replace('JSON.stringify({theme: valid.theme, fontSize: valid.fontSize, density: valid.density})', 'JSON.stringify(valid)'),
+            positive.replace('density: valid.density}', 'density: valid.density, messages: data}'),
+            positive.replace('valid.theme', 'valid.accessToken'),
+            positive + '\nconst s = window.localStorage; s.setItem("secret", value);',
+            positive + '\nwindow.localStorage.clear();',
+            positive + '\nwindow["localStorage"].setItem(APPEARANCE_KEY, raw);',
+            positive + '\nconst db = indexedDB.open("history");',
+            positive + '\nsessionStorage.setItem("appearance", raw);',
+        )
+        for source in mutations:
+            with self.subTest(source=source):
+                self.put('clients/web/src/ui/appearance.ts', source)
+                self.assertTrue(checker.check_clients(self.root))
+
+    def test_appearance_exception_fails_closed_without_matching_authority(self):
+        import hashlib, json, re
+        self.put('clients/web/src/ui/appearance.ts', self.appearance_source())
+        approval = self.root/'spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt'
+        original = approval.read_bytes()
+        approval.write_text('not approved', encoding='utf-8')
+        self.assertTrue(checker.check_clients(self.root))
+        approval.write_bytes(original)
+        adr = self.root/'spec/architecture/decisions/ADR-0011-web-appearance-storage.md'
+        adr.unlink()
+        self.assertTrue(checker.check_clients(self.root))
+        shutil.copyfile(ROOT/'spec/architecture/decisions/ADR-0011-web-appearance-storage.md', adr)
+        canonical = self.root/'spec/architecture/frozen-architecture.md'
+        text = canonical.read_text(encoding='utf-8').replace('"plugworldim.appearance.v1"', '"history"')
+        canonical.write_bytes(text.encode('utf-8'))
+        baseline = self.root/'spec/architecture/baseline.md'
+        baseline.write_text(re.sub(r'(?m)^- sha256: `[^`]+`$', '- sha256: `'+hashlib.sha256(canonical.read_bytes()).hexdigest()+'`', baseline.read_text(encoding='utf-8')), encoding='utf-8')
+        self.assertTrue(checker.check_clients(self.root))  # Even rehashing cannot extend policy.
 
     def test_current_active_clients(self):
         self.assertEqual([], checker.check_clients(ROOT))

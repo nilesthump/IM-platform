@@ -1,0 +1,40 @@
+# Independent Web readiness metadata review
+
+Decision: PASS. Zero candidate findings. This accepts only the blocked readiness administrative snapshot at `e35c425a90a851540e140078274126ac65606e3e`; it does not accept a Web storage decision, product, Task, Stage Gate, hosted CI, integration or synchronization.
+
+Reviewer `/root/web_readiness_review` is a fresh independent context, neither implementer nor fixer. Sole read/verification lease; no tracked repository writes, main writes, push, merge or product implementation. Assigned committed worktree `H:/.codex/worktrees/w/IM-platform`, branch `task/LOOP1-WEB-001-readiness`, reviewed range `6a6e97e6b7d5e19d8607c6800877187e70b4bd36..e35c425a90a851540e140078274126ac65606e3e`. Exact root and HEAD verified; clean before and after. Main unknown files were not opened or modified. The sealed accepted GUI receipt is relied on for its earlier preservation facts, rather than reconstructing unknown pre-sync bytes.
+
+## Authority and scope
+
+Read mandatory handoff/current/exact unique Current Task before authority and repository-state checks. Read canonical resolver/baseline and checked canonical `a6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72` and historical PDF `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`; inspected canonical sections 2.3/3/6.1/6.5/10 SRC-01 through SRC-07/11/19/20, ADR-0005/0006/0007, referenced domain/invariants/WSS authority and UI/acceptance, Minimality Contract, execution boundaries, independent-review and technology-selection rules. Canonical bytes are identical to accepted base. All eight changed paths are exactly Web Task/current/six readiness artifacts; no product, contracts, dependency, workflow, guard, native/helper/trust or authority write.
+
+Latest visible prompt `执行下一个task` permits selecting Web after uniquely done GUI. Accepted planning order and byte-bound GUI final synchronization at `6a6e97e6b7d5e19d8607c6800877187e70b4bd36` support that selection. Web remains uniquely backlog/status backlog, execution BLOCKED_BY_ARCHITECTURE. Task text's earlier SEND-only endpoint is explicitly historical, and the task does not claim ready/active/done or S2 PASS.
+
+Canonical 19 and 6.5 require a bounded decision for an unfrozen appearance mechanism. UI design requires restart retention, while accepted ADR-0009 appearance storage covers Desktop/Android only. Actual ci/check_architecture.py:477 rejects Web localStorage/indexedDB/SQLite source. Actual workflow:188/356 invokes the Web skeleton guard, whose Web allowed set is empty; test_s0_boundary.py:97 demands two calls. Actual Web tree has only `clients/web/.gitkeep`. These are real readiness blockers, outside the product Task's currently authorized write paths.
+
+The seven named prerequisite paths are complete for the proposed narrow canonical/manifest/ADR/guard/negative-test/workflow/workflow-test change. Proposed host-owned localStorage stores only theme/font-size/density, validates bounds, falls back without deleting unrelated keys, and retains bans on credential/message/history/Repository data. No new dependency, public contract, source permission, router/state framework or speculative future mechanism is introduced. This is a reviewable proposal, visibly PROPOSED_NOT_APPROVED at the reviewed SHA, with no storage adapter or prerequisite change already implemented. Later Human approval was relayed during review and is not retroactively attributed to this immutable candidate; a subsequent fresh freeze candidate must record that approval and follow its own independent Review/exact-head hosted CI/integration/sync chain.
+
+## Evidence preservation
+
+ZIP SHA256 `043c755897c2050871f700250fa597d2ca9a642e2366790ce057163970825711` and all four entry byte counts/hashes match original-bindings.json. Prior GUI current is byte-exact to accepted-base Git blob. The three accepted final-sync report/binding/receipt entries are independently byte-exact to original sealed local files, and the receipt also matches actual final-admin-sync.json. GUI accepted/done at base and S2 OPEN are consistently bound. Original local CRLF diff exit2 and LF repair outcomes remain explicit in local-validation.json. Existing GUI/FAIL/Recorder history is untouched. Inspection and signature scan found no credential material in the newly published metadata; source credentials were not accessed.
+
+## Verification
+
+All mandatory checks exit0: all-scope architecture, frozen integrity, 53 architecture tests without skips, clean Acceptance, and full base..candidate diff --check. Optional S0 boundary suite reports six tests with four Windows symlink subtest skips; privilege-free symlink semantics are covered by its separate mock control. Optional skips do not replace any mandatory acceptance.
+
+| Exact argv | Exit | ms | Recorder command |
+| --- | --- | --- | --- |
+| `C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe -Xutf8 -B ci/check_architecture.py --scope all --json` | 0 | 1344.0 | `C-d1459bcf-64e3-4f98-9864-4954dc88b857` |
+| `C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe -Xutf8 -B tools/verify_frozen_architecture.py` | 0 | 109.0 | `C-2330a004-7ac2-4d35-9a02-4fd94874e92f` |
+| `C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe -Xutf8 -B -m unittest discover -s tests/architecture -p test_*.py` | 0 | 11593.0 | `C-d7a44e6b-1836-4209-bc94-04e19ff29749` |
+| `C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` | 0 | 12094.0 | `C-e6b076cd-bc8e-40b7-8331-89b2290cbc91` |
+| `git diff 6a6e97e6b7d5e19d8607c6800877187e70b4bd36..e35c425a90a851540e140078274126ac65606e3e --check` | 0 | 141.0 | `C-482a2051-5e3c-45e5-aae2-f81a05011415` |
+| `C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe -Xutf8 -B C:/Users/21441/.codex/visualizations/2026/10/08/01a11a79-95c1-79e2-a26b-9bcf56508973/web-task/independent-review/inspect_candidate.py` | 1 | 500.0 | `C-d129a62b-921a-4bde-8859-ff10dbda05cd` |
+| `C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe -Xutf8 -B -m unittest discover -s tests/ci -p test_s0_boundary.py` | 0 | 484.0 | `C-0b06f4c8-edc5-4c15-89b4-b585ae8643f1` |
+| `C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe -Xutf8 -B C:/Users/21441/.codex/visualizations/2026/10/08/01a11a79-95c1-79e2-a26b-9bcf56508973/web-task/independent-review/inspect_candidate.py` | 0 | 860.0 | `C-e87fe5d3-7185-4e7b-a06f-a63f43adaa95` |
+
+commands.json preserves every recorded start/finish, exact argv, real exit/duration, raw stdout/stderr SHA256 and redacted blob reference, including the failed private inspection. Its first assertion incorrectly expected clients/web/src/.gitkeep; actual Git inventory established clients/web/.gitkeep, then the corrected private check passed. This was a reviewer-check correction without candidate edits. Original failure is retained.
+
+Research run `R-WEB-READINESS-REVIEW-20261008` is independently associated with parent `R-WEB-COORDINATOR-20261008`, fresh_context true, prospective_resume/pre_recorder_work true. Required direct startup and later direct read/sealing gaps are disclosed; pre_recorder_trace_complete false. One unsupported context_observation event was rejected, then its exact rejection and trace gap were recorded with instrumentation_warning. No original event stream was edited. finish-run PASS and validate-run exit0 are structural research evidence, separate from Task/Gate acceptance. sealing-commands.json binds final Recorder administrative argv/exits/timing/output hashes.
+
+Final endpoint: bounded administrative Review PASS; product remains unimplemented and Task backlog at this snapshot. Applicable exact-head hosted acceptance/publication/synchronization remain pending. Exclusive validation lease released after sealing. No task queue/progress file was modified by this reviewer.

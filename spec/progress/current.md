@@ -4,61 +4,63 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: S2-GUI-only
-Batch Status: COMPLETE_PRODUCT_ACCEPTED
-Current Task: LOOP1-CLIENT-GUI-001
-Current Task State: done
-Execution Status: GUI_PRODUCT_ACCEPTED_SYNCED
+Current Batch: S2-WEB-001-prerequisite
+Batch Status: APPROVED_PENDING_FREEZE
+Current Task: LOOP1-WEB-001
+Current Task State: backlog
+Execution Status: APPROVED_PENDING_FREEZE
 
 ## Immediately Relevant Completed Work
 
-GUI-only product is independently accepted: minimal Mobile test-only stale accessibility cache repair `d37626427b96fc7040280a0fe5a5cda8a700cb16`, full PR37737318185 all14 instances/13 groups PASS, protected PR24 actual main `b14bf1070ba26ac368488e2c6ea15a7936e2de89` tree-identical, fresh independent actual-main Review/clean Acceptance/exact-main CI37738345509 PASS. Guarded FF-only main synchronization preserves781 unknown files/status/index flags and exact task-owned objects. No product/canonical/contracts change in this administrative closure.
-
-Windows43 approved originals/native notification/tray/shortcut/restart/auth/SEND/retry/Sync and same-desktop CA rollback/owned cleanup remain bound. Android accepted evidence and hosted actual API34 anonymous46 PASS remain distinct. Original hosted/cache FAIL and Recorder failures/gaps are preserved.
+Human批准localStorage三外观标量与精确七额外前置路径，2026-10-09继续并指定Web完整接受同步后S2 Gate前停止。944b9bf前置candidate独立Review FAIL的已提交删除/zero-before绕过已由fresh Fix最小修复；原FAIL与真实repro保持immutable。GUI done与actual main6a6e97e已接受；Web产品未启动。
 
 ## Current Blockers
 
-No unfinished GUI product work. Administrative recovery Review of clean `c1633901c82ee2295c4ffc1c1e608c62a9b40759` failed15 mandatory current.md formatting controls. Fresh format Fix restores the established ten sections without weakening controls. Its new independent Review/applicable exact-head hosted CI/protected integration/final safe main synchronization remain pending. Only occupation-blocked helper regression is PENDING_VERIFICATION_AT_S2_GATE; helper restored unchanged. S2 Gate OPEN; Web backlog not activated.
+修复candidate等待新的fresh independent Review、actual exact-head hosted CI、protected integration/actual-main与安全main同步，前置未生效；无需重复Human批准。
 
 ## Verification
 
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: fresh clean c163 Fix baseline exit0 PASS; frozen verification and53 architecture controls also exit0. All1582 owned generated files restored byte-exact; clean before/after. Exact argv, exits, durations and output hashes are bound in the result.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure-format-fix20261008/baseline/clean-acceptance-result.json`
-- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: independent c163 Review and fresh Fix baseline exit1 FAIL15 recovery-format controls; originals preserved. This prior failure is not product rejection or final Fix acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure-format-fix20261008/failed-review/report.md`
-- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance`
-  - Result: fresh independent accepted product actual-main clean Acceptance PASS at b14; exact-main CI37738345509 all14 actual jobs PASS. Prior product acceptance does not accept this administrative candidate.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure20261008/actual-main-review/report.md`
-- Command: `guarded FF-only main synchronization with protected-file, status/index and exact-object verification`
-  - Result: PASS actual main b14;781 unknown files and original status/index flags preserved. Future administrative synchronization is separate and pending.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-GUI-001/closure20261008/product-main-sync.json`
+  - Result: exit0，source/authority local PASS，canonical2ba864fc/PDF546915不变。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
+- Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
+  - Result: exit0，current canonical/PDF provenance匹配。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
+- Command: `python -Xutf8 -B -m unittest discover -s tests/clients/web -v`
+  - Result: exit0，14controls；architecture56/CI34 tests exit0，4既有Windows真实symlink权限skip公开。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
+- Command: `python -Xutf8 -B tests/clients/web/verify.py`
+  - Result: exit0，仅PREREQUISITE_SKELETON_ONLY，无产品build/behavior/appearance接受。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
+
+Recovery Development真实exit0/7953.0ms，非接受模式；clean committed Acceptance与最终SHA待commit后由私有freeze-fix-20261009-a/report.md封存。fresh Review/hosted/sync未完成，不计PASS。
 
 ## Changed Files or Migrations
 
-Administrative current/task recovery formatting and immutable original failed-review/Fix baseline evidence only. No product code, schema, contract, canonical architecture, workflow, helper, trust or dependency changes. Previous current.md is archived byte-exact in closure-format-fix20261008/prior-current.md; earlier product-review current remains in closure20261008/prior-current.md.
+本fix仅Web verifier/tests、Task/current及fix-20261009-a证据；相关head full-history检查防止clean删除/首次push/merge回退，保持现有产品入口。无新framework/skip、authority/其他CI job或aggregate Gate、契约、产品、native/helper/trust修改。
 
 ## Known Failures, Risks, and Assumptions
 
-Only occupation-blocked helper regression remains PENDING_VERIFICATION_AT_S2_GATE. Original full hosted/cache FAIL, independent administrative FAIL15 and earlier Recorder gaps/failures remain immutable. Local checks and research structural validation are not independent Task/Gate acceptance. GUI product done/S2 OPEN remain distinct; future administrative Review/CI/integration/sync results must not be inferred or prewritten.
+原944b9bf Review FAIL原件与repro字节/hash保留。当前修复仅local evidence；Windows4symlink skips须真实hosted另审。Recorder公开pre-Recorder只读startup、不存在猜测路径、工具output截断/targeted reread、直接apply_patch/private authoring gaps；stream不编辑。Recorder结构有效不等于Task或S2 PASS。
 
 ## Next Exact Action
 
-Fresh independent Review of the committed minimal formatting Fix, clean Acceptance and immutable failed-review/baseline bindings; then applicable exact-head hosted CI/protected integration/final safe main synchronization. Final administrative publication/sync status remains separately recorded at H:/.codex/gui-handoffs/20261008-ca-native/final-admin-sync.json only when actual receipts exist, avoiding a self-referential future SHA. After those receipts PASS, GUI-only closure has no remaining product work. Await authorized work or deferred helper S2Gate check; do not activate Web or another product task or modify helper/trust.
+封存clean修复candidate与Recorder并释放lease；root委托新的fresh independent Review，随后actual exact-head hosted CI/protected integration/actual-main和安全同步。前置接受后才复评backlog->ready->active并委派fresh Web产品writer/真实浏览器截图/Architect Approval/独立产品接受与同步。完成Web后S2 Gate前停止；不执行S2 Stage Gate/helper regression，必要CI aggregate Gate保留。
 
 ## Last Known Good Commit
 
-`b14bf1070ba26ac368488e2c6ea15a7936e2de89` actual main independently accepted and safely synchronized. Current administrative candidate is not yet independently accepted/integrated/synchronized.
+`6a6e97e6b7d5e19d8607c6800877187e70b4bd36`，已独立接受GUI-only actual main并同步；本fix main sync PENDING。
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md` records the accepted product recovery point and separate pending administrative publication.
+`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md`，前置修复不建立产品Gate checkpoint。
 
 ## Uncommitted Changes / Ownership
 
-Assigned managed root `H:/.codex/worktrees/g/IM-platform`, branch `task/LOOP1-CLIENT-GUI-001-resume`, exact Git root verified. Fresh sole Fix writer /root/gui_closure_format_fix owns only this current/task/GUI evidence administrative delta until clean commit and lease release. Main H:/IM-platform stays accepted b14;31 unknown status entries/781 files preserved by prior sync, with no main writes by this Fix. All other actors read-only; no unknown work overwritten.
+sole writer+verification lease /root/web_freeze_fix_a；assigned Git root严格匹配`H:/.codex/worktrees/w/IM-platform`，branch `task/LOOP1-WEB-001-readiness`。仅本fix allowed scope属该Fix；最终clean committed SHA与lease release在私有report交接。main未知31statusentries/781files未审查/写入/复制，旧pause/readiness/原FAIL证据保留。
 
 ## Architecture Conflicts / ACP / ADR
 
-No new conflict, technology selection or authority change. Canonical/public contracts/approved ADRs unchanged; no product/runtime/native mechanism added. Accepted S1 PASS/S2 OPEN retained.
+ADR-0011/canonicalpolicy原Human批准candidate仍APPROVED_PENDING_FREEZE；本fix落实现有禁止删除产品退空要求，不扩authority。candidate canonical2ba864fc/PDF546915/v1.1/accepted lineage不变。未实现Web产品，S1 PASS/S2 OPEN。
+
+Immutable FAIL原件以ZIP保持entry原字节与original-bindings.json哈希：原negative-zero.log含CRCRLF，直接复制导致cached diff-check exit1；序列控制错误随后产生1d832e5，未amend，失败Recorder保留。新纠正commit仅封装task-owned复制证据与metadata，原review原件不动，源代码修复不变。
