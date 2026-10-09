@@ -1,0 +1,1039 @@
+{
+  "task_id": "LOOP1-WEB-001",
+  "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+  "build_origin": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\08\\01a11a79-95c1-79e2-a26b-9bcf56508973\\web-task\\product-fix-b\\build",
+  "build_index_sha256": "397bf2bbfb9d2e48e9d742e04537525345b2683f492377cc417c81843e5729d9",
+  "browser": "151.0.7922.34",
+  "fixture": "controlled same-origin HTTPS/WSS; self-signed isolated validation context only; no system trust changes",
+  "original_unedited_screenshots": true,
+  "entries": [
+    {
+      "file": "login-idle.png",
+      "sha256": "e6e6791879632b1a4d491cde5aeb2d75430a607c1cee828c84b349bd20c13632",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "login-idle",
+      "steps": [
+        "navigate built Web HTTPS"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "login-error.png",
+      "sha256": "2e2e533c1a4f80c769f2ed9a1f06a57d32700253fd4adc73a8f8edacaec754ef",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "login-error",
+      "steps": [
+        "submit controlled wrong authentication"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "login-loading.png",
+      "sha256": "232c86e1d123a3818cada7ea4a63a3008e78437c36a1f437405e4dec99e7960c",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "login-loading",
+      "steps": [
+        "submit controlled valid login with delay"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-empty.png",
+      "sha256": "fa466023994c66cd62cc2441593cf5c3fa60ae94ca27b4da9727795175086bc9",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-empty",
+      "steps": [
+        "login",
+        "open authoritative direct conversation; no prior-history request"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-sending.png",
+      "sha256": "9c41fe243278db4e82f7186769957f34784c8a0246136016608474226b3d128e",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-sending",
+      "steps": [
+        "send text",
+        "controlled durable ACK delayed"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-sent.png",
+      "sha256": "f1be7b81586251a3cf032a1002fc40431df0d5e560351f74b7259b0546381e17",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-sent",
+      "steps": [
+        "accepted canonical committed ACK"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-failed.png",
+      "sha256": "6aa22db3632c86ee97a482916db9b65dacc5c52e99fcdc85a651a33a069cee0a",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-failed",
+      "steps": [
+        "controlled server durable commit but ACK unavailable",
+        "wait real send timeout"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-retry.png",
+      "sha256": "d38645f0254d7b10d9b805904c38a046d385367d192610ae28a20984598dca7c",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-retry",
+      "steps": [
+        "retry same requestId",
+        "canonical ACK converges"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-disconnected.png",
+      "sha256": "0705245e397d3f73f70448dcd19ec44ccd41e784baf4d044080cfd75a2ad4cf7",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-disconnected",
+      "steps": [
+        "disconnect controlled WSS"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-reconnected.png",
+      "sha256": "194a1c5d704216e1b7b767e83c061c384c3a0be8da3c4aac6c4f8d64f9e13050",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-reconnected",
+      "steps": [
+        "automatic reconnect",
+        "same WEB session bind",
+        "current-page seq compensation"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-success.png",
+      "sha256": "11370c3925c82f1b3555a06c7caeccafe442e4c21e750bc81b0005e3807d0ec1",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-success",
+      "steps": [
+        "navigate Friends real list"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-loading.png",
+      "sha256": "8d5cb2e7a77f65f22c07813e1d033f5c03eb21bfad424ddc47830b7881d8c6d6",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-loading",
+      "steps": [
+        "refresh friend list delayed"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-error.png",
+      "sha256": "015896191f3f8bb45ead8a027032c656e151f9274ccf6daa5a05b0f2c72d6738",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-error",
+      "steps": [
+        "controlled 500 current friend load"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-empty.png",
+      "sha256": "f5723aa33e47f3d59b503c3c5081132578a0db8f750bf7571441c9f6fc028b74",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-empty",
+      "steps": [
+        "authoritative empty friend response"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-search-empty.png",
+      "sha256": "c682b7db50ee4398685e94e2f2de4ca4b292b2c4c34b545e5fe225827a2a7aeb",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-search-empty",
+      "steps": [
+        "exact normalized username no match"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-search.png",
+      "sha256": "029288283d2991bfb3012066feb859df9b207ced97f5ce638e3eed8d8241ab8f",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-search",
+      "steps": [
+        "exact username carol found"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-added.png",
+      "sha256": "1f051467daa804fecbee60a18afeff9a9c186f126741c85c8e11d3a69dcb2788",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-added",
+      "steps": [
+        "PUT friend",
+        "authoritative friendship/directConversationId",
+        "refresh current friend list"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "ai-placeholder.png",
+      "sha256": "15ec15d9c4aff4516f825e5f46f21a8717695677b2fbd52b86203eca85aee8ff",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "ai-placeholder",
+      "steps": [
+        "navigate AI",
+        "honest unavailable capability"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "plugin-placeholder.png",
+      "sha256": "341494c85c5dceb19b3711b62f8ee5091157090947fecd2d66ac1e4beb371d84",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "plugin-placeholder",
+      "steps": [
+        "navigate Plugin",
+        "honest unavailable capability"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "profile-success.png",
+      "sha256": "e21bdda20646b72a89ae4e34fcf694bc810f85abe7b252caeb39e90b1029fdab",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "profile-success",
+      "steps": [
+        "GET current user"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "profile-loading.png",
+      "sha256": "2555359ebb8be4d4441a54f213e8dca811d4e31a24f158cb25fa0d12bbecf75d",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "profile-loading",
+      "steps": [
+        "delayed GET current user"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "profile-error.png",
+      "sha256": "147c07d4ca539e39516df75a0ebab60ac843668f961b50017f7582bb341277b0",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "profile-error",
+      "steps": [
+        "controlled current profile failure"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "session-refreshed.png",
+      "sha256": "eef7b747ee7cff286f704264715f2fd5eb50112ff89da0f12603d387d33b06b3",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "session-refreshed",
+      "steps": [
+        "HTTP-only secure cookie refresh",
+        "same session identity"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "settings-cold.png",
+      "sha256": "00305e1a769a7737dbf632b698de2492f30362d9de50138c59612f728697527f",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "settings-cold",
+      "steps": [
+        "default Cold AI 16 comfortable"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "16px",
+        "density": "comfortable"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "settings-cold-max.png",
+      "sha256": "7cd2bafede1f86028639bc1ae5e9aa85b40ce44bfeaa51235314b0f582fd11d0",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "settings-cold-max",
+      "steps": [
+        "20px",
+        "spacious"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "settings-warm-max.png",
+      "sha256": "dac0cab2a987ba4839f732d11de59786317ea52a9347b7efb48f78b5a9524f8b",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "settings-warm-max",
+      "steps": [
+        "theme only changes colors; independent prefs kept"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-warm-max.png",
+      "sha256": "38a386fb660a728f6ee4a2d9f4b1aae789612353900dc49e24317924b2f2e12b",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-warm-max",
+      "steps": [
+        "Warm Creative",
+        "20px spacious",
+        "Chat"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-warm-max.png",
+      "sha256": "06a33a195c2aed8a9a985254ed82d8807aa19bae2ac6ba7dd94493cc7b2016cd",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-warm-max",
+      "steps": [
+        "Warm Creative",
+        "20px spacious",
+        "Friends"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "ai-warm-max.png",
+      "sha256": "4bdd5df3654eae737f49baca2a431a6904adb026b38ef090ddac9b7c996156eb",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "ai-warm-max",
+      "steps": [
+        "Warm Creative",
+        "20px spacious",
+        "AI"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "plugin-warm-max.png",
+      "sha256": "aa22d0e47f6b638a5fca8dfa1e6e045b3cb4bfcd0ab1ff18460e96c98844e617",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "plugin-warm-max",
+      "steps": [
+        "Warm Creative",
+        "20px spacious",
+        "Plugin"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "profile-warm-max.png",
+      "sha256": "d4211b461762d7deae40ff7b9500ab93a9662776746bf848952067fcbf3899ce",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "profile-warm-max",
+      "steps": [
+        "Warm Creative",
+        "20px spacious",
+        "Profile"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "settings-warm-min.png",
+      "sha256": "b68f7376a6fe0e86417be09427283a46f0b9d31580e9b0831d727c0308969750",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "settings-warm-min",
+      "steps": [
+        "14px compact"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "14px",
+        "density": "compact"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "settings-restart.png",
+      "sha256": "9502d4e6bbcd85337a405a1488471a18b440b0f03b02b6c6388fe427e113d0a4",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "settings-restart",
+      "steps": [
+        "reload clears business state",
+        "appearance persists"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "14px",
+        "density": "compact"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "settings-cold-min.png",
+      "sha256": "b3eaabc9fbaa8e43c323b51d488f07a1424b4e32d25c7d808be0c072d7fe9175",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "settings-cold-min",
+      "steps": [
+        "cold14 compact"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "14px",
+        "density": "compact"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "reload-memory-empty.png",
+      "sha256": "1165a6d64dacf0e5ace969c33f547d116c9d75ac51f3eed5f4d82282820ff473",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "reload-memory-empty",
+      "steps": [
+        "recover cookie session",
+        "no prior messages loaded"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "14px",
+        "density": "compact"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-narrow.png",
+      "sha256": "319fd6fa2eb412b432d912b624f32360c569dd6cc2c793e2a7fa742c353baabc",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-narrow",
+      "steps": [
+        "real responsive viewport560x900"
+      ],
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "14px",
+        "density": "compact"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-cold-narrow-max-sending.png",
+      "sha256": "31b8b132676765711fd3b74628ff7dc964d71e4b49fc1a6a5499fefcff527716",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-cold-narrow-max-sending",
+      "steps": [
+        "560x900",
+        "20px spacious",
+        "cold",
+        "specific unique message SENDING; older SENT cannot satisfy"
+      ],
+      "send_identity": {
+        "text": "窄屏中，交流与状态依然清晰。cold",
+        "state": "SENDING",
+        "requestId": "21633b6d-8f66-4373-b5b6-09ef07cab258",
+        "conversationId": "10000000-0000-4000-8000-000000000003",
+        "expected_seq": 103
+      },
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-cold-narrow-max-sent.png",
+      "sha256": "0f035d9642d0efa133500869b6a96beb6d2d3081bfea60888a213108fde0cc7c",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-cold-narrow-max-sent",
+      "steps": [
+        "same specific message committed ACK status and expected sequence",
+        "textarea populated"
+      ],
+      "send_identity": {
+        "text": "窄屏中，交流与状态依然清晰。cold",
+        "requestId": "21633b6d-8f66-4373-b5b6-09ef07cab258",
+        "conversationId": "10000000-0000-4000-8000-000000000003",
+        "expected_seq": 103,
+        "state": "SENT"
+      },
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-cold-narrow-max.png",
+      "sha256": "4617b180b55f794c9a882c2f14a3ce7102a7dc884fff3cd150d4f62fe4b6cff9",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-cold-narrow-max",
+      "steps": [
+        "all six host navigation targets clicked",
+        "readable search action"
+      ],
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-cold-narrow-max-busy.png",
+      "sha256": "bea945b758a76b813beb20e152affa7206d7a281f659aff3fcfa2fd5235d849f",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-cold-narrow-max-busy",
+      "steps": [
+        "delayed actual search",
+        "intact nonshrinking busy label"
+      ],
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-cold-narrow-max-error.png",
+      "sha256": "c9ab1b6a1860931e1cfa3d4c6bef93871a38ec82f6c1a9a9fc5113c52ed43490",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-cold-narrow-max-error",
+      "steps": [
+        "actual controlled search error",
+        "search retry reachable"
+      ],
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "cold",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-warm-narrow-max-sending.png",
+      "sha256": "c164942cf72efcf64ab64f6bda7f52048097e4f2b1242c37b521fe00d3709768",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-warm-narrow-max-sending",
+      "steps": [
+        "560x900",
+        "20px spacious",
+        "warm",
+        "specific unique message SENDING; older SENT cannot satisfy"
+      ],
+      "send_identity": {
+        "text": "窄屏中，交流与状态依然清晰。warm",
+        "state": "SENDING",
+        "requestId": "3b9031ea-aba6-46c1-a5ae-9be809d7c8f2",
+        "conversationId": "10000000-0000-4000-8000-000000000003",
+        "expected_seq": 104
+      },
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "chat-warm-narrow-max-sent.png",
+      "sha256": "3dd33ccc9aa962a1a83701bbbabcd5c862bd655298f02a4e2f2e4a30cbcce963",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "chat-warm-narrow-max-sent",
+      "steps": [
+        "same specific message committed ACK status and expected sequence",
+        "textarea populated"
+      ],
+      "send_identity": {
+        "text": "窄屏中，交流与状态依然清晰。warm",
+        "requestId": "3b9031ea-aba6-46c1-a5ae-9be809d7c8f2",
+        "conversationId": "10000000-0000-4000-8000-000000000003",
+        "expected_seq": 104,
+        "state": "SENT"
+      },
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-warm-narrow-max.png",
+      "sha256": "04324f8e3ff527a0db435ba292048f0ea234789f95cbe705e4e4915172a47f41",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-warm-narrow-max",
+      "steps": [
+        "all six host navigation targets clicked",
+        "readable search action"
+      ],
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-warm-narrow-max-busy.png",
+      "sha256": "7faf1230d39ac7a970c5587bf779a56792e4bb5db1acd2501c1ad73bd168d77f",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-warm-narrow-max-busy",
+      "steps": [
+        "delayed actual search",
+        "intact nonshrinking busy label"
+      ],
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "friends-warm-narrow-max-error.png",
+      "sha256": "51821a85b8779d0941ffe5ce0f258f58b881f96b90ea4a6265d6e5e43c3feb9d",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "friends-warm-narrow-max-error",
+      "steps": [
+        "actual controlled search error",
+        "search retry reachable"
+      ],
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "session-expired.png",
+      "sha256": "2d20cfb3635ca3bcfac745c91bc200582a4d67c685118e51780de543e56374f3",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "session-expired",
+      "steps": [
+        "canonical session.revoked",
+        "clear account/message memory"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    },
+    {
+      "file": "session-logout.png",
+      "sha256": "ac91a323fc1dca426586c603c818ea855439add7653ea755b6d812d10842ed78",
+      "candidate_sha": "c6a2c63174e4ca8c85cbb139fd920b3d8cf5080a",
+      "page_state": "session-logout",
+      "steps": [
+        "server logout revokes cookie",
+        "clear memory"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "appearance": {
+        "theme": "warm",
+        "fontSize": "20px",
+        "density": "spacious"
+      },
+      "fixture": "controlled alice/bob/carol; no real account",
+      "browser_version": "151.0.7922.34"
+    }
+  ]
+}
