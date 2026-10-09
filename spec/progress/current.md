@@ -12,23 +12,23 @@ Execution Status: REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
-Bounded fresh visual repair: Cold aligns accepted Desktop light-blue/white-glass/deep-blue tokens and restrained radial depth. Friends input flex/min-width plus nonshrinking nowrap primary action. Genuine Chromium151.0.7922.34 captured48 original images, including both themes560x90020px/spacious Chat sending/sent/typed input, six navigation targets, Friends search/busy/error. Source bc21106 includes unified accepted Desktop Logo; product tree equality and build provenance explicit. Original Architect FAIL preserved; source and screenshots still require NEW independent Approval. Latest-source strict Web/architecture/frozen/Web14/diff checks exit0; receipt-order Recovery failure retained and targeted recheck follows.
+Cold Desktop colors and unified Desktop logo remain exact product source bc21106. Fresh Architect B observed those repairs met but withheld Approval because Warm screenshot waited an older SENT. Fresh evidence-only harness binds unique new message text, requestId/conversationId/seq, proves same article SENDING then SENT; Warm negative control has older SENT and new message initially not SENT. Genuine Chromium151 full48 new originals, browser/fixture closed; original FAIL and prior screenshots immutable.
 
 ## Current Blockers
 
-Fresh Architect Approval and implementation Review, exact-head hosted CI/protected integration/actual-main/safe sync pending; no Edge blocker after Human cancellation.
+NEW independent Architect Approval and implementation Review; exact-head hosted CI/protected integration/actual-main/safe sync pending. Edge canceled.
 
 ## Verification
 
 - Command: `python -Xutf8 -B tests/clients/web/verify.py`
-  - Result: fresh repaired-source locked install/build/behavior/appearance/source guard results in durable receipt
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification-latest.json`
+  - Result: actual local argv/exit/timing/hash receipts; independent acceptance pending
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-b/local-verification.json`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: repaired-source all/frozen, Web14 controls and Recovery Development results in durable receipt
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification-latest.json`
+  - Result: all/frozen/Web14/Recovery Development results in durable receipt
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-b/local-verification.json`
 - Command: `node tests/clients/web/browser.mjs`
-  - Result: exit0 genuineChromium48 originals; actual fixture/browser closed; local evidence only
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/screens/chromium-b/manifest.json`
+  - Result: exit0 actualChromium48; same-send SENDING/SENT plus expected seq and older-SENT negative control
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-b/screens/chromium-c/manifest.json`
 
 ## Changed Files or Migrations
 
@@ -40,7 +40,7 @@ Initial recovery Evidence-format failures, browser fetch receiver/Settings reach
 
 ## Next Exact Action
 
-Seal clean corrected-source candidate; release lease to root for NEW Architect Approval and independent implementation Review then hosted/integration/main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
+Seal clean same-send evidence candidate; release lease to root for NEW Architect Approval and independent implementation Review then hosted/integration/main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
 
 ## Last Known Good Commit
 
@@ -52,7 +52,7 @@ Seal clean corrected-source candidate; release lease to root for NEW Architect A
 
 ## Uncommitted Changes / Ownership
 
-/root/web_product_fix_a sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-fix-a/report.md. Main unknown work untouched.
+/root/web_product_fix_b sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-fix-b/report.md. Main unknown work untouched.
 
 ## Architecture Conflicts / ACP / ADR
 

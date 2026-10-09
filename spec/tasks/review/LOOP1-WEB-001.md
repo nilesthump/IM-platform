@@ -2,7 +2,7 @@
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
 status: review
-owner: /root/web_product_fix_a
+owner: /root/web_product_fix_b
 stage: S2
 gate: S2
 ---
@@ -200,3 +200,9 @@ Repair local matrix: genuine Chromium48 new originals exit0; both themes narrow2
 Execution Status: REVIEW_PENDING
 
 Final source bc21106 includes Desktop-aligned Cold, readable Friends idle/busy action and exact Desktop Logo. Latest48 genuine Chromium original set screens/chromium-b replaces all earlier pre-Logo sets for approval; build-provenance-latest verifies exact source/stage/current file bytes, original Desktop Logo bytes and final candidate product-tree equality. Actual full source verifier/architecture all/frozen/14Web controls/diff exit0; receipt-order Recovery Development failure retained then targeted recheck with existing durable receipts. Prior prerequisite directory exactly9d7 byte-restored at bd0838, no netdiff or other original evidence change. No fixtures alive, Edge canceled. Fix local readiness only, Architect and implementationReview/hosted/main sync pending. Sole lease /root/web_product_fix_a released only at final seal; main d4bb820 unchanged; S2 Gate untouched.
+
+## Latest independent Architect B FAIL evidence repair (2026-10-09)
+
+Execution Status: REVIEW_PENDING; queue remains review. This supersedes earlier repair-ready Next Action wording. Architect B observed Cold Desktop alignment and unified Logo met, but withheld Approval: Warm narrow new send was still SENDING because older Cold SENT satisfied generic wait. Immutable report/seal and original hashes archived in product-fix-20261009-b. Fresh Fix only changes tests/clients/web/browser.mjs: exact unique new message article, fixture request/conversation/expected seq binding, same-article SENDING and not SENT, Warm older-SENT negative control, same-article SENT plus expected seq before capture. Product clients/web/shared trees unchanged from bc2110662e1de4a24fd3d76271f0cdbe992754a6; Desktop logo byteequal remains. No business/authority/contract/guard/workflow/runtime/dependency edits.
+
+Actual Chromium151 full48 new original screenshots completed exit0, same controlled fixture and existing approved test-only tooling; all own browser/fixture processes genuinely closed. Bindings/proof/build provenance at product-fix-20261009-b; actual command/exit/timing/hash receipts in local-verification.json. Fresh independent Architect and implementation Review still required; no Fix approval, done/hosted/push/PR/integration/main sync. Lastgood accepted main d4bb8200e7f5410d101a27ad58f8abb5eaa80f8f. Sole lease /root/web_product_fix_b until private report/seal release. Edge canceled; full Web accepted/synced then stop BEFORE S2 Stage Gate, no Gate/helper work.
