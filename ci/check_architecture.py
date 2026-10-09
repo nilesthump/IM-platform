@@ -225,6 +225,17 @@ def check_java(root):
 
 
 
+WEB_APPEARANCE = {
+    "decision": "ADR-0011-web-appearance-storage",
+    "adapter": "clients/web/src/ui/appearance.ts",
+    "storage": "localStorage", "key": "plugworldim.appearance.v1",
+    "fields": ["theme", "fontSize", "density"], "themes": ["cold", "warm"],
+    "font_sizes": [14, 16, 18, 20], "densities": ["compact", "comfortable", "spacious"],
+    "max_serialized_length": 128,
+    "defaults": {"theme": "cold", "fontSize": 16, "density": "comfortable"},
+}
+
+
 def client_policy(root):
     """Resolve hash-bound canonical policy; Task Specs cannot extend this policy."""
     try:
@@ -244,6 +255,13 @@ def client_policy(root):
         for key in ('languages', 'frameworks', 'runtimes', 'packages', 'native_packages', 'mobile_languages', 'mobile_frameworks', 'mobile_runtimes', 'mobile_plugins', 'mobile_dependencies', 'mobile_tooling', 'mobile_import_prefixes'):
             if not isinstance(policy.get(key), list) or not all(isinstance(x, str) for x in policy[key]):
                 raise ValueError('invalid policy ' + key)
+        web_adr = 'spec/architecture/decisions/ADR-0011-web-appearance-storage.md'
+        web_approval = 'spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt'
+        if (policy.get('web_appearance') != WEB_APPEARANCE or fields.get('web_revision_adr') != web_adr
+                or fields.get('web_approval_source') != web_approval
+                or 'Human-approved' not in (root / web_adr).read_text(encoding='utf-8')
+                or (root / web_approval).read_text(encoding='utf-8').strip() != '批准最小前置方案并继续'):
+            raise ValueError('Web appearance approved ADR/policy/approval linkage missing')
         return policy, []
     except (OSError, ValueError, AttributeError) as error:
         return {}, ['CLIENT authority unavailable (never skipped): ' + str(error)]
@@ -420,6 +438,45 @@ def check_android(root, policy):
     return errors
 
 
+def check_web_storage(relative, text, policy):
+    """One authority-bound appearance record; no generic storage/path waiver.
+
+    Direct calls and explicit projection are intentionally bounded. Actual value
+    validation/failure/retention semantics also require product behavior tests
+    and independent Review; static checks cannot establish runtime correctness.
+    """
+    code = uncomment_client(text)
+    errors = []
+    if re.search(r'\b(?:sqlite\w*|indexedDB|sessionStorage)\b|\bcaches\s*[.\[]|\bdocument\s*\.\s*cookie\b', code, re.I):
+        errors.append(f'CLIENT {relative}: Web must remain memory only / no SQLite/history persistence')
+    authority = policy['web_appearance']
+    storage = bool(re.search(r'\blocalStorage\b', code, re.I))
+    key = authority['key']
+    if relative != authority['adapter']:
+        if storage or key in code:
+            errors.append(f'CLIENT {relative}: Web appearance storage is confined to exact approved adapter')
+        return errors
+    if not storage:
+        return errors  # A pure pre-storage module does not receive an exception.
+    if re.search(r'\b(?:message\w*|history\w*|users?\w*|session\w*|(?:access|refresh)[_]?token\w*|credential\w*|endpoint\w*|conversation\w*|(?:sync[_]?)?cursor\w*)\b', code, re.I):
+        errors.append(f'CLIENT {relative}: appearance adapter cannot persist or receive business/credential data')
+    declaration = r'\bconst\s+APPEARANCE_KEY\s*=\s*(["\x27])' + re.escape(key) + r'\1\s*;'
+    if len(re.findall(declaration, code)) != 1:
+        errors.append(f'CLIENT {relative}: appearance key must be the exact versioned constant')
+    read = r'\bwindow\s*\.\s*localStorage\s*\.\s*getItem\s*\(\s*APPEARANCE_KEY\s*\)'
+    # Preserve only the three validated scalar fields, never arbitrary JSON.
+    write = (r'\bwindow\s*\.\s*localStorage\s*\.\s*setItem\s*\(\s*APPEARANCE_KEY\s*,\s*'
+             r'JSON\s*\.\s*stringify\s*\(\s*\{\s*theme\s*:\s*([A-Za-z_$][\w$]*)\s*\.\s*theme\s*,\s*'
+             r'fontSize\s*:\s*\1\s*\.\s*fontSize\s*,\s*density\s*:\s*\1\s*\.\s*density\s*,?\s*\}\s*\)\s*\)')
+    if len(re.findall(read, code)) != 1 or len(re.findall(write, code)) != 1:
+        errors.append(f'CLIENT {relative}: appearance requires direct fixed-key read/write and exact three-field projection')
+    consumed = re.sub(read, ' ', code)
+    consumed = re.sub(write, ' ', consumed)
+    if re.search(r'\blocalStorage\b', consumed, re.I):
+        errors.append(f'CLIENT {relative}: alternate key/alias/method/dynamic appearance storage access forbidden')
+    return errors
+
+
 def check_clients(root):
     policy, errors = client_policy(root)
     if errors:
@@ -474,8 +531,8 @@ def check_clients(root):
             continue
         if suffix == '.dart' or path.name.lower() in {'pubspec.yaml', 'pubspec.lock', '.metadata'} or (suffix != '.md' and FORBIDDEN_CLIENT.search(text)):
             errors.append(f'CLIENT {relative}: Dart/Flutter active source/dependency/configuration forbidden')
-        if relative.startswith('clients/web/') and re.search(r'\b(?:sqlite\w*|localStorage|indexedDB)\b', text, re.I) and suffix != '.md':
-            errors.append(f'CLIENT {relative}: Web must remain memory only / no SQLite/history persistence')
+        if relative.startswith('clients/web/') and suffix != '.md':
+            errors += check_web_storage(relative, text, policy)
         if path.name == 'package.json':
             try:
                 manifest = json.loads(text)

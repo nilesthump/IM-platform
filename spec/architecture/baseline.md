@@ -5,7 +5,7 @@
 - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `a6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72`
+- sha256: `2ba864fc2805900117f62c3c88795c52364ecc7450da17975e26d35ebf2cc432`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -112,3 +112,14 @@ APPROVED_PENDING_FREEZE：当前 canonical 为窄原生能力候选；原 revisi
 ## Native freeze accepted discovery (2026-10-08)
 
 Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c13779e99f9f463d2c6f8`, protected PR25 actual main `6a87751087de5b4063445d0fba9fe94534507a57` and safe main synchronization PASS. Exact candidate push37656041487/PR37656059375 and actual-main37657410444:5selected jobs SUCCESS,8classifier-false normally inactive, nofailedsteps. Fresh candidate Review and new same-role actual-main audit are independently bound to their exact SHA; canonical a6b1670/PDF546915/v1.1 unchanged. Task branch task/LOOP1-CLIENT-NATIVE-ARCH-001-close; receipt preserves781unknown files/status/index and recovery/s1-handoff-20261001 branch. Source approval choices unchanged; no product/contract/schema/ACK/security change, no GUI/Windows/S2 PASS. Earlier pending/blocked statements are preserved historical snapshots. Evidence: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/acceptance-20261008/acceptance.md.
+
+## Human-approved Web 外观前置候选（2026-10-09）
+
+- web_revision_type: `human_approved_web_appearance_storage`
+- web_semantic_change: `true`
+- web_revision_task_id: `LOOP1-WEB-001`
+- web_revision_adr: `spec/architecture/decisions/ADR-0011-web-appearance-storage.md`
+- web_approval_source: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt`
+- web_previous_sha256: `a6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72`
+
+APPROVED_PENDING_FREEZE：本次仅冻结已明确批准的浏览器原生 localStorage 三外观标量；§6.5 与对应 machine policy 为窄候选。保留 v1.1、所有已接受 ADR/字段谱系及原 PDF546915。新独立 Review、适用 exact-head hosted CI、protected integration/actual-main 验证与安全同步仍待完成；候选不提供产品实施权威，Web 唯一 backlog/S1 PASS/S2 OPEN。最新 Human endpoint 在 Web 完整接受同步后、S2 Gate 前停止，不执行 S2 Stage Gate。

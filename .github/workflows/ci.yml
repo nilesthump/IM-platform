@@ -56,7 +56,23 @@ jobs:
           if [[ -z "$base" || "$base" =~ ^0+$ ]]; then
             base=$(git hash-object -t tree /dev/null)
           fi
-          python3 ci/classify.py --base "$base" --head "$HEAD_SHA" --github-output "$GITHUB_OUTPUT"
+          : > "$RUNNER_TEMP/web-classified-paths"
+          python3 ci/classify.py --base "$base" --head "$HEAD_SHA" --github-output "$RUNNER_TEMP/web-classified-paths"
+          python3 - "$base" "$HEAD_SHA" "$RUNNER_TEMP/web-classified-paths" "$GITHUB_OUTPUT" <<'WEB_PATHS'
+          from pathlib import Path
+          import subprocess, sys
+          rows = [line.split('=', 1) for line in Path(sys.argv[3]).read_text().splitlines() if line]
+          values = dict(rows)
+          expected = {'go', 'java', 'web', 'desktop', 'mobile', 'shared', 'old_client', 'plugin', 'migration', 'compatibility', 'deploy', 'architecture', 'source_go', 'source_java'}
+          if len(rows) != len(values) or set(values) != expected or any(value not in {'true', 'false'} for value in values.values()):
+              raise SystemExit('Invalid classifier output; never suppress selection failure')
+          changed = subprocess.run(['git', 'diff', '--no-renames', '--name-only', '-z', sys.argv[1], sys.argv[2], '--', 'tests/clients/web/'], check=True, capture_output=True).stdout
+          if changed:
+              values['web'] = values['architecture'] = 'true'
+          with Path(sys.argv[4]).open('a', encoding='utf-8') as output:
+              for name, value in values.items():
+                  output.write(f'{name}={value}\n')
+          WEB_PATHS
 
   architecture:
     needs: classify
@@ -184,8 +200,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Web S0 skeleton boundary
-        run: python3 ci/check_s0_boundary.py web
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Web prerequisite and product verification negative controls
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -B -m unittest discover -s tests/clients/web -v
+      - name: Actual locked Web build, behavior, appearance and source verification
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -B tests/clients/web/verify.py
 
   desktop:
     needs: classify
@@ -342,6 +370,12 @@ jobs:
       DB_TEST_ENABLE: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update -qq
@@ -351,9 +385,9 @@ jobs:
           python3 contracts/websocket/verify.py
           python3 contracts/plugin-api/verify.py
           python3 -m unittest discover -s tests/database -v
-      - name: Current client source and remaining Web skeleton boundary
+      - name: Current client source and actual Web verification
         run: |
-          python3 ci/check_s0_boundary.py web
+          python3 -B tests/clients/web/verify.py
           python3 ci/check_architecture.py --scope clients --json
 
   deploy:

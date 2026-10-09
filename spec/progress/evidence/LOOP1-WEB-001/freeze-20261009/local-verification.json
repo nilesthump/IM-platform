@@ -1,0 +1,168 @@
+{
+  "kind": "local only; not independent acceptance",
+  "runs": [
+    {
+      "check": "architecture-tests",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 14140,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c3006eaacd44c170d0bd142805880b1b4ea4d7c94d97680699ff865d1f02982f",
+      "output_prefix": "01-architecture-tests",
+      "independent_acceptance": false
+    },
+    {
+      "check": "ci-tests",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 16422,
+      "stdout_sha256": "d260103c650a82689a727c276f85b42ca0d9c582efe3e36b8536e41390b8cea6",
+      "stderr_sha256": "f1f682db4c62ce9d66048d780eae85e1465aec56d621b85c5ce70fe4dc910c78",
+      "output_prefix": "02-ci-tests",
+      "independent_acceptance": false
+    },
+    {
+      "check": "web-controls",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/clients/web",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 9172,
+      "stdout_sha256": "24b5f780da966e8d071726488af33492a2d10e7a1a06644d51b284234c1a2d83",
+      "stderr_sha256": "4c2be580f82eb59e6abdda40b5ac3ec0d04d73001678906c455e8356027c8b1b",
+      "output_prefix": "03-web-controls",
+      "independent_acceptance": false
+    },
+    {
+      "check": "architecture-all",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 1640,
+      "stdout_sha256": "194faa863c9ff3fe1eea18337543c8d73763f589b47b71a2acf79881bc745bc1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_prefix": "04-architecture-all",
+      "independent_acceptance": false
+    },
+    {
+      "check": "frozen",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 1828,
+      "stdout_sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_prefix": "05-frozen",
+      "independent_acceptance": false
+    },
+    {
+      "check": "web-entry",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/web/verify.py"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 3594,
+      "stdout_sha256": "2024e488a57e2875603121cab34675e753f6dcacda65fa277fbfd9b8aa84b755",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_prefix": "06-web-entry",
+      "independent_acceptance": false
+    },
+    {
+      "check": "recovery-development",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit_code": 1,
+      "elapsed_ms": 12891,
+      "stdout_sha256": "e9fac4eaf4b5d4eb8714681b4534ca60131256a531dc5f4efa7eba2bc34afb48",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_prefix": "07-recovery-development",
+      "independent_acceptance": false
+    },
+    {
+      "check": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "6a6e97e6b7d5e19d8607c6800877187e70b4bd36",
+        "--"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 1515,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_prefix": "08-diff-check",
+      "independent_acceptance": false
+    },
+    {
+      "check": "recovery-development",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit_code": 0,
+      "elapsed_ms": 12875,
+      "stdout_sha256": "daee87d69ce18d72ff8ad7388e86646dcccd1f52f6d58531184e26b84ce7c305",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_prefix": "09-recovery-development",
+      "independent_acceptance": false
+    }
+  ],
+  "skips": "four pre-existing real symlink creation controls unavailable on Windows (WinError 1314); mocked no-privilege symlink controls passed",
+  "product_verification": "NOT_RUN; strict PREREQUISITE_SKELETON_ONLY",
+  "failures": "Initial recovery-development exit1: current Verification lacked required Command/Result/Evidence fields. Fixed metadata format; original result retained. First guard preparation assertion failed before repository write; private Recorder preserves it.",
+  "freeze_effectiveness": "pending independent Review/hosted/integration/main synchronization",
+  "recovery_repair": "current required Command/Result/Evidence formatting repaired; targeted Development retest exit0/12875ms; original exit1 retained."
+}

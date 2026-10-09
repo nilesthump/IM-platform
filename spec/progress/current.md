@@ -4,57 +4,64 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: S2-WEB-001-readiness
-Batch Status: BLOCKED_BY_ARCHITECTURE
+Current Batch: S2-WEB-001-prerequisite
+Batch Status: APPROVED_PENDING_FREEZE
 Current Task: LOOP1-WEB-001
 Current Task State: backlog
-Execution Status: BLOCKED_BY_ARCHITECTURE
+Execution Status: APPROVED_PENDING_FREEZE
 
 ## Immediately Relevant Completed Work
 
-Human latest request 执行下一个task authorizes selection of Web after uniquely done GUI. GUI product and administrative closure independently accepted/integrated/synchronized at actual main 6a6e97e6b7d5e19d8607c6800877187e70b4bd36. Original final-sync report/binding/receipt preserved in Web readiness evidence; earlier GUI current snapshot archived byte-exact. ADR-0007 planning is accepted; canonical order selects Web. Assigned managed Web root is exact-root verified with clean accepted-main baseline.
+Human批准readiness-20261008/proposal.md的localStorage三外观标量与精确七额外路径，2026-10-09明确继续。先前pause当前状态已被本次resume取代，原pause-20261008.md保持历史原件。e35c425 readiness metadata独立Review PASS原件复制到freeze-20261009，仅metadata接受，不是冻结或产品验收。GUI已done并安全同步actual main6a6e97e6b7d5e19d8607c6800877187e70b4bd36；ADR-0007选择Web。
 
 ## Current Blockers
 
-BLOCKED_BY_ARCHITECTURE: no accepted Web appearance persistence selection. Current storage guard rejects localStorage/IndexedDB/SQLite in Web source. Web/compatibility hosted jobs still enforce an empty Web skeleton; needed workflow/guard/test/freeze changes are outside current allowed_paths. Concrete minimal decision and exact seven-path prerequisite scope are in readiness-20261008/proposal.md. Task remains uniquely backlog until required inputs are accepted.
+批准已取得，无需再次确认；authority/guard/CI前置候选仍待fresh independent Review、精确hosted CI、protected integration/actual-main verification与安全main同步后生效。唯一Web backlog，产品尚未启动。
 
 ## Verification
 
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: assigned clean accepted-main baseline exit0 PASS /3141ms; local readiness evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/baseline-result.json`
+  - Result: PASS exit0 /1640ms; local candidate source/authority check.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
 - Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: exit0 PASS /187ms; canonical a6b1670/PDF546915 match accepted manifest.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/baseline-result.json`
-
+  - Result: PASS exit0 /1828ms; canonical2ba864fc/PDF546915 match.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
+- Command: `python -Xutf8 -B -m unittest discover -s tests/architecture -v`
+  - Result: PASS exit0,56tests; CI controls34tests exit0 with4pre-existing real-symlink Windows privilege skips; Webstagecontrols8tests exit0.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
+- Command: `python -Xutf8 -B tests/clients/web/verify.py`
+  - Result: exit0 PREREQUISITE_SKELETON_ONLY /3594ms; no Web build/behavior/product acceptance performed.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
 - Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: local metadata PASS for unique Web/backlog; initial CRLF diff failure repaired in authored files while original evidence remains byte-exact archived.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/local-validation.json`
+  - Result: PASS repaired retest exit0 /12875ms; original exit1 /12891ms due missing Command/Result/Evidence fields remains preserved.
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
+
+Webruntime/screenshots/Architect Approval/hosted/sync未运行，不计PASS；本地controls仅local evidence。
 
 ## Changed Files or Migrations
 
-Only selected Web Task/current/readiness evidence metadata. Proposed browser appearance adapter, frozen decision, guards and workflow are not implemented. No product, public contract, schema, dependency, canonical or trust/helper changes. Main unknown work preserved.
+已批准七个canonical/baseline/ADR/guard/architecture test/workflow/CI control paths与原Web tests/metadata/evidence用于最小前置；无Web产品、依赖、契约、schema、ACK、安全或原生/helper/trust迁移。具体范围与source hashes在freeze-20261009记录。
 
 ## Known Failures, Risks, and Assumptions
 
-Web mandatory storage decision and CI scope are unsatisfied. No Web runtime/screenshots/Architect Approval/hosted product acceptance or Task/S2 PASS claimed. Prior GUI product/cache/recovery FAIL and Recorder gaps remain immutable. Former occupation-blocked helper regression remains pending at S2 Gate. Initial read-only missing-path/glob errors and direct/delegated Recorder gaps are disclosed; local checks do not supply independent acceptance.
+前置候选尚未独立接受。e35原readiness FAIL修复和immutable证据保留。Research公开pre-Recorder只读startup与初次注册future-run顺序错误、一次并发Recorder event锁冲突；未编辑eventstream，随后序列化。本地PASS不是独立接受，Recorder有效不等于Task或S2 PASS。S2保持OPEN，deferred helper Gate regression不执行。
 
 ## Next Exact Action
 
-Human/Architect decide `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/proposal.md`: localStorage only for theme/font/density and exact seven prerequisite paths. After actual approval, freeze narrow authority/policy and CI controls, obtain fresh independent Review/applicable exact-head hosted CI/protected integration/actual-main safe sync, then reassess inputs and sequentially backlog -> ready -> active with a fresh implementation writer. Do not implement before accepted authority or invent missing approval. Readiness metadata independently reviewed/published/synced status is separate from product acceptance.
+完成前置freeze/guard/CI controls，clean commit后fresh Review/fix cycle、exact-head hosted CI、受保护集成、actual-main与安全同步。之后才复评并顺序backlog -> ready -> active，由fresh writer实现Web完整GUI/真实浏览器截图/Architect Review修复批准/独立产品接受/集成同步。最新Human endpoint：Web完整接受同步后停止于S2 Gate前，不对S2 Stage Gate操作；必要CI aggregate gate规则保持原样。
 
 ## Last Known Good Commit
 
-`6a6e97e6b7d5e19d8607c6800877187e70b4bd36` independently accepted GUI-only actual main and final safe synchronization. New Web readiness metadata is not product acceptance.
+`6a6e97e6b7d5e19d8607c6800877187e70b4bd36`，先前独立接受GUI-only actual main与安全同步。Web前置候选尚无新accepted main。
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md` remains the latest accepted product recovery checkpoint. Web selection is a blocked prerequisite discovery, not a new product milestone.
+`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md`。本轮前置不是新产品Gate recovery checkpoint。
 
 ## Uncommitted Changes / Ownership
 
-Assigned managed root `H:/.codex/worktrees/w/IM-platform`, branch `task/LOOP1-WEB-001-readiness`, exact Git root verified. Sole writer /root owns only this Web task/current/readiness metadata until clean commit and lease release. Main accepted6a6 retains31 unrelated status entries/781 files; no main task writes. Read-only preflight agent has no write lease. Readiness candidate synchronization is pending its own applicable review/CI chain; no unknown work copied or overwritten.
+唯一writer/verification lease：/root/web_freeze_impl，assigned app Git root `H:/.codex/worktrees/w/IM-platform`严格核对，branch `task/LOOP1-WEB-001-readiness`。/root此前Task/current/pause更新保留并被最新resume metadata明确supersede，pause原件不变。只改Task原scope与Human七exact路径；不写main、不复制main未知31statusentries/781files，不触及其所有权。clean task-owned candidate commit待完成；branch/SHA/main-sync-pending将封存在私有freeze-implementation/report.md；该handoff是后续独立Review输入，不是接受。
 
 ## Architecture Conflicts / ACP / ADR
 
-BLOCKED_BY_ARCHITECTURE smallest question: approve host-owned browser localStorage only for three appearance scalars and the seven exact freeze/guard/CI paths in the concrete proposal? Current Web memory-only chat/security/ACK/public contracts remain effective. Proposal is not a frozen or accepted decision. No canonical/ADR/guard/workflow edits before explicit approval.
+ADR-0011 narrowWebappearance/canonicalpolicy candidate落实直接Human授权，APPROVED_PENDING_FREEZE。具体fixedkey/3scalar/bounds/strictCI阶段控制见ADR。原canonical a6b1670/PDF546915/v1.1与已接受谱系保留。未改变公共契约/ACK/兼容/安全边界，未生效候选不作为产品权威。

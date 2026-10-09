@@ -2,7 +2,7 @@
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
 status: backlog
-owner: /root
+owner: /root/web_freeze_impl
 stage: S2
 gate: S2
 ---
@@ -47,6 +47,14 @@ client_framework: React
 - `spec/progress/evidence/LOOP1-WEB-001/**`
 - `spec/progress/checkpoints/*loop1-web-001*.md`
 
+- `spec/architecture/frozen-architecture.md`
+- `spec/architecture/baseline.md`
+- `spec/architecture/decisions/ADR-0011-web-appearance-storage.md`
+- `ci/check_architecture.py`
+- `tests/architecture/test_client_technology.py`
+- `.github/workflows/ci.yml`
+- `tests/ci/test_s0_boundary.py`
+
 # Acceptance
 
 spec/acceptance/client-gui.md 真实浏览器截图与 Architect 审查修复重拍批准；内存协议状态/发送重试、页面生命周期后不保证消息保留、无聊天持久化；refresh/logout/session-expired。独立 Review、exact-head hosted CI、protected integration/main sync。
@@ -76,7 +84,7 @@ Backlog 规格实例化 canonical 已批准规划 ID；GUI 是唯一新增产品
 
 # Next Action
 
-Human/Architect decide the concrete minimal prerequisite in `spec/progress/evidence/LOOP1-WEB-001/readiness-20261008/proposal.md`; approve its exact seven-path scope and freeze/independently accept the Web appearance decision and applicable CI. Reassess readiness before backlog -> ready -> active. Earlier SEND-only endpoint text is historical; latest Human request authorizes Web selection, not missing technology.
+Human 已批准最小前置方案并继续；直接落实 ADR-0011/canonical/policy/guard/CI 前置候选，fresh independent Review、exact-head hosted CI、protected integration/actual-main验证/安全同步后才生效；随后重评 ready/active 产品。最新 endpoint 是 Web完整接受同步后S2 Gate前停止，不执行S2 Stage Gate。
 
 
 ## Authorized next-task readiness (2026-10-08)
@@ -90,3 +98,26 @@ Minimum baseline in assigned managed root H:/.codex/worktrees/w/IM-platform: bun
 Sole writer /root owns only Task/current/new Web readiness evidence, assigned Git root exactly verified and branch task/LOOP1-WEB-001-readiness. Last known good main6a6e97e6b7d5e19d8607c6800877187e70b4bd36; main31 unknown status entries/781 files untouched. Readiness metadata commit/independent Review/applicable exact-head CI/synchronization remain separately pending, not Web product completion. Prospective_resume Recorder R-WEB-COORDINATOR-20261008 registers actual visible prompt; startup/direct read/delegated-read instrumentation gaps and read-only missing-path/glob errors are disclosed. No product, contract, canonical, workflow, guard, dependency, helper or trust writes.
 
 Local recovery Development exits0 for unique Web/backlog. Initial authored diff check exits2 on Windows CRLF; fixed authored outputs to LF, preserved original failed command and archived accepted GUI originals byte-exact in accepted-gui-originals.zip with original-bindings.json. Corrected diff/architecture all exits0; local-validation.json preserves real command outcomes. No verifier or acceptance assertion weakened. Readiness candidate requires fresh independent Review/hosted acceptance before its separate metadata synchronization; no Web product acceptance.
+
+## Human-requested pause (2026-10-08)
+
+Execution Status: PAUSED_BY_HUMAN. Human approved the exact minimal seven-path/localStorage prerequisite, then explicitly paused before implementation. Fresh e35c425 readiness metadata Review PASS is sealed; no prerequisite/product/hosted acceptance is claimed. Resume on 继续 from the saved state without re-auditing repository changes and without asking again for the same approval. Exact approval, released leases, evidence, uncommitted pause-write ownership and next action: `spec/progress/evidence/LOOP1-WEB-001/pause-20261008.md`. This newest pause/approval record supersedes the earlier missing-consent Next Action and not-approved wording; Task remains backlog until independently accepted prerequisite inputs are satisfied.
+
+## Continued approved prerequisite (2026-10-09)
+
+Execution Status: APPROVED_PENDING_FREEZE
+web_verification_phase: appearance_prerequisite
+
+Human精确答复“批准最小前置方案并继续”授权上述七额外路径与localStorage三标量；2026-10-09明确“继续”，恢复暂停点，无重复仓库改动审查。最新Human要求“你的任务截止到s2gate前，不对gate进行任何操作”：Web完整接受/同步后停止于S2 Stage Gate前；保留必要CI aggregate gate，不选择/执行Stage Gate或deferred helper regression。
+
+本记录明确supersede此前not-approved/BLOCKED_BY_ARCHITECTURE/PAUSED_BY_HUMAN当前执行措辞；原readiness proposal和pause-20261008.md历史原件保持不变。Task仍唯一backlog，前置authority freeze须fresh Review/精确hosted/受保护集成/actual-main/安全main同步后生效才可ready/active。GUI done和ADR-0007输入已接受；不实现Web产品。
+
+前置源/测试责任仅七paths与原tests/clients/web、Task/current/Web evidence；无ci/classify.py或check_gate.py改动。精确决策/批准/冻结说明见freeze-20261009。本轮sole writer与verification lease为/root/web_freeze_impl，assigned root严格匹配H:/.codex/worktrees/w/IM-platform，branch task/LOOP1-WEB-001-readiness；保留/root暂停写及immutable原件，main未知31entries/781files不读取/改写。last known good6a6e97e6b7d5e19d8607c6800877187e70b4bd36。
+
+前置minimum baseline bundled Python -Xutf8 -B ci/check_architecture.py --scope all --json和tools/verify_frozen_architecture.py真实exit0。前置后续必需：architecture all/frozen；unittest discover tests/architecture、tests/ci、tests/clients/web；tests/clients/web/verify.py（只报告严格PREREQUISITE_SKELETON_ONLY）；Recovery Development/clean candidate Acceptance；diff/scope/hash checks。产品phase必需入口同verify.py执行locked npm ci/build + node tests/clients/web/behavior.mjs + appearance.mjs + clients source guard；缺输入/失败不可fallback。Webruntime/截图/Architect Approval尚未运行。候选commit/sync/hosted未完成，本地结果仅local evidence。
+
+Research R-WEB-FREEZE-IMPL-20261009 prospective_resume独立implementation run；公开pre-Recorder只读startup gaps、首次注册关联future run失败与一次并发event锁冲突，原eventstream不改。无Task/S2 PASS宣称。
+
+Local candidate verification: architecture all/frozen真实exit0；architecture56、CI34（4既有Windows真实symlink权限skip）、Web8负例controls exit0；Web入口exit0仅PREREQUISITE_SKELETON_ONLY，无产品build/behavior。Recovery Development initial exit1由current Verification格式三字段缺失导致，已修metadata，原FAIL保留；diff-check真实exit0。完整真实argv/exit/时长/output SHA在freeze-20261009/local-verification.json，后续clean committedAcceptance仍待运行，独立Review/hosted/main sync仍pending。
+
+Recovery Development metadata修复定向重跑exit0/12875ms。本地最小checks已完成；clean候选branch/SHA/尚未sync与sealedRecorder由私有freeze-implementation/report.md记录供fresh Review，不是独立接受。前置尚未生效，Task仍backlog/S2 OPEN，latest endpoint S2 Gate前。
