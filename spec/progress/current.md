@@ -16,7 +16,7 @@ Complete memory-only Web GUI independently accepted and synchronized to main a1b
 
 ## Current Blockers
 
-No product blocker. This administrative closure metadata requires fresh independent Review/applicable exact-head hosted/protected integration/actual-main audit/safe sync before reporting full closure. Edge waived by Human. Human endpoint prohibits S2 Gate and nexttask operations.
+No product blocker. Edge waived by Human. Human endpoint remains STOP before S2 Stage Gate; no Gate, deferred helper or next-task operations. Candidate-specific administrative acceptance status is recorded separately in `spec/progress/evidence/LOOP1-WEB-001/product-closure-fix-20261009/candidate-status.md`.
 
 ## Verification
 
@@ -36,11 +36,11 @@ Only Task queue/current/new Web closure evidence/checkpoint administrative write
 
 ## Known Failures, Risks, and Assumptions
 
-Candidate first push attempt failed Linux Compose startup with cause unknown; retained originals, normal unchanged-head retry independently accepted14 effective successes. Actual-main own run six selected successes/seven correct inactive entries independently accepted. Research gaps and original failures retained; Recorder validity alone is not acceptance. Current root Recorder active until final closure sync.
+Candidate first push attempt failed Linux Compose startup with cause unknown; retained originals, normal unchanged-head retry independently accepted14 effective successes. Actual-main own run six selected successes/seven correct inactive entries independently accepted. Research gaps and original failures retained; Recorder validity alone is not acceptance. The archived root Recorder was active at the historical closure snapshot; its finalization is tracked by private coordinator receipts.
 
 ## Next Exact Action
 
-Complete only independent administrative closure Review/CI/protected integration/actual-main audit and safe synchronization. Then remain STOP before S2 Stage Gate; do not select/evaluate Gate, deferred helper regression or another Task.
+STOP before S2 Stage Gate. Do not select or evaluate Gate, run deferred helper regression, select another Task, or repeat an already accepted administrative closure. This terminal recovery instruction does not authorize further work.
 
 ## Last Known Good Commit
 
@@ -52,7 +52,7 @@ Complete only independent administrative closure Review/CI/protected integration
 
 ## Uncommitted Changes / Ownership
 
-/root sole closure metadata writer in verified assigned H:/.codex/worktrees/w/IM-platform on task/LOOP1-WEB-001-product. Product/hosted leases released. Unknown main work retained; no unknown content copied. New closure commit and independent final receipts separately bind subsequent administrative integration/sync.
+This bounded recovery fix is owned by /root/web_product_closure_fix in verified assigned H:/.codex/worktrees/w/IM-platform on task/LOOP1-WEB-001-product. Exact candidate, clean state and lease release are bound by private fix receipts. Product/hosted leases released. Unknown main work retained; no unknown content copied. Candidate acceptance/synchronization facts remain separately bound in fix evidence.
 
 ## Architecture Conflicts / ACP / ADR
 

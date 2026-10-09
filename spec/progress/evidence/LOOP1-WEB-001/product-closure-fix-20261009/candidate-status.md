@@ -1,0 +1,15 @@
+# Bounded administrative recovery fix C1
+
+Fresh Fix /root/web_product_closure_fix repairs only the independent C1 P2 recovery loop found at clean parent 2ebbf46a860ae702eedb57825c6f1cd844e90080 on task/LOOP1-WEB-001-product. The original independent FAIL report, seal, verification receipts and Recorder bytes are immutable in independent-fail-originals.zip and original-bindings.json. No acceptance claim is made by the Fix.
+
+The accepted Web product remains unique done, synchronized at a1b154d06c0a9d191ec8dca514fff3ab1b46ee25. S1 PASS/S2 OPEN and the Human endpoint STOP before S2 Stage Gate remain unchanged. Product source, approved 52 Chromium originals, harness, authority, contracts, dependencies, tests, guards and CI are unchanged; no browser/product rerun or main/remote action.
+
+This new fixed administrative candidate is not yet independently accepted or synchronized. NEW fresh independent Review, applicable exact-head hosted CI, protected integration, independent actual-main audit and preservation-aware safe synchronization are all PENDING for this candidate. Exact candidate SHA/parent, local clean Acceptance and later coordinator acceptance receipts are separately bound by private sealed fix/coordinator evidence. These pending facts are limited to this candidate and never authorize repeating an already accepted closure chain. Local checks and Recorder validity are not independent acceptance.
+
+Durable terminal recovery: STOP before S2 Stage Gate. Do not select/evaluate Gate, run deferred helper regression, select another Task or repeat accepted administrative closure. Earlier Task/closure workflow instructions are historical acceptance procedures, not new-task or Gate authorization.
+
+Research: independent implementation/prospective_resume R-WEB-CLOSURE-FIX-20261009 registers the complete delegated prompt. Pre-Recorder direct startup/read/tool/collaboration and private script authoring are incomplete capture gaps; initial shell helper_unknown_error is retained in conversation evidence. Initial large startup outputs were truncated; relevant normative inputs were subsequently reread in smaller direct calls before baseline/implementation. Git inspection preceded completion of these supplemental rereads; this ordering gap is exposed. Bundled commands are routed through the Recorder where possible. Private authoring, tool invocations, final sealing and postfinish reporting remain direct gaps. No hidden/internal prompt, timing or complete trace is inferred. Recorder finish/validate follows all completed wrappers directly, never from within its own run-command.
+
+Verification commands/results and raw-output SHA bindings are in local-verification.json; final committed clean Recovery Acceptance and lease release are in the private sealed report. No migrations, new mechanisms, dependencies or mirrored-text tests.
+
+Private scope helper v1 exited1 only because a Windows relative path used backslashes in an exact slash comparison; original helper and failed wrapper output retained. Fresh v2 uses Path.as_posix and passes unchanged scope/queue assertions. No product/test/guard or acceptance rule changed.

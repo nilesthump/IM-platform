@@ -261,3 +261,9 @@ Task enters done only after this independent product acceptance and verified mai
 Next Exact Action: STOP before S2 Stage Gate. Do not evaluate Gate, run deferred helper regression or select another Task. Coordinator completes only administrative closure independent Review/CI/integration/sync, with no product source change. Durable exact branch/candidate/main/sync bindings: spec/progress/evidence/LOOP1-WEB-001/product-closure-20261009/original-bindings.json
 
 Ownership: /root solely authors this closure metadata; product source and prior evidence remain owned by their recorded actors. No unknown main work overwritten. This latest accepted record supersedes earlier review/pending implementation status while retaining original history.
+
+## Latest terminal recovery clarification C1 (2026-10-09)
+
+Product acceptance, unique done queue, synchronized product main a1b154d06c0a9d191ec8dca514fff3ab1b46ee25 and S2 OPEN remain established. The bounded fresh administrative fix only makes current.md recovery terminal and archives the independent C1 FAIL byte-exact. Candidate-specific pending Review/CI/integration/actual-main audit/sync, local verification and Recorder gaps are recorded in spec/progress/evidence/LOOP1-WEB-001/product-closure-fix-20261009/candidate-status.md and local-verification.json; exact candidate/clean Acceptance/lease release are privately sealed. The Fix does not accept itself or reopen product.
+
+Latest Next Exact Action: STOP before S2 Stage Gate; no Gate evaluation, deferred helper regression, next Task selection or repetition of accepted administrative closure. Earlier administrative workflow paragraphs remain historical, not renewed execution authority. Sole bounded writer /root/web_product_closure_fix; no main or remote writes. Last known good accepted product main remains a1b154d06c0a9d191ec8dca514fff3ab1b46ee25. New administrative candidate acceptance/sync remains PENDING in candidate-specific evidence.
