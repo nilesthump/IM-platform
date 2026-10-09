@@ -5,14 +5,14 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-WEB-001-product
-Batch Status: REPAIRING_AFTER_ARCHITECT_FAIL
+Batch Status: REVIEW_PENDING
 Current Task: LOOP1-WEB-001
 Current Task State: review
-Execution Status: REPAIRING_AFTER_ARCHITECT_FAIL
+Execution Status: REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
-Bounded fresh visual repair: Cold aligns accepted Desktop light-blue/white-glass/deep-blue tokens and restrained radial depth. Friends input flex/min-width plus nonshrinking nowrap primary action. Genuine Chromium151.0.7922.34 captured48 original images, including both themes560x90020px/spacious Chat sending/sent/typed input, six navigation targets, Friends search/busy/error. Source bd0838a; product tree equality and build provenance explicit. Original Architect FAIL preserved; source and screenshots still require NEW independent Approval.
+Bounded fresh visual repair: Cold aligns accepted Desktop light-blue/white-glass/deep-blue tokens and restrained radial depth. Friends input flex/min-width plus nonshrinking nowrap primary action. Genuine Chromium151.0.7922.34 captured48 original images, including both themes560x90020px/spacious Chat sending/sent/typed input, six navigation targets, Friends search/busy/error. Source bc21106 includes unified accepted Desktop Logo; product tree equality and build provenance explicit. Original Architect FAIL preserved; source and screenshots still require NEW independent Approval. Latest-source strict Web/architecture/frozen/Web14/diff checks exit0; receipt-order Recovery failure retained and targeted recheck follows.
 
 ## Current Blockers
 
@@ -22,13 +22,13 @@ Fresh Architect Approval and implementation Review, exact-head hosted CI/protect
 
 - Command: `python -Xutf8 -B tests/clients/web/verify.py`
   - Result: fresh repaired-source locked install/build/behavior/appearance/source guard results in durable receipt
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification.json`
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification-latest.json`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
   - Result: repaired-source all/frozen, Web14 controls and Recovery Development results in durable receipt
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification.json`
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/local-verification-latest.json`
 - Command: `node tests/clients/web/browser.mjs`
   - Result: exit0 genuineChromium48 originals; actual fixture/browser closed; local evidence only
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/screens/chromium-a/manifest.json`
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-a/screens/chromium-b/manifest.json`
 
 ## Changed Files or Migrations
 
@@ -40,7 +40,7 @@ Initial recovery Evidence-format failures, browser fetch receiver/Settings reach
 
 ## Next Exact Action
 
-Finish Desktop-aligned Cold/search repair, recapture Chromium full matrix plus narrow maxima, seal clean candidate/Recorder and release lease; root delegates NEW Architect and implementation Review then hosted/integration/main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
+Seal clean corrected-source candidate; release lease to root for NEW Architect Approval and independent implementation Review then hosted/integration/main sync. Web fully accepted/synced thenSTOP before S2 Stage Gate; no Gate selection/evaluation/helper regression.
 
 ## Last Known Good Commit
 
