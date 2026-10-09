@@ -62,3 +62,5 @@ sole writer+verification lease /root/web_freeze_fix_a；assigned Git root严格�
 ## Architecture Conflicts / ACP / ADR
 
 ADR-0011/canonicalpolicy原Human批准candidate仍APPROVED_PENDING_FREEZE；本fix落实现有禁止删除产品退空要求，不扩authority。candidate canonical2ba864fc/PDF546915/v1.1/accepted lineage不变。未实现Web产品，S1 PASS/S2 OPEN。
+
+Immutable FAIL原件以ZIP保持entry原字节与original-bindings.json哈希：原negative-zero.log含CRCRLF，直接复制导致cached diff-check exit1；序列控制错误随后产生1d832e5，未amend，失败Recorder保留。新纠正commit仅封装task-owned复制证据与metadata，原review原件不动，源代码修复不变。

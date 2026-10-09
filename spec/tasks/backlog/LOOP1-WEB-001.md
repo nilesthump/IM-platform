@@ -124,8 +124,10 @@ Recovery Development metadata修复定向重跑exit0/12875ms。本地最小check
 
 ## Independent Review FAIL repaired candidate (2026-10-09)
 
-原944b9bf独立Review FAIL：clean committed产品删除与first branch push before=zero绕过前置；immutable原件见fix-20261009-a/independent-fail-originals及original-bindings.json。fresh Fix /root/web_freeze_fix_a只修verify.py+14真实Git/阶段controls，增加可信HEAD相关full-history，无关branches不扫、历史Markdown-only非产品、当前仍exact skeleton；shallow/graft failclosed，Git替换对象不影响真实历史。Web/compat workflow fetch-depth0已有，其他authority/guard/CI/Gate不变。
+原944b9bf独立Review FAIL：clean committed产品删除与first branch push before=zero绕过前置；immutable原件见fix-20261009-a/independent-fail-originals.zip及original-bindings.json。fresh Fix /root/web_freeze_fix_a只修verify.py+14真实Git/阶段controls，增加可信HEAD相关full-history，无关branches不扫、历史Markdown-only非产品、当前仍exact skeleton；shallow/graft failclosed，Git替换对象不影响真实历史。Web/compat workflow fetch-depth0已有，其他authority/guard/CI/Gate不变。
 
 Local architecture all/frozen exit0、architecture56/CI34/Web14 tests exit0，4既有Windows真实symlink权限skip公开；actual Web入口仅PREREQUISITE_SKELETON_ONLY，无产品行为接受。Recovery Development/clean committed Acceptance、最终branch/SHA/diff/Recorder由私有freeze-fix-20261009-a/report.md封存，精确argv/exit/ms/hash见fix-20261009-a/local-verification.json。last good6a6e97e；main sync PENDING，no main write。所有新uncommitted fix scope归fresh Fix唯一lease；clean后释放待NEW independent Review，Fix不得自行接受。Task仍backlog/APPROVED_PENDING_FREEZE，S2 OPEN，不选Stage Gate。
 
 Recovery Development本fix真实exit0/7953.0ms，仅local非接受验证；source/control修复待clean commit后由新独立Reviewer审查，最终clean Recovery Acceptance结果与SHA在私有report封存。
+
+Immutable FAIL原件以ZIP保持entry原字节与original-bindings.json哈希：原negative-zero.log含CRCRLF，直接复制导致cached diff-check exit1；序列控制错误随后产生1d832e5，未amend，失败Recorder保留。新纠正commit仅封装task-owned复制证据与metadata，原review原件不动，源代码修复不变。
