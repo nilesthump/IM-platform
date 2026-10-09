@@ -19,7 +19,11 @@ export class Http {
     let r:Response;try {r=await this.fetcher(this.origin+path,{method,body:body===undefined?undefined:JSON.stringify(body),headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},credentials:'same-origin',redirect:'error',cache:'no-store',signal});}catch{throw new ApiFailure('CONNECTION_UNAVAILABLE',0);}
     if(path==='/v1/auth/logout'&&method==='POST'){
       if(r.redirected)return invalid();
-      if(r.status===204){if(r.body!==null)return invalid();return undefined;}
+      if(r.status===204){
+        // Browsers may expose an empty stream for a no-content HTTP response.
+        if(r.body){const reader=r.body.getReader();try{if(!(await reader.read()).done)return invalid();}finally{await reader.cancel().catch(()=>{});}}
+        return undefined;
+      }
       if(r.ok)return invalid();
     }
     if(r.redirected||!/^application\/json(?:\s*;|$)/i.test(r.headers.get('content-type')??'')||r.headers.get('cache-control')!=='no-store')return invalid();

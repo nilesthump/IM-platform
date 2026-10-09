@@ -77,6 +77,9 @@ for(const late of [99,103]){
  const signal=new AbortController().signal;
  const http=new Http('https://regression.invalid',async()=>new Response(null,{status:204}));
  assert.equal(await http.request('/v1/auth/logout','POST',undefined,'controlled-access',signal),undefined);
+ const streamResponse=bytes=>({status:204,ok:true,redirected:false,body:new ReadableStream({start(controller){if(bytes)controller.enqueue(new Uint8Array([1]));controller.close();}})});
+ const empty=new Http('https://regression.invalid',async()=>streamResponse(false));assert.equal(await empty.request('/v1/auth/logout','POST',undefined,'controlled-access',signal),undefined);
+ const illegal=new Http('https://regression.invalid',async()=>streamResponse(true));await assert.rejects(()=>illegal.request('/v1/auth/logout','POST',undefined,'controlled-access',signal));
  await assert.rejects(()=>http.request('/v1/users/me','GET',undefined,'controlled-access',signal));
  const fake=new Http('https://regression.invalid',async()=>json({revoked:true}));await assert.rejects(()=>fake.request('/v1/auth/logout','POST',undefined,'controlled-access',signal));
  for(const success of [true,false]){const {client}=await setup(async url=>{assert(url.endsWith('/auth/logout'));return success?new Response(null,{status:204}):json({requestId:id(999),error:{code:'AUTH_SESSION_REVOKED',message:'Controlled rejection'}},401);});try{await client.logout();assert.equal(client.view().session,false);assert.equal(client.view().notice,success?'已退出登录。':'本页已退出，但服务端撤销未确认；请使用恢复会话再重试退出。');}finally{client.dispose();}}
