@@ -14,7 +14,7 @@ export function auth(v:unknown):Session {
 }
 export class Http {
   readonly origin:string;
-  constructor(origin:string,private fetcher:typeof fetch=fetch){const u=new URL(origin);if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash||u.pathname!=='/')throw new ApiFailure('HTTPS_REQUIRED',0);this.origin=u.origin;}
+  constructor(origin:string,private fetcher:typeof fetch=(input,init)=>fetch(input,init)){const u=new URL(origin);if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash||u.pathname!=='/')throw new ApiFailure('HTTPS_REQUIRED',0);this.origin=u.origin;}
   async request(path:string,method:string,body:unknown,token:string|undefined,signal:AbortSignal):Promise<unknown>{
     let r:Response;try {r=await this.fetcher(this.origin+path,{method,body:body===undefined?undefined:JSON.stringify(body),headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},credentials:'same-origin',redirect:'error',cache:'no-store',signal});}catch{throw new ApiFailure('CONNECTION_UNAVAILABLE',0);}
     if(r.redirected||!/^application\/json(?:\s*;|$)/i.test(r.headers.get('content-type')??'')||r.headers.get('cache-control')!=='no-store')return invalid();

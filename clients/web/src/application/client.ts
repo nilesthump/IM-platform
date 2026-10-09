@@ -11,7 +11,7 @@ export class WebClient {
   private state:View={session:false,authBusy:false,notice:'',connection:'未连接',sync:'',friends:[],friendsBusy:false,friendsError:'',profileBusy:false,profileError:'',searchBusy:false,searchError:'',searchResults:[],selected:'',revision:0};
   private listeners=new Set<()=>void>();private session?:Session;private generation=0;private abort=new AbortController();private socket?:WebSocket;private reconnectTimer?:ReturnType<typeof setTimeout>;private refreshTimer?:ReturnType<typeof setTimeout>;private pending=new Map<string,{conversation:string;timer:ReturnType<typeof setTimeout>}>();private opened=new Set<string>();private syncing=new Set<string>();private bind='';private device=crypto.randomUUID();private refreshing?:Promise<void>;
   readonly http:Http;
-  constructor(origin:string,private fetcher:typeof fetch=fetch,private socketFactory:(url:string)=>WebSocket=url=>new WebSocket(url),private timeout=10000){this.http=new Http(origin,fetcher);}
+  constructor(origin:string,private fetcher:typeof fetch=(input,init)=>fetch(input,init),private socketFactory:(url:string)=>WebSocket=url=>new WebSocket(url),private timeout=10000){this.http=new Http(origin,fetcher);}
   view=()=>this.state;
   subscribe=(f:()=>void)=>{this.listeners.add(f);return()=>{this.listeners.delete(f);};};
   private publish(p:Partial<View>={}){this.state={...this.state,...p,revision:this.state.revision+1};for(const f of this.listeners)f();}
