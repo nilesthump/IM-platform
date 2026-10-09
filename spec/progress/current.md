@@ -22,13 +22,13 @@ NEW independent Architect Approval and implementation Review; exact-head hosted 
 
 - Command: `python -Xutf8 -B tests/clients/web/verify.py`
   - Result: locked actual build/behavior/appearance/source plus meaningful three-failure and crossing regressions; receipts record actual exits
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/local-verification.json`
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/local-verification-latest.json`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
   - Result: all/frozen/Web14/Recovery Development results in durable receipt
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/local-verification.json`
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/local-verification-latest.json`
 - Command: `node tests/clients/web/browser.mjs`
   - Result: actual Chromium52 originals, prior48 plus lateACK/crossingSync; real logout204; own fixture/browser closed
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/screens/chromium-c/manifest.json`
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-c/screens/chromium-d/manifest.json`
 
 ## Changed Files or Migrations
 
