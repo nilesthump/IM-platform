@@ -4,7 +4,7 @@ export const defaults:Appearance={theme:"cold",fontSize:16,density:"comfortable"
 export function validate(value:unknown):Appearance {
   if(!value||typeof value!=="object"||Array.isArray(value))throw new Error("Invalid appearance");
   const v=value as Record<string,unknown>;
-  if(Object.keys(v).length!==3||!['theme','fontSize','density'].every(k=>Object.hasOwn(v,k))||!['cold','warm'].includes(String(v.theme))||typeof v.fontSize!=="number"||![14,16,18,20].includes(v.fontSize)||!['compact','comfortable','spacious'].includes(String(v.density)))throw new Error("Invalid appearance");
+  if(Object.keys(v).length!==3||!['theme','fontSize','density'].every(k=>Object.hasOwn(v,k))||typeof v.theme!=="string"||!['cold','warm'].includes(v.theme)||typeof v.fontSize!=="number"||![14,16,18,20].includes(v.fontSize)||typeof v.density!=="string"||!['compact','comfortable','spacious'].includes(v.density))throw new Error("Invalid appearance");
   return {theme:v.theme as Appearance['theme'],fontSize:v.fontSize as Appearance['fontSize'],density:v.density as Appearance['density']};
 }
 export function loadAppearance():Appearance {
