@@ -5,14 +5,14 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: S2-WEB-001-product
-Batch Status: REVIEW_PENDING
+Batch Status: REPAIR_IN_PROGRESS
 Current Task: LOOP1-WEB-001
 Current Task State: review
-Execution Status: REVIEW_PENDING
+Execution Status: REPAIR_IN_PROGRESS
 
 ## Immediately Relevant Completed Work
 
-Cold Desktop colors and unified Desktop logo remain exact product source bc21106. Fresh Architect B observed those repairs met but withheld Approval because Warm screenshot waited an older SENT. Fresh evidence-only harness binds unique new message text, requestId/conversationId/seq, proves same article SENDING then SENT; Warm negative control has older SENT and new message initially not SENT. Genuine Chromium151 full48 new originals, browser/fixture closed; original FAIL and prior screenshots immutable.
+Independent ReviewA reproduced three FAILs: late ACK timeout correlation, crossing terminal Sync and legal logout204. Fresh FixC repairs bounded Web logic/contract fixtures, preserves approved Cold Desktop colors and unified Logo; new regressions and browser capture pending. Original FAIL and old-source ArchitectC Approval archived byteexact.
 
 ## Current Blockers
 
@@ -52,7 +52,7 @@ Seal clean same-send evidence candidate; release lease to root for NEW Architect
 
 ## Uncommitted Changes / Ownership
 
-/root/web_product_fix_b sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-fix-b/report.md. Main unknown work untouched.
+/root/web_product_fix_c sole writer/verifier in verified H:/.codex/worktrees/w/IM-platform, task/LOOP1-WEB-001-product; only task-owned files, final clean SHA/release private product-fix-c/report.md. Main unknown work untouched.
 
 ## Architecture Conflicts / ACP / ADR
 

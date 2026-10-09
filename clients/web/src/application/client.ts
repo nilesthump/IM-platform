@@ -9,7 +9,7 @@ export interface View {session:boolean;authBusy:boolean;notice:string;connection
 export class WebClient {
   readonly repository=new MemoryRepository();
   private state:View={session:false,authBusy:false,notice:'',connection:'未连接',sync:'',friends:[],friendsBusy:false,friendsError:'',profileBusy:false,profileError:'',searchBusy:false,searchError:'',searchResults:[],selected:'',revision:0};
-  private listeners=new Set<()=>void>();private session?:Session;private generation=0;private abort=new AbortController();private socket?:WebSocket;private reconnectTimer?:ReturnType<typeof setTimeout>;private refreshTimer?:ReturnType<typeof setTimeout>;private pending=new Map<string,{conversation:string;timer:ReturnType<typeof setTimeout>}>();private opened=new Set<string>();private syncing=new Set<string>();private bind='';private device=crypto.randomUUID();private refreshing?:Promise<void>;
+  private listeners=new Set<()=>void>();private session?:Session;private generation=0;private abort=new AbortController();private socket?:WebSocket;private reconnectTimer?:ReturnType<typeof setTimeout>;private refreshTimer?:ReturnType<typeof setTimeout>;private pending=new Map<string,{conversation:string;timer:ReturnType<typeof setTimeout>}>();private opened=new Set<string>();private syncing=new Map<string,{again:boolean}>();private bind='';private device=crypto.randomUUID();private refreshing?:Promise<void>;
   readonly http:Http;
   constructor(origin:string,private fetcher:typeof fetch=(input,init)=>fetch(input,init),private socketFactory:(url:string)=>WebSocket=url=>new WebSocket(url),private timeout=10000){this.http=new Http(origin,fetcher);}
   view=()=>this.state;
@@ -37,11 +37,41 @@ export class WebClient {
     socket.onmessage=e=>{if(!current()||typeof e.data!=='string')return;try{const f=decode(e.data),p=f.payload;if(f.type==='auth.ack'){clearTimeout(authTimer);if(f.requestId!==bind)throw new Error('Bind correlation');if(p.status==='rejected'){const code=(p.error as {code:string}).code;if(code==='AUTH_TOKEN_EXPIRED'){void this.refresh();return;}this.clear('会话已失效，请重新登录。');return;}if(p.userId!==s.userId||p.sessionId!==s.sessionId||p.clientType!=='WEB'||p.sessionEpoch!==s.sessionEpoch)throw new Error('Session mismatch');this.publish({connection:'在线'});for(const c of this.opened)void this.sync(c);}
       else if(f.type==='ping')socket.send(envelope('pong',f.requestId,{}));
       else if(f.type==='session.revoked'){if(p.sessionId===s.sessionId)this.clear('会话已过期或在其他网页被替换，请重新登录。');}
-      else if(this.state.connection==='在线'&&f.type==='message.ack'){const pending=this.pending.get(f.requestId);if(!pending)return;if(p.status==='committed'){if(p.conversationId!==pending.conversation)throw new Error('Wrong conversation');this.repository.ack(f.requestId,p as unknown as Committed);}else this.repository.fail(pending.conversation,f.requestId);clearTimeout(pending.timer);this.pending.delete(f.requestId);this.publish();}
+      else if(this.state.connection==='在线'&&f.type==='message.ack'){
+        const pending=this.pending.get(f.requestId);
+        if(p.status==='committed'){
+          if(pending&&p.conversationId!==pending.conversation)throw new Error('Wrong conversation');
+          // Attempt timeout does not erase the logical send stored in page memory.
+          const c=p.conversationId as string,row=this.repository.snapshot(c).find(v=>v.requestId===f.requestId&&v.senderId===s.userId);
+          if(!row||!this.state.friends.some(v=>v.directConversationId===c))return;
+          this.repository.ack(f.requestId,p as unknown as Committed);
+        }else {if(!pending)return;this.repository.fail(pending.conversation,f.requestId);}
+        if(pending)clearTimeout(pending.timer);this.pending.delete(f.requestId);this.publish();
+      }
       else if(this.state.connection==='在线'&&f.type==='message.created'){const c=p.conversationId as string;if(!this.state.friends.some(v=>v.directConversationId===c))return;this.repository.realtime(f.requestId,p as unknown as RealtimeMessage);const pending=this.pending.get(f.requestId);if(pending&&pending.conversation===c){clearTimeout(pending.timer);this.pending.delete(f.requestId);}this.publish();if(this.opened.has(c))void this.sync(c);}
     }catch{socket.close();this.publish({connection:'协议错误',sync:'无效响应未改变已确认消息'});}};
     socket.onclose=()=>{clearTimeout(authTimer);if(!current())return;for(const [r,v] of this.pending){clearTimeout(v.timer);this.repository.fail(v.conversation,r);}this.pending.clear();this.publish({connection:'连接已断开'});this.reconnectTimer=setTimeout(()=>{if(current())this.connected();},2000);};socket.onerror=()=>{if(current())this.publish({connection:'连接失败'});};
   }
-  async sync(c:string){const s=this.session,g=this.generation;if(!s||!this.repository.hasBaseline(c)||this.syncing.has(c)||!this.state.friends.some(f=>f.directConversationId===c))return;this.syncing.add(c);this.publish({sync:'正在补齐本页在线消息…'});try{const http=new SyncHttp(this.http.origin,s,this.fetcher);let more=true;while(more&&this.alive(g)){const after=this.repository.after(c);const page=await http.conversation(c,after,this.abort.signal);if(!this.alive(g))return;this.repository.page(c,after,page.messages);more=page.hasMore;this.publish();}if(this.alive(g))this.publish({sync:'本页在线消息已同步 · 不补历史'});}catch(e){this.error(e,g);if(this.alive(g))this.publish({sync:'同步失败，重连或重新打开会话重试'});}finally{if(this.alive(g))this.syncing.delete(c);}}
+  async sync(c:string){
+    const s=this.session,g=this.generation;if(!s||!this.repository.hasBaseline(c)||!this.state.friends.some(f=>f.directConversationId===c))return;
+    const active=this.syncing.get(c);if(active){active.again=true;return;}
+    const job={again:false};this.syncing.set(c,job);this.publish({sync:'正在补齐本页在线消息…'});
+    try{
+      const http=new SyncHttp(this.http.origin,s,this.fetcher);let more=true;
+      while(more&&this.alive(g)){
+        job.again=false;const after=this.repository.after(c);
+        const page=await http.conversation(c,after,this.abort.signal);if(!this.alive(g))return;
+        this.repository.page(c,after,page.messages);
+        const prefix=this.repository.after(c),gap=this.repository.snapshot(c).some(m=>m.seq!==undefined&&m.seq>prefix);
+        // A realtime frame may supersede the window while this page is in flight.
+        // Re-read from the committed live prefix, never from initial history.
+        more=page.hasMore||job.again||prefix<after;
+        if(!more&&gap)throw new Error('Terminal Sync did not fill the known live gap');
+        this.publish();
+      }
+      if(this.alive(g))this.publish({sync:'本页在线消息已同步 · 不补历史'});
+    }catch(e){this.error(e,g);if(this.alive(g))this.publish({sync:'同步失败，重连或重新打开会话重试'});}
+    finally{if(this.alive(g))this.syncing.delete(c);}
+  }
   dispose(){this.clear('');this.listeners.clear();}
 }

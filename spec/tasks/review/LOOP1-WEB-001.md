@@ -2,7 +2,7 @@
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
 status: review
-owner: /root/web_product_fix_b
+owner: /root/web_product_fix_c
 stage: S2
 gate: S2
 ---
@@ -208,3 +208,7 @@ Execution Status: REVIEW_PENDING; queue remains review. This supersedes earlier 
 Actual Chromium151 full48 new original screenshots completed exit0, same controlled fixture and existing approved test-only tooling; all own browser/fixture processes genuinely closed. Bindings/proof/build provenance at product-fix-20261009-b; actual command/exit/timing/hash receipts in local-verification.json. Fresh independent Architect and implementation Review still required; no Fix approval, done/hosted/push/PR/integration/main sync. Lastgood accepted main d4bb8200e7f5410d101a27ad58f8abb5eaa80f8f. Sole lease /root/web_product_fix_b until private report/seal release. Edge canceled; full Web accepted/synced then stop BEFORE S2 Stage Gate, no Gate/helper work.
 
 Fresh B local strict locked Web/build/behavior/appearance/source, all architecture/frozen, Web14 controls, Recovery Development and both diff checks exit0 in local-verification.json. Private verification path typo build/clients/.../logo.png failed once; actual build/logo.png correction only private helper; Recorder original exit1 retained, new public screenshots compared byteexact on rerun. No product change. Final clean candidate Recovery Acceptance and SHA/lease release sealed privately product-fix-b/report.md; no independent Task PASS.
+
+## Fresh independent semantic FAIL repair C
+
+Execution Status: REPAIR_IN_PROGRESS; unique review retained. Independent ReviewA FAIL originals and prior ArchitectC old-source Approval archived byteexact in product-fix-20261009-c. Repair keeps local send identity after attempt timeout, reschedules superseding live-window Sync including both backward and forward crossing frames, and handles only legal logout204/no-body while preserving strict JSON elsewhere; fixtures match AUTH_INVALID_CREDENTIALS. Cold/Desktop colors and exact unified Logo unchanged. New regressions, exact-source48 Chromium capture, clean Acceptance and NEW Architect/implementationReview required. No Edge/Gate/shared/authority/main writes; lastgood d4bb820, pending full acceptance/sync. Sole writer/verifier /root/web_product_fix_c.
