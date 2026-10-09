@@ -110,6 +110,81 @@ class WebVerificationControls(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'cannot bypass'):
             verifier.verify(self.root, runner=self.collect)
 
+    def test_clean_committed_deletion_and_zero_before_push_cannot_regain_exception(self):
+        product = self.put('clients/web/product.ts', 'export const real = true;')
+        product_head = self.commit()
+        product.unlink()
+        deletion = self.commit()
+        self.assertEqual(self.git('status', '--porcelain'), '')
+        with self.assertRaisesRegex(ValueError, 'cannot bypass'):
+            verifier.verify(self.root, runner=self.collect)
+        event = self.put('.git/web-event.json', '')
+        for before in ('0' * 40, product_head):
+            event.write_text(json.dumps({'before': before, 'after': deletion}))
+            with self.subTest(before=before), mock.patch.dict(os.environ, {
+                    'GITHUB_ACTIONS': 'true', 'GITHUB_EVENT_PATH': str(event), 'GITHUB_EVENT_NAME': 'push'}):
+                with self.assertRaisesRegex(ValueError, 'cannot bypass'):
+                    verifier.verify(self.root, runner=self.collect)
+        self.assertEqual(self.commands, [])
+        self.assertEqual(self.git('status', '--porcelain'), '')
+
+    def test_zero_before_first_push_of_never_product_branch_is_allowed(self):
+        head = self.git('rev-parse', 'HEAD')
+        event = self.put('.git/web-event.json', json.dumps({'before': '0' * 40, 'after': head}))
+        with mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true', 'GITHUB_EVENT_PATH': str(event), 'GITHUB_EVENT_NAME': 'push'}):
+            self.assertEqual(verifier.verify(self.root, runner=self.collect), 'PREREQUISITE_SKELETON_ONLY')
+        self.assertEqual(self.git('status', '--porcelain'), '')
+
+    def test_zero_diff_merge_preserves_product_ancestor_and_unrelated_branch_is_ignored(self):
+        initial = self.git('rev-parse', 'HEAD')
+        self.git('checkout', '-qb', 'product-control')
+        self.put('clients/web/product.ts', 'export const real = true;')
+        product = self.commit()
+        self.git('checkout', '-qb', 'prerequisite-control', initial)
+        self.assertEqual(verifier.verify(self.root, runner=self.collect), 'PREREQUISITE_SKELETON_ONLY')
+        self.git('-c', 'user.name=Web verifier control', '-c', 'user.email=web-control@example.invalid',
+                 'merge', '-q', '--no-ff', '-s', 'ours', '-m', 'zero tree diff merge control', 'product-control')
+        self.assertEqual(self.git('diff', '--name-only', initial, 'HEAD'), '')
+        self.assertIn(product, self.git('rev-list', 'HEAD'))
+        self.assertEqual(self.git('status', '--porcelain'), '')
+        self.commands = []
+        with self.assertRaisesRegex(ValueError, 'cannot bypass'):
+            verifier.verify(self.root, runner=self.collect)
+        self.assertEqual(self.commands, [])
+
+    def test_historical_markdown_only_is_not_product_but_current_tree_is_strict(self):
+        doc = self.put('clients/web/README.md', '# Web planning only')
+        self.commit()
+        with self.assertRaisesRegex(ValueError, 'Incomplete Web product'):
+            verifier.verify(self.root, runner=self.collect)
+        doc.unlink()
+        self.commit()
+        self.assertEqual(self.git('status', '--porcelain'), '')
+        self.assertEqual(verifier.verify(self.root, runner=self.collect), 'PREREQUISITE_SKELETON_ONLY')
+
+    def test_shallow_and_grafted_history_cannot_establish_prerequisite(self):
+        head = self.git('rev-parse', 'HEAD')
+        shallow = self.put('.git/shallow', head + '\n')
+        with self.assertRaisesRegex(ValueError, 'Incomplete Web history'):
+            verifier.verify(self.root, runner=self.collect)
+        shallow.unlink()
+        self.put('.git/info/grafts', head + '\n')
+        with self.assertRaisesRegex(ValueError, 'Grafted Web history'):
+            verifier.verify(self.root, runner=self.collect)
+        self.assertEqual(self.commands, [])
+
+    def test_replacement_commit_cannot_hide_real_product_ancestry(self):
+        initial = self.git('rev-parse', 'HEAD')
+        product = self.put('clients/web/product.ts', 'export const real = true;')
+        self.commit()
+        product.unlink()
+        deletion = self.commit()
+        self.git('replace', deletion, initial)
+        self.assertEqual(self.git('status', '--porcelain'), '')
+        with self.assertRaisesRegex(ValueError, 'cannot bypass'):
+            verifier.verify(self.root, runner=self.collect)
+        self.assertEqual(self.commands, [])
+
     def test_product_failures_propagate_before_any_success_or_skeleton_result(self):
         self.product()
         with mock.patch.object(verifier.shutil, 'which', side_effect=lambda value: value):

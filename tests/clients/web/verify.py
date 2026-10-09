@@ -21,7 +21,7 @@ MARKERS = (b'', b'\n', b'\r\n')
 
 
 def git(root, *args, input=None):
-    result = subprocess.run(['git', '-C', str(root), *args], input=input, capture_output=True, check=True)
+    result = subprocess.run(['git', '--no-replace-objects', '-C', str(root), *args], input=input, capture_output=True, check=True)
     return result.stdout
 
 
@@ -50,10 +50,26 @@ def compared_base(root):
 
 def base_had_product(root, base):
     files = git(root, 'ls-tree', '-r', '--name-only', '-z', base, '--', 'clients/web/').split(b'\0')
-    files = [name for name in files if name]
+    # Historical Markdown documentation alone is not a product implementation.
+    # The current checkout still requires the single exact empty marker.
+    files = [name for name in files if name and not name.lower().endswith(b'.md')]
     if files != [b'clients/web/.gitkeep']:
         return bool(files)
     return git(root, 'show', base + ':clients/web/.gitkeep') not in MARKERS
+
+
+def head_had_product(root):
+    """Deletion cannot restore pre-product status, including a first branch push."""
+    if git(root, 'rev-parse', '--is-shallow-repository').strip() != b'false':
+        raise ValueError('Incomplete Web history cannot establish pre-product provenance')
+    grafts = Path(git(root, 'rev-parse', '--git-path', 'info/grafts').decode().strip())
+    if not grafts.is_absolute():
+        grafts = root/grafts
+    if grafts.exists():
+        raise ValueError('Grafted Web history cannot establish pre-product provenance')
+    # full-history keeps relevant ancestors across merges; never inspect unrelated refs.
+    commits = git(root, 'log', '--full-history', '--format=%H', 'HEAD', '--', 'clients/web/').splitlines()
+    return any(base_had_product(root, commit.decode()) for commit in commits)
 
 
 def prerequisite(root):
@@ -84,7 +100,8 @@ def verify(root=ROOT, *, runner=run):
     skeleton = (entries == [web/'.gitkeep'] and entries[0].is_file()
                 and entries[0].read_bytes() in MARKERS)
     if skeleton:
-        if not prerequisite(root) or base_had_product(root, compared_base(root)):
+        if (not prerequisite(root) or base_had_product(root, compared_base(root))
+                or head_had_product(root)):
             raise ValueError('Empty Web skeleton cannot bypass product verification')
         runner([sys.executable, '-B', 'ci/check_s0_boundary.py', 'web'], cwd=root)
         runner([sys.executable, '-B', 'ci/check_architecture.py', '--scope', 'clients', '--json'], cwd=root)

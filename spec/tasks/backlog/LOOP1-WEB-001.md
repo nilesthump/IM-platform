@@ -2,7 +2,7 @@
 task_id: LOOP1-WEB-001
 title: Web complete memory-only Loop1 GUI
 status: backlog
-owner: /root/web_freeze_impl
+owner: /root/web_freeze_fix_a
 stage: S2
 gate: S2
 ---
@@ -121,3 +121,11 @@ Research R-WEB-FREEZE-IMPL-20261009 prospective_resume独立implementation run�
 Local candidate verification: architecture all/frozen真实exit0；architecture56、CI34（4既有Windows真实symlink权限skip）、Web8负例controls exit0；Web入口exit0仅PREREQUISITE_SKELETON_ONLY，无产品build/behavior。Recovery Development initial exit1由current Verification格式三字段缺失导致，已修metadata，原FAIL保留；diff-check真实exit0。完整真实argv/exit/时长/output SHA在freeze-20261009/local-verification.json，后续clean committedAcceptance仍待运行，独立Review/hosted/main sync仍pending。
 
 Recovery Development metadata修复定向重跑exit0/12875ms。本地最小checks已完成；clean候选branch/SHA/尚未sync与sealedRecorder由私有freeze-implementation/report.md记录供fresh Review，不是独立接受。前置尚未生效，Task仍backlog/S2 OPEN，latest endpoint S2 Gate前。
+
+## Independent Review FAIL repaired candidate (2026-10-09)
+
+原944b9bf独立Review FAIL：clean committed产品删除与first branch push before=zero绕过前置；immutable原件见fix-20261009-a/independent-fail-originals及original-bindings.json。fresh Fix /root/web_freeze_fix_a只修verify.py+14真实Git/阶段controls，增加可信HEAD相关full-history，无关branches不扫、历史Markdown-only非产品、当前仍exact skeleton；shallow/graft failclosed，Git替换对象不影响真实历史。Web/compat workflow fetch-depth0已有，其他authority/guard/CI/Gate不变。
+
+Local architecture all/frozen exit0、architecture56/CI34/Web14 tests exit0，4既有Windows真实symlink权限skip公开；actual Web入口仅PREREQUISITE_SKELETON_ONLY，无产品行为接受。Recovery Development/clean committed Acceptance、最终branch/SHA/diff/Recorder由私有freeze-fix-20261009-a/report.md封存，精确argv/exit/ms/hash见fix-20261009-a/local-verification.json。last good6a6e97e；main sync PENDING，no main write。所有新uncommitted fix scope归fresh Fix唯一lease；clean后释放待NEW independent Review，Fix不得自行接受。Task仍backlog/APPROVED_PENDING_FREEZE，S2 OPEN，不选Stage Gate。
+
+Recovery Development本fix真实exit0/7953.0ms，仅local非接受验证；source/control修复待clean commit后由新独立Reviewer审查，最终clean Recovery Acceptance结果与SHA在私有report封存。

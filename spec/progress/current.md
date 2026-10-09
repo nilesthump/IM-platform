@@ -12,56 +12,53 @@ Execution Status: APPROVED_PENDING_FREEZE
 
 ## Immediately Relevant Completed Work
 
-Human批准readiness-20261008/proposal.md的localStorage三外观标量与精确七额外路径，2026-10-09明确继续。先前pause当前状态已被本次resume取代，原pause-20261008.md保持历史原件。e35c425 readiness metadata独立Review PASS原件复制到freeze-20261009，仅metadata接受，不是冻结或产品验收。GUI已done并安全同步actual main6a6e97e6b7d5e19d8607c6800877187e70b4bd36；ADR-0007选择Web。
+Human批准localStorage三外观标量与精确七额外前置路径，2026-10-09继续并指定Web完整接受同步后S2 Gate前停止。944b9bf前置candidate独立Review FAIL的已提交删除/zero-before绕过已由fresh Fix最小修复；原FAIL与真实repro保持immutable。GUI done与actual main6a6e97e已接受；Web产品未启动。
 
 ## Current Blockers
 
-批准已取得，无需再次确认；authority/guard/CI前置候选仍待fresh independent Review、精确hosted CI、protected integration/actual-main verification与安全main同步后生效。唯一Web backlog，产品尚未启动。
+修复candidate等待新的fresh independent Review、actual exact-head hosted CI、protected integration/actual-main与安全main同步，前置未生效；无需重复Human批准。
 
 ## Verification
 
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: PASS exit0 /1640ms; local candidate source/authority check.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
+  - Result: exit0，source/authority local PASS，canonical2ba864fc/PDF546915不变。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
 - Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: PASS exit0 /1828ms; canonical2ba864fc/PDF546915 match.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
-- Command: `python -Xutf8 -B -m unittest discover -s tests/architecture -v`
-  - Result: PASS exit0,56tests; CI controls34tests exit0 with4pre-existing real-symlink Windows privilege skips; Webstagecontrols8tests exit0.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
+  - Result: exit0，current canonical/PDF provenance匹配。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
+- Command: `python -Xutf8 -B -m unittest discover -s tests/clients/web -v`
+  - Result: exit0，14controls；architecture56/CI34 tests exit0，4既有Windows真实symlink权限skip公开。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
 - Command: `python -Xutf8 -B tests/clients/web/verify.py`
-  - Result: exit0 PREREQUISITE_SKELETON_ONLY /3594ms; no Web build/behavior/product acceptance performed.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
-- Command: `tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: PASS repaired retest exit0 /12875ms; original exit1 /12891ms due missing Command/Result/Evidence fields remains preserved.
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/local-verification.json`
+  - Result: exit0，仅PREREQUISITE_SKELETON_ONLY，无产品build/behavior/appearance接受。
+  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/fix-20261009-a/local-verification.json`
 
-Webruntime/screenshots/Architect Approval/hosted/sync未运行，不计PASS；本地controls仅local evidence。
+Recovery Development真实exit0/7953.0ms，非接受模式；clean committed Acceptance与最终SHA待commit后由私有freeze-fix-20261009-a/report.md封存。fresh Review/hosted/sync未完成，不计PASS。
 
 ## Changed Files or Migrations
 
-已批准七个canonical/baseline/ADR/guard/architecture test/workflow/CI control paths与原Web tests/metadata/evidence用于最小前置；无Web产品、依赖、契约、schema、ACK、安全或原生/helper/trust迁移。具体范围与source hashes在freeze-20261009记录。
+本fix仅Web verifier/tests、Task/current及fix-20261009-a证据；相关head full-history检查防止clean删除/首次push/merge回退，保持现有产品入口。无新framework/skip、authority/其他CI job或aggregate Gate、契约、产品、native/helper/trust修改。
 
 ## Known Failures, Risks, and Assumptions
 
-前置候选尚未独立接受。e35原readiness FAIL修复和immutable证据保留。Research公开pre-Recorder只读startup与初次注册future-run顺序错误、一次并发Recorder event锁冲突；未编辑eventstream，随后序列化。本地PASS不是独立接受，Recorder有效不等于Task或S2 PASS。S2保持OPEN，deferred helper Gate regression不执行。
+原944b9bf Review FAIL原件与repro字节/hash保留。当前修复仅local evidence；Windows4symlink skips须真实hosted另审。Recorder公开pre-Recorder只读startup、不存在猜测路径、工具output截断/targeted reread、直接apply_patch/private authoring gaps；stream不编辑。Recorder结构有效不等于Task或S2 PASS。
 
 ## Next Exact Action
 
-完成前置freeze/guard/CI controls，clean commit后fresh Review/fix cycle、exact-head hosted CI、受保护集成、actual-main与安全同步。之后才复评并顺序backlog -> ready -> active，由fresh writer实现Web完整GUI/真实浏览器截图/Architect Review修复批准/独立产品接受/集成同步。最新Human endpoint：Web完整接受同步后停止于S2 Gate前，不对S2 Stage Gate操作；必要CI aggregate gate规则保持原样。
+封存clean修复candidate与Recorder并释放lease；root委托新的fresh independent Review，随后actual exact-head hosted CI/protected integration/actual-main和安全同步。前置接受后才复评backlog->ready->active并委派fresh Web产品writer/真实浏览器截图/Architect Approval/独立产品接受与同步。完成Web后S2 Gate前停止；不执行S2 Stage Gate/helper regression，必要CI aggregate Gate保留。
 
 ## Last Known Good Commit
 
-`6a6e97e6b7d5e19d8607c6800877187e70b4bd36`，先前独立接受GUI-only actual main与安全同步。Web前置候选尚无新accepted main。
+`6a6e97e6b7d5e19d8607c6800877187e70b4bd36`，已独立接受GUI-only actual main并同步；本fix main sync PENDING。
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md`。本轮前置不是新产品Gate recovery checkpoint。
+`spec/progress/checkpoints/2026-10-08-loop1-client-gui-001-product-accepted.md`，前置修复不建立产品Gate checkpoint。
 
 ## Uncommitted Changes / Ownership
 
-唯一writer/verification lease：/root/web_freeze_impl，assigned app Git root `H:/.codex/worktrees/w/IM-platform`严格核对，branch `task/LOOP1-WEB-001-readiness`。/root此前Task/current/pause更新保留并被最新resume metadata明确supersede，pause原件不变。只改Task原scope与Human七exact路径；不写main、不复制main未知31statusentries/781files，不触及其所有权。clean task-owned candidate commit待完成；branch/SHA/main-sync-pending将封存在私有freeze-implementation/report.md；该handoff是后续独立Review输入，不是接受。
+sole writer+verification lease /root/web_freeze_fix_a；assigned Git root严格匹配`H:/.codex/worktrees/w/IM-platform`，branch `task/LOOP1-WEB-001-readiness`。仅本fix allowed scope属该Fix；最终clean committed SHA与lease release在私有report交接。main未知31statusentries/781files未审查/写入/复制，旧pause/readiness/原FAIL证据保留。
 
 ## Architecture Conflicts / ACP / ADR
 
-ADR-0011 narrowWebappearance/canonicalpolicy candidate落实直接Human授权，APPROVED_PENDING_FREEZE。具体fixedkey/3scalar/bounds/strictCI阶段控制见ADR。原canonical a6b1670/PDF546915/v1.1与已接受谱系保留。未改变公共契约/ACK/兼容/安全边界，未生效候选不作为产品权威。
+ADR-0011/canonicalpolicy原Human批准candidate仍APPROVED_PENDING_FREEZE；本fix落实现有禁止删除产品退空要求，不扩authority。candidate canonical2ba864fc/PDF546915/v1.1/accepted lineage不变。未实现Web产品，S1 PASS/S2 OPEN。
