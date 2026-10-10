@@ -55,3 +55,8 @@ Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c1
 通过baseline的supplement_revision_adr/supplement_approval_source/supplement_previous_sha256解析ADR-0012。规范§6.6/§15/§19/§20/附录A追加WEB→STATE→UI-REF→I18N→S2 Gate；v1.1、原PDF与旧接受历史不改。本轮只交付三个backlog及规划独立闭环，S2 OPEN；新候选接受/集成同步待完成。
 
 补充索引：[规范§6.6](frozen-architecture.md#section-6-6)、[ADR-0012](decisions/ADR-0012-client-supplement-planning.md)、[补充验收](../acceptance/client-supplement.md)、[STATE](../tasks/backlog/LOOP1-CLIENT-STATE-001.md)、[UI-REF](../tasks/backlog/LOOP1-CLIENT-UI-REF-001.md)、[I18N](../tasks/backlog/LOOP1-CLIENT-I18N-001.md)。Task链接反映本规划backlog交付，未来队列移动按精确ID解析。
+
+
+## S2 客户端补充规划接受发现（2026-10-10）
+
+前述supplement候选/pending文字保留为历史。ADR-0012在candidate 8b52a56403a5a761a12d94e4fabf4f2cf82f63d0 / protectedPR31 actualmain 9f99cfda1cecfc85c0acf3ae8db979f622c97a02经fresh independent Review与exact candidate/PR/actualmain hostedCI（各14selected成功）及H:/IM-platform安全同步接受，canonical efbe04c7/v1.1/PDF与旧谱系不变。证据：spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/acceptance.md。此行政闭合候选另待新Review/CI/actualmain/safe sync。三产品backlog，S2 OPEN；本轮stop，不实施产品/Gate。
