@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import stat
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = 'LOOP1-CLIENT-SUPPLEMENT-PLAN-001'
@@ -91,18 +92,69 @@ def inventory(root):
     return tasks, errors
 
 
+COMPLETION_KEYS = ('acceptance_result', 'accepted_candidate_sha', 'integrated_main_sha',
+                   'main_sync_result', 'independent_review_evidence',
+                   'hosted_acceptance_evidence', 'main_sync_evidence')
+
+
+def completion_fields(text):
+    headings = list(re.finditer(r'^# Completion Metadata[ \t]*$', text, re.M))
+    if len(headings) != 1:
+        raise ValueError('Completion Metadata must be a single section')
+    body = text[headings[0].end():]
+    body = re.split(r'^# ', body, maxsplit=1, flags=re.M)[0]
+    values = {}
+    for line in body.splitlines():
+        if not line.strip():
+            continue
+        match = re.fullmatch(r'([a-z_]+):[ \t]*([^\r\n]+)', line)
+        if not match:
+            raise ValueError('malformed Completion Metadata line')
+        key, value = match.group(1), match.group(2).strip(' \t')
+        if key not in COMPLETION_KEYS or key in values or not value:
+            raise ValueError('duplicate, unknown or empty Completion Metadata field')
+        values[key] = value
+    if set(values) != set(COMPLETION_KEYS):
+        raise ValueError('missing Completion Metadata field')
+    return values
+
+
+def bounded_evidence(root, task, value):
+    relative = Path(value)
+    if (not value.startswith(f'spec/progress/evidence/{task}/')
+            or relative.is_absolute() or '..' in relative.parts):
+        return False
+    path = root/relative
+    try:
+        # Inspect every component, including the task directory and repository root.
+        # Windows junctions/reparse points are not reported by is_symlink().
+        for component in (path, *path.parents):
+            info = component.lstat()
+            if (stat.S_ISLNK(info.st_mode)
+                    or getattr(info, 'st_file_attributes', 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+                return False
+        directory = (root/'spec/progress/evidence'/task).resolve(strict=True)
+        resolved = path.resolve(strict=True)
+        if not resolved.is_relative_to(directory):
+            return False
+        return resolved.is_file() and bool(resolved.read_bytes().strip())
+    except (OSError, RuntimeError, ValueError):
+        return False
+
+
 def completion_errors(root, task, text):
-    f = fields(section(text, 'Completion Metadata')); errors = []
+    try:
+        f = completion_fields(text)
+    except ValueError as exc:
+        return [f'S2 {task}: invalid completion metadata: {exc}']
+    errors = []
     if f.get('acceptance_result') != 'PASS' or f.get('main_sync_result') != 'PASS':
         errors.append(f'S2 {task}: independent acceptance/main sync incomplete')
     for key in ('accepted_candidate_sha', 'integrated_main_sha'):
         if not re.fullmatch(r'[0-9a-f]{40}', f.get(key, '')):
             errors.append(f'S2 {task}: missing actual {key}')
     for key in ('independent_review_evidence', 'hosted_acceptance_evidence', 'main_sync_evidence'):
-        value = f.get(key, '')
-        p = Path(value)
-        if (not value.startswith(f'spec/progress/evidence/{task}/') or p.is_absolute() or '..' in p.parts
-                or not (root/p).is_file() or (root/p).is_symlink() or not (root/p).read_bytes().strip()):
+        if not bounded_evidence(root, task, f.get(key, '')):
             errors.append(f'S2 {task}: missing bounded {key}')
     # These are necessary structural links only. Review must inspect the contents,
     # actual exact-head jobs, independence, merge and preservation-aware sync.

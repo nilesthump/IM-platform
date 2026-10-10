@@ -16,13 +16,13 @@ Web independently accepted/synchronized at product a1b154d；latest accepted adm
 
 ## Current Blockers
 
-No external blocker. Planning local checks passed, independent acceptance pending; no product activation or S2 Stage Gate operation.
+No external blocker. Original626 independent Review FAIL retained; Fresh Fix A repairs local checks passed, new independent acceptance pending; no product activation or S2 Stage Gate operation.
 
 ## Verification
 
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: baseline and revised architecture/frozen/planning exit0; architecture73PASS, CI35PASS/4existing symlink skip, Development Recovery PASS. Local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/local-verification.md`
+  - Result: baseline and revised architecture/frozen/planning exit0; architecture77 OK/1platform POSIX symlink skip, CI35 OK/4existing symlink skip, Development Recovery PASS. Local evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/fix-a/local-verification.md`
 
 ## Changed Files or Migrations
 
@@ -30,7 +30,7 @@ ADR-0012/canonical baseline lineage/three backlog specs/acceptance/guards and me
 
 ## Known Failures, Risks, and Assumptions
 
-Pre-Recorder startup/direct/private helper trace incomplete; original gbk/legacy shell/missing-path failures retained. Planning has no independent acceptance yet. Accepted Web/S1 and historical failures preserved.
+Fresh Fix A startup/direct/private helper trace incomplete and start helper JSON assumption exit1 retained; Windows junction actual PASS, Linux symlink awaits hosted; original Review626 FAIL and rejected product-build call preserved; original gbk/legacy shell/missing-path failures retained. Planning has no independent acceptance yet. Accepted Web/S1 and historical failures preserved.
 
 ## Next Exact Action
 
@@ -46,7 +46,7 @@ Clean committed candidate -> fresh independent Review/exact-head CI/protected in
 
 ## Uncommitted Changes / Ownership
 
-Only this bounded planning scope /root/s2_plan_impl in verified H:/.codex/worktrees/s2p/IM-platform. Main781unknown files/status/indexflags preserved; no main write or copy.
+Only this bounded planning fix scope /root/s2_plan_fix_a in verified H:/.codex/worktrees/s2p/IM-platform. Main781unknown files/status/indexflags preserved; no main write or copy.
 
 ## Architecture Conflicts / ACP / ADR
 

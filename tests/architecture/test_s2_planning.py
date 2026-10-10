@@ -1,6 +1,8 @@
 import importlib.util
 import hashlib
 import json
+import os
+import subprocess
 from pathlib import Path
 import re
 import shutil
@@ -103,6 +105,87 @@ class SupplementControls(unittest.TestCase):
 
     def test_completion_evidence_cannot_escape_task_scope(self):
         self.accepted_prefix();p=self.path(checker.NEW[0]);text=p.read_text(encoding='utf8');p.write_text(re.sub(r'(?m)^main_sync_evidence: .+$','main_sync_evidence: ../private.txt',text),encoding='utf8');self.assertTrue(checker.check(self.root))
+
+    def test_completion_metadata_rejects_duplicate_sections_fields_empty_and_malformed(self):
+        self.accepted_prefix()
+        self.assertEqual([], checker.check(self.root))
+        p = self.path(checker.NEW[0]); original = p.read_text(encoding='utf8')
+        mutations = [original + '\n# Completion Metadata\nacceptance_result: PASS\n',
+                     original.replace('acceptance_result: PASS', 'acceptance_result: FAIL\nacceptance_result: PASS'),
+                     original.replace('main_sync_result: PASS', 'main_sync_result PASS')]
+        for key in checker.COMPLETION_KEYS:
+            line = re.search(r'^' + key + r': .+$', original, re.M).group()
+            mutations.extend([original.replace(line, line + '\n' + line),
+                              original.replace(line, key + ':   \n'),
+                              original.replace(line, key + ':\nPASS'),
+                              original.replace(line, '')])
+        for text in mutations:
+            with self.subTest(metadata=text):
+                p.write_text(text, encoding='utf8')
+                errors = checker.check(self.root)
+                self.assertTrue(any('invalid completion metadata' in e for e in errors), errors)
+        p.write_text(original, encoding='utf8')
+        self.assertEqual([], checker.check(self.root))
+
+    def set_redirect_evidence(self, task, relative):
+        p = self.path(task); text = p.read_text(encoding='utf8')
+        p.write_text(re.sub(r'^main_sync_evidence: .+$', 'main_sync_evidence: ' + relative, text, flags=re.M), encoding='utf8')
+
+    @unittest.skipIf(os.name == 'nt', 'Linux/POSIX symlink case; Windows executes real junction case')
+    def test_real_symlink_evidence_leaf_ancestor_and_task_directory_rejected(self):
+        self.accepted_prefix(); self.assertEqual([], checker.check(self.root))
+        task = checker.NEW[0]; base = self.root/'spec/progress/evidence'/task
+        external = self.root/'external'; external.mkdir(); (external/'proof.md').write_text('outside proof', encoding='utf8')
+        for target, directory in ((external/'proof.md', False), (external, True), (base, True)):
+            link = base/'redirect'
+            link.symlink_to(target, target_is_directory=directory)
+            self.addCleanup(lambda p=link: p.unlink(missing_ok=True))
+            relative = f'spec/progress/evidence/{task}/redirect' + ('/proof.md' if target == external else '/fixture-main_sync_evidence.md' if directory else '')
+            self.set_redirect_evidence(task, relative)
+            self.assertTrue(checker.check(self.root))
+            link.unlink()
+        original = base.with_name(task + '-original'); base.rename(original); base.symlink_to(original, target_is_directory=True)
+        try:
+            self.set_redirect_evidence(task, f'spec/progress/evidence/{task}/fixture-main_sync_evidence.md')
+            self.assertTrue(checker.check(self.root))
+        finally:
+            base.unlink(); original.rename(base)
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows junction case; POSIX executes real symlink case')
+    def test_real_windows_junction_evidence_ancestor_and_task_directory_rejected(self):
+        self.accepted_prefix(); self.assertEqual([], checker.check(self.root))
+        task = checker.NEW[0]; base = self.root/'spec/progress/evidence'/task
+        external = self.root/'external'; external.mkdir(); (external/'proof.md').write_text('outside proof', encoding='utf8')
+        for target in (external, base):
+            link = base/'redirect'
+            result = subprocess.run(['cmd.exe', '/d', '/c', 'mklink', '/J', str(link), str(target)], capture_output=True, text=True)
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            try:
+                leaf = link/('proof.md' if target == external else 'fixture-main_sync_evidence.md')
+                self.assertTrue(link.is_junction()); self.assertFalse(leaf.is_symlink())
+                self.set_redirect_evidence(task, leaf.relative_to(self.root).as_posix())
+                self.assertTrue(checker.check(self.root))
+            finally:
+                link.rmdir()  # Remove only this test-created junction, never its target.
+        original = base.with_name(task + '-original'); base.rename(original)
+        result = subprocess.run(['cmd.exe', '/d', '/c', 'mklink', '/J', str(base), str(original)], capture_output=True, text=True)
+        try:
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertTrue(base.is_junction())
+            self.set_redirect_evidence(task, f'spec/progress/evidence/{task}/fixture-main_sync_evidence.md')
+            self.assertTrue(checker.check(self.root))
+        finally:
+            if base.is_junction(): base.rmdir()
+            original.rename(base)
+
+    def test_completion_evidence_resolution_errors_and_empty_file_fail_closed(self):
+        self.accepted_prefix(); self.assertEqual([], checker.check(self.root))
+        with patch.object(Path, 'resolve', side_effect=OSError('unavailable resolution')):
+            self.assertTrue(checker.check(self.root))
+        task = checker.NEW[0]
+        proof = self.root/f'spec/progress/evidence/{task}/fixture-main_sync_evidence.md'
+        proof.write_text('   ', encoding='utf8'); self.assertTrue(checker.check(self.root))
+        proof.unlink(); self.assertTrue(checker.check(self.root))
 
     def test_every_prior_gate_prerequisite_remains_required(self):
         self.accepted_prefix()

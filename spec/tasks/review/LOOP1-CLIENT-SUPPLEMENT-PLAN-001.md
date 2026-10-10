@@ -2,7 +2,7 @@
 task_id: LOOP1-CLIENT-SUPPLEMENT-PLAN-001
 title: S2 客户端补充架构与任务规划修订
 status: review
-owner: /root/s2_plan_impl
+owner: /root/s2_plan_fix_a
 stage: S2
 gate: S2
 ---
@@ -102,6 +102,8 @@ hosted_acceptance_evidence: unavailable
 main_sync_evidence: unavailable
 
 # Handoff
+
+Fresh Fix A修复6267726独立Review FAIL的三阻断；原Review报告/自动审批拒绝和静态dispatch事实原样保留于evidence/fix-a。唯一section/mandatory字段及严格真实路径拒绝links/reparse；三个backlog使用package和工具链/安装条件。architecture77 OK/1平台skip，CI35 OK/4原skip，planning/frozen/allarchitecture/Development exit0，Linux真实symlink待新hosted执行；无产品构建或实际S2 Gate。新commit/clean Acceptance/Recorder结果见private fix-a handoff；独立接受/同步PENDING，last accepted good b4d271c。
 
 本轮规划实现完成，真实检查与原FAIL见 evidence/local-verification.json、local-verification.md 和 instrumentation-failures.md。三产品 Task 均 backlog，S2 OPEN，不执行 Gate。assigned root verified exact；起点/last accepted good b4d271ceeed40343e627450f6b43cd9c9ad5ff0e。提交候选后只允许 fresh independent Review 与修复/复审、精确 hosted CI、protected integration、actual-main 验证、安全主仓库同步。Implementation 自己不接受、不 done。独立接受 metadata 由 Coordinator 填实际证据，当前全部 PENDING。
 

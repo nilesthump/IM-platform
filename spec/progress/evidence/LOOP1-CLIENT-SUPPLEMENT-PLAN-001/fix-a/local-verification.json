@@ -1,0 +1,105 @@
+[
+  {
+    "name": "planning",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-Xutf8",
+      "-B",
+      "ci/check_s2_planning.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.141,
+    "stdout_sha256": "9e791c56600e427153790c5038c028082d3918dcb4d99151e1135f534976f4bf",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "frozen",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-Xutf8",
+      "-B",
+      "tools/verify_frozen_architecture.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.906,
+    "stdout_sha256": "96759a56f90da9f06bda137400c4bb8b5352a0f177a881d44de58611744d4721",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "architecture",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-Xutf8",
+      "-B",
+      "ci/check_architecture.py",
+      "--scope",
+      "all",
+      "--json"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 2.656,
+    "stdout_sha256": "5096c9d432031f6f5449027274a002a2ed2eabd8f5c74e1c14682ce443fdff94",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "architecture-tests",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-Xutf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/architecture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 21.672,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "783001250a2a5c3d4c8eb44343e6f98a89b4465a7159f82bffd7a0bf060171c3"
+  },
+  {
+    "name": "ci-tests",
+    "argv": [
+      "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-Xutf8",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/ci"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 26.219,
+    "stdout_sha256": "fb4fefe5e6d95d71bcd15641d1b10edc754956438fa0c74b03d49dd18ac7ed49",
+    "stderr_sha256": "3889044939b839de07a9085eab667222527aabb478d770747573bbbe2226ee94"
+  },
+  {
+    "name": "recovery-development",
+    "argv": [
+      "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoProfile",
+      "-File",
+      "tools/verify-loop1-ctrl-002.ps1",
+      "-Mode",
+      "Development"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 23.562,
+    "stdout_sha256": "dabe4563bed4ecc7f360df8daa5d56e81ee04149632c75e1cd8fe20c59b3da52",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "diff-check",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.578,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]
