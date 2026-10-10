@@ -299,6 +299,17 @@ if (Test-Path -LiteralPath (Join-Path $repoRoot 'tools/verify-frozen-architectur
     if ($LASTEXITCODE -ne 0) { Add-Failure "Frozen Architecture migration verification failed: $($architectureResult -join ' ')" }
 }
 
+$planningChecker = Join-Path $repoRoot 'ci/check_s2_planning.py'
+if (Test-Path -LiteralPath $planningChecker -PathType Leaf) {
+    # Use the same standard-library checker; recorder initialization belongs to the caller.
+    $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+    if (-not $pythonCommand) { Add-Failure 'S2 planning recovery requires Python 3.' }
+    else {
+        $planningResult = @(& $pythonCommand.Source -Xutf8 -B $planningChecker --root $repoRoot 2>&1)
+        if ($LASTEXITCODE -ne 0) { Add-Failure "S2 planning recovery failed: $($planningResult -join ' ')" }
+    }
+}
+
 if ($failures.Count -gt 0) {
     Write-Output "FAIL: recovery verification found $($failures.Count) issue(s)."
     $failures | ForEach-Object { Write-Output " - $_" }

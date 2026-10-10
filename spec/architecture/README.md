@@ -49,3 +49,9 @@ ADR-0008 / 公开 HTTPS Sync 绑定 已在 candidate b8200783ea3eadc1ed4e4050238
 ## Native freeze accepted discovery (2026-10-08)
 
 Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c13779e99f9f463d2c6f8`, protected PR25 actual main `6a87751087de5b4063445d0fba9fe94534507a57` and safe main synchronization PASS. Exact candidate push37656041487/PR37656059375 and actual-main37657410444:5selected jobs SUCCESS,8classifier-false normally inactive, nofailedsteps. Fresh candidate Review and new same-role actual-main audit are independently bound to their exact SHA; canonical a6b1670/PDF546915/v1.1 unchanged. Task branch task/LOOP1-CLIENT-NATIVE-ARCH-001-close; receipt preserves781unknown files/status/index and recovery/s1-handoff-20261001 branch. Source approval choices unchanged; no product/contract/schema/ACK/security change, no GUI/Windows/S2 PASS. Earlier pending/blocked statements are preserved historical snapshots. Evidence: spec/progress/evidence/LOOP1-CLIENT-NATIVE-ARCH-001/acceptance-20261008/acceptance.md.
+
+## S2 客户端补充规划候选
+
+通过baseline的supplement_revision_adr/supplement_approval_source/supplement_previous_sha256解析ADR-0012。规范§6.6/§15/§19/§20/附录A追加WEB→STATE→UI-REF→I18N→S2 Gate；v1.1、原PDF与旧接受历史不改。本轮只交付三个backlog及规划独立闭环，S2 OPEN；新候选接受/集成同步待完成。
+
+补充索引：[规范§6.6](frozen-architecture.md#section-6-6)、[ADR-0012](decisions/ADR-0012-client-supplement-planning.md)、[补充验收](../acceptance/client-supplement.md)、[STATE](../tasks/backlog/LOOP1-CLIENT-STATE-001.md)、[UI-REF](../tasks/backlog/LOOP1-CLIENT-UI-REF-001.md)、[I18N](../tasks/backlog/LOOP1-CLIENT-I18N-001.md)。Task链接反映本规划backlog交付，未来队列移动按精确ID解析。

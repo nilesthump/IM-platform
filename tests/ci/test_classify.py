@@ -77,6 +77,15 @@ class PathMatrixTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assert_jobs(path, classify_module.JOBS)
 
+    def test_s2_supplement_controls_keep_required_classification(self):
+        for path in ('spec/tasks/backlog/LOOP1-CLIENT-STATE-001.md',
+                     'spec/architecture/decisions/ADR-0012-client-supplement-planning.md',
+                     'spec/acceptance/client-supplement.md', 'tests/architecture/test_s2_planning.py'):
+            self.assert_jobs(path, {'architecture', 'source_go', 'source_java'})
+        self.assert_jobs('ci/check_s2_planning.py', classify_module.JOBS)
+        self.assert_jobs('tests/ci/test_classify.py', classify_module.JOBS)
+        self.assert_jobs('docs/unrelated.md', set())
+
     def test_deploy_changes_run_deploy_validation(self):
         for path in ("deploy/compose.yaml", "tests/infrastructure/smoke.ps1"):
             with self.subTest(path=path):

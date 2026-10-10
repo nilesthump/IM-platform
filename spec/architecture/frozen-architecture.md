@@ -50,6 +50,7 @@
   - [6.2 Optimistic write 与状态机](#section-6-2) · 原 PDF 第 11 页
   - [6.3 SQLite 事务不变量](#section-6-3) · 原 PDF 第 11 页
   - [6.4 双层 Cursor](#section-6-4) · 原 PDF 第 11 页
+  - [6.6 Web 完成后的 S2 客户端补充](#section-6-6)
 - [7. HTTPS/WSS/TLS 与认证协议](#section-7) · 原 PDF 第 12 页
   - [7.1 登录与 Token](#section-7-1) · 原 PDF 第 12 页
   - [7.2 WSS 状态机](#section-7-2) · 原 PDF 第 12 页
@@ -667,6 +668,141 @@ Human 已批准最小前置方案并继续。Web 仅允许宿主适配器 `clien
 
 机器守卫绑定本节 policy、baseline Web ADR/批准来源、唯一适配器、固定 key、直接 getItem/setItem 及三个字段投影；行为验收还须执行真实适配器的正负例、不可用存储/重启与主题独立性检查，并由独立 Reviewer 检查实际逻辑。前置 CI 只在 Web 完全空骨架、Task backlog/明确外观前置、可信被比较 base 无产品时允许 PREREQUISITE_SKELETON_ONLY；任何产品/部分脚手架或删除既有产品都不能降级为空骨架。产品 CI 必须锁定依赖、实际 build、行为/外观与源码守卫。新独立 Review、精确 HEAD hosted CI、受保护集成/actual-main 验证和主仓库安全同步前，此候选不生效、不实施 Web 产品。
 
+<a id="section-6-6"></a>
+### 6.6 Web 完成后的 S2 客户端补充（Human-approved ADR-0012；候选待独立接受）
+
+本轮直接 Human 规划授权见 `spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/human-request.txt`。ADR-0007 原有任务及接受结果保持；其 WEB→S2 Gate 的直接边被以下串行链追加替代：LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → S2 Gate。三个新增产品任务均S2/backlog；每项仅在前项独立接受、protected integration/actual-main验证和H:/IM-platform同步完成后激活；STATE另依赖本规划正式生效。本轮仅规划及其接受/集成/同步，不实施新产品，S2 Gate OPEN。
+
+#### STATE：消息状态、幂等重发与好友同步
+
+以最新三端实现和已有验收为基线，逐项记录现有能力、证据和待补齐内容，将以下要求写入任务目标与强制验收。
+
+1. 消息可靠性的两个核心场景：
+   A. 首次发送未在服务端提交，发送方超时显示 FAILED，用户点击重发后完成首次持久化并收敛为 SENT。
+   B. 首次发送已在服务端提交，接收方已获得消息，发送方因成功确认丢失或延迟显示 FAILED；用户重发后获得原始提交结果，原消息收敛为 SENT。
+
+2. 同一逻辑消息的每次重发复用原始 request_id、conversation_id、发送者身份和消息内容。服务端已有提交时返回原始 messageId、seq、createdAt；最终对应一条持久化消息、一条逻辑 Outbox 和各客户端的一条消息展示。
+
+3. 覆盖 SENDING、FAILED、重发按钮和 SENT 的真实界面状态。FAILED 表达当前尝试未获得成功确认；迟到 ACK、实时消息和适用 Sync 均通过既有收敛入口更新原消息，SENT 保持终态。核对 Gateway/Core 超时与提交结果未知路径，使其处理符合实际提交结果和现行契约。
+
+4. 同一会话的已确认消息以服务端 seq 为最终排序依据，覆盖：
+   - R1 首次未提交，R2 先成功提交，R1 后重发成功：最终顺序为 R2、R1。
+   - R1 首次已提交但确认超时，R2 随后提交，R1 再获得确认：最终顺序为 R1、R2。
+   验证 UI 在 ACK、实时事件、Sync 交叉到达后保持正确身份、状态和顺序。
+
+5. Desktop/Mobile 覆盖保留本地消息时的重启重发，以及受控测试中从全新账号本地数据库和初始同步游标恢复的流程。验证已提交历史按 seq 恢复，后续新消息使用新的 request_id 和服务端分配的序号，序号连续性与渲染顺序正确。Web 按当前页面内存生命周期和已接受的在线消息同步规则验收。
+
+6. 补齐三端好友变更同步。明确既有好友查询和 User Sync 的触发、消费及界面刷新链路；任一端添加好友后，其余在线端最终更新好友列表、对应私聊和名称展示，并验证断线恢复与账号切换后的正确结果。
+
+7. 使用真实服务端、数据库和客户端的受控故障注入验证上述链路。场景 B 同时取得服务端持久提交、接收方获得消息、发送方 FAILED、重发后原消息 SENT 的证据；分别核对存储记录、请求身份、序号、Outbox 和实际渲染。
+
+
+#### UI-REF：组件拆分与完整性
+
+以任务一验收后的三端产品树为行为和视觉基线，规划并验收各端现有页面、组件和展示状态的职责拆分。
+
+1. 根据实际源码拆分应用入口、Shell、导航、认证、会话列表、消息展示、输入区域、好友及设置等现有职责，明确入口挂载、组件输入输出、状态归属和导入方向。
+
+2. 保持各端独立视觉实现及现有 Auth、Repository、Send、Sync 职责边界，共享现有协议、类型和适用展示语义。
+
+3. 将组件展示文案、应用状态标识与业务判断建立清晰边界，为后续语言资源提取提供稳定接口。
+
+4. 建立拆分前后的页面、入口、功能和测试覆盖对照表。完整回归现有客户端能力及任务一新增场景，验证状态保持、事件绑定、账号隔离、同步、重发、排序和外观设置的行为等价。
+
+5. 完成各端构建、适用自动化测试、真实运行截图和 Architect 审查，以功能完整、行为等价和视觉基线保持作为验收结果。
+
+
+#### I18N：三端国际化拆包
+
+依赖任务二完成，提取三端现有用户可见文案，建立英语、简体中文和日语的独立语言资源。
+
+1. 统一语言标识 en、zh-CN、ja-JP，以及跨端文案语义和占位参数。Web/Desktop 使用 TypeScript 侧纯数据语言资源，Android 使用现有 Kotlin/Compose 技术栈下的等价资源映射。
+
+2. 覆盖页面文本、按钮、输入提示、校验与错误提示、连接及同步状态、无障碍标签，以及已有系统通知和托盘文案。将状态逻辑使用的稳定标识与翻译后的显示文本分离。
+
+3. Settings 增加固定入口“Language / 语言 / 言語”，使用固定顺序的滚动选择列表：
+   English → 简体中文 → 日本語。
+   选项名称保持各自语言，切换后即时更新当前界面，本地保存并恢复语言选择。
+
+4. 将语言选择的本地持久化范围、存储位置、字段和校验规则纳入三端偏好适配器的明确架构授权，保证现有外观配置继续有效，主题、字号、间距和语言独立保持。
+
+5. 建立语言键完整性、占位参数一致性和英文回退验证；覆盖切换后的页面状态、消息状态、布局可读性及本地偏好恢复，完成三种语言的适用截图和 Architect 验收。
+
+
+#### 语言偏好窄授权与阶段
+
+语言偏好为设备/宿主应用范围，跨账号保持、无云同步，独立于credential、账号SQLite、消息和Sync cursor。默认 en；只允许大小写精确的 en、zh-CN、ja-JP，不trim、不接受系统locale猜测或任意别名。缺失/非法/超长/存储不可用回退内存en，写失败诚实显示且不覆盖其他偏好或清除其他key。固定三端位置：Web仅新增 src/ui/language.ts 以原生 localStorage固定key plugworldim.language.v1读取/写入raw UTF-8 enum（最长5bytes），不改plugworldim.appearance.v1三字段；Desktop TypeScript native.ts持有language意图，desktop_capabilities.rs仅窄language_load/save字符串枚举校验及app_data/language.txt读写raw UTF-8（最多5bytes、无BOM/换行），appearance.json三项tuple原字节继续可读；Android Preferences.kt在既有MODE_PRIVATE appearance SharedPreferences只增String key language（最多5UTF-8bytes），保留theme/fontSize/density键和值。theme仅cold/warm；Web fontSize14/16/18/20、density compact/comfortable/spacious；Desktop/Android既有fontSize14..22、density0.8/1.0/1.2及默认cold/16/1继续有效。四标量语义各自独立，但Web/Desktop外观record仍三项，不合并为四字段记录。当前三字段appearance守卫不得提前放宽；只有I18N依赖独立接受+集成同步且任务active/review/done、client_supplement_phase: i18n_product才可实现语言adapter及对应窄源码guard。STATE/UI-REF和本规划不获得语言持久化产品许可。
+
+Web/Desktop英语、简中、日语资源为TypeScript纯数据；Mobile为Kotlin/Compose等价纯数据映射，不安装i18n/runtime/桥接库。通知/tray固定显示文案同样提取，Desktop应用层根据language选择已批准纯数据并将显示文本传给现有native presentation；native不拥有协议、业务判断或翻译状态。翻译键/占位参数跨端同义，未知键或缺失locale项回退英文（英文键缺失为验收FAIL）；稳定状态标识不参与翻译、不由显示字符串判断业务。
+
+<!-- client-supplement-policy -->
+```json
+{
+  "decision": "ADR-0012-client-supplement-planning",
+  "planning_task": "LOOP1-CLIENT-SUPPLEMENT-PLAN-001",
+  "stage": "S2",
+  "chain": [
+    "LOOP1-WEB-001",
+    "LOOP1-CLIENT-STATE-001",
+    "LOOP1-CLIENT-UI-REF-001",
+    "LOOP1-CLIENT-I18N-001"
+  ],
+  "gate_prerequisites": [
+    "LOOP1-CLIENT-SQLITE-001",
+    "LOOP1-CLIENT-UI-ARCH-001",
+    "LOOP1-CLIENT-SEND-001",
+    "LOOP1-SYNC-001",
+    "LOOP1-CLIENT-GUI-001",
+    "LOOP1-WEB-001",
+    "LOOP1-CLIENT-STATE-001",
+    "LOOP1-CLIENT-UI-REF-001",
+    "LOOP1-CLIENT-I18N-001"
+  ],
+  "language": {
+    "activation_task": "LOOP1-CLIENT-I18N-001",
+    "activation_phase": "i18n_product",
+    "locales": [
+      "en",
+      "zh-CN",
+      "ja-JP"
+    ],
+    "default": "en",
+    "names": [
+      "English",
+      "简体中文",
+      "日本語"
+    ],
+    "entry": "Language / 语言 / 言語",
+    "web": {
+      "adapter": "clients/web/src/ui/language.ts",
+      "key": "plugworldim.language.v1",
+      "storage": "localStorage",
+      "field": "language",
+      "format": "raw UTF-8 enum",
+      "max_bytes": 5
+    },
+    "desktop": {
+      "adapter": "clients/desktop/src/application/ui/native.ts",
+      "native_adapter": "clients/desktop/src-tauri/src/desktop_capabilities.rs",
+      "storage": "app_data/language.txt",
+      "field": "language",
+      "format": "raw UTF-8 enum",
+      "max_bytes": 5
+    },
+    "mobile": {
+      "adapter": "clients/mobile/app/src/main/kotlin/im/platform/client/ui/Preferences.kt",
+      "storage": "SharedPreferences appearance MODE_PRIVATE",
+      "key": "language",
+      "field": "language",
+      "format": "String enum",
+      "max_bytes": 5
+    }
+  }
+}
+```
+
+本机器policy只绑定规划/串行依赖/未来语言窄授权，不建立新公共契约。实际产品需每项独立真实运行与存储/协议证据、截图/Architect批准、fresh independent Review、精确候选hosted CI和安全同步。新增任务的完成metadata与真实证据必须同时可核对；写PASS文本不能代替独立接受。S2 Gate原所有条件与三个新增完成项共同生效，尚未完成任一项不能Stage PASS。
+
 <a id="section-7"></a>
 ## 7. HTTPS/WSS/TLS 与认证协议
 
@@ -1088,11 +1224,13 @@ This loop is milestone-gated, not calendar-gated. A stage MAY begin immediately 
 | --- | --- | --- | --- |
 | S0 控制面 | W1 | Monorepo、spec/contracts/tasks/progress、CI skeleton、Compose、PostgreSQL/NATS/TLS；冻结 HTTP/WSS/Error/Session/Message/Sync/Plugin API v1 | 新 Agent 仅靠控制面可定位项目、状态、下一任务；契约 lint 与 skeleton CI PASS |
 | S1 Go 纵向链路 | W2-3 | 注册/登录、WSS、搜索、好友、唯一私聊、文本发送、ACK、持久化、Outbox、NATS | A 搜索/添加 B 后发 hello，B 实时收到；contract/integration PASS |
-| S2 客户端与Sync | W4-5 | Desktop/Mobile SQLite、optimistic/retry/Sync 和完整 Loop1 GUI；Web memory-only 完整 GUI | ACK 丢失/离线 gap/重复乱序 PASS；GUI/Web 完整截图 Architect Approval、独立 Review、精确 HEAD CI 与 main 验证 |
+| S2 客户端与Sync | W4-5 | Desktop/Mobile SQLite、optimistic/retry/Sync 和完整 Loop1 GUI；Web memory-only 完整 GUI；WEB后STATE→UI-REF→I18N | 既有ACK/gap/乱序GUI条件与三个新增任务独立接受、集成、主仓库同步共同必需；真实故障/组件完整性/三语言与Architect证据 |
 | S3 Java 等价 | W6-7 | Auth/Session/User/Friend/Conversation/Message/Sync/Outbox/NATS | 两 profile 同一 Golden Tests PASS；客户端零改动切换 |
 | S4 插件平台 | W8-9 | Registry、Manifest、Permission、WASM、UI Host、Render Bundle、生命周期、Echo/Poll | 两个 fixture 在三端与双后端兼容；sandbox/权限负例 PASS |
 | S5 工程硬化 | W10 | path-aware CI、compatibility matrix、migration/plugin tests、Release Manifest、rollback/security | Compatibility CI 可复现；无硬编码跳过；回滚演练 PASS |
 | S6 性能与 RC | W11-12 | 500/1000/2500/5000 阶梯压测、profile、修复、soak、RC、architecture snapshot | 单机 5k authenticated WSS Gate PASS；正确性零红线违例；RC 可回滚 |
+
+S2补充串行前置：LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → S2 Gate；每项独立接受、集成、主仓库同步与旧门禁条件共同必需。
 
 <a id="section-16"></a>
 ## 16. Loop 1 性能与可靠性验收
@@ -1244,11 +1382,15 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 | LOOP1-CLIENT-GUI-001 | Desktop/Mobile 完整 Loop1 GUI | S2 | Login/session、Chat、Friends、AI Placeholder、Plugin capability/unavailable、Settings/Profile、双主题/本地字体间距、Offline History、SENDING/SENT/FAILED/retry、Sync/reconnect、Desktop notification/tray/shortcut、Android emulator | CLIENT-UI-ARCH 与 spec/acceptance/client-gui.md；真实截图/Architect Review/修复重拍/Approval，再独立 Review、精确 HEAD CI、protected main 核验 |
 | LOOP1-WEB-001 | Web 完整 Loop1 GUI | S2 | React + TypeScript；memory only；Chat/Friends/AI Placeholder/Plugin/Settings/Profile、双主题和本地字体/间距 | 无 SQLite/离线历史；遵守 CLIENT-UI-ARCH、client-gui 截图验收和独立 Review/精确 HEAD CI/main 核验 |
 
+| LOOP1-CLIENT-STATE-001 | 消息状态、幂等重发与好友同步 | S2 | §6.6 A/B、seq排序、重启/cleanDB恢复、跨端好友 | 真实服务/DB/三端证据、独立Review/CI/集成同步 |
+| LOOP1-CLIENT-UI-REF-001 | 组件职责拆分与完整性验证 | S2 | §6.6 页面/入口/组件/状态/import和覆盖对照 | STATE后行为等价/视觉保持、截图/Architect/独立接受同步 |
+| LOOP1-CLIENT-I18N-001 | 三端国际化拆包 | S2 | §6.6 en/zh-CN/ja-JP、固定语言入口/偏好 | UI-REF后键/参数/回退/三语言截图/Architect/独立接受同步 |
+
 ### S2 最小任务依赖与执行顺序（Human-approved ADR-0007）
 
-LOOP1-CLIENT-SQLITE-001（已接受） → LOOP1-CLIENT-UI-ARCH-001（UI 冻结已接受，当前规划补充另行验收） → LOOP1-CLIENT-SEND-001 → LOOP1-SYNC-001 → LOOP1-CLIENT-GUI-001 → LOOP1-WEB-001 → S2 Gate。
+LOOP1-CLIENT-SQLITE-001（已接受） → LOOP1-CLIENT-UI-ARCH-001（UI 冻结已接受，当前规划补充另行验收） → LOOP1-CLIENT-SEND-001 → LOOP1-SYNC-001 → LOOP1-CLIENT-GUI-001 → LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → S2 Gate。
 
-该补充只新增一个产品 UI ID LOOP1-CLIENT-GUI-001。Desktop/Mobile GUI 独立边界包含上述完整界面及既有发送/同步编排的可观察状态，不重新实现 SQLite、发送或 Sync 领域逻辑。GUI 明确依赖 SQLITE、UI-ARCH、SEND、SYNC 四个已接受任务；Web 完整 GUI 使用原 LOOP1-WEB-001 且在 GUI 后执行。各任务在真实队列中唯一存在，依赖未接受不得激活；本轮 Human endpoint 为 SEND done，后续任务保持 backlog。
+ADR-0007当时只新增一个产品 UI ID LOOP1-CLIENT-GUI-001；ADR-0012追加三个S2产品ID，原接受历史不撤销。Desktop/Mobile GUI 独立边界包含上述完整界面及既有发送/同步编排的可观察状态，不重新实现 SQLite、发送或 Sync 领域逻辑。GUI 明确依赖 SQLITE、UI-ARCH、SEND、SYNC 四个已接受任务；Web 完整 GUI 使用原 LOOP1-WEB-001 且在 GUI 后执行。各任务在真实队列中唯一存在，依赖未接受不得激活；此前ADR-0007 Human endpoint为历史；本轮ADR-0012 endpoint为规划独立接受/集成同步后停止，新三个任务保持backlog，S2 OPEN。
 
 GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成真实运行截图 → Architect Review → 修复 → 重新截图 → Architect Approval → fresh independent Review → exact-head applicable hosted CI → protected integration/actual-main verification。S2 不实现 AI API/chat/Agent/RAG、Plugin runtime、Marketplace、S4 renderer 或新公共 API；Web 始终 React/TypeScript memory only、no SQLite、no offline history。偏好仅存外观设置，不授权聊天持久化；未冻结具体存储机制按 §2.3 先决策后实现。
 
@@ -1262,6 +1404,9 @@ GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成�
 | LOOP1-SYNC-001 | LOOP1-CLIENT-SEND-001 | 双层 Sync 编排及断线重连；保留领域职责 | S2 |
 | LOOP1-CLIENT-GUI-001 | LOOP1-CLIENT-SQLITE-001 + LOOP1-CLIENT-UI-ARCH-001 + LOOP1-CLIENT-SEND-001 + LOOP1-SYNC-001 | Desktop/Mobile 完整 GUI；CLIENT-UI-ARCH、client-gui 截图/Architect/独立 Review/CI/main 验收 | S2 |
 | LOOP1-WEB-001 | LOOP1-CLIENT-GUI-001 | Web 完整 Loop1 GUI；React/TypeScript memory only，无 SQLite/离线历史，同一截图验收 | S2 |
+| LOOP1-CLIENT-STATE-001 | LOOP1-WEB-001 + LOOP1-CLIENT-SUPPLEMENT-PLAN-001正式生效 | §6.6真实A/B、排序恢复和好友同步 | S2 |
+| LOOP1-CLIENT-UI-REF-001 | LOOP1-CLIENT-STATE-001独立接受/集成/同步 | §6.6组件拆分与全回归/Architect | S2 |
+| LOOP1-CLIENT-I18N-001 | LOOP1-CLIENT-UI-REF-001独立接受/集成/同步 | §6.6三语言资源与本地语言偏好/Architect | S2 |
 | LOOP1-JAVA-AUTH-001 | S2 PASS + Auth contracts | Java/Spring Auth/Session 等价实现 | S3 |
 | LOOP1-JAVA-IM-001 | Java Auth + IM contracts | Friend/Conversation/Message/Sync/Outbox/NATS | S3 |
 | LOOP1-PARITY-001 | Go + Java core + S2 PASS | Golden parity；同一客户端制品/代码无需业务修改切换 Go/Java profile，GUI 不改写协议，两 profile 当前关键纵向流程通过 | S3 |
@@ -1332,7 +1477,7 @@ GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成�
 | --- | --- |
 | S0 | spec/contracts/tasks/progress 完整；CI/Compose/TLS/PostgreSQL/NATS skeleton；Agent dry-run 可恢复；无重复权威 |
 | S1 | Go Auth -> Friend -> Direct -> Message 全链；durable ACK/outbox/NATS；contract/integration/E2E PASS |
-| S2 | SQLITE/UI-ARCH/SEND/SYNC/CLIENT-GUI/WEB 全部接受；Desktop/Mobile 完整 Loop1 GUI，Web memory only/no SQLite/no offline history；client-gui 真实截图/Architect Approval、fresh independent Review、精确 HEAD CI/main 验证；ACK 丢失/离线 gap/乱序重复 PASS |
+| S2 | SQLITE/UI-ARCH/SEND/SYNC/CLIENT-GUI/WEB及LOOP1-CLIENT-STATE-001、LOOP1-CLIENT-UI-REF-001、LOOP1-CLIENT-I18N-001全部独立接受、集成与主仓库同步；Desktop/Mobile 完整 Loop1 GUI，Web memory only/no SQLite/no offline history；client-gui 真实截图/Architect Approval、fresh independent Review、精确 HEAD CI/main 验证；ACK 丢失/离线 gap/乱序重复 PASS |
 | S3 | Java 核心等价；Go/Java Golden Tests；客户端零修改 profile switch |
 | S4 | Registry/WASM/UI/Render Bundle/lifecycle；Echo/Poll；权限与 sandbox 负例 |
 | S5 | Path-aware CI、全平台 compatibility、migration、manifest、security、rollback rehearsal |

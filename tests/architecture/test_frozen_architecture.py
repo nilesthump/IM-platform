@@ -54,7 +54,7 @@ class ArchitectureIntegrityTests(unittest.TestCase):
         # Minimal temporary authority copy; never mutate product or historical tree.
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
-            for name in ('spec/architecture','AGENTS.md','spec/handoff/agent-context.md','scalable-distributed-im-architecture.pdf','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt'):
+            for name in ('spec/architecture','AGENTS.md','spec/handoff/agent-context.md','scalable-distributed-im-architecture.pdf','spec/progress/evidence/LOOP1-ARCH-REMEDIATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/approval-and-recovery.md','spec/progress/evidence/LOOP1-CLIENT-ARCH-CLARIFICATION-001/human-mobile-kotlin-compose-decision.txt','spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/human-request.txt'):
                 src=ROOT/name; dst=root/name; dst.parent.mkdir(parents=True,exist_ok=True)
                 if src.is_dir(): shutil.copytree(src,dst)
                 else: shutil.copyfile(src,dst)
