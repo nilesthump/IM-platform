@@ -22,6 +22,9 @@ class SupplementControls(unittest.TestCase):
         shutil.copytree(ROOT/'spec/tasks', self.root/'spec/tasks')
         for p in ['spec/architecture/baseline.md', 'spec/architecture/frozen-architecture.md', checker.ADR, checker.APPROVAL]:
             out = self.root/p; out.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(ROOT/p, out)
+        # Isolated controls start unaccepted; check(ROOT) separately verifies the live queue.
+        for task in (checker.PLAN, *checker.NEW):
+            self.move(task, 'review' if task == checker.PLAN else 'backlog')
         self.put('spec/progress/current.md', 'Current Gate: S2\nGate Status: OPEN\n')
 
     def put(self, p, text):

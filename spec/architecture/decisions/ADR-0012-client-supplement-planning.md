@@ -85,3 +85,8 @@ machine policy绑定依赖和未来窄授权，guard真正解析queue/status/依
 ## 最小性与完成
 
 单行政Task、三明确产品Task、直接标准库校验，无通用编排/抽象层/新库/未来产品。完成须clean committed candidate、fresh independent Reviewer与必要Architect、exact-head hosted required jobs、protected merge、actual-main audit和主仓库未知work保存安全同步；记录branch/SHA/证据/checkpoint后本控制任务才done。产品仍backlog，S2 OPEN；Recorder不是接受。
+
+
+## 正式生效发现（2026-10-10）
+
+上方Human-approved candidate / APPROVED_PENDING_FREEZE为候选时点历史；当前状态Human-approved，APPROVED。规划规范在candidate 8b52a56403a5a761a12d94e4fabf4f2cf82f63d0 / protectedPR31 actualmain 9f99cfda1cecfc85c0acf3ae8db979f622c97a02独立Review/精确hosted/actual-main/主仓库安全同步接受，spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/acceptance.md提供完整原件。正文决定与canonical当前hash不变。三产品仍backlog、语言仅I18N正式phase可实施；S2 OPEN。本行政状态记录另待独立接受，不提前声称其未来SHA通过。

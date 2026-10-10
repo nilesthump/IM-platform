@@ -1,8 +1,8 @@
 ---
 task_id: LOOP1-CLIENT-SUPPLEMENT-PLAN-001
 title: S2 客户端补充架构与任务规划修订
-status: review
-owner: /root/s2_plan_fix_a
+status: done
+owner: /root
 stage: S2
 gate: S2
 ---
@@ -93,20 +93,18 @@ gate: S2
 
 # Completion Metadata
 
-acceptance_result: PENDING
-accepted_candidate_sha: unavailable
-integrated_main_sha: unavailable
-main_sync_result: PENDING
-independent_review_evidence: unavailable
-hosted_acceptance_evidence: unavailable
-main_sync_evidence: unavailable
+acceptance_result: PASS
+accepted_candidate_sha: 8b52a56403a5a761a12d94e4fabf4f2cf82f63d0
+integrated_main_sha: 9f99cfda1cecfc85c0acf3ae8db979f622c97a02
+main_sync_result: PASS
+independent_review_evidence: spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/independent-review.md
+hosted_acceptance_evidence: spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/hosted-acceptance.md
+main_sync_evidence: spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/main-sync.json
 
 # Handoff
 
-Fresh Fix A修复6267726独立Review FAIL的三阻断；原Review报告/自动审批拒绝和静态dispatch事实原样保留于evidence/fix-a。唯一section/mandatory字段及严格真实路径拒绝links/reparse；三个backlog使用package和工具链/安装条件。architecture77 OK/1平台skip，CI35 OK/4原skip，planning/frozen/allarchitecture/Development exit0，Linux真实symlink待新hosted执行；无产品构建或实际S2 Gate。新commit/clean Acceptance/Recorder结果见private fix-a handoff；独立接受/同步PENDING，last accepted good b4d271c。
-
-本轮规划实现完成，真实检查与原FAIL见 evidence/local-verification.json、local-verification.md 和 instrumentation-failures.md。三产品 Task 均 backlog，S2 OPEN，不执行 Gate。assigned root verified exact；起点/last accepted good b4d271ceeed40343e627450f6b43cd9c9ad5ff0e。提交候选后只允许 fresh independent Review 与修复/复审、精确 hosted CI、protected integration、actual-main 验证、安全主仓库同步。Implementation 自己不接受、不 done。独立接受 metadata 由 Coordinator 填实际证据，当前全部 PENDING。
+本规划在candidate 8b52a56403a5a761a12d94e4fabf4f2cf82f63d0 / protectedPR31 actualmain 9f99cfda1cecfc85c0acf3ae8db979f622c97a02独立接受和安全同步完成，详情acceptance/acceptance.md；原失败保留。此行政closed候选自己另待fresh Review/精确hosted/actualmain/同步，不能用原接受替代。最终行政实际SHA见Coordinator sealed receipt与对应PR，原件不伪造未来值。主781未知工作保持，不复制进任务。
 
 # Next Action
 
-Coordinator 在 clean committed candidate 上分配新鲜 Reviewer；若 FAIL 交 fresh Fix Agent 后 fresh Review。准确候选接受后集成及安全同步，最终此控制任务 done、三产品 backlog、S2 OPEN，并建立 accepted checkpoint。future order WEB → STATE → UI-REF → I18N → S2 Gate，STATE 同时依赖本规划 done 生效。
+STOP after administrative closure acceptance/safe synchronization；三个独立产品Task backlog，S2 OPEN，绝不自动激活或评估Gate。未来依赖WEB → STATE → UI-REF → I18N → S2 Gate，每项独立接受/集成/主仓库同步；STATE同时要求本规划done。

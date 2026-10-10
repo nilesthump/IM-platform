@@ -136,3 +136,8 @@ APPROVED_PENDING_FREEZE：本次仅冻结已明确批准的浏览器原生 local
 APPROVED_PENDING_FREEZE。沿用v1.1，最新canonical hash只绑定本候选字节；旧ADR5～11及各字段/批准/接受/PDF546915谱系不改。ADR12追加WEB后的STATE→UI-REF→I18N和S2 obligations，取代旧直接WEB→Gate边；原产品接受不撤销。语言窄授权仅后续I18N正式phase实施，不使现三字段产品不合规。本规划fresh independent Review/exact-head hostedCI/protected integration/actual-main/safe sync前不生效。S1 PASS/S2 OPEN，三个产品backlog。
 
 - supplement_approval_sha256: `21be409c7172ed6e946455386f40c52871578a88511cc2b21e1e605c0ce52e3a`
+
+
+## S2 客户端补充规划接受发现（2026-10-10）
+
+前述supplement候选/pending文字保留为历史。ADR-0012在candidate 8b52a56403a5a761a12d94e4fabf4f2cf82f63d0 / protectedPR31 actualmain 9f99cfda1cecfc85c0acf3ae8db979f622c97a02经fresh independent Review与exact candidate/PR/actualmain hostedCI（各14selected成功）及H:/IM-platform安全同步接受，canonical efbe04c7/v1.1/PDF与旧谱系不变。证据：spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/acceptance.md。此行政闭合候选另待新Review/CI/actualmain/safe sync。三产品backlog，S2 OPEN；本轮stop，不实施产品/Gate。
