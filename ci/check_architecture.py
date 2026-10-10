@@ -721,6 +721,11 @@ def main(argv=None):
     graphs = {}
     if args.scope in {"governance", "all"}:
         errors += check_governance(args.root)
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("s2_planning_controls", ROOT / "ci/check_s2_planning.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        errors += checker.check(args.root)
     if args.scope in {"clients", "all"}:
         errors += check_clients(args.root)
     for language, checker in (("go", check_go), ("java", check_java)):

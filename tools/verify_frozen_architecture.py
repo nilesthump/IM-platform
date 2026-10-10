@@ -114,6 +114,11 @@ def verify(root, base_commit=''):
             errors.append(f'{relative} SHA-256 mismatch actual={actual}')
     doc = (root / expected['repository_path']).read_text(encoding='utf-8')
     errors.extend(structural_errors(doc))
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("s2_planning_integrity", Path(__file__).resolve().parents[1] / "ci/check_s2_planning.py")
+    checker = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(checker)
+    errors.extend(checker.authority_errors(root))
     if '| 版本 | v1.1 |' not in doc:
         errors.append('body version differs from revision')
     for key in ('revision_adr', 'approval_source'):

@@ -56,3 +56,7 @@ S2 仅预留宿主控制的 Plugin/AI 入口。不实现 renderer、UI 代码下
 ## 交付边界
 
 本任务不交付页面、组件、UI 交互实现、像素级设计或运行时。后续 GUI 任务必须引用独立验收后的规范架构/ADR 和 spec/acceptance/client-gui.md。架构冻结、GUI Task PASS 与 S2 Gate PASS 是三个不同结果。
+
+## Web 后 S2 补充（ADR-0012候选）
+
+原GUI/Web接受保持。正式生效后追加WEB→STATE→UI-REF→I18N→S2 Gate；完整要求见canonical§6.6及spec/acceptance/client-supplement.md。三产品任务backlog、逐项独立接受/集成/主仓库同步后激活下项；本次不实施，S2 OPEN。独立视觉/Repository/Auth/Send/Sync职责与原截图/Architect/Review/hosted/main链共同保留。STATE真实A/B/排序/恢复/跨端好友，UIREF完整对照回归和视觉基线，I18N三纯数据语言/固定入口/独立偏好窄授权均必需。

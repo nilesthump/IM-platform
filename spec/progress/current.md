@@ -4,56 +4,50 @@ Current Loop: Loop 1
 Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
-Current Batch: S2-WEB-001-product
-Batch Status: PRODUCT_ACCEPTED
-Current Task: LOOP1-WEB-001
-Current Task State: done
-Execution Status: STOP_BEFORE_S2_GATE
+Current Batch: S2-CLIENT-SUPPLEMENT-PLAN-001
+Batch Status: REVIEW_PENDING
+Current Task: LOOP1-CLIENT-SUPPLEMENT-PLAN-001
+Current Task State: review
+Execution Status: INDEPENDENT_REVIEW_PENDING
 
 ## Immediately Relevant Completed Work
 
-Complete memory-only Web GUI independently accepted and synchronized to main a1b154d06c0a9d191ec8dca514fff3ab1b46ee25 through protected PR29. Desktop Cold theme/unified logo,52 formally approved Chromium originals, protocol regressions and independent semantic/delta/metadata/hosted reviews accepted. No initial history backfill/business persistence.
+Web independently accepted/synchronized at product a1b154d；latest accepted administrative main b4d271c/PR30 confirmed. New Human authorizes only S2 supplemental planning and review/CI/integration/safe synchronization; three product tasks backlog, S2 OPEN.
 
 ## Current Blockers
 
-No product blocker. Edge waived by Human. Human endpoint remains STOP before S2 Stage Gate; no Gate, deferred helper or next-task operations. Candidate-specific administrative acceptance status is recorded separately in `spec/progress/evidence/LOOP1-WEB-001/product-closure-fix-20261009/candidate-status.md`.
+No external blocker. Planning local checks passed, independent acceptance pending; no product activation or S2 Stage Gate operation.
 
 ## Verification
 
-- Command: `python -Xutf8 -B tests/clients/web/verify.py`
-  - Result: actual-main37945266468 exacta1 locked build/behavior/regressions/appearance/source PASS, independent actual-main acceptance
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-closure-20261009/acceptance-originals.zip`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: independent architecture/frozen baseline and exact-main Linux controls/source checks PASS
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-closure-20261009/acceptance-originals.zip`
-- Command: `node tests/clients/web/browser.mjs`
-  - Result:52 actual original Chromium images formally approved by independent ArchitectE; fixtures closed
-  - Evidence: `spec/progress/evidence/LOOP1-WEB-001/product-fix-20261009-d/screens/chromium-e/manifest.json`
+  - Result: baseline and revised architecture/frozen/planning exit0; architecture73PASS, CI35PASS/4existing symlink skip, Development Recovery PASS. Local evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/local-verification.md`
 
 ## Changed Files or Migrations
 
-Only Task queue/current/new Web closure evidence/checkpoint administrative writes. Product52/harnessbc989/source/authority/contracts/shared/dependencies/guard/CI/Desktop unchanged. No migrations.
+ADR-0012/canonical baseline lineage/three backlog specs/acceptance/guards and meaningful tests completed. No product/data migration.
 
 ## Known Failures, Risks, and Assumptions
 
-Candidate first push attempt failed Linux Compose startup with cause unknown; retained originals, normal unchanged-head retry independently accepted14 effective successes. Actual-main own run six selected successes/seven correct inactive entries independently accepted. Research gaps and original failures retained; Recorder validity alone is not acceptance. The archived root Recorder was active at the historical closure snapshot; its finalization is tracked by private coordinator receipts.
+Pre-Recorder startup/direct/private helper trace incomplete; original gbk/legacy shell/missing-path failures retained. Planning has no independent acceptance yet. Accepted Web/S1 and historical failures preserved.
 
 ## Next Exact Action
 
-STOP before S2 Stage Gate. Do not select or evaluate Gate, run deferred helper regression, select another Task, or repeat an already accepted administrative closure. This terminal recovery instruction does not authorize further work.
+Clean committed candidate -> fresh independent Review/exact-head CI/protected integration/actual-main/safe synchronization. Stop with three backlog and S2 OPEN.
 
 ## Last Known Good Commit
 
-`a1b154d06c0a9d191ec8dca514fff3ab1b46ee25`, independently accepted product main safely synchronized, all781 unknown files/status/index flags preserved.
+`b4d271ceeed40343e627450f6b43cd9c9ad5ff0e`, latest accepted main; Web product a1b154d accepted separately.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-09-loop1-web-001-product-accepted.md`
+`spec/progress/checkpoints/2026-10-10-client-supplement-plan-local-review.md`
 
 ## Uncommitted Changes / Ownership
 
-This bounded recovery fix is owned by /root/web_product_closure_fix in verified assigned H:/.codex/worktrees/w/IM-platform on task/LOOP1-WEB-001-product. Exact candidate, clean state and lease release are bound by private fix receipts. Product/hosted leases released. Unknown main work retained; no unknown content copied. Candidate acceptance/synchronization facts remain separately bound in fix evidence.
+Only this bounded planning scope /root/s2_plan_impl in verified H:/.codex/worktrees/s2p/IM-platform. Main781unknown files/status/indexflags preserved; no main write or copy.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Accepted ADR0011 effective; S1 PASS/S2 OPEN. Product Task accepted/synchronized; S2 Stage Gate untouched. Necessary workflow aggregate check remains distinct from Stage Gate.
+Direct Human approves supplemental architecture/Task/Gate planning. ADR12 pending independent acceptance; no product authority until freeze/Review/CI/integration/sync.

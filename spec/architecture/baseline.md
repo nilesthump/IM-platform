@@ -5,7 +5,7 @@
 - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `2ba864fc2805900117f62c3c88795c52364ecc7450da17975e26d35ebf2cc432`
+- sha256: `efbe04c7eb308904d1759b8e145a32363620ed8c14daef58f09c644bdc897bdc`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -123,3 +123,16 @@ Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c1
 - web_previous_sha256: `a6b1670aae1707fd325a00f75e19f243c9bf8f5cb24cd5089c5f160314e67b72`
 
 APPROVED_PENDING_FREEZE：本次仅冻结已明确批准的浏览器原生 localStorage 三外观标量；§6.5 与对应 machine policy 为窄候选。保留 v1.1、所有已接受 ADR/字段谱系及原 PDF546915。新独立 Review、适用 exact-head hosted CI、protected integration/actual-main 验证与安全同步仍待完成；候选不提供产品实施权威，Web 唯一 backlog/S1 PASS/S2 OPEN。最新 Human endpoint 在 Web 完整接受同步后、S2 Gate 前停止，不执行 S2 Stage Gate。
+
+## Human-approved S2 客户端补充规划（2026-10-10）
+
+- supplement_revision_type: `human_approved_s2_client_supplement_planning`
+- supplement_semantic_change: `true`
+- supplement_revision_task_id: `LOOP1-CLIENT-SUPPLEMENT-PLAN-001`
+- supplement_revision_adr: `spec/architecture/decisions/ADR-0012-client-supplement-planning.md`
+- supplement_approval_source: `spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/human-request.txt`
+- supplement_previous_sha256: `2ba864fc2805900117f62c3c88795c52364ecc7450da17975e26d35ebf2cc432`
+
+APPROVED_PENDING_FREEZE。沿用v1.1，最新canonical hash只绑定本候选字节；旧ADR5～11及各字段/批准/接受/PDF546915谱系不改。ADR12追加WEB后的STATE→UI-REF→I18N和S2 obligations，取代旧直接WEB→Gate边；原产品接受不撤销。语言窄授权仅后续I18N正式phase实施，不使现三字段产品不合规。本规划fresh independent Review/exact-head hostedCI/protected integration/actual-main/safe sync前不生效。S1 PASS/S2 OPEN，三个产品backlog。
+
+- supplement_approval_sha256: `21be409c7172ed6e946455386f40c52871578a88511cc2b21e1e605c0ce52e3a`
