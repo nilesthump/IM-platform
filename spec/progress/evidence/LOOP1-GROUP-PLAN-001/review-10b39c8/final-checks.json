@@ -1,0 +1,106 @@
+{
+  "candidate_sha": "10b39c8688588c94f95a9a3d671b8496e076fcdf",
+  "future_task": "spec/tasks/backlog/LOOP1-GROUP-001.md",
+  "control_scope_outside": [],
+  "changed_count": 74,
+  "new_migrations_required": [
+    "contracts/database/migrations/0002_group_operations.up.sql",
+    "contracts/database/migrations/0002_group_operations.down.sql"
+  ],
+  "runner_version": "0001_initial",
+  "runner_up_actual_file": "H:\\.codex\\worktrees\\grp\\IM-platform\\contracts\\database\\migrations\\0001_initial.up.sql",
+  "runner_allowed": false,
+  "existing_regression_allowed": false,
+  "existing_regression_exists": true,
+  "workflow_allowed": false,
+  "existing_http_verifier_allowed": false,
+  "workflow_group_verifier_wired": false,
+  "workflow_group_suite_wired": false,
+  "existing_http_verifier_pins_auth": true,
+  "workflow_migrate_entrypoint": [
+    [
+      168,
+      "        run: python3 contracts/database/migrate.py up"
+    ]
+  ],
+  "workflow_shared_contract_commands": [
+    [
+      332,
+      "      - name: HTTP, WSS, Sync and Plugin contracts"
+    ],
+    [
+      333,
+      "        shell: pwsh"
+    ],
+    [
+      334,
+      "        run: |"
+    ],
+    [
+      335,
+      "          ./contracts/http/verify-auth-user-friend.ps1"
+    ],
+    [
+      336,
+      "          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }"
+    ],
+    [
+      337,
+      "          python3 -B tools/verify_sync_transport.py"
+    ],
+    [
+      338,
+      "          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }"
+    ],
+    [
+      339,
+      "          python3 -B -m unittest discover -s tests/contract -p test_sync_transport.py"
+    ],
+    [
+      340,
+      "          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }"
+    ],
+    [
+      341,
+      "          python3 contracts/websocket/verify.py"
+    ],
+    [
+      342,
+      "          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }"
+    ],
+    [
+      343,
+      "          python3 contracts/plugin-api/verify.py"
+    ],
+    [
+      344,
+      "          exit $LASTEXITCODE"
+    ],
+    [
+      345,
+      ""
+    ]
+  ],
+  "contract_authority_paths": {
+    "contracts/http/auth-user-friend.openapi.json": [
+      "/v1/auth/register",
+      "/v1/auth/login",
+      "/v1/auth/logout",
+      "/v1/users/me",
+      "/v1/users/search",
+      "/v1/friends",
+      "/v1/friends/{friendUserId}",
+      "/v1/auth/refresh/web",
+      "/v1/auth/refresh/native"
+    ],
+    "contracts/http/sync.openapi.json": [
+      "/v1/sync/user",
+      "/v1/sync/conversation"
+    ]
+  },
+  "final_root": "H:/.codex/worktrees/grp/IM-platform",
+  "final_head": "10b39c8688588c94f95a9a3d671b8496e076fcdf",
+  "final_branch": "task/LOOP1-GROUP-PLAN-001",
+  "final_status": "",
+  "no_source_write": true
+}

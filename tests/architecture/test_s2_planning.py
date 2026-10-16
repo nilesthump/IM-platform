@@ -20,11 +20,11 @@ class SupplementControls(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         shutil.copytree(ROOT/'spec/tasks', self.root/'spec/tasks')
-        for p in ['spec/architecture/baseline.md', 'spec/architecture/frozen-architecture.md', checker.ADR, checker.APPROVAL]:
+        for p in ['spec/architecture/baseline.md', 'spec/architecture/frozen-architecture.md', checker.ADR, checker.APPROVAL, checker.GROUP_ADR, checker.GROUP_APPROVAL]:
             out = self.root/p; out.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(ROOT/p, out)
         # Isolated controls start unaccepted; check(ROOT) separately verifies the live queue.
-        for task in (checker.PLAN, *checker.NEW):
-            self.move(task, 'review' if task == checker.PLAN else 'backlog')
+        for task in (checker.PLAN, checker.GROUP_PLAN, *checker.NEW):
+            self.move(task, 'review' if task in (checker.PLAN, checker.GROUP_PLAN) else 'backlog')
         self.put('spec/progress/current.md', 'Current Gate: S2\nGate Status: OPEN\n')
 
     def put(self, p, text):
@@ -51,6 +51,7 @@ class SupplementControls(unittest.TestCase):
 
     def accepted_prefix(self):
         self.accepted(checker.PLAN)
+        self.accepted(checker.GROUP_PLAN)
         for task in checker.NEW: self.accepted(task)
 
     def policy(self, change):
@@ -229,5 +230,66 @@ class SupplementControls(unittest.TestCase):
         policy,_=module.client_policy(ROOT)
         source='const APPEARANCE_KEY="plugworldim.appearance.v1";window.localStorage.getItem(APPEARANCE_KEY);window.localStorage.setItem(APPEARANCE_KEY,JSON.stringify({theme:v.theme,fontSize:v.fontSize,density:v.density,language:v.language}));'
         self.assertTrue(module.check_web_storage('clients/web/src/ui/appearance.ts',source,policy))
+
+
+    def test_group_requires_i18n_and_separate_accepted_synced_planning(self):
+        self.accepted(checker.PLAN)
+        for task in checker.NEW[:-1]: self.accepted(task)
+        self.move(checker.GROUP, 'ready')
+        self.assertTrue(any(checker.GROUP_PLAN in e for e in checker.check(self.root)))
+        self.accepted(checker.GROUP_PLAN)
+        self.assertEqual([], checker.check(self.root))
+        self.move(checker.I18N_TASK, 'review')
+        self.assertTrue(any(checker.I18N_TASK in e for e in checker.check(self.root)))
+
+    def test_all_old_s2_prerequisites_accepted_but_group_backlog_blocks_gate(self):
+        self.accepted(checker.PLAN); self.accepted(checker.GROUP_PLAN)
+        for task in checker.NEW[:-1]: self.accepted(task)
+        self.assertEqual([], checker.check(self.root))  # OPEN is never evaluated.
+        errors = checker.s2_gate_errors(self.root)
+        self.assertEqual(['S2 prerequisite not uniquely done: '+checker.GROUP], errors)
+        self.put('spec/progress/current.md', 'Current Gate: S2\nGate Status: PASS\n')
+        self.assertTrue(any(checker.GROUP in e for e in checker.check(self.root)))
+        self.accepted(checker.GROUP)
+        self.assertEqual([], checker.check(self.root))
+
+    def test_group_completion_and_planning_must_have_real_structural_links(self):
+        self.accepted_prefix()
+        for task in (checker.GROUP_PLAN, checker.GROUP):
+            p=self.path(task); original=p.read_text(encoding='utf8')
+            p.write_text(original.replace('main_sync_result: PASS','main_sync_result: PENDING'),encoding='utf8')
+            self.assertTrue(checker.check(self.root));p.write_text(original,encoding='utf8')
+            p.write_text(re.sub(r'(?m)^hosted_acceptance_evidence: .+$','hosted_acceptance_evidence: unavailable',original),encoding='utf8')
+            self.assertTrue(checker.check(self.root));p.write_text(original,encoding='utf8')
+
+    def test_group_missing_duplicate_status_phase_and_plan_dependency_fail(self):
+        p=self.path(checker.GROUP); raw=p.read_bytes();p.unlink()
+        self.assertTrue(checker.check(self.root));p.write_bytes(raw)
+        dup=self.put('spec/tasks/active/'+p.name,p.read_text(encoding='utf8').replace('status: backlog','status: active'))
+        self.assertTrue(checker.check(self.root));dup.unlink()
+        original=p.read_text(encoding='utf8')
+        for old,new in [('status: backlog','status: done'),('client_supplement_phase: planned','client_supplement_phase: group_product'),('- '+checker.GROUP_PLAN+'；','- '+checker.PLAN+'；')]:
+            p.write_text(original.replace(old,new),encoding='utf8');self.assertTrue(checker.check(self.root))
+        p.write_text(original,encoding='utf8')
+        q=self.path(checker.GROUP_PLAN);raw=q.read_bytes();q.unlink()
+        self.assertTrue(checker.check(self.root));q.write_bytes(raw)
+
+    def test_language_remains_i18n_when_group_is_last_or_active(self):
+        self.assertEqual(checker.GROUP, checker.NEW[-1])
+        self.assertEqual(checker.I18N_TASK, checker.NEW[-2])
+        self.accepted(checker.PLAN);self.accepted(checker.NEW[0]);self.accepted(checker.I18N_PREDECESSOR)
+        self.move(checker.I18N_TASK,'active')
+        self.put('clients/web/src/ui/language.ts','window.localStorage.getItem("plugworldim.language.v1")')
+        self.assertEqual([], checker.check(self.root))  # GROUP/its plan still unaccepted.
+        self.move(checker.I18N_TASK,'backlog')
+        self.move(checker.GROUP,'active')
+        self.assertTrue(any('premature language persistence' in e for e in checker.check(self.root)))
+
+    def test_group_rehashed_policy_cannot_rebind_language_or_group_authority(self):
+        originals={p:(self.root/p).read_bytes() for p in ['spec/architecture/frozen-architecture.md','spec/architecture/baseline.md']}
+        for mut in (lambda p:p['language'].update(activation_task=checker.GROUP),lambda p:p['group'].update(predecessor=checker.NEW[0]),lambda p:p['group'].update(planning_task=checker.PLAN),lambda p:p['group'].update(activation_phase='i18n_product')):
+            self.policy(mut);self.assertTrue(checker.check(self.root))
+            for p,raw in originals.items():(self.root/p).write_bytes(raw)
+        self.put(checker.GROUP_APPROVAL,'altered approval\n');self.assertTrue(checker.check(self.root))
 
 if __name__ == '__main__': unittest.main()

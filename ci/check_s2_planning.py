@@ -8,13 +8,19 @@ import stat
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = 'LOOP1-CLIENT-SUPPLEMENT-PLAN-001'
-NEW = ('LOOP1-CLIENT-STATE-001', 'LOOP1-CLIENT-UI-REF-001', 'LOOP1-CLIENT-I18N-001')
+I18N_TASK = 'LOOP1-CLIENT-I18N-001'
+I18N_PREDECESSOR = 'LOOP1-CLIENT-UI-REF-001'
+GROUP = 'LOOP1-GROUP-001'
+GROUP_PLAN = 'LOOP1-GROUP-PLAN-001'
+NEW = ('LOOP1-CLIENT-STATE-001', I18N_PREDECESSOR, I18N_TASK, GROUP)
 CHAIN = ('LOOP1-WEB-001', *NEW)
 PREREQUISITES = ('LOOP1-CLIENT-SQLITE-001', 'LOOP1-CLIENT-UI-ARCH-001', 'LOOP1-CLIENT-SEND-001', 'LOOP1-SYNC-001', 'LOOP1-CLIENT-GUI-001', *CHAIN)
 QUEUES = ('backlog', 'ready', 'active', 'review', 'done')
 ADR = 'spec/architecture/decisions/ADR-0012-client-supplement-planning.md'
 APPROVAL = f'spec/progress/evidence/{PLAN}/human-request.txt'
-PHASES = dict(zip(NEW, ('state_product', 'ui_ref_product', 'i18n_product')))
+GROUP_ADR = 'spec/architecture/decisions/ADR-0013-group-planning.md'
+GROUP_APPROVAL = f'spec/progress/evidence/{GROUP_PLAN}/human-request.txt'
+PHASES = dict(zip(NEW, ('state_product', 'ui_ref_product', 'i18n_product', 'group_product')))
 
 
 def fields(text):
@@ -38,6 +44,17 @@ def authority_errors(root):
                     'supplement_previous_sha256': '2ba864fc2805900117f62c3c88795c52364ecc7450da17975e26d35ebf2cc432'}
         if any(manifest.get(k) != v for k, v in required.items()):
             raise ValueError('supplement manifest lineage/approval linkage')
+        group_required = {'group_revision_adr': GROUP_ADR, 'group_revision_task_id': GROUP_PLAN,
+                          'group_revision_type': 'human_approved_s2_group_planning',
+                          'group_semantic_change': 'true', 'group_approval_source': GROUP_APPROVAL,
+                          'group_previous_sha256': 'efbe04c7eb308904d1759b8e145a32363620ed8c14daef58f09c644bdc897bdc'}
+        if any(manifest.get(k) != v for k, v in group_required.items()):
+            raise ValueError('group manifest lineage/approval linkage')
+        if manifest.get('group_approval_sha256') != hashlib.sha256((root/GROUP_APPROVAL).read_bytes()).hexdigest():
+            raise ValueError('group Human raw prompt hash')
+        group_adr = (root/GROUP_ADR).read_text(encoding='utf8')
+        if 'Human-approved' not in group_adr or 'semantic_change=true' not in group_adr or GROUP_APPROVAL not in group_adr:
+            raise ValueError('Human-approved group ADR linkage')
         approved = (root/APPROVAL).read_bytes()
         if manifest.get('supplement_approval_sha256') != hashlib.sha256(approved).hexdigest():
             raise ValueError('supplement Human raw prompt hash')
@@ -51,8 +68,11 @@ def authority_errors(root):
                 or p.get('stage') != 'S2' or p.get('chain') != list(CHAIN)
                 or p.get('gate_prerequisites') != list(PREREQUISITES)):
             raise ValueError('exact chain/Stage Gate prerequisites')
+        if p.get('group') != {'decision': 'ADR-0013-group-planning', 'planning_task': GROUP_PLAN,
+                              'task': GROUP, 'predecessor': I18N_TASK, 'activation_phase': 'group_product'}:
+            raise ValueError('group identity/dependency/phase')
         language = p.get('language', {})
-        if (language.get('activation_task') != NEW[-1] or language.get('activation_phase') != 'i18n_product'
+        if (language.get('activation_task') != I18N_TASK or language.get('activation_phase') != 'i18n_product'
                 or language.get('locales') != ['en', 'zh-CN', 'ja-JP'] or language.get('default') != 'en'
                 or language.get('names') != ['English', '简体中文', '日本語']
                 or language.get('entry') != 'Language / 语言 / 言語'):
@@ -165,7 +185,7 @@ def accepted_errors(root, tasks, task):
     entries = tasks.get(task, [])
     if len(entries) != 1 or entries[0][0] != 'done':
         return [f'S2 prerequisite not uniquely done: {task}']
-    return completion_errors(root, task, entries[0][1]) if task in (*NEW, PLAN) else []
+    return completion_errors(root, task, entries[0][1]) if task in (*NEW, PLAN, GROUP_PLAN) else []
 
 
 def s2_gate_errors(root, tasks=None):
@@ -193,7 +213,7 @@ def check(root):
             errors.append(f'S2 missing unique planned task: {task}'); continue
         queue, text, f = entries[0]
         deps = re.findall(r'^\s*-\s+(LOOP1-[A-Z0-9-]+)(?=\s|[；;])', section(text, 'Dependencies'), re.M)
-        expected = [CHAIN[i]] + ([PLAN] if i == 0 else [])
+        expected = [CHAIN[i]] + ([PLAN] if i == 0 else [GROUP_PLAN] if task == GROUP else [])
         if deps != expected:
             errors.append(f'S2 {task}: exact serial dependency mismatch')
         if f.get('stage') != 'S2' or f.get('gate') != 'S2':
@@ -207,13 +227,14 @@ def check(root):
             for dep in expected:
                 errors += accepted_errors(root, tasks, dep)
         if queue == 'done': errors += completion_errors(root, task, text)
-    plan = tasks.get(PLAN, [])
-    if len(plan) != 1: errors.append('S2 missing unique planning control Task')
-    elif plan[0][0] == 'done': errors += completion_errors(root, PLAN, plan[0][1])
-    i18n = tasks.get(NEW[-1], [])
+    for planning_task in (PLAN, GROUP_PLAN):
+        plan = tasks.get(planning_task, [])
+        if len(plan) != 1: errors.append(f'S2 missing unique planning control Task: {planning_task}')
+        elif plan[0][0] == 'done': errors += completion_errors(root, planning_task, plan[0][1])
+    i18n = tasks.get(I18N_TASK, [])
     enabled = (len(i18n) == 1 and i18n[0][0] in ('active', 'review', 'done')
                and i18n[0][2].get('client_supplement_phase') == 'i18n_product'
-               and not accepted_errors(root, tasks, NEW[-2]))
+               and not accepted_errors(root, tasks, I18N_PREDECESSOR))
     if not enabled:
         # Detect premature language persistence in actual source ownership only.
         for relative, tokens in {

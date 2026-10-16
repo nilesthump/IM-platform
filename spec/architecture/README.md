@@ -60,3 +60,8 @@ Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c1
 ## S2 客户端补充规划接受发现（2026-10-10）
 
 前述supplement候选/pending文字保留为历史。ADR-0012在candidate 8b52a56403a5a761a12d94e4fabf4f2cf82f63d0 / protectedPR31 actualmain 9f99cfda1cecfc85c0acf3ae8db979f622c97a02经fresh independent Review与exact candidate/PR/actualmain hostedCI（各14selected成功）及H:/IM-platform安全同步接受，canonical efbe04c7/v1.1/PDF与旧谱系不变。证据：spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/acceptance.md。此行政闭合候选另待新Review/CI/actualmain/safe sync。三产品backlog，S2 OPEN；本轮stop，不实施产品/Gate。
+
+
+## S2 群聊规划候选（2026-10-15）
+
+baseline的group_revision_adr/group_approval_source/group_previous_sha256解析Human批准的[ADR-0013](decisions/ADR-0013-group-planning.md)、canonical§4.3/§6.7/§15/§19/§20/附录A/B及本轮当前hash。I18N→LOOP1-GROUP-001→S2 Gate；[群领域](../domain/group.md)、[不变量](../invariants/group.md)、[验收](../acceptance/group.md)与[产品Task](../tasks/backlog/LOOP1-GROUP-001.md)从属canonical/contracts。语言激活仍I18N。独立两审/精确CI/受保护合入/实际main/安全同步PENDING；GROUP backlog、S2 OPEN。本轮只规划及接受同步后STOP，旧接受/PDF/FAIL/Recorder保持。

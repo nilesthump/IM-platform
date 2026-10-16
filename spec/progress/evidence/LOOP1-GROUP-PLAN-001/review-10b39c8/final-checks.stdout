@@ -1,0 +1,157 @@
+{
+  "candidate_sha": "10b39c8688588c94f95a9a3d671b8496e076fcdf",
+  "future_task": "spec/tasks/backlog/LOOP1-GROUP-001.md",
+  "control_scope_outside": [],
+  "changed_count": 74,
+  "new_migrations_required": [
+    "contracts/database/migrations/0002_group_operations.up.sql",
+    "contracts/database/migrations/0002_group_operations.down.sql"
+  ],
+  "runner_version": "0001_initial",
+  "runner_up_actual_file": "H:\\.codex\\worktrees\\grp\\IM-platform\\contracts\\database\\migrations\\0001_initial.up.sql",
+  "runner_allowed": false,
+  "existing_regression_allowed": false,
+  "existing_regression_exists": true,
+  "workflow_migrate_entrypoint": [
+    [
+      168,
+      "        run: python3 contracts/database/migrate.py up"
+    ]
+  ],
+  "contract_authority_paths": {
+    "contracts/http/auth-user-friend.openapi.json": [
+      "/v1/auth/register",
+      "/v1/auth/login",
+      "/v1/auth/logout",
+      "/v1/users/me",
+      "/v1/users/search",
+      "/v1/friends",
+      "/v1/friends/{friendUserId}",
+      "/v1/auth/refresh/web",
+      "/v1/auth/refresh/native"
+    ],
+    "contracts/http/sync.openapi.json": [
+      "/v1/sync/user",
+      "/v1/sync/conversation"
+    ]
+  },
+  "final_root": "H:/.codex/worktrees/grp/IM-platform",
+  "final_head": "10b39c8688588c94f95a9a3d671b8496e076fcdf",
+  "final_branch": "task/LOOP1-GROUP-PLAN-001",
+  "final_status": "",
+  "no_source_write": true
+}
+
+contracts/database/migrate.py
+12: import subprocess
+13: import sys
+14: 
+15: ROOT = pathlib.Path(__file__).resolve().parent
+16: MIGRATIONS = ROOT / "migrations"
+17: VERSION = "0001_initial"
+18: LOCK = 481233001
+19: 
+20: 
+21: def psql(sql: str, *, capture: bool = False) -> str:
+22:     proc = subprocess.run(
+23:         ["psql", "-X", "-v", "ON_ERROR_STOP=1", "-q", "-A", "-t"],
+24:         input=sql, text=True, capture_output=True,
+25:     )
+26:     if proc.returncode:
+27:         raise RuntimeError(proc.stderr.strip() or f"psql exited {proc.returncode}")
+28:     if not capture and proc.stdout.strip():
+29:         print(proc.stdout.strip())
+30:     return proc.stdout.strip()
+31: 
+32: 
+33: def migration_sql(direction: str) -> str:
+34:     return (MIGRATIONS / f"{VERSION}.{direction}.sql").read_text(encoding="utf-8")
+35: 
+36: 
+37: def checksum() -> str:
+38:     return hashlib.sha256(migration_sql("up").encode("utf-8")).hexdigest()
+39: 
+40: 
+41: def applied() -> str | None:
+42:     result = psql("SELECT to_regclass('schema_migrations') IS NOT NULL;", capture=True)
+
+tests/database/test_migrations.py
+12: 
+13: ROOT = pathlib.Path(__file__).resolve().parents[2]
+14: RUNNER = ROOT / "contracts" / "database" / "migrate.py"
+15: UP = ROOT / "contracts" / "database" / "migrations" / "0001_initial.up.sql"
+16: 
+17: 
+18: class StaticSchemaTests(unittest.TestCase):
+19:     def test_single_ordered_reversible_migration_and_runner(self):
+20:         self.assertTrue(UP.is_file())
+21:         self.assertTrue(UP.with_name("0001_initial.down.sql").is_file())
+22:         text = UP.read_text(encoding="utf-8")
+23:         for table in ("users", "sessions", "friendships", "conversations",
+24:                       "conversation_members", "messages", "outbox_events",
+25:                       "plugin_artifacts", "plugin_instances", "plugin_kv"):
+26:             self.assertRegex(text, rf"CREATE TABLE {table}\s*\(")
+27:         self.assertIn("UNIQUE (conversation_id, request_id)", text)
+28:         self.assertIn("UNIQUE (conversation_id, seq)", text)
+29:         self.assertIn("PRIMARY KEY (user_id, client_type)", text)
+30:         self.assertIn("PRIMARY KEY (user_low_id, user_high_id)", text)
+31:         self.assertIn("UNIQUE (direct_user_low_id, direct_user_high_id)", text)
+32: 
+33:     def test_down_requires_explicit_data_loss_acknowledgement(self):
+34:         result = subprocess.run([sys.executable, str(RUNNER), "down"], capture_output=True, text=True)
+35:         self.assertEqual(result.returncode, 1)
+
+tests/database/test_migrations.py
+59:         if result.returncode:
+60:             raise AssertionError(result.stderr)
+61:         return result.stdout.strip()
+62: 
+63:     def migrate(self, *args):
+64:         result = subprocess.run([sys.executable, str(RUNNER), *args],
+65:                                 text=True, capture_output=True, env=self.env)
+66:         self.assertEqual(result.returncode, 0, result.stderr)
+67:         return result.stdout
+68: 
+69:     def test_forward_uniqueness_and_rollback(self):
+70:         self.migrate("up")
+71:         self.assertIn("already applied", self.migrate("up"))
+72:         self.assertIn("applied", self.migrate("status"))
+
+spec/tasks/backlog/LOOP1-GROUP-001.md
+39: # Allowed Paths
+40: 
+41: 普通业务按服务职责窄列，allowed_paths不豁免canonical。下面只授予未来GROUP激活后使用；激活时核对路径，确有新增输入先修Task范围，不在实施后追认。无跨服务迁移。
+42: 
+43: - `contracts/http/group.openapi.json`（建群/加人/本人会话快照；唯一新增HTTP权威）
+44: - `contracts/http/verify-group.py`（标准库/现有validator适配，不新依赖）
+45: - `contracts/errors/http-errors.schema.json`（仅已批准群操作必要错误）
+46: - `contracts/database/migrations/0002_group_operations.up.sql`
+47: - `contracts/database/migrations/0002_group_operations.down.sql`
+48: - `contracts/database/README.md`（仅新增migration语义/兼容与回滚）
+49: - `contracts/fixtures/group/**`（canonical正负/并发/幂等/兼容输入与expected）
+50: - `backend/go/core/group.go`（群权限、事务、快照）
+51: - `backend/go/core/group_test.go`
+52: - `backend/go/core/http.go`（仅现HTTP路由注册）
+
+spec/tasks/backlog/LOOP1-GROUP-001.md
+114: - `spec/tasks/done/LOOP1-GROUP-001.md`
+115: - `spec/progress/current.md`
+116: - `spec/progress/evidence/LOOP1-GROUP-001/**`
+117: - `spec/progress/checkpoints/*group*.md`
+118: 
+119: 以上现有路径及新群文件已明确列举；checker/Reviewer核实，无权增加无关页面、根装配、shared业务、native能力。当前没有schema本地变化依据，不授权native SQLite/schema/Composer改动；如契约冻结后证明必要，先按架构/Task流程处理。
+120: 
+121: # Public Contract Slice
+122: 
+123: 先建立并独立冻结contracts/http/group.openapi.json：POST /v1/groups（requestId、memberUserIds）、POST /v1/groups/{conversationId}/members（requestId、memberUserIds）、GET /v1/conversations（只返回本人有效会话和群成员最小展示身份）。字段/成功结果/错误码/分页资源界限/关联ID/幂等冲突/权限/兼容负例以contracts/唯一机器定义；本Task仅规定必须交付的入口和语义，不成为第二wire权威。复用既有PublicUser/ID/错误形状；读取不泄露非成员会话，返回GROUP种类、成员userId/真实displayName及可区分身份，含非好友成员；状态事件只提供subjectId/revision invalidation不能代替快照。
+
+spec/tasks/backlog/LOOP1-GROUP-001.md
+156: 
+157: # Verification
+158: 
+159: - Minimum activation baseline：`python -Xutf8 -B tools/verify_frozen_architecture.py`、`python -Xutf8 -B ci/check_s2_planning.py`、`python -Xutf8 -B ci/check_architecture.py --scope all --json`，`python -Xutf8 -B -m unittest discover -s tests/architecture`、`python -Xutf8 -B -m unittest discover -s tests/ci`；已有accepted stage-three checker，不豁免。
+160: - 现契约回归：`pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1`、`python -Xutf8 -B contracts/websocket/verify.py`、`python -Xutf8 -B contracts/plugin-api/verify.py`；DB现migration runner及0002正反/旧fixture兼容在契约切片登记真实命令、启用环境、退出/时长，未执行不计PASS。
+161: - 未来新增（当前不存在/不可计PASS）：`python -Xutf8 -B contracts/http/verify-group.py`，`python -Xutf8 -B tests/clients/group/verify.py`、`python -Xutf8 -B tests/clients/group/runtime.py --serial <实际独占serial> --capture`。激活后先实现/登记参数、fault hooks/fixture/服务/清理及每G项映射；若命令有变化先Task更新，不能把planned harness当已执行。
+162: - cwd backend/go：`go test ./...`；真实受控PG/NATS使用DB_TEST_ENABLE=1及受控DATABASE_URL/NATS_URL执行group integration/concurrency/fault测试，缺环境skip不是PASS；`python -Xutf8 -B tools/verify_sync_runtime.py`沿现TLS入口。
+163: - `python -Xutf8 -B tests/clients/web/verify.py`、`node tests/clients/web/browser.mjs`；shared/Desktop现`tools/verify_client_send.py --scope shared`和`--scope desktop`、`tools/verify_client_sync.py --scope shared`和`--scope desktop`适用回归。
+164: - Desktop `python -Xutf8 -B tests/clients/gui/native.py package`，Windows现MSVC/Rust/Tauri/locked npm、安装同候选制品并以真实身份运行和截图；host renderer不替代。

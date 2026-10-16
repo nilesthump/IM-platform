@@ -51,6 +51,7 @@
   - [6.3 SQLite 事务不变量](#section-6-3) · 原 PDF 第 11 页
   - [6.4 双层 Cursor](#section-6-4) · 原 PDF 第 11 页
   - [6.6 Web 完成后的 S2 客户端补充](#section-6-6)
+  - [6.7 建群、成员添加与三端群聊接入](#section-6-7)
 - [7. HTTPS/WSS/TLS 与认证协议](#section-7) · 原 PDF 第 12 页
   - [7.1 登录与 Token](#section-7-1) · 原 PDF 第 12 页
   - [7.2 WSS 状态机](#section-7-2) · 原 PDF 第 12 页
@@ -357,7 +358,11 @@ Loop 1 不做好友申请审批。添加好友表示即时建立双向关系，�
 <a id="section-4-3"></a>
 ### 4.3 群聊最小实现
 
-发起者只能从自己的好友列表选择成员。创建请求必须带 request_id 以避免网络重试重复建群。事务写入 GROUP Conversation、成员、用户状态同步事件与 outbox。Loop 1 不含邀请链接、二维码、陌生人拉群、复杂管理员审批。
+Human-approved ADR-0013（本规划候选待独立接受）明确：创建者从自己的好友列表选择至少一名不同用户，原子创建 GROUP 并自动加入。任意有效群成员均可从其本人的好友列表选择新成员加入当前群；好友资格只相对本次操作者校验，不要求新成员与创建者或其他成员为好友，也不要求 OWNER。Core 在数据库权威 Session、GROUP kind、操作者有效成员及每个目标好友资格校验后整体提交；目标集合去重、不含操作者，已有有效成员无新增变化但仍校验本人好友资格，任一目标非法整批拒绝。
+
+创建幂等身份为 actor + create request_id；加人为 actor + conversation + add request_id，操作类型分隔。同 key 同规范目标集重放原始已提交结果，同 key 异内容明确冲突。并发同 key 归并；不同请求重叠最终每群每用户一个有效成员，只有实际变化产生逻辑事件。Conversation、新成员、必要持久幂等原结果、所有受影响用户低频 Sync 事件及相应 Outbox 在 Core 同一事务提交，COMMIT 后才成功。响应丢失、超时或 commit 未知必须诚实未确认，原 ID/目标重试，不得推定回滚或换 ID 重建。未知异常/内部错误/不变量破坏传播，事务失败整体回滚且不掩盖根因。
+
+未来产品先在 contracts/ 独立冻结最小群 HTTP/错误/必要 additive migration 与正负 fixtures，再实现；本轮不修改公共契约或产品。现 schema GROUP/create 唯一键/成员主键/Sync/Outbox 优先复用，持久操作收据只为当前加人幂等重放需要。成员加入后沿现成员鉴权可读该群已提交消息，不新增 join-seq 历史过滤。Loop 1 不含退群、移除、群管理审批、群名编辑、邀请链接、二维码、陌生人拉群。
 
 <a id="section-4-4"></a>
 ### 4.4 消息身份与序号
@@ -671,7 +676,7 @@ Human 已批准最小前置方案并继续。Web 仅允许宿主适配器 `clien
 <a id="section-6-6"></a>
 ### 6.6 Web 完成后的 S2 客户端补充（Human-approved ADR-0012；候选待独立接受）
 
-本轮直接 Human 规划授权见 `spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/human-request.txt`。ADR-0007 原有任务及接受结果保持；其 WEB→S2 Gate 的直接边被以下串行链追加替代：LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → S2 Gate。三个新增产品任务均S2/backlog；每项仅在前项独立接受、protected integration/actual-main验证和H:/IM-platform同步完成后激活；STATE另依赖本规划正式生效。本轮仅规划及其接受/集成/同步，不实施新产品，S2 Gate OPEN。
+ADR-0012 的直接 Human 规划授权见 `spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/human-request.txt`，原批准三个补充任务串行至 I18N；ADR-0013 本轮 Human 授权再追加 GROUP。ADR-0007/0012 原任务与接受历史保持。当前链为 LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → LOOP1-GROUP-001 → S2 Gate。每项仅在前项独立接受、protected integration/actual-main 验证和 H:/IM-platform 安全同步完成后激活；STATE 另依赖 SUPPLEMENT-PLAN 正式生效，GROUP 另依赖 GROUP-PLAN 正式生效。当前真实队列按精确 ID 解析；本轮仅群规划接受/集成/同步，不实施 GROUP，GROUP backlog/S2 OPEN。
 
 #### STATE：消息状态、幂等重发与好友同步
 
@@ -745,7 +750,8 @@ Web/Desktop英语、简中、日语资源为TypeScript纯数据；Mobile为Kotli
     "LOOP1-WEB-001",
     "LOOP1-CLIENT-STATE-001",
     "LOOP1-CLIENT-UI-REF-001",
-    "LOOP1-CLIENT-I18N-001"
+    "LOOP1-CLIENT-I18N-001",
+    "LOOP1-GROUP-001"
   ],
   "gate_prerequisites": [
     "LOOP1-CLIENT-SQLITE-001",
@@ -756,7 +762,8 @@ Web/Desktop英语、简中、日语资源为TypeScript纯数据；Mobile为Kotli
     "LOOP1-WEB-001",
     "LOOP1-CLIENT-STATE-001",
     "LOOP1-CLIENT-UI-REF-001",
-    "LOOP1-CLIENT-I18N-001"
+    "LOOP1-CLIENT-I18N-001",
+    "LOOP1-GROUP-001"
   ],
   "language": {
     "activation_task": "LOOP1-CLIENT-I18N-001",
@@ -797,11 +804,30 @@ Web/Desktop英语、简中、日语资源为TypeScript纯数据；Mobile为Kotli
       "format": "String enum",
       "max_bytes": 5
     }
+  },
+  "group": {
+    "decision": "ADR-0013-group-planning",
+    "planning_task": "LOOP1-GROUP-PLAN-001",
+    "task": "LOOP1-GROUP-001",
+    "predecessor": "LOOP1-CLIENT-I18N-001",
+    "activation_phase": "group_product"
   }
 }
 ```
 
-本机器policy只绑定规划/串行依赖/未来语言窄授权，不建立新公共契约。实际产品需每项独立真实运行与存储/协议证据、截图/Architect批准、fresh independent Review、精确候选hosted CI和安全同步。新增任务的完成metadata与真实证据必须同时可核对；写PASS文本不能代替独立接受。S2 Gate原所有条件与三个新增完成项共同生效，尚未完成任一项不能Stage PASS。
+本机器policy只绑定规划/串行依赖/未来语言窄授权，不建立新公共契约。实际产品需每项独立真实运行与存储/协议证据、截图/Architect批准、fresh independent Review、精确候选hosted CI和安全同步。新增任务的完成metadata与真实证据必须同时可核对；写PASS文本不能代替独立接受。S2 Gate原所有条件与STATE/UI-REF/I18N及GROUP完成项共同生效，尚未完成任一项不能Stage PASS。
+
+
+<a id="section-6-7"></a>
+### 6.7 建群、成员添加与三端群聊接入（Human-approved ADR-0013 候选）
+
+LOOP1-GROUP-001 依赖 LOOP1-CLIENT-I18N-001 与 LOOP1-GROUP-PLAN-001 正式独立接受、受保护集成/actual-main 验证和主目录安全同步。当前链为 WEB→STATE→UI-REF→I18N→GROUP→S2 Gate；本规划仅入队 backlog、S2 OPEN。§6.6 与旧 ADR 的三产品 backlog/候选时点保留为当时范围，现队列依精确 Task ID；语言 activation_task 始终 LOOP1-CLIENT-I18N-001、i18n_product，不随链末端 GROUP 改变。
+
+三端从好友入口选本人好友建群，从群入口由任意有效成员选本人好友加人；可观察加载/空/拒绝/真实失败/提交未确认及原 ID 重试。会话列表与群消息补齐成员及 senderId→真实成员展示身份；非好友成员也通过授权会话快照可辨认，不能以名字/翻译/好友 DIRECT 推断身份。Web/Desktop React/TypeScript、Desktop 现 Tauri/SQLx 原子边界、Android Kotlin/Compose/SDK SQLite 及现 Send/Sync 分层不变，新文案与accessibility使用已接受 en/zh-CN/ja-JP 资源，不新增依赖或语言偏好机制。
+
+每次实际成员变化面向全部有效成员含新成员生成现 conversation.changed/membership.changed 低频 invalidation 与 Outbox，同业务事务。User Sync 消费 subjectId/revision 后经授权会话快照取 GROUP/成员/最小展示身份；在线现触发/周期同步和重连持久 cursor 补偿，不能只靠消息发现新群。消息复用现发送/成员鉴权/seq/幂等/durable ACK/单Message单Outbox/local fan-out/会话Sync；Web仅当前页面memory/在线窗口，无新增离线历史，Desktop/Mobile现账号SQLite/游标原子UPSERT。Gateway只代理及连接分发，好友/成员决策与写事务在Core，共享支持无业务下沉。
+
+spec/acceptance/group.md G01..G09 必须包括 A-B好友、A建群+B、B-C好友/A-C非好友而B加C、三人获得同群互发辨认身份；非成员/非好友、重复/并发、rollback、响应丢失原ID重试、多端与离线补偿。真实 Go/PG/NATS/TLS、三端真实入口/原始截图及Architect批准，最终候选 fresh常规Review→different fresh错误专项→exact-head hostedCI→protected integration/actual-main→安全主目录同步均必需。群Task未done/独立接受/同步则S2阻止，不以截图、local或Recorder替代。契约先在contracts独立冻结接受再产品实施；本轮无contracts/backend/clients改动。
 
 <a id="section-7"></a>
 ## 7. HTTPS/WSS/TLS 与认证协议
@@ -1224,13 +1250,13 @@ This loop is milestone-gated, not calendar-gated. A stage MAY begin immediately 
 | --- | --- | --- | --- |
 | S0 控制面 | W1 | Monorepo、spec/contracts/tasks/progress、CI skeleton、Compose、PostgreSQL/NATS/TLS；冻结 HTTP/WSS/Error/Session/Message/Sync/Plugin API v1 | 新 Agent 仅靠控制面可定位项目、状态、下一任务；契约 lint 与 skeleton CI PASS |
 | S1 Go 纵向链路 | W2-3 | 注册/登录、WSS、搜索、好友、唯一私聊、文本发送、ACK、持久化、Outbox、NATS | A 搜索/添加 B 后发 hello，B 实时收到；contract/integration PASS |
-| S2 客户端与Sync | W4-5 | Desktop/Mobile SQLite、optimistic/retry/Sync 和完整 Loop1 GUI；Web memory-only 完整 GUI；WEB后STATE→UI-REF→I18N | 既有ACK/gap/乱序GUI条件与三个新增任务独立接受、集成、主仓库同步共同必需；真实故障/组件完整性/三语言与Architect证据 |
+| S2 客户端与Sync | W4-5 | Desktop/Mobile SQLite、optimistic/retry/Sync 和完整 Loop1 GUI；Web memory-only 完整 GUI；WEB后STATE→UI-REF→I18N→GROUP | 既有ACK/gap/乱序GUI条件与STATE/UI-REF/I18N/GROUP任务独立接受、集成、主仓库同步共同必需；真实故障/组件完整性/三语言/群聊与Architect证据 |
 | S3 Java 等价 | W6-7 | Auth/Session/User/Friend/Conversation/Message/Sync/Outbox/NATS | 两 profile 同一 Golden Tests PASS；客户端零改动切换 |
 | S4 插件平台 | W8-9 | Registry、Manifest、Permission、WASM、UI Host、Render Bundle、生命周期、Echo/Poll | 两个 fixture 在三端与双后端兼容；sandbox/权限负例 PASS |
 | S5 工程硬化 | W10 | path-aware CI、compatibility matrix、migration/plugin tests、Release Manifest、rollback/security | Compatibility CI 可复现；无硬编码跳过；回滚演练 PASS |
 | S6 性能与 RC | W11-12 | 500/1000/2500/5000 阶梯压测、profile、修复、soak、RC、architecture snapshot | 单机 5k authenticated WSS Gate PASS；正确性零红线违例；RC 可回滚 |
 
-S2补充串行前置：LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → S2 Gate；每项独立接受、集成、主仓库同步与旧门禁条件共同必需。
+S2补充串行前置：LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → LOOP1-GROUP-001 → S2 Gate；每项独立接受、集成、主仓库同步与旧门禁条件共同必需。
 
 <a id="section-16"></a>
 ## 16. Loop 1 性能与可靠性验收
@@ -1385,14 +1411,15 @@ P0: 数据丢失/错投/越权/ACK-before-commit；P1: 大面积认证/连接/Sy
 | LOOP1-CLIENT-STATE-001 | 消息状态、幂等重发与好友同步 | S2 | §6.6 A/B、seq排序、重启/cleanDB恢复、跨端好友 | 真实服务/DB/三端证据、独立Review/CI/集成同步 |
 | LOOP1-CLIENT-UI-REF-001 | 组件职责拆分与完整性验证 | S2 | §6.6 页面/入口/组件/状态/import和覆盖对照 | STATE后行为等价/视觉保持、截图/Architect/独立接受同步 |
 | LOOP1-CLIENT-I18N-001 | 三端国际化拆包 | S2 | §6.6 en/zh-CN/ja-JP、固定语言入口/偏好 | UI-REF后键/参数/回退/三语言截图/Architect/独立接受同步 |
+| LOOP1-GROUP-001 | 建群、成员添加与三端群聊接入 | S2 | §4.3/§6.7、群公共契约/事务/三端/i18n | I18N及GROUP-PLAN接受后，G01..G09/真实入口/截图/Architect/双审/CI/同步 |
 
 ### S2 最小任务依赖与执行顺序（Human-approved ADR-0007）
 
-LOOP1-CLIENT-SQLITE-001（已接受） → LOOP1-CLIENT-UI-ARCH-001（UI 冻结已接受，当前规划补充另行验收） → LOOP1-CLIENT-SEND-001 → LOOP1-SYNC-001 → LOOP1-CLIENT-GUI-001 → LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → S2 Gate。
+LOOP1-CLIENT-SQLITE-001（已接受） → LOOP1-CLIENT-UI-ARCH-001（UI 冻结已接受，当前规划补充另行验收） → LOOP1-CLIENT-SEND-001 → LOOP1-SYNC-001 → LOOP1-CLIENT-GUI-001 → LOOP1-WEB-001 → LOOP1-CLIENT-STATE-001 → LOOP1-CLIENT-UI-REF-001 → LOOP1-CLIENT-I18N-001 → LOOP1-GROUP-001 → S2 Gate。
 
-ADR-0007当时只新增一个产品 UI ID LOOP1-CLIENT-GUI-001；ADR-0012追加三个S2产品ID，原接受历史不撤销。Desktop/Mobile GUI 独立边界包含上述完整界面及既有发送/同步编排的可观察状态，不重新实现 SQLite、发送或 Sync 领域逻辑。GUI 明确依赖 SQLITE、UI-ARCH、SEND、SYNC 四个已接受任务；Web 完整 GUI 使用原 LOOP1-WEB-001 且在 GUI 后执行。各任务在真实队列中唯一存在，依赖未接受不得激活；此前ADR-0007 Human endpoint为历史；本轮ADR-0012 endpoint为规划独立接受/集成同步后停止，新三个任务保持backlog，S2 OPEN。
+ADR-0007当时只新增一个产品 UI ID LOOP1-CLIENT-GUI-001；ADR-0012追加三个S2产品ID，原接受历史不撤销。Desktop/Mobile GUI 独立边界包含上述完整界面及既有发送/同步编排的可观察状态，不重新实现 SQLite、发送或 Sync 领域逻辑。GUI 明确依赖 SQLITE、UI-ARCH、SEND、SYNC 四个已接受任务；Web 完整 GUI 使用原 LOOP1-WEB-001 且在 GUI 后执行。各任务在真实队列中唯一存在，依赖未接受不得激活；此前ADR-0007/0012 Human endpoint及三产品backlog是各自当时范围；本轮ADR-0013 endpoint为群规划独立接受/集成同步后停止，GROUP保持backlog，S2 OPEN。
 
-GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成真实运行截图 → Architect Review → 修复 → 重新截图 → Architect Approval → fresh independent Review → exact-head applicable hosted CI → protected integration/actual-main verification。S2 不实现 AI API/chat/Agent/RAG、Plugin runtime、Marketplace、S4 renderer 或新公共 API；Web 始终 React/TypeScript memory only、no SQLite、no offline history。偏好仅存外观设置，不授权聊天持久化；未冻结具体存储机制按 §2.3 先决策后实现。
+GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成真实运行截图 → Architect Review → 修复 → 重新截图 → Architect Approval → fresh independent Review → exact-head applicable hosted CI → protected integration/actual-main verification。S2 仅允许 ADR-0013 群聊所需且先独立冻结接受的公共 HTTP/错误/必要 additive migration 增量；不实现 AI API/chat/Agent/RAG、Plugin runtime、Marketplace、S4 renderer 或其他新公共 API；Web 始终 React/TypeScript memory only、no SQLite、no offline history。偏好仅存外观设置，不授权聊天持久化；未冻结具体存储机制按 §2.3 先决策后实现。
 
 <a id="section-20"></a>
 ## 20. 后续任务队列与依赖
@@ -1407,6 +1434,7 @@ GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成�
 | LOOP1-CLIENT-STATE-001 | LOOP1-WEB-001 + LOOP1-CLIENT-SUPPLEMENT-PLAN-001正式生效 | §6.6真实A/B、排序恢复和好友同步 | S2 |
 | LOOP1-CLIENT-UI-REF-001 | LOOP1-CLIENT-STATE-001独立接受/集成/同步 | §6.6组件拆分与全回归/Architect | S2 |
 | LOOP1-CLIENT-I18N-001 | LOOP1-CLIENT-UI-REF-001独立接受/集成/同步 | §6.6三语言资源与本地语言偏好/Architect | S2 |
+| LOOP1-GROUP-001 | LOOP1-CLIENT-I18N-001 + LOOP1-GROUP-PLAN-001独立接受/集成/同步 | §4.3/§6.7群契约先冻结、建群/任意有效成员加本人好友/三端入口及sender身份 | S2 |
 | LOOP1-JAVA-AUTH-001 | S2 PASS + Auth contracts | Java/Spring Auth/Session 等价实现 | S3 |
 | LOOP1-JAVA-IM-001 | Java Auth + IM contracts | Friend/Conversation/Message/Sync/Outbox/NATS | S3 |
 | LOOP1-PARITY-001 | Go + Java core + S2 PASS | Golden parity；同一客户端制品/代码无需业务修改切换 Go/Java profile，GUI 不改写协议，两 profile 当前关键纵向流程通过 | S3 |
@@ -1477,7 +1505,7 @@ GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成�
 | --- | --- |
 | S0 | spec/contracts/tasks/progress 完整；CI/Compose/TLS/PostgreSQL/NATS skeleton；Agent dry-run 可恢复；无重复权威 |
 | S1 | Go Auth -> Friend -> Direct -> Message 全链；durable ACK/outbox/NATS；contract/integration/E2E PASS |
-| S2 | SQLITE/UI-ARCH/SEND/SYNC/CLIENT-GUI/WEB及LOOP1-CLIENT-STATE-001、LOOP1-CLIENT-UI-REF-001、LOOP1-CLIENT-I18N-001全部独立接受、集成与主仓库同步；Desktop/Mobile 完整 Loop1 GUI，Web memory only/no SQLite/no offline history；client-gui 真实截图/Architect Approval、fresh independent Review、精确 HEAD CI/main 验证；ACK 丢失/离线 gap/乱序重复 PASS |
+| S2 | SQLITE/UI-ARCH/SEND/SYNC/CLIENT-GUI/WEB及LOOP1-CLIENT-STATE-001、LOOP1-CLIENT-UI-REF-001、LOOP1-CLIENT-I18N-001、LOOP1-GROUP-001全部独立接受、集成与主仓库同步；Desktop/Mobile 完整 Loop1 GUI，Web memory only/no SQLite/no offline history；client-gui 真实截图/Architect Approval、fresh independent Review、精确 HEAD CI/main 验证；ACK 丢失/离线 gap/乱序重复 PASS |
 | S3 | Java 核心等价；Go/Java Golden Tests；客户端零修改 profile switch |
 | S4 | Registry/WASM/UI/Render Bundle/lifecycle；Echo/Poll；权限与 sandbox 负例 |
 | S5 | Path-aware CI、全平台 compatibility、migration、manifest、security、rollback rehearsal |
@@ -1502,7 +1530,7 @@ GUI/Web 均须引用 spec/acceptance/client-gui.md 和 CLIENT-UI-ARCH，完成�
 | --- | --- |
 | Session | 同 user/client_type 最多一个有效 Session；不同 client_type 可同时登录；epoch 使旧端失效 |
 | Friend | 规范化 pair 唯一；好友与唯一 DIRECT Conversation 同事务 |
-| Group | 成员只能来自发起者好友列表；create request 幂等 |
+| Group | 建群自动含创建者；有效成员仅从本人好友加人；create/add request幂等、整批原子；响应丢失原ID重试 |
 | Message | ACK=durable commit；conversation 内 seq 单调；服务端幂等 key 含 sender/conversation/request |
 | Outbox | 与业务数据同事务；NATS 可重复/短暂遗漏；Sync 保证最终完整 |
 | SQLite | UNIQUE(conversation_id, request_id)；所有入口事务 UPSERT；SENT 不回退 |

@@ -1,0 +1,64 @@
+{
+  "source": "C:/Users/21441/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.6/pgconn/config.go",
+  "version": "v5.7.6",
+  "sha256": "9d21b9aed763c9cb779353e7e5afb036772d3b2e3cf82a071037392d3ed7c150",
+  "excerpts": [
+    {
+      "line": 218,
+      "text": "// ParseConfig tries to match libpq behavior with regard to PGSSLMODE. This includes defaulting to \"prefer\" behavior if"
+    },
+    {
+      "line": 219,
+      "text": "// not set."
+    },
+    {
+      "line": 224,
+      "text": "// The sslmode \"prefer\" (the default), sslmode \"allow\", and multiple hosts are implemented via the Fallbacks field of"
+    },
+    {
+      "line": 225,
+      "text": "// the Config struct. If TLSConfig is manually changed it will not affect the fallbacks. For example, in the case of"
+    },
+    {
+      "line": 226,
+      "text": "// sslmode \"prefer\" this means it will first try the main Config settings which use TLS, then it will try the fallback"
+    },
+    {
+      "line": 227,
+      "text": "// which does not use TLS. This can lead to an unexpected unencrypted connection if the main TLS config is manually"
+    },
+    {
+      "line": 454,
+      "text": "\t\t\"PGSSLMODE\":            \"sslmode\","
+    },
+    {
+      "line": 663,
+      "text": "\tif sslmode == \"\" {"
+    },
+    {
+      "line": 664,
+      "text": "\t\tsslmode = \"prefer\""
+    },
+    {
+      "line": 709,
+      "text": "\tswitch sslmode {"
+    },
+    {
+      "line": 710,
+      "text": "\tcase \"disable\":"
+    },
+    {
+      "line": 711,
+      "text": "\t\treturn []*tls.Config{nil}, nil"
+    },
+    {
+      "line": 834,
+      "text": "\tcase \"prefer\":"
+    },
+    {
+      "line": 835,
+      "text": "\t\treturn []*tls.Config{tlsConfig, nil}, nil"
+    }
+  ],
+  "inference": "Explicit disable removes TLS attempts for the already non-TLS disposable service. This is a minimal evidence-backed environment correction; hosted resolution remains unverified."
+}

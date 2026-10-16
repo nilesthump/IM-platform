@@ -1,0 +1,191 @@
+{
+  "task_id": "LOOP1-GROUP-PLAN-001",
+  "actor": "/root/group_fix_r1",
+  "meaning": "Local evidence only; not independent acceptance",
+  "checks": [
+    {
+      "name": "frozen",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tools/verify_frozen_architecture.py",
+        "--base-commit",
+        "86b41e4dbacd2fd6c92033697ee2ebe05a8b0ed0"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\grp\\IM-platform",
+      "exit_code": 0,
+      "elapsed_seconds": 0.375,
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\frozen.stdout",
+        "bytes": 164,
+        "sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989"
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\frozen.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "planning",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_s2_planning.py"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\grp\\IM-platform",
+      "exit_code": 0,
+      "elapsed_seconds": 0.23,
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\planning.stdout",
+        "bytes": 77,
+        "sha256": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426"
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\planning.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "architecture",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\grp\\IM-platform",
+      "exit_code": 0,
+      "elapsed_seconds": 1.767,
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\architecture.stdout",
+        "bytes": 219356,
+        "sha256": "4f65e9536ce23c00e1564e10630e385de25f2eed54724fd9e64301647ad616c6"
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\architecture.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "architecture-tests",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\grp\\IM-platform",
+      "exit_code": 0,
+      "elapsed_seconds": 29.415,
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\architecture-tests.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\architecture-tests.stderr",
+        "bytes": 210,
+        "sha256": "79bb415c48dbbc2b8ee85009e017d72f7853a83c7bcbd00413c446c61758d31a"
+      }
+    },
+    {
+      "name": "ci-tests",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\grp\\IM-platform",
+      "exit_code": 0,
+      "elapsed_seconds": 6.06,
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\ci-tests.stdout",
+        "bytes": 410,
+        "sha256": "d260103c650a82689a727c276f85b42ca0d9c582efe3e36b8536e41390b8cea6"
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\ci-tests.stderr",
+        "bytes": 1762,
+        "sha256": "58d72a0337e3a58416f1d43161d5197c8cce98cac951369497ec752f8401c441"
+      }
+    },
+    {
+      "name": "development",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\grp\\IM-platform",
+      "exit_code": 1,
+      "elapsed_seconds": 31.387,
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\development.stdout",
+        "bytes": 348,
+        "sha256": "e9fac4eaf4b5d4eb8714681b4534ca60131256a531dc5f4efa7eba2bc34afb48"
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\development.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "development-recheck",
+      "argv": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\grp\\IM-platform",
+      "exit_code": 0,
+      "elapsed_seconds": 31.161,
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\development-recheck.stdout",
+        "bytes": 331,
+        "sha256": "d9ec818306f9efe9b42a3609680994d3bb68360cf39cd5d68ba2ff7aa2d872d6"
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\15\\01a1400d-ed56-7fb0-bb81-bc855be6da84\\fix-r1\\development-recheck.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "development_initial_failure": {
+    "exit_code": 1,
+    "kind": "control_document_format_mismatch",
+    "reason": "current.md Verification omitted required exact Command/Result/Evidence syntax",
+    "resolution": "Required syntax restored; affected Development entrypoint rerun exit0. No product failure or suppression."
+  },
+  "future_checks_not_executed": [
+    "GROUP contract/verifier/fixtures",
+    "0002 migration/disposable PostgreSQL suite",
+    "GROUP runtime Go/PG/NATS/TLS/client/screenshots/Architect",
+    "hosted CI/protected integration/actual-main/safe-main-sync"
+  ],
+  "independent_acceptance": "PENDING"
+}

@@ -87,3 +87,8 @@ TS/Kotlin资源键set与每键占位参数set必须一致；未知locale/非法�
 沿用client-gui完整截图→Architect Review→修复重拍→Approval、fresh independent semantic Review、exact-head applicable hosted CI、protected integration/actual-main和safe H:/IM-platform同步。每新任务done必须在Task Completion Metadata写实际candidate/main SHA、PASS与独立review/hosted/main sync证据路径；Reviewer读证据内容与实际jobs/checkout/受保护合入/保存未知work，字段本身不提供接受。
 
 顺序WEB→STATE→UI-REF→I18N→S2 Gate，前项独立接受/集成同步后才能激活后项；STATE另依赖本规划正式生效。Gate仍需旧SQLITE/UI-ARCH/SEND/SYNC/GUI/WEB和所有旧要求、三个新完成项及deferred helper适用验收。规划或单Task PASS不能S2 PASS。本次仅独立接受规划、三个backlog交付，不评估实际Stage Gate。
+
+
+## 当前群聊前置（ADR-0013候选）
+
+原补充规划与接受为既有历史；本轮Human授权在I18N后追加LOOP1-GROUP-001，再到S2 Gate，且GROUP依赖LOOP1-GROUP-PLAN-001正式独立接受/集成/安全主目录同步。完整群契约、权限、原子幂等/真实失败、三端入口/i18n及G01..G09见spec/acceptance/group.md；沿用本规范真实截图/Architect与独立接受要求，不降低旧门禁。语言activation_task保持LOOP1-CLIENT-I18N-001/i18n_product。群聊未独立完成/接受/同步不能S2 PASS；本轮仅规划，GROUP backlog/S2 OPEN，不评估实际Stage Gate。

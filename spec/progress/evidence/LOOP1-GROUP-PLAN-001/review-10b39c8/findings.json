@@ -1,0 +1,59 @@
+{
+  "result": "FAIL",
+  "actor": "/root/group_regular_10b39c8",
+  "candidate_sha": "10b39c8688588c94f95a9a3d671b8496e076fcdf",
+  "findings": [
+    {
+      "id": "R1",
+      "priority": 2,
+      "blocking": true,
+      "title": "Complete future contract-slice migration and hosted-verification scope",
+      "code_location": {
+        "path": "spec/tasks/backlog/LOOP1-GROUP-001.md",
+        "start_line": 43,
+        "end_line": 49
+      },
+      "additional_locations": [
+        {
+          "path": "spec/tasks/backlog/LOOP1-GROUP-001.md",
+          "line": 160
+        },
+        {
+          "path": "contracts/database/migrate.py",
+          "line": 17
+        },
+        {
+          "path": "contracts/database/migrate.py",
+          "line": 33
+        },
+        {
+          "path": "tests/database/test_migrations.py",
+          "line": 14
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "line": 168
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "line": 332
+        },
+        {
+          "path": "contracts/http/verify-auth-user-friend.ps1",
+          "line": 13
+        }
+      ],
+      "trigger": "Future first contract slice adds required 0002 migration, group verifier and group fixtures within currently listed hard allowed_paths.",
+      "impact": "The existing runner/hosted database setup still applies only 0001 and cannot be updated within scope; selected contract jobs never execute the new group verifier/suite, so green hosted jobs cannot establish the promised independent contract freeze.",
+      "authority": "Human request 3/6; AGENTS hard allowed_paths and contract-first acceptance; canonical11.4 migration/14 CI; Task Public Contract Slice and Verification.",
+      "minimal_fix": "Planning only: narrowly add contracts/database/migrate.py, tests/database/test_migrations.py and .github/workflows/ci.yml (existing contract-step wiring only) to future Task allowed_paths. Specify accepted migration entrypoint status/up/database regression with disposable PG+DB_TEST_ENABLE=1, 0001-to0002/reapply/rollback/oldfixture evidence, preserving old migration bytes and existing checksum/lock/failure behavior. Connect planned group contract verifier/suite to a required existing contract job in the independently accepted contract slice; preserve old checks and failure propagation. No product/contracts/workflow implementation this round, no new framework/job.",
+      "verification": "Read-only candidate-bound final-checks.json/final-checks-ciwiring.stdout confirms all omissions and exact existing entrypoints. No PG/group runtime test claimed."
+    }
+  ],
+  "nonblocking_observations": [
+    {
+      "location": "spec/acceptance/group.md:25",
+      "text": "Format-neutral original-image SHA wording would be clearer than PNG hash, but no explicit PNG-only rule/current forced transcode was proven; not a blocking finding."
+    }
+  ]
+}

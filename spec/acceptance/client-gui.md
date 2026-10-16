@@ -41,3 +41,8 @@ S3 PARITY、S4 PLUGIN-UI/FIX、S5 COMPAT/RELEASE、S6 RC 在各自既有 accepta
 ## Web 后 S2 补充（ADR-0012候选）
 
 原GUI/Web接受保持。正式生效后追加WEB→STATE→UI-REF→I18N→S2 Gate；完整要求见canonical§6.6及spec/acceptance/client-supplement.md。三产品任务backlog、逐项独立接受/集成/主仓库同步后激活下项；本次不实施，S2 OPEN。独立视觉/Repository/Auth/Send/Sync职责与原截图/Architect/Review/hosted/main链共同保留。STATE真实A/B/排序/恢复/跨端好友，UIREF完整对照回归和视觉基线，I18N三纯数据语言/固定入口/独立偏好窄授权均必需。
+
+
+## 当前群聊前置（ADR-0013候选）
+
+原补充规划与接受为既有历史；本轮Human授权在I18N后追加LOOP1-GROUP-001，再到S2 Gate，且GROUP依赖LOOP1-GROUP-PLAN-001正式独立接受/集成/安全主目录同步。完整群契约、权限、原子幂等/真实失败、三端入口/i18n及G01..G09见spec/acceptance/group.md；沿用本规范真实截图/Architect与独立接受要求，不降低旧门禁。语言activation_task保持LOOP1-CLIENT-I18N-001/i18n_product。群聊未独立完成/接受/同步不能S2 PASS；本轮仅规划，GROUP backlog/S2 OPEN，不评估实际Stage Gate。

@@ -1,0 +1,7 @@
+# GROUP planning CI R2 recovery checkpoint
+
+Task LOOP1-GROUP-PLAN-001 remains review; S1 accepted/S2 OPEN/GROUP backlog planned. Last accepted main 86b41e4dbacd2fd6c92033697ee2ebe05a8b0ed0; fix branch task/LOOP1-GROUP-PLAN-001 clean start bab8ef34612ba3a07455c7b674aaff353234db5a. Actual new clean commit is resolved externally via ci-fix-r2/final-receipt.json to avoid self-referential source hashes. No data/schema/fixture version migration; product contract tree unchanged.
+
+Only existing Go disposable PostgreSQL env + seven checkout pins changed after pre-edit scope amendment. All13 checkout refs bound; no job/step/test/race/failure gate removed; five product trees same as base. Old bab8 both reviews/push PASS and PR attempts1/2 Go FAIL preserved as history. Local frozen/planning/architectureall and88arch(1existing Windows skip)/35CI(4existing OS skips)exit0; final Development/Acceptance/Recorder/lease externally bound. No hosted resolution claim.
+
+Latest evidence: spec/progress/evidence/LOOP1-GROUP-PLAN-001/ci-fix-r2/handoff.md and local-verification.json; latest candidate discovery appended to recovery.md. NEW regular→DIFFERENT NEW error review same finalSHA PENDING, CI/protected integration/actual-main/safe main sync PENDING. No push/PR update/CI trigger by Fix. Main unknown work never adopted/written; exact external before/after preservation required. Existing two-stage metadata independent closure remains required. GROUP backlog/S2 OPEN/STOP.

@@ -5,7 +5,7 @@
 - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `efbe04c7eb308904d1759b8e145a32363620ed8c14daef58f09c644bdc897bdc`
+- sha256: `33b7b2a0a29b555b8c2842383890ae67fc382286b582b4681d2cd78b9f5829ca`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -141,3 +141,16 @@ APPROVED_PENDING_FREEZE。沿用v1.1，最新canonical hash只绑定本候选字
 ## S2 客户端补充规划接受发现（2026-10-10）
 
 前述supplement候选/pending文字保留为历史。ADR-0012在candidate 8b52a56403a5a761a12d94e4fabf4f2cf82f63d0 / protectedPR31 actualmain 9f99cfda1cecfc85c0acf3ae8db979f622c97a02经fresh independent Review与exact candidate/PR/actualmain hostedCI（各14selected成功）及H:/IM-platform安全同步接受，canonical efbe04c7/v1.1/PDF与旧谱系不变。证据：spec/progress/evidence/LOOP1-CLIENT-SUPPLEMENT-PLAN-001/acceptance/acceptance.md。此行政闭合候选另待新Review/CI/actualmain/safe sync。三产品backlog，S2 OPEN；本轮stop，不实施产品/Gate。
+
+
+## Human-approved S2 群聊规划候选（2026-10-15）
+
+- group_revision_type: `human_approved_s2_group_planning`
+- group_semantic_change: `true`
+- group_revision_task_id: `LOOP1-GROUP-PLAN-001`
+- group_revision_adr: `spec/architecture/decisions/ADR-0013-group-planning.md`
+- group_approval_source: `spec/progress/evidence/LOOP1-GROUP-PLAN-001/human-request.txt`
+- group_approval_sha256: `ab0699e01d34dbca86b5d879715bbeb4d9073705e40d5a6684cc794a852a0bdd`
+- group_previous_sha256: `efbe04c7eb308904d1759b8e145a32363620ed8c14daef58f09c644bdc897bdc`
+
+当前canonical hash仅绑定本轮候选字节；v1.1、PDF与旧supplement/其他ADR谱系不变。Human明确授权最小群聊规划，fresh常规Review、different fresh错误专项、exact-head hostedCI、protected integration、actual-main和安全主目录同步PENDING。产品GROUP backlog/S2 OPEN；本轮终点为规划接受及同步后STOP，不实施群聊。
