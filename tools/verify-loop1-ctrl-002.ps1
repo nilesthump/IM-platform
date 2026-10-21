@@ -1,7 +1,11 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Acceptance', 'Development')]
-    [string]$Mode = 'Acceptance'
+    [string]$Mode = 'Acceptance',
+    # Optional explicit Python 3 executable for the S2 planning checker;
+    # defaults to tolerant PATH discovery so Microsoft Store alias stubs
+    # cannot crash this verifier before its designed failure reporting.
+    [string]$Python = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -295,17 +299,48 @@ if (Test-Path -LiteralPath (Join-Path $repoRoot '.github/workflows') -PathType C
 }
 
 if (Test-Path -LiteralPath (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1') -PathType Leaf) {
-    $architectureResult = @(& (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1') 2>&1)
+    $frozenScript = Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1'
+    if ($Python) { $architectureResult = @(& $frozenScript -Python $Python 2>&1) }
+    else { $architectureResult = @(& $frozenScript 2>&1) }
     if ($LASTEXITCODE -ne 0) { Add-Failure "Frozen Architecture migration verification failed: $($architectureResult -join ' ')" }
 }
 
 $planningChecker = Join-Path $repoRoot 'ci/check_s2_planning.py'
 if (Test-Path -LiteralPath $planningChecker -PathType Leaf) {
     # Use the same standard-library checker; recorder initialization belongs to the caller.
-    $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
-    if (-not $pythonCommand) { Add-Failure 'S2 planning recovery requires Python 3.' }
+    $planningPython = $null
+    if ($Python -and -not (Test-Path -LiteralPath $Python -PathType Leaf)) {
+        Add-Failure "Specified -Python path does not exist: $Python"
+    }
+    elseif ($Python) {
+        $version = & $Python --version 2>&1
+        if ($LASTEXITCODE -eq 0 -and "$version" -match '^Python 3\.') { $planningPython = $Python }
+        else { Add-Failure "Specified -Python is not a working Python 3: $Python" }
+    }
     else {
-        $planningResult = @(& $pythonCommand.Source -Xutf8 -B $planningChecker --root $repoRoot 2>&1)
+        # Probes and invocation must tolerate failing executables (for example
+        # the Windows Store python/python3 alias stubs) instead of aborting the
+        # whole verifier with a NativeCommandError before failures are reported.
+        $ErrorActionPreference = 'Continue'
+        try {
+            foreach ($name in @('python3', 'python')) {
+                $candidate = Get-Command $name -ErrorAction SilentlyContinue
+                if (-not $candidate) { continue }
+                $version = & $candidate.Source --version 2>&1
+                if ($LASTEXITCODE -eq 0 -and "$version" -match '^Python 3\.') { $planningPython = $candidate.Source; break }
+            }
+        } finally {
+            $ErrorActionPreference = 'Stop'
+        }
+    }
+    if (-not $planningPython) { Add-Failure 'S2 planning recovery requires Python 3.' }
+    if ($planningPython) {
+        $ErrorActionPreference = 'Continue'
+        try {
+            $planningResult = @(& $planningPython -Xutf8 -B $planningChecker --root $repoRoot 2>&1)
+        } finally {
+            $ErrorActionPreference = 'Stop'
+        }
         if ($LASTEXITCODE -ne 0) { Add-Failure "S2 planning recovery failed: $($planningResult -join ' ')" }
     }
 }
