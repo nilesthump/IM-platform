@@ -1,0 +1,44 @@
+diff --git a/contracts/http/check-openapi-3.1.js b/contracts/http/check-openapi-3.1.js
+index c96b369b..b4b89b0c 100644
+--- a/contracts/http/check-openapi-3.1.js
++++ b/contracts/http/check-openapi-3.1.js
+@@ -3,7 +3,10 @@ const fs = require('node:fs');
+ const validate = require('./auth-user-friend.openapi.validator.js');
+ 
+ try {
+-  const document = JSON.parse(fs.readFileSync(0, 'utf8'));
++  // Strip a leading UTF-8 BOM: Windows PowerShell 5.1 pipeline stdin prepends
++  // one (contract verifier + documented standalone usage pipe JSON to stdin).
++  const raw = fs.readFileSync(0, 'utf8').replace(/^\uFEFF/, '');
++  const document = JSON.parse(raw);
+   if (!validate(document)) {
+     for (const error of (validate.errors || []).slice(0, 8)) {
+       console.error(`${error.instancePath || '/'}: ${error.message}`);
+diff --git a/contracts/http/openapi-3.1-lint.md b/contracts/http/openapi-3.1-lint.md
+index 0c3fc087..7ba192f3 100644
+--- a/contracts/http/openapi-3.1-lint.md
++++ b/contracts/http/openapi-3.1-lint.md
+@@ -6,4 +6,4 @@ The source file `openapi-3.1-2026-08-03.schema.json` is the OpenAPI Initiative's
+ 
+ The source schema is intentionally **without Schema Object validation**. It checks that Schema Object positions contain an object or boolean, but does not prove that every embedded JSON Schema keyword or reference is valid. Ajv's `format` assertions are disabled in this standalone structural build. OAI also notes that its published schemas do not establish full conformance with every prose rule of the OpenAPI Specification. A passing structural lint is one part of this task's verification; `verify-auth-user-friend.ps1` separately checks the canonical Auth/User/Friend semantics, error bindings, and golden fixtures. The checker does not claim full OpenAPI conformance by itself.
+ 
+-To reproduce the generated validator, install the pinned Ajv version in a disposable location and run `node contracts/http/build-openapi-3.1-validator.js <path-to-ajv-package>`. The generated file has no runtime package dependencies. `check-openapi-3.1.js` reads JSON from standard input and exits nonzero on structural errors. The task verifier executes it on the canonical document and on nine committed invalid-shape regressions, including the three shapes found by independent review.
++To reproduce the generated validator, install the pinned Ajv version in a disposable location and run `node contracts/http/build-openapi-3.1-validator.js <path-to-ajv-package>`. The generated file has no runtime package dependencies. `check-openapi-3.1.js` reads JSON from standard input and exits nonzero on structural errors; a leading UTF-8 BOM (prepended by Windows PowerShell 5.1 pipeline stdin) is stripped before parsing. The task verifier executes it on the canonical document and on nine committed invalid-shape regressions, including the three shapes found by independent review.
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.BOMLINT.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.BOMLINT.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-575e92c5-fe25-46de-ae4c-90ce3429d50f.stderr.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-575e92c5-fe25-46de-ae4c-90ce3429d50f.stdout.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-ce6c6124-a194-4f76-9b84-73d679ff9b19.stderr.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-ce6c6124-a194-4f76-9b84-73d679ff9b19.stdout.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-d5b1700c-5116-42ab-9f42-0ebcc9d3c58e.stderr.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-d5b1700c-5116-42ab-9f42-0ebcc9d3c58e.stdout.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-e680f471-d919-473b-a77a-535560beb86c.stderr.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-e680f471-d919-473b-a77a-535560beb86c.stdout.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-ea2518bd-5a00-48b0-aecf-ffeff37580a5.stderr.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/blobs/C-ea2518bd-5a00-48b0-aecf-ffeff37580a5.stdout.txt
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-BOMLINT-R1/metadata.json
+# ?? tests/ci/test_openapi_lint.py

@@ -3,7 +3,10 @@ const fs = require('node:fs');
 const validate = require('./auth-user-friend.openapi.validator.js');
 
 try {
-  const document = JSON.parse(fs.readFileSync(0, 'utf8'));
+  // Strip a leading UTF-8 BOM: Windows PowerShell 5.1 pipeline stdin prepends
+  // one (contract verifier + documented standalone usage pipe JSON to stdin).
+  const raw = fs.readFileSync(0, 'utf8').replace(/^\uFEFF/, '');
+  const document = JSON.parse(raw);
   if (!validate(document)) {
     for (const error of (validate.errors || []).slice(0, 8)) {
       console.error(`${error.instancePath || '/'}: ${error.message}`);
