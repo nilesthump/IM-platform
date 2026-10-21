@@ -13,12 +13,13 @@ tools/research/recorder.ps1 register-prompt --task-id TASK --file prompt.txt
 tools/research/recorder.ps1 start-run --task-id TASK --role implementation --capture-mode prospective --prompt-id P-ID --experiment-group full_governance
 tools/research/recorder.ps1 run-command --run-id R-ID -- command arg
 tools/research/recorder.ps1 record-event --run-id R-ID --event-type architecture_conflict --data-json '{"decision":"...","reason":"..."}'
+tools/research/recorder.ps1 record-event --run-id R-ID --event-type finding_created --data-file event.json
 tools/research/recorder.ps1 record-human-decision --run-id R-ID --question "..." --alternatives-json '["A","B"]' --selected B --reason "..."
 tools/research/recorder.ps1 finish-run --run-id R-ID --result PASS
 tools/research/recorder.ps1 validate-run --run-id R-ID
 ```
 
-`register-prompt` stores the visible Human prompt and SHA-256 before dispatch. It never claims access to platform-internal system prompts. `start-run` captures Git/task/authority state without reading untracked file contents. `run-command` executes the real argv, records timestamps, duration, raw-output hashes and redacted output blobs, and propagates the real exit code. Semantic events are reserved for facts scripts cannot infer.
+`register-prompt` stores the visible Human prompt and SHA-256 before dispatch. It never claims access to platform-internal system prompts. `start-run` captures Git/task/authority state without reading untracked file contents. `run-command` executes the real argv, records timestamps, duration, raw-output hashes and redacted output blobs, and propagates the real exit code. Semantic events are reserved for facts scripts cannot infer. `record-event` takes its JSON payload through `--data-json` or `--data-file` (exactly one); prefer `--data-file` whenever the payload contains quotes, because shell quoting differs across platforms — Windows PowerShell single quotes do not unescape `\"`, and Windows PowerShell 5.1 can even re-split quoted arguments into extra argv entries.
 
 Review, fix, and implementation are separate runs connected with `parent_run_id` or `related_run_id`. A review is independent only when the observed actor/context establishes that fact; the Recorder never promotes self-review. CI evidence is ingested with `ingest-ci` from an externally produced evidence object matching `schema/ci-ingestion.schema.json`; Recorder does not manufacture CI outcomes and no GitHub workflow is installed by this task.
 

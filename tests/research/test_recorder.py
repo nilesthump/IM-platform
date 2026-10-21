@@ -290,7 +290,7 @@ Current Task State: active
 
         run_id = self.start()
         recorder.cmd_record_event(self.ns(run_id=run_id, event_type="finding_created",
-                                  data_json=json.dumps(structured)), self.repo, self.root)
+                                  data_json=json.dumps(structured), data_file=None), self.repo, self.root)
         durable = (self.root / "runs" / run_id / "events.jsonl").read_text(encoding="utf-8")
         for secret in secrets:
             self.assertNotIn(secret, durable)
@@ -309,6 +309,59 @@ Current Task State: active
         text = paused.read_text(encoding="utf-8")
         self.assertIn("status: review", text)
         self.assertIn("owner: unassigned-independent-review-agent", text)
+
+    def test_record_event_data_file_avoids_shell_quoting(self):
+        # JSON delivered from a file is immune to shell quoting differences
+        # (Windows PowerShell single quotes keep \" literally; 5.1 even
+        # re-splits embedded quotes into extra argv entries).
+        run_id = self.start()
+        payload = Path(self.temp.name) / "event-payload.json"
+        payload.write_text(json.dumps({"subject": "windows powershell",
+                                       "detail": 'quoted " and \\ bytes'}),
+                           encoding="utf-8")
+        recorder.cmd_record_event(
+            self.ns(run_id=run_id, event_type="finding_created", data_json=None,
+                    data_file=str(payload)), self.repo, self.root)
+        # A BOM (written unconditionally by Windows PowerShell 5.1
+        # Set-Content -Encoding utf8) must not corrupt the payload.
+        bom_payload = Path(self.temp.name) / "event-payload-bom.json"
+        bom_payload.write_bytes(b"\xef\xbb\xbf" + json.dumps(
+            {"subject": "bom", "detail": "tolerated"}).encode("utf-8"))
+        recorder.cmd_record_event(
+            self.ns(run_id=run_id, event_type="finding_created", data_json=None,
+                    data_file=str(bom_payload)), self.repo, self.root)
+        events = [json.loads(line) for line in
+                  (self.root / "runs" / run_id / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+        findings = [event for event in events if event["event_type"] == "finding_created"]
+        self.assertEqual(2, len(findings))
+        self.assertEqual("windows powershell", findings[0]["data"]["subject"])
+        self.assertEqual('quoted " and \\ bytes', findings[0]["data"]["detail"])
+        self.assertEqual("tolerated", findings[1]["data"]["detail"])
+
+    def test_record_event_requires_exactly_one_payload_source(self):
+        run_id = self.start()
+        with self.assertRaises(recorder.RecorderError):
+            recorder.cmd_record_event(
+                self.ns(run_id=run_id, event_type="finding_created",
+                        data_json=None, data_file=None), self.repo, self.root)
+        with self.assertRaises(recorder.RecorderError):
+            recorder.cmd_record_event(
+                self.ns(run_id=run_id, event_type="finding_created",
+                        data_json="{}", data_file="unused"), self.repo, self.root)
+        missing = Path(self.temp.name) / "missing-payload.json"
+        with self.assertRaises(recorder.RecorderError):
+            recorder.cmd_record_event(
+                self.ns(run_id=run_id, event_type="finding_created",
+                        data_json=None, data_file=str(missing)), self.repo, self.root)
+
+    def test_record_event_reports_invalid_json_with_guidance(self):
+        run_id = self.start()
+        with self.assertRaisesRegex(recorder.RecorderError, "not valid JSON"):
+            recorder.cmd_record_event(
+                self.ns(run_id=run_id, event_type="finding_created",
+                        data_json="{not-json}", data_file=None), self.repo, self.root)
+        durable = (self.root / "runs" / run_id / "events.jsonl").read_text(encoding="utf-8")
+        self.assertNotIn("not-json", durable)
 
 
 if __name__ == "__main__":

@@ -428,7 +428,20 @@ def cmd_run_command(args: argparse.Namespace, repo: Path, root: Path) -> int:
 
 
 def cmd_record_event(args: argparse.Namespace, repo: Path, root: Path) -> int:
-    data = json.loads(args.data_json)
+    if bool(args.data_json) == bool(args.data_file):
+        raise RecorderError("record-event requires exactly one of --data-json or --data-file")
+    raw = args.data_json
+    if args.data_file:
+        try:
+            # utf-8-sig accepts payloads written with or without a BOM;
+            # Windows PowerShell 5.1 Set-Content -Encoding utf8 always writes one.
+            raw = Path(args.data_file).read_text(encoding="utf-8-sig")
+        except OSError as exc:
+            raise RecorderError(f"cannot read --data-file {args.data_file}: {exc}") from exc
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RecorderError(f"event data is not valid JSON ({exc}); use --data-file to avoid shell quoting differences") from exc
     if not isinstance(data, dict):
         raise RecorderError("event data must be a JSON object")
     safe_data, redacted = redact_value(data)
@@ -635,7 +648,7 @@ def parser() -> argparse.ArgumentParser:
     p = sub.add_parser("register-prompt", parents=[common]); p.add_argument("--task-id", required=True); p.add_argument("--file"); p.add_argument("--stdin-base64", action="store_true"); p.add_argument("--source", default="human"); p.add_argument("--template-version"); p.add_argument("--run-id"); p.add_argument("--prompt-id")
     p = sub.add_parser("start-run", parents=[common]); p.add_argument("--task-id"); p.add_argument("--role", required=True); p.add_argument("--capture-mode", required=True); p.add_argument("--experiment-group", default="unassigned"); p.add_argument("--prompt-id"); p.add_argument("--parent-run-id"); p.add_argument("--related-run-id"); p.add_argument("--run-id"); p.add_argument("--pre-recorder-work", action="store_true"); p.add_argument("--agent-harness", default="unavailable"); p.add_argument("--model-name", default="unavailable"); p.add_argument("--fresh-context", default="unavailable"); p.add_argument("--explicit-token-budget", default="unavailable"); p.add_argument("--context-mode", default="unavailable"); p.add_argument("--public-reasoning-mode", default="unavailable"); p.add_argument("--baseline-id", default="unavailable"); p.add_argument("--replicate-id", default="unavailable"); p.add_argument("--mutation-id", default="unavailable"); p.add_argument("--model-condition", default="unavailable"); p.add_argument("--budget-condition", default="unavailable")
     p = sub.add_parser("run-command", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("command", nargs=argparse.REMAINDER)
-    p = sub.add_parser("record-event", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--event-type", required=True); p.add_argument("--data-json", required=True)
+    p = sub.add_parser("record-event", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--event-type", required=True); p.add_argument("--data-json"); p.add_argument("--data-file")
     p = sub.add_parser("record-human-decision", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--decision-id"); p.add_argument("--question", required=True); p.add_argument("--alternatives-json", required=True); p.add_argument("--selected", required=True); p.add_argument("--reason", required=True); p.add_argument("--affected-authority"); p.add_argument("--fixture", action="store_true")
     p = sub.add_parser("ingest-ci", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--evidence", required=True)
     p = sub.add_parser("finish-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--result", choices=["PASS", "FAIL", "BLOCKED", "CANCELLED"], required=True)
