@@ -1,5 +1,59 @@
-param([Parameter(Mandatory=$true)][ValidateSet('shared','desktop','mobile')][string]$Scope, [string]$Serial)
+param(
+    [Parameter(Mandatory=$true)][ValidateSet('shared','desktop','mobile')][string]$Scope,
+    [string]$Serial,
+    # Optional explicit Python 3 executable; defaults to tolerant PATH discovery
+    # so Microsoft Store python/python3 alias stubs cannot silently break this
+    # documented client verification entry point.
+    [string]$Python = ''
+)
+$ErrorActionPreference = 'Stop'
 $arguments = @('-B', (Join-Path $PSScriptRoot 'verify_client_sqlite.py'), '--scope', $Scope)
 if ($Serial) { $arguments += @('--serial', $Serial) }
-python @arguments
+
+function Test-Python3 {
+    param([string]$Exe, [string[]]$Prefix = @())
+    # Probes must tolerate failing executables (for example the Windows Store
+    # python/python3 alias stub) instead of aborting the whole discovery loop.
+    $output = & $Exe @Prefix --version 2>&1
+    return ($LASTEXITCODE -eq 0 -and "$output" -match '^Python 3\.')
+}
+
+$interpreter = $null
+$prefix = @()
+if ($Python) {
+    if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) {
+        throw "Specified -Python path does not exist: $Python"
+    }
+    if (-not (Test-Python3 $Python)) {
+        throw "Specified -Python is not a working Python 3: $Python"
+    }
+    $interpreter = $Python
+}
+if (-not $interpreter) {
+    $ErrorActionPreference = 'Continue'
+    try {
+        foreach ($name in @('python3', 'python')) {
+            $candidate = Get-Command $name -ErrorAction SilentlyContinue
+            if (-not $candidate) { continue }
+            if (Test-Python3 $candidate.Source) { $interpreter = $candidate.Source; break }
+        }
+        if (-not $interpreter) {
+            $launcher = Get-Command py -ErrorAction SilentlyContinue
+            if ($launcher -and (Test-Python3 $launcher.Source @('-3'))) {
+                $interpreter = $launcher.Source
+                $prefix = @('-3')
+            }
+        }
+    } finally {
+        $ErrorActionPreference = 'Stop'
+    }
+}
+if (-not $interpreter) {
+    $bundled = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+    if ((Test-Path -LiteralPath $bundled -PathType Leaf) -and (Test-Python3 $bundled)) { $interpreter = $bundled }
+}
+if (-not $interpreter) {
+    throw 'Client SQLite verification requires Python 3; pass -Python <path> to name an interpreter.'
+}
+& $interpreter @prefix @arguments
 exit $LASTEXITCODE
