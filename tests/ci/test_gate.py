@@ -55,6 +55,45 @@ class GateTests(unittest.TestCase):
             with self.subTest(job=job, invalid=True), self.assertRaises(ValueError):
                 gate.check(needs)
 
+    def test_unselected_job_must_not_run(self):
+        # A job the classifier did not select must report `skipped`; anything
+        # else means the workflow ran unselected work and the gate fails.
+        for status in ("success", "failure", "cancelled"):
+            needs = self.needs()
+            needs["web"]["result"] = status
+            with self.subTest(status=status), self.assertRaises(ValueError):
+                gate.check(needs)
+
+    def test_every_shared_subcheck_requires_compatibility(self):
+        # old_client, plugin and migration all select the compatibility job;
+        # the existing test only exercised migration.
+        for subcheck in ("old_client", "plugin", "migration"):
+            needs = self.needs()
+            needs["classify"]["outputs"][subcheck] = "true"
+            with self.subTest(subcheck=subcheck), self.assertRaises(ValueError):
+                gate.check(needs)
+            needs = self.needs()
+            needs["classify"]["outputs"]["compatibility"] = "true"
+            needs["classify"]["outputs"][subcheck] = "true"
+            needs["compatibility"]["result"] = "success"
+            gate.check(needs)
+
+    def test_invalid_subcheck_selection_output_fails(self):
+        for subcheck in ("old_client", "plugin", "migration"):
+            needs = self.needs()
+            needs["classify"]["outputs"][subcheck] = "bogus"
+            with self.subTest(subcheck=subcheck), self.assertRaises(ValueError):
+                gate.check(needs)
+
+    def test_classify_entry_missing_fails(self):
+        needs = self.needs()
+        del needs["classify"]
+        with self.assertRaises(ValueError):
+            gate.check(needs)
+
+    def test_all_unselected_gate_passes(self):
+        gate.check(self.needs())
+
 
 if __name__ == "__main__":
     unittest.main()
