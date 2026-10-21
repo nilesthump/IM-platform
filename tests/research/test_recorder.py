@@ -135,6 +135,18 @@ Current Task State: active
         with self.assertRaisesRegex(recorder.RecorderError, "duplicate or non-monotonic"):
             recorder.validate_events(path, run_id)
 
+    def test_locked_event_stream_reports_path_and_recovery_guidance(self):
+        run_id = self.start()
+        lock = self.root / "runs" / run_id / ".events.lock"
+        lock.write_text("stale", encoding="utf-8")
+        with self.assertRaises(recorder.RecorderError) as context:
+            recorder.append_event(self.root, run_id, "finding_created", {})
+        message = str(context.exception)
+        self.assertIn(str(lock), message)
+        self.assertIn("stale lock", message)
+        lock.unlink()
+        recorder.append_event(self.root, run_id, "finding_created", {})
+
     def test_malformed_and_partial_jsonl_rejected(self):
         run_id = self.start()
         path = self.root / "runs" / run_id / "events.jsonl"

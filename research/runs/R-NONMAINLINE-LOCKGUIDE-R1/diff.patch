@@ -1,0 +1,52 @@
+diff --git a/tests/research/test_recorder.py b/tests/research/test_recorder.py
+index db30b6c7..35a56b75 100644
+--- a/tests/research/test_recorder.py
++++ b/tests/research/test_recorder.py
+@@ -135,6 +135,18 @@ Current Task State: active
+         with self.assertRaisesRegex(recorder.RecorderError, "duplicate or non-monotonic"):
+             recorder.validate_events(path, run_id)
+ 
++    def test_locked_event_stream_reports_path_and_recovery_guidance(self):
++        run_id = self.start()
++        lock = self.root / "runs" / run_id / ".events.lock"
++        lock.write_text("stale", encoding="utf-8")
++        with self.assertRaises(recorder.RecorderError) as context:
++            recorder.append_event(self.root, run_id, "finding_created", {})
++        message = str(context.exception)
++        self.assertIn(str(lock), message)
++        self.assertIn("stale lock", message)
++        lock.unlink()
++        recorder.append_event(self.root, run_id, "finding_created", {})
++
+     def test_malformed_and_partial_jsonl_rejected(self):
+         run_id = self.start()
+         path = self.root / "runs" / run_id / "events.jsonl"
+diff --git a/tools/research/recorder.py b/tools/research/recorder.py
+index 86205266..7ce794b4 100644
+--- a/tools/research/recorder.py
++++ b/tools/research/recorder.py
+@@ -292,7 +292,10 @@ def append_event(root: Path, run_id: str, event_type: str, data: dict, *, allow_
+         fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+         os.close(fd)
+     except FileExistsError as exc:
+-        raise RecorderError("event stream is locked; interrupted writer may require inspection") from exc
++        raise RecorderError(
++            f"event stream is locked by {lock}; if no recorder process is still writing this run, "
++            "confirm events.jsonl ends with a complete JSON line, then remove that stale lock "
++            "and retry") from exc
+     try:
+         records = validate_events(path, run_id)
+         seq = len(records) + 1
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.LOCKGUIDE.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.LOCKGUIDE.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/blobs/C-22d0edd2-7dd9-47ba-ab2c-89faa1b22e3c.stderr.txt
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/blobs/C-22d0edd2-7dd9-47ba-ab2c-89faa1b22e3c.stdout.txt
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/blobs/C-4e997969-01a6-45a9-82b2-b10e1a8d1afe.stderr.txt
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/blobs/C-4e997969-01a6-45a9-82b2-b10e1a8d1afe.stdout.txt
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/blobs/C-d9c8745a-02e7-4c05-8208-5556c8f38f0f.stderr.txt
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/blobs/C-d9c8745a-02e7-4c05-8208-5556c8f38f0f.stdout.txt
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-LOCKGUIDE-R1/metadata.json

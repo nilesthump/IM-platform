@@ -292,7 +292,10 @@ def append_event(root: Path, run_id: str, event_type: str, data: dict, *, allow_
         fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         os.close(fd)
     except FileExistsError as exc:
-        raise RecorderError("event stream is locked; interrupted writer may require inspection") from exc
+        raise RecorderError(
+            f"event stream is locked by {lock}; if no recorder process is still writing this run, "
+            "confirm events.jsonl ends with a complete JSON line, then remove that stale lock "
+            "and retry") from exc
     try:
         records = validate_events(path, run_id)
         seq = len(records) + 1
