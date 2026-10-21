@@ -1,0 +1,131 @@
+diff --git a/research/README.md b/research/README.md
+index e5e89277..7854acfe 100644
+--- a/research/README.md
++++ b/research/README.md
+@@ -6,7 +6,7 @@ This directory is a non-product research control plane. It records observable fa
+ 
+ ## Workflow
+ 
+-The implementation uses only the Python 3 standard library. On Windows use `tools/research/recorder.ps1`; on other platforms invoke `python3 tools/research/recorder.py` with the same subcommands:
++The implementation uses only the Python 3 standard library. On Windows use `tools/research/recorder.ps1`; on other platforms invoke `python3 tools/research/recorder.py` with the same subcommands. On Windows, `RESEARCH_RECORDER_PYTHON` may name the Python 3 executable for the launcher when PATH discovery cannot find a working interpreter (for example when `python3`/`python` resolve only to the Microsoft Store alias stub); a set-but-unusable value fails loudly instead of silently falling back:
+ 
+ ```text
+ tools/research/recorder.ps1 register-prompt --task-id TASK --file prompt.txt
+@@ -20,7 +20,7 @@ tools/research/recorder.ps1 validate-run --run-id R-ID
+ 
+ `register-prompt` stores the visible Human prompt and SHA-256 before dispatch. It never claims access to platform-internal system prompts. `start-run` captures Git/task/authority state without reading untracked file contents. `run-command` executes the real argv, records timestamps, duration, raw-output hashes and redacted output blobs, and propagates the real exit code. Semantic events are reserved for facts scripts cannot infer.
+ 
+-Review, fix, and implementation are separate runs connected with `parent_run_id` or `related_run_id`. A review is independent only when the observed actor/context establishes that fact; the Recorder never promotes self-review. CI evidence is ingested with `ingest-ci` from an externally produced evidence object matching `schema/ci-ingestion.schema.json`; Recorder does not manufacture CI outcomes and no GitHub workflow is installed by this task.
++Review, fix, and implementation are separate runs connected with `parent_run_id` or `related_run_id`. A review is independent only when the observed actor/context establishes that fact; the Recorder never promotes self-review. CI evidence is ingested with `ingest-ci` from an externally produced evidence object matching `schema/ci-ingestion.schema.json`; Recorder does not manufacture CI outcomes. The repository CI workflow comes from LOOP1-CI-001 and remains an independent acceptance judge.
+ 
+ ## Capture modes and history
+ 
+diff --git a/tools/research/recorder.ps1 b/tools/research/recorder.ps1
+index 4b88b12b..5624f24a 100644
+--- a/tools/research/recorder.ps1
++++ b/tools/research/recorder.ps1
+@@ -6,40 +6,61 @@ param(
+ 
+ $ErrorActionPreference = 'Stop'
+ $script = Join-Path $PSScriptRoot 'recorder.py'
++
++function Test-Python3 {
++    param([string]$Exe, [string[]]$Prefix = @())
++    # Probes must tolerate failing executables (for example the Windows Store
++    # python/python3 alias stub) instead of aborting the whole discovery loop.
++    $output = & $Exe @Prefix --version 2>&1
++    return ($LASTEXITCODE -eq 0 -and "$output" -match '^Python 3\.')
++}
++
+ $python = $null
+ $prefix = @()
+ 
+-foreach ($name in @('python3', 'python')) {
+-    $candidate = Get-Command $name -ErrorAction SilentlyContinue
+-    if ($candidate) {
+-        $version = & $candidate.Source --version 2>&1
+-        if ($version -match '^Python 3\.') {
+-            $python = $candidate.Source
+-            break
+-        }
++# Explicit override first. A set-but-unusable value fails loudly; it never
++# silently falls back to discovery.
++if ($env:RESEARCH_RECORDER_PYTHON) {
++    $override = $env:RESEARCH_RECORDER_PYTHON
++    if (-not (Test-Path -LiteralPath $override -PathType Leaf)) {
++        throw "RESEARCH_RECORDER_PYTHON is set but does not point to an executable file: $override"
+     }
+-}
+-
+-if (-not $python) {
+-    $launcher = Get-Command py -ErrorAction SilentlyContinue
+-    if ($launcher) {
+-        $version = & $launcher.Source -3 --version 2>&1
+-        if ($version -match '^Python 3\.') {
+-            $python = $launcher.Source
+-            $prefix = @('-3')
+-        }
++    if (-not (Test-Python3 $override)) {
++        throw "RESEARCH_RECORDER_PYTHON is set but is not a working Python 3 interpreter: $override"
+     }
++    $python = $override
+ }
+ 
+ if (-not $python) {
+-    $bundled = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+-    if (Test-Path -LiteralPath $bundled -PathType Leaf) {
+-        $python = $bundled
++    $ErrorActionPreference = 'Continue'
++    try {
++        foreach ($name in @('python3', 'python')) {
++            $candidate = Get-Command $name -ErrorAction SilentlyContinue
++            if ($candidate -and (Test-Python3 $candidate.Source)) {
++                $python = $candidate.Source
++                break
++            }
++        }
++        if (-not $python) {
++            $launcher = Get-Command py -ErrorAction SilentlyContinue
++            if ($launcher -and (Test-Python3 $launcher.Source @('-3'))) {
++                $python = $launcher.Source
++                $prefix = @('-3')
++            }
++        }
++        if (-not $python) {
++            $bundled = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
++            if ((Test-Path -LiteralPath $bundled -PathType Leaf) -and (Test-Python3 $bundled)) {
++                $python = $bundled
++            }
++        }
++    } finally {
++        $ErrorActionPreference = 'Stop'
+     }
+ }
+ 
+ if (-not $python) {
+-    throw 'Research Recorder requires Python 3. No compatible interpreter was found.'
++    throw 'Research Recorder requires Python 3. No compatible interpreter was found; set RESEARCH_RECORDER_PYTHON to a Python 3 executable path.'
+ }
+ 
+ & $python @prefix $script @RecorderArguments
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.RECORDER.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.RECORDER.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-0f85a0b9-5fba-49fa-89d3-3087548c7308.stderr.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-0f85a0b9-5fba-49fa-89d3-3087548c7308.stdout.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-22d1c6d6-6cb9-4479-bd00-5b973d0fe766.stderr.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-22d1c6d6-6cb9-4479-bd00-5b973d0fe766.stdout.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-2a97a291-d525-431c-963e-d6e67af060ff.stderr.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-2a97a291-d525-431c-963e-d6e67af060ff.stdout.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-4e92ea24-4903-4fd6-becb-3f10dc81e6b0.stderr.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-4e92ea24-4903-4fd6-becb-3f10dc81e6b0.stdout.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-796b8608-2345-462c-8ed7-be5c8906d8ce.stderr.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-796b8608-2345-462c-8ed7-be5c8906d8ce.stdout.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-8c5aa83c-f8f7-45ca-bb5c-3da44e576199.stderr.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-8c5aa83c-f8f7-45ca-bb5c-3da44e576199.stdout.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-96c35226-640a-4230-8735-b5d48a87d736.stderr.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/blobs/C-96c35226-640a-4230-8735-b5d48a87d736.stdout.txt
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-RECORDER-R1/metadata.json
