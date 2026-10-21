@@ -192,6 +192,17 @@ class PathMatrixTests(unittest.TestCase):
     def test_unrelated_files_do_not_schedule_product_jobs(self):
         self.assert_jobs("docs/unrelated.md", set())
 
+    def test_maintenance_paths_currently_schedule_no_jobs(self):
+        # Characterization of the current selection map: maintenance surfaces
+        # (Recorder tooling and artifacts, root metadata docs) select no CI job
+        # today. If that policy changes deliberately, update these expectations
+        # together with ci/classify.py in the same change.
+        for path in (".gitattributes", "CONTRIBUTING.md", "tests/README.md",
+                     "research/README.md", "research/runs/R-X/events.jsonl",
+                     "tools/research/recorder.py", "tools/research/recorder.ps1"):
+            with self.subTest(path=path):
+                self.assert_jobs(path, set())
+
     def test_governance_changes_cannot_skip_architecture(self):
         for path in ("README.md", "AGENTS.md", "CLAUDE.md", "spec/architecture/baseline.md",
                      "spec/architecture/decisions/ADR-9999.md", "spec/handoff/agent-context.md",
