@@ -31,6 +31,10 @@ Review, fix, and implementation are separate runs connected with `parent_run_id`
 
 `backfill` creates explicitly marked metadata. It does not replay history. A running run is partial; default validation fails it. Finished raw event streams are immutable through normal commands. JSONL sequence and the event hash chain detect malformed, partial, duplicate, reordered, or edited events.
 
+## Advanced CLI flags
+
+Every subcommand also accepts `--repo <path>` (Git repository root; defaults to the repository containing `tools/research/recorder.py`, resolved through `git rev-parse`) and `--research-root <path>` (Recorder artifact root; defaults to `<repo>/research`). `validate-run` and `validate-repository` accept `--allow-partial` to validate the structural integrity (sequence, hash chain, manifest) of non-finished runs — for example while a run is still open, or for a preserved interrupted run — without claiming it is a complete trace.
+
 ## Secrets and unavailable facts
 
 The Recorder never dumps the process environment. Prompt, argv, stdout, stderr, and semantic payloads are checked for common credential forms and redacted before durable storage. Do not pass `.env`, credentials, raw auth headers, signing keys, or secret-bearing files. Redaction is defense in depth, not authorization to submit secrets.
