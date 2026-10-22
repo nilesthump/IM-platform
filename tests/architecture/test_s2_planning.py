@@ -77,6 +77,20 @@ class SupplementControls(unittest.TestCase):
         for text in (old.replace('status: backlog','status: done'),old.replace('task_id: '+checker.NEW[0],'task_id: LOOP1-WRONG-001')):
             p.write_text(text,encoding='utf8');self.assertTrue(checker.check(self.root))
 
+    def test_frontmatter_value_containing_delimiter_does_not_drop_later_fields(self):
+        # A field value may legitimately contain '---' (e.g. a range in a note).
+        # Field extraction must stop at the closing delimiter line, not at the
+        # first '---' substring, or later fields like status are dropped.
+        self.put('spec/tasks/done/LOOP1-FIXTURE-001.md',
+                 '---\ntask_id: LOOP1-FIXTURE-001\nnote: compare a---b ranges\nstatus: done\n---\n\nbody\n')
+        _, errors = checker.inventory(self.root)
+        self.assertEqual([], [e for e in errors if 'LOOP1-FIXTURE-001' in e])
+        malformed = self.put('spec/tasks/done/LOOP1-FIXTURE-001.md',
+                             '---\ntask_id: LOOP1-FIXTURE-001\nstatus: done\n')  # unterminated frontmatter
+        self.assertFalse(malformed.read_text(encoding='utf8').endswith('---\n'))
+        _, errors = checker.inventory(self.root)
+        self.assertTrue([e for e in errors if 'LOOP1-FIXTURE-001' in e])
+
     def test_dependency_order_and_planning_dependency_are_enforced(self):
         for task in checker.NEW:
             p=self.path(task);old=p.read_text(encoding='utf8');text=old.replace('- '+checker.CHAIN[checker.NEW.index(task)]+'；','- LOOP1-WEB-001；' if task!=checker.NEW[0] else '- LOOP1-CLIENT-UI-REF-001；')

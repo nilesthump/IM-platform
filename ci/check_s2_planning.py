@@ -27,6 +27,14 @@ def fields(text):
     return dict(re.findall(r'^([a-z_]+):\s*([^\n]+?)\s*$', text, re.M))
 
 
+def frontmatter(text):
+    # Frontmatter is delimited by '---' on its own line. Splitting on the bare
+    # '---' substring truncates fields whose value contains '---' and silently
+    # drops every later field (e.g. status), producing false id/queue errors.
+    m = re.match(r'^---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)', text, re.S)
+    return m.group(1) if m else ''
+
+
 def section(text, heading):
     m = re.search(r'^# ' + re.escape(heading) + r'\s*\n(.*?)(?=^# |\Z)', text, re.M | re.S)
     return m.group(1) if m else ''
@@ -101,7 +109,7 @@ def inventory(root):
         for path in sorted((root/'spec/tasks'/queue).glob('*.md')):
             if path.is_symlink():
                 errors.append(f'S2 task symlink: {path.name}'); continue
-            text = path.read_text(encoding='utf8'); f = fields(text.split('---', 2)[1] if text.startswith('---') else '')
+            text = path.read_text(encoding='utf8'); f = fields(frontmatter(text))
             task = f.get('task_id', '')
             if task != path.stem or f.get('status') != queue:
                 errors.append(f'S2 task id/queue/status mismatch: {path.name}')
