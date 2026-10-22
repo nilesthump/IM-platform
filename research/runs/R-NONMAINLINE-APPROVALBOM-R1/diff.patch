@@ -1,0 +1,52 @@
+diff --git a/ci/check_architecture.py b/ci/check_architecture.py
+index dee43de3..014705a1 100644
+--- a/ci/check_architecture.py
++++ b/ci/check_architecture.py
+@@ -260,7 +260,7 @@ def client_policy(root):
+         if (policy.get('web_appearance') != WEB_APPEARANCE or fields.get('web_revision_adr') != web_adr
+                 or fields.get('web_approval_source') != web_approval
+                 or 'Human-approved' not in (root / web_adr).read_text(encoding='utf-8')
+-                or (root / web_approval).read_text(encoding='utf-8').strip() != '批准最小前置方案并继续'):
++                or (root / web_approval).read_text(encoding='utf-8-sig').strip() != '批准最小前置方案并继续'):
+             raise ValueError('Web appearance approved ADR/policy/approval linkage missing')
+         return policy, []
+     except (OSError, ValueError, AttributeError) as error:
+diff --git a/tests/architecture/test_client_technology.py b/tests/architecture/test_client_technology.py
+index 15925c3a..7b803b82 100644
+--- a/tests/architecture/test_client_technology.py
++++ b/tests/architecture/test_client_technology.py
+@@ -77,6 +77,18 @@ class ClientTechnologyControls(unittest.TestCase):
+         baseline.write_text(re.sub(r'(?m)^- sha256: `[^`]+`$', '- sha256: `'+hashlib.sha256(canonical.read_bytes()).hexdigest()+'`', baseline.read_text(encoding='utf-8')), encoding='utf-8')
+         self.assertTrue(checker.check_clients(self.root))  # Even rehashing cannot extend policy.
+ 
++    def test_human_approval_comparison_tolerates_utf8_bom(self):
++        # Windows editors commonly save the approval evidence with a UTF-8 BOM.
++        # The content comparison must not report a false missing-linkage failure.
++        self.put('clients/web/src/ui/appearance.ts', self.appearance_source())
++        approval = self.root/'spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt'
++        original = approval.read_bytes()
++        self.assertFalse(original.startswith(b'\xef\xbb\xbf'))
++        approval.write_bytes(b'\xef\xbb\xbf' + original)
++        self.assertEqual([], checker.check_clients(self.root))
++        approval.write_bytes(b'\xef\xbb\xbf' + 'not approved'.encode('utf-8'))
++        self.assertTrue(checker.check_clients(self.root))
++
+     def test_current_active_clients(self):
+         self.assertEqual([], checker.check_clients(ROOT))
+ 
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/__pycache__/check_architecture.cpython-312.pyc
+# ?? ci/__pycache__/check_s2_planning.cpython-312.pyc
+# ?? research/prompts/P-NONMAINLINE.APPROVALBOM.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.APPROVALBOM.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-APPROVALBOM-R1/blobs/C-2dc75096-7201-45cd-afc6-f42c3f10bf13.stderr.txt
+# ?? research/runs/R-NONMAINLINE-APPROVALBOM-R1/blobs/C-2dc75096-7201-45cd-afc6-f42c3f10bf13.stdout.txt
+# ?? research/runs/R-NONMAINLINE-APPROVALBOM-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-APPROVALBOM-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-APPROVALBOM-R1/metadata.json
+# ?? tests/architecture/__pycache__/test_client_technology.cpython-312.pyc
+# ?? tests/architecture/__pycache__/test_frozen_architecture.cpython-312.pyc
+# ?? tests/architecture/__pycache__/test_s2_planning.cpython-312.pyc
+# ?? tests/architecture/__pycache__/test_source_boundaries.cpython-312.pyc
+# ?? tools/__pycache__/verify_frozen_architecture.cpython-312.pyc

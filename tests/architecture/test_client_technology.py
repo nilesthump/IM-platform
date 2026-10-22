@@ -77,6 +77,18 @@ class ClientTechnologyControls(unittest.TestCase):
         baseline.write_text(re.sub(r'(?m)^- sha256: `[^`]+`$', '- sha256: `'+hashlib.sha256(canonical.read_bytes()).hexdigest()+'`', baseline.read_text(encoding='utf-8')), encoding='utf-8')
         self.assertTrue(checker.check_clients(self.root))  # Even rehashing cannot extend policy.
 
+    def test_human_approval_comparison_tolerates_utf8_bom(self):
+        # Windows editors commonly save the approval evidence with a UTF-8 BOM.
+        # The content comparison must not report a false missing-linkage failure.
+        self.put('clients/web/src/ui/appearance.ts', self.appearance_source())
+        approval = self.root/'spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt'
+        original = approval.read_bytes()
+        self.assertFalse(original.startswith(b'\xef\xbb\xbf'))
+        approval.write_bytes(b'\xef\xbb\xbf' + original)
+        self.assertEqual([], checker.check_clients(self.root))
+        approval.write_bytes(b'\xef\xbb\xbf' + 'not approved'.encode('utf-8'))
+        self.assertTrue(checker.check_clients(self.root))
+
     def test_current_active_clients(self):
         self.assertEqual([], checker.check_clients(ROOT))
 

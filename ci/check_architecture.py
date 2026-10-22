@@ -260,7 +260,7 @@ def client_policy(root):
         if (policy.get('web_appearance') != WEB_APPEARANCE or fields.get('web_revision_adr') != web_adr
                 or fields.get('web_approval_source') != web_approval
                 or 'Human-approved' not in (root / web_adr).read_text(encoding='utf-8')
-                or (root / web_approval).read_text(encoding='utf-8').strip() != '批准最小前置方案并继续'):
+                or (root / web_approval).read_text(encoding='utf-8-sig').strip() != '批准最小前置方案并继续'):
             raise ValueError('Web appearance approved ADR/policy/approval linkage missing')
         return policy, []
     except (OSError, ValueError, AttributeError) as error:
