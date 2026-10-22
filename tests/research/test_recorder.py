@@ -188,6 +188,18 @@ Current Task State: active
         with self.assertRaisesRegex(recorder.RecorderError, "manifest hash mismatch"):
             recorder.validate_run(self.root, run_id)
 
+    def test_write_json_never_leaves_temp_file_on_replace_failure(self):
+        # A failed os.replace (permissions, full disk) must propagate the real
+        # error and leave no .tmp-* artifact behind in the research tree.
+        import unittest.mock
+        target = self.root / "runs" / "R-FIXTURE" / "metadata.json"
+        with unittest.mock.patch("os.replace", side_effect=OSError("simulated replace failure")):
+            with self.assertRaisesRegex(OSError, "simulated replace failure"):
+                recorder.write_json(target, {"k": "v"})
+        self.assertEqual([], list(target.parent.glob("*.tmp-*")))
+        recorder.write_json(target, {"k": "v"})
+        self.assertEqual({"k": "v"}, recorder.read_json(target))
+
     def test_finished_manifest_is_portable_across_crlf_checkout(self):
         run_id = self.start()
         recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)

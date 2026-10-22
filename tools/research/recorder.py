@@ -83,12 +83,18 @@ def read_json(path: Path) -> dict:
 def write_json(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_name(path.name + f".tmp-{uuid.uuid4().hex}")
-    with temp.open("x", encoding="utf-8", newline="\n") as stream:
-        json.dump(value, stream, ensure_ascii=False, sort_keys=True, indent=2)
-        stream.write("\n")
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temp, path)
+    try:
+        with temp.open("x", encoding="utf-8", newline="\n") as stream:
+            json.dump(value, stream, ensure_ascii=False, sort_keys=True, indent=2)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temp, path)
+    finally:
+        # os.replace can fail (permissions, full disk); a stray .tmp-* file in
+        # research/prompts or research/runs would pollute git status and the
+        # repository validation scan, so never leave it behind.
+        temp.unlink(missing_ok=True)
 
 
 def redact(text: str) -> tuple[str, bool]:

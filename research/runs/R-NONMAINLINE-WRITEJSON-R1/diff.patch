@@ -1,0 +1,63 @@
+diff --git a/tests/research/test_recorder.py b/tests/research/test_recorder.py
+index db30b6c7..87383069 100644
+--- a/tests/research/test_recorder.py
++++ b/tests/research/test_recorder.py
+@@ -188,6 +188,18 @@ Current Task State: active
+         with self.assertRaisesRegex(recorder.RecorderError, "manifest hash mismatch"):
+             recorder.validate_run(self.root, run_id)
+ 
++    def test_write_json_never_leaves_temp_file_on_replace_failure(self):
++        # A failed os.replace (permissions, full disk) must propagate the real
++        # error and leave no .tmp-* artifact behind in the research tree.
++        import unittest.mock
++        target = self.root / "runs" / "R-FIXTURE" / "metadata.json"
++        with unittest.mock.patch("os.replace", side_effect=OSError("simulated replace failure")):
++            with self.assertRaisesRegex(OSError, "simulated replace failure"):
++                recorder.write_json(target, {"k": "v"})
++        self.assertEqual([], list(target.parent.glob("*.tmp-*")))
++        recorder.write_json(target, {"k": "v"})
++        self.assertEqual({"k": "v"}, recorder.read_json(target))
++
+     def test_finished_manifest_is_portable_across_crlf_checkout(self):
+         run_id = self.start()
+         recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
+diff --git a/tools/research/recorder.py b/tools/research/recorder.py
+index 86205266..0df61893 100644
+--- a/tools/research/recorder.py
++++ b/tools/research/recorder.py
+@@ -83,12 +83,18 @@ def read_json(path: Path) -> dict:
+ def write_json(path: Path, value: object) -> None:
+     path.parent.mkdir(parents=True, exist_ok=True)
+     temp = path.with_name(path.name + f".tmp-{uuid.uuid4().hex}")
+-    with temp.open("x", encoding="utf-8", newline="\n") as stream:
+-        json.dump(value, stream, ensure_ascii=False, sort_keys=True, indent=2)
+-        stream.write("\n")
+-        stream.flush()
+-        os.fsync(stream.fileno())
+-    os.replace(temp, path)
++    try:
++        with temp.open("x", encoding="utf-8", newline="\n") as stream:
++            json.dump(value, stream, ensure_ascii=False, sort_keys=True, indent=2)
++            stream.write("\n")
++            stream.flush()
++            os.fsync(stream.fileno())
++        os.replace(temp, path)
++    finally:
++        # os.replace can fail (permissions, full disk); a stray .tmp-* file in
++        # research/prompts or research/runs would pollute git status and the
++        # repository validation scan, so never leave it behind.
++        temp.unlink(missing_ok=True)
+ 
+ 
+ def redact(text: str) -> tuple[str, bool]:
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.WRITEJSON.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.WRITEJSON.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-WRITEJSON-R1/blobs/C-0ebeba8c-d4f4-4420-b2d2-02ed8183ff5d.stderr.txt
+# ?? research/runs/R-NONMAINLINE-WRITEJSON-R1/blobs/C-0ebeba8c-d4f4-4420-b2d2-02ed8183ff5d.stdout.txt
+# ?? research/runs/R-NONMAINLINE-WRITEJSON-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-WRITEJSON-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-WRITEJSON-R1/metadata.json
+# ?? tests/research/__pycache__/test_recorder.cpython-312.pyc
+# ?? tools/research/__pycache__/recorder.cpython-312.pyc
