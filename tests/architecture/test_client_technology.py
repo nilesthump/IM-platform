@@ -165,6 +165,16 @@ class ClientTechnologyControls(unittest.TestCase):
         self.put('spec/progress/evidence/HISTORICAL/pubspec.yaml', 'dependencies: flutter')
         self.assertEqual([], checker.check_clients(self.root))
 
+    def test_installed_build_artifacts_are_not_client_source_or_declarations(self):
+        # node_modules/ and dist/ are generated artifacts declared by the client
+        # packages' own .gitignore; a local npm ci / npm run build must not
+        # flood the check with false dependency or source-type findings.
+        self.assertEqual([], checker.check_clients(self.root))
+        self.put('clients/shared/protocol-sdk/node_modules/typescript/package.json',
+                 '{"name":"typescript","version":"5.9.0","dependencies":{"@dprint/formatter":"*","minimist":"*","mocha":"*"}}')
+        self.put('clients/shared/protocol-sdk/dist/storage/models.js', 'export const x = 1;\n')
+        self.assertEqual([], checker.check_clients(self.root))
+
     def test_symlink_cannot_bypass_boundary(self):
         source = self.put('archive/bad.dart', 'void main() {}')
         link = self.root/'clients/shared/store.ts'

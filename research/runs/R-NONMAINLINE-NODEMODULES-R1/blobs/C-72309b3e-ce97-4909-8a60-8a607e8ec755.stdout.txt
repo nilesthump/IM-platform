@@ -1,0 +1,29 @@
+RUN C:\Users\Aeoliang\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe -B ci/check_architecture.py --scope clients --json
+{
+  "result": "PASS",
+  "scope": "clients",
+  "violations": [],
+  "graphs": {}
+}
+RUN C:\nvm4w\nodejs\npm.cmd --prefix R:\Temp\web-verification-li91uf1m\clients\web ci --ignore-scripts --no-audit --no-fund
+
+added 10 packages in 5s
+RUN C:\nvm4w\nodejs\npm.cmd --prefix R:\Temp\web-verification-li91uf1m\clients\web run build
+
+> im-web@0.1.0 build
+> tsc -p tsconfig.json && node src/ui/build.config.mjs
+
+RUN C:\nvm4w\nodejs\node.EXE D:\0\Work\App\IM-platform\tests\clients\web\behavior.mjs
+PASS Web behavior: exact auth/contracts, no initial backfill, memory state, retry identity, terminal SENT, gap/duplicates/page rollback, refresh/logout and stale callback isolation
+PASS Web regression: late ACK identity, both terminal-page crossing directions, continued pagination/atomic failed-page rollback, stable missing-gap failure/retry, strict legal logout204 and genuine failure
+PASS STATE real-contract cache alignment, strict Sync cache rejection, late old friend success/error isolation, cursor projection failure retry, prior login generation isolation
+PASS unknown Web adapter Error and primitive preserve original failure
+PASS Web UTF8/read classification and retired refresh unknown-error identity without account publication
+PASS compiled Web renderer three-state/content/identity and truthful successful-empty search; editing query clears old completion
+PASS stream cleanup normal/single/known same root/unknown same root/distinct dual roots
+PASS stream cleanup normal/single/known same root/unknown same root/distinct dual roots (actual204 status; controlled adapter-exposed empty stream)
+PASS compiled i18n resource equivalence/negative controls/Web adapter; native and browser acceptance separate
+RUN C:\nvm4w\nodejs\node.EXE D:\0\Work\App\IM-platform\tests\clients\web\appearance.mjs
+PASS appearance: bounded values, rejection, restart, theme independence, unavailable storage, unrelated key preservation
+PASS appearance actual DOMException defaults, unknown Error/TypeError-name spoof/primitive original identity
+PASS: actual locked Web build, behavior, appearance and source verification; GUI screenshots remain independent.
