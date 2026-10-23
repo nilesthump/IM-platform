@@ -1,4 +1,11 @@
 ---
+
+## Latest Human UI review stop point (2026-10-23)
+
+Human requests independent review, then actual group-page screenshots to explain desired layout. Immediate next action: coordinator delegates fresh UI Standards/Spec/Architect review of this frozen working-tree checkpoint, then shows Web/Desktop/Android raw screenshots; await Human layout direction. Full GROUP remains active and S2 OPEN. Do not guess redesign or continue new G06/G07 fixture work now.
+
+Client source baseline is75f6bfb2b0f7044ab747ab26aa5605576e058181 with runtime working-tree changes. Web real A/B/C entry and Web G06 before/after completed locally; Android real A/B/C entry10 passes after actual duplicate-key fix. Source/artifact/screenshot bindings, original failures and exact remaining G06..G09 are in product/clients-20261023/runtime-ui-handoff.md and runtime-ui-binding.json. Windows owner retains separate installed candidate evidence. Local group verification exit0; final independent reviews/hosted/main sync PENDING. Accepted LKG/main remains3d30872d3d18c55fa8156a5ce1133281ffaa4e7e. Current task-owned changes belong solely to /root/resume_backend/clients_impl; release writer after checkpoint commit to coordinator. Recorder partial FAIL is disclosed, not acceptance.
+
 task_id: LOOP1-GROUP-001
 title: 建群、成员添加与三端群聊接入
 status: active
