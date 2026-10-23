@@ -197,6 +197,8 @@ class PathMatrixTests(unittest.TestCase):
                      "spec/architecture/decisions/ADR-9999.md", "spec/handoff/agent-context.md",
                      "spec/tasks/TASK_TEMPLATE.md", "spec/tasks/active/TEST.md",
                      "spec/batches/BATCH.md", "spec/acceptance/s1.md", "spec/governance/minimality.md",
+                     "spec/progress/current.md", "spec/progress/checkpoints/2026-01-01-checkpoint.md",
+                     "spec/progress/evidence/LOOP1-CI-001/local-verification.json",
                      "tools/architecture/go_source_graph.go", "tools/verify-frozen-architecture.ps1",
                      "tools/verify_frozen_architecture.py",
                      "tools/verify-loop1-min-001.ps1",

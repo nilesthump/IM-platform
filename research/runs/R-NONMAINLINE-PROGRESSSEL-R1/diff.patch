@@ -1,0 +1,249 @@
+diff --git a/ci/classify.py b/ci/classify.py
+index 5975a123..1f3ddc97 100644
+--- a/ci/classify.py
++++ b/ci/classify.py
+@@ -1,106 +1,107 @@
+-"""Classify a Git diff into the Loop 1 CI job matrix.
+-
+-The classifier consumes repository-relative paths, including deleted paths. A
+-shared contract change runs every profile/client and compatibility check.
+-"""
+-
+-import argparse
+-import json
+-import os
+-import subprocess
+-import sys
+-
+-
+-JOBS = (
+-    "go", "java", "web", "desktop", "mobile", "shared",
+-    "old_client", "plugin", "migration", "compatibility", "deploy",
+-    "architecture", "source_go", "source_java",
+-)
+-FULL_COMPATIBILITY = frozenset(JOBS) - {"deploy"}
+-
+-
+-def classify(paths):
+-    selected = set()
+-    for raw in paths:
+-        path = raw.replace("\\", "/").removeprefix("./")
+-        if not path or path.startswith("/") or ".." in path.split("/"):
+-            raise ValueError(f"not a repository-relative path: {raw!r}")
+-        parts = path.split("/")
+-        governance = (
+-            path in {"AGENTS.md", "CLAUDE.md", "README.md"}
+-            or parts[:2] in (["spec", "architecture"], ["spec", "handoff"],
+-                             ["spec", "tasks"], ["spec", "batches"],
+-                             ["spec", "acceptance"], ["spec", "governance"],
+-                             ["tests", "architecture"], ["tools", "architecture"])
+-            or path.startswith("tools/verify-frozen-architecture")
+-            or path == "tools/verify_frozen_architecture.py"
+-            or path.startswith("tools/verify-loop1-ctrl-")
+-            or path.startswith("tools/verify-loop1-min-")
+-        )
+-        if parts[:3] in (["tests", "clients", "sqlite"], ["tests", "clients", "send"]) or path in {"tools/verify-client-sqlite.ps1", "tools/verify_client_sqlite.py", "tools/verify_client_send.py"}:
+-            selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
+-        if parts[0] == "clients":
+-            selected.add("architecture")
+-        if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:
+-            selected.update(JOBS)
+-        if governance:
+-            selected.update({"architecture", "source_go", "source_java"})
+-        shared = (
+-            parts[0] in {"contracts", "database", "migrations", "sdk", "sdks", "shared"}
+-            or parts[:2] in (["backend", "shared"], ["clients", "shared"])
+-            or (len(parts) > 2 and parts[0] == "backend" and parts[2] in {"migrations", "sdk", "sdks", "shared"})
+-            or parts[:2] == ["tests", "database"]
+-        )
+-        if shared:
+-            selected.update(FULL_COMPATIBILITY)
+-        elif parts[:2] in (["tests", "go"], ["tests", "e2e"]):
+-            selected.update({"go", "deploy", "architecture", "source_go"})
+-        elif parts[:2] == ["backend", "go"]:
+-            selected.update({"go", "architecture", "source_go"})
+-        elif parts[:2] == ["backend", "java"]:
+-            selected.update({"java", "architecture", "source_java"})
+-        elif parts[:2] == ["clients", "web"]:
+-            selected.add("web")
+-        elif parts[:2] == ["clients", "desktop"]:
+-            selected.add("desktop")
+-        elif parts[:2] == ["clients", "mobile"]:
+-            selected.add("mobile")
+-        elif (parts[0] == "ci"
+-              or parts[:2] in ([".github", "workflows"], ["tests", "ci"])):
+-            selected.update(JOBS)
+-        elif (parts[0] == "deploy" or parts[:2] == ["tests", "infrastructure"]):
+-            selected.add("deploy")
+-    return {job: job in selected for job in JOBS}
+-
+-
+-def diff_paths(base, head):
+-    result = subprocess.run(
+-        ["git", "diff", "--no-renames", "--name-only", "-z", base, head, "--"],
+-        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+-    )
+-    return [os.fsdecode(path) for path in result.stdout.split(b"\0") if path]
+-
+-
+-def main(argv=None):
+-    parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--base", help="Git base commit")
+-    parser.add_argument("--head", help="Git head commit")
+-    parser.add_argument("--paths", nargs="*", help="Explicit paths for local inspection")
+-    parser.add_argument("--github-output", help="GitHub Actions output file")
+-    args = parser.parse_args(argv)
+-    if args.paths is None and not (args.base and args.head):
+-        parser.error("supply --paths or both --base and --head")
+-    if args.paths is not None and (args.base or args.head):
+-        parser.error("--paths and Git revisions are mutually exclusive")
+-    paths = args.paths if args.paths is not None else diff_paths(args.base, args.head)
+-    matrix = classify(paths)
+-    if args.github_output:
+-        with open(args.github_output, "a", encoding="utf-8") as output:
+-            for job, selected in matrix.items():
+-                output.write(f"{job}={str(selected).lower()}\n")
+-    json.dump({"paths": paths, "jobs": matrix}, sys.stdout, indent=2)
+-    sys.stdout.write("\n")
+-
+-
+-if __name__ == "__main__":
+-    main()
++"""Classify a Git diff into the Loop 1 CI job matrix.
++
++The classifier consumes repository-relative paths, including deleted paths. A
++shared contract change runs every profile/client and compatibility check.
++"""
++
++import argparse
++import json
++import os
++import subprocess
++import sys
++
++
++JOBS = (
++    "go", "java", "web", "desktop", "mobile", "shared",
++    "old_client", "plugin", "migration", "compatibility", "deploy",
++    "architecture", "source_go", "source_java",
++)
++FULL_COMPATIBILITY = frozenset(JOBS) - {"deploy"}
++
++
++def classify(paths):
++    selected = set()
++    for raw in paths:
++        path = raw.replace("\\", "/").removeprefix("./")
++        if not path or path.startswith("/") or ".." in path.split("/"):
++            raise ValueError(f"not a repository-relative path: {raw!r}")
++        parts = path.split("/")
++        governance = (
++            path in {"AGENTS.md", "CLAUDE.md", "README.md"}
++            or parts[:2] in (["spec", "architecture"], ["spec", "handoff"],
++                             ["spec", "tasks"], ["spec", "batches"],
++                             ["spec", "acceptance"], ["spec", "governance"],
++                             ["spec", "progress"],
++                             ["tests", "architecture"], ["tools", "architecture"])
++            or path.startswith("tools/verify-frozen-architecture")
++            or path == "tools/verify_frozen_architecture.py"
++            or path.startswith("tools/verify-loop1-ctrl-")
++            or path.startswith("tools/verify-loop1-min-")
++        )
++        if parts[:3] in (["tests", "clients", "sqlite"], ["tests", "clients", "send"]) or path in {"tools/verify-client-sqlite.ps1", "tools/verify_client_sqlite.py", "tools/verify_client_send.py"}:
++            selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
++        if parts[0] == "clients":
++            selected.add("architecture")
++        if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:
++            selected.update(JOBS)
++        if governance:
++            selected.update({"architecture", "source_go", "source_java"})
++        shared = (
++            parts[0] in {"contracts", "database", "migrations", "sdk", "sdks", "shared"}
++            or parts[:2] in (["backend", "shared"], ["clients", "shared"])
++            or (len(parts) > 2 and parts[0] == "backend" and parts[2] in {"migrations", "sdk", "sdks", "shared"})
++            or parts[:2] == ["tests", "database"]
++        )
++        if shared:
++            selected.update(FULL_COMPATIBILITY)
++        elif parts[:2] in (["tests", "go"], ["tests", "e2e"]):
++            selected.update({"go", "deploy", "architecture", "source_go"})
++        elif parts[:2] == ["backend", "go"]:
++            selected.update({"go", "architecture", "source_go"})
++        elif parts[:2] == ["backend", "java"]:
++            selected.update({"java", "architecture", "source_java"})
++        elif parts[:2] == ["clients", "web"]:
++            selected.add("web")
++        elif parts[:2] == ["clients", "desktop"]:
++            selected.add("desktop")
++        elif parts[:2] == ["clients", "mobile"]:
++            selected.add("mobile")
++        elif (parts[0] == "ci"
++              or parts[:2] in ([".github", "workflows"], ["tests", "ci"])):
++            selected.update(JOBS)
++        elif (parts[0] == "deploy" or parts[:2] == ["tests", "infrastructure"]):
++            selected.add("deploy")
++    return {job: job in selected for job in JOBS}
++
++
++def diff_paths(base, head):
++    result = subprocess.run(
++        ["git", "diff", "--no-renames", "--name-only", "-z", base, head, "--"],
++        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++    )
++    return [os.fsdecode(path) for path in result.stdout.split(b"\0") if path]
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--base", help="Git base commit")
++    parser.add_argument("--head", help="Git head commit")
++    parser.add_argument("--paths", nargs="*", help="Explicit paths for local inspection")
++    parser.add_argument("--github-output", help="GitHub Actions output file")
++    args = parser.parse_args(argv)
++    if args.paths is None and not (args.base and args.head):
++        parser.error("supply --paths or both --base and --head")
++    if args.paths is not None and (args.base or args.head):
++        parser.error("--paths and Git revisions are mutually exclusive")
++    paths = args.paths if args.paths is not None else diff_paths(args.base, args.head)
++    matrix = classify(paths)
++    if args.github_output:
++        with open(args.github_output, "a", encoding="utf-8") as output:
++            for job, selected in matrix.items():
++                output.write(f"{job}={str(selected).lower()}\n")
++    json.dump({"paths": paths, "jobs": matrix}, sys.stdout, indent=2)
++    sys.stdout.write("\n")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tests/ci/test_classify.py b/tests/ci/test_classify.py
+index 9c485786..60abb376 100644
+--- a/tests/ci/test_classify.py
++++ b/tests/ci/test_classify.py
+@@ -197,6 +197,8 @@ class PathMatrixTests(unittest.TestCase):
+                      "spec/architecture/decisions/ADR-9999.md", "spec/handoff/agent-context.md",
+                      "spec/tasks/TASK_TEMPLATE.md", "spec/tasks/active/TEST.md",
+                      "spec/batches/BATCH.md", "spec/acceptance/s1.md", "spec/governance/minimality.md",
++                     "spec/progress/current.md", "spec/progress/checkpoints/2026-01-01-checkpoint.md",
++                     "spec/progress/evidence/LOOP1-CI-001/local-verification.json",
+                      "tools/architecture/go_source_graph.go", "tools/verify-frozen-architecture.ps1",
+                      "tools/verify_frozen_architecture.py",
+                      "tools/verify-loop1-min-001.ps1",
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/__pycache__/check_gate.cpython-312.pyc
+# ?? ci/__pycache__/check_s0_boundary.cpython-312.pyc
+# ?? ci/__pycache__/classify.cpython-312.pyc
+# ?? research/prompts/P-NONMAINLINE.PROGRESSSEL.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.PROGRESSSEL.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-PROGRESSSEL-R1/blobs/C-917eb168-da0f-44d7-bb8b-8436bc2e8876.stderr.txt
+# ?? research/runs/R-NONMAINLINE-PROGRESSSEL-R1/blobs/C-917eb168-da0f-44d7-bb8b-8436bc2e8876.stdout.txt
+# ?? research/runs/R-NONMAINLINE-PROGRESSSEL-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-PROGRESSSEL-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-PROGRESSSEL-R1/metadata.json
+# ?? tests/ci/__pycache__/test_classify.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_gate.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_go_regression.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_s0_boundary.cpython-312.pyc
+# ?? tests/ci/__pycache__/test_workflow_context.cpython-312.pyc
+# ?? tests/go/__pycache__/live_role_smoke.cpython-312.pyc
