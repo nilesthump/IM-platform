@@ -2,7 +2,7 @@
 task_id: LOOP1-GROUP-001
 title: 建群、成员添加与三端群聊接入
 status: active
-owner: /root/backend_go_fix_r2
+owner: /root/resume_backend/clients_impl
 stage: S2
 gate: S2
 client_supplement_phase: group_product
@@ -10,13 +10,24 @@ client_supplement_phase: group_product
 
 # Goal
 
-current_delivery: BACKEND_PR_ONLY_HUMAN_STOP_AFTER_PR
-backend_regular_review: R3_FAIL_AT_a9bb4877_SPEC_P2_001_FIXED_NEW_FRESH_REVIEW_PENDING_FINAL_FIX_R2_SHA
-backend_error_handling_review: DIFFERENT_NEW_FRESH_SPECIALIST_PENDING_FINAL_FIX_R2_SHA_AFTER_NEW_REGULAR_PASS
-backend_pull_request: NOT_CREATED
-backend_main_sync: PENDING_NOT_PERFORMED_NOT_AUTHORIZED_THIS_ROUND
+## Current Human resumption (2026-10-23)
+
+Coordinator recovered the latest Human instruction to finish the complete GROUP task including Web/Desktop/Mobile; this supersedes the historical backend-only stop below. Current delivery: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN. GROUP remains active/group_product and S2 OPEN. Historical evidence and stops below describe their original scope and are retained.
+
+Assigned managed Git root: H:/.codex/worktrees/g-8802/IM-platform; continuation branch: task/LOOP1-GROUP-001-resume (HEAD c7c19195); client implementation owner: /root/resume_backend/clients_impl. Current sole writer grant covers the already-listed client source, group tests, necessary existing CI step and Task/current/new evidence; shared+Web then Desktop then Kotlin. Local tests/builds and task-owned commits allowed; runtime requires resource qualification, no push/PR/merge. Backend PR70 is independently accepted, merged and safely synchronized at 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e (new accepted LKG/main); this is not full GROUP acceptance. See checkpoint 2026-10-23-group-backend-accepted.md and new product/clients-20261023/backend-bindings.json.
+
+Next exact action: freeze the locally verified client source candidate for fresh independent review; complete G01..G09, real TLS/browser/installed Windows Tauri/owned Android emulator, screenshots and Architect approval, fresh final-SHA regular and different error review, hosted acceptance, protected integration/actual-main and safe main sync. All client/product acceptance remains PENDING; no new authority, contract, native/schema or dependency change is authorized.
+
+Current uncommitted ownership: all listed client/group tests, the approved i18n fixture binding, one existing CI step and Task/current/new evidence by /root/resume_backend/clients_impl; no unknown source touched. Local source/build behavior results and preserved failures: spec/progress/evidence/LOOP1-GROUP-001/product/clients-20261023/report.md. Fresh client regular/error reviews PENDING; native runtime/visual/Architect/full GROUP acceptance PENDING. Recorder partial status is disclosed in that report.
+
+
+current_delivery: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
+backend_regular_review: PASS_AT_c7c19195_COORDINATOR_VERIFIED
+backend_error_handling_review: PASS_AT_c7c19195_COORDINATOR_VERIFIED
+backend_pull_request: PR70
+backend_main_sync: PASS_AT_3d30872d3d18c55fa8156a5ce1133281ffaa4e7e
 backend_review_fixed_base: 79d39dcbd045597ccc5abd459edd388eed269254
-backend_review_spec_source: this_Task_and_latest_Human_backend_only_stop
+backend_review_spec_source: bounded_backend_review_then_latest_Human_full_GROUP_resumption
 
 可恢复discovery（root完成实际审查/PR时外部写真实值，现在不虚构结果）：`C:/Users/21441/.codex/visualizations/2026/10/18/01a14d96-146d-7f42-9fd8-0fd0c7e399e0/backend-go-pr-reviews.json`记录fresh regular/error同最终SHA状态/originalrefs；同目录`backend-go-pr-handoff.json`记录实际最终SHA、PR URL、已执行验证、CI仅触发未接受、main-sync PENDING与STOP_BY_HUMAN。恢复时跟随两文件读取实际最终状态，不为URL再追逐metadata SHA；文件尚未写入/结果缺失不算PASS。
 
@@ -123,6 +134,7 @@ client_runtime: Android
 - `tests/contract/group/**`（Fix R5新增的 `tests/contract/group/test_verification_failures.py` 原6测试方法保持；Fix R6仅在该文件追加R6-P2-002现E2E实际SQL/断言边界的有意义回归：精确两真实记录正例、单LF记录别名及必要缺失/额外/重复/乱序/大小写错/native非零反例，隔离边界证据不冒称真实Docker/TLS接受。原test_group.py全部22测试方法、35valid/30invalid对象与helpers保持）
 - `tests/integration/group/**`
 - `tests/clients/i18n/verify.mjs`（群资源键/参数负例）
+- `tests/clients/i18n/scheduling.mjs`（2026-10-23 coordinator批准：仅现source-derived Workspace fixture补GroupFailure依赖绑定；保持全部现断言与unknown异常原样传播负例，不放宽接受）
 - `tests/clients/i18n/compiled.mjs`（群资源键/参数负例）
 - `ci/check_s2_planning.py`（仅GROUP phase/完成事实，不能自删Gate要求）
 - `tests/architecture/test_s2_planning.py`（对应完成/阻断负例）
@@ -143,8 +155,8 @@ client_runtime: Android
 
 接受链原件由seal逐path/bytes/hash绑定：contract-r6-reviews.json、regularR7/errorR4 receipts、candidate hosted auditor/bindings、protected-integration、actual-main auditor/bindings、contract-r6-acceptance.json、preservation-before-sync及contract-r6-main-sync.json。safe sync全部8检查PASS，H:/IM-platform SHA79；782未知文件含2tracked、recovery/s1-handoff-20261001分支与无关index flags/entries保持。当前assigned managedroot `H:/.codex/worktrees/group/IM-platform`、branch `task/LOOP1-GROUP-001`已ff-only到同79/同tree；未复制main未知工作。新last known good为已接受/同步首契约main79；不代表群产品已接受。
 
-product_owner: /root/backend_go_fix_r2
-product_registration: BACKEND_PR_ONLY_HUMAN_STOP_AFTER_PR
+product_owner: /root/resume_backend/clients_impl
+product_registration: CLIENT_IMPLEMENTATION_RESUMED
 product_G01_G09: NOT_RUN
 product_regular_review: NOT_STARTED
 product_error_handling_review: NOT_STARTED

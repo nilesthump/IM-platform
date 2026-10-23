@@ -1,3 +1,4 @@
+import {GroupPanel} from './GroupPanel.js';
 import {LanguageContext,useText,useDisplayText} from "../i18n/context.js";
 import {WindowBar} from "./WindowBar.js";
 import {Navigation} from "./Navigation.js";
@@ -36,8 +37,8 @@ function WorkspaceShell(){const t=useText();const display=useDisplayText();
       {s.error&&<div className="notice" role="alert"><span>{display(s.error)}</span>{s.session&&<button disabled={!s.session} onClick={()=>run(reconnect())}>{t("auth.reconnect")}</button>}</div>}
       {!authenticated?<AuthPanel s={s} registering={registering} setRegistering={setRegistering} confirmation={confirmation} setConfirmation={setConfirmation} registered={registered} setRegistered={setRegistered} username={username} setUsername={setUsername} password={password} setPassword={setPassword} register={register} login={login} restore={restore} run={run}/>:
       s.page==="Chat"?<section className="chat-layout"><ConversationList s={s} page={page} open={open} run={run}/>
-      <div className="chat-pane glass">{s.selected&&<><div className="chat-heading"><span className="avatar">{friend?.user.displayName[0]??"#"}</span><div><h2>{title}</h2><small>{s.connection==="ready"?t("sync.connected"):t("sync.offline")}</small></div><button className="quiet" disabled={!s.session} onClick={()=>run(reconnect())}>{t("auth.reconnect")}</button></div><Messages s={s} retry={retry} run={run}/><Composer s={s} draft={draft} setDraft={setDraft} send={send} run={run} textarea={textarea} composerHeight={composerHeight} setComposerHeight={setComposerHeight} resize={resize}/></>}</div></section>:
-      s.page==="Friends"?<FriendsPanel s={s} query={query} setQuery={setQuery} search={search} add={add} open={open} run={run}/>:
+      <div className="chat-pane glass">{s.selected&&<><div className="chat-heading"><span className="avatar">{friend?.user.displayName[0]??"#"}</span><div><h2>{title}</h2><small>{s.connection==="ready"?t("sync.connected"):t("sync.offline")}</small></div><button className="quiet" disabled={!s.session} onClick={()=>run(reconnect())}>{t("auth.reconnect")}</button></div><Messages s={s} retry={retry} run={run}/><>{s.groups.some(r=>r.conversationId===s.selected)&&<GroupPanel key={s.selected} s={s} conversation={s.selected} submit={app.createGroup.bind(app)} retry={app.retryGroup.bind(app)}/>}</><Composer s={s} draft={draft} setDraft={setDraft} send={send} run={run} textarea={textarea} composerHeight={composerHeight} setComposerHeight={setComposerHeight} resize={resize}/></>}</div></section>:
+      s.page==="Friends"?<><GroupPanel s={s} submit={app.createGroup.bind(app)} retry={app.retryGroup.bind(app)}/><FriendsPanel s={s} query={query} setQuery={setQuery} search={search} add={add} open={open} run={run}/></>:
       s.page==="AI"?<AIPlaceholder />:
       s.page==="Plugin"?<PluginPlaceholder />:
       <SettingsPanel selectLanguage={app.selectLanguage.bind(app)} language={s.language} languageStored={s.languageStored} s={s} prefs={prefs} preferences={preferences} refresh={refresh} disconnect={disconnect} reconnect={reconnect} testNotification={testNotification} logout={logout} run={run}/>}

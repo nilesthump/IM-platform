@@ -258,5 +258,17 @@ export default {
   "web.emptyChat2": "挨拶して、新しい会話を始めましょう。",
   "error.userNotFound": "ユーザーが見つかりません",
   "error.friendSelf": "自分を友だちに追加することはできません",
-  "error.friendState": "友だち関係の状態が変わりました。更新して再試行してください。"
+  "error.friendState": "友だち関係の状態が変わりました。更新して再試行してください。",
+  "group.create": "グループを作成",
+  "group.add": "メンバーを追加",
+  "group.members": "メンバー",
+  "group.loading": "読み込み中…",
+  "group.empty": "友達を追加してグループを作成します。",
+  "group.rejected": "リクエストが拒否されました。",
+  "group.unconfirmed": "送信結果が未確認です。元のリクエストを再試行してください。",
+  "group.retry": "元のリクエストを再試行",
+  "group.success": "グループを更新しました。",
+  "group.failure": "グループのリクエストに失敗しました。",
+  "group.conflict": "このリクエストIDは別のメンバーに対応しています。",
+  "group.title": "グループ"
 };

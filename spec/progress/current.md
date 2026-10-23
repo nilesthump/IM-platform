@@ -5,21 +5,31 @@ Current Stage: S2
 Current Gate: S2
 Gate Status: OPEN
 Current Batch: LOOP1-GROUP-001
-Batch Status: BACKEND_PR_ONLY_HUMAN_STOP_AFTER_PR
+Batch Status: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
 Current Task: LOOP1-GROUP-001
 Current Task State: active
 Execution Status: active
 
-Current Delivery: BACKEND_PR_ONLY_HUMAN_STOP_AFTER_PR
-Human Stop Point: 完成后端代码编写与审查并提交新PR后停止；不merge/main-sync/Taskdone，不启动三端/新runtime。
-Backend Regular Review: R3 FAIL at a9bb4877 (Standards0/Spec1 P2-001); numeric token fixed, NEW fresh Standards+Spec PENDING final Fix R2 SHA
-Backend Error Review: DIFFERENT NEW fresh specialist PENDING same final Fix R2 SHA after new regular PASS
-Backend PR: NOT_CREATED
-Backend Main Sync: PENDING_NOT_PERFORMED
+Current Delivery: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
+Human Stop Point: latest Human resumes full GROUP including three clients; previous backend-only stop is historical. Full acceptance and main synchronization remain required.
+Backend Regular Review: PASS at c7c19195; coordinator verified bounded backend evidence
+Backend Error Review: PASS at c7c19195; different fresh specialist, coordinator verified bounded evidence
+Backend PR: PR70
+Backend Main Sync: PASS at 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e
 Backend Review Fixed Base: 79d39dcbd045597ccc5abd459edd388eed269254
-Backend Review Spec Source: 当前Task及Human最新backend-only停止点
+Backend Review Spec Source: bounded accepted backend; latest Human now resumes full GROUP
 
 Backend Discovery: `C:/Users/21441/.codex/visualizations/2026/10/18/01a14d96-146d-7f42-9fd8-0fd0c7e399e0/backend-go-pr-reviews.json`与同目录`backend-go-pr-handoff.json`。root在实际完成fresh双审/PR时写最终同SHA与originalrefs/PR URL/验证/CI仅触发未接受/main-sync PENDING/STOP_BY_HUMAN；恢复跟随实际文件，不虚构尚未发生结果、不为URL再追逐SHA。
+
+## Current Human resumption (2026-10-23)
+
+Coordinator recovered the latest Human instruction to finish the complete GROUP task including Web/Desktop/Mobile; this supersedes the historical backend-only stop below. Current delivery: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN. GROUP remains active/group_product and S2 OPEN. Historical evidence and stops below describe their original scope and are retained.
+
+Assigned managed Git root: H:/.codex/worktrees/g-8802/IM-platform; continuation branch: task/LOOP1-GROUP-001-resume (HEAD c7c19195); client implementation owner: /root/resume_backend/clients_impl. Current sole writer grant covers the already-listed client source, group tests, necessary existing CI step and Task/current/new evidence; shared+Web then Desktop then Kotlin. Local tests/builds and task-owned commits allowed; runtime requires resource qualification, no push/PR/merge. Backend PR70 is independently accepted, merged and safely synchronized at 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e (new accepted LKG/main); this is not full GROUP acceptance. See checkpoint 2026-10-23-group-backend-accepted.md and new product/clients-20261023/backend-bindings.json.
+
+Next exact action: freeze the locally verified client source candidate for fresh independent review; complete G01..G09, real TLS/browser/installed Windows Tauri/owned Android emulator, screenshots and Architect approval, fresh final-SHA regular and different error review, hosted acceptance, protected integration/actual-main and safe main sync. All client/product acceptance remains PENDING; no new authority, contract, native/schema or dependency change is authorized.
+
+Current uncommitted ownership: all listed client/group tests, the approved i18n fixture binding, one existing CI step and Task/current/new evidence by /root/resume_backend/clients_impl; no unknown source touched. Local source/build behavior results and preserved failures: spec/progress/evidence/LOOP1-GROUP-001/product/clients-20261023/report.md. Fresh client regular/error reviews PENDING; native runtime/visual/Architect/full GROUP acceptance PENDING. Recorder partial status is disclosed in that report.
 
 ## Immediately Relevant Completed Work
 
@@ -35,7 +45,7 @@ Human随后明确收窄为后端审查/新PR后停止。上述一次handoff meta
 
 ## Current Blockers
 
-首Go已本地验证，当前只待后端fresh常规Standards+Spec、different fresh错误专项同finalSHA与新PR。PR创建后按Human停止；本轮未main-sync且不执行merge/同步/Taskdone。完整GROUP/三端/G01..G09、Architect及完整产品接受仍PENDING，不以本地/Recorder或PR替代。
+No current external blocker to local implementation. Full client runtime, visual/Architect approval, independent final reviews and applicable hosted acceptance remain required and pending. Older backend-only stop and pending statements in historical records below are superseded by the current resumption/checkpoint.
 
 ## Verification
 
@@ -82,19 +92,19 @@ Recorder R-GROUP-FIX-R6-20261020 prospective_resume/partial：startup、外部he
 
 ## Next Exact Action
 
-Root independently binds `C:\Users\21441\.codex\visualizations\2026\10\18\01a14d96-146d-7f42-9fd8-0fd0c7e399e0\backend-go-fix-r2\final-receipt.json` actual final Fix R2 SHA/source/clean Control and released leases → wholly new Standards+Spec regular → different fresh error specialist on the SAME SHA. Only two PASS permit push/new backend PR; stop after PR creation per Human. No CI wait/merge/main-sync/Taskdone or client continuation. S2 OPEN/active/group_product; accepted LKG/main79 remains.
+Commit the locally checked client source candidate; coordinator arranges independent review and ancestry integration. Complete real TLS/browser/installed Tauri/owned Android scenarios, G01..G09/visuals/Architect, final reviews and hosted acceptance before protected integration and safe main sync. No push grant to implementation owner.
 
 ## Last Known Good Commit
 
-`79d39dcbd045597ccc5abd459edd388eed269254`：已接受、集成并安全同步的首契约main；完整群产品未接受。
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e`: accepted backend merge and safe main sync; full GROUP remains pending.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-20-group-go-local.md`；已独立接受首契约恢复点另见`2026-10-20-group-contract-accepted.md`。
+`spec/progress/checkpoints/2026-10-23-group-backend-accepted.md`.
 
 ## Uncommitted Changes / Ownership
 
-Fix R2 sole writer `/root/backend_go_fix_r2`, assigned exactroot H:/.codex/worktrees/group/IM-platform, branch task/LOOP1-GROUP-001; only two Go files, Task/current and new thin fix-r2 evidence owned here. Single final commit/clean state/source/runtime lease RELEASED are determined from sealed `C:\Users\21441\.codex\visualizations\2026\10\18\01a14d96-146d-7f42-9fd8-0fd0c7e399e0\backend-go-fix-r2\final-receipt.json`; no unknown main work is copied or modified. No push/PR/merge/sync by Fix owner.
+Only assigned g-8802 worktree client/group implementation, approved test adaptation, single existing CI command and Task/current/new evidence belong to /root/resume_backend/clients_impl. Original Go and old sealed evidence unchanged. Stage commit and external receipt will identify exact candidate SHA. Runtime resources belong to /root/resume_backend/runtime_preflight, independently of source ownership.
 
 ## Architecture Conflicts / ACP / ADR
 

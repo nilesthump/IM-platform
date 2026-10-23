@@ -259,5 +259,17 @@ val en:Map<String,String> = mapOf(
 "web.emptyChat2" to "Say hello and start a new conversation.",
  "error.userNotFound" to "User not found",
  "error.friendSelf" to "You cannot add yourself as a friend",
- "error.friendState" to "Friendship state changed. Refresh and try again."
+ "error.friendState" to "Friendship state changed. Refresh and try again.",
+ "group.create" to "Create group",
+ "group.add" to "Add members",
+ "group.members" to "Members",
+ "group.loading" to "Loading…",
+ "group.empty" to "Add a friend to start a group.",
+ "group.rejected" to "Request rejected.",
+ "group.unconfirmed" to "Submission unconfirmed. Retry the original request.",
+ "group.retry" to "Retry original request",
+ "group.success" to "Group updated.",
+ "group.failure" to "Group request failed.",
+ "group.conflict" to "This request ID has different members.",
+ "group.title" to "Group"
 )

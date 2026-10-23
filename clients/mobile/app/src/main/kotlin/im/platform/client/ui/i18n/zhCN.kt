@@ -259,5 +259,17 @@ val zhCN:Map<String,String> = mapOf(
 "web.emptyChat2" to "发一句问候，开启新的交流。",
  "error.userNotFound" to "用户不存在",
  "error.friendSelf" to "不能添加自己为好友",
- "error.friendState" to "好友关系状态已变化，请刷新后重试。"
+ "error.friendState" to "好友关系状态已变化，请刷新后重试。",
+ "group.create" to "创建群聊",
+ "group.add" to "添加成员",
+ "group.members" to "群成员",
+ "group.loading" to "加载中…",
+ "group.empty" to "添加好友后即可创建群聊。",
+ "group.rejected" to "请求被拒绝。",
+ "group.unconfirmed" to "提交结果未确认，请重试原请求。",
+ "group.retry" to "重试原请求",
+ "group.success" to "群聊已更新。",
+ "group.failure" to "群聊请求失败。",
+ "group.conflict" to "此请求编号对应不同成员。",
+ "group.title" to "群聊"
 )

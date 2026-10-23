@@ -1,3 +1,4 @@
+import {GroupPanel} from './GroupPanel.js';
 import {LanguageContext,useText,useDisplayText} from "../i18n/context.js";
 import {Navigation} from "./Navigation.js";
 import {Header} from "./Header.js";
@@ -29,13 +30,13 @@ function WorkspaceShell({locale,selectLanguage,languageStored}:{locale:Locale;se
   const loadProfile=client.loadProfile.bind(client),logout=client.logout.bind(client),refresh=client.refresh.bind(client),loadFriends=client.loadFriends.bind(client),reconnect=client.reconnect.bind(client),retry=client.retry.bind(client),send=client.send.bind(client),searchUsers=client.search.bind(client),addFriend=client.addFriend.bind(client),login=client.login.bind(client);
   function appearance(p:Partial<Appearance>){const next={...prefs,...p};setPrefs(next);setStored(saveAppearance(next));}
   function open(c:string){client.open(c);setPage('Chat');}
-  const selected=v.friends.find(f=>f.directConversationId===v.selected),messages=client.repository.snapshot(v.selected);
+  const selected=v.friends.find(f=>f.directConversationId===v.selected),messages=client.repository.snapshot(v.selected),group=v.groups.find(r=>r.conversationId===v.selected);
   return <div className="workspace">
     <Navigation page={page} setPage={setPage} v={v} loadProfile={loadProfile}/>
     <div className="main"><Header page={page} setPage={setPage} v={v} logout={logout}/>
     {!v.session&&page!=='Settings'?<AuthPanel v={v} username={username} setUsername={setUsername} password={password} setPassword={setPassword} login={login} refresh={refresh}/>:
-    page==='Chat'?<section className="chat-layout"><ConversationList v={v} open={open} setPage={setPage} loadFriends={loadFriends}/><div className="chat-view">{selected?<><div className="chat-heading"><span className="avatar">{selected.user.displayName.slice(0,1)}</span><div><h2>{selected.user.displayName}</h2><p>{t("chat.webLive")}</p></div><button onClick={()=>reconnect()}>{t("auth.reconnect")}</button></div>{v.sync&&<p className="sync" role="status">{display(v.sync)}</p>}<Messages v={v} messages={messages} retry={retry}/><Composer text={text} setText={setText} send={send}/></>:<div className="empty chat-empty"><span>◌</span><h2>{t("chat.place")}</h2><p>{t("chat.choose")}</p></div>}</div></section>:
-    page==='Friends'?<FriendsPanel v={v} search={search} setSearch={setSearch} searched={searched} setSearched={setSearched} open={open} loadFriends={loadFriends} searchUsers={searchUsers} addFriend={addFriend}/>:
+    page==='Chat'?<section className="chat-layout"><ConversationList v={v} open={open} setPage={setPage} loadFriends={loadFriends}/><div className="chat-view">{selected||group?<><div className="chat-heading"><span className="avatar">{selected?.user.displayName.slice(0,1)??'◈'}</span><div><h2>{selected?.user.displayName??t('group.title')}</h2><p>{t("chat.webLive")}</p></div><button onClick={()=>reconnect()}>{t("auth.reconnect")}</button></div>{v.sync&&<p className="sync" role="status">{display(v.sync)}</p>}<Messages v={v} messages={messages} retry={retry}/><>{group&&<GroupPanel key={v.selected} v={v} conversation={v.selected} submit={client.createGroup.bind(client)} retry={client.retryGroup.bind(client)}/>}</><Composer text={text} setText={setText} send={send}/></>:<div className="empty chat-empty"><span>◌</span><h2>{t("chat.place")}</h2><p>{t("chat.choose")}</p></div>}</div></section>:
+    page==='Friends'?<><GroupPanel v={v} submit={client.createGroup.bind(client)} retry={client.retryGroup.bind(client)}/><FriendsPanel v={v} search={search} setSearch={setSearch} searched={searched} setSearched={setSearched} open={open} loadFriends={loadFriends} searchUsers={searchUsers} addFriend={addFriend}/></>:
     page==='AI'||page==='Plugin'?<Placeholder page={page} setPage={setPage}/>:
     page==='Settings'?<SettingsPanel locale={locale} selectLanguage={selectLanguage} languageStored={languageStored} prefs={prefs} appearance={appearance} stored={stored}/>:
     <ProfilePanel v={v} loadProfile={loadProfile} refresh={refresh} logout={logout}/>}

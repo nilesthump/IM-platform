@@ -258,5 +258,17 @@ export default {
   "web.emptyChat2": "Say hello and start a new conversation.",
   "error.userNotFound": "User not found",
   "error.friendSelf": "You cannot add yourself as a friend",
-  "error.friendState": "Friendship state changed. Refresh and try again."
+  "error.friendState": "Friendship state changed. Refresh and try again.",
+  "group.create": "Create group",
+  "group.add": "Add members",
+  "group.members": "Members",
+  "group.loading": "Loading…",
+  "group.empty": "Add a friend to start a group.",
+  "group.rejected": "Request rejected.",
+  "group.unconfirmed": "Submission unconfirmed. Retry the original request.",
+  "group.retry": "Retry original request",
+  "group.success": "Group updated.",
+  "group.failure": "Group request failed.",
+  "group.conflict": "This request ID has different members.",
+  "group.title": "Group"
 };

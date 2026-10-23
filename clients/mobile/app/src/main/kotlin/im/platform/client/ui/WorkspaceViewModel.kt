@@ -1,5 +1,6 @@
 package im.platform.client.ui
 import android.app.Application
+import im.platform.client.group.*
 import im.platform.client.ui.i18n.errorKey
 import androidx.lifecycle.AndroidViewModel
 import im.platform.client.send.*
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 data class ConversationPreview(val text:String,val time:Long)
-data class WorkspaceState(val language:String="en",val languageStored:Boolean=true,val appearance:Appearance=Appearance(),val busy:Boolean=false,val error:String?=null,val session:SendSession?=null,val offlineAccount:String?=null,val profile:User?=null,val friends:List<Friend> = emptyList(),val results:List<User> = emptyList(),val searchComplete:Boolean=false,val conversations:List<String> = emptyList(),val selected:String="",val messages:List<List<String?>> = emptyList(),val connection:String="offline",val sync:String="idle",val unavailable:List<String> = emptyList(),val endpoint:String="https://localhost:8443",val previews:Map<String,ConversationPreview> = emptyMap(),val registered:Boolean=false)
+data class WorkspaceState(val groups:List<MemberRow> = emptyList(),val groupBusy:Boolean=false,val groupStatus:String="",val groupError:String="",val language:String="en",val languageStored:Boolean=true,val appearance:Appearance=Appearance(),val busy:Boolean=false,val error:String?=null,val session:SendSession?=null,val offlineAccount:String?=null,val profile:User?=null,val friends:List<Friend> = emptyList(),val results:List<User> = emptyList(),val searchComplete:Boolean=false,val conversations:List<String> = emptyList(),val selected:String="",val messages:List<List<String?>> = emptyList(),val connection:String="offline",val sync:String="idle",val unavailable:List<String> = emptyList(),val endpoint:String="https://localhost:8443",val previews:Map<String,ConversationPreview> = emptyMap(),val registered:Boolean=false)
 class WorkspaceViewModel(application:Application):AndroidViewModel(application) {
     private val scope=CoroutineScope(SupervisorJob()+Dispatchers.Main.immediate)
     private val preferences=Preferences(application)
@@ -25,7 +26,7 @@ class WorkspaceViewModel(application:Application):AndroidViewModel(application) 
     fun language(value:String){if(!im.platform.client.ui.i18n.validLocale(value))return;val revision=++languageRevision;publish{it.copy(language=value,languageStored=true)};scope.launch{languageWrites.withLock{try{withContext(Dispatchers.IO){preferences.saveLanguage(value)};publish{if(revision==languageRevision)it.copy(languageStored=true)else it}}catch(e:Exception){fail(e);publish{if(revision==languageRevision)it.copy(languageStored=false)else it}}}}}
     private val appearanceWrites=Mutex()
     fun appearance(value:Appearance){publish{it.copy(appearance=value,error=null)};scope.launch{appearanceWrites.withLock{try{withContext(Dispatchers.IO){preferences.saveAppearance(value)}}catch(e:Exception){fail(e);publish{it.copy(error="Appearance could not be saved")}}}}}
-    private suspend fun stop(){generation++;listRevision++;repository=null;friendCursor="";friendRevision++;activity.clear();refreshTimer?.cancel();refreshTimer=null;observers?.cancel();observers=null;val old=sync;sync=null;val offline=offlineRepository;offlineRepository=null;publish{WorkspaceState(language=it.language,languageStored=it.languageStored,appearance=it.appearance,endpoint=it.endpoint,busy=it.busy)};withContext(Dispatchers.IO){old?.dispose();offline?.close()}}
+    private suspend fun stop(preserveGroup:Boolean=false){if(!preserveGroup)groupOperation=null;groupScanning=false;groupDirty=false;generation++;listRevision++;repository=null;friendCursor="";friendRevision++;activity.clear();refreshTimer?.cancel();refreshTimer=null;observers?.cancel();observers=null;val old=sync;sync=null;val offline=offlineRepository;offlineRepository=null;publish{WorkspaceState(groups=if(preserveGroup)it.groups else emptyList(),groupStatus=if(preserveGroup&&groupOperation!=null)"unconfirmed" else "",language=it.language,languageStored=it.languageStored,appearance=it.appearance,endpoint=it.endpoint,busy=it.busy)};withContext(Dispatchers.IO){old?.dispose();offline?.close()}}
     private fun fail(e:Exception,active:Boolean=true){if(e !is ApiFailure && e !is SyncFailure && e !is WireFailure && e !is SendStorageFailure && e !is java.io.IOException && e !is java.security.GeneralSecurityException)throw e;if(!active)return;publish{it.copy(error=if(e is ApiFailure)e.message else "Operation unavailable")};if(e is ApiFailure&&e.kind=="session_expired")expire()}
     private fun accountRepository(account:String):Repository {
         // Preserve the existing initialization failure projection at its actual
@@ -35,7 +36,7 @@ class WorkspaceViewModel(application:Application):AndroidViewModel(application) 
         return repo
     }
     private suspend fun bind(session:SendSession,op:Long){
-        if(op!=operation)return;stop();if(op!=operation)return;val g=generation;val authOwner=auth
+        if(op!=operation)return;stop(state.value.session?.userId==session.userId);if(op!=operation)return;val g=generation;val authOwner=auth
         val repo=withContext(Dispatchers.IO){accountRepository(session.userId)}
         if(g!=generation || op!=operation){repo.close();return}
         val send=SendViewModel(repo,session,factory={url,open,message,end->Wss(url,open,{raw->
@@ -46,12 +47,12 @@ class WorkspaceViewModel(application:Application):AndroidViewModel(application) 
         val ids=withContext(Dispatchers.IO){repositoryRead {repo.conversationIds()}};if(g!=generation || op!=operation)return;publish{it.copy(session=session,conversations=ids,selected="",error=null)}
         observers=scope.launch {
             launch{send.state.collect{s->if(g==generation){publish{it.copy(connection=s.connection,error=s.error?:it.error)};updateList(repo,g)}}}
-            launch{owner.state.collect{s->if(g==generation){publish{it.copy(sync=s.status,unavailable=s.unavailable,error=s.error?.let{"Sync "+it}?:it.error)};if(s.error=="authentication")expire();if(s.status=="idle"){updateList(repo,g);refreshFriends(repo,g)}}}}
+            launch{owner.state.collect{s->if(g==generation){publish{it.copy(sync=s.status,unavailable=s.unavailable,error=s.error?.let{"Sync "+it}?:it.error)};if(s.error=="authentication")expire();if(s.status=="idle"){updateList(repo,g);refreshFriends(repo,g);refreshGroups()}}}}
         }
         updateList(repo,g);if(g!=generation)return
         send.connect(state.value.endpoint.replaceFirst("https:","wss:")+"/v1/ws")
         refreshTimer=scope.launch{while(isActive){delay(30000);if(g==generation && auth?.needsRefresh()==true && !state.value.busy)refresh()}}
-        try{val profile=authOwner!!.profile();if(g!=generation || op!=operation)return;publish{it.copy(profile=profile)};refreshFriends(repo,g)}catch(e:Exception){fail(e,g==generation && op==operation)}
+        try{val profile=authOwner!!.profile();if(g!=generation || op!=operation)return;publish{it.copy(profile=profile)};refreshFriends(repo,g);refreshGroups()}catch(e:Exception){fail(e,g==generation && op==operation)}
     }
     private suspend fun refreshFriends(repo:Repository,g:Long){
         val owner=auth?:return;val revision=++friendRevision
@@ -62,7 +63,7 @@ class WorkspaceViewModel(application:Application):AndroidViewModel(application) 
     }
     private suspend fun updateList(repo:Repository,g:Long){
         val revision=++listRevision
-        try {val friendIds=state.value.friends.map{it.directConversationId};val localActivity=activity.toMap()
+        try {val friendIds=state.value.friends.map{it.directConversationId}+state.value.groups.map{it.conversationId};val localActivity=activity.toMap()
             val entries=withContext(Dispatchers.IO){(repositoryRead {repo.conversationIds()}+friendIds).distinct().map{id->val rows=repositoryRead {repo.messages(id)};val time=rows.mapNotNull{it[6]?.let{v->java.time.Instant.parse(v).toEpochMilli()}}.maxOrNull()?:0L;Triple(id,ConversationPreview(rows.lastOrNull()?.get(2)?:"",maxOf(time,localActivity[id]?:0L)),rows)}}
             if(g!=generation||revision!=listRevision)return
             val previews=entries.associate{it.first to it.second};val ids=previews.keys.sortedWith(compareByDescending<String>{previews[it]!!.time}.thenBy{it});publish{it.copy(conversations=ids,previews=previews,messages=entries.find{row->row.first==it.selected}?.third?:emptyList())}
@@ -92,5 +93,20 @@ class WorkspaceViewModel(application:Application):AndroidViewModel(application) 
     fun reconnect(){val owner=sync?:return;val g=generation;scope.launch{try{owner.send.connect(state.value.endpoint.replaceFirst("https:","wss:")+"/v1/ws");owner.synchronize()}catch(e:Exception){fail(e,g==generation);if(g==generation)publish{it.copy(error="Connection unavailable")}}}}
     fun search(query:String){val owner=auth?:return;val g=generation;publish{it.copy(busy=true,results=emptyList(),searchComplete=false,error=null)};scope.launch{try{val results=owner.search(query);if(g==generation)publish{it.copy(results=results,searchComplete=true)}}catch(e:Exception){fail(e,g==generation)}finally{if(g==generation)publish{it.copy(busy=false)}}}}
     fun add(id:String){val owner=auth?:return;val g=generation;publish{it.copy(busy=true,error=null)};scope.launch{try{val c=owner.add(id);if(g!=generation)return@launch;val revision=++friendRevision;val friends=owner.friends();if(g==generation&&owner===auth){if(revision==friendRevision)publish{it.copy(friends=friends,conversations=(it.conversations+c).distinct())};open(c)}}catch(e:Exception){fail(e,g==generation)}finally{if(g==generation)publish{it.copy(busy=false)}}}}
+    private var groupOperation:GroupOperation?=null
+    private var groupScanning=false;private var groupDirty=false
+    fun createGroup(ids:List<String>,conversation:String?){val session=state.value.session?:return;if(state.value.groupBusy||groupOperation!=null)return
+        groupOperation=GroupOperation(session.userId,java.util.UUID.randomUUID().toString(),GroupWire.targets(ids,session.userId).toList(),conversation);retryGroup()}
+    fun retryGroup(){val op=groupOperation?:return;val owner=auth?:return;val session=state.value.session?:return;val g=generation;if(op.account!=session.userId||state.value.groupBusy)return
+        publish{it.copy(groupBusy=true,groupStatus="loading",groupError="")};scope.launch{try{val c=GroupHttp(owner).mutate(op);if(g!=generation)return@launch;groupOperation=null;publish{it.copy(groupBusy=false,groupStatus="success")};refreshGroups();if(g==generation)open(c)}
+        catch(e:CancellationException){throw e}catch(e:Exception){fail(e,g==generation);if(g==generation){val rejected=e is ApiFailure&&e.kind in listOf("VALIDATION_FAILED","AUTHORIZATION_DENIED","GROUP_REQUEST_CONFLICT");if(rejected)groupOperation=null;publish{it.copy(groupBusy=false,groupStatus=if(rejected)"rejected"else"unconfirmed",groupError=if(e is ApiFailure)e.kind else "protocol")}}}}
+    }
+    private suspend fun refreshGroups(){val owner=auth?:return;val g=generation;if(state.value.session==null)return;groupDirty=true;if(groupScanning)return;groupScanning=true
+        try{val http=GroupHttp(owner);while(groupDirty&&g==generation){groupDirty=false;var c="";var u="";val rows=linkedMapOf<String,MemberRow>();var last:MemberRow?=null
+            while(true){val page=http.members(c,u);if(g!=generation)return;for(row in page.items){val prior=last;if(prior?.conversationId==row.conversationId&&(prior.kind!=row.kind||prior.createdBy!=row.createdBy||prior.createdAt!=row.createdAt))throw im.platform.client.send.WireFailure();rows[row.conversationId+"/"+row.user.userId]=row;last=row};if(!page.more)break;c=page.afterConversation;u=page.afterMember}
+            publish{it.copy(groups=rows.values.filter{row->row.kind=="GROUP"},groupError="")};repository?.let{updateList(it,g)}
+        }}catch(e:CancellationException){throw e}catch(e:Exception){fail(e,g==generation);if(g==generation)publish{it.copy(groupError=if(e is ApiFailure)e.kind else "protocol")}}
+        finally{if(g==generation)groupScanning=false}
+    }
     override fun onCleared(){generation++;observers?.cancel();refreshTimer?.cancel();val owner=sync;val offline=offlineRepository;sync=null;offlineRepository=null;scope.launch{try{withContext(Dispatchers.IO){owner?.dispose();offline?.close()}}finally{scope.cancel()}}}
 }

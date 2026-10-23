@@ -259,5 +259,17 @@ val jaJP:Map<String,String> = mapOf(
 "web.emptyChat2" to "挨拶して、新しい会話を始めましょう。",
  "error.userNotFound" to "ユーザーが見つかりません",
  "error.friendSelf" to "自分を友だちに追加することはできません",
- "error.friendState" to "友だち関係の状態が変わりました。更新して再試行してください。"
+ "error.friendState" to "友だち関係の状態が変わりました。更新して再試行してください。",
+ "group.create" to "グループを作成",
+ "group.add" to "メンバーを追加",
+ "group.members" to "メンバー",
+ "group.loading" to "読み込み中…",
+ "group.empty" to "友達を追加してグループを作成します。",
+ "group.rejected" to "リクエストが拒否されました。",
+ "group.unconfirmed" to "送信結果が未確認です。元のリクエストを再試行してください。",
+ "group.retry" to "元のリクエストを再試行",
+ "group.success" to "グループを更新しました。",
+ "group.failure" to "グループのリクエストに失敗しました。",
+ "group.conflict" to "このリクエストIDは別のメンバーに対応しています。",
+ "group.title" to "グループ"
 )
