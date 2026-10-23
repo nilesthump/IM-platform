@@ -1,0 +1,14 @@
+RUN C:\Users\Aeoliang\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe -B ci/check_architecture.py --scope clients --json
+{
+  "result": "FAIL",
+  "scope": "clients",
+  "violations": [
+    "CLIENT clients/shared/protocol-sdk/dist/send/wire.js: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only",
+    "CLIENT clients/shared/protocol-sdk/dist/storage/models.js: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only",
+    "CLIENT clients/shared/protocol-sdk/dist/storage/repository.js: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only",
+    "CLIENT clients/shared/protocol-sdk/dist/storage/schema.js: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only",
+    "CLIENT clients/shared/protocol-sdk/dist/sync/http.js: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only",
+    "CLIENT clients/shared/protocol-sdk/dist/sync/wire.js: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only"
+  ],
+  "graphs": {}
+}

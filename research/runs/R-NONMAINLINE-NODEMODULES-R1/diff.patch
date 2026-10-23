@@ -1,0 +1,1728 @@
+diff --git a/ci/check_architecture.py b/ci/check_architecture.py
+index dee43de3..5052b703 100644
+--- a/ci/check_architecture.py
++++ b/ci/check_architecture.py
+@@ -1,829 +1,837 @@
+-"""Execute canonical SRC-01..07. Static evidence supplements independent semantic Review.
+-
+-No legacy Go waiver: source violations return nonzero even during stage003.
+-Every Go file is parsed (not only the host build tags). Java imports and qualified
+-references are checked now; the Java job also compiles its explicit S0 transport.
+-"""
+-import argparse
+-import hashlib
+-import json
+-from pathlib import Path
+-import re
+-import subprocess
+-import sys
+-
+-ROOT = Path(__file__).resolve().parents[1]
+-SERVICES = {"gateway", "core", "plugin-host"}
+-SOURCE_DIRS = SERVICES | {"shared", "tests"}
+-ROOT_FILES = {
+-    "go": {"main.go", "main_test.go", "go.mod", "go.sum", "Dockerfile", "README.md", "config.example.json"},
+-    "java": {"Main.java", "MainTest.java", "pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts", "gradle.properties", "Dockerfile", "README.md", "config.example.json"},
+-}
+-BUSINESS_SQL = re.compile(r"\b(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM|SELECT\b[\s\S]*?\bFROM)\s+(?:public\.)?(?:users|sessions|outbox_events|user_sync_events|messages|conversations|friendships|conversation_members)\b", re.I)
+-WRITE_SQL = re.compile(r"\b(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+(?:public\.)?(?:users|sessions|outbox_events|user_sync_events|messages|conversations|friendships|conversation_members)\b", re.I)
+-BUSINESS_ROUTE = re.compile(r"/v\d+/(?:auth|users|friends|conversations|messages|sync|plugins)(?:/|\b)")
+-
+-
+-def owner(path):
+-    parts = Path(path).parts
+-    return parts[0] if len(parts) > 1 else "root"
+-
+-
+-def source_paths(root, language):
+-    directory = root / "backend" / language
+-    violations = []
+-    if directory.is_symlink():
+-        return [], [f"SRC-01 {directory}: backend symlink prohibited"]
+-    files = []
+-    for path in directory.rglob("*"):
+-        relative = path.relative_to(directory).as_posix()
+-        if path.is_symlink():
+-            violations.append(f"SRC-01 backend/{language}/{relative}: symlink bypass prohibited")
+-        elif path.is_file():
+-            if path.name == ".gitkeep" and path.read_bytes() in (b"", b"\n", b"\r\n"):
+-                continue
+-            parts = Path(relative).parts
+-            allowed = relative in ROOT_FILES[language] or (len(parts) > 1 and parts[0] in SOURCE_DIRS)
+-            # One explicit historical placeholder, never inferred from a task name.
+-            if language == "java" and relative == "InfraPlaceholder.java":
+-                allowed = True
+-            if not allowed:
+-                violations.append(f"SRC-01/02 backend/{language}/{relative}: outside exact root whitelist/service ownership")
+-            if path.suffix == (".go" if language == "go" else ".java"):
+-                files.append(path)
+-    return files, violations
+-
+-
+-def semantic_violations(path, unit_owner, strings, functions, types, is_test=False):
+-    errors = []
+-    # Black-box test helpers may exercise real behavior under tests/ or service dirs;
+-    # root tests only assemble and shared tests must not hide runtime business.
+-    if is_test and unit_owner not in {"root", "shared"}:
+-        return errors
+-    if unit_owner in {"root", "shared", "gateway", "plugin-host"}:
+-        for value in strings:
+-            sql = BUSINESS_SQL if unit_owner in {"root", "shared", "plugin-host"} else WRITE_SQL
+-            if sql.search(value):
+-                errors.append(f"SRC-01/03 {path}: {unit_owner} contains business SQL: {value[:100]}")
+-            if unit_owner in {"root", "shared", "plugin-host"} and BUSINESS_ROUTE.search(value):
+-                errors.append(f"SRC-01/03 {path}: {unit_owner} owns business route {value[:100]}")
+-    # Declaration names are recorded for Review, not a responsibility verdict.
+-    # Assembly may use helpers/types of any name; SQL/routes/persistence and actual
+-    # imports are the machine guardrails. Semantic Review remains mandatory.
+-    return errors
+-
+-
+-def dependency_violation(path, origin, target, is_blackbox=False):
+-    if origin == "root" and target == "tests" and not is_blackbox:
+-        return f"SRC-04 {path}: assembly depends on test implementation"
+-    if is_blackbox or origin in {"root", "tests"}:
+-        return None
+-    if origin == "shared" and target in SERVICES:
+-        return f"SRC-03/04 {path}: shared reverse dependency on {target}"
+-    if origin in SERVICES and target in SERVICES and target != origin:
+-        return f"SRC-04 {path}: {origin} directly depends on {target} implementation"
+-    if origin in SERVICES | {"shared"} and target in {"root", "tests"}:
+-        return f"SRC-04 {path}: runtime implementation depends on assembly/tests"
+-    return None
+-
+-
+-def check_go(root):
+-    files, errors = source_paths(root, "go")
+-    if not files:
+-        return errors, []
+-    directory = root / "backend/go"
+-    module_file = directory / "go.mod"
+-    if not module_file.exists():
+-        return errors + ["SRC-04 Go module missing; import graph cannot be verified"], []
+-    match = re.search(r"^module\s+(\S+)", module_file.read_text(encoding="utf-8"), re.M)
+-    if not match:
+-        return errors + ["SRC-04 Go module declaration missing"], []
+-    module = match.group(1)
+-    command = ["go", "run", str(ROOT / "tools/architecture/go_source_graph.go"), str(directory)]
+-    try:
+-        result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8")
+-    except OSError as error:
+-        return errors + ["Go parser unavailable (never skipped): " + str(error)], []
+-    if result.returncode:
+-        return errors + ["Go parser failed (never skipped): " + result.stderr.strip()], []
+-    graph = json.loads(result.stdout)
+-    for unit in graph:
+-        path = "backend/go/" + unit["path"]
+-        origin = owner(unit["path"])
+-        test = unit["path"].endswith("_test.go")
+-        errors += semantic_violations(path, origin, unit["strings"] or [], unit["functions"] or [], unit["types"] or [], test)
+-        if not test or origin in {"root", "shared"}:
+-            for call in unit["calls"] or []:
+-                method = call.rsplit(".", 1)[-1]
+-                prohibited = {"Exec", "ExecContext", "Query", "QueryRow", "QueryContext", "QueryRowContext", "Begin", "BeginTx"}
+-                # net/url URL.Query is protocol parsing, not persistence. SELECT
+-                # literals remain independently checked; no DB query is exempted.
+-                if call.endswith(".URL.Query") and "net/http" in (unit["imports"] or []):
+-                    continue
+-                if origin == "gateway":
+-                    prohibited = {"Exec", "ExecContext", "Begin", "BeginTx"}
+-                if origin in {"root", "shared", "gateway", "plugin-host"} and method in prohibited:
+-                    errors.append(f"SRC-01/03 {path}: {origin} owns prohibited persistence call {call}")
+-        for dependency in unit["imports"] or []:
+-            if dependency == module or dependency.startswith(module + "/"):
+-                target_path = dependency[len(module):].lstrip("/")
+-                target = target_path.split("/")[0] if target_path else "root"
+-                violation = dependency_violation(path, origin, target, test and (origin == "tests" or unit["package"].endswith("_test")))
+-                if violation:
+-                    errors.append(violation + " (" + dependency + ")")
+-                if target not in SOURCE_DIRS | {"root"}:
+-                    errors.append(f"SRC-01/04 {path}: imports unowned local package {dependency}")
+-    return errors, graph
+-
+-
+-def java_tokens(text):
+-    # Preserve string literals (SQL/routes) and discard comments, including comments
+-    # containing forged imports. Handle escapes before collecting actual tokens.
+-    # Java processes Unicode escapes before tokenization, including imports.
+-    text = re.sub(r"\\u+([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), text)
+-    pattern = r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|//[^\n]*|/\*[\s\S]*?\*/'
+-    strings = []
+-    def clean(match):
+-        value = match.group()
+-        if value.startswith('"'):
+-            strings.append(value[1:-1])
+-            return " "
+-        return " " if value.startswith(("//", "/*", "'")) else value
+-    return re.sub(pattern, clean, text), strings
+-
+-
+-def check_java(root):
+-    files, errors = source_paths(root, "java")
+-    units = []
+-    declarations = {}
+-    for path in files:
+-        relative = path.relative_to(root / "backend/java").as_posix()
+-        code, strings = java_tokens(path.read_text(encoding="utf-8"))
+-        package_match = re.search(r"\bpackage\s+([\w.]+)\s*;", code)
+-        package = package_match.group(1) if package_match else ""
+-        types = re.findall(r"\b(?:class|interface|enum|record)\s+(\w+)", code)
+-        origin = owner(relative)
+-        for declaration in types:
+-            qualified = (package + "." if package else "") + declaration
+-            if qualified in declarations:
+-                errors.append(f"SRC-04 duplicate Java type {qualified}")
+-            declarations[qualified] = origin
+-        units.append(dict(path=relative, owner=origin, package=package, code=code, strings=strings, types=types))
+-    has_business = any(x["owner"] in SERVICES for x in units)
+-    placeholder = [x for x in units if x["path"] == "InfraPlaceholder.java"]
+-    for unit in units:
+-        path = "backend/java/" + unit["path"]
+-        code = unit["code"]
+-        methods = re.findall(r"\b(\w+)\s*\([^;{}]*\)\s*(?:throws\s+[\w., ]+)?\s*\{", code)
+-        if unit in placeholder:
+-            if has_business:
+-                errors.append(f"SRC-06 {path}: placeholder expired at Java first service implementation")
+-            # Exact bounded transport behavior, with no business route/SQL/import.
+-            errors += semantic_violations(path, "shared", unit["strings"], methods, unit["types"])
+-            bad_routes = [s for s in unit["strings"] if s.startswith("/") and s not in {"/__infra/ws", "/__infra/health"}]
+-            if bad_routes:
+-                errors.append(f"SRC-06 {path}: unapproved placeholder routes {bad_routes}")
+-        elif unit["owner"] == "root":
+-            errors += semantic_violations(path, "shared", unit["strings"], methods, unit["types"])
+-        else:
+-            errors += semantic_violations(path, unit["owner"], unit["strings"], methods, unit["types"], unit["path"].endswith("Test.java"))
+-        jdbc = bool(re.search(r"\b(?:java|javax)\.sql\b", code))
+-        if jdbc and unit["owner"] in {"root", "shared", "gateway", "plugin-host"}:
+-            calls = re.findall(r"\.\s*(\w+)\s*\(", code)
+-            transactions = {"commit", "rollback", "setAutoCommit", "setSavepoint", "releaseSavepoint"}
+-            forbidden = transactions | {"prepareStatement", "prepareCall", "createStatement", "execute", "executeQuery", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
+-            if unit["owner"] == "gateway":
+-                # execute() is ambiguous even when another literal in the file is
+-                # SELECT. Gateway read-only queries use executeQuery(); transaction
+-                # control and mutations belong to Core. Connection setup/close and
+-                # shared connection factories remain allowed.
+-                forbidden = transactions | {"execute", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
+-            for call in set(calls) & forbidden:
+-                errors.append(f"SRC-01/03 {path}: {unit['owner']} owns prohibited JDBC persistence call {call}")
+-        # Includes explicit imports, static imports, wildcard packages, same-package
+-        # references and fully qualified usages without import declarations.
+-        references = re.findall(r"\bimport\s+(?:static\s+)?([\w.*]+)\s*;", code)
+-        for qualified, target in declarations.items():
+-            package, _, simple = qualified.rpartition(".")
+-            present = bool(re.search(r"(?<![\w$])" + re.escape(qualified) + r"(?![\w$])", code))
+-            present |= unit["package"] == package and bool(re.search(r"\b" + re.escape(simple) + r"\b", code))
+-            present |= any(r == qualified or r.startswith(qualified + ".") or r == package + ".*" for r in references)
+-            if present:
+-                violation = dependency_violation(path, unit["owner"], target, unit["owner"] == "tests")
+-                if violation:
+-                    errors.append(violation + " (" + qualified + ")")
+-        for dependency in references:
+-            # Unresolved project service imports are rejected too; renaming/deleting
+-            # the destination cannot erase a prohibited dependency classification.
+-            for segment in dependency.split("."):
+-                target = "plugin-host" if segment in {"pluginhost", "plugin_host"} else segment
+-                if target in SERVICES:
+-                    violation = dependency_violation(path, unit["owner"], target, unit["owner"] == "tests")
+-                    if violation:
+-                        errors.append(violation + " (" + dependency + ")")
+-    return errors, [{k: v for k, v in u.items() if k != "code"} for u in units]
+-
+-
+-
+-WEB_APPEARANCE = {
+-    "decision": "ADR-0011-web-appearance-storage",
+-    "adapter": "clients/web/src/ui/appearance.ts",
+-    "storage": "localStorage", "key": "plugworldim.appearance.v1",
+-    "fields": ["theme", "fontSize", "density"], "themes": ["cold", "warm"],
+-    "font_sizes": [14, 16, 18, 20], "densities": ["compact", "comfortable", "spacious"],
+-    "max_serialized_length": 128,
+-    "defaults": {"theme": "cold", "fontSize": 16, "density": "comfortable"},
+-}
+-
+-
+-def client_policy(root):
+-    """Resolve hash-bound canonical policy; Task Specs cannot extend this policy."""
+-    try:
+-        manifest = (root / 'spec/architecture/baseline.md').read_text(encoding='utf-8')
+-        fields = dict(re.findall(r'^- ([a-z_0-9]+): `([^`]+)`\s*$', manifest, re.M))
+-        docpath = root / 'spec/architecture/frozen-architecture.md'
+-        doc = docpath.read_text(encoding='utf-8')
+-        if fields.get('repository_path') != 'spec/architecture/frozen-architecture.md' or fields.get('sha256') != hashlib.sha256(docpath.read_bytes()).hexdigest():
+-            raise ValueError('canonical hash/resolver mismatch')
+-        adrpath = 'spec/architecture/decisions/ADR-0005-client-technology-clarification.md'
+-        if fields.get('revision_adr') != adrpath or 'Human-approved' not in (root / adrpath).read_text(encoding='utf-8'):
+-            raise ValueError('approved ADR-0005 linkage missing')
+-        match = re.search(r'<!-- client-technology-policy -->\s*```json\s*(.*?)\s*```', doc, re.S)
+-        policy = json.loads(match.group(1)) if match else {}
+-        if policy.get('decision') != 'ADR-0005-client-technology-clarification' or policy.get('mobile_framework') != 'Jetpack Compose' or policy.get('native_boundary') != 'clients/desktop/src-tauri/':
+-            raise ValueError('client decision/boundary missing')
+-        for key in ('languages', 'frameworks', 'runtimes', 'packages', 'native_packages', 'mobile_languages', 'mobile_frameworks', 'mobile_runtimes', 'mobile_plugins', 'mobile_dependencies', 'mobile_tooling', 'mobile_import_prefixes'):
+-            if not isinstance(policy.get(key), list) or not all(isinstance(x, str) for x in policy[key]):
+-                raise ValueError('invalid policy ' + key)
+-        web_adr = 'spec/architecture/decisions/ADR-0011-web-appearance-storage.md'
+-        web_approval = 'spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt'
+-        if (policy.get('web_appearance') != WEB_APPEARANCE or fields.get('web_revision_adr') != web_adr
+-                or fields.get('web_approval_source') != web_approval
+-                or 'Human-approved' not in (root / web_adr).read_text(encoding='utf-8')
+-                or (root / web_approval).read_text(encoding='utf-8').strip() != '批准最小前置方案并继续'):
+-            raise ValueError('Web appearance approved ADR/policy/approval linkage missing')
+-        return policy, []
+-    except (OSError, ValueError, AttributeError) as error:
+-        return {}, ['CLIENT authority unavailable (never skipped): ' + str(error)]
+-
+-
+-FORBIDDEN_CLIENT = re.compile(r'(?:dart-lang/setup-dart|subosito/flutter-action|\bflutter\b|\bdart\b|pubspec\.(?:yaml|lock))', re.I)
+-CLIENT_SOURCE = {'.ts', '.tsx'}
+-CLIENT_RESOURCES = {'.json', '.yaml', '.yml', '.toml', '.sql', '.md', '.css', '.scss', '.html', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.txt', '.lock'}
+-
+-
+-def client_package_allowed(name, relative, policy, native=False):
+-    if relative.startswith('clients/mobile/'):
+-        return False  # Native Android Mobile never installs/reuses JS/TS runtime packages.
+-    approved = policy['native_packages'] if native else policy['packages']
+-    if name not in approved:
+-        return False
+-    if name.startswith('@tauri-apps/') or name in policy['native_packages']:
+-        return relative.startswith('clients/desktop/')
+-    if name in {'react', 'react-dom', '@types/react', '@types/react-dom'}:
+-        return not relative.startswith('clients/mobile/')
+-    return True
+-
+-
+-
+-def uncomment_client(text):
+-    # Preserve actual quoted strings; comments cannot forge dependencies/imports.
+-    return re.sub(r'"""[\s\S]*?"""|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|//[^\n]*|/\*[\s\S]*?\*/',
+-                  lambda m: ' ' if m.group().startswith(('//', '/*')) else m.group(), text)
+-
+-
+-def check_android(root, policy):
+-    """Bounded direct declarations, never execute Gradle to determine authority.
+-
+-    Unresolved/dynamic dependency/plugin notation fails closed; Review checks the
+-    runtime semantics. This is a stack guard, not an Android build or acceptance.
+-    """
+-    errors = []
+-    base = root / 'clients/mobile'
+-    packages = set()
+-    catalog_libraries, catalog_plugins, catalog_bundles = {}, {}, set()
+-    paths = [p for p in base.rglob('*') if p.is_file() and not p.is_symlink()]
+-    for path in paths:
+-        if path.suffix == '.kt':
+-            code = uncomment_client(path.read_text(encoding='utf-8'))
+-            packages.update(re.findall(r'(?m)^\s*package\s+([\w.]+)', code))
+-        if path.name != 'libs.versions.toml':
+-            continue
+-        import tomllib
+-        try:
+-            catalog = tomllib.loads(path.read_text(encoding='utf-8'))
+-            for alias, value in catalog.get('libraries', {}).items():
+-                coordinate = value.split(':')[:2] if isinstance(value, str) else (value.get('module', '').split(':')[:2] if 'module' in value else [value.get('group', ''), value.get('name', '')])
+-                name = ':'.join(coordinate)
+-                catalog_libraries[re.sub(r'[-_]', '.', alias)] = name
+-                if name not in policy['mobile_dependencies']:
+-                    errors.append(f'CLIENT {path.relative_to(root)}: unapproved Android catalog dependency {name}')
+-            for alias, value in catalog.get('plugins', {}).items():
+-                name = value.split(':')[0] if isinstance(value, str) else value.get('id', '')
+-                catalog_plugins[re.sub(r'[-_]', '.', alias)] = name
+-                if name not in policy['mobile_plugins']:
+-                    errors.append(f'CLIENT {path.relative_to(root)}: unapproved Android catalog plugin {name}')
+-            for alias, values in catalog.get('bundles', {}).items():
+-                if not isinstance(values, list) or any(re.sub(r'[-_]', '.', x) not in catalog_libraries for x in values):
+-                    errors.append(f'CLIENT {path.relative_to(root)}: unresolved Android catalog bundle {alias}')
+-                else:
+-                    catalog_bundles.add(re.sub(r'[-_]', '.', alias))
+-        except (ValueError, TypeError, AttributeError):
+-            errors.append(f'CLIENT {path.relative_to(root)}: invalid Android version catalog')
+-    for path in paths:
+-        relative = path.relative_to(root).as_posix()
+-        if path.suffix not in {'.kt', '.kts', '.gradle', '.toml', '.properties', '.xml', '.sh', '.bat', '.cmd', '.yml', '.yaml', '.json'} and path.name not in {'gradlew', 'Makefile', 'Dockerfile'}:
+-            continue
+-        code = uncomment_client(path.read_text(encoding='utf-8'))
+-        if path.suffix == '.kt':
+-            for dependency in re.findall(r'(?m)^\s*import\s+([\w.*]+)', code):
+-                local = any(dependency.startswith(package + '.') for package in packages)
+-                if not local and not any(dependency.startswith(prefix) for prefix in policy['mobile_import_prefixes']):
+-                    errors.append(f'CLIENT {relative}: unapproved Kotlin import {dependency}')
+-            if re.search(r'\b(?:addJavascriptInterface|evaluateJavascript|ReactNative|JavascriptEngine)\b|\bSystem\s*\.\s*load(?:Library)?\s*\(', code):
+-                errors.append(f'CLIENT {relative}: unapproved Mobile JS/native bridge/runtime')
+-        if path.suffix in {'.gradle', '.kts'}:
+-            # Accept the entire selector argument, never an approved string prefix.
+-            literal = r"(?:\"[\w.-]+\"|'[\w.-]+')"
+-            selector = re.compile(r'\b(id|kotlin)\s*(?:\(\s*(' + literal +
+-                                  r')\s*\)|[ \t]+(' + literal + r'))')
+-            for declaration in re.finditer(r'\b(?:id|kotlin)\s*(?=\(|[\"\'])', code):
+-                match = selector.match(code, declaration.start())
+-                if not match:
+-                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin selector')
+-                    continue
+-                name = (match.group(2) or match.group(3))[1:-1]
+-                plugin = 'org.jetbrains.kotlin.' + name if match.group(1) == 'kotlin' else name
+-                if plugin not in policy['mobile_plugins']:
+-                    errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {plugin}')
+-            # Plugins blocks allow only complete supported declarations and their
+-            # version/apply modifiers. Residual entries reject builtin shortcuts
+-            # and computed selectors without maintaining a plugin-name blacklist.
+-            text_literal = r"(?:\"[^\"\n]*\"|'[^'\n]*')"
+-            version = r'(?:\s*(?:\.\s*)?version\s*(?:\(\s*' + text_literal + r'\s*\)|' + text_literal + r'))?'
+-            apply = r'(?:\s*(?:\.\s*)?apply\s*(?:\(\s*(?:true|false)\s*\)|(?:true|false)\b))?'
+-            entry = r'(?:' + selector.pattern + r'|\balias\s*\(\s*libs\.plugins\.[\w.]+\s*\))' + version + apply
+-            build_code = code
+-            for block in re.finditer(r'\bplugins\s*\{([^}]*)(\}|$)', code):
+-                if block.group(2) != '}' or not re.fullmatch(r'(?:\s*(?:' + entry + r')\s*;?)*\s*', block.group(1)):
+-                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugins block')
+-                build_code = build_code.replace(block.group(0), '')
+-            for coordinate in re.findall(r'["\']([\w.\-]+:[\w.\-]+)(?::[^"\']*)?["\']', code):
+-                if coordinate not in policy['mobile_dependencies']:
+-                    errors.append(f'CLIENT {relative}: unapproved Android Gradle dependency {coordinate}')
+-            # Check every declaration start, not only already-literal/resolved forms.
+-            for declaration in re.finditer(r'\bapply\s+plugin\s*:\s*', code):
+-                expression = code[declaration.end():]
+-                match = re.match(r"([\"'])([^\"']+)\1[ \t]*(?=$|[\n;}])", expression)
+-                if not match:
+-                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android apply plugin declaration')
+-                elif match.group(2) not in policy['mobile_plugins']:
+-                    errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {match.group(2)}')
+-            for declaration in re.finditer(r'\balias\s*\(\s*', code):
+-                alias = re.match(r'libs\.plugins\.([\w.]+)\s*\)', code[declaration.end():])
+-                if not alias or alias.group(1) not in catalog_plugins:
+-                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin alias')
+-            # Every dependency call must be a literal approved coordinate, a checked
+-            # catalog alias, BOM platform wrapper, or an internal Android project.
+-            calls = re.findall(r'\b(?:implementation|api|compileOnly|runtimeOnly|classpath|kapt|ksp|annotationProcessor|\w*Implementation)\s*(?:\(\s*)?([^\n;{}]+)', code)
+-            for expression in calls:
+-                expression = expression.strip()
+-                literal = bool(re.match(r'(?:platform\s*\(\s*|enforcedPlatform\s*\(\s*)?["\'][\w.\-]+:[\w.\-]+:[^"\']+["\']\s*\)*\s*$', expression))
+-                internal = bool(re.fullmatch(r'project\s*\(\s*["\']:[\w:\-]+["\']\s*\)\s*\)*', expression))
+-                alias = re.fullmatch(r'(?:platform\s*\(\s*)?libs\.(bundles\.)?([\w.]+)\s*\)*', expression)
+-                resolved = bool(alias and (alias.group(2) in (catalog_bundles if alias.group(1) else catalog_libraries)))
+-                if not (literal or internal or resolved):
+-                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android dependency declaration {expression}')
+-            # Consume supported direct Groovy declarations, then reject every
+-            # remaining apply identifier outside strings/comments. This covers
+-            # command calls, variables, closures, references and typed calls
+-            # without a receiver/plugin-name blacklist or executing Gradle.
+-            direct_apply = r'(?m)(?:^|[;{}])([ \t]*apply\s+plugin\s*:\s*' + text_literal + r'[ \t]*(?=$|[\n;}]))'
+-            build_code = re.sub(direct_apply, lambda m: m.group(0)[:m.start(1) - m.start()], build_code)
+-            quoted = r'"{3}[\s\S]*?"{3}|\x27{3}[\s\S]*?\x27{3}|"(?:\\.|[^"\\])*"|\x27(?:\\.|[^\x27\\])*\x27'
+-            # Slashy literals have an unambiguous expression-start/member prefix;
+-            # dollar-slashy literals have their own delimiter. Keep division as code.
+-            quoted += r'|\$/[\s\S]*?/\$|(?P<slashy_prefix>(?:^|[=(\[,:.]|\.\s*&)\s*)/(?:\\.|[^/\\])*/'
+-            def mask_build_literal(match):
+-                # Groovy quoted members are executable selectors, including method
+-                # pointers and interpolation. Ordinary entire strings remain data.
+-                # Unsupported member notation must not evade plugin/dependency checks.
+-                prefix = match.group('slashy_prefix') or ''
+-                if re.search(r'\.\s*&?\s*$', prefix or build_code[:match.start()]):
+-                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android quoted plugin/dependency/build selector')
+-                return prefix + ' '
+-            build_code = re.sub(quoted, mask_build_literal, build_code, flags=re.MULTILINE)
+-            if re.search(r'\bapply\b|\b(?:includeBuild|useModule|usePlugin)\s*\(', build_code):
+-                errors.append(f'CLIENT {relative}: unapproved/dynamic Android Gradle plugin/build inclusion')
+-    # Build/install/CI commands must not restore Mobile TS or choose another stack.
+-    configurations = paths + list((root / '.github/workflows').glob('*'))
+-    for path in configurations:
+-        if path.suffix not in {'.yml', '.yaml', '.json', '.gradle', '.kts', '.properties', '.sh', '.bat', '.cmd'} and path.name not in {'gradlew', 'Makefile', 'Dockerfile'}:
+-            continue
+-        code = path.read_text(encoding='utf-8')
+-        relative = path.relative_to(root).as_posix()
+-        # Only Mobile-relevant workflow jobs; TS Desktop/Web tooling remains valid.
+-        if relative.startswith('.github/'):
+-            blocks = re.findall(r'(?ms)^  [\w-]+:\n.*?(?=^  [\w-]+:\n|\Z)', code)
+-            code = '\n'.join(x for x in blocks if re.search(r'\bmobile\b|clients/mobile|setup-android|android-emulator', x, re.I)) if blocks else (code if re.search(r'clients/mobile|android|compose|gradle', code, re.I) else '')
+-        if re.search(r'\b(?:npm|pnpm|yarn|node|bun|deno|npx)\b|setup-node|react-native|capacitor|nativescript|\bexpo\b|\b(?:Room|ktor|retrofit|okhttp)\b|--init-script|(?:^|\s)-I\s', code, re.I):
+-            errors.append(f'CLIENT {relative}: unapproved Mobile build/runtime/dependency command')
+-        for action in re.findall(r'uses:\s*([\w.-]+/[\w./-]+)@', code):
+-            if re.search(r'android|gradle|kotlin|compose', action, re.I) and action not in policy['mobile_tooling']:
+-                errors.append(f'CLIENT {relative}: unapproved Android tooling action {action}')
+-        if path.name == 'gradle-wrapper.properties':
+-            for url in re.findall(r'(?m)^distributionUrl\s*=\s*(\S+)', code):
+-                if not re.fullmatch(r'https\\?://services\.gradle\.org/distributions/gradle-[\w.\-]+-(?:bin|all)\.zip', url):
+-                    errors.append(f'CLIENT {relative}: unapproved Gradle wrapper distribution')
+-    return errors
+-
+-
+-def language_product_enabled(root):
+-    import importlib.util
+-    try:
+-        spec = importlib.util.spec_from_file_location('i18n_planning_authority', Path(__file__).with_name('check_s2_planning.py'))
+-        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+-        if module.check(root): return False
+-        tasks, errors = module.inventory(root)
+-        entries = tasks.get('LOOP1-CLIENT-I18N-001', [])
+-        return (not errors and len(entries) == 1 and entries[0][0] in ('active', 'review', 'done')
+-                and entries[0][2].get('client_supplement_phase') == 'i18n_product')
+-    except (OSError, ValueError, KeyError):
+-        return False
+-
+-
+-def check_language_storage(relative, code, enabled):
+-    errors = []
+-    if relative != 'clients/web/src/ui/language.ts' or not enabled:
+-        return [f'CLIENT {relative}: language storage requires exact adapter and accepted i18n product phase']
+-    declaration = r'const\s+LANGUAGE_KEY\s*=\s*"plugworldim\.language\.v1"\s*;'
+-    read = r'window\.localStorage\.getItem\(LANGUAGE_KEY\)'
+-    write = r'window\.localStorage\.setItem\(LANGUAGE_KEY,value\)'
+-    if len(re.findall(declaration, code)) != 1 or len(re.findall(read, code)) != 1 or len(re.findall(write, code)) != 1:
+-        errors.append(f'CLIENT {relative}: language requires direct fixed-key raw scalar read/write')
+-    remaining = re.sub(read, '', re.sub(write, '', code))
+-    if re.search(r'localStorage|JSON|\b(?:clear|removeItem|trim|toLowerCase|message\w*|history\w*|credential\w*|session\w*|token\w*)\b', remaining, re.I):
+-        errors.append(f'CLIENT {relative}: alternate storage, normalization or business payload forbidden')
+-    if 'validLocale(raw)?raw:"en"' not in code or 'if(!validLocale(value))return false;' not in code:
+-        errors.append(f'CLIENT {relative}: exact locale validation and English read fallback required')
+-    return errors
+-
+-
+-def check_web_storage(relative, text, policy, language_enabled=False):
+-    """One authority-bound appearance record; no generic storage/path waiver.
+-
+-    Direct calls and explicit projection are intentionally bounded. Actual value
+-    validation/failure/retention semantics also require product behavior tests
+-    and independent Review; static checks cannot establish runtime correctness.
+-    """
+-    code = uncomment_client(text)
+-    errors = []
+-    if re.search(r'\b(?:sqlite\w*|indexedDB|sessionStorage)\b|\bcaches\s*[.\[]|\bdocument\s*\.\s*cookie\b', code, re.I):
+-        errors.append(f'CLIENT {relative}: Web must remain memory only / no SQLite/history persistence')
+-    if relative == 'clients/web/src/ui/language.ts' or 'plugworldim.language.v1' in code:
+-        return errors + check_language_storage(relative, code, language_enabled)
+-    authority = policy['web_appearance']
+-    storage = bool(re.search(r'\blocalStorage\b', code, re.I))
+-    key = authority['key']
+-    if relative != authority['adapter']:
+-        if storage or key in code:
+-            errors.append(f'CLIENT {relative}: Web appearance storage is confined to exact approved adapter')
+-        return errors
+-    if not storage:
+-        return errors  # A pure pre-storage module does not receive an exception.
+-    if re.search(r'\b(?:message\w*|history\w*|users?\w*|session\w*|(?:access|refresh)[_]?token\w*|credential\w*|endpoint\w*|conversation\w*|(?:sync[_]?)?cursor\w*)\b', code, re.I):
+-        errors.append(f'CLIENT {relative}: appearance adapter cannot persist or receive business/credential data')
+-    declaration = r'\bconst\s+APPEARANCE_KEY\s*=\s*(["\x27])' + re.escape(key) + r'\1\s*;'
+-    if len(re.findall(declaration, code)) != 1:
+-        errors.append(f'CLIENT {relative}: appearance key must be the exact versioned constant')
+-    read = r'\bwindow\s*\.\s*localStorage\s*\.\s*getItem\s*\(\s*APPEARANCE_KEY\s*\)'
+-    # Preserve only the three validated scalar fields, never arbitrary JSON.
+-    write = (r'\bwindow\s*\.\s*localStorage\s*\.\s*setItem\s*\(\s*APPEARANCE_KEY\s*,\s*'
+-             r'JSON\s*\.\s*stringify\s*\(\s*\{\s*theme\s*:\s*([A-Za-z_$][\w$]*)\s*\.\s*theme\s*,\s*'
+-             r'fontSize\s*:\s*\1\s*\.\s*fontSize\s*,\s*density\s*:\s*\1\s*\.\s*density\s*,?\s*\}\s*\)\s*\)')
+-    if len(re.findall(read, code)) != 1 or len(re.findall(write, code)) != 1:
+-        errors.append(f'CLIENT {relative}: appearance requires direct fixed-key read/write and exact three-field projection')
+-    consumed = re.sub(read, ' ', code)
+-    consumed = re.sub(write, ' ', consumed)
+-    if re.search(r'\blocalStorage\b', consumed, re.I):
+-        errors.append(f'CLIENT {relative}: alternate key/alias/method/dynamic appearance storage access forbidden')
+-    return errors
+-
+-
+-def check_native_language(relative, text, enabled):
+-    if relative.startswith('clients/mobile/app/src/androidTest/'):
+-        return []  # Test-only faults are not production adapter ownership.
+-    code = uncomment_client(text)
+-    compact = re.sub(r'\s+', '', code)
+-    ts = 'clients/desktop/src/application/ui/native.ts'
+-    rust = 'clients/desktop/src-tauri/src/desktop_capabilities.rs'
+-    android = 'clients/mobile/app/src/main/kotlin/im/platform/client/ui/Preferences.kt'
+-    errors = []
+-    tokens = ('"language_load"', '"language_save"', '.join("language.txt")', '.putString("language",')
+-    if relative not in (ts, rust, android):
+-        if any(token in compact for token in tokens):
+-            errors.append(f'CLIENT {relative}: native language persistence confined to exact approved adapters')
+-        return errors
+-    present = ('exportconstlanguage=' in compact if relative == ts else 'fnlanguage_load(' in compact if relative == rust else 'funloadLanguage(' in compact)
+-    if not present: return errors
+-    if not enabled:
+-        errors.append(f'CLIENT {relative}: native language persistence requires accepted i18n phase')
+-    if relative == ts:
+-        start = compact.find('exportconstlanguage=')
+-        part = compact[start:compact.find('exportconsttrayText=', start)]
+-        required = ('invoke<unknown>("language_load")', 'validLocale(value)?value:"en"', 'catch(error){if(error==="Languageunavailable")return"en";throwerror;}', 'if(!validLocale(value))', 'invoke<void>("language_save",{value})')
+-        if any(token not in part for token in required) or re.search(r'credentials?|sqlite|appearance|localStorage|trim\(|toLowerCase\(', part, re.I):
+-            errors.append(f'CLIENT {relative}: language intent must validate exact enum and use only narrow native commands')
+-    elif relative == rust:
+-        start = compact.find('fnvalid_language('); end = compact.find('pubfnsetup(', start)
+-        part = compact[start:end]
+-        required = ('matches!(value,"en"|"zh-CN"|"ja-JP")', 'file.take(6).read_to_end(&mutbytes)', 'bytes.len()>5', 'std::str::from_utf8(&bytes)', 'valid_language(value)', 'if!valid_language(value)', 'std::fs::write(path,value.as_bytes())')
+-        if any(token not in part for token in required) or part.count('.join("language.txt")') != 2 or re.search(r'credentials?|sqlite|appearance|serde|trim\(|to_lowercase\(', part, re.I):
+-            errors.append(f'CLIENT {relative}: native language file must remain fixed raw bounded UTF-8 enum')
+-        for name,signature in [('language_load','app:tauri::AppHandle'),('language_save','app:tauri::AppHandle,value:String')]:
+-            if f'pubfn{name}({signature})' not in part:
+-                errors.append(f'CLIENT {relative}: arbitrary language path/argument forbidden')
+-    else:
+-        start = compact.find('funloadLanguage('); end = compact.find('privatefunkey(', start)
+-        part = compact[start:end]
+-        required = ('appearance.getString("language",null)', 'value=="en"||value=="zh-CN"||value=="ja-JP"', 'else"en"', 'catch(_:ClassCastException){"en"}', 'require(value=="en"||value=="zh-CN"||value=="ja-JP")', 'appearance.edit().putString("language",value).commit()')
+-        if any(token not in part for token in required) or re.search(r'credentials?|sqlite|putInt|putFloat|remove\(|clear\(|trim\(|lowercase\(',part,re.I):
+-            errors.append(f'CLIENT {relative}: language must be one validated String key in existing appearance MODE_PRIVATE store')
+-    return errors
+-
+-
+-def check_clients(root):
+-    policy, errors = client_policy(root)
+-    if errors:
+-        return errors
+-    language_enabled = language_product_enabled(root)
+-    errors += check_android(root, policy)
+-    files = []
+-    for directory in ('clients', '.github/workflows'):
+-        if (root / directory).is_symlink():
+-            errors.append(f'CLIENT {directory}: symlink boundary bypass')
+-    for area in ('shared', 'web', 'desktop', 'mobile'):
+-        base = root / 'clients' / area
+-        if base.is_symlink():
+-            errors.append(f'CLIENT {base}: symlink boundary bypass')
+-            continue
+-        files.extend(base.rglob('*'))
+-    # Active configuration only: immutable research/evidence/history not scanned.
+-    files += list((root / '.github/workflows').glob('*'))
+-    files += [root / p for p in ('package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'bun.lockb', 'tsconfig.json') if (root / p).exists()]
+-    for path in files:
+-        relative = path.relative_to(root).as_posix()
+-        if path.is_symlink():
+-            errors.append(f'CLIENT {relative}: symlink boundary bypass')
+-            continue
+-        if not path.is_file():
+-            continue
+-        client = relative.startswith('clients/')
+-        native = relative.startswith(policy['native_boundary'])
+-        mobile = relative.startswith('clients/mobile/')
+-        if path.name == '.gitkeep' and not path.read_bytes().strip():
+-            continue
+-        suffix = path.suffix.lower()
+-        config_js = suffix in {'.js', '.mjs', '.cjs'} and ('.config.' in path.name or path.name.startswith('eslint.config.'))
+-        allowed = suffix in CLIENT_SOURCE | CLIENT_RESOURCES or config_js or path.name in {'.gitignore', '.npmrc', 'Dockerfile', 'Makefile'}
+-        if native and (suffix in {'.rs', '.rc', '.plist', '.manifest', '.icns'} or path.name == 'Cargo.lock'):
+-            allowed = True
+-        if mobile:
+-            allowed = suffix in CLIENT_RESOURCES | {'.kt', '.xml', '.gradle', '.properties', '.sh', '.bat', '.cmd'} or path.name in {'.gitignore', 'gradlew', 'Makefile', 'Dockerfile'} or path.name in {'build.gradle.kts', 'settings.gradle.kts'}
+-            if path.name == 'gradle-wrapper.jar' and relative.endswith('/gradle/wrapper/gradle-wrapper.jar'):
+-                continue  # Standard Android Gradle tooling, semantic Review verifies artifact provenance.
+-            if suffix == '.toml' and path.name != 'libs.versions.toml':
+-                allowed = False
+-            if path.name in {'package.json', 'tsconfig.json'} or suffix in {'.ts', '.tsx', '.js', '.mjs', '.cjs', '.rs'}:
+-                allowed = False
+-        if client and not allowed:
+-            errors.append(f'CLIENT {relative}: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only')
+-        if suffix in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.icns'}:
+-            continue
+-        try:
+-            text = path.read_text(encoding='utf-8')
+-        except UnicodeError:
+-            errors.append(f'CLIENT {relative}: unsupported binary configuration/source')
+-            continue
+-        if suffix == '.dart' or path.name.lower() in {'pubspec.yaml', 'pubspec.lock', '.metadata'} or (suffix != '.md' and FORBIDDEN_CLIENT.search(text)):
+-            errors.append(f'CLIENT {relative}: Dart/Flutter active source/dependency/configuration forbidden')
+-        if relative.startswith('clients/web/') and suffix != '.md':
+-            errors += check_web_storage(relative, text, policy, language_enabled)
+-        if client and suffix in {'.ts', '.tsx', '.kt', '.rs'}:
+-            errors += check_native_language(relative, text, language_enabled)
+-        if path.name == 'package.json':
+-            try:
+-                manifest = json.loads(text)
+-                for key in ('dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'):
+-                    for name in manifest.get(key, {}):
+-                        if not client_package_allowed(name, relative, policy):
+-                            errors.append(f'CLIENT {relative}: unapproved dependency {name}; task/tests cannot authorize selection')
+-            except (ValueError, AttributeError, TypeError):
+-                errors.append(f'CLIENT {relative}: invalid package manifest')
+-        if path.name == 'Cargo.toml':
+-            # Standard-library TOML parser, no product/tooling dependency added.
+-            import tomllib
+-            try:
+-                manifest = tomllib.loads(text)
+-                tables = [manifest, manifest.get('workspace', {})] + list(manifest.get('target', {}).values())
+-                for table in tables:
+-                    for key in ('dependencies', 'build-dependencies', 'dev-dependencies'):
+-                        for name, value in table.get(key, {}).items():
+-                            package = value.get('package', name) if isinstance(value, dict) else name
+-                            if not native or not client_package_allowed(package, relative, policy, native=True):
+-                                errors.append(f'CLIENT {relative}: unapproved native dependency {package}; Desktop SQLite is SQLx only')
+-                            if package == 'sqlx' and isinstance(value, dict) and any(x in value.get('features', []) for x in ('postgres', 'mysql', 'any')):
+-                                errors.append(f'CLIENT {relative}: SQLx is approved for SQLite only')
+-            except (ValueError, AttributeError, TypeError):
+-                errors.append(f'CLIENT {relative}: invalid Cargo manifest')
+-        if suffix in CLIENT_SOURCE or config_js:
+-            imports = re.findall(r'''(?:\bfrom\s*|\bimport\s*(?:\(\s*)?|\brequire\s*\(\s*)["']([^"']+)["']''', text)
+-            for dependency in imports:
+-                if dependency.startswith(('.', '/')):
+-                    continue
+-                name = '/'.join(dependency.split('/')[:2]) if dependency.startswith('@') else dependency.split('/')[0]
+-                if not client_package_allowed(name, relative, policy):
+-                    errors.append(f'CLIENT {relative}: unapproved import/runtime {dependency}')
+-        # Known alternate runtimes/framework install commands cannot hide in builds/CI.
+-        if suffix in {'.json', '.yaml', '.yml', '.toml', '.lock', '.js', '.mjs', '.cjs'} or path.name in {'Dockerfile', 'Makefile'}:
+-            if re.search(r'\b(?:expo|react-native|nativescript|capacitor|electron|svelte|vue|angular|solid-js|zustand|redux|bun|deno|rusqlite)\b', text, re.I):
+-                errors.append(f'CLIENT {relative}: unapproved framework/runtime/native dependency in active configuration')
+-            for match in re.finditer(r'\b(?:npm|pnpm|yarn)\s+(?:install|add)\s+([^\n;]+)', text):
+-                for name in match.group(1).split():
+-                    if name.startswith('-'):
+-                        continue
+-                    name = re.sub(r'(?<!^)@[^/]*$', '', name)
+-                    if not client_package_allowed(name, relative, policy):
+-                        errors.append(f'CLIENT {relative}: unapproved build-installed dependency {name}')
+-    return errors
+-
+-
+-def client_task_violations(text, path, root):
+-    # Explicit positive declarations are checked regardless of allowed_paths/tests.
+-    declarations = re.findall(r'(?mi)^\s*(?:[-*]\s*)?(client_(?:framework|runtime|language|dependency)):\s*`?([^`\n]+?)`?\s*$', text)
+-    if not declarations:
+-        return []
+-    policy, errors = client_policy(root)
+-    if errors:
+-        return errors
+-    keys = {'client_framework': 'frameworks', 'client_runtime': 'runtimes', 'client_language': 'languages', 'client_dependency': 'packages'}
+-    mobile_only = 'clients/mobile/' in text and 'clients/desktop/' not in text and 'clients/web/' not in text and 'clients/shared/' not in text
+-    for kind, value in declarations:
+-        approved = policy[keys[kind]]
+-        if mobile_only:
+-            approved = policy[{'client_framework':'mobile_frameworks', 'client_runtime':'mobile_runtimes', 'client_language':'mobile_languages', 'client_dependency':'mobile_dependencies'}[kind]] + (policy['mobile_plugins'] + policy['mobile_tooling'] if kind == 'client_dependency' else [])
+-        if kind == 'client_dependency' and 'clients/mobile/' in text and not mobile_only:
+-            approved = approved + policy['mobile_dependencies'] + policy['mobile_plugins'] + policy['mobile_tooling']
+-        if kind == 'client_dependency' and 'clients/desktop/src-tauri/' in text:
+-            approved = approved + policy['native_packages']
+-        native_language_outside_boundary = kind == 'client_language' and value == 'Rust' and 'clients/desktop/src-tauri/' not in text
+-        if value not in approved or native_language_outside_boundary or (not 'clients/mobile/' in text and value in policy['mobile_languages'] + policy['mobile_frameworks'] + policy['mobile_runtimes']):
+-            errors.append(f'CLIENT {path}: unapproved {kind} {value}; Task Spec cannot authorize technology')
+-    return errors
+-
+-
+-def task_paths(text):
+-    section = re.search(r"(?ms)^# Allowed Paths\s*\n(.*?)(?=^# |\Z)", text)
+-    if not section:
+-        return []
+-    paths = []
+-    for line in section.group(1).splitlines():
+-        bullet = re.match(r"^\s*[-*+]\s+(.+)", line)
+-        if not bullet:
+-            continue
+-        item = bullet.group(1).strip()
+-        if item.startswith("`"):
+-            match = re.match(r"`([^`]+)`", item)
+-            if not match:
+-                raise ValueError("unparseable allowed_path: " + item)
+-            paths.append(match.group(1))
+-        else:
+-            match = re.match(r"([\w.*?/-]+)(?:\s|$)", item)
+-            if not match:
+-                raise ValueError("unparseable allowed_path: " + item)
+-            paths.append(match.group(1))
+-    if not paths:
+-        raise ValueError("Allowed Paths section has no parseable path entries")
+-    return paths
+-
+-
+-def check_governance(root):
+-    errors = []
+-    # This is subordinate discovery validation; current authority/hash/ADR semantics
+-    # are verified by the independent frozen integrity verifier, not duplicated here.
+-    required = {
+-        "AGENTS.md": ["spec/architecture/README.md", "SRC-01", "allowed_paths", "spec/governance/independent-review.md"],
+-        "spec/handoff/agent-context.md": ["spec/architecture/README.md", "SRC-01", "allowed_paths"],
+-        "spec/tasks/TASK_TEMPLATE.md": ["spec/architecture/README.md", "SRC-01", "allowed_paths", "source"],
+-        "spec/governance/execution-boundaries.md": ["SRC-01", "allowed_paths", "placeholder", "stage"],
+-        "spec/governance/independent-review.md": ["SRC-01", "imports", "minimality", "hosted"],
+-    }
+-    for path, tokens in required.items():
+-        text = (root / path).read_text(encoding="utf-8") if (root / path).exists() else ""
+-        for token in tokens:
+-            if token.lower() not in text.lower():
+-                errors.append(f"governance {path}: missing canonical execution reference {token}")
+-    claude = root / "CLAUDE.md"
+-    if claude.exists() and "AGENTS.md" not in claude.read_text(encoding="utf-8"):
+-        errors.append("governance CLAUDE.md: must route to authoritative Agent entry")
+-    for queue in ("backlog", "ready", "active", "review"):
+-        for path in (root / "spec/tasks" / queue).glob("*.md"):
+-            text = path.read_text(encoding="utf-8")
+-            errors += client_task_violations(text, path.relative_to(root), root)
+-            try:
+-                allowed_paths = task_paths(text)
+-            except ValueError as error:
+-                errors.append(f"SRC-07 {path.relative_to(root)}: {error}")
+-                continue
+-            for allowed in allowed_paths:
+-                if allowed.startswith(("backend/go/", "backend/java/")):
+-                    parts = allowed.split("/")
+-                    if len(parts) > 3 and parts[2] in SOURCE_DIRS:
+-                        continue
+-                    if allowed == "backend/java/InfraPlaceholder.java":
+-                        # Canonical SRC-06 exact pre-business skeleton; check_java
+-                        # still enforces its responsibility and placeholder expiry.
+-                        continue
+-                    if len(parts) == 3 and parts[2] in ROOT_FILES[parts[1]]:
+-                        continue
+-                    # Explicit one-time migration, exact task and exit, never a
+-                    # runtime source-check waiver. Adding broad paths elsewhere fails.
+-                    if path.name == "LOOP1-ARCH-REMEDIATION-004.md" and allowed == "backend/go/**" and "one-time migration authorization" in text and "exits on batch completion" in text:
+-                        continue
+-                    errors.append(f"SRC-07 {path.relative_to(root)}: conflicting allowed_path {allowed}")
+-            if allowed_paths and any(p.startswith("backend/") for p in allowed_paths):
+-                for token in ("spec/architecture/README.md", "SRC-01", "allowed_paths"):
+-                    if token not in text:
+-                        errors.append(f"SRC-07 {path.relative_to(root)}: missing {token}")
+-    errors += check_workflow((root / ".github/workflows/ci.yml").read_text(encoding="utf-8"))
+-    return errors
+-
+-
+-def check_workflow(text):
+-    errors = []
+-    blocks = {m.group(1): m.group(2) for m in re.finditer(r"(?ms)^  ([a-z_]+):\n(.*?)(?=^  [a-z_]+:\n|\Z)", text)}
+-    trigger = re.search(r"(?ms)^on:(.*?)(?=^\S|\Z)", text)
+-    trigger_text = trigger.group(1) if trigger else ""
+-    if not (re.search(r"\bpush\b", trigger_text) and re.search(r"\bpull_request\b", trigger_text)):
+-        errors.append("CI on: push/pull_request triggers required")
+-    if re.search(r"\b(?:paths|paths-ignore|branches|branches-ignore)\s*:", trigger_text):
+-        errors.append("CI on: trigger filters cannot bypass applicable checks")
+-    commands = {"architecture": ["./tools/verify-frozen-architecture.ps1", "ci/check_architecture.py --scope governance", "unittest discover -s tests/architecture", "ci/check_architecture.py --scope clients --json"],
+-                "source_go": ["ci/check_architecture.py --scope go --json"],
+-                "source_java": ["ci/check_architecture.py --scope java --json"]}
+-    for job, required in commands.items():
+-        block = blocks.get(job, "")
+-        if f"if: needs.classify.outputs.{job} == 'true'" not in block:
+-            errors.append(f"CI {job}: missing exact path selection condition")
+-        for command in required:
+-            if command not in block:
+-                errors.append(f"CI {job}: missing required command {command}")
+-        if "continue-on-error" in block or "|| true" in block:
+-            errors.append(f"CI {job}: failure suppression forbidden")
+-        if f"{job}: ${{{{ steps.paths.outputs.{job} }}}}" not in blocks.get("classify", ""):
+-            errors.append(f"CI classify: missing output {job}")
+-        if not re.search(r"needs:\s*\[[^\]]*\b" + job + r"\b", blocks.get("gate", "")):
+-            errors.append(f"CI gate: missing required dependency {job}")
+-    if "if: always()" not in blocks.get("gate", "") or "python3 ci/check_gate.py" not in blocks.get("gate", ""):
+-        errors.append("CI gate: required unconditional result verification missing")
+-    for job in ("classify", "gate"):
+-        block = blocks.get(job, "")
+-        if "continue-on-error" in block or "|| true" in block:
+-            errors.append(f"CI {job}: failure suppression forbidden")
+-    return errors
+-
+-
+-def main(argv=None):
+-    parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--root", type=Path, default=ROOT)
+-    parser.add_argument("--scope", choices=("go", "java", "governance", "clients", "all"), default="all")
+-    parser.add_argument("--json", action="store_true")
+-    args = parser.parse_args(argv)
+-    errors = []
+-    graphs = {}
+-    if args.scope in {"governance", "all"}:
+-        errors += check_governance(args.root)
+-        import importlib.util
+-        spec = importlib.util.spec_from_file_location("s2_planning_controls", ROOT / "ci/check_s2_planning.py")
+-        checker = importlib.util.module_from_spec(spec)
+-        spec.loader.exec_module(checker)
+-        errors += checker.check(args.root)
+-    if args.scope in {"clients", "all"}:
+-        errors += check_clients(args.root)
+-    for language, checker in (("go", check_go), ("java", check_java)):
+-        if args.scope in {language, "all"}:
+-            found, graph = checker(args.root)
+-            errors += found
+-            graphs[language] = graph
+-    errors = sorted(set(errors))
+-    if args.json:
+-        print(json.dumps({"result": "FAIL" if errors else "PASS", "scope": args.scope, "violations": errors, "graphs": graphs}, ensure_ascii=False, indent=2))
+-    else:
+-        for error in errors:
+-            print("FAIL: " + error)
+-        print(f"{ 'FAIL' if errors else 'PASS'}: scope={args.scope} violations={len(errors)}; static checks supplement independent Review")
+-    return int(bool(errors))
+-
+-
+-if __name__ == "__main__":
+-    sys.exit(main())
++"""Execute canonical SRC-01..07. Static evidence supplements independent semantic Review.
++
++No legacy Go waiver: source violations return nonzero even during stage003.
++Every Go file is parsed (not only the host build tags). Java imports and qualified
++references are checked now; the Java job also compiles its explicit S0 transport.
++"""
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import re
++import subprocess
++import sys
++
++ROOT = Path(__file__).resolve().parents[1]
++SERVICES = {"gateway", "core", "plugin-host"}
++SOURCE_DIRS = SERVICES | {"shared", "tests"}
++ROOT_FILES = {
++    "go": {"main.go", "main_test.go", "go.mod", "go.sum", "Dockerfile", "README.md", "config.example.json"},
++    "java": {"Main.java", "MainTest.java", "pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts", "gradle.properties", "Dockerfile", "README.md", "config.example.json"},
++}
++BUSINESS_SQL = re.compile(r"\b(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM|SELECT\b[\s\S]*?\bFROM)\s+(?:public\.)?(?:users|sessions|outbox_events|user_sync_events|messages|conversations|friendships|conversation_members)\b", re.I)
++WRITE_SQL = re.compile(r"\b(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+(?:public\.)?(?:users|sessions|outbox_events|user_sync_events|messages|conversations|friendships|conversation_members)\b", re.I)
++BUSINESS_ROUTE = re.compile(r"/v\d+/(?:auth|users|friends|conversations|messages|sync|plugins)(?:/|\b)")
++
++
++def owner(path):
++    parts = Path(path).parts
++    return parts[0] if len(parts) > 1 else "root"
++
++
++def source_paths(root, language):
++    directory = root / "backend" / language
++    violations = []
++    if directory.is_symlink():
++        return [], [f"SRC-01 {directory}: backend symlink prohibited"]
++    files = []
++    for path in directory.rglob("*"):
++        relative = path.relative_to(directory).as_posix()
++        if path.is_symlink():
++            violations.append(f"SRC-01 backend/{language}/{relative}: symlink bypass prohibited")
++        elif path.is_file():
++            if path.name == ".gitkeep" and path.read_bytes() in (b"", b"\n", b"\r\n"):
++                continue
++            parts = Path(relative).parts
++            allowed = relative in ROOT_FILES[language] or (len(parts) > 1 and parts[0] in SOURCE_DIRS)
++            # One explicit historical placeholder, never inferred from a task name.
++            if language == "java" and relative == "InfraPlaceholder.java":
++                allowed = True
++            if not allowed:
++                violations.append(f"SRC-01/02 backend/{language}/{relative}: outside exact root whitelist/service ownership")
++            if path.suffix == (".go" if language == "go" else ".java"):
++                files.append(path)
++    return files, violations
++
++
++def semantic_violations(path, unit_owner, strings, functions, types, is_test=False):
++    errors = []
++    # Black-box test helpers may exercise real behavior under tests/ or service dirs;
++    # root tests only assemble and shared tests must not hide runtime business.
++    if is_test and unit_owner not in {"root", "shared"}:
++        return errors
++    if unit_owner in {"root", "shared", "gateway", "plugin-host"}:
++        for value in strings:
++            sql = BUSINESS_SQL if unit_owner in {"root", "shared", "plugin-host"} else WRITE_SQL
++            if sql.search(value):
++                errors.append(f"SRC-01/03 {path}: {unit_owner} contains business SQL: {value[:100]}")
++            if unit_owner in {"root", "shared", "plugin-host"} and BUSINESS_ROUTE.search(value):
++                errors.append(f"SRC-01/03 {path}: {unit_owner} owns business route {value[:100]}")
++    # Declaration names are recorded for Review, not a responsibility verdict.
++    # Assembly may use helpers/types of any name; SQL/routes/persistence and actual
++    # imports are the machine guardrails. Semantic Review remains mandatory.
++    return errors
++
++
++def dependency_violation(path, origin, target, is_blackbox=False):
++    if origin == "root" and target == "tests" and not is_blackbox:
++        return f"SRC-04 {path}: assembly depends on test implementation"
++    if is_blackbox or origin in {"root", "tests"}:
++        return None
++    if origin == "shared" and target in SERVICES:
++        return f"SRC-03/04 {path}: shared reverse dependency on {target}"
++    if origin in SERVICES and target in SERVICES and target != origin:
++        return f"SRC-04 {path}: {origin} directly depends on {target} implementation"
++    if origin in SERVICES | {"shared"} and target in {"root", "tests"}:
++        return f"SRC-04 {path}: runtime implementation depends on assembly/tests"
++    return None
++
++
++def check_go(root):
++    files, errors = source_paths(root, "go")
++    if not files:
++        return errors, []
++    directory = root / "backend/go"
++    module_file = directory / "go.mod"
++    if not module_file.exists():
++        return errors + ["SRC-04 Go module missing; import graph cannot be verified"], []
++    match = re.search(r"^module\s+(\S+)", module_file.read_text(encoding="utf-8"), re.M)
++    if not match:
++        return errors + ["SRC-04 Go module declaration missing"], []
++    module = match.group(1)
++    command = ["go", "run", str(ROOT / "tools/architecture/go_source_graph.go"), str(directory)]
++    try:
++        result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8")
++    except OSError as error:
++        return errors + ["Go parser unavailable (never skipped): " + str(error)], []
++    if result.returncode:
++        return errors + ["Go parser failed (never skipped): " + result.stderr.strip()], []
++    graph = json.loads(result.stdout)
++    for unit in graph:
++        path = "backend/go/" + unit["path"]
++        origin = owner(unit["path"])
++        test = unit["path"].endswith("_test.go")
++        errors += semantic_violations(path, origin, unit["strings"] or [], unit["functions"] or [], unit["types"] or [], test)
++        if not test or origin in {"root", "shared"}:
++            for call in unit["calls"] or []:
++                method = call.rsplit(".", 1)[-1]
++                prohibited = {"Exec", "ExecContext", "Query", "QueryRow", "QueryContext", "QueryRowContext", "Begin", "BeginTx"}
++                # net/url URL.Query is protocol parsing, not persistence. SELECT
++                # literals remain independently checked; no DB query is exempted.
++                if call.endswith(".URL.Query") and "net/http" in (unit["imports"] or []):
++                    continue
++                if origin == "gateway":
++                    prohibited = {"Exec", "ExecContext", "Begin", "BeginTx"}
++                if origin in {"root", "shared", "gateway", "plugin-host"} and method in prohibited:
++                    errors.append(f"SRC-01/03 {path}: {origin} owns prohibited persistence call {call}")
++        for dependency in unit["imports"] or []:
++            if dependency == module or dependency.startswith(module + "/"):
++                target_path = dependency[len(module):].lstrip("/")
++                target = target_path.split("/")[0] if target_path else "root"
++                violation = dependency_violation(path, origin, target, test and (origin == "tests" or unit["package"].endswith("_test")))
++                if violation:
++                    errors.append(violation + " (" + dependency + ")")
++                if target not in SOURCE_DIRS | {"root"}:
++                    errors.append(f"SRC-01/04 {path}: imports unowned local package {dependency}")
++    return errors, graph
++
++
++def java_tokens(text):
++    # Preserve string literals (SQL/routes) and discard comments, including comments
++    # containing forged imports. Handle escapes before collecting actual tokens.
++    # Java processes Unicode escapes before tokenization, including imports.
++    text = re.sub(r"\\u+([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), text)
++    pattern = r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|//[^\n]*|/\*[\s\S]*?\*/'
++    strings = []
++    def clean(match):
++        value = match.group()
++        if value.startswith('"'):
++            strings.append(value[1:-1])
++            return " "
++        return " " if value.startswith(("//", "/*", "'")) else value
++    return re.sub(pattern, clean, text), strings
++
++
++def check_java(root):
++    files, errors = source_paths(root, "java")
++    units = []
++    declarations = {}
++    for path in files:
++        relative = path.relative_to(root / "backend/java").as_posix()
++        code, strings = java_tokens(path.read_text(encoding="utf-8"))
++        package_match = re.search(r"\bpackage\s+([\w.]+)\s*;", code)
++        package = package_match.group(1) if package_match else ""
++        types = re.findall(r"\b(?:class|interface|enum|record)\s+(\w+)", code)
++        origin = owner(relative)
++        for declaration in types:
++            qualified = (package + "." if package else "") + declaration
++            if qualified in declarations:
++                errors.append(f"SRC-04 duplicate Java type {qualified}")
++            declarations[qualified] = origin
++        units.append(dict(path=relative, owner=origin, package=package, code=code, strings=strings, types=types))
++    has_business = any(x["owner"] in SERVICES for x in units)
++    placeholder = [x for x in units if x["path"] == "InfraPlaceholder.java"]
++    for unit in units:
++        path = "backend/java/" + unit["path"]
++        code = unit["code"]
++        methods = re.findall(r"\b(\w+)\s*\([^;{}]*\)\s*(?:throws\s+[\w., ]+)?\s*\{", code)
++        if unit in placeholder:
++            if has_business:
++                errors.append(f"SRC-06 {path}: placeholder expired at Java first service implementation")
++            # Exact bounded transport behavior, with no business route/SQL/import.
++            errors += semantic_violations(path, "shared", unit["strings"], methods, unit["types"])
++            bad_routes = [s for s in unit["strings"] if s.startswith("/") and s not in {"/__infra/ws", "/__infra/health"}]
++            if bad_routes:
++                errors.append(f"SRC-06 {path}: unapproved placeholder routes {bad_routes}")
++        elif unit["owner"] == "root":
++            errors += semantic_violations(path, "shared", unit["strings"], methods, unit["types"])
++        else:
++            errors += semantic_violations(path, unit["owner"], unit["strings"], methods, unit["types"], unit["path"].endswith("Test.java"))
++        jdbc = bool(re.search(r"\b(?:java|javax)\.sql\b", code))
++        if jdbc and unit["owner"] in {"root", "shared", "gateway", "plugin-host"}:
++            calls = re.findall(r"\.\s*(\w+)\s*\(", code)
++            transactions = {"commit", "rollback", "setAutoCommit", "setSavepoint", "releaseSavepoint"}
++            forbidden = transactions | {"prepareStatement", "prepareCall", "createStatement", "execute", "executeQuery", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
++            if unit["owner"] == "gateway":
++                # execute() is ambiguous even when another literal in the file is
++                # SELECT. Gateway read-only queries use executeQuery(); transaction
++                # control and mutations belong to Core. Connection setup/close and
++                # shared connection factories remain allowed.
++                forbidden = transactions | {"execute", "executeUpdate", "executeLargeUpdate", "executeBatch", "executeLargeBatch"}
++            for call in set(calls) & forbidden:
++                errors.append(f"SRC-01/03 {path}: {unit['owner']} owns prohibited JDBC persistence call {call}")
++        # Includes explicit imports, static imports, wildcard packages, same-package
++        # references and fully qualified usages without import declarations.
++        references = re.findall(r"\bimport\s+(?:static\s+)?([\w.*]+)\s*;", code)
++        for qualified, target in declarations.items():
++            package, _, simple = qualified.rpartition(".")
++            present = bool(re.search(r"(?<![\w$])" + re.escape(qualified) + r"(?![\w$])", code))
++            present |= unit["package"] == package and bool(re.search(r"\b" + re.escape(simple) + r"\b", code))
++            present |= any(r == qualified or r.startswith(qualified + ".") or r == package + ".*" for r in references)
++            if present:
++                violation = dependency_violation(path, unit["owner"], target, unit["owner"] == "tests")
++                if violation:
++                    errors.append(violation + " (" + qualified + ")")
++        for dependency in references:
++            # Unresolved project service imports are rejected too; renaming/deleting
++            # the destination cannot erase a prohibited dependency classification.
++            for segment in dependency.split("."):
++                target = "plugin-host" if segment in {"pluginhost", "plugin_host"} else segment
++                if target in SERVICES:
++                    violation = dependency_violation(path, unit["owner"], target, unit["owner"] == "tests")
++                    if violation:
++                        errors.append(violation + " (" + dependency + ")")
++    return errors, [{k: v for k, v in u.items() if k != "code"} for u in units]
++
++
++
++WEB_APPEARANCE = {
++    "decision": "ADR-0011-web-appearance-storage",
++    "adapter": "clients/web/src/ui/appearance.ts",
++    "storage": "localStorage", "key": "plugworldim.appearance.v1",
++    "fields": ["theme", "fontSize", "density"], "themes": ["cold", "warm"],
++    "font_sizes": [14, 16, 18, 20], "densities": ["compact", "comfortable", "spacious"],
++    "max_serialized_length": 128,
++    "defaults": {"theme": "cold", "fontSize": 16, "density": "comfortable"},
++}
++
++
++def client_policy(root):
++    """Resolve hash-bound canonical policy; Task Specs cannot extend this policy."""
++    try:
++        manifest = (root / 'spec/architecture/baseline.md').read_text(encoding='utf-8')
++        fields = dict(re.findall(r'^- ([a-z_0-9]+): `([^`]+)`\s*$', manifest, re.M))
++        docpath = root / 'spec/architecture/frozen-architecture.md'
++        doc = docpath.read_text(encoding='utf-8')
++        if fields.get('repository_path') != 'spec/architecture/frozen-architecture.md' or fields.get('sha256') != hashlib.sha256(docpath.read_bytes()).hexdigest():
++            raise ValueError('canonical hash/resolver mismatch')
++        adrpath = 'spec/architecture/decisions/ADR-0005-client-technology-clarification.md'
++        if fields.get('revision_adr') != adrpath or 'Human-approved' not in (root / adrpath).read_text(encoding='utf-8'):
++            raise ValueError('approved ADR-0005 linkage missing')
++        match = re.search(r'<!-- client-technology-policy -->\s*```json\s*(.*?)\s*```', doc, re.S)
++        policy = json.loads(match.group(1)) if match else {}
++        if policy.get('decision') != 'ADR-0005-client-technology-clarification' or policy.get('mobile_framework') != 'Jetpack Compose' or policy.get('native_boundary') != 'clients/desktop/src-tauri/':
++            raise ValueError('client decision/boundary missing')
++        for key in ('languages', 'frameworks', 'runtimes', 'packages', 'native_packages', 'mobile_languages', 'mobile_frameworks', 'mobile_runtimes', 'mobile_plugins', 'mobile_dependencies', 'mobile_tooling', 'mobile_import_prefixes'):
++            if not isinstance(policy.get(key), list) or not all(isinstance(x, str) for x in policy[key]):
++                raise ValueError('invalid policy ' + key)
++        web_adr = 'spec/architecture/decisions/ADR-0011-web-appearance-storage.md'
++        web_approval = 'spec/progress/evidence/LOOP1-WEB-001/freeze-20261009/human-approval.txt'
++        if (policy.get('web_appearance') != WEB_APPEARANCE or fields.get('web_revision_adr') != web_adr
++                or fields.get('web_approval_source') != web_approval
++                or 'Human-approved' not in (root / web_adr).read_text(encoding='utf-8')
++                or (root / web_approval).read_text(encoding='utf-8').strip() != '批准最小前置方案并继续'):
++            raise ValueError('Web appearance approved ADR/policy/approval linkage missing')
++        return policy, []
++    except (OSError, ValueError, AttributeError) as error:
++        return {}, ['CLIENT authority unavailable (never skipped): ' + str(error)]
++
++
++FORBIDDEN_CLIENT = re.compile(r'(?:dart-lang/setup-dart|subosito/flutter-action|\bflutter\b|\bdart\b|pubspec\.(?:yaml|lock))', re.I)
++CLIENT_SOURCE = {'.ts', '.tsx'}
++CLIENT_RESOURCES = {'.json', '.yaml', '.yml', '.toml', '.sql', '.md', '.css', '.scss', '.html', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.txt', '.lock'}
++
++
++def client_package_allowed(name, relative, policy, native=False):
++    if relative.startswith('clients/mobile/'):
++        return False  # Native Android Mobile never installs/reuses JS/TS runtime packages.
++    approved = policy['native_packages'] if native else policy['packages']
++    if name not in approved:
++        return False
++    if name.startswith('@tauri-apps/') or name in policy['native_packages']:
++        return relative.startswith('clients/desktop/')
++    if name in {'react', 'react-dom', '@types/react', '@types/react-dom'}:
++        return not relative.startswith('clients/mobile/')
++    return True
++
++
++
++def uncomment_client(text):
++    # Preserve actual quoted strings; comments cannot forge dependencies/imports.
++    return re.sub(r'"""[\s\S]*?"""|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|//[^\n]*|/\*[\s\S]*?\*/',
++                  lambda m: ' ' if m.group().startswith(('//', '/*')) else m.group(), text)
++
++
++def check_android(root, policy):
++    """Bounded direct declarations, never execute Gradle to determine authority.
++
++    Unresolved/dynamic dependency/plugin notation fails closed; Review checks the
++    runtime semantics. This is a stack guard, not an Android build or acceptance.
++    """
++    errors = []
++    base = root / 'clients/mobile'
++    packages = set()
++    catalog_libraries, catalog_plugins, catalog_bundles = {}, {}, set()
++    paths = [p for p in base.rglob('*') if p.is_file() and not p.is_symlink()]
++    for path in paths:
++        if path.suffix == '.kt':
++            code = uncomment_client(path.read_text(encoding='utf-8'))
++            packages.update(re.findall(r'(?m)^\s*package\s+([\w.]+)', code))
++        if path.name != 'libs.versions.toml':
++            continue
++        import tomllib
++        try:
++            catalog = tomllib.loads(path.read_text(encoding='utf-8'))
++            for alias, value in catalog.get('libraries', {}).items():
++                coordinate = value.split(':')[:2] if isinstance(value, str) else (value.get('module', '').split(':')[:2] if 'module' in value else [value.get('group', ''), value.get('name', '')])
++                name = ':'.join(coordinate)
++                catalog_libraries[re.sub(r'[-_]', '.', alias)] = name
++                if name not in policy['mobile_dependencies']:
++                    errors.append(f'CLIENT {path.relative_to(root)}: unapproved Android catalog dependency {name}')
++            for alias, value in catalog.get('plugins', {}).items():
++                name = value.split(':')[0] if isinstance(value, str) else value.get('id', '')
++                catalog_plugins[re.sub(r'[-_]', '.', alias)] = name
++                if name not in policy['mobile_plugins']:
++                    errors.append(f'CLIENT {path.relative_to(root)}: unapproved Android catalog plugin {name}')
++            for alias, values in catalog.get('bundles', {}).items():
++                if not isinstance(values, list) or any(re.sub(r'[-_]', '.', x) not in catalog_libraries for x in values):
++                    errors.append(f'CLIENT {path.relative_to(root)}: unresolved Android catalog bundle {alias}')
++                else:
++                    catalog_bundles.add(re.sub(r'[-_]', '.', alias))
++        except (ValueError, TypeError, AttributeError):
++            errors.append(f'CLIENT {path.relative_to(root)}: invalid Android version catalog')
++    for path in paths:
++        relative = path.relative_to(root).as_posix()
++        if path.suffix not in {'.kt', '.kts', '.gradle', '.toml', '.properties', '.xml', '.sh', '.bat', '.cmd', '.yml', '.yaml', '.json'} and path.name not in {'gradlew', 'Makefile', 'Dockerfile'}:
++            continue
++        code = uncomment_client(path.read_text(encoding='utf-8'))
++        if path.suffix == '.kt':
++            for dependency in re.findall(r'(?m)^\s*import\s+([\w.*]+)', code):
++                local = any(dependency.startswith(package + '.') for package in packages)
++                if not local and not any(dependency.startswith(prefix) for prefix in policy['mobile_import_prefixes']):
++                    errors.append(f'CLIENT {relative}: unapproved Kotlin import {dependency}')
++            if re.search(r'\b(?:addJavascriptInterface|evaluateJavascript|ReactNative|JavascriptEngine)\b|\bSystem\s*\.\s*load(?:Library)?\s*\(', code):
++                errors.append(f'CLIENT {relative}: unapproved Mobile JS/native bridge/runtime')
++        if path.suffix in {'.gradle', '.kts'}:
++            # Accept the entire selector argument, never an approved string prefix.
++            literal = r"(?:\"[\w.-]+\"|'[\w.-]+')"
++            selector = re.compile(r'\b(id|kotlin)\s*(?:\(\s*(' + literal +
++                                  r')\s*\)|[ \t]+(' + literal + r'))')
++            for declaration in re.finditer(r'\b(?:id|kotlin)\s*(?=\(|[\"\'])', code):
++                match = selector.match(code, declaration.start())
++                if not match:
++                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin selector')
++                    continue
++                name = (match.group(2) or match.group(3))[1:-1]
++                plugin = 'org.jetbrains.kotlin.' + name if match.group(1) == 'kotlin' else name
++                if plugin not in policy['mobile_plugins']:
++                    errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {plugin}')
++            # Plugins blocks allow only complete supported declarations and their
++            # version/apply modifiers. Residual entries reject builtin shortcuts
++            # and computed selectors without maintaining a plugin-name blacklist.
++            text_literal = r"(?:\"[^\"\n]*\"|'[^'\n]*')"
++            version = r'(?:\s*(?:\.\s*)?version\s*(?:\(\s*' + text_literal + r'\s*\)|' + text_literal + r'))?'
++            apply = r'(?:\s*(?:\.\s*)?apply\s*(?:\(\s*(?:true|false)\s*\)|(?:true|false)\b))?'
++            entry = r'(?:' + selector.pattern + r'|\balias\s*\(\s*libs\.plugins\.[\w.]+\s*\))' + version + apply
++            build_code = code
++            for block in re.finditer(r'\bplugins\s*\{([^}]*)(\}|$)', code):
++                if block.group(2) != '}' or not re.fullmatch(r'(?:\s*(?:' + entry + r')\s*;?)*\s*', block.group(1)):
++                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugins block')
++                build_code = build_code.replace(block.group(0), '')
++            for coordinate in re.findall(r'["\']([\w.\-]+:[\w.\-]+)(?::[^"\']*)?["\']', code):
++                if coordinate not in policy['mobile_dependencies']:
++                    errors.append(f'CLIENT {relative}: unapproved Android Gradle dependency {coordinate}')
++            # Check every declaration start, not only already-literal/resolved forms.
++            for declaration in re.finditer(r'\bapply\s+plugin\s*:\s*', code):
++                expression = code[declaration.end():]
++                match = re.match(r"([\"'])([^\"']+)\1[ \t]*(?=$|[\n;}])", expression)
++                if not match:
++                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android apply plugin declaration')
++                elif match.group(2) not in policy['mobile_plugins']:
++                    errors.append(f'CLIENT {relative}: unapproved Android Gradle plugin {match.group(2)}')
++            for declaration in re.finditer(r'\balias\s*\(\s*', code):
++                alias = re.match(r'libs\.plugins\.([\w.]+)\s*\)', code[declaration.end():])
++                if not alias or alias.group(1) not in catalog_plugins:
++                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android plugin alias')
++            # Every dependency call must be a literal approved coordinate, a checked
++            # catalog alias, BOM platform wrapper, or an internal Android project.
++            calls = re.findall(r'\b(?:implementation|api|compileOnly|runtimeOnly|classpath|kapt|ksp|annotationProcessor|\w*Implementation)\s*(?:\(\s*)?([^\n;{}]+)', code)
++            for expression in calls:
++                expression = expression.strip()
++                literal = bool(re.match(r'(?:platform\s*\(\s*|enforcedPlatform\s*\(\s*)?["\'][\w.\-]+:[\w.\-]+:[^"\']+["\']\s*\)*\s*$', expression))
++                internal = bool(re.fullmatch(r'project\s*\(\s*["\']:[\w:\-]+["\']\s*\)\s*\)*', expression))
++                alias = re.fullmatch(r'(?:platform\s*\(\s*)?libs\.(bundles\.)?([\w.]+)\s*\)*', expression)
++                resolved = bool(alias and (alias.group(2) in (catalog_bundles if alias.group(1) else catalog_libraries)))
++                if not (literal or internal or resolved):
++                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android dependency declaration {expression}')
++            # Consume supported direct Groovy declarations, then reject every
++            # remaining apply identifier outside strings/comments. This covers
++            # command calls, variables, closures, references and typed calls
++            # without a receiver/plugin-name blacklist or executing Gradle.
++            direct_apply = r'(?m)(?:^|[;{}])([ \t]*apply\s+plugin\s*:\s*' + text_literal + r'[ \t]*(?=$|[\n;}]))'
++            build_code = re.sub(direct_apply, lambda m: m.group(0)[:m.start(1) - m.start()], build_code)
++            quoted = r'"{3}[\s\S]*?"{3}|\x27{3}[\s\S]*?\x27{3}|"(?:\\.|[^"\\])*"|\x27(?:\\.|[^\x27\\])*\x27'
++            # Slashy literals have an unambiguous expression-start/member prefix;
++            # dollar-slashy literals have their own delimiter. Keep division as code.
++            quoted += r'|\$/[\s\S]*?/\$|(?P<slashy_prefix>(?:^|[=(\[,:.]|\.\s*&)\s*)/(?:\\.|[^/\\])*/'
++            def mask_build_literal(match):
++                # Groovy quoted members are executable selectors, including method
++                # pointers and interpolation. Ordinary entire strings remain data.
++                # Unsupported member notation must not evade plugin/dependency checks.
++                prefix = match.group('slashy_prefix') or ''
++                if re.search(r'\.\s*&?\s*$', prefix or build_code[:match.start()]):
++                    errors.append(f'CLIENT {relative}: unresolved/dynamic Android quoted plugin/dependency/build selector')
++                return prefix + ' '
++            build_code = re.sub(quoted, mask_build_literal, build_code, flags=re.MULTILINE)
++            if re.search(r'\bapply\b|\b(?:includeBuild|useModule|usePlugin)\s*\(', build_code):
++                errors.append(f'CLIENT {relative}: unapproved/dynamic Android Gradle plugin/build inclusion')
++    # Build/install/CI commands must not restore Mobile TS or choose another stack.
++    configurations = paths + list((root / '.github/workflows').glob('*'))
++    for path in configurations:
++        if path.suffix not in {'.yml', '.yaml', '.json', '.gradle', '.kts', '.properties', '.sh', '.bat', '.cmd'} and path.name not in {'gradlew', 'Makefile', 'Dockerfile'}:
++            continue
++        code = path.read_text(encoding='utf-8')
++        relative = path.relative_to(root).as_posix()
++        # Only Mobile-relevant workflow jobs; TS Desktop/Web tooling remains valid.
++        if relative.startswith('.github/'):
++            blocks = re.findall(r'(?ms)^  [\w-]+:\n.*?(?=^  [\w-]+:\n|\Z)', code)
++            code = '\n'.join(x for x in blocks if re.search(r'\bmobile\b|clients/mobile|setup-android|android-emulator', x, re.I)) if blocks else (code if re.search(r'clients/mobile|android|compose|gradle', code, re.I) else '')
++        if re.search(r'\b(?:npm|pnpm|yarn|node|bun|deno|npx)\b|setup-node|react-native|capacitor|nativescript|\bexpo\b|\b(?:Room|ktor|retrofit|okhttp)\b|--init-script|(?:^|\s)-I\s', code, re.I):
++            errors.append(f'CLIENT {relative}: unapproved Mobile build/runtime/dependency command')
++        for action in re.findall(r'uses:\s*([\w.-]+/[\w./-]+)@', code):
++            if re.search(r'android|gradle|kotlin|compose', action, re.I) and action not in policy['mobile_tooling']:
++                errors.append(f'CLIENT {relative}: unapproved Android tooling action {action}')
++        if path.name == 'gradle-wrapper.properties':
++            for url in re.findall(r'(?m)^distributionUrl\s*=\s*(\S+)', code):
++                if not re.fullmatch(r'https\\?://services\.gradle\.org/distributions/gradle-[\w.\-]+-(?:bin|all)\.zip', url):
++                    errors.append(f'CLIENT {relative}: unapproved Gradle wrapper distribution')
++    return errors
++
++
++def language_product_enabled(root):
++    import importlib.util
++    try:
++        spec = importlib.util.spec_from_file_location('i18n_planning_authority', Path(__file__).with_name('check_s2_planning.py'))
++        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
++        if module.check(root): return False
++        tasks, errors = module.inventory(root)
++        entries = tasks.get('LOOP1-CLIENT-I18N-001', [])
++        return (not errors and len(entries) == 1 and entries[0][0] in ('active', 'review', 'done')
++                and entries[0][2].get('client_supplement_phase') == 'i18n_product')
++    except (OSError, ValueError, KeyError):
++        return False
++
++
++def check_language_storage(relative, code, enabled):
++    errors = []
++    if relative != 'clients/web/src/ui/language.ts' or not enabled:
++        return [f'CLIENT {relative}: language storage requires exact adapter and accepted i18n product phase']
++    declaration = r'const\s+LANGUAGE_KEY\s*=\s*"plugworldim\.language\.v1"\s*;'
++    read = r'window\.localStorage\.getItem\(LANGUAGE_KEY\)'
++    write = r'window\.localStorage\.setItem\(LANGUAGE_KEY,value\)'
++    if len(re.findall(declaration, code)) != 1 or len(re.findall(read, code)) != 1 or len(re.findall(write, code)) != 1:
++        errors.append(f'CLIENT {relative}: language requires direct fixed-key raw scalar read/write')
++    remaining = re.sub(read, '', re.sub(write, '', code))
++    if re.search(r'localStorage|JSON|\b(?:clear|removeItem|trim|toLowerCase|message\w*|history\w*|credential\w*|session\w*|token\w*)\b', remaining, re.I):
++        errors.append(f'CLIENT {relative}: alternate storage, normalization or business payload forbidden')
++    if 'validLocale(raw)?raw:"en"' not in code or 'if(!validLocale(value))return false;' not in code:
++        errors.append(f'CLIENT {relative}: exact locale validation and English read fallback required')
++    return errors
++
++
++def check_web_storage(relative, text, policy, language_enabled=False):
++    """One authority-bound appearance record; no generic storage/path waiver.
++
++    Direct calls and explicit projection are intentionally bounded. Actual value
++    validation/failure/retention semantics also require product behavior tests
++    and independent Review; static checks cannot establish runtime correctness.
++    """
++    code = uncomment_client(text)
++    errors = []
++    if re.search(r'\b(?:sqlite\w*|indexedDB|sessionStorage)\b|\bcaches\s*[.\[]|\bdocument\s*\.\s*cookie\b', code, re.I):
++        errors.append(f'CLIENT {relative}: Web must remain memory only / no SQLite/history persistence')
++    if relative == 'clients/web/src/ui/language.ts' or 'plugworldim.language.v1' in code:
++        return errors + check_language_storage(relative, code, language_enabled)
++    authority = policy['web_appearance']
++    storage = bool(re.search(r'\blocalStorage\b', code, re.I))
++    key = authority['key']
++    if relative != authority['adapter']:
++        if storage or key in code:
++            errors.append(f'CLIENT {relative}: Web appearance storage is confined to exact approved adapter')
++        return errors
++    if not storage:
++        return errors  # A pure pre-storage module does not receive an exception.
++    if re.search(r'\b(?:message\w*|history\w*|users?\w*|session\w*|(?:access|refresh)[_]?token\w*|credential\w*|endpoint\w*|conversation\w*|(?:sync[_]?)?cursor\w*)\b', code, re.I):
++        errors.append(f'CLIENT {relative}: appearance adapter cannot persist or receive business/credential data')
++    declaration = r'\bconst\s+APPEARANCE_KEY\s*=\s*(["\x27])' + re.escape(key) + r'\1\s*;'
++    if len(re.findall(declaration, code)) != 1:
++        errors.append(f'CLIENT {relative}: appearance key must be the exact versioned constant')
++    read = r'\bwindow\s*\.\s*localStorage\s*\.\s*getItem\s*\(\s*APPEARANCE_KEY\s*\)'
++    # Preserve only the three validated scalar fields, never arbitrary JSON.
++    write = (r'\bwindow\s*\.\s*localStorage\s*\.\s*setItem\s*\(\s*APPEARANCE_KEY\s*,\s*'
++             r'JSON\s*\.\s*stringify\s*\(\s*\{\s*theme\s*:\s*([A-Za-z_$][\w$]*)\s*\.\s*theme\s*,\s*'
++             r'fontSize\s*:\s*\1\s*\.\s*fontSize\s*,\s*density\s*:\s*\1\s*\.\s*density\s*,?\s*\}\s*\)\s*\)')
++    if len(re.findall(read, code)) != 1 or len(re.findall(write, code)) != 1:
++        errors.append(f'CLIENT {relative}: appearance requires direct fixed-key read/write and exact three-field projection')
++    consumed = re.sub(read, ' ', code)
++    consumed = re.sub(write, ' ', consumed)
++    if re.search(r'\blocalStorage\b', consumed, re.I):
++        errors.append(f'CLIENT {relative}: alternate key/alias/method/dynamic appearance storage access forbidden')
++    return errors
++
++
++def check_native_language(relative, text, enabled):
++    if relative.startswith('clients/mobile/app/src/androidTest/'):
++        return []  # Test-only faults are not production adapter ownership.
++    code = uncomment_client(text)
++    compact = re.sub(r'\s+', '', code)
++    ts = 'clients/desktop/src/application/ui/native.ts'
++    rust = 'clients/desktop/src-tauri/src/desktop_capabilities.rs'
++    android = 'clients/mobile/app/src/main/kotlin/im/platform/client/ui/Preferences.kt'
++    errors = []
++    tokens = ('"language_load"', '"language_save"', '.join("language.txt")', '.putString("language",')
++    if relative not in (ts, rust, android):
++        if any(token in compact for token in tokens):
++            errors.append(f'CLIENT {relative}: native language persistence confined to exact approved adapters')
++        return errors
++    present = ('exportconstlanguage=' in compact if relative == ts else 'fnlanguage_load(' in compact if relative == rust else 'funloadLanguage(' in compact)
++    if not present: return errors
++    if not enabled:
++        errors.append(f'CLIENT {relative}: native language persistence requires accepted i18n phase')
++    if relative == ts:
++        start = compact.find('exportconstlanguage=')
++        part = compact[start:compact.find('exportconsttrayText=', start)]
++        required = ('invoke<unknown>("language_load")', 'validLocale(value)?value:"en"', 'catch(error){if(error==="Languageunavailable")return"en";throwerror;}', 'if(!validLocale(value))', 'invoke<void>("language_save",{value})')
++        if any(token not in part for token in required) or re.search(r'credentials?|sqlite|appearance|localStorage|trim\(|toLowerCase\(', part, re.I):
++            errors.append(f'CLIENT {relative}: language intent must validate exact enum and use only narrow native commands')
++    elif relative == rust:
++        start = compact.find('fnvalid_language('); end = compact.find('pubfnsetup(', start)
++        part = compact[start:end]
++        required = ('matches!(value,"en"|"zh-CN"|"ja-JP")', 'file.take(6).read_to_end(&mutbytes)', 'bytes.len()>5', 'std::str::from_utf8(&bytes)', 'valid_language(value)', 'if!valid_language(value)', 'std::fs::write(path,value.as_bytes())')
++        if any(token not in part for token in required) or part.count('.join("language.txt")') != 2 or re.search(r'credentials?|sqlite|appearance|serde|trim\(|to_lowercase\(', part, re.I):
++            errors.append(f'CLIENT {relative}: native language file must remain fixed raw bounded UTF-8 enum')
++        for name,signature in [('language_load','app:tauri::AppHandle'),('language_save','app:tauri::AppHandle,value:String')]:
++            if f'pubfn{name}({signature})' not in part:
++                errors.append(f'CLIENT {relative}: arbitrary language path/argument forbidden')
++    else:
++        start = compact.find('funloadLanguage('); end = compact.find('privatefunkey(', start)
++        part = compact[start:end]
++        required = ('appearance.getString("language",null)', 'value=="en"||value=="zh-CN"||value=="ja-JP"', 'else"en"', 'catch(_:ClassCastException){"en"}', 'require(value=="en"||value=="zh-CN"||value=="ja-JP")', 'appearance.edit().putString("language",value).commit()')
++        if any(token not in part for token in required) or re.search(r'credentials?|sqlite|putInt|putFloat|remove\(|clear\(|trim\(|lowercase\(',part,re.I):
++            errors.append(f'CLIENT {relative}: language must be one validated String key in existing appearance MODE_PRIVATE store')
++    return errors
++
++
++def check_clients(root):
++    policy, errors = client_policy(root)
++    if errors:
++        return errors
++    language_enabled = language_product_enabled(root)
++    errors += check_android(root, policy)
++    files = []
++    for directory in ('clients', '.github/workflows'):
++        if (root / directory).is_symlink():
++            errors.append(f'CLIENT {directory}: symlink boundary bypass')
++    for area in ('shared', 'web', 'desktop', 'mobile'):
++        base = root / 'clients' / area
++        if base.is_symlink():
++            errors.append(f'CLIENT {base}: symlink boundary bypass')
++            continue
++        files.extend(base.rglob('*'))
++    # Active configuration only: immutable research/evidence/history not scanned.
++    files += list((root / '.github/workflows').glob('*'))
++    files += [root / p for p in ('package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'bun.lockb', 'tsconfig.json') if (root / p).exists()]
++    for path in files:
++        relative = path.relative_to(root).as_posix()
++        if 'node_modules' in path.parts or 'dist' in path.parts:
++            # Installed dependency trees and compiled output are local build
++            # artifacts, declared generated by the client packages' own
++            # .gitignore; they are not client source or dependency
++            # declarations. Without this, any local verifier run (npm ci /
++            # npm run build) floods the check with false unapproved-dependency,
++            # symlink and source-type findings.
++            continue
++        if path.is_symlink():
++            errors.append(f'CLIENT {relative}: symlink boundary bypass')
++            continue
++        if not path.is_file():
++            continue
++        client = relative.startswith('clients/')
++        native = relative.startswith(policy['native_boundary'])
++        mobile = relative.startswith('clients/mobile/')
++        if path.name == '.gitkeep' and not path.read_bytes().strip():
++            continue
++        suffix = path.suffix.lower()
++        config_js = suffix in {'.js', '.mjs', '.cjs'} and ('.config.' in path.name or path.name.startswith('eslint.config.'))
++        allowed = suffix in CLIENT_SOURCE | CLIENT_RESOURCES or config_js or path.name in {'.gitignore', '.npmrc', 'Dockerfile', 'Makefile'}
++        if native and (suffix in {'.rs', '.rc', '.plist', '.manifest', '.icns'} or path.name == 'Cargo.lock'):
++            allowed = True
++        if mobile:
++            allowed = suffix in CLIENT_RESOURCES | {'.kt', '.xml', '.gradle', '.properties', '.sh', '.bat', '.cmd'} or path.name in {'.gitignore', 'gradlew', 'Makefile', 'Dockerfile'} or path.name in {'build.gradle.kts', 'settings.gradle.kts'}
++            if path.name == 'gradle-wrapper.jar' and relative.endswith('/gradle/wrapper/gradle-wrapper.jar'):
++                continue  # Standard Android Gradle tooling, semantic Review verifies artifact provenance.
++            if suffix == '.toml' and path.name != 'libs.versions.toml':
++                allowed = False
++            if path.name in {'package.json', 'tsconfig.json'} or suffix in {'.ts', '.tsx', '.js', '.mjs', '.cjs', '.rs'}:
++                allowed = False
++        if client and not allowed:
++            errors.append(f'CLIENT {relative}: unapproved source/config type; Web/Desktop/shared TypeScript, Mobile Android Kotlin/Compose, Rust Desktop native only')
++        if suffix in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.icns'}:
++            continue
++        try:
++            text = path.read_text(encoding='utf-8')
++        except UnicodeError:
++            errors.append(f'CLIENT {relative}: unsupported binary configuration/source')
++            continue
++        if suffix == '.dart' or path.name.lower() in {'pubspec.yaml', 'pubspec.lock', '.metadata'} or (suffix != '.md' and FORBIDDEN_CLIENT.search(text)):
++            errors.append(f'CLIENT {relative}: Dart/Flutter active source/dependency/configuration forbidden')
++        if relative.startswith('clients/web/') and suffix != '.md':
++            errors += check_web_storage(relative, text, policy, language_enabled)
++        if client and suffix in {'.ts', '.tsx', '.kt', '.rs'}:
++            errors += check_native_language(relative, text, language_enabled)
++        if path.name == 'package.json':
++            try:
++                manifest = json.loads(text)
++                for key in ('dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'):
++                    for name in manifest.get(key, {}):
++                        if not client_package_allowed(name, relative, policy):
++                            errors.append(f'CLIENT {relative}: unapproved dependency {name}; task/tests cannot authorize selection')
++            except (ValueError, AttributeError, TypeError):
++                errors.append(f'CLIENT {relative}: invalid package manifest')
++        if path.name == 'Cargo.toml':
++            # Standard-library TOML parser, no product/tooling dependency added.
++            import tomllib
++            try:
++                manifest = tomllib.loads(text)
++                tables = [manifest, manifest.get('workspace', {})] + list(manifest.get('target', {}).values())
++                for table in tables:
++                    for key in ('dependencies', 'build-dependencies', 'dev-dependencies'):
++                        for name, value in table.get(key, {}).items():
++                            package = value.get('package', name) if isinstance(value, dict) else name
++                            if not native or not client_package_allowed(package, relative, policy, native=True):
++                                errors.append(f'CLIENT {relative}: unapproved native dependency {package}; Desktop SQLite is SQLx only')
++                            if package == 'sqlx' and isinstance(value, dict) and any(x in value.get('features', []) for x in ('postgres', 'mysql', 'any')):
++                                errors.append(f'CLIENT {relative}: SQLx is approved for SQLite only')
++            except (ValueError, AttributeError, TypeError):
++                errors.append(f'CLIENT {relative}: invalid Cargo manifest')
++        if suffix in CLIENT_SOURCE or config_js:
++            imports = re.findall(r'''(?:\bfrom\s*|\bimport\s*(?:\(\s*)?|\brequire\s*\(\s*)["']([^"']+)["']''', text)
++            for dependency in imports:
++                if dependency.startswith(('.', '/')):
++                    continue
++                name = '/'.join(dependency.split('/')[:2]) if dependency.startswith('@') else dependency.split('/')[0]
++                if not client_package_allowed(name, relative, policy):
++                    errors.append(f'CLIENT {relative}: unapproved import/runtime {dependency}')
++        # Known alternate runtimes/framework install commands cannot hide in builds/CI.
++        if suffix in {'.json', '.yaml', '.yml', '.toml', '.lock', '.js', '.mjs', '.cjs'} or path.name in {'Dockerfile', 'Makefile'}:
++            if re.search(r'\b(?:expo|react-native|nativescript|capacitor|electron|svelte|vue|angular|solid-js|zustand|redux|bun|deno|rusqlite)\b', text, re.I):
++                errors.append(f'CLIENT {relative}: unapproved framework/runtime/native dependency in active configuration')
++            for match in re.finditer(r'\b(?:npm|pnpm|yarn)\s+(?:install|add)\s+([^\n;]+)', text):
++                for name in match.group(1).split():
++                    if name.startswith('-'):
++                        continue
++                    name = re.sub(r'(?<!^)@[^/]*$', '', name)
++                    if not client_package_allowed(name, relative, policy):
++                        errors.append(f'CLIENT {relative}: unapproved build-installed dependency {name}')
++    return errors
++
++
++def client_task_violations(text, path, root):
++    # Explicit positive declarations are checked regardless of allowed_paths/tests.
++    declarations = re.findall(r'(?mi)^\s*(?:[-*]\s*)?(client_(?:framework|runtime|language|dependency)):\s*`?([^`\n]+?)`?\s*$', text)
++    if not declarations:
++        return []
++    policy, errors = client_policy(root)
++    if errors:
++        return errors
++    keys = {'client_framework': 'frameworks', 'client_runtime': 'runtimes', 'client_language': 'languages', 'client_dependency': 'packages'}
++    mobile_only = 'clients/mobile/' in text and 'clients/desktop/' not in text and 'clients/web/' not in text and 'clients/shared/' not in text
++    for kind, value in declarations:
++        approved = policy[keys[kind]]
++        if mobile_only:
++            approved = policy[{'client_framework':'mobile_frameworks', 'client_runtime':'mobile_runtimes', 'client_language':'mobile_languages', 'client_dependency':'mobile_dependencies'}[kind]] + (policy['mobile_plugins'] + policy['mobile_tooling'] if kind == 'client_dependency' else [])
++        if kind == 'client_dependency' and 'clients/mobile/' in text and not mobile_only:
++            approved = approved + policy['mobile_dependencies'] + policy['mobile_plugins'] + policy['mobile_tooling']
++        if kind == 'client_dependency' and 'clients/desktop/src-tauri/' in text:
++            approved = approved + policy['native_packages']
++        native_language_outside_boundary = kind == 'client_language' and value == 'Rust' and 'clients/desktop/src-tauri/' not in text
++        if value not in approved or native_language_outside_boundary or (not 'clients/mobile/' in text and value in policy['mobile_languages'] + policy['mobile_frameworks'] + policy['mobile_runtimes']):
++            errors.append(f'CLIENT {path}: unapproved {kind} {value}; Task Spec cannot authorize technology')
++    return errors
++
++
++def task_paths(text):
++    section = re.search(r"(?ms)^# Allowed Paths\s*\n(.*?)(?=^# |\Z)", text)
++    if not section:
++        return []
++    paths = []
++    for line in section.group(1).splitlines():
++        bullet = re.match(r"^\s*[-*+]\s+(.+)", line)
++        if not bullet:
++            continue
++        item = bullet.group(1).strip()
++        if item.startswith("`"):
++            match = re.match(r"`([^`]+)`", item)
++            if not match:
++                raise ValueError("unparseable allowed_path: " + item)
++            paths.append(match.group(1))
++        else:
++            match = re.match(r"([\w.*?/-]+)(?:\s|$)", item)
++            if not match:
++                raise ValueError("unparseable allowed_path: " + item)
++            paths.append(match.group(1))
++    if not paths:
++        raise ValueError("Allowed Paths section has no parseable path entries")
++    return paths
++
++
++def check_governance(root):
++    errors = []
++    # This is subordinate discovery validation; current authority/hash/ADR semantics
++    # are verified by the independent frozen integrity verifier, not duplicated here.
++    required = {
++        "AGENTS.md": ["spec/architecture/README.md", "SRC-01", "allowed_paths", "spec/governance/independent-review.md"],
++        "spec/handoff/agent-context.md": ["spec/architecture/README.md", "SRC-01", "allowed_paths"],
++        "spec/tasks/TASK_TEMPLATE.md": ["spec/architecture/README.md", "SRC-01", "allowed_paths", "source"],
++        "spec/governance/execution-boundaries.md": ["SRC-01", "allowed_paths", "placeholder", "stage"],
++        "spec/governance/independent-review.md": ["SRC-01", "imports", "minimality", "hosted"],
++    }
++    for path, tokens in required.items():
++        text = (root / path).read_text(encoding="utf-8") if (root / path).exists() else ""
++        for token in tokens:
++            if token.lower() not in text.lower():
++                errors.append(f"governance {path}: missing canonical execution reference {token}")
++    claude = root / "CLAUDE.md"
++    if claude.exists() and "AGENTS.md" not in claude.read_text(encoding="utf-8"):
++        errors.append("governance CLAUDE.md: must route to authoritative Agent entry")
++    for queue in ("backlog", "ready", "active", "review"):
++        for path in (root / "spec/tasks" / queue).glob("*.md"):
++            text = path.read_text(encoding="utf-8")
++            errors += client_task_violations(text, path.relative_to(root), root)
++            try:
++                allowed_paths = task_paths(text)
++            except ValueError as error:
++                errors.append(f"SRC-07 {path.relative_to(root)}: {error}")
++                continue
++            for allowed in allowed_paths:
++                if allowed.startswith(("backend/go/", "backend/java/")):
++                    parts = allowed.split("/")
++                    if len(parts) > 3 and parts[2] in SOURCE_DIRS:
++                        continue
++                    if allowed == "backend/java/InfraPlaceholder.java":
++                        # Canonical SRC-06 exact pre-business skeleton; check_java
++                        # still enforces its responsibility and placeholder expiry.
++                        continue
++                    if len(parts) == 3 and parts[2] in ROOT_FILES[parts[1]]:
++                        continue
++                    # Explicit one-time migration, exact task and exit, never a
++                    # runtime source-check waiver. Adding broad paths elsewhere fails.
++                    if path.name == "LOOP1-ARCH-REMEDIATION-004.md" and allowed == "backend/go/**" and "one-time migration authorization" in text and "exits on batch completion" in text:
++                        continue
++                    errors.append(f"SRC-07 {path.relative_to(root)}: conflicting allowed_path {allowed}")
++            if allowed_paths and any(p.startswith("backend/") for p in allowed_paths):
++                for token in ("spec/architecture/README.md", "SRC-01", "allowed_paths"):
++                    if token not in text:
++                        errors.append(f"SRC-07 {path.relative_to(root)}: missing {token}")
++    errors += check_workflow((root / ".github/workflows/ci.yml").read_text(encoding="utf-8"))
++    return errors
++
++
++def check_workflow(text):
++    errors = []
++    blocks = {m.group(1): m.group(2) for m in re.finditer(r"(?ms)^  ([a-z_]+):\n(.*?)(?=^  [a-z_]+:\n|\Z)", text)}
++    trigger = re.search(r"(?ms)^on:(.*?)(?=^\S|\Z)", text)
++    trigger_text = trigger.group(1) if trigger else ""
++    if not (re.search(r"\bpush\b", trigger_text) and re.search(r"\bpull_request\b", trigger_text)):
++        errors.append("CI on: push/pull_request triggers required")
++    if re.search(r"\b(?:paths|paths-ignore|branches|branches-ignore)\s*:", trigger_text):
++        errors.append("CI on: trigger filters cannot bypass applicable checks")
++    commands = {"architecture": ["./tools/verify-frozen-architecture.ps1", "ci/check_architecture.py --scope governance", "unittest discover -s tests/architecture", "ci/check_architecture.py --scope clients --json"],
++                "source_go": ["ci/check_architecture.py --scope go --json"],
++                "source_java": ["ci/check_architecture.py --scope java --json"]}
++    for job, required in commands.items():
++        block = blocks.get(job, "")
++        if f"if: needs.classify.outputs.{job} == 'true'" not in block:
++            errors.append(f"CI {job}: missing exact path selection condition")
++        for command in required:
++            if command not in block:
++                errors.append(f"CI {job}: missing required command {command}")
++        if "continue-on-error" in block or "|| true" in block:
++            errors.append(f"CI {job}: failure suppression forbidden")
++        if f"{job}: ${{{{ steps.paths.outputs.{job} }}}}" not in blocks.get("classify", ""):
++            errors.append(f"CI classify: missing output {job}")
++        if not re.search(r"needs:\s*\[[^\]]*\b" + job + r"\b", blocks.get("gate", "")):
++            errors.append(f"CI gate: missing required dependency {job}")
++    if "if: always()" not in blocks.get("gate", "") or "python3 ci/check_gate.py" not in blocks.get("gate", ""):
++        errors.append("CI gate: required unconditional result verification missing")
++    for job in ("classify", "gate"):
++        block = blocks.get(job, "")
++        if "continue-on-error" in block or "|| true" in block:
++            errors.append(f"CI {job}: failure suppression forbidden")
++    return errors
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--root", type=Path, default=ROOT)
++    parser.add_argument("--scope", choices=("go", "java", "governance", "clients", "all"), default="all")
++    parser.add_argument("--json", action="store_true")
++    args = parser.parse_args(argv)
++    errors = []
++    graphs = {}
++    if args.scope in {"governance", "all"}:
++        errors += check_governance(args.root)
++        import importlib.util
++        spec = importlib.util.spec_from_file_location("s2_planning_controls", ROOT / "ci/check_s2_planning.py")
++        checker = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(checker)
++        errors += checker.check(args.root)
++    if args.scope in {"clients", "all"}:
++        errors += check_clients(args.root)
++    for language, checker in (("go", check_go), ("java", check_java)):
++        if args.scope in {language, "all"}:
++            found, graph = checker(args.root)
++            errors += found
++            graphs[language] = graph
++    errors = sorted(set(errors))
++    if args.json:
++        print(json.dumps({"result": "FAIL" if errors else "PASS", "scope": args.scope, "violations": errors, "graphs": graphs}, ensure_ascii=False, indent=2))
++    else:
++        for error in errors:
++            print("FAIL: " + error)
++        print(f"{ 'FAIL' if errors else 'PASS'}: scope={args.scope} violations={len(errors)}; static checks supplement independent Review")
++    return int(bool(errors))
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+diff --git a/tests/architecture/test_client_technology.py b/tests/architecture/test_client_technology.py
+index 15925c3a..a8bce675 100644
+--- a/tests/architecture/test_client_technology.py
++++ b/tests/architecture/test_client_technology.py
+@@ -165,6 +165,16 @@ class ClientTechnologyControls(unittest.TestCase):
+         self.put('spec/progress/evidence/HISTORICAL/pubspec.yaml', 'dependencies: flutter')
+         self.assertEqual([], checker.check_clients(self.root))
+ 
++    def test_installed_build_artifacts_are_not_client_source_or_declarations(self):
++        # node_modules/ and dist/ are generated artifacts declared by the client
++        # packages' own .gitignore; a local npm ci / npm run build must not
++        # flood the check with false dependency or source-type findings.
++        self.assertEqual([], checker.check_clients(self.root))
++        self.put('clients/shared/protocol-sdk/node_modules/typescript/package.json',
++                 '{"name":"typescript","version":"5.9.0","dependencies":{"@dprint/formatter":"*","minimist":"*","mocha":"*"}}')
++        self.put('clients/shared/protocol-sdk/dist/storage/models.js', 'export const x = 1;\n')
++        self.assertEqual([], checker.check_clients(self.root))
++
+     def test_symlink_cannot_bypass_boundary(self):
+         source = self.put('archive/bad.dart', 'void main() {}')
+         link = self.root/'clients/shared/store.ts'
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.NODEMODULES.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.NODEMODULES.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-2795d42c-ef35-4163-a240-add375f2cb34.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-2795d42c-ef35-4163-a240-add375f2cb34.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-2ffbeeda-3fac-40c1-b610-4ca2aa0577d7.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-2ffbeeda-3fac-40c1-b610-4ca2aa0577d7.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-3d5e9a27-c454-4f5d-98a7-b79224a544cd.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-43d95534-4082-4899-9ffb-2eebe7f18a70.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-43d95534-4082-4899-9ffb-2eebe7f18a70.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-46aa9a58-eff8-4f1e-8788-f0c452d9209d.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-46aa9a58-eff8-4f1e-8788-f0c452d9209d.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-684cbfbf-b8e4-48e4-97c7-f7036351e996.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-684cbfbf-b8e4-48e4-97c7-f7036351e996.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-6ae70a6f-064f-454c-896d-091c75840529.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-6ae70a6f-064f-454c-896d-091c75840529.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-72309b3e-ce97-4909-8a60-8a607e8ec755.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-72309b3e-ce97-4909-8a60-8a607e8ec755.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-9d1709c5-a920-4106-bd82-ba5bb8b4bec6.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-9d1709c5-a920-4106-bd82-ba5bb8b4bec6.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-9de63b27-1582-4b1a-b68f-6ab729c85899.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-9de63b27-1582-4b1a-b68f-6ab729c85899.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-c2c10037-b31d-42e8-bc6b-9641b25c2f5b.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-c2c10037-b31d-42e8-bc6b-9641b25c2f5b.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-d92af464-6b48-4a3d-a985-3e5030a428ae.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-d92af464-6b48-4a3d-a985-3e5030a428ae.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-e03123ca-d2bd-415a-bb17-25be4d1c114c.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-e03123ca-d2bd-415a-bb17-25be4d1c114c.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-f3542966-0464-4ecd-a9a1-59c17fb5ffe4.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-f3542966-0464-4ecd-a9a1-59c17fb5ffe4.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-fc7a622a-eb3c-44aa-87d8-72eef579cc2a.stderr.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/blobs/C-fc7a622a-eb3c-44aa-87d8-72eef579cc2a.stdout.txt
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-NODEMODULES-R1/metadata.json
