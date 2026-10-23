@@ -270,5 +270,11 @@ export default {
   "group.success": "グループを更新しました。",
   "group.failure": "グループのリクエストに失敗しました。",
   "group.conflict": "このリクエストIDは別のメンバーに対応しています。",
-  "group.title": "グループ"
+  "group.title": "グループ",
+  "group.search": "友だちを検索",
+  "group.selected": "選択済み",
+  "group.remove": "削除",
+  "group.confirm": "確認",
+  "group.cancel": "キャンセル",
+  "group.friend": "友だちを追加",
 };

@@ -270,5 +270,11 @@ export default {
   "group.success": "Group updated.",
   "group.failure": "Group request failed.",
   "group.conflict": "This request ID has different members.",
-  "group.title": "Group"
+  "group.title": "Group",
+  "group.search": "Search friends",
+  "group.selected": "Selected",
+  "group.remove": "Remove",
+  "group.confirm": "Confirm",
+  "group.cancel": "Cancel",
+  "group.friend": "Add friend",
 };

@@ -270,5 +270,11 @@ export default {
   "group.success": "群聊已更新。",
   "group.failure": "群聊请求失败。",
   "group.conflict": "此请求编号对应不同成员。",
-  "group.title": "群聊"
+  "group.title": "群聊",
+  "group.search": "搜索好友",
+  "group.selected": "已选择",
+  "group.remove": "移除",
+  "group.confirm": "确定",
+  "group.cancel": "取消",
+  "group.friend": "加好友",
 };
