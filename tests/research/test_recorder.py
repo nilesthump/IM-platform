@@ -178,6 +178,26 @@ Current Task State: active
             recorder.validate_run(self.root, run_id)
         self.assertEqual("running", recorder.validate_run(self.root, run_id, require_finished=False)["status"])
 
+    def test_repo_root_resolves_non_ascii_repository_paths(self):
+        # Git returns raw path bytes. They must be decoded as filesystem paths
+        # (os.fsdecode), not assumed to be locale-decoded text: on a GBK-locale
+        # Chinese Windows machine, locale decoding corrupts non-ASCII roots.
+        # The probe seam is exercised with the raw bytes Git actually emits.
+        import shutil
+        from unittest import mock
+        os = __import__("os")
+        base = Path(self.temp.name) / "工作区"
+        shutil.copytree(self.repo, base)
+        nested = base / "nested"
+        nested.mkdir()
+        self.assertEqual(base.resolve(), recorder.repo_root(str(nested)))
+        raw = subprocess.run(["git", "-C", str(nested), "rev-parse", "--show-toplevel"],
+                             capture_output=True).stdout
+        self.assertEqual(base.resolve(), Path(os.fsdecode(raw).strip()))
+        fake = subprocess.CompletedProcess([], 0, stdout=raw, stderr=b"")
+        with mock.patch.object(recorder.subprocess, "run", return_value=fake):
+            self.assertEqual(base.resolve(), recorder.repo_root(str(nested)))
+
     def test_finished_manifest_tamper_detected(self):
         run_id = self.start()
         recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)

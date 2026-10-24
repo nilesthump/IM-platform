@@ -1,0 +1,62 @@
+diff --git a/tests/research/test_recorder.py b/tests/research/test_recorder.py
+index db30b6c7..18038502 100644
+--- a/tests/research/test_recorder.py
++++ b/tests/research/test_recorder.py
+@@ -178,6 +178,26 @@ Current Task State: active
+             recorder.validate_run(self.root, run_id)
+         self.assertEqual("running", recorder.validate_run(self.root, run_id, require_finished=False)["status"])
+ 
++    def test_repo_root_resolves_non_ascii_repository_paths(self):
++        # Git returns raw path bytes. They must be decoded as filesystem paths
++        # (os.fsdecode), not assumed to be locale-decoded text: on a GBK-locale
++        # Chinese Windows machine, locale decoding corrupts non-ASCII roots.
++        # The probe seam is exercised with the raw bytes Git actually emits.
++        import shutil
++        from unittest import mock
++        os = __import__("os")
++        base = Path(self.temp.name) / "工作区"
++        shutil.copytree(self.repo, base)
++        nested = base / "nested"
++        nested.mkdir()
++        self.assertEqual(base.resolve(), recorder.repo_root(str(nested)))
++        raw = subprocess.run(["git", "-C", str(nested), "rev-parse", "--show-toplevel"],
++                             capture_output=True).stdout
++        self.assertEqual(base.resolve(), Path(os.fsdecode(raw).strip()))
++        fake = subprocess.CompletedProcess([], 0, stdout=raw, stderr=b"")
++        with mock.patch.object(recorder.subprocess, "run", return_value=fake):
++            self.assertEqual(base.resolve(), recorder.repo_root(str(nested)))
++
+     def test_finished_manifest_tamper_detected(self):
+         run_id = self.start()
+         recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
+diff --git a/tools/research/recorder.py b/tools/research/recorder.py
+index 86205266..d2d02628 100644
+--- a/tools/research/recorder.py
++++ b/tools/research/recorder.py
+@@ -147,10 +147,13 @@ def redact_value(value: object) -> tuple[object, bool]:
+ def repo_root(explicit: str | None) -> Path:
+     root = Path(explicit).resolve() if explicit else Path(__file__).resolve().parents[2]
+     if not (root / ".git").exists():
+-        probe = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
++        probe = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True)
+         if probe.returncode != 0:
+             raise RecorderError(f"not a Git repository: {root}")
+-        root = Path(probe.stdout.strip()).resolve()
++        # Decode the probed path like any other filesystem path. text=True
++        # would use the locale codec (e.g. GBK on Chinese Windows) and mangle
++        # non-ASCII repository paths that Git prints as raw path bytes.
++        root = Path(os.fsdecode(probe.stdout).strip()).resolve()
+     return root
+ 
+ 
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.REPOROOT.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.REPOROOT.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-REPOROOT-R1/blobs/C-5c4dd212-43c0-4701-8751-6000f6985cbf.stderr.txt
+# ?? research/runs/R-NONMAINLINE-REPOROOT-R1/blobs/C-5c4dd212-43c0-4701-8751-6000f6985cbf.stdout.txt
+# ?? research/runs/R-NONMAINLINE-REPOROOT-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-REPOROOT-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-REPOROOT-R1/metadata.json
+# ?? tests/research/__pycache__/test_recorder.cpython-312.pyc
+# ?? tools/research/__pycache__/recorder.cpython-312.pyc

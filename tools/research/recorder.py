@@ -147,10 +147,13 @@ def redact_value(value: object) -> tuple[object, bool]:
 def repo_root(explicit: str | None) -> Path:
     root = Path(explicit).resolve() if explicit else Path(__file__).resolve().parents[2]
     if not (root / ".git").exists():
-        probe = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+        probe = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True)
         if probe.returncode != 0:
             raise RecorderError(f"not a Git repository: {root}")
-        root = Path(probe.stdout.strip()).resolve()
+        # Decode the probed path like any other filesystem path. text=True
+        # would use the locale codec (e.g. GBK on Chinese Windows) and mangle
+        # non-ASCII repository paths that Git prints as raw path bytes.
+        root = Path(os.fsdecode(probe.stdout).strip()).resolve()
     return root
 
 
