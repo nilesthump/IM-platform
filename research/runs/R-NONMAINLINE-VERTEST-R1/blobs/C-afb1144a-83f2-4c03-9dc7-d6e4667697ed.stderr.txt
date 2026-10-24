@@ -1,0 +1,17 @@
+test_ctrl_reports_design_failure_for_missing_override (tests.ci.test_verifier_launchers.VerifierLauncherTest.test_ctrl_reports_design_failure_for_missing_override) ... FAIL
+test_frozen_override_actually_runs_the_verifier (tests.ci.test_verifier_launchers.VerifierLauncherTest.test_frozen_override_actually_runs_the_verifier) ... ok
+test_frozen_rejects_missing_override_path (tests.ci.test_verifier_launchers.VerifierLauncherTest.test_frozen_rejects_missing_override_path) ... ok
+test_frozen_rejects_non_python_override (tests.ci.test_verifier_launchers.VerifierLauncherTest.test_frozen_rejects_non_python_override) ... ok
+
+======================================================================
+FAIL: test_ctrl_reports_design_failure_for_missing_override (tests.ci.test_verifier_launchers.VerifierLauncherTest.test_ctrl_reports_design_failure_for_missing_override)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\0\Work\App\IM-platform\tests\ci\test_verifier_launchers.py", line 61, in test_ctrl_reports_design_failure_for_missing_override
+    self.assertIn("FAIL: recovery verification found", combined)
+AssertionError: 'FAIL: recovery verification found' not found in 'Specified -Python path does not exist: R:\\Temp\\definitely-not-python.exe\nAt D:\\0\\Work\\App\\IM-platform\\tools\\verify-frozen-architecture.ps1:16 char:9\n+         throw "Specified -Python path does not exist: $Python"\n+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : OperationStopped: (Specified -Pyth...-not-python.exe:String) [], RuntimeException\n    + FullyQualifiedErrorId : Specified -Python path does not exist: R:\\Temp\\definitely-not-python.exe\n \n'
+
+----------------------------------------------------------------------
+Ran 4 tests in 91.682s
+
+FAILED (failures=1)

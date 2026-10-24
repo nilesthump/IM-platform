@@ -1,0 +1,67 @@
+diff --git a/tools/verify-loop1-ctrl-002.ps1 b/tools/verify-loop1-ctrl-002.ps1
+index 3d261078..38fc5410 100644
+--- a/tools/verify-loop1-ctrl-002.ps1
++++ b/tools/verify-loop1-ctrl-002.ps1
+@@ -300,9 +300,20 @@ if (Test-Path -LiteralPath (Join-Path $repoRoot '.github/workflows') -PathType C
+ 
+ if (Test-Path -LiteralPath (Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1') -PathType Leaf) {
+     $frozenScript = Join-Path $repoRoot 'tools/verify-frozen-architecture.ps1'
+-    if ($Python) { $architectureResult = @(& $frozenScript -Python $Python 2>&1) }
+-    else { $architectureResult = @(& $frozenScript 2>&1) }
+-    if ($LASTEXITCODE -ne 0) { Add-Failure "Frozen Architecture migration verification failed: $($architectureResult -join ' ')" }
++    # The wrapper script is invoked in-process: its designed throws (for example
++    # an invalid -Python) propagate as real exceptions and must be caught here
++    # so they become reportable failures instead of crashing this verifier.
++    $architectureResult = @()
++    $frozenExit = 0
++    try {
++        if ($Python) { $architectureResult = @(& $frozenScript -Python $Python 2>&1) }
++        else { $architectureResult = @(& $frozenScript 2>&1) }
++        $frozenExit = $LASTEXITCODE
++    } catch {
++        $architectureResult = @("$($architectureResult)", "$($_.Exception.Message)")
++        $frozenExit = 1
++    }
++    if ($frozenExit -ne 0) { Add-Failure "Frozen Architecture migration verification failed: $($architectureResult -join ' ')" }
+ }
+ 
+ $planningChecker = Join-Path $repoRoot 'ci/check_s2_planning.py'
+@@ -313,7 +324,12 @@ if (Test-Path -LiteralPath $planningChecker -PathType Leaf) {
+         Add-Failure "Specified -Python path does not exist: $Python"
+     }
+     elseif ($Python) {
+-        $version = & $Python --version 2>&1
++        $ErrorActionPreference = 'Continue'
++        try {
++            $version = & $Python --version 2>&1
++        } finally {
++            $ErrorActionPreference = 'Stop'
++        }
+         if ($LASTEXITCODE -eq 0 -and "$version" -match '^Python 3\.') { $planningPython = $Python }
+         else { Add-Failure "Specified -Python is not a working Python 3: $Python" }
+     }
+
+# Untracked paths observed; content intentionally not captured
+# ?? ci/__pycache__/check_s2_planning.cpython-312.pyc
+# ?? research/prompts/P-NONMAINLINE.VERTEST.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.VERTEST.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-890b904e-427d-4154-9854-08d0ea2b938d.stderr.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-890b904e-427d-4154-9854-08d0ea2b938d.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-8dece094-1e75-4eb2-a23d-e9ac3ced924e.stderr.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-8dece094-1e75-4eb2-a23d-e9ac3ced924e.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-afb1144a-83f2-4c03-9dc7-d6e4667697ed.stderr.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-afb1144a-83f2-4c03-9dc7-d6e4667697ed.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-b1e729f0-07c6-4661-97c4-f7c54c24ed3b.stderr.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-b1e729f0-07c6-4661-97c4-f7c54c24ed3b.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-c32b6f0a-af13-4cfe-ac81-09c0e1d3d1b9.stderr.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-c32b6f0a-af13-4cfe-ac81-09c0e1d3d1b9.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-d05e819d-4d29-423c-9a59-b267a0effe84.stderr.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-d05e819d-4d29-423c-9a59-b267a0effe84.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-de77345d-5c6f-4178-86b5-cd0bb5375a24.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-df8170db-37fb-4ee8-95a5-8c62bb579659.stderr.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-df8170db-37fb-4ee8-95a5-8c62bb579659.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/blobs/C-f06a485a-a511-47fa-9304-7ac793fb9d3a.stdout.txt
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-VERTEST-R1/metadata.json
+# ?? tests/ci/test_verifier_launchers.py
