@@ -275,7 +275,7 @@ val jaJP:Map<String,String> = mapOf(
  "group.search" to "友だちを検索",
  "group.selected" to "選択済み",
  "group.remove" to "削除",
- "group.confirm" to "確定",
+ "group.confirm" to "確認",
  "group.cancel" to "キャンセル",
  "group.friend" to "友だちを追加"
 )

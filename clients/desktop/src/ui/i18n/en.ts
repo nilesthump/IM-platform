@@ -276,5 +276,5 @@ export default {
   "group.remove": "Remove",
   "group.confirm": "Confirm",
   "group.cancel": "Cancel",
-  "group.friend": "Add friend",
+  "group.friend": "Add friend"
 };

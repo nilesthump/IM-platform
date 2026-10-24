@@ -276,5 +276,5 @@ export default {
   "group.remove": "移除",
   "group.confirm": "确定",
   "group.cancel": "取消",
-  "group.friend": "加好友",
+  "group.friend": "加好友"
 };

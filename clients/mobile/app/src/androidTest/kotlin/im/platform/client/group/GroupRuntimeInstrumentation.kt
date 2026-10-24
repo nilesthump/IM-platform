@@ -33,7 +33,7 @@ class GroupRuntimeInstrumentation:Instrumentation(){
   val accounts=JSONObject(input.readText());val run=checkNotNull(args.getString("runId"));require(Regex("[A-Za-z0-9-]+").matches(run));output=File(targetContext.getExternalFilesDir(null),"group-runtime/"+run);check(output.mkdirs());
   activity=startActivitySync(Intent(targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));settled{vm().state.value.language=="en"}
   val a=accounts.getJSONObject("A");fill("Username",a.getString("username"));fill("Password",a.getString("password"));runOnMainSync{(activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager).hideSoftInputFromWindow(activity.window.decorView.windowToken,0)};click("Sign in");settled{vm().state.value.session?.userId==a.getString("userId")&&vm().state.value.friends.isNotEmpty()};
-  click("Chat");click("+ New chat");click("Create group");
+  click("+ New chat");click("Create group");
   val beforeCancel=vm().state.value;fill("Search friends","Group Fixture B");choose("Group Fixture B");await("Selected (1)");
   runOnMainSync{vm().language("zh-CN")};await("已选择 (1)");await("Group Fixture B");runOnMainSync{vm().language("en")};await("Selected (1)");click("Remove");await("Selected (0)");click("Cancel");
   check(vm().state.value.selected==beforeCancel.selected&&vm().state.value.groupPending==null&&vm().state.value.groupSuccessRevision==beforeCancel.groupSuccessRevision);

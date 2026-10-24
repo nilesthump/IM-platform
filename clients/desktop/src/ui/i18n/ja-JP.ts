@@ -276,5 +276,5 @@ export default {
   "group.remove": "削除",
   "group.confirm": "確認",
   "group.cancel": "キャンセル",
-  "group.friend": "友だちを追加",
+  "group.friend": "友だちを追加"
 };
