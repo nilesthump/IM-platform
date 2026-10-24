@@ -45,8 +45,19 @@ const response=(value,status=200)=>new Response(JSON.stringify(value),{status,he
   const requestId=query.get('requestId');
   return response(call===1?{...short,requestId}:{...terminal,requestId,items:query.has('afterConversationId')?[row(B)]:terminal.items});
  });
- scanning.session={...client.session};const scanningJob=scanning.refreshGroups();await Promise.resolve();await scanning.refreshGroups();release();await scanningJob;
+ scanning.session={...client.session};const scanningJob=scanning.refreshGroups();await Promise.resolve();const dirtyJob=scanning.refreshGroups();release();await Promise.all([scanningJob,dirtyJob]);
  assert.equal(scanCalls,3,'inflight dirty causes another scan from origin after terminal');assert.equal(scanning.view().groups.length,2);
+ let releaseOldScan,mutationReturned;const oldScan=new Promise(resolve=>releaseOldScan=resolve),mutated=new Promise(resolve=>mutationReturned=resolve);let concurrentScans=0;
+ const concurrent=new WebClient('https://example.invalid',async(url,init)=>{
+  if(url.includes('/v1/groups')){mutationReturned();return response({...result,requestId:JSON.parse(init.body).requestId},201)}
+  const requestId=new URL(url).searchParams.get('requestId');if(++concurrentScans===1){await oldScan;return response({...terminal,requestId,items:[]})}
+  return response({...terminal,requestId});
+ });
+ concurrent.session={...client.session};const oldScanJob=concurrent.refreshGroups();const creating=concurrent.createGroup([B]);await mutated;releaseOldScan();await Promise.all([oldScanJob,creating]);
+ assert.equal(concurrent.view().selected,C,'create waits for dirty scan before selecting new group');assert.equal(concurrent.view().groupStatus,'success');concurrent.dispose();
+ const confirmedBodies=[];let snapshotFails=true;
+ const recovering=new WebClient('https://example.invalid',async(url,init)=>{if(url.includes('/v1/groups')){confirmedBodies.push(init.body);return response({...result,requestId:JSON.parse(init.body).requestId},201)}if(snapshotFails)throw new TypeError('snapshot unavailable');return response({...terminal,requestId:new URL(url).searchParams.get('requestId')})});
+ recovering.session={...client.session};await recovering.createGroup([B]);assert.equal(recovering.view().groupStatus,'unconfirmed');assert.equal(recovering.view().selected,'');snapshotFails=false;await recovering.retryGroup();assert.equal(recovering.view().selected,C);assert.equal(confirmedBodies[0],confirmedBodies[1],'snapshot failure preserves original mutation identity');recovering.dispose();
  const before=scanning.view().groups;scanning.fetcher=async(url)=>response({...terminal,requestId:new URL(url).searchParams.get('requestId'),items:[row(B),row(A)]});
  await scanning.refreshGroups();assert.deepEqual(scanning.view().groups,before,'invalid page preserves previous projection');assert.equal(scanning.view().groupError,'protocol');
  const many=Array.from({length:205},(_,i)=>row('20000000-0000-4000-8000-'+String(i+1).padStart(12,'0')));let manyCalls=0;

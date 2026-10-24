@@ -35,7 +35,7 @@ import im.platform.client.ui.i18n.useText
      items(friends,key={"friend:"+it.user.userId}){friend->
       Row(Modifier.fillMaxWidth().padding(vertical=8.dp),verticalAlignment=Alignment.CenterVertically){
        Checkbox(modifier=Modifier.semantics{contentDescription=friend.user.displayName},checked=friend.user.userId in selection,enabled=!locked,onCheckedChange={checked->select(if(checked)selection+friend.user.userId else selection-friend.user.userId)})
-       Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)){GroupAvatar(friend.user.displayName);Text(friend.user.displayName);Text("@"+friend.user.username,style=MaterialTheme.typography.bodySmall)}
+       Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)){GroupAvatar(friend.user.userId);Text(friend.user.displayName);Text("@"+friend.user.username,style=MaterialTheme.typography.bodySmall)}
       }
      }
     }
@@ -47,7 +47,7 @@ import im.platform.client.ui.i18n.useText
      items(selection,key={"selected:"+it}){id->
       val friend=state.friends.find{it.user.userId==id}
       Column(Modifier.fillMaxWidth().padding(vertical=8.dp)){
-       Row(verticalAlignment=Alignment.CenterVertically){GroupAvatar(friend?.user?.displayName?:id);Spacer(Modifier.weight(1f));IconButton(onClick={select(selection-id)},enabled=!locked,modifier=Modifier.semantics{contentDescription=t("group.remove")}){Text("×")}}
+       Row(verticalAlignment=Alignment.CenterVertically){GroupAvatar(id);Spacer(Modifier.weight(1f));IconButton(onClick={select(selection-id)},enabled=!locked,modifier=Modifier.semantics{contentDescription=t("group.remove")}){Text("×")}}
        Text(friend?.user?.displayName?:id)
       }
      }
@@ -73,7 +73,7 @@ import im.platform.client.ui.i18n.useText
   Row(verticalAlignment=Alignment.CenterVertically){Text(t("group.members"),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=add,enabled=state.session!=null&&!state.groupBusy){Text("+ "+t("group.add"))}}
   LazyColumn(Modifier.weight(1f)){
    items(state.groups.filter{it.conversationId==conversation},key={"member:"+it.user.userId}){member->
-    Row(Modifier.fillMaxWidth().padding(vertical=10.dp),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalAlignment=Alignment.CenterVertically){GroupAvatar(member.user.displayName);Column(Modifier.weight(1f)){Text(member.user.displayName);Text(member.user.userId,style=MaterialTheme.typography.bodySmall)}}
+    Row(Modifier.fillMaxWidth().padding(vertical=10.dp),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalAlignment=Alignment.CenterVertically){GroupAvatar(member.user.userId);Column(Modifier.weight(1f)){Text(member.user.displayName);Text(member.user.userId,style=MaterialTheme.typography.bodySmall)}}
    }
   }
  }
