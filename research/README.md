@@ -6,7 +6,7 @@ This directory is a non-product research control plane. It records observable fa
 
 ## Workflow
 
-The implementation uses only the Python 3 standard library. On Windows use `tools/research/recorder.ps1`; on other platforms invoke `python3 tools/research/recorder.py` with the same subcommands:
+The implementation uses only the Python 3 standard library. On Windows use `tools/research/recorder.ps1`; on other platforms invoke `python3 tools/research/recorder.py` with the same subcommands. On Windows, `RESEARCH_RECORDER_PYTHON` may name the Python 3 executable for the launcher when PATH discovery cannot find a working interpreter (for example when `python3`/`python` resolve only to the Microsoft Store alias stub); a set-but-unusable value fails loudly instead of silently falling back:
 
 ```text
 tools/research/recorder.ps1 register-prompt --task-id TASK --file prompt.txt
@@ -20,7 +20,7 @@ tools/research/recorder.ps1 validate-run --run-id R-ID
 
 `register-prompt` stores the visible Human prompt and SHA-256 before dispatch. It never claims access to platform-internal system prompts. `start-run` captures Git/task/authority state without reading untracked file contents. `run-command` executes the real argv, records timestamps, duration, raw-output hashes and redacted output blobs, and propagates the real exit code. Semantic events are reserved for facts scripts cannot infer.
 
-Review, fix, and implementation are separate runs connected with `parent_run_id` or `related_run_id`. A review is independent only when the observed actor/context establishes that fact; the Recorder never promotes self-review. CI evidence is ingested with `ingest-ci` from an externally produced evidence object matching `schema/ci-ingestion.schema.json`; Recorder does not manufacture CI outcomes and no GitHub workflow is installed by this task.
+Review, fix, and implementation are separate runs connected with `parent_run_id` or `related_run_id`. A review is independent only when the observed actor/context establishes that fact; the Recorder never promotes self-review. CI evidence is ingested with `ingest-ci` from an externally produced evidence object matching `schema/ci-ingestion.schema.json`; Recorder does not manufacture CI outcomes. The repository CI workflow comes from LOOP1-CI-001 and remains an independent acceptance judge.
 
 ## Capture modes and history
 

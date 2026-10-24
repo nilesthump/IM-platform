@@ -1,0 +1,29 @@
+....E...........F.......
+======================================================================
+ERROR: test_committed_repository_artifacts_validate (test_recorder.RecorderTest.test_committed_repository_artifacts_validate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\0\Work\App\IM-platform\tests\research\test_recorder.py", line 300, in test_committed_repository_artifacts_validate
+    recorder.cmd_validate_repository(self.ns(allow_partial=False), actual, actual / "research")
+  File "D:\0\Work\App\IM-platform\tools\research\recorder.py", line 606, in cmd_validate_repository
+    raise RecorderError("repository validation failed: " + "; ".join(failures))
+research_recorder.RecorderError: repository validation failed: R-20260929T185051Z-4ba6947e-5726-4f55-ba96-a1b9bed48769: partial/interrupted run: status is not finished; R-NONMAINLINE-LAUNCHTEST-R1: partial/interrupted run: status is not finished
+
+======================================================================
+FAIL: test_repository_safety_in_real_checkout (test_recorder.RecorderTest.test_repository_safety_in_real_checkout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\0\Work\App\IM-platform\tests\research\test_recorder.py", line 306, in test_repository_safety_in_real_checkout
+    self.assertEqual([], forbidden)
+AssertionError: Lists differ: [] != ['backend/go/Dockerfile', 'backend/go/conf[13019 chars].md']
+
+Second list contains 255 additional elements.
+First extra element 0:
+'backend/go/Dockerfile'
+
+Diff is 13836 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 24 tests in 28.155s
+
+FAILED (failures=1, errors=1)
