@@ -40,15 +40,17 @@ import im.platform.client.ui.i18n.useText
      }
     }
    }
-   VerticalDivider()
-   Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(8.dp)){
-    Text(t("group.selected")+" ("+selection.size+")",style=MaterialTheme.typography.titleMedium)
-    LazyColumn(Modifier.weight(1f)){
-     items(selection,key={"selected:"+it}){id->
-      val friend=state.friends.find{it.user.userId==id}
-      Column(Modifier.fillMaxWidth().padding(vertical=8.dp)){
-       Row(verticalAlignment=Alignment.CenterVertically){GroupAvatar(id);Spacer(Modifier.weight(1f));IconButton(onClick={select(selection-id)},enabled=!locked,modifier=Modifier.semantics{contentDescription=t("group.remove")}){Text("×")}}
-       Text(friend?.user?.displayName?:id)
+   if(conversation!=null){
+    VerticalDivider()
+    Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(8.dp)){
+     Text(t("group.selected")+" ("+selection.size+")",style=MaterialTheme.typography.titleMedium)
+     LazyColumn(Modifier.weight(1f)){
+      items(selection,key={"selected:"+it}){id->
+       val friend=state.friends.find{it.user.userId==id}
+       Column(Modifier.fillMaxWidth().padding(vertical=8.dp)){
+        Row(verticalAlignment=Alignment.CenterVertically){GroupAvatar(id);Spacer(Modifier.weight(1f));IconButton(onClick={select(selection-id)},enabled=!locked,modifier=Modifier.semantics{contentDescription=t("group.remove")}){Text("×")}}
+        Text(friend?.user?.displayName?:id)
+       }
       }
      }
     }

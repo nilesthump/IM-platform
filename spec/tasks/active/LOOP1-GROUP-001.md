@@ -1,3 +1,6 @@
+## Android create selector simplification (2026-10-24)
+
+Latest Human request: Android的建群页移除selected部分. Sole writer /root/resume_backend/android_create_single_column changes only the existing Group.kt picker: show its right Selected column only for add-member mode; create mode retains full-width friend search/checkboxes, selection state and existing confirm/cancel/success/unconfirmed behavior. No new tests, dependency or contract. Local cached Gradle 8.9 -p clients/mobile --offline :app:assembleDebug PASS (exit 0, 20s; Kotlin compiled and APK packaged); fresh bounded review and actual Android screenshot next, broader acceptance/main sync remain pending. GROUP active/S2 OPEN; accepted LKG/main remains 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e. Recorder prospective_resume is partial because startup/direct edits are outside capture. No push/merge/done.
 ---
 
 ## Current Human UI continuation (2026-10-24)
