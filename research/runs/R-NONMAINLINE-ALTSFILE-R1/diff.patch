@@ -1,0 +1,134 @@
+diff --git a/research/README.md b/research/README.md
+index 38779273..374a7ba8 100644
+--- a/research/README.md
++++ b/research/README.md
+@@ -15,11 +15,12 @@ tools/research/recorder.ps1 run-command --run-id R-ID -- command arg
+ tools/research/recorder.ps1 record-event --run-id R-ID --event-type architecture_conflict --data-json '{"decision":"...","reason":"..."}'
+ tools/research/recorder.ps1 record-event --run-id R-ID --event-type finding_created --data-file event.json
+ tools/research/recorder.ps1 record-human-decision --run-id R-ID --question "..." --alternatives-json '["A","B"]' --selected B --reason "..."
++tools/research/recorder.ps1 record-human-decision --run-id R-ID --question "..." --alternatives-file alternatives.json --selected B --reason "..."
+ tools/research/recorder.ps1 finish-run --run-id R-ID --result PASS
+ tools/research/recorder.ps1 validate-run --run-id R-ID
+ ```
+ 
+-`register-prompt` stores the visible Human prompt and SHA-256 before dispatch. It never claims access to platform-internal system prompts. `start-run` captures Git/task/authority state without reading untracked file contents. `run-command` executes the real argv, records timestamps, duration, raw-output hashes and redacted output blobs, and propagates the real exit code. Semantic events are reserved for facts scripts cannot infer. `record-event` takes its JSON payload through `--data-json` or `--data-file` (exactly one); prefer `--data-file` whenever the payload contains quotes, because shell quoting differs across platforms — Windows PowerShell single quotes do not unescape `\"`, and Windows PowerShell 5.1 can even re-split quoted arguments into extra argv entries.
++`register-prompt` stores the visible Human prompt and SHA-256 before dispatch. It never claims access to platform-internal system prompts. `start-run` captures Git/task/authority state without reading untracked file contents. `run-command` executes the real argv, records timestamps, duration, raw-output hashes and redacted output blobs, and propagates the real exit code. Semantic events are reserved for facts scripts cannot infer. `record-event` takes its JSON payload through `--data-json` or `--data-file` (exactly one); `record-human-decision` takes its alternatives list through `--alternatives-json` or `--alternatives-file` (exactly one). Prefer the file form whenever the payload contains quotes, because shell quoting differs across platforms — Windows PowerShell single quotes do not unescape `\"`, and Windows PowerShell 5.1 can even re-split quoted arguments into extra argv entries.
+ 
+ Review, fix, and implementation are separate runs connected with `parent_run_id` or `related_run_id`. A review is independent only when the observed actor/context establishes that fact; the Recorder never promotes self-review. CI evidence is ingested with `ingest-ci` from an externally produced evidence object matching `schema/ci-ingestion.schema.json`; Recorder does not manufacture CI outcomes and no GitHub workflow is installed by this task.
+ 
+diff --git a/tests/research/test_recorder.py b/tests/research/test_recorder.py
+index 3c0d1efb..bd6a1f23 100644
+--- a/tests/research/test_recorder.py
++++ b/tests/research/test_recorder.py
+@@ -200,7 +200,8 @@ Current Task State: active
+     def test_human_decision_fixture_explicit(self):
+         run_id = self.start(role="human")
+         args = self.ns(run_id=run_id, decision_id=None, question="choose", alternatives_json='["A","B"]',
+-                       selected="B", reason="fixture reason", affected_authority=None, fixture=True)
++                       selected="B", reason="fixture reason", affected_authority=None, fixture=True,
++                       alternatives_file=None)
+         recorder.cmd_human_decision(args, self.repo, self.root)
+         event = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)[-1]
+         self.assertTrue(event["data"]["human_actor"])
+@@ -363,6 +364,53 @@ Current Task State: active
+         durable = (self.root / "runs" / run_id / "events.jsonl").read_text(encoding="utf-8")
+         self.assertNotIn("not-json", durable)
+ 
++    def test_human_decision_alternatives_file_avoids_shell_quoting(self):
++        run_id = self.start(role="human")
++        payload = Path(self.temp.name) / "alternatives.json"
++        payload.write_text(json.dumps(['选项 A "引号"', '选项 B \\反斜杠']), encoding="utf-8")
++        recorder.cmd_human_decision(self.ns(
++            run_id=run_id, decision_id=None, question="选一个", alternatives_json=None,
++            alternatives_file=str(payload), selected='选项 A "引号"', reason="文件传入避免 shell 转义",
++            affected_authority=None, fixture=True), self.repo, self.root)
++        event = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)[-1]
++        self.assertEqual(['选项 A "引号"', '选项 B \\反斜杠'], event["data"]["alternatives"])
++        # A BOM (Windows PowerShell 5.1 Set-Content -Encoding utf8) must not corrupt the list.
++        bom_payload = Path(self.temp.name) / "alternatives-bom.json"
++        bom_payload.write_bytes(b"\xef\xbb\xbf" + json.dumps(["BOM ok"]).encode("utf-8"))
++        recorder.cmd_human_decision(self.ns(
++            run_id=run_id, decision_id=None, question="again", alternatives_json=None,
++            alternatives_file=str(bom_payload), selected="BOM ok", reason="bom",
++            affected_authority=None, fixture=True), self.repo, self.root)
++        event = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)[-1]
++        self.assertEqual(["BOM ok"], event["data"]["alternatives"])
++
++    def test_human_decision_requires_exactly_one_alternatives_source(self):
++        run_id = self.start(role="human")
++        with self.assertRaises(recorder.RecorderError):
++            recorder.cmd_human_decision(self.ns(
++                run_id=run_id, decision_id=None, question="q", alternatives_json=None,
++                alternatives_file=None, selected="A", reason="r", affected_authority=None, fixture=True),
++                self.repo, self.root)
++        with self.assertRaises(recorder.RecorderError):
++            recorder.cmd_human_decision(self.ns(
++                run_id=run_id, decision_id=None, question="q", alternatives_json='["A"]',
++                alternatives_file="unused", selected="A", reason="r", affected_authority=None, fixture=True),
++                self.repo, self.root)
++        missing = Path(self.temp.name) / "missing-alternatives.json"
++        with self.assertRaises(recorder.RecorderError):
++            recorder.cmd_human_decision(self.ns(
++                run_id=run_id, decision_id=None, question="q", alternatives_json=None,
++                alternatives_file=str(missing), selected="A", reason="r", affected_authority=None, fixture=True),
++                self.repo, self.root)
++
++    def test_human_decision_reports_invalid_json_with_guidance(self):
++        run_id = self.start(role="human")
++        with self.assertRaisesRegex(recorder.RecorderError, "not valid JSON"):
++            recorder.cmd_human_decision(self.ns(
++                run_id=run_id, decision_id=None, question="q", alternatives_json="{not-json}",
++                alternatives_file=None, selected="A", reason="r", affected_authority=None, fixture=True),
++                self.repo, self.root)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/tools/research/recorder.py b/tools/research/recorder.py
+index 995d67a2..3f0deb79 100644
+--- a/tools/research/recorder.py
++++ b/tools/research/recorder.py
+@@ -455,7 +455,20 @@ def cmd_record_event(args: argparse.Namespace, repo: Path, root: Path) -> int:
+ 
+ 
+ def cmd_human_decision(args: argparse.Namespace, repo: Path, root: Path) -> int:
+-    alternatives = json.loads(args.alternatives_json)
++    if bool(args.alternatives_json) == bool(args.alternatives_file):
++        raise RecorderError("record-human-decision requires exactly one of --alternatives-json or --alternatives-file")
++    raw = args.alternatives_json
++    if args.alternatives_file:
++        try:
++            # utf-8-sig accepts payloads written with or without a BOM;
++            # Windows PowerShell 5.1 Set-Content -Encoding utf8 always writes one.
++            raw = Path(args.alternatives_file).read_text(encoding="utf-8-sig")
++        except OSError as exc:
++            raise RecorderError(f"cannot read --alternatives-file {args.alternatives_file}: {exc}") from exc
++    try:
++        alternatives = json.loads(raw)
++    except json.JSONDecodeError as exc:
++        raise RecorderError(f"alternatives are not valid JSON ({exc}); use --alternatives-file to avoid shell quoting differences") from exc
+     if not isinstance(alternatives, list) or not alternatives:
+         raise RecorderError("alternatives must be a non-empty JSON list")
+     data = {"decision_id": args.decision_id or f"HD-{uuid.uuid4()}", "question": args.question,
+@@ -649,7 +662,7 @@ def parser() -> argparse.ArgumentParser:
+     p = sub.add_parser("start-run", parents=[common]); p.add_argument("--task-id"); p.add_argument("--role", required=True); p.add_argument("--capture-mode", required=True); p.add_argument("--experiment-group", default="unassigned"); p.add_argument("--prompt-id"); p.add_argument("--parent-run-id"); p.add_argument("--related-run-id"); p.add_argument("--run-id"); p.add_argument("--pre-recorder-work", action="store_true"); p.add_argument("--agent-harness", default="unavailable"); p.add_argument("--model-name", default="unavailable"); p.add_argument("--fresh-context", default="unavailable"); p.add_argument("--explicit-token-budget", default="unavailable"); p.add_argument("--context-mode", default="unavailable"); p.add_argument("--public-reasoning-mode", default="unavailable"); p.add_argument("--baseline-id", default="unavailable"); p.add_argument("--replicate-id", default="unavailable"); p.add_argument("--mutation-id", default="unavailable"); p.add_argument("--model-condition", default="unavailable"); p.add_argument("--budget-condition", default="unavailable")
+     p = sub.add_parser("run-command", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("command", nargs=argparse.REMAINDER)
+     p = sub.add_parser("record-event", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--event-type", required=True); p.add_argument("--data-json"); p.add_argument("--data-file")
+-    p = sub.add_parser("record-human-decision", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--decision-id"); p.add_argument("--question", required=True); p.add_argument("--alternatives-json", required=True); p.add_argument("--selected", required=True); p.add_argument("--reason", required=True); p.add_argument("--affected-authority"); p.add_argument("--fixture", action="store_true")
++    p = sub.add_parser("record-human-decision", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--decision-id"); p.add_argument("--question", required=True); p.add_argument("--alternatives-json"); p.add_argument("--alternatives-file"); p.add_argument("--selected", required=True); p.add_argument("--reason", required=True); p.add_argument("--affected-authority"); p.add_argument("--fixture", action="store_true")
+     p = sub.add_parser("ingest-ci", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--evidence", required=True)
+     p = sub.add_parser("finish-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--result", choices=["PASS", "FAIL", "BLOCKED", "CANCELLED"], required=True)
+     p = sub.add_parser("validate-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--allow-partial", action="store_true")
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.ALTSFILE.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.ALTSFILE.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/blobs/C-4299be4a-eb68-42cc-97da-ec9f17c827d7.stderr.txt
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/blobs/C-4299be4a-eb68-42cc-97da-ec9f17c827d7.stdout.txt
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/blobs/C-8686016b-ff6f-4c54-8993-02cf91156b04.stderr.txt
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/blobs/C-8686016b-ff6f-4c54-8993-02cf91156b04.stdout.txt
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/blobs/C-8c4d2896-3311-4466-9419-ee91fc974a30.stderr.txt
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/blobs/C-8c4d2896-3311-4466-9419-ee91fc974a30.stdout.txt
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-ALTSFILE-R1/metadata.json
