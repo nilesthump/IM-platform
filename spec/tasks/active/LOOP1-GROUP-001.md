@@ -1,5 +1,12 @@
 ---
 
+## Current Human UI continuation (2026-10-24)
+
+Human continues the approved three-client group UI revision. Desktop local slice is implemented and tests/clients/group/verify.py passed (Recorder raw dce76f90, exit0, 3703ms; Web/wire/Desktop PASS). Sole writer /root/resume_backend/group_ui_desktop_prepare is closing this slice on task/LOOP1-GROUP-001-resume; next writer is the coordinator-assigned Android implementer. Preserve existing unknown-request targets and draft, hidden management sidebar and independent selection dialog. Next: Android UI, fresh independent reviews, then actual three-client screenshots. No push/merge/done; GROUP active/S2 OPEN. LKG/main remains 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e.
+
+The 2026-10-24 tail preserves original WIP bytes externally before restoring HEAD line endings; no semantic source change in this tail. Original Recorder remains finished partial FAIL; this direct tail is explicitly incomplete research capture, not acceptance. Original run/evidence and older stop statements below remain historical.
+
+
 ## Latest Human UI review stop point (2026-10-23)
 
 Human requests independent review, then actual group-page screenshots to explain desired layout. Immediate next action: coordinator delegates fresh UI Standards/Spec/Architect review of this frozen working-tree checkpoint, then shows Web/Desktop/Android raw screenshots; await Human layout direction. Full GROUP remains active and S2 OPEN. Do not guess redesign or continue new G06/G07 fixture work now.
@@ -475,3 +482,7 @@ Human supersedes the historical screenshot stop: all three clients need New chat
 Sole writer /root/resume_backend/group_ui_fix_r1 owns first Web slice only: existing Shell/ConversationList/GroupPanel/style and existing Web i18n resources plus necessary group tests. Desktop/Android follow serially. Local baseline tests/clients/group/verify.py PASS after recorded sandbox npm EPERM retry. Real Web/installed Windows/AVD5590 screenshots, fresh final-SHA regular and error reviews, hosted acceptance/main synchronization remain PENDING; GROUP active/S2 OPEN. Accepted LKG/main 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e. Recorder R-GROUP-UI-WEB-R1 is partial; external evidence group-ui-fix-r1/research. Next action: implement and verify Web slice, commit for serial continuation; no push/PR/merge.
 
 Web slice local implementation and existing group verification exit0; remaining UI interaction tests, three-end i18n alignment and real screenshots are pending. Recovery checkpoint: spec/progress/checkpoints/2026-10-23-group-web-ui-slice.md. All current uncommitted edits belong to group_ui_fix_r1; next action commit this slice and hand off serial continuation.
+
+Desktop UI serial slice: sole writer /root/resume_backend/group_ui_desktop_prepare from 917ddff; existing Desktop components/style/i18n/workspace and group tests only. No runtime/native/schema writes. Verification pending; Recorder R-GROUP-UI-DESKTOP-R1 partial.
+
+Desktop UI slice local verification: bundled Python -B tests/clients/group/verify.py exit0 (Web/Desktop compilation, Web/wire/Desktop behavior including active-group add staying open). Initial sandbox npm EPERM, locale comma syntax failure, and incorrect test add-response fixture failure preserved in external group-ui-desktop/research. Recorder partial; missing prospective prompt/startup/edit capture, no acceptance claim. Runtime installation/screenshots and fresh final-SHA reviews/CI/main sync remain PENDING. Next: serial Mobile implementation then native runtime owner verifies installed Desktop. LKG main 3d30872 remains unchanged.
