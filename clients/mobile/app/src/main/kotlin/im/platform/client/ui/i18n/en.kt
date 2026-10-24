@@ -271,5 +271,11 @@ val en:Map<String,String> = mapOf(
  "group.success" to "Group updated.",
  "group.failure" to "Group request failed.",
  "group.conflict" to "This request ID has different members.",
- "group.title" to "Group"
+ "group.title" to "Group",
+ "group.search" to "Search friends",
+ "group.selected" to "Selected",
+ "group.remove" to "Remove",
+ "group.confirm" to "Confirm",
+ "group.cancel" to "Cancel",
+ "group.friend" to "Add friend"
 )

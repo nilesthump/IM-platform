@@ -271,5 +271,11 @@ val zhCN:Map<String,String> = mapOf(
  "group.success" to "群聊已更新。",
  "group.failure" to "群聊请求失败。",
  "group.conflict" to "此请求编号对应不同成员。",
- "group.title" to "群聊"
+ "group.title" to "群聊",
+ "group.search" to "搜索好友",
+ "group.selected" to "已选择",
+ "group.remove" to "移除",
+ "group.confirm" to "确定",
+ "group.cancel" to "取消",
+ "group.friend" to "加好友"
 )

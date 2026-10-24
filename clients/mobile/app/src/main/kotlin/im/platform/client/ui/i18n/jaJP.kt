@@ -271,5 +271,11 @@ val jaJP:Map<String,String> = mapOf(
  "group.success" to "グループを更新しました。",
  "group.failure" to "グループのリクエストに失敗しました。",
  "group.conflict" to "このリクエストIDは別のメンバーに対応しています。",
- "group.title" to "グループ"
+ "group.title" to "グループ",
+ "group.search" to "友だちを検索",
+ "group.selected" to "選択済み",
+ "group.remove" to "削除",
+ "group.confirm" to "確定",
+ "group.cancel" to "キャンセル",
+ "group.friend" to "友だちを追加"
 )
