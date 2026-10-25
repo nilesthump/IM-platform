@@ -407,7 +407,24 @@ def cmd_run_command(args: argparse.Namespace, repo: Path, root: Path) -> int:
     append_event(root, args.run_id, "command_started", {"command_id": command_id, "argv": safe_argv,
                  "cwd": ".", "secret_redaction_applied": command_redacted})
     started = time.monotonic_ns()
-    result = subprocess.run(argv, cwd=repo, capture_output=True)
+    try:
+        result = subprocess.run(argv, cwd=repo, capture_output=True)
+    except OSError as exc:
+        # The command never executed; the stream must still record a finished
+        # observation so started/finished pairs stay balanced for validation.
+        duration_ms = (time.monotonic_ns() - started) / 1_000_000
+        message = f"command could not be started: {exc}"
+        safe_err, err_redacted = redact(message)
+        blob_dir = run_dir(root, args.run_id) / "blobs"
+        blob_dir.mkdir(exist_ok=True)
+        (blob_dir / f"{command_id}.stderr.txt").write_text(safe_err, encoding="utf-8", newline="\n")
+        append_event(root, args.run_id, "command_finished", {"command_id": command_id, "exit_code": 127,
+                     "duration_ms": duration_ms, "result": "FAIL",
+                     "stdout_sha256": sha256_bytes(b""), "stderr_sha256": sha256_bytes(message.encode("utf-8")),
+                     "stdout_blob": "", "stderr_blob": f"blobs/{command_id}.stderr.txt",
+                     "secret_redaction_applied": command_redacted or err_redacted})
+        print(f"ERROR: {message}", file=sys.stderr)
+        return 127
     duration_ms = (time.monotonic_ns() - started) / 1_000_000
     stdout_text = result.stdout.decode("utf-8", "replace")
     stderr_text = result.stderr.decode("utf-8", "replace")

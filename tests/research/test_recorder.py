@@ -159,6 +159,21 @@ Current Task State: active
         self.assertEqual(7, events[-1]["data"]["exit_code"])
         self.assertEqual("FAIL", events[-1]["data"]["result"])
 
+    def test_run_command_startup_failure_records_finished_event(self):
+        run_id = self.start()
+        missing = str(self.repo / "definitely-missing-executable-xyz")
+        result = self.cli("run-command", "--run-id", run_id, "--", missing)
+        self.assertEqual(127, result.returncode)
+        self.assertIn("could not be started", result.stderr)
+        events = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)
+        self.assertEqual(("command_started", "command_finished"),
+                         (events[-2]["event_type"], events[-1]["event_type"]))
+        self.assertEqual(127, events[-1]["data"]["exit_code"])
+        self.assertEqual("FAIL", events[-1]["data"]["result"])
+        self.assertEqual("", events[-1]["data"]["stdout_blob"])
+        blob = self.root / "runs" / run_id / events[-1]["data"]["stderr_blob"]
+        self.assertIn("could not be started", blob.read_text(encoding="utf-8"))
+
     def test_finish_captures_final_diff_duration_and_locks_history(self):
         run_id = self.start()
         self.write("change.txt", "change\n")
