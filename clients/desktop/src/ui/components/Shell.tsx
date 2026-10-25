@@ -27,7 +27,7 @@ function WorkspaceShell(){const t=useText();const display=useDisplayText();
   async function retryGroup(){await app.retryGroup();if(app.snapshot().groupStatus==='success')setPicker(null);}
   function showPicker(conversation?:string){if(s.groupStatus!=='unconfirmed')setPicker({conversation});setPickerVisible(true);setMenu(false);}
   useEffect(()=>{setManagement(false);},[s.selected]);
-  useEffect(()=>{if(!s.session){setPicker(null);setMenu(false);setManagement(false);}},[s.session]);
+  useEffect(()=>{if(!s.session){if(s.groupStatus!=='unconfirmed')setPicker(null);setMenu(false);setManagement(false);}},[s.session,s.groupStatus]);
   const [composerHeight,setComposerHeight]=useState(72),textarea=useRef<HTMLTextAreaElement>(null),resize=useRef<{y:number;height:number}|null>(null);
   useEffect(()=>{void app.start();},[]);
   useEffect(()=>{let active=true;const refresh=()=>{void windowMaximized().then(value=>{if(active)setMaximized(value);});};refresh();window.addEventListener("resize",refresh);return()=>{active=false;window.removeEventListener("resize",refresh);};},[]);
