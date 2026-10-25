@@ -360,6 +360,8 @@ def cmd_start_run(args: argparse.Namespace, repo: Path, root: Path) -> int:
         associated = prompt_meta.get("associated_run_id", "unavailable")
         if associated not in {"unavailable", run_id}:
             raise RecorderError(f"prompt is already associated with run {associated}")
+    if directory.exists():
+        raise RecorderError(f"run already exists: {run_id}")
     directory.mkdir(parents=True, exist_ok=False)
     metadata = {"recorder_schema_version": SCHEMA_VERSION, "run_id": run_id, "task_id": task_id,
                 "role": args.role, "parent_run_id": args.parent_run_id or "unavailable",

@@ -76,6 +76,14 @@ Current Task State: active
 
     def test_start_run_unique_and_schema(self):
         first = self.start()
+        duplicate = self.ns(role="review", capture_mode="prospective", experiment_group="unassigned",
+                            pre_recorder_work=False, run_id=first, task_id="TEST-001", prompt_id=None,
+                            parent_run_id=None, related_run_id=None, agent_harness="fixture", model_name="unavailable",
+                            fresh_context="unavailable", explicit_token_budget="unavailable", context_mode="unavailable",
+                            public_reasoning_mode="unavailable", baseline_id="unavailable", replicate_id="unavailable",
+                            mutation_id="unavailable", model_condition="unavailable", budget_condition="unavailable")
+        with self.assertRaisesRegex(recorder.RecorderError, f"run already exists: {first}"):
+            recorder.cmd_start_run(duplicate, self.repo, self.root)
         second_args = self.ns(role="review", capture_mode="prospective", experiment_group="unassigned",
                               pre_recorder_work=False, run_id=None, task_id="TEST-001", prompt_id=None,
                               parent_run_id=first, related_run_id=first, agent_harness="fixture", model_name="unavailable",
