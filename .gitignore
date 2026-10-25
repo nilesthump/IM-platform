@@ -1,0 +1,10 @@
+# Transient Research Recorder crash markers must never be committed;
+# a hard-killed writer can leave them behind (see .events.lock semantics
+# in tools/research/recorder.py append_event).
+research/runs/*/.events.lock
+
+# CPython bytecode caches are local build artifacts; committing them
+# (tests/research/__pycache__, tools/research/__pycache__) only pollutes
+# git status and can leak stale bytecode into evidence runs.
+__pycache__/
+*.py[cod]
