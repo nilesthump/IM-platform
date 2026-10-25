@@ -204,6 +204,14 @@ class PathMatrixTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assert_jobs(path, {"architecture", "source_go", "source_java"})
 
+    def test_domain_and_invariant_authority_cannot_skip_architecture(self):
+        # spec/domain and spec/invariants are authority-order level 3 documents
+        # (hashed by the Recorder authority snapshot); changes were zero-selected.
+        for path in ("spec/domain/messaging.md", "spec/domain/group.md",
+                     "spec/invariants/auth-user-friend.md", "spec/invariants/sync-plugin.md"):
+            with self.subTest(path=path):
+                self.assert_jobs(path, {"architecture", "source_go", "source_java"})
+
     def test_governance_deleted_and_renamed_paths_still_trigger(self):
         with tempfile.TemporaryDirectory() as temp:
             root = pathlib.Path(temp)
