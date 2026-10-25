@@ -169,8 +169,14 @@ def main():
             for user in (True, False):
                 path = "/v1/sync/user" if user else "/v1/sync/conversation"
                 position = "0" if user else 0
+                expected_total = 208 if user else 205
                 total, seen, kinds = 0, set(), set()
+                # The loop's only exit is the server's own hasMore, and every
+                # continuing page must carry progress, so total is strictly
+                # increasing: bound it to the known fixture total plus one full
+                # page, turning a fabricating server into a loud failure.
                 while True:
+                    require(total <= expected_total + 100, "Pagination exceeded expected total")
                     page = call(path, body(user, position), users[0][1])
                     items = page["events" if user else "messages"]
                     expected_keys = {"syncVersion", "type", "requestId", "hasMore"} | ({"events", "nextCursor"} if user else {"messages", "conversationId"})
@@ -192,7 +198,7 @@ def main():
                         total += 1
                     if not page["hasMore"]:
                         break
-                require(total == (208 if user else 205), "Total synchronization truncated")
+                require(total == expected_total, "Total synchronization truncated")
                 if user:
                     require(kinds == {"friend.changed","conversation.changed","membership.changed","plugin.changed"}, "Metadata projection differs")
                 terminal = body(user, position)

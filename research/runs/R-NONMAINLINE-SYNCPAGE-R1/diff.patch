@@ -1,0 +1,40 @@
+diff --git a/tools/verify_sync_runtime.py b/tools/verify_sync_runtime.py
+index 123e31a3..e4867f2c 100644
+--- a/tools/verify_sync_runtime.py
++++ b/tools/verify_sync_runtime.py
+@@ -169,8 +169,14 @@ def main():
+             for user in (True, False):
+                 path = "/v1/sync/user" if user else "/v1/sync/conversation"
+                 position = "0" if user else 0
++                expected_total = 208 if user else 205
+                 total, seen, kinds = 0, set(), set()
++                # The loop's only exit is the server's own hasMore, and every
++                # continuing page must carry progress, so total is strictly
++                # increasing: bound it to the known fixture total plus one full
++                # page, turning a fabricating server into a loud failure.
+                 while True:
++                    require(total <= expected_total + 100, "Pagination exceeded expected total")
+                     page = call(path, body(user, position), users[0][1])
+                     items = page["events" if user else "messages"]
+                     expected_keys = {"syncVersion", "type", "requestId", "hasMore"} | ({"events", "nextCursor"} if user else {"messages", "conversationId"})
+@@ -192,7 +198,7 @@ def main():
+                         total += 1
+                     if not page["hasMore"]:
+                         break
+-                require(total == (208 if user else 205), "Total synchronization truncated")
++                require(total == expected_total, "Total synchronization truncated")
+                 if user:
+                     require(kinds == {"friend.changed","conversation.changed","membership.changed","plugin.changed"}, "Metadata projection differs")
+                 terminal = body(user, position)
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.SYNCPAGE.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.SYNCPAGE.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-SYNCPAGE-R1/blobs/C-3ad7ad8f-d57d-450f-858d-b760bb900415.stderr.txt
+# ?? research/runs/R-NONMAINLINE-SYNCPAGE-R1/blobs/C-3ad7ad8f-d57d-450f-858d-b760bb900415.stdout.txt
+# ?? research/runs/R-NONMAINLINE-SYNCPAGE-R1/blobs/C-a8a45a20-2137-477d-bf5c-30922dd9a22a.stderr.txt
+# ?? research/runs/R-NONMAINLINE-SYNCPAGE-R1/blobs/C-a8a45a20-2137-477d-bf5c-30922dd9a22a.stdout.txt
+# ?? research/runs/R-NONMAINLINE-SYNCPAGE-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-SYNCPAGE-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-SYNCPAGE-R1/metadata.json
+# ?? tools/__pycache__/verify_sync_runtime.cpython-313.pyc
