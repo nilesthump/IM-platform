@@ -133,8 +133,18 @@ def main():
                 INSERT INTO user_sync_events(user_id,event_type,payload) VALUES('{users[0][0]}','session.revoked','{{}}');
                 END $$;""")
             ws = harness.WS(context, port)
-            ws.send(harness.frame("auth.bind", {"accessToken": users[0][1]}))
-            require(ws.read()["payload"]["status"] == "bound", "WSS authentication failed")
+            # The bind acknowledgment is correlated like every other frame in
+            # this file; an unsolicited bound-looking frame is not evidence of
+            # an authenticated socket.
+            bind = harness.frame("auth.bind", {"accessToken": users[0][1]})
+            ws.send(bind)
+            for _ in range(10):
+                ack = ws.read()
+                if ack["type"] == "auth.ack" and ack["requestId"] == bind["requestId"]:
+                    require(ack["payload"]["status"] == "bound", "WSS authentication failed")
+                    break
+            else:
+                raise AssertionError("Bind acknowledgment missing")
             for i in range(205):
                 frame = harness.frame("message.send", {"conversationId": conversation, "content": {"kind": "TEXT", "text": "sync " + str(i)}})
                 ws.send(frame)
