@@ -31,7 +31,7 @@ EXPERIMENT_GROUPS = {"vanilla", "spec_only", "full_governance", "unassigned"}
 SECRET_PATTERNS = [
     re.compile(r"(?i)(authorization\s*:\s*(?:bearer\s+)?)[^\s]+"),
     re.compile(r"(?i)\b(api[_-]?key|password|passwd|secret|access[_-]?token|refresh[_-]?token)\b\s*[:=]\s*[^\s,;]+"),
-    re.compile(r"\b(?:ghp|github_pat|sk)-[A-Za-z0-9_-]{12,}\b"),
+    re.compile(r"\b(?:ghp|gho|ghu|ghs|ghr|github_pat|sk|glpat)[-_][A-Za-z0-9_-]{12,}\b"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 ]
 SENSITIVE_KEY_NAMES = {

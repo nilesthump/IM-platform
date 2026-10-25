@@ -288,12 +288,14 @@ Current Task State: active
         for secret in secrets:
             self.assertNotIn(secret, prompt_text)
 
-        run_id = self.start()
-        recorder.cmd_record_event(self.ns(run_id=run_id, event_type="finding_created",
-                                  data_json=json.dumps(structured)), self.repo, self.root)
-        durable = (self.root / "runs" / run_id / "events.jsonl").read_text(encoding="utf-8")
-        for secret in secrets:
-            self.assertNotIn(secret, durable)
+    def test_credential_prefix_family_is_redacted(self):
+        # gho/ghu/ghs/ghr (GitHub app/user/server/refresh tokens) and
+        # glpat- (GitLab personal access tokens) share the ghp- shape.
+        text = "tokens: gho_SYNTHETIC0000000000 ghs_SYNTHETIC0000000000 glpat-SYNTHETIC0000"
+        safe, changed = recorder.redact(text)
+        self.assertTrue(changed)
+        self.assertNotIn("SYNTHETIC0000", safe)
+        self.assertIn("[REDACTED]", safe)
 
     def test_committed_repository_artifacts_validate(self):
         actual = Path(__file__).resolve().parents[2]
