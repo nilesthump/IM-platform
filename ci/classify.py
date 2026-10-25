@@ -70,6 +70,12 @@ def classify(paths):
             selected.update(JOBS)
         elif (parts[0] == "deploy" or parts[:2] == ["tests", "infrastructure"]):
             selected.add("deploy")
+        elif path == "tools/verify_sync_transport.py":
+            # Executed by the shared job's contract verification step.
+            selected.add("shared")
+        elif path == "tools/verify_sync_runtime.py":
+            # Executed by the deploy job against the real Compose TLS runtime.
+            selected.add("deploy")
     return {job: job in selected for job in JOBS}
 
 
