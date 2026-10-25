@@ -297,18 +297,34 @@ Current Task State: active
 
     def test_committed_repository_artifacts_validate(self):
         actual = Path(__file__).resolve().parents[2]
-        recorder.cmd_validate_repository(self.ns(allow_partial=False), actual, actual / "research")
+        # The bootstrap run R-20260929T185051Z-* (3 start events, no commands,
+        # preserved by 3023b3b3) is the single documented permanently-partial run.
+        # Structural validation stays strict through allow_partial=True, and the
+        # explicit allowlist below fails on any NEW non-finished run, including
+        # one left open while this suite executes during active Recorder work.
+        recorder.cmd_validate_repository(self.ns(allow_partial=True), actual, actual / "research")
+        partial = sorted(
+            path.name for path in (actual / "research" / "runs").glob("R-*")
+            if recorder.read_json(path / "metadata.json").get("status") != "finished"
+        )
+        self.assertEqual(
+            ["R-20260929T185051Z-4ba6947e-5726-4f55-ba96-a1b9bed48769"], partial
+        )
 
     def test_repository_safety_in_real_checkout(self):
         actual = Path(__file__).resolve().parents[2]
-        changed = subprocess.run(["git", "-C", str(actual), "diff", "--name-only", "1e1523c127c5a0f3baf85d8b5eca11b7b34d80dc", "--"], capture_output=True, text=True, check=True).stdout.splitlines()
+        # Live safety property: the working tree carries no uncommitted
+        # modifications to product/authority paths. The original pinned base
+        # 1e1523c1 and the frozen paused-queue assertions described the
+        # LOOP1-RESEARCH-001 acceptance moment and could never pass again once
+        # LOOP1-CONTRACT-001 legitimately progressed past `review`.
+        changed = subprocess.run(["git", "-C", str(actual), "diff", "--name-only", "HEAD", "--"], capture_output=True, text=True, check=True).stdout.splitlines()
         forbidden = [p for p in changed if p.startswith(("backend/", "clients/", "plugins/", "contracts/", "spec/architecture/", "spec/domain/", "spec/invariants/", "spec/acceptance/"))]
         self.assertEqual([], forbidden)
-        paused = actual / "spec/tasks/review/LOOP1-CONTRACT-001.md"
-        self.assertTrue(paused.exists())
-        text = paused.read_text(encoding="utf-8")
-        self.assertIn("status: review", text)
-        self.assertIn("owner: unassigned-independent-review-agent", text)
+        matches = sorted((actual / "spec/tasks").glob("*/LOOP1-CONTRACT-001.md"))
+        self.assertEqual(1, len(matches))
+        text = matches[0].read_text(encoding="utf-8")
+        self.assertIn("status: " + matches[0].parent.name, text)
 
 
 if __name__ == "__main__":

@@ -44,6 +44,10 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python3 -m unittest discover -s tests/ci -v
+      - name: Test Research Recorder regression suite
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -m unittest discover -s tests/research -v
       - name: Classify full diff, including deletions
         id: paths
         env:
