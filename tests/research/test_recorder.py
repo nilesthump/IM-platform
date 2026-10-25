@@ -115,6 +115,17 @@ Current Task State: active
         with self.assertRaisesRegex(recorder.RecorderError, "prompt content hash mismatch"):
             recorder.cmd_validate_repository(self.ns(allow_partial=False), self.repo, self.root)
 
+    def test_repository_scan_reports_missing_artifacts_as_failures(self):
+        prompt_id = self.prompt("stable prompt\n")
+        run_id = self.start(prompt_id=prompt_id)
+        recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
+        (self.root / "prompts" / prompt_id / "prompt.txt").unlink()
+        (self.root / "runs" / run_id / "initial_state.json").unlink()
+        with self.assertRaisesRegex(recorder.RecorderError, prompt_id):
+            recorder.cmd_validate_repository(self.ns(allow_partial=False), self.repo, self.root)
+        with self.assertRaisesRegex(recorder.RecorderError, "finished run missing initial_state.json"):
+            recorder.cmd_validate_run(self.ns(run_id=run_id, allow_partial=False), self.repo, self.root)
+
     def test_git_capture_dirty_without_modification(self):
         self.write("dirty.txt", "unchanged by capture")
         before = (self.repo / "dirty.txt").read_bytes()

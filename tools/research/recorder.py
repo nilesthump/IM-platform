@@ -537,7 +537,7 @@ def validate_run(root: Path, run_id: str, require_finished: bool = True) -> dict
     if not records or records[0]["event_type"] != "run_started":
         raise RecorderError("run has no valid run_started event")
     if metadata["status"] == "finished":
-        for name in ("final_state.json", "diff.patch", "summary.json"):
+        for name in ("initial_state.json", "final_state.json", "diff.patch", "summary.json"):
             if not (directory / name).exists():
                 raise RecorderError(f"finished run missing {name}")
         if records[-1]["event_type"] != "run_finished":
@@ -567,7 +567,7 @@ def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) ->
     for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
         try:
             validate_run(root, directory.name, not args.allow_partial)
-        except RecorderError as exc:
+        except (RecorderError, OSError) as exc:
             failures.append(f"{directory.name}: {exc}")
     prompt_metadata: dict[str, dict] = {}
     for directory in sorted((root / "prompts").glob("P-*")) if (root / "prompts").exists() else []:
@@ -584,7 +584,7 @@ def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) ->
                 if run_metadata.get("prompt_id") != prompt_id:
                     raise RecorderError("prompt/run cross-link mismatch")
             prompt_metadata[prompt_id] = metadata
-        except RecorderError as exc:
+        except (RecorderError, OSError) as exc:
             failures.append(f"{directory.name}: {exc}")
     for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
         try:
@@ -594,7 +594,7 @@ def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) ->
                 prompt = prompt_metadata.get(prompt_id)
                 if prompt is None or prompt.get("associated_run_id") != directory.name:
                     raise RecorderError("run/prompt cross-link mismatch")
-        except RecorderError as exc:
+        except (RecorderError, OSError) as exc:
             failures.append(f"{directory.name}: {exc}")
     epoch = root / "INSTRUMENTATION_EPOCH.json"
     if epoch.exists():
