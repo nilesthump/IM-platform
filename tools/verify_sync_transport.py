@@ -99,7 +99,9 @@ def check_error(kind, request, status, error):
 def structural_lint(doc, node=None):
     node = node or shutil.which("node")
     require(bool(node), "Node required for existing official OAI structural lint")
-    result = subprocess.run([node, str(ROOT / "contracts/http/check-openapi-3.1.js")], input=json.dumps(doc).encode(), capture_output=True)
+    # Bounded like every other wait in the sync verification stack; a wedged
+    # lint child must fail the verifier instead of blocking it forever.
+    result = subprocess.run([node, str(ROOT / "contracts/http/check-openapi-3.1.js")], input=json.dumps(doc).encode(), capture_output=True, timeout=120)
     require(result.returncode == 0, result.stderr.decode(errors="replace"))
 
 def main():
