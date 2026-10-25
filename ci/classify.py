@@ -55,6 +55,9 @@ def classify(paths):
             selected.update(FULL_COMPATIBILITY)
         elif parts[:2] in (["tests", "go"], ["tests", "e2e"]):
             selected.update({"go", "deploy", "architecture", "source_go"})
+        elif parts[:2] == ["tests", "contract"]:
+            # The shared job is the only CI consumer of the contract suites.
+            selected.add("shared")
         elif parts[:2] == ["backend", "go"]:
             selected.update({"go", "architecture", "source_go"})
         elif parts[:2] == ["backend", "java"]:
