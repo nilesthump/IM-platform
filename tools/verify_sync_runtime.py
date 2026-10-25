@@ -94,11 +94,18 @@ def main():
                     time.sleep(.5)
             else:
                 raise RuntimeError("Verified TLS Gateway unavailable")
+            # The property under test is that the deployment CA is absent from
+            # the default trust store, and only a no-trusted-issuer chain
+            # failure proves it (codes 2/18/19/20/21). Any other generic TLS
+            # failure - name mismatch (62/64), expired or malformed certs -
+            # would pass the control vacuously, so fail closed on every other
+            # code; the canonical harness rejects only 62/64 in its probe.
             try:
                 with socket.create_connection(("localhost", port), timeout=5) as raw:
                     ssl.create_default_context().wrap_socket(raw, server_hostname="localhost")
-            except ssl.SSLCertVerificationError:
-                pass
+            except ssl.SSLCertVerificationError as error:
+                require(error.verify_code in (2, 18, 19, 20, 21),
+                        "Untrusted-CA probe failed for wrong reason (verify_code " + str(error.verify_code) + ")")
             else:
                 raise AssertionError("Untrusted CA accepted")
             users = []
