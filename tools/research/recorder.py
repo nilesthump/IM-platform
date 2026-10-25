@@ -445,6 +445,12 @@ def cmd_human_decision(args: argparse.Namespace, repo: Path, root: Path) -> int:
     alternatives = json.loads(args.alternatives_json)
     if not isinstance(alternatives, list) or not alternatives:
         raise RecorderError("alternatives must be a non-empty JSON list")
+    if not all(isinstance(item, str) and item for item in alternatives):
+        raise RecorderError("alternatives must be non-empty strings")
+    if args.selected not in alternatives:
+        # A decision outside the presented alternatives is a recording error,
+        # not a judgment call the recorder may reinterpret.
+        raise RecorderError(f"selected {args.selected!r} is not one of the recorded alternatives")
     data = {"decision_id": args.decision_id or f"HD-{uuid.uuid4()}", "question": args.question,
             "alternatives": alternatives, "selected": args.selected, "reason": args.reason,
             "affected_authority": args.affected_authority or "unavailable", "human_actor": True,

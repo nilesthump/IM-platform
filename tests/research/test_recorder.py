@@ -206,6 +206,15 @@ Current Task State: active
         self.assertTrue(event["data"]["human_actor"])
         self.assertTrue(event["data"]["fixture"])
 
+    def test_human_decision_rejects_selection_outside_alternatives(self):
+        run_id = self.start(role="human")
+        args = self.ns(run_id=run_id, decision_id=None, question="choose", alternatives_json='["A","B"]',
+                       selected="C", reason="typo", affected_authority=None, fixture=True)
+        before = (self.root / "runs" / run_id / "events.jsonl").read_bytes()
+        with self.assertRaisesRegex(recorder.RecorderError, "not one of the recorded alternatives"):
+            recorder.cmd_human_decision(args, self.repo, self.root)
+        self.assertEqual(before, (self.root / "runs" / run_id / "events.jsonl").read_bytes())
+
     def test_backfill_marks_unknowns_unavailable(self):
         recorder.cmd_backfill(self.ns(task_id="TEST-001"), self.repo, self.root)
         value = recorder.read_json(self.root / "backfill" / "TEST-001.json")
