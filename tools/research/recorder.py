@@ -159,7 +159,10 @@ def research_root(repo: Path, explicit: str | None) -> Path:
 
 
 def git(repo: Path, *args: str, binary: bool = False) -> str | bytes:
-    result = subprocess.run(["git", "-C", str(repo), "-c", "core.excludesFile=.git/info/exclude", *args], capture_output=True)
+    # core.quotePath=false keeps non-ASCII paths as literal UTF-8 instead of
+    # quoted octal escapes, so captured status/diff evidence stays decodable.
+    result = subprocess.run(["git", "-C", str(repo), "-c", "core.excludesFile=.git/info/exclude",
+                             "-c", "core.quotePath=false", *args], capture_output=True)
     if result.returncode != 0:
         raise RecorderError(f"git {' '.join(args)} failed ({result.returncode}): {result.stderr.decode('utf-8', 'replace').strip()}")
     return result.stdout if binary else result.stdout.decode("utf-8", "replace")
