@@ -33,13 +33,14 @@ def main():
     if canonical.read_bytes()!=asset.read_bytes(): raise RuntimeError("Android fixture differs from canonical input")
     if (ROOT/"tests/clients/sqlite/v1.sql").read_bytes()!=(ROOT/"clients/mobile/app/src/androidTest/assets/v1.sql").read_bytes(): raise RuntimeError("Android migration fixture differs from retained old layout")
     mobile=ROOT/"clients/mobile"
+    # Fail before the multi-minute Gradle build, matching the send/sync verifiers.
+    if not args.serial: raise RuntimeError("Explicit real emulator serial required")
+    serial=args.serial
+    if not serial.startswith("emulator-"): raise RuntimeError("Acceptance requires Android emulator")
     wrapper=Path(os.environ.get("IM_CLIENT_GRADLE",mobile/("gradlew.bat" if os.name=="nt" else "gradlew")))
     if os.name!="nt": run(["chmod","+x",wrapper])
     run([wrapper,"--no-daemon","assembleDebug","assembleDebugAndroidTest"],mobile)
     adb=os.environ.get("IM_CLIENT_ADB","adb")
-    if not args.serial: raise RuntimeError("Explicit real emulator serial required")
-    serial=args.serial
-    if not serial.startswith("emulator-"): raise RuntimeError("Acceptance requires Android emulator")
     devices=subprocess.check_output([adb,"devices"],text=True)
     if serial+"\tdevice" not in devices: raise RuntimeError("Emulator unavailable or unauthorized")
     def shell(*argv):
