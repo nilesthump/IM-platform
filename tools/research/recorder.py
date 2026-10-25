@@ -73,6 +73,8 @@ def portable_text_sha256(path: Path) -> str:
 def read_json(path: Path) -> dict:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise RecorderError(f"missing JSON artifact: {path}") from exc
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise RecorderError(f"invalid JSON at {path}: {exc}") from exc
     if not isinstance(value, dict):

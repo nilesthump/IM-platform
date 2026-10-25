@@ -127,6 +127,11 @@ Current Task State: active
     def test_event_append_seq_hash_and_duplicate_rejected(self):
         run_id = self.start()
         recorder.append_event(self.root, run_id, "finding_created", {"finding": "x"})
+        with self.assertRaisesRegex(recorder.RecorderError, "missing JSON artifact"):
+            recorder.read_json(self.root / "runs" / run_id / "summary.json")
+        (self.root / "runs" / run_id / "metadata.json").write_text("{broken", encoding="utf-8")
+        with self.assertRaisesRegex(recorder.RecorderError, "invalid JSON at"):
+            recorder.read_json(self.root / "runs" / run_id / "metadata.json")
         records = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)
         self.assertEqual(list(range(1, len(records) + 1)), [e["seq"] for e in records])
         records[-1]["seq"] = records[-2]["seq"]
