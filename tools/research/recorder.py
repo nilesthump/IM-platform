@@ -312,7 +312,12 @@ def append_event(root: Path, run_id: str, event_type: str, data: dict, *, allow_
 
 def cmd_register_prompt(args: argparse.Namespace, repo: Path, root: Path) -> int:
     if args.file:
-        content = Path(args.file).read_text(encoding="utf-8")
+        try:
+            # utf-8-sig accepts prompt files written with or without a BOM;
+            # Windows PowerShell 5.1 Set-Content -Encoding utf8 always writes one.
+            content = Path(args.file).read_text(encoding="utf-8-sig")
+        except OSError as exc:
+            raise RecorderError(f"cannot read --file {args.file}: {exc}") from exc
     elif args.stdin_base64:
         content = base64.b64decode(sys.stdin.buffer.read(), validate=True).decode("utf-8")
     else:

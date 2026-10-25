@@ -106,6 +106,17 @@ Current Task State: active
         recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
         recorder.cmd_validate_repository(self.ns(allow_partial=False), self.repo, self.root)
 
+    def test_register_prompt_accepts_bom_file(self):
+        source = self.repo / "prompt-input-bom.txt"
+        source.write_bytes(b"\xef\xbb\xbfBOM prompt\r\nsecond line\r\n")
+        recorder.cmd_register_prompt(self.ns(file=str(source), prompt_id=None, task_id="TEST-001",
+                                     source="human", template_version=None, run_id=None), self.repo, self.root)
+        prompt_id = next((self.root / "prompts").iterdir()).name
+        prompt_path = self.root / "prompts" / prompt_id / "prompt.txt"
+        self.assertEqual(b"BOM prompt\nsecond line\n", prompt_path.read_bytes())
+        meta = recorder.read_json(self.root / "prompts" / prompt_id / "metadata.json")
+        self.assertEqual(recorder.sha256_bytes(prompt_path.read_bytes()), meta["prompt_sha256"])
+
     def test_prompt_registry_rejects_hash_and_cross_link_tampering(self):
         prompt_id = self.prompt("stable prompt\n")
         run_id = self.start(prompt_id=prompt_id)
