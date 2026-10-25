@@ -260,5 +260,22 @@ class ClientStoragePaths(unittest.TestCase):
                 self.assertTrue(matrix[job],(path,job))
 
 
+class ClientSyncPaths(unittest.TestCase):
+    def test_sync_runner_selects_actual_runtimes(self):
+        # tools/verify_client_sync.py is executed by the desktop, mobile and
+        # shared jobs exactly like its sqlite/send siblings.
+        matrix = classify_module.classify(["tools/verify_client_sync.py"])
+        for job in ("architecture", "desktop", "mobile", "shared", "compatibility"):
+            self.assertTrue(matrix[job], job)
+
+    def test_sync_suite_selects_actual_runtimes_and_deploy(self):
+        # tests/clients/sync feeds desktop/mobile/shared verifiers and
+        # go_smoke.py also runs directly inside the deploy job.
+        for path in ("tests/clients/sync/tls_fixture.py", "tests/clients/sync/go_smoke.py"):
+            matrix = classify_module.classify([path])
+            for job in ("architecture", "desktop", "mobile", "shared", "compatibility", "deploy"):
+                self.assertTrue(matrix[job], (path, job))
+
+
 if __name__ == "__main__":
     unittest.main()
