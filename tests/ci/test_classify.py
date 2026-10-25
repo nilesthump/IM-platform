@@ -27,6 +27,20 @@ class PathMatrixTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assert_jobs(path, job if isinstance(job, set) else {job})
 
+    def test_web_suite_selects_web_and_compatibility(self):
+        # The web job discovers tests/clients/web and the compatibility job
+        # re-runs tests/clients/web/verify.py; suite-only changes were zero-selected.
+        for path in ("tests/clients/web/verify.py", "tests/clients/web/regressions.mjs",
+                     "tests/clients/web/test_verifier.py"):
+            self.assert_jobs(path, {"web", "compatibility"})
+
+    def test_gui_suite_selects_desktop_and_mobile(self):
+        # gui/auth.mjs runs in the desktop job and gui/android.py in mobile;
+        # suite-only changes were previously zero-selected.
+        for path in ("tests/clients/gui/auth.mjs", "tests/clients/gui/android.py",
+                     "tests/clients/gui/native.py"):
+            self.assert_jobs(path, {"desktop", "mobile"})
+
     def test_shared_changes_fan_out_to_full_compatibility(self):
         for path in (
             "contracts/http/api.json",
