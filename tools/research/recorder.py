@@ -564,13 +564,15 @@ def cmd_validate_run(args: argparse.Namespace, repo: Path, root: Path) -> int:
 
 def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) -> int:
     failures = []
-    for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
+    runs = sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []
+    prompts = sorted((root / "prompts").glob("P-*")) if (root / "prompts").exists() else []
+    for directory in runs:
         try:
             validate_run(root, directory.name, not args.allow_partial)
         except RecorderError as exc:
             failures.append(f"{directory.name}: {exc}")
     prompt_metadata: dict[str, dict] = {}
-    for directory in sorted((root / "prompts").glob("P-*")) if (root / "prompts").exists() else []:
+    for directory in prompts:
         try:
             metadata = read_json(directory / "metadata.json")
             prompt_id = directory.name
@@ -586,7 +588,7 @@ def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) ->
             prompt_metadata[prompt_id] = metadata
         except RecorderError as exc:
             failures.append(f"{directory.name}: {exc}")
-    for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
+    for directory in runs:
         try:
             metadata = read_json(directory / "metadata.json")
             prompt_id = metadata.get("prompt_id", "unavailable")
@@ -602,6 +604,10 @@ def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) ->
         required = {"timestamp", "recorder_schema_version", "accepted_recorder_commit_sha", "recorder_task_id", "acceptance_evidence", "prospective_trace_start"}
         if missing := required - set(value):
             failures.append(f"Instrumentation Epoch missing {sorted(missing)}")
+    if getattr(args, "json", False):
+        value = {"result": "FAIL", "failures": failures} if failures else {"result": "PASS", "runs": len(runs), "prompts": len(prompts)}
+        print(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2))
+        return 1 if failures else 0
     if failures:
         raise RecorderError("repository validation failed: " + "; ".join(failures))
     print("PASS: Research Recorder repository artifacts validated.")
@@ -640,7 +646,7 @@ def parser() -> argparse.ArgumentParser:
     p = sub.add_parser("ingest-ci", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--evidence", required=True)
     p = sub.add_parser("finish-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--result", choices=["PASS", "FAIL", "BLOCKED", "CANCELLED"], required=True)
     p = sub.add_parser("validate-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--allow-partial", action="store_true")
-    p = sub.add_parser("validate-repository", parents=[common]); p.add_argument("--allow-partial", action="store_true")
+    p = sub.add_parser("validate-repository", parents=[common]); p.add_argument("--allow-partial", action="store_true"); p.add_argument("--json", action="store_true")
     p = sub.add_parser("backfill", parents=[common]); p.add_argument("--task-id", required=True)
     return top
 
