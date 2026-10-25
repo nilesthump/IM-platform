@@ -226,6 +226,19 @@ Current Task State: active
         self.assertEqual("ci_finished", event["event_type"])
         self.assertEqual("FAIL", event["data"]["result"])
 
+    def test_ci_ingestion_accepts_bom_evidence_file(self):
+        run_id = self.start(role="ci")
+        evidence_path = self.repo / "ci-evidence-bom.json"
+        evidence = {"provider": "fixture", "ci_run_id": "fixture-1", "commit_sha": "0" * 40,
+                    "job_name": "fixture", "result": "PASS", "failed_checks": [],
+                    "duration_ms": 12, "evidence_reference": "fixture://ci/1"}
+        evidence_path.write_text(json.dumps(evidence), encoding="utf-8-sig")
+        recorder.cmd_ingest_ci(self.ns(run_id=run_id, evidence=str(evidence_path)), self.repo, self.root)
+        event = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)[-1]
+        self.assertEqual("ci_finished", event["event_type"])
+        self.assertEqual("PASS", event["data"]["result"])
+        self.assertEqual("fixture://ci/1", event["data"]["evidence_reference"])
+
     def test_ci_ingestion_rejects_extra_secret_fields_without_persisting(self):
         run_id = self.start(role="ci")
         evidence_path = self.repo / "ci-secret-evidence.json"

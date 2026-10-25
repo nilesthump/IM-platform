@@ -458,7 +458,15 @@ def cmd_human_decision(args: argparse.Namespace, repo: Path, root: Path) -> int:
 
 
 def cmd_ingest_ci(args: argparse.Namespace, repo: Path, root: Path) -> int:
-    evidence = read_json(Path(args.evidence))
+    evidence_path = Path(args.evidence)
+    try:
+        # utf-8-sig accepts evidence written with or without a BOM;
+        # Windows PowerShell 5.1 Set-Content -Encoding utf8 always writes one.
+        evidence = json.loads(evidence_path.read_text(encoding="utf-8-sig"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise RecorderError(f"invalid CI evidence at {evidence_path}: {exc}") from exc
+    if not isinstance(evidence, dict):
+        raise RecorderError(f"expected CI evidence JSON object at {evidence_path}")
     missing = CI_EVIDENCE_FIELDS - set(evidence)
     extra = set(evidence) - CI_EVIDENCE_FIELDS
     valid_types = (
