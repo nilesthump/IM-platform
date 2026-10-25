@@ -45,4 +45,6 @@ Hidden chain-of-thought, private reasoning traces, platform-internal prompts, an
 
 Each run uses `runs/<run_id>/metadata.json`, `events.jsonl`, `initial_state.json`, `final_state.json`, `diff.patch`, `summary.json`, and optional redacted `blobs/`. JSON and JSONL are the stable export formats. Join runs by `run_id`, `task_id`, `parent_run_id`, and `related_run_id`; group experiments by `experiment_group`, with optional future `baseline_id`, `replicate_id`, `mutation_id`, `model_condition`, and `budget_condition` fields.
 
+Two read-only query commands serve this without mutating artifacts: `list-runs` enumerates run directories with `--task-id/--role/--capture-mode/--status/--result` filters and a `--json` form; `run-stats` aggregates the same selection into status/role/capture-mode/result tallies, event totals, and duration sums. Both report unreadable run directories as explicit warnings (and `errors` entries in JSON) instead of skipping them silently; correctness gating remains `validate-repository`'s job.
+
 Research evidence and product acceptance evidence remain distinct. Recorder validation is not Task PASS; Task PASS is not Stage Gate PASS. Agents must expose Recorder failures, must not silently skip instrumentation, and must not edit evidence to make their own run pass.

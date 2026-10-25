@@ -626,6 +626,104 @@ def cmd_backfill(args: argparse.Namespace, repo: Path, root: Path) -> int:
     return 0
 
 
+QUERY_FILTERS = ("task_id", "role", "capture_mode", "status", "result")
+
+
+def load_runs(root: Path) -> tuple[list[dict], list[dict]]:
+    """Tolerant read-only view of every run directory: state, not a gate.
+
+    Rows carry only what metadata/summary.json/events.jsonl line counts state;
+    unreadable or inconsistent run directories are returned in errors and never
+    silently skipped. Correctness gating remains validate-repository's job.
+    """
+    runs, errors = [], []
+    for directory in sorted((root / "runs").glob("R-*")) if (root / "runs").exists() else []:
+        try:
+            metadata = read_json(directory / "metadata.json")
+            if metadata.get("run_id") != directory.name:
+                raise RecorderError("run_id does not match directory")
+            summary_path = directory / "summary.json"
+            summary = read_json(summary_path) if summary_path.exists() else {}
+            events = directory / "events.jsonl"
+            event_count = None
+            if events.exists():
+                with events.open(encoding="utf-8") as stream:
+                    event_count = sum(1 for _ in stream)
+            runs.append({"run_id": directory.name, "task_id": metadata.get("task_id"),
+                         "role": metadata.get("role"), "capture_mode": metadata.get("capture_mode"),
+                         "status": metadata.get("status"), "result": summary.get("result"),
+                         "started_at": metadata.get("started_at"), "finished_at": metadata.get("finished_at"),
+                         "duration_ms": metadata.get("duration_ms"), "event_count": event_count,
+                         "prompt_id": metadata.get("prompt_id", "unavailable"),
+                         "agent_harness": metadata.get("agent_harness", "unavailable"),
+                         "model_name": metadata.get("model_name", "unavailable")})
+        except (RecorderError, OSError, ValueError, json.JSONDecodeError) as exc:
+            errors.append({"run": directory.name, "error": str(exc)})
+    return runs, errors
+
+
+def filter_runs(runs: list[dict], args: argparse.Namespace) -> list[dict]:
+    for field in QUERY_FILTERS:
+        value = getattr(args, field)
+        if value is not None:
+            runs = [run for run in runs if (run[field] if run[field] is not None else "unavailable") == value]
+    return runs
+
+
+def cmd_list_runs(args: argparse.Namespace, repo: Path, root: Path) -> int:
+    discovered, errors = load_runs(root)
+    runs = filter_runs(discovered, args)
+    for error in errors:
+        print(f"warning: run {error['run']}: {error['error']}", file=sys.stderr)
+    if args.json:
+        print(json.dumps({"runs": runs, "errors": errors, "total_discovered": len(discovered),
+                          "matched": len(runs)}, ensure_ascii=False, sort_keys=True, indent=2))
+        return 0
+    header = ("RUN_ID", "TASK_ID", "ROLE", "STATUS", "RESULT", "CAPTURE_MODE", "EVENTS")
+    rows = [[run["run_id"], run["task_id"] or "unavailable", run["role"] or "unavailable",
+             run["status"] or "unavailable", run["result"] or "unavailable",
+             run["capture_mode"] or "unavailable",
+             "unavailable" if run["event_count"] is None else str(run["event_count"])] for run in runs]
+    widths = [max(len(row[column]) for row in ([header] + rows)) for column in range(len(header))]
+    for row in [header] + rows:
+        print("  ".join(cell.ljust(width) for cell, width in zip(row, widths)).rstrip())
+    print(f"# matched {len(runs)} of {len(discovered)} run directories; {len(errors)} read error(s) reported as warnings")
+    return 0
+
+
+def cmd_run_stats(args: argparse.Namespace, repo: Path, root: Path) -> int:
+    discovered, errors = load_runs(root)
+    runs = filter_runs(discovered, args)
+    for error in errors:
+        print(f"warning: run {error['run']}: {error['error']}", file=sys.stderr)
+
+    def tally(field):
+        counts: dict[str, int] = {}
+        for run in runs:
+            value = run[field] if run[field] is not None else "unavailable"
+            counts[value] = counts.get(value, 0) + 1
+        return dict(sorted(counts.items()))
+
+    durations = [run["duration_ms"] for run in runs if isinstance(run["duration_ms"], (int, float))]
+    event_counts = [run["event_count"] for run in runs if isinstance(run["event_count"], int)]
+    stats = {"matched": len(runs), "total_discovered": len(discovered), "read_errors": len(errors),
+             "by_status": tally("status"), "by_capture_mode": tally("capture_mode"),
+             "by_role": tally("role"), "by_result": tally("result"),
+             "events_total": sum(event_counts),
+             "duration_ms_total": sum(durations),
+             "duration_ms_mean": round(sum(durations) / len(durations), 3) if durations else None}
+    if args.json:
+        print(json.dumps(stats, ensure_ascii=False, sort_keys=True, indent=2))
+        return 0
+    print(f"# stats over {stats['matched']} matched of {stats['total_discovered']} run directories; {stats['read_errors']} read error(s) reported as warnings")
+    for field in ("by_status", "by_capture_mode", "by_role", "by_result"):
+        print(field + ": " + json.dumps(stats[field], ensure_ascii=False, sort_keys=True))
+    print(f"events_total: {stats['events_total']}")
+    print(f"duration_ms_total: {stats['duration_ms_total']}")
+    print(f"duration_ms_mean: {stats['duration_ms_mean']}")
+    return 0
+
+
 def parser() -> argparse.ArgumentParser:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--repo")
@@ -642,6 +740,11 @@ def parser() -> argparse.ArgumentParser:
     p = sub.add_parser("validate-run", parents=[common]); p.add_argument("--run-id", required=True); p.add_argument("--allow-partial", action="store_true")
     p = sub.add_parser("validate-repository", parents=[common]); p.add_argument("--allow-partial", action="store_true")
     p = sub.add_parser("backfill", parents=[common]); p.add_argument("--task-id", required=True)
+    for name in ("list-runs", "run-stats"):
+        p = sub.add_parser(name, parents=[common])
+        for flag in QUERY_FILTERS:
+            p.add_argument("--" + flag.replace("_", "-"))
+        p.add_argument("--json", action="store_true")
     return top
 
 
@@ -654,7 +757,8 @@ def main(argv: list[str] | None = None) -> int:
         commands = {"register-prompt": cmd_register_prompt, "start-run": cmd_start_run, "run-command": cmd_run_command,
                     "record-event": cmd_record_event, "record-human-decision": cmd_human_decision, "ingest-ci": cmd_ingest_ci,
                     "finish-run": cmd_finish_run, "validate-run": cmd_validate_run,
-                    "validate-repository": cmd_validate_repository, "backfill": cmd_backfill}
+                    "validate-repository": cmd_validate_repository, "backfill": cmd_backfill,
+                    "list-runs": cmd_list_runs, "run-stats": cmd_run_stats}
         return commands[args.subcommand](args, repo, root)
     except (RecorderError, OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
