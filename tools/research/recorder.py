@@ -594,6 +594,23 @@ def cmd_validate_repository(args: argparse.Namespace, repo: Path, root: Path) ->
                 prompt = prompt_metadata.get(prompt_id)
                 if prompt is None or prompt.get("associated_run_id") != directory.name:
                     raise RecorderError("run/prompt cross-link mismatch")
+            try:
+                records = validate_events(directory / "events.jsonl", directory.name)
+            except RecorderError:
+                # The malformed stream is already reported by the run scan above.
+                records = []
+            blobs = directory / "blobs"
+            for record in records:
+                if record["event_type"] != "command_finished":
+                    continue
+                for field in ("stdout_blob", "stderr_blob"):
+                    reference = record["data"].get(field, "")
+                    if not reference:
+                        continue
+                    if reference.startswith("/") or "\\" in reference or ".." in reference.split("/"):
+                        raise RecorderError(f"unsafe blob reference in event {record['seq']}: {reference}")
+                    if not (blobs / reference.removeprefix("blobs/")).is_file():
+                        raise RecorderError(f"missing blob referenced by event {record['seq']}: {reference}")
         except RecorderError as exc:
             failures.append(f"{directory.name}: {exc}")
     epoch = root / "INSTRUMENTATION_EPOCH.json"

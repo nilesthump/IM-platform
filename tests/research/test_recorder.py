@@ -150,6 +150,11 @@ Current Task State: active
         events = recorder.validate_events(self.root / "runs" / run_id / "events.jsonl", run_id)
         self.assertEqual(0, events[-1]["data"]["exit_code"])
         self.assertEqual("PASS", events[-1]["data"]["result"])
+        recorder.cmd_finish_run(self.ns(run_id=run_id, result="PASS"), self.repo, self.root)
+        recorder.cmd_validate_repository(self.ns(allow_partial=False), self.repo, self.root)
+        (self.root / "runs" / run_id / events[-1]["data"]["stdout_blob"]).unlink()
+        with self.assertRaisesRegex(recorder.RecorderError, "missing blob referenced by event"):
+            recorder.cmd_validate_repository(self.ns(allow_partial=False), self.repo, self.root)
 
     def test_run_command_propagates_failure_and_records_fail(self):
         run_id = self.start()
