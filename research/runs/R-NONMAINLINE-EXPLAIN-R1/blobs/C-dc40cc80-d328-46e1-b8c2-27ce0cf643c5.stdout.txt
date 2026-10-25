@@ -1,0 +1,50 @@
+{
+  "paths": [
+    "tools/verify_sync_runtime.py",
+    "clients/shared/protocol-sdk/x.ts"
+  ],
+  "jobs": {
+    "go": true,
+    "java": true,
+    "web": true,
+    "desktop": true,
+    "mobile": true,
+    "shared": true,
+    "old_client": true,
+    "plugin": true,
+    "migration": true,
+    "compatibility": true,
+    "deploy": false,
+    "architecture": true,
+    "source_go": true,
+    "source_java": true
+  },
+  "reasons": [
+    {
+      "path": "clients/shared/protocol-sdk/x.ts",
+      "rule": "clients",
+      "jobs": [
+        "architecture"
+      ]
+    },
+    {
+      "path": "clients/shared/protocol-sdk/x.ts",
+      "rule": "shared-contract",
+      "jobs": [
+        "architecture",
+        "compatibility",
+        "desktop",
+        "go",
+        "java",
+        "migration",
+        "mobile",
+        "old_client",
+        "plugin",
+        "shared",
+        "source_go",
+        "source_java",
+        "web"
+      ]
+    }
+  ]
+}

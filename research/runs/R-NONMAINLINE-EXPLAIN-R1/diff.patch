@@ -1,0 +1,127 @@
+diff --git a/ci/classify.py b/ci/classify.py
+index 5975a123..2eeeb62b 100644
+--- a/ci/classify.py
++++ b/ci/classify.py
+@@ -19,8 +19,20 @@ JOBS = (
+ FULL_COMPATIBILITY = frozenset(JOBS) - {"deploy"}
+ 
+ 
+-def classify(paths):
++def classify_detailed(paths):
++    """Classify paths and attribute every selection to its rule.
++
++    Same selection semantics as classify(); the returned reasons list records
++    one entry per (path, rule) pair that selected jobs, in evaluation order.
++    A path can fire several rules; zero-selection paths produce no entries.
++    """
+     selected = set()
++    reasons = []
++
++    def select(raw, rule, jobs):
++        selected.update(jobs)
++        reasons.append({"path": raw, "rule": rule, "jobs": sorted(jobs)})
++
+     for raw in paths:
+         path = raw.replace("\\", "/").removeprefix("./")
+         if not path or path.startswith("/") or ".." in path.split("/"):
+@@ -38,13 +50,13 @@ def classify(paths):
+             or path.startswith("tools/verify-loop1-min-")
+         )
+         if parts[:3] in (["tests", "clients", "sqlite"], ["tests", "clients", "send"]) or path in {"tools/verify-client-sqlite.ps1", "tools/verify_client_sqlite.py", "tools/verify_client_send.py"}:
+-            selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
++            select(raw, "client-verifier", {"architecture", "desktop", "mobile", "shared", "compatibility"})
+         if parts[0] == "clients":
+-            selected.add("architecture")
++            select(raw, "clients", {"architecture"})
+         if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:
+-            selected.update(JOBS)
++            select(raw, "root-manifest", JOBS)
+         if governance:
+-            selected.update({"architecture", "source_go", "source_java"})
++            select(raw, "governance", {"architecture", "source_go", "source_java"})
+         shared = (
+             parts[0] in {"contracts", "database", "migrations", "sdk", "sdks", "shared"}
+             or parts[:2] in (["backend", "shared"], ["clients", "shared"])
+@@ -52,25 +64,29 @@ def classify(paths):
+             or parts[:2] == ["tests", "database"]
+         )
+         if shared:
+-            selected.update(FULL_COMPATIBILITY)
++            select(raw, "shared-contract", FULL_COMPATIBILITY)
+         elif parts[:2] in (["tests", "go"], ["tests", "e2e"]):
+-            selected.update({"go", "deploy", "architecture", "source_go"})
++            select(raw, "go-e2e-tests", {"go", "deploy", "architecture", "source_go"})
+         elif parts[:2] == ["backend", "go"]:
+-            selected.update({"go", "architecture", "source_go"})
++            select(raw, "backend-go", {"go", "architecture", "source_go"})
+         elif parts[:2] == ["backend", "java"]:
+-            selected.update({"java", "architecture", "source_java"})
++            select(raw, "backend-java", {"java", "architecture", "source_java"})
+         elif parts[:2] == ["clients", "web"]:
+-            selected.add("web")
++            select(raw, "clients-web", {"web"})
+         elif parts[:2] == ["clients", "desktop"]:
+-            selected.add("desktop")
++            select(raw, "clients-desktop", {"desktop"})
+         elif parts[:2] == ["clients", "mobile"]:
+-            selected.add("mobile")
++            select(raw, "clients-mobile", {"mobile"})
+         elif (parts[0] == "ci"
+               or parts[:2] in ([".github", "workflows"], ["tests", "ci"])):
+-            selected.update(JOBS)
++            select(raw, "ci-config", JOBS)
+         elif (parts[0] == "deploy" or parts[:2] == ["tests", "infrastructure"]):
+-            selected.add("deploy")
+-    return {job: job in selected for job in JOBS}
++            select(raw, "deploy-infra", {"deploy"})
++    return {job: job in selected for job in JOBS}, reasons
++
++
++def classify(paths):
++    return classify_detailed(paths)[0]
+ 
+ 
+ def diff_paths(base, head):
+@@ -86,6 +102,7 @@ def main(argv=None):
+     parser.add_argument("--base", help="Git base commit")
+     parser.add_argument("--head", help="Git head commit")
+     parser.add_argument("--paths", nargs="*", help="Explicit paths for local inspection")
++    parser.add_argument("--explain", action="store_true", help="attribute every selection to the rule that made it")
+     parser.add_argument("--github-output", help="GitHub Actions output file")
+     args = parser.parse_args(argv)
+     if args.paths is None and not (args.base and args.head):
+@@ -93,13 +110,20 @@ def main(argv=None):
+     if args.paths is not None and (args.base or args.head):
+         parser.error("--paths and Git revisions are mutually exclusive")
+     paths = args.paths if args.paths is not None else diff_paths(args.base, args.head)
+-    matrix = classify(paths)
++    if args.explain:
++        matrix, reasons = classify_detailed(paths)
++    else:
++        matrix, reasons = classify(paths), None
+     if args.github_output:
+         with open(args.github_output, "a", encoding="utf-8") as output:
+             for job, selected in matrix.items():
+                 output.write(f"{job}={str(selected).lower()}\n")
+-    json.dump({"paths": paths, "jobs": matrix}, sys.stdout, indent=2)
++    payload = {"paths": paths, "jobs": matrix}
++    if reasons is not None:
++        payload["reasons"] = reasons
++    json.dump(payload, sys.stdout, indent=2)
+     sys.stdout.write("\n")
++    return 0
+ 
+ 
+ if __name__ == "__main__":
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.EXPLAIN.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.EXPLAIN.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-EXPLAIN-R1/blobs/C-b4d2e051-b9a8-4d4d-9612-33797c711793.stderr.txt
+# ?? research/runs/R-NONMAINLINE-EXPLAIN-R1/blobs/C-b4d2e051-b9a8-4d4d-9612-33797c711793.stdout.txt
+# ?? research/runs/R-NONMAINLINE-EXPLAIN-R1/blobs/C-dc40cc80-d328-46e1-b8c2-27ce0cf643c5.stderr.txt
+# ?? research/runs/R-NONMAINLINE-EXPLAIN-R1/blobs/C-dc40cc80-d328-46e1-b8c2-27ce0cf643c5.stdout.txt
+# ?? research/runs/R-NONMAINLINE-EXPLAIN-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-EXPLAIN-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-EXPLAIN-R1/metadata.json
+# ?? tests/ci/test_classify_explain.py
