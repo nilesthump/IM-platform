@@ -8,6 +8,7 @@ import base64
 import datetime as dt
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -472,6 +473,7 @@ def cmd_ingest_ci(args: argparse.Namespace, repo: Path, root: Path) -> int:
         and all(isinstance(item, str) for item in evidence.get("failed_checks", []))
         and isinstance(evidence.get("duration_ms"), (int, float))
         and not isinstance(evidence.get("duration_ms"), bool)
+        and math.isfinite(evidence.get("duration_ms", float("nan")))
         and evidence.get("duration_ms", -1) >= 0
         and isinstance(evidence.get("evidence_reference"), str)
     )

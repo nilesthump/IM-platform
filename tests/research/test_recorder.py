@@ -242,6 +242,17 @@ Current Task State: active
         self.assertEqual(before, events_path.read_bytes())
         self.assertNotIn(secret, events_path.read_text(encoding="utf-8"))
 
+    def test_ci_ingestion_rejects_nonfinite_duration(self):
+        run_id = self.start(role="ci")
+        for raw in ('{"provider":"f","ci_run_id":"1","commit_sha":"' + "0" * 40 + '","job_name":"j",'
+                    '"result":"PASS","failed_checks":[],"duration_ms":NaN,"evidence_reference":"x"}',
+                    '{"provider":"f","ci_run_id":"1","commit_sha":"' + "0" * 40 + '","job_name":"j",'
+                    '"result":"PASS","failed_checks":[],"duration_ms":1e999,"evidence_reference":"x"}'):
+            evidence_path = self.repo / "ci-duration-evidence.json"
+            evidence_path.write_text(raw, encoding="utf-8")
+            with self.assertRaisesRegex(recorder.RecorderError, "invalid CI evidence"):
+                recorder.cmd_ingest_ci(self.ns(run_id=run_id, evidence=str(evidence_path)), self.repo, self.root)
+
     def test_prospective_resume_trace_flags(self):
         run_id = self.start(capture="prospective_resume", pre=True)
         value = recorder.read_json(self.root / "runs" / run_id / "metadata.json")
