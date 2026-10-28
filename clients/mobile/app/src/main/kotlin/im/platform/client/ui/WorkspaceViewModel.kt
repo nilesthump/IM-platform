@@ -52,14 +52,14 @@ class WorkspaceViewModel(application:Application):AndroidViewModel(application) 
         updateList(repo,g);if(g!=generation)return
         send.connect(state.value.endpoint.replaceFirst("https:","wss:")+"/v1/ws")
         refreshTimer=scope.launch{while(isActive){delay(30000);if(g==generation && auth?.needsRefresh()==true && !state.value.busy)refresh()}}
-        try{val profile=authOwner!!.profile();if(g!=generation || op!=operation)return;publish{it.copy(profile=profile)};refreshFriends(repo,g);refreshGroups()}catch(e:Exception){fail(e,g==generation && op==operation);if(g==generation&&op==operation&&state.value.friendsStatus=="loading")publish{it.copy(friendsStatus="error")}}
+        try{val profile=authOwner!!.profile();if(g!=generation || op!=operation)return;publish{it.copy(profile=profile)};refreshFriends(repo,g);refreshGroups()}catch(e:Exception){if(g==generation&&op==operation&&authOwner===auth&&state.value.friendsStatus=="loading")publish{it.copy(friendsStatus="error")};fail(e,g==generation && op==operation)}
     }
     private suspend fun refreshFriends(repo:Repository,g:Long){
         val owner=auth?:return;val revision=++friendRevision
         try{val cursor=withContext(Dispatchers.IO){repositoryRead {repo.cursor()}};if(g!=generation||cursor==friendCursor)return
             publish{it.copy(friendsStatus="loading")};val friends=owner.friends();if(g!=generation||owner!==auth||revision!=friendRevision)return
             friendCursor=cursor;publish{it.copy(friends=friends,friendsStatus="ready")};updateList(repo,g)
-        }catch(e:CancellationException){throw e}catch(e:Exception){fail(e,g==generation&&revision==friendRevision);if(g==generation&&owner===auth&&revision==friendRevision)publish{it.copy(friendsStatus="error")}}
+        }catch(e:CancellationException){throw e}catch(e:Exception){if(g==generation&&owner===auth&&revision==friendRevision)publish{it.copy(friendsStatus="error")};fail(e,g==generation&&revision==friendRevision)}
     }
     private suspend fun updateList(repo:Repository,g:Long){
         val revision=++listRevision
@@ -92,7 +92,7 @@ class WorkspaceViewModel(application:Application):AndroidViewModel(application) 
     fun disconnect(){scope.launch{sync?.send?.disconnect()}}
     fun reconnect(){val owner=sync?:return;val g=generation;scope.launch{try{owner.send.connect(state.value.endpoint.replaceFirst("https:","wss:")+"/v1/ws");owner.synchronize()}catch(e:Exception){fail(e,g==generation);if(g==generation)publish{it.copy(error="Connection unavailable")}}}}
     fun search(query:String){val owner=auth?:return;val g=generation;publish{it.copy(busy=true,results=emptyList(),searchComplete=false,error=null)};scope.launch{try{val results=owner.search(query);if(g==generation)publish{it.copy(results=results,searchComplete=true)}}catch(e:Exception){fail(e,g==generation)}finally{if(g==generation)publish{it.copy(busy=false)}}}}
-    fun add(id:String){val owner=auth?:return;val g=generation;publish{it.copy(busy=true,error=null)};scope.launch{try{val c=owner.add(id);if(g!=generation)return@launch;val revision=++friendRevision;publish{it.copy(friendsStatus="loading")};val friends=owner.friends();if(g==generation&&owner===auth){if(revision==friendRevision)publish{it.copy(friends=friends,friendsStatus="ready",conversations=(it.conversations+c).distinct())};open(c)}}catch(e:Exception){fail(e,g==generation)}finally{if(g==generation)publish{it.copy(busy=false)}}}}
+    fun add(id:String){val owner=auth?:return;val g=generation;publish{it.copy(busy=true,error=null)};scope.launch{var revision:Long?=null;try{val c=owner.add(id);if(g!=generation||owner!==auth)return@launch;revision=++friendRevision;publish{it.copy(friendsStatus="loading")};val friends=owner.friends();if(g==generation&&owner===auth){if(revision==friendRevision)publish{it.copy(friends=friends,friendsStatus="ready",conversations=(it.conversations+c).distinct())};open(c)}}catch(e:Exception){if(revision!=null&&g==generation&&owner===auth&&revision==friendRevision)publish{it.copy(friendsStatus="error")};fail(e,g==generation)}finally{if(g==generation)publish{it.copy(busy=false)}}}}
     private var groupOperation:GroupOperation?=null
     private var groupScanning=false;private var groupDirty=false
     fun createGroup(ids:List<String>,conversation:String?){val session=state.value.session?:return;if(state.value.groupBusy||groupOperation!=null)return
