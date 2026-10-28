@@ -1,3 +1,5 @@
+Human tray acceptance (2026-10-28): user explicitly confirmed "托盘已确认符合预期" for installed source 053aac5c840af28d6afa0b861d33bb7e9992e55b: left-click opens main window, right-click shows menu. Human-verified tray behavior, not automated input evidence. Picker component regression PASS; native picker replay still pending. GROUP active / S2 OPEN; no full-GROUP acceptance/push/merge/done. Recorder R-TRAY-HUMAN-ACCEPT-1028 partial FAIL disclosed.
+
 ## Windows feedback checkpoint (2026-10-28)
 
 Product source 053aac5c840af28d6afa0b861d33bb7e9992e55b, branch task/LOOP1-GROUP-001-resume, assigned root H:/.codex/worktrees/g-8802/IM-platform. Human reported pending picker cannot reopen after language changes and requested tray left-click opens main window/right-click menu. Both fixes are implemented. Real React RED/GREEN and independent regression verify transient same-account refresh retains search/selection/original request while logout/account change clears it. Existing group verification and Windows NSIS build exit0. Fresh independent Standards and Spec PASS on this exact source; these are bounded feedback reviews, not final whole-GROUP/error-specialist acceptance.

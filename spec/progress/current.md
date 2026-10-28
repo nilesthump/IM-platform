@@ -1,3 +1,5 @@
+Human tray acceptance (2026-10-28): user explicitly confirmed "托盘已确认符合预期" for installed source 053aac5c840af28d6afa0b861d33bb7e9992e55b: left-click opens main window, right-click shows menu. Human-verified tray behavior, not automated input evidence. Picker component regression PASS; native picker replay still pending. GROUP active / S2 OPEN; no full-GROUP acceptance/push/merge/done. Recorder R-TRAY-HUMAN-ACCEPT-1028 partial FAIL disclosed.
+
 Latest checkpoint: spec/progress/checkpoints/2026-10-28-group-windows-feedback.md
 
 ## Windows feedback checkpoint (2026-10-28)
