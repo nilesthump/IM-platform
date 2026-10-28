@@ -10,9 +10,9 @@ import {SendStorageFailure,SendApplication,type Session,type Socket} from "../se
 import {SyncApplication} from "../sync/application.js";
 import {Auth,ApiFailure,type Friend,type User,origin} from "./auth.js";
 import {NativeCapabilityFailure,NativeTransportFailure,appearance,language,trayText,defaults,nativeFetch,notify,type Appearance} from "./native.js";
-export interface WorkspaceState {groups:MemberRow[];groupBusy:boolean;groupError:string;groupStatus:string;language:Locale;languageStored:boolean;appearance:Appearance;busy:boolean;error:string|null;session:Session|null;offlineAccount:string|null;profile:User|null;friends:Friend[];results:User[];conversations:string[];selected:string;messages:ReadonlyArray<ReadonlyArray<string|null>>;connection:string;sync:string;unavailable:readonly string[];page:"Chat"|"Friends"|"AI"|"Plugin"|"Settings";endpoint:string;previews:Record<string,{text:string;time:number}>}
+export interface WorkspaceState {groups:MemberRow[];groupBusy:boolean;groupError:string;groupStatus:string;language:Locale;languageStored:boolean;appearance:Appearance;busy:boolean;error:string|null;session:Session|null;offlineAccount:string|null;profile:User|null;friendsStatus:'loading'|'ready'|'error';friends:Friend[];results:User[];conversations:string[];selected:string;messages:ReadonlyArray<ReadonlyArray<string|null>>;connection:string;sync:string;unavailable:readonly string[];page:"Chat"|"Friends"|"AI"|"Plugin"|"Settings";endpoint:string;previews:Record<string,{text:string;time:number}>}
 export class Workspace {
-  state:WorkspaceState={groups:[],groupBusy:false,groupError:"",groupStatus:"",language:"en",languageStored:true,appearance:defaults,busy:false,error:null,session:null,offlineAccount:null,profile:null,friends:[],results:[],conversations:[],selected:"",messages:[],connection:"offline",sync:"idle",unavailable:[],page:"Chat",endpoint:"https://localhost:8443",previews:{}};
+  state:WorkspaceState={groups:[],groupBusy:false,groupError:"",groupStatus:"",language:"en",languageStored:true,appearance:defaults,busy:false,error:null,session:null,offlineAccount:null,profile:null,friendsStatus:'loading',friends:[],results:[],conversations:[],selected:"",messages:[],connection:"offline",sync:"idle",unavailable:[],page:"Chat",endpoint:"https://localhost:8443",previews:{}};
   private listeners=new Set<()=>void>();private auth:Auth|null=null;private sync:SyncApplication|null=null;private offlineRepository:Repository|null=null;private generation=0;private operation=0;private detach: (()=>void)[]=[];private repository:Repository|null=null;private listRevision=0;private activity=new Map<string,number>();private friendRevision=0;private friendCursor="";private refreshTimer:ReturnType<typeof setInterval>|null=null;
   observe=(fn:()=>void)=>{this.listeners.add(fn);return()=>{this.listeners.delete(fn);};};
   snapshot=()=>this.state;
@@ -32,7 +32,7 @@ export class Workspace {
   private appearanceWrites:Promise<void>=Promise.resolve();
   preferences(value:Appearance){this.publish({appearance:value,error:null});this.appearanceWrites=this.appearanceWrites.then(async()=>{try{await appearance.save(value);}catch(error){this.failure(error);this.publish({error:"Appearance could not be saved"});}});return this.appearanceWrites;}
   private async stop(preserveGroup=false){if(!preserveGroup){this.groupOperation=undefined;}this.groupScanning=false;this.groupDirty=false;this.generation++;if(this.refreshTimer)clearInterval(this.refreshTimer);this.refreshTimer=null;this.detach.forEach(fn=>fn());this.detach=[];const old=this.sync;this.sync=null;this.offlineRepository=null;this.repository=null;this.friendCursor="";this.friendRevision++;this.listRevision++;this.activity.clear();const failures:unknown[]=[];
-    try{this.publish({groups:preserveGroup?this.state.groups:[],groupBusy:false,groupError:"",groupStatus:preserveGroup?(this.groupOperation?"unconfirmed":this.state.groupStatus):"",session:null,offlineAccount:null,profile:null,friends:[],results:[],conversations:[],selected:"",messages:[],connection:"offline",sync:"idle",unavailable:[],previews:{}});}catch(error){failures.push(error);}
+    try{this.publish({groups:preserveGroup?this.state.groups:[],groupBusy:false,groupError:"",groupStatus:preserveGroup?(this.groupOperation?"unconfirmed":this.state.groupStatus):"",session:null,offlineAccount:null,profile:null,friendsStatus:'loading',friends:[],results:[],conversations:[],selected:"",messages:[],connection:"offline",sync:"idle",unavailable:[],previews:{}});}catch(error){failures.push(error);}
     try{await old?.close();}catch(error){if(!failures.includes(error))failures.push(error);}
     if(failures.length===1)throw failures[0];if(failures.length>1)throw new AggregateError(failures,"Workspace retirement failed");}
   private socket(url:string,expired:()=>void):Socket {
@@ -52,14 +52,14 @@ export class Workspace {
     await this.updateList(repo,g);if(!active())return;
     this.publish({selected:"",messages:[]});send.connect(this.state.endpoint.replace(/^https:/,"wss:")+"/v1/ws");
     this.refreshTimer=setInterval(()=>{if(active()&&this.auth?.needsRefresh())void this.refresh();},30000);
-    try{const profile=await owner!.profile();if(!active())return;this.publish({profile});await this.refreshFriends(repo,g);await this.refreshGroups();}catch(error){this.failure(error,active());}
+    try{const profile=await owner!.profile();if(!active())return;this.publish({profile});await this.refreshFriends(repo,g);await this.refreshGroups();}catch(error){this.failure(error,active());if(active()&&this.state.friendsStatus==='loading')this.publish({friendsStatus:'error'});}
   }
   private async refreshFriends(repo:Repository,g:number){
     const owner=this.auth;if(!owner)return;const revision=++this.friendRevision;
     try{const cursor=await repo.cursor();if(g!==this.generation||cursor===this.friendCursor)return;
-      const friends=await owner.friends();if(g!==this.generation||owner!==this.auth||revision!==this.friendRevision)return;
-      this.friendCursor=cursor;this.publish({friends});await this.updateList(repo,g);
-    }catch(error){this.failure(error,g===this.generation&&revision===this.friendRevision);}
+      this.publish({friendsStatus:'loading'});const friends=await owner.friends();if(g!==this.generation||owner!==this.auth||revision!==this.friendRevision)return;
+      this.friendCursor=cursor;this.publish({friends,friendsStatus:'ready'});await this.updateList(repo,g);
+    }catch(error){this.failure(error,g===this.generation&&revision===this.friendRevision);if(g===this.generation&&owner===this.auth&&revision===this.friendRevision)this.publish({friendsStatus:'error'});}
   }
   private failure(error:unknown,active=true){
     const failures=error instanceof AggregateError?error.errors:[error];
@@ -136,7 +136,7 @@ export class Workspace {
     if(rejected)throw failure;
   }
   async add(id:string){if(!this.auth)return;const auth=this.auth,g=this.generation;let failed=false,rejected=false,failure:unknown;
-    try{this.publish({busy:true,error:null});const conversation=await auth.add(id);if(g!==this.generation)return;const revision=++this.friendRevision;const friends=await auth.friends();if(g!==this.generation||auth!==this.auth)return;if(revision===this.friendRevision)this.publish({friends,conversations:[...new Set([...this.state.conversations,conversation])]});await this.open(conversation);}
+    try{this.publish({busy:true,error:null});const conversation=await auth.add(id);if(g!==this.generation)return;const revision=++this.friendRevision;const friends=await auth.friends();if(g!==this.generation||auth!==this.auth)return;if(revision===this.friendRevision)this.publish({friends,friendsStatus:'ready',conversations:[...new Set([...this.state.conversations,conversation])]});await this.open(conversation);}
     catch(error){failed=true;failure=error;try{this.failure(error,g===this.generation);}catch(propagated){failure=propagated;rejected=true;}}
     finally{if(g===this.generation)try{this.publish({busy:false});}catch(error){failure=failed&&error!==failure?new AggregateError([failure,error],"Friend add and observer failed"):error;rejected=true;}}
     if(rejected)throw failure;

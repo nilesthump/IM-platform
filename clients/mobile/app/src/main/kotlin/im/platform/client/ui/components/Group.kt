@@ -31,7 +31,9 @@ import im.platform.client.ui.i18n.useText
     OutlinedTextField(value=query,onValueChange=search,label={Text(t("group.search"))},singleLine=true,modifier=Modifier.fillMaxWidth())
     Text(t("friends.your"),style=MaterialTheme.typography.titleMedium)
     LazyColumn(Modifier.weight(1f)){
-     if(state.friends.isEmpty())item{Text(t("group.empty"))}
+     if(state.friendsStatus=="loading")item{Text(t("friends.loading"))}
+     if(state.friendsStatus=="error")item{Text(t("friends.failed"),color=MaterialTheme.colorScheme.error)}
+     if(state.friendsStatus=="ready"&&state.friends.isEmpty())item{Text(t("group.empty"))}
      items(friends,key={"friend:"+it.user.userId}){friend->
       Row(Modifier.fillMaxWidth().padding(vertical=8.dp),verticalAlignment=Alignment.CenterVertically){
        Checkbox(modifier=Modifier.semantics{contentDescription=friend.user.displayName},checked=friend.user.userId in selection,enabled=!locked,onCheckedChange={checked->select(if(checked)selection+friend.user.userId else selection-friend.user.userId)})
