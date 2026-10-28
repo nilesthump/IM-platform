@@ -26,11 +26,12 @@ import im.platform.client.ui.i18n.*
 @Composable fun Shell(state:WorkspaceState,createGroup:(List<String>,String?)->Unit,retryGroup:()->Unit,language:(String)->Unit,closeConversation:()->Unit,open:(String)->Unit,reconnect:()->Unit,login:(String,String,String)->Unit,register:(String,String,String)->Unit,restore:(String)->Unit,send:(String)->Unit,retry:(String)->Unit,search:(String)->Unit,add:(String)->Unit,appearance:(Appearance)->Unit,refresh:()->Unit,disconnect:()->Unit,logout:()->Unit) {
     var draft by remember(state.session?.userId,state.offlineAccount){mutableStateOf("")}
     val t=useText()
-    var groupPage by remember(state.session?.userId,state.offlineAccount){mutableStateOf("")}
-    var groupTarget by remember(state.session?.userId,state.offlineAccount){mutableStateOf<String?>(null)}
-    var groupSelection by remember(state.session?.userId,state.offlineAccount){mutableStateOf(emptyList<String>())}
-    var groupQuery by remember(state.session?.userId,state.offlineAccount){mutableStateOf("")}
-    var submitted by remember(state.session?.userId,state.offlineAccount){mutableStateOf(false)}
+    val groupOwner=state.session?.userId?:state.offlineAccount?:state.groupPending?.account
+    var groupPage by remember(groupOwner){mutableStateOf("")}
+    var groupTarget by remember(groupOwner){mutableStateOf<String?>(null)}
+    var groupSelection by remember(groupOwner){mutableStateOf(emptyList<String>())}
+    var groupQuery by remember(groupOwner){mutableStateOf("")}
+    var submitted by remember(groupOwner){mutableStateOf(false)}
     var newChatMenu by remember{mutableStateOf(false)}
 
     val prefs=state.appearance;val warm=prefs.theme=="warm"
