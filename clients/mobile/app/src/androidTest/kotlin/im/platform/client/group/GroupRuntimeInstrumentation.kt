@@ -37,10 +37,11 @@ class GroupRuntimeInstrumentation:Instrumentation(){
   val friends=listOf(im.platform.client.ui.Friend(im.platform.client.ui.User(b,"fixture","Refresh Friend"),"30000000-0000-4000-8000-000000000001","40000000-0000-4000-8000-000000000001"))
   fun set(s:im.platform.client.ui.WorkspaceState){runOnMainSync{f.value=s};waitForIdleSync();Thread.sleep(300)}
   fun stop(keep:Boolean){runOnMainSync{kotlinx.coroutines.runBlocking{kotlin.coroutines.suspendCoroutine<Unit>{c->val m=v.javaClass.getDeclaredMethod("stop",Boolean::class.javaPrimitiveType,kotlin.coroutines.Continuation::class.java).apply{isAccessible=true};if(m.invoke(v,keep,c)!==kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED)c.resumeWith(Result.success(Unit))}}};waitForIdleSync();Thread.sleep(300)}
-  set(im.platform.client.ui.WorkspaceState(session=session,friends=friends));click("+ New chat");click("Create group");fill("Search friends","Refresh");choose("Refresh Friend")
-  val op=GroupOperation(a,"50000000-0000-4000-8000-000000000001",listOf(b));v.javaClass.getDeclaredField("groupOperation").apply{isAccessible=true}.set(v,op)
+  set(im.platform.client.ui.WorkspaceState(groupSuccessRevision=1,session=session,friends=friends));click("+ New chat");click("Create group");fill("Search friends","Refresh");choose("Refresh Friend")
+  click("Confirm");val op=v.javaClass.getDeclaredField("groupOperation").apply{isAccessible=true}.get(v) as GroupOperation;check(op.account==a&&op.targets==listOf(b))
   set(f.value.copy(groupPending=op,groupStatus="unconfirmed"));stop(true);check(f.value.session==null&&f.value.groupPending==op);set(f.value.copy(session=session,friends=friends))
   await("Search friends");check(find(root(),"Refresh")!=null){"Search cleared by refresh"};check(checkbox("Refresh Friend").isChecked);check(f.value.groupPending==op)
+  set(f.value.copy(groupStatus="success",groupPending=null,groupSuccessRevision=f.value.groupSuccessRevision+1));check(find(root(),"Search friends")==null){"Confirmed success did not close selector"}
   stop(false);check(f.value.groupPending==null);set(im.platform.client.ui.WorkspaceState(session=session.copy(userId="10000000-0000-4000-8000-000000000003"),friends=friends))
   click("+ New chat");click("Create group");await("Search friends");check(find(root(),"Refresh")==null);check(!checkbox("Refresh Friend").isChecked)
  }
