@@ -1,0 +1,21 @@
+{
+  "result": "PASS_BOUNDED",
+  "axis": "Spec",
+  "reviewer": "/root/resume_backend/desktop_feedback_spec",
+  "independent": true,
+  "base": "abafe17e2902669f905bfbd2d06a3a3c6e00eeb4",
+  "head": "053aac5c840af28d6afa0b861d33bb7e9992e55b",
+  "findings": [],
+  "checks": [
+    "Actual Shell effect retains mounted picker only while unconfirmed; groupStatus dependency clears it on logout/retirement. GroupPanel retains search/selection/conversation for CREATE and ADD.",
+    "Workspace same-account stop(true) preserves original operation; retry retains requestId/targets and account guard. Logout/different-account stop clears it.",
+    "Only tray Click Left Up calls existing show/unminimize/focus; left menu disabled, original right-menu retained.",
+    "New regression loads real React components/Workspace and verifies original body and account retirement.",
+    "git diff --check abafe17e...053aac5c exit0"
+  ],
+  "limitations": [
+    "No reviewer native foreground interaction.",
+    "Not full GROUP acceptance, error specialist, hosted CI or main sync."
+  ],
+  "recorder": "partial FAIL, direct inspection and wrapper failure disclosed"
+}

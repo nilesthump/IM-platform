@@ -1,13 +1,38 @@
-## Full GROUP continuation (2026-10-25)
+---
+task_id: LOOP1-GROUP-001
+title: 建群、成员添加与三端群聊接入
+status: active
+owner: /root/resume_backend
+stage: S2
+gate: S2
+client_supplement_phase: group_product
+---
 
-## Android Retry visibility fix (2026-10-25)
+## Windows feedback checkpoint (2026-10-28)
 
-Fresh sole Fix writer /root/resume_backend/android_retry_layout_fix reproduced the real 320px G08 screenshot where long FAILED status displaced Retry. Only Messages.kt now bounds the status Row to the existing 310dp message width and weights the status Text with fill=false, preserving intrinsic button space and wrapping text. Retry callback/original request/state logic unchanged; no dependency or contract change. Fixed cached Gradle 8.9 -p clients/mobile --offline :app:assembleDebug PASS, exit0/8s with Kotlin compiled. Actual new-APK retry/screenshot and fresh independent review remain pending with Coordinator; no runtime writes by fixer. Evidence external group-completion-20261025/android-retry-fix; Recorder prospective_resume partial (startup/direct helper authoring and closure outside capture), not acceptance. Next: install new APK preserving owned failed request then actual visible Retry validation. GROUP active/S2 OPEN; accepted LKG/main3d30872 unchanged. Writer releases upon commit.
+Product source 053aac5c840af28d6afa0b861d33bb7e9992e55b, branch task/LOOP1-GROUP-001-resume, assigned root H:/.codex/worktrees/g-8802/IM-platform. Human reported pending picker cannot reopen after language changes and requested tray left-click opens main window/right-click menu. Both fixes are implemented. Real React RED/GREEN and independent regression verify transient same-account refresh retains search/selection/original request while logout/account change clears it. Existing group verification and Windows NSIS build exit0. Fresh independent Standards and Spec PASS on this exact source; these are bounded feedback reviews, not final whole-GROUP/error-specialist acceptance.
+
+Installed candidate SHA256 1a95fb8cb7e625b777e9e09947d5714bbc058b8168b6221b67f3f61b485a6e2d was rechecked 2026-10-28; exact bytes differ from release only by documented three-byte NSS/UNK bundle marker. Original install backed up, no AppData/credentials/SQLite deletion. New app launched and login screen observed. Native tray interaction remains unverified: documented Sky inventory exposed no taskbar/tray target, so no guessed handle/coordinates were used. No pending-picker native network replay claimed. Old after-commit case remains incomplete and its original evidence preserved.
+
+No GROUP test containers running on 2026-10-28; prior TLS v4 expired. No renewal or unrelated containers modified. New windows-feedback-053aac fixtures/helpers exist but no ready/attempt receipts: not acceptance evidence. Current short feedback slice is built/reviewed/installed; next action receive Human tray check or obtain supported tray target, then resume remaining GROUP matrix with fresh environment qualification. GROUP active / S2 OPEN; no push/merge/done. Accepted LKG/main remains 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e. Main unknown work untouched.
+
+Durable evidence: spec/progress/evidence/LOOP1-GROUP-001/product/windows-feedback-20261028/ (picker, standards, spec, build, install). Research trace is partial: direct recovery reads, helper creation, GUI observations and original installation helper failures retained; Recorder is not acceptance. Coordinator owns only recovery metadata/evidence changes; all product writers released.
 
 
-Human 2026-10-25: 通过. This accepts the displayed three-client UI and final Android CREATE single-column layout at product c33943023004df026cee7ec573a70a5229457a95 (recovery ef70b09d). Resume the previously authorized full GROUP completion; prior UI-only no-push/await-feedback stops below are historical. Current coordinator is /root/resume_backend, sole repository writer; runtime_preflight owns only external runtime qualification and completion_evidence_audit is read-only. Next: qualify owned TLS/services/AVD and audit existing G01..G09 evidence, fill actual missing scenarios (Desktop/Android G06, G07/G08 and G09 matrix/Architect), then fresh final-SHA regular review followed by different fresh error review, exact-head hosted CI, protected integration/actual-main and safe main synchronization. Reuse valid existing evidence with exact source bindings; never treat UI acceptance as full GROUP acceptance. GROUP remains active/S2 OPEN; accepted LKG/main 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e. Recorder R-GROUP-COMPLETION-20261025 is prospective_resume/partial: root/coordinator initial reads and delegation were direct. No unknown main work may be overwritten.
 
-Android runtime test alignment (2026-10-25): sole writer /root/resume_backend/android_runtime_assertion_fix replaced obsolete CREATE Selected/Remove assertions with actual checkbox checked-state across zh-CN/en and deselection using the same checkbox. Search entry and Cancel no-operation checks remain. No product changes. Fixed Gradle8.9 with JAVA_HOME=H:/.jdks/jdk17, GRADLE_USER_HOME=H:/gradle, --offline and imSendInstrumentation=im.platform.client.group.GroupRuntimeInstrumentation compiled :app:compileDebugAndroidTestKotlin and :app:assembleDebugAndroidTest successfully (exit0,20s). Initial default-cache absence and unquoted PowerShell property failures retained externally. Evidence: C:/Users/21441/.codex/visualizations/2026/10/23/01a16733-cff1-7573-ad3b-65f45068986a/group-completion-20261025/android-test-fix/. Recorder partial FAIL; startup, helper authoring and final metadata/commit direct, not full prospective trace. Next: coordinator run actual Android acceptance and final independent reviews; no runtime acceptance claimed. Writer releases on commit. GROUP active/S2 OPEN; accepted LKG/main3d30872 unchanged.
+## Full GROUP runtime continuation (2026-10-25)
+
+Human approved the shown UI and Android single-column CREATE (c3394302; metadata ef70b09d), continuing the previously authorized full GROUP scope. Current product source: abafe17e2902669f905bfbd2d06a3a3c6e00eeb4. Assigned root H:/.codex/worktrees/g-8802/IM-platform, branch task/LOOP1-GROUP-001-resume; Coordinator /root/resume_backend is the sole repository writer. Product source is fixed; current metadata edits are Coordinator-owned. GROUP active / S2 OPEN; accepted LKG/main remains 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e. All older UI-only stops/owners below are historical, not current permission limits.
+
+Local completion since UI approval: d0391b75 aligns Android CREATE instrumentation with checked-state UI (compile/test APK exit0); abafe17e fixes real 320px long FAILED text displacing Retry (assembleDebug exit0/8s). Installed APK c05266f135ff10c6305527d4b3038e769f9bc00dcaff6daa486da32831afac8a preserves the original failed request; actual Retry/ACK replay/SQLite restart and fresh bounded independent Standards+Spec review PASS. This is not the final whole-GROUP regular/error review.
+
+Actual evidence: Android G06 before-forward/after-commit original-ID retries; Web G07 51-group continuous/short pagination, low-key insertion during an in-flight page, no-message discovery/reconnect and memory-only fresh-page boundary; Web/Android G08 ACK-loss original-ID retry with unique PostgreSQL Message/Outbox and Android retained/new-account SQLite compensation. Web 12-cell and Android 6-cell locale/theme/font-density matrices are complete. Fresh Architect viewed 20 originals and approved only inspected layouts. New Web G09 loading/empty/failure/real403, unconfirmed en/zh/ja selection/search retention and same-request successful retry, same-browser new-account isolation now pass locally; its 8 new screenshots still require fresh visual review. Android extra G09 error/locale states are running. Reuse of older evidence is bounded by actual unchanged-source bindings, never renamed as fresh final screenshots.
+
+Runtime: owned strict TLS v4 valid through 2026-10-26 16:42:45 +08; Android emulator-5590 Enforcing, actual Go/PG/NATS resources qualified. Human manually imported v4 and later explicitly allowed IM+ control. Windows app-control approval timeout was real and retained; it is now resolved: documented Sky activation and screenshot successfully read installed IM+ login page. Fresh Windows runtime owner /root/resume_backend/windows_acceptance_final owns Windows only; /root/resume_backend/group_ui_android_prepare owns Android only. No main-repository unknown work touched.
+
+Next exact actions: complete Android extra G09 states and Windows G01/G06/G07/G08/G09 matrix; fresh independent Architect review of new states; bind all G01..G09 evidence including actual UserSync metadata behavior (no invented NATS metadata subscription); fresh final-SHA whole regular review then different error specialist; exact-head hosted CI, protected integration/actual-main acceptance and safe H:/IM-platform synchronization. No GROUP done or S2 PASS before these conditions.
+
+Evidence root: C:/Users/21441/.codex/visualizations/2026/10/23/01a16733-cff1-7573-ad3b-65f45068986a/group-completion-20261025. See completion-progress.json, remaining-matrix-v2.json, android-g06/receipt.json, android-g08/receipt.json, web-g09-states/result-v2.json, android-g09/manifest.json, architect-review/report.json and android-retry-review/report.json. Original runner/helper failures, including wrong CREATE200 expectation vs real201, remain preserved. Recorder R-GROUP-COMPLETION-20261025 is honestly partial: direct reads, helper authoring, UI and some runtime commands are outside command capture; unsupported recovery_checkpoint event attempt failed exit1, corrected instrumentation_warning recorded. Recorder is not product acceptance.
 
 ## Android create selector simplification (2026-10-24)
 
@@ -27,14 +52,6 @@ Human requests independent review, then actual group-page screenshots to explain
 
 Client source baseline is75f6bfb2b0f7044ab747ab26aa5605576e058181 with runtime working-tree changes. Web real A/B/C entry and Web G06 before/after completed locally; Android real A/B/C entry10 passes after actual duplicate-key fix. Source/artifact/screenshot bindings, original failures and exact remaining G06..G09 are in product/clients-20261023/runtime-ui-handoff.md and runtime-ui-binding.json. Windows owner retains separate installed candidate evidence. Local group verification exit0; final independent reviews/hosted/main sync PENDING. Accepted LKG/main remains3d30872d3d18c55fa8156a5ce1133281ffaa4e7e. Current task-owned changes belong solely to /root/resume_backend/clients_impl; release writer after checkpoint commit to coordinator. Recorder partial FAIL is disclosed, not acceptance.
 
-task_id: LOOP1-GROUP-001
-title: 建群、成员添加与三端群聊接入
-status: active
-owner: /root/resume_backend/clients_impl
-stage: S2
-gate: S2
-client_supplement_phase: group_product
----
 
 # Goal
 
@@ -42,7 +59,7 @@ client_supplement_phase: group_product
 
 Coordinator recovered the latest Human instruction to finish the complete GROUP task including Web/Desktop/Mobile; this supersedes the historical backend-only stop below. Current delivery: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN. GROUP remains active/group_product and S2 OPEN. Historical evidence and stops below describe their original scope and are retained.
 
-Assigned managed Git root: H:/.codex/worktrees/g-8802/IM-platform; continuation branch: task/LOOP1-GROUP-001-resume (HEAD c7c19195); client implementation owner: /root/resume_backend/clients_impl. Current sole writer grant covers the already-listed client source, group tests, necessary existing CI step and Task/current/new evidence; shared+Web then Desktop then Kotlin. Local tests/builds and task-owned commits allowed; runtime requires resource qualification, no push/PR/merge. Backend PR70 is independently accepted, merged and safely synchronized at 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e (new accepted LKG/main); this is not full GROUP acceptance. See checkpoint 2026-10-23-group-backend-accepted.md and new product/clients-20261023/backend-bindings.json.
+Assigned managed Git root: H:/.codex/worktrees/g-8802/IM-platform; continuation branch: task/LOOP1-GROUP-001-resume (HEAD c7c19195); client implementation owner: /root/resume_backend. Current sole writer grant covers the already-listed client source, group tests, necessary existing CI step and Task/current/new evidence; shared+Web then Desktop then Kotlin. Local tests/builds and task-owned commits allowed; runtime requires resource qualification, no push/PR/merge. Backend PR70 is independently accepted, merged and safely synchronized at 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e (new accepted LKG/main); this is not full GROUP acceptance. See checkpoint 2026-10-23-group-backend-accepted.md and new product/clients-20261023/backend-bindings.json.
 
 Next exact action: freeze the locally verified client source candidate for fresh independent review; complete G01..G09, real TLS/browser/installed Windows Tauri/owned Android emulator, screenshots and Architect approval, fresh final-SHA regular and different error review, hosted acceptance, protected integration/actual-main and safe main sync. All client/product acceptance remains PENDING; no new authority, contract, native/schema or dependency change is authorized.
 
@@ -132,6 +149,7 @@ client_runtime: Android
 - `clients/web/src/ui/i18n/ja-JP.ts`（群聊键/参数）
 - `clients/web/src/ui/i18n/resources.ts`（群聊键/参数）
 - `clients/web/src/ui/style.css`（仅新入口必要现有tokens布局）
+- `clients/desktop/src-tauri/src/desktop_capabilities.rs` (Human 2026-10-25 tray request: existing Tauri tray left single click shows/restores/focuses main window; right single click keeps existing menu. Only existing tray builder/event binding; no dependency, transport, credential, storage, shortcut or other native change.)
 - `clients/desktop/src/application/ui/group.ts`
 - `clients/desktop/src/application/ui/auth.ts`（现HTTP transport，不改认证）
 - `clients/desktop/src/application/ui/workspace.ts`（现群/同步编排）
@@ -184,7 +202,7 @@ client_runtime: Android
 
 接受链原件由seal逐path/bytes/hash绑定：contract-r6-reviews.json、regularR7/errorR4 receipts、candidate hosted auditor/bindings、protected-integration、actual-main auditor/bindings、contract-r6-acceptance.json、preservation-before-sync及contract-r6-main-sync.json。safe sync全部8检查PASS，H:/IM-platform SHA79；782未知文件含2tracked、recovery/s1-handoff-20261001分支与无关index flags/entries保持。当前assigned managedroot `H:/.codex/worktrees/group/IM-platform`、branch `task/LOOP1-GROUP-001`已ff-only到同79/同tree；未复制main未知工作。新last known good为已接受/同步首契约main79；不代表群产品已接受。
 
-product_owner: /root/resume_backend/clients_impl
+product_owner: /root/resume_backend
 product_registration: CLIENT_IMPLEMENTATION_RESUMED
 product_G01_G09: NOT_RUN
 product_regular_review: NOT_STARTED
