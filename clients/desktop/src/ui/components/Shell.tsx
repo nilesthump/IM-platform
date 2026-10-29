@@ -23,8 +23,9 @@ export function Shell(){const s=useSyncExternalStore(app.observe,app.snapshot);
 function WorkspaceShell(){const t=useText();const display=useDisplayText();
   const s=useSyncExternalStore(app.observe,app.snapshot),[registering,setRegistering]=useState(false),[confirmation,setConfirmation]=useState(""),[registered,setRegistered]=useState(false),[username,setUsername]=useState(""),[password,setPassword]=useState(""),[query,setQuery]=useState(""),[draft,setDraft]=useState(""),[maximized,setMaximized]=useState(false);
   const [menu,setMenu]=useState(false),[picker,setPicker]=useState<{conversation?:string}|null>(null),[pickerVisible,setPickerVisible]=useState(false),[management,setManagement]=useState(false);
-  async function submitGroup(ids:string[],conversation?:string){await app.createGroup(ids,conversation);if(app.snapshot().groupStatus==='success')setPicker(null);}
-  async function retryGroup(){await app.retryGroup();if(app.snapshot().groupStatus==='success')setPicker(null);}
+  const submitGroup=app.createGroup.bind(app),retryGroup=app.retryGroup.bind(app);
+  // Close on the confirmed mutation, before its subsequent history/metadata reads settle.
+  useEffect(()=>{setPicker(null);},[s.groupSuccessRevision]);
   function showPicker(conversation?:string){if(s.groupStatus!=='unconfirmed')setPicker({conversation});setPickerVisible(true);setMenu(false);}
   useEffect(()=>{setManagement(false);},[s.selected]);
   useEffect(()=>{if(!s.session){if(s.groupStatus!=='unconfirmed')setPicker(null);setMenu(false);setManagement(false);}},[s.session,s.groupStatus]);

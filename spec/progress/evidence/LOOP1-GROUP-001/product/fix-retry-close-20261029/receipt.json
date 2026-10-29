@@ -1,0 +1,146 @@
+{
+  "base": "36b023f412b3c07b5309ddc91664045729b37902",
+  "candidate": "commit containing this receipt; external commit-binding.json records exact SHA",
+  "writer": "/root/completion_coordinator/fix_retry_close",
+  "finding": "EH36-P2-001: confirmed retry waits for unrelated history Sync before Shell closes picker",
+  "source_evidence": [
+    "root-1029/windows-retry/ui/05-retry-result.png",
+    "root-1029/windows-retry/ui/05-retry-result.json",
+    "final-error-36/report.json",
+    "final-error-36/retry-observed.json"
+  ],
+  "external_root": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025",
+  "files": {
+    "clients/desktop/src/application/ui/workspace.ts": "e5bd0614915c1a6ef646d444c5299bb2286af8b0912ac640178e88d2a6145dd8",
+    "clients/desktop/src/ui/components/Shell.tsx": "395a6f9893fb20be4085dee66ae8a56aca4a6c9aa6101a30c785d9f1fb11e67c",
+    "tests/clients/group/desktop-picker.cjs": "349f6015dac7f93e9b8090d4e2b933395aee58106d870e36ec725d312436c866"
+  },
+  "repair": "Desktop increments a per-confirmation revision after current-generation canonical mutation success. Shell observes that revision to close; no completion callback remains after metadata/history awaits. Revision is retained across same-account refresh and carries no account data. Existing retirement still clears picker. A status-only effect could miss consecutive batched loading/success when previous status is already success; revision also prevents late completion from closing a newly opened picker.",
+  "regression": {
+    "red": "actual React/Shell/GroupPanel/Workspace: dialog count 1 vs expected0 while mutation succeeded and Sync tail deferred; exit1",
+    "green": "same test exit0: original body retry after transient same-account phase + zh/en reopen; success closes before resolved/unknown Sync tail; late tail cannot close new picker; CREATE/ADD held member refresh; rejected/unknown retain selection; exact unknown errors observed",
+    "boundary": "headless actual React + Workspace and native GroupHttp adapter with controlled native invoke and Sync port; transient stop(true)/republish represents bind phase, not full auth/SQLite/native acceptance. Root native evidence separately proves full Profile Refresh.",
+    "group": "existing group verify compiles Web/Desktop and runs wire/Web/Desktop behavior; exit0"
+  },
+  "other_platforms": "Web opens synchronously before its success publication; Android uses success revision with asynchronous open intent. No equivalent awaited post-success Desktop tail found; no Web/Android product edit.",
+  "baseline": {
+    "architecture": {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit": 1,
+      "seconds": 7.469,
+      "output": "architecture.log"
+    },
+    "architecture-tests": {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture"
+      ],
+      "exit": 1,
+      "seconds": 34.141,
+      "output": "architecture-tests.log"
+    },
+    "ci-tests": {
+      "argv": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci"
+      ],
+      "exit": 0,
+      "seconds": 9.109,
+      "output": "ci-tests.log"
+    }
+  },
+  "commands": [
+    {
+      "command_id": "C-449fbc3a-d53f-459c-9343-d321102acca0",
+      "duration_ms": 157.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stderr_blob": "blobs/C-449fbc3a-d53f-459c-9343-d321102acca0.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-449fbc3a-d53f-459c-9343-d321102acca0.stdout.txt",
+      "stdout_sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+    },
+    {
+      "command_id": "C-6398646d-eb1e-49d5-87c7-59c543cea2cc",
+      "duration_ms": 203.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stderr_blob": "blobs/C-6398646d-eb1e-49d5-87c7-59c543cea2cc.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-6398646d-eb1e-49d5-87c7-59c543cea2cc.stdout.txt",
+      "stdout_sha256": "3df1e5253d74266b23647092f1519cf9376fb83445dd70df9bf0e01569fcc43f"
+    },
+    {
+      "command_id": "C-be32772b-424b-4946-a8c5-95cae90ef18e",
+      "duration_ms": 8406.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stderr_blob": "blobs/C-be32772b-424b-4946-a8c5-95cae90ef18e.stderr.txt",
+      "stderr_sha256": "56cbe98dad639c27d2e404c593237918471bb3a6e7ddf9a57973be40b8b40c12",
+      "stdout_blob": "blobs/C-be32772b-424b-4946-a8c5-95cae90ef18e.stdout.txt",
+      "stdout_sha256": "45f863cb7185342f4a09550d536366569aeede98f24236d88b63f804bfc2ce03"
+    },
+    {
+      "command_id": "C-6450888c-f248-48cd-b2dc-f36e3569e2c9",
+      "duration_ms": 11234.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stderr_blob": "blobs/C-6450888c-f248-48cd-b2dc-f36e3569e2c9.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-6450888c-f248-48cd-b2dc-f36e3569e2c9.stdout.txt",
+      "stdout_sha256": "6a5fb3503fd79d1921e7cda5c215a4713354e07bcfeb5fb2d943a2683183c546"
+    },
+    {
+      "command_id": "C-72f05184-dd24-4ae1-9428-b875f54738cc",
+      "duration_ms": 11406.0,
+      "exit_code": 0,
+      "result": "PASS",
+      "secret_redaction_applied": false,
+      "stderr_blob": "blobs/C-72f05184-dd24-4ae1-9428-b875f54738cc.stderr.txt",
+      "stderr_sha256": "2a7e865c9b89aa72979cc04719484ef6879a649174763ce0970142f319e5815f",
+      "stdout_blob": "blobs/C-72f05184-dd24-4ae1-9428-b875f54738cc.stdout.txt",
+      "stdout_sha256": "1002fccf277597fe7ace7e0d6fd05925aa836c5a9f65132de1235c072488e87e"
+    },
+    {
+      "command_id": "C-a76ce695-f55c-4a36-b2be-f64b7b7714a9",
+      "duration_ms": 34281.0,
+      "exit_code": 1,
+      "result": "FAIL",
+      "secret_redaction_applied": false,
+      "stderr_blob": "blobs/C-a76ce695-f55c-4a36-b2be-f64b7b7714a9.stderr.txt",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_blob": "blobs/C-a76ce695-f55c-4a36-b2be-f64b7b7714a9.stdout.txt",
+      "stdout_sha256": "6b2aa9008880901ff198cdbdb163108aa3adad3bf9e6fd308a489002c843f27d"
+    }
+  ],
+  "limitations": [
+    "Direct working-tree architecture/all and architecture tests FAIL only from 2998 ignored generated Desktop/Android paths; originals retained. CI tests35/4skip exit0; frozen/planning exit0. Clean exact-head hosted acceptance still required.",
+    "No fresh independent review, Windows package/install/runtime, CI, integration or main synchronization implied.",
+    "Recorder partial: startup reads, edits/helper authoring and communications were outside command capture; finish honestly FAIL, structural validation separately.",
+    "Earlier observed.json overwrite remains disclosed in coordinator-1029/observer-disclosure/receipt.json. This run never executes old probes or rewrites sealed evidence."
+  ]
+}

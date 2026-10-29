@@ -13,59 +13,41 @@ Execution Status: active
 Current Delivery: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: fresh Fix candidate following 93f2eb7825b219566ad50456bef89e8de746cd5d; exact SHA is the commit containing this recovery and external fix-eh93-1029/commit-binding.json.
+Product Source: fresh retry-close Fix following `36b023f412b3c07b5309ddc91664045729b37902`; exact SHA is the commit containing this recovery and external fix-retry-close-1029/commit-binding.json.
 Coordinator: /root/completion_coordinator
 
-Human authorized the whole GROUP task including Web, Windows and Android. Earlier backend-only/screenshot-only stops are historical and superseded. UI direction, Android CREATE without Selected, and Windows tray behavior were approved. GROUP is unfinished and not synchronized; S2 remains OPEN.
+Human authorized complete GROUP including Web, Windows and Android. Earlier backend-only/screenshot stops are superseded. Android CREATE without Selected and Windows tray behavior were approved. GROUP is unfinished; S2 OPEN.
 
-## Immediately Relevant Completed Work
+## Completed and Current Finding
 
-Backend PR70 remains accepted and safely synchronized at main3d30872. Backend source is unchanged. Prior real TLS/PG G01-G05, Web/Android operations, original-ID retries, pagination/discovery, message ACK/SQLite compensation and bounded visual reviews remain in the evidence index. Reuse requires unchanged-source binding; old screenshots are not new final-source screenshots.
+Backend PR70/main `3d30872` remains accepted and unchanged. Prior real TLS/PG G01-G05, Web/Android flows, original-ID retries, pagination/discovery, ACK/SQLite compensation and visual reviews remain in the evidence index; reuse needs unchanged-source binding.
 
-Fresh regular R5 accepted exact93 code scope, then different fresh error review found two P2 issues. Fresh Fix now ends Desktop friend loading after successful PUT/failing replacement GET while protecting owner/generation/revision and preserving unknown/observer errors. Two existing Android test harnesses preserve primary+cleanup causes, finish after cleanup, and cannot report PASS on cleanup failure. Their local reporting functions remain test-only; no product Android/backend/native/public-contract/dependency changes.
+Source36 preserved Desktop failed friend-read state and Android harness primary/cleanup causes. Its regular review passed, but native Windows G06 found successful original-ID retry leaves Create dialog open while background conversation opens. Different fresh error review36 FAIL/EH36-P2-001 independently reproduced: Shell waited for full metadata/history Sync before closing, and unknown tail failure left it open permanently. Installed36 is source-bound at coordinator-1029/install-36b023f4/binding.json; this is not acceptance.
 
-## Current Blockers
-
-Final candidate needs NEW fresh regular and DIFFERENT fresh error review; source93's prior regular PASS cannot accept this Fix. No push/CI-triggering PR until both pass the exact final SHA. Ordinary findings require another fresh Fix/review cycle.
-
-Windows G01/G06-after/G07/G08/G09 remains incomplete. Root's first 2026-10-29 control attempt timed out before any click/login/group request, then documented rediscovery successfully obtained actual screenshot/AX. Control is available; remaining native verification waits for the new source-bound package/install and foreground batch. Root's receipt records zero attempts, unconsumed relay arm, restored original TLS/health200. Hosted CI, protected integration, actual-main verification and safe synchronization remain pending.
+Fresh Fix adds only Desktop confirmed-success revision and Shell observation to close immediately, with no delayed callback that can close a newly opened picker. Original requests, generation/account retirement and unknown propagation stay unchanged. Web/Android equivalent paths inspected; no product change there. New reviews are required on final SHA.
 
 ## Verification
 
-- `python -Xutf8 -B tests/clients/group/verify.py`: actual Desktop new regression RED exit1 then GREEN exit0; known/unknown GET failures, GET-only recovery without another PUT, stale generation/owner/revision and primary+observer preservation. Retained Web/Desktop group tests PASS.
-- `python -Xutf8 -B tests/clients/gui/native.py gradle --offline -PimSendInstrumentation=im.platform.client.group.<runner> :app:assembleDebug :app:assembleDebugAndroidTest`: GroupRuntime, Cleanup and FriendLoad builds exit0. Original owned im_group_g8802/emulator-5590 restored without reset; API34, Enforcing verified.
-- Actual GroupRuntime nonempty directory at a previously absent app-private fixture: read EISDIR + delete failure RED lost the primary; GREEN reports both and returns FAIL/canceled. Sentinel/directory removed, original absence verified. This is a controlled fixture fault, not a hardware filesystem fault.
-- Actual CleanupInstrumentation: both real harness reporting/finally paths success/primary/cleanup/dual and cancel+close dual failures PASS/code -1. Existing actual VM FriendLoadInstrumentation PASS/code -1; controlled transport, no TLS claim. Android product APK remains bd5bf36f39354f95819794debde42042f429fc4d7661390cf7428bc3020380bf.
-- Prior exact93 tracked snapshot: all19102 blobs independently matched; architecture all exit0/4.047s, architecture88 tests/1skip exit0/37.750s, CI35/4skips exit0/12.953s. Direct working-tree architecture fails on ignored generated Desktop dist; failure retained, outputs not deleted. These prior results do not certify the new Fix.
+- Actual React/Shell/GroupPanel/Workspace regression: RED exit1 then GREEN exit0 (11.234s). Covers original-ID retry after same-account transient stop(true) + zh/en reopen, search/selection, deferred and unknown Sync tails, new picker unaffected by old completion, immediate CREATE/ADD with deferred member read, rejection/unknown retention and error propagation. Controlled native invoke/Sync port; not installed acceptance or full auth/SQLite refresh.
+- `python -Xutf8 -B tests/clients/group/verify.py`: exit0/11.406s, real Web/Desktop compilation and wire/Web/Desktop behavior including source36 friend-read regressions.
+- Frozen architecture/PDF integrity and S2 planning exit0. CI tests35/4skip exit0. Direct working-tree all-architecture and architecture88/1skip FAIL from 2998 ignored generated Desktop/Android artifacts; raw failures retained and outputs not deleted. Prior exact93 tracked-snapshot PASS supports only93, not this candidate. Clean final hosted checks remain mandatory.
 
-Commands, hashes and raw output discovery: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-error-20261029/receipt.json`; external `group-completion-20261025/fix-eh93-1029/`. Desktop package build is pending after this commit.
+Durable new receipt: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-retry-close-20261029/receipt.json`. External evidence under `group-completion-20261025/fix-retry-close-1029/`; original36 native screenshot root-1029/windows-retry/ui/05-retry-result.png/json; final-error-36/report.json and retry-observed.json.
 
-## Changed Files or Migrations
+## Blockers and Next Exact Action
 
-Desktop Workspace + existing group regression; only two named Android group instrumentation harnesses and one local test runner; Task/current and new recovery/fix evidence. No migration, contract, dependency, native or architecture changes. Coordinator's original large current.md is preserved at product/recovery-20261029/current-before.md.
+Freeze clean Fix, fresh regular review then DIFFERENT fresh error review on same final SHA. Both must PASS before any push/CI-triggering PR. Source36 regular PASS cannot accept this fix. Build exact-source NSIS in parallel; coordinator installs only after root releases installed36 runtime lease, preserving AppData/credentials/database. Root owns Windows UI/services and remaining G01/G06/G07/G08/G09 native evidence; no current control-access blocker.
 
-## Known Failures, Risks, and Assumptions
+Then bind full G01-G09/Architect evidence, exact-head required hosted jobs, protected integration, actual-main validation and safe H:/IM-platform synchronization. No GROUP done or S2 PASS until requirements met. Do not advance another task or S2 Gate automatically.
 
-All prior review/test/tool failures stay evidence. Installed ff6/93 Windows package is superseded by this Desktop change and is not runtime acceptance. Root owns runtime/service/TLS; Human-imported v5 valid through2026-11-04. No main unknown work is modified.
+## Known Risks and Ownership
 
-R-COORDINATOR-1029 finished partial FAIL, validate exit0 (16 events). R-FIX-EH93 is prospective_resume/partial; startup/direct reads/helper authoring and commit/build tail are disclosed. It will finish honestly FAIL and validate after build; neither is product acceptance. The original reviewer probe was run before noticing its output write: same failed-state desktop-friends-observed.json was rewritten; original review report is untouched. New raw regression evidence is isolated.
+No contract/schema/native/dependency/backend or other-client product change. Android production APK remains bd5bf36f39354f95819794debde42042f429fc4d7661390cf7428bc3020380bf. Root owns runtime/TLS (Human-imported v5 valid through2026-11-04). Main unknown782 files +2 tracked changes remain untouched.
 
-## Next Exact Action
+R-FIX-RETRY-CLOSE is prospective_resume/partial: startup/direct reads, edits and helper authoring are outside command capture; finish honestly FAIL and validate after build. Recorder is not acceptance. Earlier partial runs and the original reviewer observed.json overwrite remain disclosed at coordinator-1029/observer-disclosure/receipt.json; no original bytes reconstructed. Old current.md remains archived byte-exact at product/recovery-20261029/current-before.md.
 
-Commit this verified local Fix, release source writer, delegate new regular then different error review on that SHA. Build exact-source Desktop package, guarded install and complete remaining Windows native checks. Bind full G01-G09/Architect evidence; satisfy exact-head required hosted jobs, protected integration/actual-main and safe H:/IM-platform synchronization before GROUP done.
+Sole writer /root/completion_coordinator/fix_retry_close owns the two Desktop source files, existing picker regression and new receipt/Task/current. Commit only known files, then release repository writer; build/evidence continues externally. Root alone operates Windows.
 
-## Last Known Good Commit
+## Last Known Good Commit and Checkpoint
 
-`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e`: accepted backend/main, rechecked2026-10-29; all unknown main work preserved.
-
-## Latest Checkpoint
-
-`spec/progress/checkpoints/2026-10-28-group-windows-feedback.md`: bounded recovery, not full GROUP acceptance.
-
-## Uncommitted Changes / Ownership
-
-Sole writer /root/completion_coordinator/fix_eh93 owns the listed Fix and explicitly authorized coordinator recovery metadata. Commit these known files only, then release source writer to coordinator; build outputs/evidence may continue separately. No unknown main or other-agent changes modified. Root owns Windows UI.
-
-## Architecture Conflicts / ACP / ADR
-
-None identified. Existing authority, public contracts, ACK/security/source/technology boundaries remain unchanged.
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e`: accepted backend/main. Latest checkpoint: `spec/progress/checkpoints/2026-10-28-group-windows-feedback.md`, bounded recovery only. No architecture conflict identified; architecture/contracts/ACK/security boundaries unchanged.
