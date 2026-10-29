@@ -2,11 +2,13 @@
 task_id: LOOP1-GROUP-001
 title: 建群、成员添加与三端群聊接入
 status: active
-owner: /root/resume_backend
+owner: /root/completion_coordinator/fix_eh93
 stage: S2
 gate: S2
 client_supplement_phase: group_product
 ---
+
+Current recovery (2026-10-29): exact93 fresh regular R5 PASS was followed by different fresh error review FAIL with two P2 findings. Fresh Fix corrected Desktop add/read loading state with owner/generation/revision guards and preserved unknown/observer causes; the two Android instrumentation harnesses now retain primary and cleanup failures and finish canceled after cleanup. Actual Desktop regression RED/GREEN, actual Android GroupRuntime EISDIR+cleanup RED/GREEN, both harnesses' four reporting paths and existing actual-VM FriendLoad regression PASS locally. No product Android/backend/native/contract change. New final-SHA regular and different error reviews are PENDING before push. Evidence: product/fix-error-20261029/receipt.json and external fix-eh93-1029; source SHA is the commit containing this receipt. Desktop package build follows commit; no installation or native acceptance implied. Windows control recovered after the timeout with real screenshot/AX; zero login/group effects in that attempt, and remaining runtime awaits the new installed candidate. GROUP active/S2 OPEN; accepted main3d30872 unchanged. Root owns Windows runtime; Fix owns only this authorized source/metadata slice until commit, then releases to coordinator. Historical recovery paragraphs follow.
 
 R5 recovery (2026-10-28): source ff6da015 regular R4 FAIL/P2: Android friend PUT success then list GET failure leaves loading. Sole writer /root/resume_backend/android_friend_refresh_fix_r5 completed a three-line production fix with actual VM RED/GREEN on emulator-5590: PUT success / GET failure, GET-only empty recovery without repeating PUT, unknown propagation, and retired-generation protection. Final Gradle build exit0; deterministic instrumentation PASS/code -1. Fresh independent review is next; this is not whole-task acceptance. Windows native validation remains incomplete after backend 403 / approval timeouts. GROUP active / S2 OPEN; no push/merge/done. Initial direct recovery reads are partial Recorder capture.
 

@@ -135,10 +135,10 @@ export class Workspace {
     finally{if(g===this.generation)try{this.publish({busy:false});}catch(error){failure=failed&&error!==failure?new AggregateError([failure,error],"Search and observer failed"):error;rejected=true;}}
     if(rejected)throw failure;
   }
-  async add(id:string){if(!this.auth)return;const auth=this.auth,g=this.generation;let failed=false,rejected=false,failure:unknown;
-    try{this.publish({busy:true,error:null});const conversation=await auth.add(id);if(g!==this.generation)return;const revision=++this.friendRevision;const friends=await auth.friends();if(g!==this.generation||auth!==this.auth)return;if(revision===this.friendRevision)this.publish({friends,friendsStatus:'ready',conversations:[...new Set([...this.state.conversations,conversation])]});await this.open(conversation);}
-    catch(error){failed=true;failure=error;try{this.failure(error,g===this.generation);}catch(propagated){failure=propagated;rejected=true;}}
-    finally{if(g===this.generation)try{this.publish({busy:false});}catch(error){failure=failed&&error!==failure?new AggregateError([failure,error],"Friend add and observer failed"):error;rejected=true;}}
+  async add(id:string){if(!this.auth)return;const auth=this.auth,g=this.generation;let failed=false,rejected=false,failure:unknown,readRevision:number|undefined;
+    try{this.publish({busy:true,error:null});const conversation=await auth.add(id);if(g!==this.generation||auth!==this.auth)return;const revision=++this.friendRevision;readRevision=revision;const friends=await auth.friends();readRevision=undefined;if(g!==this.generation||auth!==this.auth)return;if(revision===this.friendRevision)this.publish({friends,friendsStatus:'ready',conversations:[...new Set([...this.state.conversations,conversation])]});await this.open(conversation);}
+    catch(error){failed=true;failure=error;try{this.failure(error,g===this.generation&&auth===this.auth&&(readRevision===undefined||readRevision===this.friendRevision));}catch(propagated){failure=propagated;rejected=true;}}
+    finally{if(g===this.generation&&auth===this.auth)try{this.publish({busy:false,...(failed&&readRevision!==undefined&&readRevision===this.friendRevision?{friendsStatus:'error' as const}:{})});}catch(error){failure=failed&&error!==failure?new AggregateError([failure,error],"Friend add and observer failed"):error;rejected=true;}}
     if(rejected)throw failure;
   }
 

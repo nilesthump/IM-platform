@@ -30,8 +30,19 @@ class FriendLoadInstrumentation:Instrumentation(){
   override fun getInputStream():InputStream=response().byteInputStream()
  }
  override fun onCreate(args:Bundle?){super.onCreate(args);start()}
+ // This instrumentation owns reporting: cleanup must not replace a failed assertion.
+ internal fun runChecks(result:Bundle,checks:()->Unit,cancelScope:()->Unit,closeRepository:()->Unit):Int {
+  var failure:Throwable?=null
+  try{checks()}catch(e:Throwable){failure=e}
+  finally{
+   try{cancelScope()}catch(e:Throwable){val primary=failure;if(primary==null)failure=e else if(primary!==e)primary.addSuppressed(e)}
+   try{closeRepository()}catch(e:Throwable){val primary=failure;if(primary==null)failure=e else if(primary!==e)primary.addSuppressed(e)}
+  }
+  failure?.let{result.putString("result","FAIL");result.putString("failure",it.stackTraceToString())}
+  return if(result.getString("result")=="PASS")android.app.Activity.RESULT_OK else android.app.Activity.RESULT_CANCELED
+ }
  override fun onStart(){val result=Bundle();var vm:WorkspaceViewModel?=null;var scope:CoroutineScope?=null;var repo:Repository?=null
-  try{URL.setURLStreamHandlerFactory{scheme->if(scheme=="https")object:URLStreamHandler(){override fun openConnection(url:URL):URLConnection{
+  val code=runChecks(result,{URL.setURLStreamHandlerFactory{scheme->if(scheme=="https")object:URLStreamHandler(){override fun openConnection(url:URL):URLConnection{
    check(url.host=="friend-load-r5.invalid"){"unexpected host"}
    return Peer(url){if(url.path=="/v1/friends/$friend"){puts++;"{\"friendshipId\":\"$friend\",\"normalizedPair\":[],\"directConversationId\":\"$conversation\",\"memberUserIds\":[],\"created\":true}"}else{check(url.path=="/v1/friends");gets++;entered?.countDown();release?.await();fault?.let{throw it};"{\"friends\":[]}"}}
   }}else null}
@@ -78,8 +89,7 @@ class FriendLoadInstrumentation:Instrumentation(){
 
    }
    result.putString("result","PASS");result.putString("scope","actual VM.add PUT then GET, terminal error, GET-only empty recovery, unknown propagation; controlled transport, not TLS acceptance")
-  }catch(e:Throwable){result.putString("result","FAIL");result.putString("failure",e.toString())}
-  finally{scope?.cancel();repo?.close()}
-  finish(if(result.getString("result")=="PASS")android.app.Activity.RESULT_OK else android.app.Activity.RESULT_CANCELED,result)
+  },{scope?.cancel()},{repo?.close()})
+  finish(code,result)
  }
 }
