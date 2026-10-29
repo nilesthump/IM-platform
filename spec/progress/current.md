@@ -1,53 +1,60 @@
 # Current Execution State
 
-Current Loop: Loop 1
-Current Stage: S2
-Current Gate: S2
-Gate Status: OPEN
-Current Batch: LOOP1-GROUP-001
+Current Loop: `Loop 1`
+Current Stage: `S2`
+Current Gate: `S2`
+Gate Status: `OPEN`
+Current Batch: `LOOP1-GROUP-001`
 Batch Status: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
-Current Task: LOOP1-GROUP-001
-Current Task State: active
+Current Task: `LOOP1-GROUP-001`
+Current Task State: `active`
 Execution Status: active
-
-Current Delivery: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: fresh retry-close Fix following `36b023f412b3c07b5309ddc91664045729b37902`; exact SHA is the commit containing this recovery and external fix-retry-close-1029/commit-binding.json.
+Product Source: Android closure Fix after 974e7c97049ed559e11904ff58831628a5063571; exact commit is externally bound in fix-android-close-1029/commit-binding.json.
 Coordinator: /root/completion_coordinator
 
-Human authorized complete GROUP including Web, Windows and Android. Earlier backend-only/screenshot stops are superseded. Android CREATE without Selected and Windows tray behavior were approved. GROUP is unfinished; S2 OPEN.
+## Immediately Relevant Completed Work
 
-## Completed and Current Finding
+Human authorized full GROUP across Web, Windows and Android; earlier backend-only/screenshot stops are superseded. Backend PR70/main3d30872 remains accepted. Prior Desktop36 friend-read and974 confirmed-picker-close fixes remain. Source974 regular review FAIL REG974-P2-001 found Android clears its request before closing, then waits for member GET. The one-line Android fix signals confirmed success and opens the conversation before that read. Actual Compose/VM regression passes after reproducing RED; no blanket GROUP acceptance.
 
-Backend PR70/main `3d30872` remains accepted and unchanged. Prior real TLS/PG G01-G05, Web/Android flows, original-ID retries, pagination/discovery, ACK/SQLite compensation and visual reviews remain in the evidence index; reuse needs unchanged-source binding.
+## Current Blockers
 
-Source36 preserved Desktop failed friend-read state and Android harness primary/cleanup causes. Its regular review passed, but native Windows G06 found successful original-ID retry leaves Create dialog open while background conversation opens. Different fresh error review36 FAIL/EH36-P2-001 independently reproduced: Shell waited for full metadata/history Sync before closing, and unknown tail failure left it open permanently. Installed36 is source-bound at coordinator-1029/install-36b023f4/binding.json; this is not acceptance.
-
-Fresh Fix adds only Desktop confirmed-success revision and Shell observation to close immediately, with no delayed callback that can close a newly opened picker. Original requests, generation/account retirement and unknown propagation stay unchanged. Web/Android equivalent paths inspected; no product change there. New reviews are required on final SHA.
+GROUP unfinished; S2 OPEN. Final-SHA fresh regular and DIFFERENT fresh error review are NEW PENDING. Source974 regular FAIL/no specialist; no accepted final hosted CI/integration/main synchronization. Full native G01-G09 and Architect binding remain coordinator-owned.
 
 ## Verification
 
-- Actual React/Shell/GroupPanel/Workspace regression: RED exit1 then GREEN exit0 (11.234s). Covers original-ID retry after same-account transient stop(true) + zh/en reopen, search/selection, deferred and unknown Sync tails, new picker unaffected by old completion, immediate CREATE/ADD with deferred member read, rejection/unknown retention and error propagation. Controlled native invoke/Sync port; not installed acceptance or full auth/SQLite refresh.
-- `python -Xutf8 -B tests/clients/group/verify.py`: exit0/11.406s, real Web/Desktop compilation and wire/Web/Desktop behavior including source36 friend-read regressions.
-- Frozen architecture/PDF integrity and S2 planning exit0. CI tests35/4skip exit0. Direct working-tree all-architecture and architecture88/1skip FAIL from 2998 ignored generated Desktop/Android artifacts; raw failures retained and outputs not deleted. Prior exact93 tracked-snapshot PASS supports only93, not this candidate. Clean final hosted checks remain mandatory.
+- Command: `H:/Android/platform-tools/adb.exe -s emulator-5590 shell am instrument -w -r im.platform.client.test/im.platform.client.group.GroupCloseInstrumentation`
+  - Result: RED FAIL/code0 (5.000s), GREEN PASS/code-1 (46.515s); actual Activity/Compose/VM with controlled HTTPS transport; accessibility assertions only, no new PNG/AX capture. CREATE/ADD, deferred/unknown member reads, original-ID same-account retry/reopen, old-read/new-picker and retired-account safety. Emulator API34/Enforcing restored stopped; data preserved.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-android-close-20261029/receipt.json`
+- Command: `python -Xutf8 -B tests/clients/group/verify.py`
+  - Result: final exit0; actual Web/Desktop compile and wire/client regressions. Android Gradle offline product/test build exit0. Frozen/planning exit0; CI tests35/4skip exit0. Direct architecture and architecture88/1skip FAIL from2998 ignored generated build artifacts, retained without waiver. Control Development exit1/31.360s: only remaining issue is the generated-artifact architecture test (3035 findings after builds); required current.md format checks passed.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-android-close-20261029/receipt.json`
 
-Durable new receipt: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-retry-close-20261029/receipt.json`. External evidence under `group-completion-20261025/fix-retry-close-1029/`; original36 native screenshot root-1029/windows-retry/ui/05-retry-result.png/json; final-error-36/report.json and retry-observed.json.
+## Changed Files or Migrations
 
-## Blockers and Next Exact Action
+Android WorkspaceViewModel one-line reorder, GroupCloseInstrumentation using existing reporting/Compose accessibility, current Task/current and new thin receipt. No migration, dependency, native, contract, backend, Web or Desktop change. Exact source/APK inputs in external green2-inputs.json and final package binding.
 
-Freeze clean Fix, fresh regular review then DIFFERENT fresh error review on same final SHA. Both must PASS before any push/CI-triggering PR. Source36 regular PASS cannot accept this fix. Build exact-source NSIS in parallel; coordinator installs only after root releases installed36 runtime lease, preserving AppData/credentials/database. Root owns Windows UI/services and remaining G01/G06/G07/G08/G09 native evidence; no current control-access blocker.
+## Known Failures, Risks, and Assumptions
 
-Then bind full G01-G09/Architect evidence, exact-head required hosted jobs, protected integration, actual-main validation and safe H:/IM-platform synchronization. No GROUP done or S2 PASS until requirements met. Do not advance another task or S2 Gate automatically.
+Raw cache EPERM baseline failure, pre-unlock emulator timeout, initial green scenario-cleanup failure and generated-output architecture failures remain preserved. Earlier overwritten reviewer observed.json remains disclosed at coordinator-1029/observer-disclosure/receipt.json. Recorder R-FIX-ANDROID-CLOSE-1029 is prospective_resume/partial: startup/direct reads, edits, helper authoring and diagnostic runtime recovery outside capture; its prompt text is explicitly an assignment summary, although register-prompt default metadata says human/full. Finish honestly FAIL; final validation recorded externally. Recorder/local PASS is not acceptance.
 
-## Known Risks and Ownership
+## Next Exact Action
 
-No contract/schema/native/dependency/backend or other-client product change. Android production APK remains bd5bf36f39354f95819794debde42042f429fc4d7661390cf7428bc3020380bf. Root owns runtime/TLS (Human-imported v5 valid through2026-11-04). Main unknown782 files +2 tracked changes remain untouched.
+Commit only owned files and bind exact source/package SHA, release writer. Fresh regular review then DIFFERENT fresh error specialist on the same final SHA; both must PASS before push/CI-triggering PR. Root owns installed974 Windows executable bd0f08fc668b26998e7b2fdea4c22e6a0d598a73d59ffe36e17ee2bb40c50976 and Go/TLS; coordinate runtime reuse by source binding. Complete native/Architect evidence, exact-head required hosted jobs, protected integration, actual-main and safe H:/IM-platform synchronization. Do not mark GROUP done or advance S2 before independent acceptance and synchronization.
 
-R-FIX-RETRY-CLOSE is prospective_resume/partial: startup/direct reads, edits and helper authoring are outside command capture; finish honestly FAIL and validate after build. Recorder is not acceptance. Earlier partial runs and the original reviewer observed.json overwrite remain disclosed at coordinator-1029/observer-disclosure/receipt.json; no original bytes reconstructed. Old current.md remains archived byte-exact at product/recovery-20261029/current-before.md.
+## Last Known Good Commit
 
-Sole writer /root/completion_coordinator/fix_retry_close owns the two Desktop source files, existing picker regression and new receipt/Task/current. Commit only known files, then release repository writer; build/evidence continues externally. Root alone operates Windows.
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main; synchronization of this Android fix PENDING. No main writes by this Fix Agent.
 
-## Last Known Good Commit and Checkpoint
+## Latest Checkpoint
 
-`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e`: accepted backend/main. Latest checkpoint: `spec/progress/checkpoints/2026-10-28-group-windows-feedback.md`, bounded recovery only. No architecture conflict identified; architecture/contracts/ACK/security boundaries unchanged.
+`spec/progress/checkpoints/2026-10-28-group-windows-feedback.md` is bounded recovery, not full GROUP acceptance.
+
+## Uncommitted Changes / Ownership
+
+Sole source writer /root/completion_coordinator/fix_android_close owns only the listed Android/test/recovery files until clean commit, then releases to coordinator. Main782 unknown untracked files and2 tracked changes untouched. Final external commit-binding records actual clean state and release.
+
+## Architecture Conflicts / ACP / ADR
+
+None identified; existing Kotlin/Compose/SDK stack, original request identity, generation safety, unknown/cancellation propagation, contracts/ACK/security boundaries remain unchanged.

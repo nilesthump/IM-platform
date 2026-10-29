@@ -2,11 +2,15 @@
 task_id: LOOP1-GROUP-001
 title: 建群、成员添加与三端群聊接入
 status: active
-owner: /root/completion_coordinator/fix_retry_close
+owner: /root/completion_coordinator/fix_android_close
 stage: S2
 gate: S2
 client_supplement_phase: group_product
 ---
+
+Fresh Android closure Fix (2026-10-29): source974 regular FAIL REG974-P2-001 is reproduced by actual Compose/WorkspaceViewModel on owned API34 emulator-5590. One production line now publishes the existing confirmed-success revision and opens the conversation before awaiting member refresh. Actual RED result FAIL/code0/outer1 then GREEN PASS/code-1/outer0 (46.515s) covers first CREATE/ADD, deferred and unknown member reads, original-ID same-account stop(true)/locale/reopen retry, old read/new picker and retired-account safety. Unknown errors remain the same object; existing cancellation catches unchanged. New runner reuses FriendLoadInstrumentation primary/cleanup reporting. No new dependency/native/protocol/storage or Web/Desktop change. Emulator restored stopped; all data/credentials/trust preserved. New receipt product/fix-android-close-20261029/receipt.json; external fix-android-close-1029 binds exact commit/APKs. Final SHA needs NEW fresh regular then DIFFERENT fresh error specialist; neither source974 regular FAIL nor older reviews accept this fix. Hosted/protected integration/actual-main/main synchronization remain PENDING, GROUP active/S2 OPEN, LKG3d30872. Root owns installed974 Windows/TLS and remaining native G01/G06/G07/G08/G09. Initial runtime before user unlock timed out; first green test had scenario-cleanup failure; originals preserved. Recorder prospective_resume partial, not acceptance. Source writer releases only after clean commit; main unknown work untouched.
+
+Historical prior recovery follows.
 
 Current recovery (2026-10-29 retry-close): source36 was built/guard-installed (coordinator-1029/install-36b023f4/binding.json) and passed fresh regular review, then actual Windows G06 plus different fresh error review FAIL/EH36-P2-001 showed the successful retry picker waits for post-commit Sync and stays open on unknown tail failure. Original screenshot root-1029/windows-retry/ui/05-retry-result.png/json and final-error-36 report/probe are preserved. Fresh Fix now publishes a Desktop confirmed-success revision and closes Shell picker on observation, preventing old tail completion from closing a new picker. Actual React/Workspace RED exit1 then GREEN exit0 covers original-ID same-account transient/locale reopening, deferred/unknown tails, new picker, CREATE/ADD and failed retention; group compile/behavior exit0. Frozen/planning/CI-tests pass locally; direct architecture/all and architecture tests still fail on 2998 ignored generated artifacts, preserved. New receipt product/fix-retry-close-20261029/receipt.json; external fix-retry-close-1029 records exact commit/build bindings. Final-SHA fresh regular and different error review PENDING, then hosted/integration/actual-main/safe main sync required. Root owns installed36/runtime until serialized replacement; Fix may build after clean commit, no installation. GROUP active/S2 OPEN, accepted main3d30872 and unknown main work unchanged. Recorder partial disclosed; no local/Recorder acceptance claim. Previous36 friend-read/instrumentation fixes remain. Historical recovery paragraphs follow.
 
@@ -337,6 +341,8 @@ Final-source whole Go ordinary21.750s/race100.031s native0 each:72 main/265 incl
 Recorder prospective_resume/partial actually finished FAIL (finish CLI0), direct structural validate0;95events/45starts/44finishes/one unmatched rg launch. No trace edits or fabricated finish. Packaging/commit/clean Control/sealing are explicit postclosure tail. Original shell-escape/default-write/pg_ctl status3 failures remain; same-instance privileged PG status0 required no restart and status3 cause is unavailable. New final SHA requires wholly fresh regular then different fresh error specialist. Both are NEW PENDING, hosted not accepted, PR not created by Fix owner, main-sync PENDING; GROUP active/group_product, S2 OPEN and accepted LKG/main `79d39dcbd045597ccc5abd459edd388eed269254`. Root may push/new PR only after both reviews PASS, then STOP per Human; no merge/main-sync/Taskdone/client continuation.
 
 # Handoff
+
+Current Android closure fix: use the top 2026-10-29 Android recovery and new receipt. Final source SHA is externally bound after the single commit; fresh regular and different error review are PENDING, then hosted/full GROUP evidence/integration/main synchronization. Historical backend-only stops below are superseded by the current Human full-GROUP authorization.
 
 Backend Fix R1 supersedes the historical implementation next-action text: follow the sealed external fix receipt, verify the single final commit/clean state, and perform NEW regular→different NEW error review before new backend PR; stop after PR creation. Full GROUP acceptance remains pending.
 
