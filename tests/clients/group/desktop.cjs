@@ -51,6 +51,38 @@ const rows=[A,B].map(id=>({conversationId:C,kind:'GROUP',createdBy:A,createdAt:t
  const unknown=new Error('controlled native bug');window.__TAURI_INTERNALS__.invoke=async()=>{throw unknown};await assert.rejects(()=>app.refreshGroups(),e=>e===unknown);
  await app.stop();assert.equal(app.state.groups.length,0);assert.equal(app.groupOperation,undefined);
  console.log('Group Desktop actual native adapter retry/snapshot/unknown/isolation behavior PASS');
+ // Only the literal native invoke is controlled: compiled nativeFetch, GroupHttp
+ // and Workspace must propagate unexpected failures, even after retirement.
+ for(const name of ['Error','InvalidStateError','DataCloneError','AbortError'])for(const method of ['POST','GET'])for(const retired of [false,true]){
+  const app=new Workspace(),entered=deferred(),pendingNative=deferred();
+  const cause=name==='Error'?new Error('owned native bug'):new DOMException('owned native bug',name);
+  let calls=0;
+  window.__TAURI_INTERNALS__.invoke=async(command,args)=>{assert.equal(command,'native_https');assert.equal(args.method,method);calls++;entered.resolve();return pendingNative.promise;};
+  app.state={...app.state,session:{userId:A,sessionId:R,sessionEpoch:1n,accessToken:'controlled-only'}};
+  const pending=method==='POST'?app.createGroup([B]):app.refreshGroups();await entered.promise;
+  if(retired){await app.stop();app.state={...app.state,session:{userId:B,sessionId:R,sessionEpoch:1n,accessToken:'controlled-only'}};}
+  const before=app.state,rejection=assert.rejects(pending,e=>e===cause,name+' must retain the same cause');
+  pendingNative.reject(cause);await rejection;
+  assert.equal(app.state,before,'unknown failure must not publish a fabricated transport state');assert.equal(calls,1);
+  if(retired)assert.equal(app.groupOperation,undefined,'retirement clears the old operation');
+  else if(method==='POST')assert.equal(app.groupOperation.account,A,'unknown commit must not discard original identity');
+ }
+ // Workspace creates fresh, unexposed signals and does not cancel group calls.
+ // Exercise real adapter cancellation via its actual GroupHttp, with an owned
+ // signal: cancellation must reject as AbortError, never as GroupFailure.
+ for(const phase of ['before-invoke','after-invoke']){
+  const app=new Workspace(),controller=new AbortController();let calls=0;
+  app.state={...app.state,session:{userId:A,sessionId:R,sessionEpoch:1n,accessToken:'controlled-only'}};
+  window.__TAURI_INTERNALS__.invoke=async(command,args)=>{
+   assert.equal(command,'native_https');calls++;controller.abort();
+   return [201,{'content-type':'application/json','cache-control':'no-store'},Array.from(Buffer.from(JSON.stringify({requestId:R,conversationId:C,addedMemberUserIds:[A,B],createdAt:time})))];
+  };
+  if(phase==='before-invoke')controller.abort();
+  const before=app.state;
+  await assert.rejects(app.groupHttp().mutate(R,[B],controller.signal),e=>e instanceof DOMException&&e.name==='AbortError');
+  assert.equal(calls,phase==='before-invoke'?0:1);assert.equal(app.state,before);
+ }
+ console.log('Desktop actual native/group/workspace DOM cause, account retirement and real signal cancellation PASS');
  // A confirmed mutation must not defer its navigation until an older member read finishes.
  for(const next of ['create','manual','retired','unknown']){
   const app=new Workspace(),held=deferred(),entered=deferred(),later='30000000-0000-4000-8000-000000000002';

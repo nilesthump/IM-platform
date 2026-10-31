@@ -146,7 +146,7 @@ export class Workspace {
   private groupScanning=false;private groupDirty=false;
   async createGroup(ids:string[],conversation?:string){const s=this.state.session;if(!s||this.state.groupBusy||this.groupOperation)return;
     this.groupOperation=Object.freeze({account:s.userId,requestId:crypto.randomUUID(),targets:Object.freeze(targets(ids,s.userId)),conversation});await this.retryGroup();}
-  private groupHttp(){const s=this.state.session;if(!s)throw new GroupFailure('authentication');return new GroupHttp(this.state.endpoint,s.userId,s.accessToken,nativeFetch,e=>e instanceof NativeTransportFailure||e instanceof DOMException);}
+  private groupHttp(){const s=this.state.session;if(!s)throw new GroupFailure('authentication');return new GroupHttp(this.state.endpoint,s.userId,s.accessToken,nativeFetch,e=>e instanceof NativeTransportFailure);}
   async retryGroup(){const s=this.state.session,g=this.generation,op=this.groupOperation;if(!s||!op||op.account!==s.userId||this.state.groupBusy)return;
     this.publish({groupBusy:true,groupError:'',groupStatus:'loading'});
     try{const answer=await this.groupHttp().mutate(op.requestId,op.targets,new AbortController().signal,op.conversation);if(g!==this.generation)return;
