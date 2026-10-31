@@ -1,9 +1,11 @@
 """Compile real Web/Desktop group UI and exercise behavior. Native acceptance is separate."""
 from pathlib import Path
-import json, os, shutil, subprocess, tempfile
+import json, os, shutil, subprocess, sys, tempfile
 root=Path(__file__).resolve().parents[3]
 npm=shutil.which('npm.cmd' if os.name=='nt' else 'npm');node=shutil.which('node')
 if not npm or not node:raise RuntimeError('Node/npm required')
+subprocess.run([sys.executable,'-B',str(root/'tests/clients/group/test_harness_failures.py')],check=True,cwd=root)
+subprocess.run([node,str(root/'tests/clients/group/harness-failures.cjs')],check=True,cwd=root)
 with tempfile.TemporaryDirectory(prefix='group-client-') as directory:
  stage=Path(directory)
  for name in ('package.json','package-lock.json'):shutil.copyfile(root/'clients/desktop'/name,stage/name)

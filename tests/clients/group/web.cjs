@@ -1,11 +1,12 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const config=JSON.parse(fs.readFileSync(process.argv[2],'utf8').replace(/^\uFEFF/,''));
 const {chromium}=require(config.playwright);const accounts=JSON.parse(fs.readFileSync(config.credentials,'utf8').replace(/^\uFEFF/,''));const out=config.out;fs.mkdirSync(out,{recursive:false});
+const publicFailure=e=>String(e?.message??e).split('Call log:')[0].trim();
 const result={scope:'Actual Web group TLS/UI; independent DB checkpoints are separate',events:[],result:'PENDING'};
 const save=(name,data)=>fs.writeFileSync(path.join(out,name),JSON.stringify(data,null,2));
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 async function checkpoint(name,data){save(name+'.json',data);for(let n=0;n<12000;n++){if(fs.existsSync(path.join(out,name+'.continue')))return;await delay(100)}throw new Error('Independent DB observer checkpoint timed out: '+name)}
-(async()=>{const browser=await chromium.launch({executablePath:config.browser,headless:true});let page;
+(async()=>{const browser=await chromium.launch({executablePath:config.browser,headless:true});const failures=[];let page;
  try{
   const context=await browser.newContext({viewport:{width:1440,height:1000}});page=await context.newPage();page.on('pageerror',e=>{result.events.push({type:'pageerror',message:e.message})});await page.goto('https://localhost:18444');
   await page.getByLabel('Username',{exact:true}).fill(accounts.A.username);await page.getByLabel('Password',{exact:true}).fill(accounts.A.password);await page.getByRole('button',{name:'Enter workspace →',exact:true}).click();await page.getByText('Online',{exact:true}).waitFor();
@@ -22,6 +23,12 @@ async function checkpoint(name,data){save(name+'.json',data);for(let n=0;n<12000
    await page.screenshot({path:path.join(out,'web-'+mode+'-retried.png'),fullPage:true});await checkpoint('web-'+mode+'-success',{actor:accounts.A.userId,requestId:original.requestId,targets:original.memberUserIds,response:success,attempts});result.events.push({mode,original,response:success,attempts});await page.unroute('**/v1/groups');
   }
   assert.equal(result.events.filter(e=>e.type==='pageerror').length,0);result.result='PASS_WEB_G06_UI_AND_REAL_RESPONSES';
- }catch(e){result.result='FAIL';result.failure=String(e.message).split('Call log:')[0].trim();if(page){try{await page.screenshot({path:path.join(out,'failure.png'),fullPage:true})}catch(captureError){result.captureFailure=String(captureError.message).split('Call log:')[0].trim()}}throw new Error(result.failure)}
- finally{save('result.json',result);await browser.close()}
-})().catch(e=>{console.error(e.message);process.exitCode=1});
+ }catch(e){failures.push(e);result.result='FAIL';result.failure=publicFailure(e);if(page){try{await page.screenshot({path:path.join(out,'failure.png'),fullPage:true})}catch(captureError){failures.push(captureError);result.captureFailure=publicFailure(captureError)}}}
+ finally{
+  try{await browser.close();}catch(error){failures.push(error);result.result='FAIL';result.cleanupFailure=publicFailure(error);}
+  try{save('result.json',result);}catch(error){failures.push(error);}
+ }
+ if(failures.length===1)throw failures[0];
+ if(failures.length)throw new AggregateError(failures,failures.map(publicFailure).join('\n'));
+ console.log(result.result);
+})().catch(e=>{console.error(publicFailure(e));process.exitCode=1});

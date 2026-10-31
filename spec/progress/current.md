@@ -11,47 +11,49 @@ Current Task State: `active`
 Execution Status: active
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: de88cf326c520801693480e193cbd50dee9b0853; current metadata follows this source and does not alter product inputs.
+Product Source: de88cf326c520801693480e193cbd50dee9b0853; this fix changes test harnesses and metadata only.
 Coordinator: /root/completion_coordinator
 
 ## Immediately Relevant Completed Work
 
-Human authorized full GROUP. Backend PR70/main3d30872 remains accepted. Source51 regular PASS followed by formal error FAIL EH51-P2-001: native unknown DOMException was incorrectly projected as transport. One Workspace predicate now accepts only NativeTransportFailure. Actual nativeFetch/GroupHttp/Workspace regressions prove unknown Error/InvalidStateError/DataCloneError/AbortError same-object rejection for POST/GET and retired accounts. Genuine signal cancellation propagates AbortError; no current group cancellation owner exists. Known HTTPS failure retains original retry bytes; prior stale-navigation/picker/draft behavior remains.
+Human authorized full GROUP. Backend PR70/main3d30872 remains accepted. Exact356 fresh regular PASS was followed by different error review FAIL3 (runtime cleanup launch, Desktop browser close, Web report-write cleanup). Fresh Fix preserves all original causes, attempts required cleanup/report independently, and only outputs PASS after successful cleanup/report. Web durable result is FAIL on close failure; public errors remain sanitized. Two formal actual-runner boundary regressions join the existing group verifier. No product/native/contract/dependency change.
+
+Resource recovery enabled Desktop NSIS build exit0/101.969s; all72 build inputs rechecked unchanged. Guarded installed SHA256 aac613549d21306b7d72b525fb21d5ce05ca76d1f08a7a121d555dee14f4a70e differs from release only by the documented three-byte NSS/UNK marker. AppData/credentials/DB preserved. Earlier two memory-failure builds remain historical. Web G07 repeated/older actual browser proof is bounded PASS; it includes real fixture WEB login/session write, not zero database writes.
 
 ## Current Blockers
 
-GROUP unfinished; S2 OPEN. NEW final-SHA fresh regular and DIFFERENT fresh error review PENDING. Source51 regular PASS/error FAIL (initial error PASS superseded) remain historical. Native G01-G09/Architect, exact-head hosted CI, protected integration, actual-main and safe main synchronization remain incomplete. Windows source51 fresh real201 closes picker and preserves new picker/draft during held memberGET PASS. Old windows-finish21 PNG batch FAILED: identical JPEG reused, wrong dimensions; originals retained. Architect37-original bounded review requires6 Windows recaptures; no UI source fix. Genuine root1029/root1031/new51 images remain valid only within their bindings. Android final6b APK346cb... unchanged,73inputs currently bind51; AVD stopped,133system CAs omit currentv5. Final actual TLS close/new picker/friend loading/error needs specific temporary trust authorization. No runtime/trust/install lease active. Both new Desktop NSIS attempts failed from memory exhaustion; C free about160MB and virtual headroom below1GB at the last observation. Only owned idle IM+4384 was stopped after path/hash verification; no user process was terminated. New Windows captures wait for a source-bound package. Android temporary v5 trust remains specifically unauthorized.
+GROUP unfinished; S2 OPEN. New final-SHA fresh regular and DIFFERENT fresh error review PENDING;356 error FAIL3 is not acceptance. Windows recaptures/Architect and remaining native G07 mapping remain pending coordinator validation. Old21-image batch remains INVALID because cached identical JPEGs were reused; original valid root1029/root1031 images keep their exact bounds. Android unchanged final6b APK346cb... still needs specific temporary owned-emulator v5 trust authorization for final real TLS close/new picker/friend loading/error. Do not treat prior certificate or Desktop control authorization as that grant. Full native G01-G09, exact-head hosted CI, protected integration, actual-main and safe main synchronization remain incomplete.
 
 ## Verification
 
 - Command: `python -Xutf8 -B tests/clients/group/verify.py`
-  - Result: actual-chain RED1 then final GREEN0/7.969s; same-object unknown exceptions and signal cancellations preserve failure. This is local regression, not runtime or hosted acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-native-dom-20261031/receipt.json`
+  - Result: exit0/4.765s; Python8 and JS26 actual-runner boundary cases plus existing compiled Web/Desktop/Workspace behavior. Original356 runner regressions RED1; report close-only false-PASS is explicitly rejected. Boundary cases use controlled dependencies and are not runtime acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
+- Command: `node tests/clients/group/desktop-picker.cjs <root> <desktop-node-modules> <playwright> <Edge>`
+  - Result: exit0/4.156s; actual React lifecycle, original request retry, confirmed close, later picker/navigation and drafts, unknown failure propagation; native invoke controlled.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
+- Command: `node tests/clients/group/desktop-friends.cjs <root> <desktop-node-modules> <playwright> <Edge>`
+  - Result: exit0/1.687s; actual refreshFriends pending/failure/empty and original unknown Retry/Cancel. No backend or native UI operation.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
 - Command: `python -Xutf8 -B tests/clients/gui/native.py package --bundles nsis -- --jobs 1`
-  - Result: exit1/10.531s after first attempt exit1/26.469s; both rustc allocation failures. No de88 installer exists; installed source51 unchanged. Resources must recover before another build.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/coordinator-20261031/receipt.json`
-
-- `python -Xutf8 -B tests/clients/group/verify.py`: original baseline0 after preserved npm cache EPERM; added regression RED1, final GREEN0/7.969s. Real Web/Desktop compile and actual adapter/group/Workspace behavior,16 unknown-error matrix cells plus2 native cancellation cases.
-- Copied independent native-dom-probe: RED1 then GREEN0; original reviewer evidence untouched. Copied probe contains historical51 candidate label; final source bound separately.
-- `node tests/clients/group/desktop-picker.cjs <root> <modules> <playwright> <Edge>`: exit0/8.641s; actual React/Shell/Workspace with only native invoke controlled, existing known retry/locale/later navigation/draft checks. Not installed native acceptance.
-- Frozen/planning and35CI tests(4skip) baseline exit0. Direct architecture/all exit1; architecture88(1skip) exit1 from3035 ignored generated outputs, preserved without deletion. Final Development control exit1/30.734s; direct generated-output failure remains; coordinator handles clean final control. Final recovery/control receipts external; clean committed control belongs to coordinator.
-- Durable receipt: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-native-dom-20261031/receipt.json`; full exact argv/exit/elapsed/raw logs: external fix-native-dom-1031.
+  - Result: coordinator recovered build exit0/101.969s at356, unchanged de88 product72inputs. Installed binding is source-bound; this is not UI acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
 
 ## Changed Files or Migrations
 
-Desktop workspace.ts predicate, existing desktop.cjs tests, Task/current and new thin receipt. No migration, native, shared, dependency, backend, Android or Web change.
+Only tests/clients/group runtime.py, desktop-friends.cjs, desktop-picker.cjs, web.cjs, web-ui.cjs; two new formal regressions and existing verify.py entry; Task/current/new thin receipt. No migration, client, native, shared, dependency, backend or contract change. Standard Python/Node exception groups retain original causes; Python3.11 was already required by existing tomllib use.
 
 ## Known Failures, Risks, and Assumptions
 
-All RED, npm permission and generated-output failures retained. First de88 control also exposed missing standard recovery field labels (corrected here) and27 PermissionErrors because read-only snapshot attributes propagated into copy2 test fixtures; that verification-artifact failure is preserved and is not a product failure. Outer log printing also hit GBK encoding; rerun uses UTF8. Snapshot bytes were verified, no sealed original bytes deleted or rewritten. Recorder R-FIX-NATIVE-DOM-1031 prospective_resume is partial: startup/direct reads/edits/helper authoring outside capture; coordinator-summary prompt explicitly marked; early baseline command overlapped probe capture. Finish honestly FAIL; final validation externally recorded. Prior observer overwrite disclosure remains at coordinator-1029/observer-disclosure/receipt.json. Local/Recorder PASS is not acceptance.
+All original review/probe/RED/build failures retained. Boundary tests do not prove real device/browser cleanup or absence of credential residue. Actual runtime.py private-file removal can fail; this now fails explicitly and preserves the operation failure. Previous current/task bytes are archived externally under fix-harness-cleanup-1031, hash-bound by the new thin receipt. Prior ignored generated-artifact architecture failures and snapshot read-only-copy failure remain historical; final clean committed control belongs to coordinator. Observer overwrite disclosure remains coordinator-1029/observer-disclosure/receipt.json. Recorder R-FIX-HARNESS-PREP-1031 prospective_resume is partial (startup/direct reads/helper authoring/edits outside capture), honestly finishes FAIL with final validation external. Local/Recorder PASS is not acceptance.
 
 ## Next Exact Action
 
-Final metadata control and fresh regular then DIFFERENT fresh error review on the same final candidate; no push/CI-triggering PR before both PASS. Build/install Desktop only after resource recovery, then execute prepared6 fresh Windows captures and independent Architect review. Obtain specific owned-emulator v5 trust authorization for final Android TLS states; complete G07 metadata ordering/isolation mapping and native G01-G09 before integration. Exact-head hosted CI, protected integration, actual-main and safe main synchronization remain required. Do not mark GROUP done or advance S2.
+Commit this verified harness Fix, then coordinator performs fresh regular followed by DIFFERENT fresh error review of the same final SHA; no push/CI-triggering PR until both PASS. Windows capture agent owns its UI/proxy work. Finish bounded native G07 proofs, specific Android trust authorization and real final TLS states, then Architect/native G01-G09 mapping, exact-head hosted CI/protected integration/actual-main and safe main sync. Do not mark GROUP done or advance S2.
 
 ## Last Known Good Commit
 
-`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main; fix main synchronization PENDING. Main782 unknown files and2 tracked changes untouched.
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main; full GROUP synchronization PENDING. Latest read-only main preflight found780 untracked and2 tracked changes, no exactpath overlap; preserve all unknown work. Historical782 count retained without inferred cause; final sync must requalify paths/hashes/prefix collisions.
 
 ## Latest Checkpoint
 
@@ -59,8 +61,8 @@ Final metadata control and fresh regular then DIFFERENT fresh error review on th
 
 ## Uncommitted Changes / Ownership
 
-All product Fix writers released at clean de88. Coordinator alone owns this Task/current/thin evidence metadata update until commit; regular reviewer is read-only. Windows capture agent prepared scripts and released, no active UI/proxy; AVD stopped. Main782 unknown files and2 tracked changes untouched. External candidate binding records the metadata commit and clean state.
+/root/completion_coordinator/fix_harness_cleanup_1031 solely owns the eight listed harness/regression files, Task/current and new thin receipt until clean commit, then writer releases to coordinator. No other source writer. Windows capture agent has separate exclusive native UI/runtime lease, not repository writes. Android trust untouched. Main unknown work untouched. External final receipt binds the committed candidate and clean state; no self-review acceptance.
 
 ## Architecture Conflicts / ACP / ADR
 
-None identified. Existing TypeScript/application responsibility and native provenance are preserved; no new authority, public contract or security change.
+None identified. Existing technology/source boundaries and public contracts unchanged; no new runtime, dependency, protocol or security authority.

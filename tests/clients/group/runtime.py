@@ -12,6 +12,7 @@ def main():
   begin=time.time();r=subprocess.run(list(map(str,args)),input=data,capture_output=True,timeout=timeout,cwd=ROOT);record['commands'].append({'argv':list(map(str,args)),'exit':r.returncode,'seconds':time.time()-begin})
   if r.returncode:raise RuntimeError('Owned command failed: '+str(args[0])+' exit '+str(r.returncode))
   return r.stdout
+ failures=[]
  try:
   assert run(adb+['shell','getprop','sys.boot_completed']).strip()==b'1'
   assert config['endpoint']=='https://localhost:8443'
@@ -33,13 +34,21 @@ def main():
   if a.capture:
    run(adb+['pull','/sdcard/Android/data/im.platform.client/files/group-runtime/'+out.name,str(out/'captures')])
   assert b'INSTRUMENTATION_RESULT: result=PASS' in raw and b'INSTRUMENTATION_CODE: -1' in raw,'Actual instrumentation failed; see raw evidence'
-  record['screenshots']=[{'path':str(x.relative_to(out)),'sha256':sha(x)} for x in out.rglob('*.png')];record['result']='PASS_LOCAL_ENTRY';return 0
- except Exception as error:record['result']='FAIL';record['failure']=type(error).__name__+': '+str(error);return 1
+  record['screenshots']=[{'path':str(x.relative_to(out)),'sha256':sha(x)} for x in out.rglob('*.png')];record['result']='PASS_LOCAL_ENTRY'
+ except BaseException as error:
+  failures.append(error);record['result']='FAIL';record['failure']=type(error).__name__+': '+str(error)
  finally:
+  # Removal/report failures must not hide the operation failure or skip the report attempt.
   if private_written:
-   r=subprocess.run(adb+['shell','run-as','im.platform.client','rm','-f','files/group-runtime-fixture.json'],capture_output=True)
-   record['private_cleanup_exit']=r.returncode
-   if r.returncode:record['result']='FAIL';record['cleanup_failure']='Owned private fixture removal failed'
-  (out/'manifest.json').write_text(json.dumps(record,indent=2)+'\n',encoding='utf8');print(record['result'])
-  if record.get('cleanup_failure'):raise RuntimeError(record['cleanup_failure'])
+   try:
+    r=subprocess.run(adb+['shell','run-as','im.platform.client','rm','-f','files/group-runtime-fixture.json'],capture_output=True)
+    record['private_cleanup_exit']=r.returncode
+    if r.returncode:raise RuntimeError('Owned private fixture removal failed: exit '+str(r.returncode))
+   except BaseException as error:
+    failures.append(error);record['result']='FAIL';record['cleanup_failure']=type(error).__name__+': '+str(error)
+  try:(out/'manifest.json').write_text(json.dumps(record,indent=2)+'\n',encoding='utf8')
+  except BaseException as error:failures.append(error)
+ if len(failures)==1:raise failures[0]
+ if failures:raise BaseExceptionGroup('Group runtime operation/cleanup/report failed',failures)
+ print(record['result']);return 0
 if __name__=='__main__':sys.exit(main())

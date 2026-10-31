@@ -1,0 +1,97 @@
+{
+  "task": "LOOP1-GROUP-001",
+  "fixBase": "356e0d78b72e80687eec4759ac14698c9209ca25",
+  "productSource": "de88cf326c520801693480e193cbd50dee9b0853",
+  "result": "LOCAL_FIX_VERIFIED_NOT_ACCEPTED",
+  "findings": [
+    "EH356-P2-001",
+    "EH356-P2-002",
+    "EH356-P2-003"
+  ],
+  "scope": "Five current harnesses retain operation, report and cleanup causes; two bounded actual-runner regressions wired into existing group verifier. No product, contract, dependency, workflow or native changes.",
+  "sourceFiles": {
+    "tests/clients/group/runtime.py": "5345170a110c4683b1d3bb3153d03daa91939d0983f8653b94b7ec33b6394f51",
+    "tests/clients/group/desktop-friends.cjs": "be5ae27220f17cbc4d51660cc7fa4dba938a89991763331f1045faf95010d44c",
+    "tests/clients/group/desktop-picker.cjs": "fa4e46ea0643f865b386e16c02d2429efbf29617b5ff1a38742a8203e3dce792",
+    "tests/clients/group/web.cjs": "79b58b34da76c8accc1e343e336e4600515bdf9a9c6ea54e8cdbcda30778ae6c",
+    "tests/clients/group/web-ui.cjs": "02387bd851d8d4665784d7147ceb36a77b7b503e0f258176d0193dc9976d06fb",
+    "tests/clients/group/verify.py": "45215438cc186a1ec8e53e6f82f48491ef98c6d92b66363177261128aa80afc0",
+    "tests/clients/group/harness-failures.cjs": "3a421e019a813c54ee5c608ae3cff645de4465709900f88f02c198076dd6ef4e",
+    "tests/clients/group/test_harness_failures.py": "73ced80cc888448aa32912dbfc85ffb20922a7b816c470a493ee32fbf14fe975"
+  },
+  "desktopBuildInputsRechecked": 72,
+  "failureSemantics": "Required cleanup and report attempts are independent; single failure rethrows original, multiple failures retain originals with standard BaseExceptionGroup/AggregateError; PASS output is deferred until required cleanup/report succeeds. Web persisted report is FAIL after close failure and public messages omit Playwright Call log details. Falsy JavaScript errors are not used as sentinels.",
+  "runtimeAuthority": "Existing ci/check_architecture.py imports tomllib, already requiring Python >=3.11; actual Python3.12.14 supports BaseExceptionGroup. Existing Node runtime supports AggregateError. No new runtime requirement.",
+  "tests": "Python8 actual runtime.main subprocess/fs boundary cases + JavaScript26 complete runner cases; JS UI assertion ports intentionally inert, no browser/device/network/product acceptance. Separate real headless React picker/friends regression with native invoke controlled passed.",
+  "externalEvidence": [
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-356-1031\\report.json",
+      "sha256": "d885a41e99013bf59b9efeaca6de560dab59cf6c0d2f72aa2852d677a14c93f1"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\coordinator-1029\\build-de88-recovered\\receipt.json",
+      "sha256": "4001abb19825b7d93e66c464ca506b254026e3d0d39dad87d4ed8d2985ea62a1"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\coordinator-1029\\install-356e0d78\\binding.json",
+      "sha256": "bef35d515e941bfdd1522d781d0286aafee4176392dfdc936c4657a0ac67658e"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\web-g07-metadata-1031\\receipt.json",
+      "sha256": "a09f5acf7e215b8f149595d7770c20e3041732a3de900776eb57bb36502ad33c"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\coordinator-1029\\main-sync-name-preflight-356.json",
+      "sha256": "8717a21d7535fdb98251e516882749865e2866f1b6e4ef879afb54bd052bc2c2"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\python-red.json",
+      "sha256": "fb198a539e7bb4d2adc79ff4fc4e916ec6fe79fb7d1bf55acb140d3ca8ff508c"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\node-report-original-red.json",
+      "sha256": "edf2c6860ff62618b280423bf0ba0936a04a903a53da3c44385a0480a95fc111"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\python-green.json",
+      "sha256": "36f3ce39c6e4e44559180c44abb3a59c0a9db93b064155372581548494541e83"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\node-green.json",
+      "sha256": "c53e86658335f828d3713bfb10b14b2c33847035662334922df56dc58c16feb5"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\group-report-final.json",
+      "sha256": "d776de2c39e900986e7ae325249dd49546f75bd260c67fc7776ad5d0e533216c"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\react-picker.json",
+      "sha256": "8b3594eea5bfbd14f3826508085df1bb7bd9e20a7bfa87894167861e38270c2a"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\react-friends.json",
+      "sha256": "a4e5b2f06d168c88735e97dbf4eff2003db9735ae1d3fe7d364b47bb91c093c5"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\current-before.md",
+      "sha256": "a77f7fe9d96f226ece1f05475b7613af305aca17848700a29970de1cf555607c"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\task-before.md",
+      "sha256": "2e41a95e63043f164f15eadca2d7782e4d6f36cc6aeac617d982c1fff6d0174e"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\frozen-final.json",
+      "sha256": "af9e98f6eea001172a233f195a92ee3b7956e7ef01dd2944f7fdc674147f3d75"
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-harness-cleanup-1031\\planning-final.json",
+      "sha256": "d8bc2660dfa44bf4017761e18f558ede8c19249d10b2546d4d44af6f0330a18a"
+    }
+  ],
+  "review": "356 fresh regular PASS then different error FAIL3 retained. New final SHA requires fresh regular and DIFFERENT fresh error PASS before push/CI.",
+  "remaining": "Windows six valid recaptures/Architect and native G07 mapping; Android specific owned-emulator v5 trust authorization and final actual Go/TLS UI; full native G01-G09 mapping; exact-head hosted CI, protected integration, actual-main and safe main synchronization. GROUP active/S2 OPEN.",
+  "mainLKG": "3d30872d3d18c55fa8156a5ce1133281ffaa4e7e",
+  "mainWork": "Latest parent read-only preflight780 untracked +2 tracked, no exactpath overlap; unknown content untouched; not safe-sync acceptance. Historical782 count retained without inferred cause.",
+  "recorder": "R-FIX-HARNESS-PREP-1031 prospective_resume partial: startup/direct reads, external helpers and edits outside command capture. Finish honestly FAIL then validate, external final receipt binds commit; Recorder is not acceptance."
+}

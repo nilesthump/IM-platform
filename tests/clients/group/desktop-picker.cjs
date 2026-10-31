@@ -22,7 +22,7 @@ function load(id){if(cache[id])return cache[id].exports;const m={exports:{}};cac
 const W=load('${work}').Workspace,original=W.prototype.start;W.prototype.start=function(){window.app=this;return original.call(this)};const React=load('react');load('react-dom').createRoot(document.getElementById('root')).render(React.createElement(load('${shell}').Shell));
 window.session={userId:'10000000-0000-4000-8000-000000000001',sessionId:'40000000-0000-4000-8000-000000000001',sessionEpoch:1n,accessToken:'controlled-only'};window.friends=[{user:{userId:'10000000-0000-4000-8000-000000000002',username:'friend',displayName:'Friend'},directConversationId:'30000000-0000-4000-8000-000000000001'}];`;
 (async()=>{
- const b=await chromium.launch({executablePath:browser,headless:true});
+ const b=await chromium.launch({executablePath:browser,headless:true});const failures=[],checks=[];
  try{
   const p=await b.newPage();p.setDefaultTimeout(3000);const errors=[];p.on('pageerror',e=>errors.push(e.message));
   await p.route('http://localhost:18743/',r=>r.fulfill({contentType:'text/html',body:'<div id="root"></div>'}));
@@ -34,7 +34,7 @@ window.session={userId:'10000000-0000-4000-8000-000000000001',sessionId:'4000000
   const frame=()=>p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await open();await select();await confirm();await p.waitForFunction(()=>app.state.groupStatus==='unconfirmed');await cancel();
   await p.evaluate(()=>app.selectLanguage('ja-JP'));await open();assert.equal(await p.locator('dialog').evaluate(e=>e.open),true);assert.equal(await p.locator('dialog input[type=checkbox]').isChecked(),true);
-  console.log('CONTROL language-only reopen PASS');await cancel();
+  checks.push('CONTROL language-only reopen PASS');await cancel();
   // The actual transient stop(true) phase of same-account bind; controlled native port, no auth/SQLite claim.
   await p.evaluate(()=>app.stop(true));await p.waitForFunction(()=>!app.state.session);await p.evaluate(()=>app.publish({session,friends,friendsStatus:'ready'}));
   await p.evaluate(()=>app.selectLanguage('en'));await open();assert.equal(await p.locator('dialog').count(),1,'pending picker survives same-account stop(true)');assert.equal(await p.locator('dialog').evaluate(e=>e.open),true);
@@ -44,7 +44,7 @@ window.session={userId:'10000000-0000-4000-8000-000000000001',sessionId:'4000000
   await p.evaluate(()=>app.stop());await p.waitForFunction(()=>document.querySelector('dialog')===null);
   await p.evaluate(()=>app.publish({session:{...session,userId:'10000000-0000-4000-8000-000000000003'},friends,friendsStatus:'ready'}));await open();
   assert.equal(await p.locator('dialog input[type=checkbox]').isChecked(),false);assert.equal(await p.locator('dialog input:not([type])').inputValue(),'');await cancel();assert.deepEqual(errors,[]);
-  console.log('PASS actual Shell/GroupPanel/Workspace lifecycle, original request body and retirement/different-account isolation');
+  checks.push('PASS actual Shell/GroupPanel/Workspace lifecycle, original request body and retirement/different-account isolation');
 
   for(const outcome of ['resolve','unknown']){
    await p.evaluate(()=>app.stop());await p.evaluate(()=>{app.publish({session,friends,friendsStatus:'ready'});window.mutationMode='transport';window.bodies=[];});
@@ -61,7 +61,7 @@ window.session={userId:'10000000-0000-4000-8000-000000000001',sessionId:'4000000
    else{await p.evaluate(()=>failTail());await p.waitForTimeout(50);assert.deepEqual(errors,['post-commit sentinel']);}
    await frame();assert.equal(await p.locator('dialog').evaluate(e=>e.open),true,'late prior completion must not close a newly opened picker');
    assert.equal(await p.evaluate(()=>app.state.groupStatus),'success');assert.equal(await p.evaluate(()=>app.groupOperation),undefined);await cancel();
-   console.log('PASS successful original retry closes with '+outcome+' Sync tail; late completion cannot close next picker');
+   checks.push('PASS successful original retry closes with '+outcome+' Sync tail; late completion cannot close next picker');
   }
   // New CREATE and ADD close at the same confirmed boundary even while member refresh waits.
   for(const adding of [false,true]){
@@ -88,7 +88,7 @@ window.session={userId:'10000000-0000-4000-8000-000000000001',sessionId:'4000000
    assert.equal(await p.locator('#message').inputValue(),draft,'latest conversation draft stays attached to selected conversation');
    assert.equal(await p.evaluate(()=>bodies.length),next==='create'?2:1);
   }
-  console.log('PASS actual React delayed member read preserves later CREATE/manual navigation and draft');
+  checks.push('PASS actual React delayed member read preserves later CREATE/manual navigation and draft');
   for(const mode of ['rejected','unknown']){
    await p.evaluate(()=>app.stop());await p.evaluate(value=>{app.publish({session,friends,friendsStatus:'ready'});window.mutationMode=value;},mode);
    await open();await select();await confirm();await p.waitForTimeout(50);await frame();
@@ -98,6 +98,6 @@ window.session={userId:'10000000-0000-4000-8000-000000000001',sessionId:'4000000
    else assert.deepEqual(errors,['post-commit sentinel','mutation sentinel']);
   }
   await p.evaluate(()=>app.stop());assert.deepEqual(errors,['post-commit sentinel','mutation sentinel']);
-  console.log('PASS actual React confirmed CREATE/ADD, pending/rejected/unknown retention and error propagation');
- }finally{await b.close();}
+  checks.push('PASS actual React confirmed CREATE/ADD, pending/rejected/unknown retention and error propagation');
+ }catch(error){failures.push(error);}finally{try{await b.close();}catch(error){failures.push(error);}}if(failures.length===1)throw failures[0];if(failures.length)throw new AggregateError(failures,'Component test and browser cleanup failed');for(const check of checks)console.log(check);
 })().catch(e=>{console.error(e);process.exitCode=1});
