@@ -72,6 +72,23 @@ window.session={userId:'10000000-0000-4000-8000-000000000001',sessionId:'4000000
    await p.evaluate(()=>{finishMembers();window.finishMembers=undefined;});await frame();
    assert.equal(await p.evaluate(()=>app.state.selected),await p.evaluate(()=>groupId));
   }
+  // A newer explicit choice and its draft survive the first CREATE's delayed member read.
+  for(const next of ['create','manual']){
+   await p.evaluate(()=>app.stop());await p.evaluate(()=>{app.publish({session,friends,friendsStatus:'ready',conversations:[friends[0].directConversationId]});window.groupId='30000000-0000-4000-8000-000000000002';window.mutationMode='success';window.holdMembers=true;window.finishMembers=undefined;window.bodies=[];});
+   await open();await select();await confirm();await p.waitForFunction(()=>typeof window.finishMembers==='function');await frame();
+   assert.equal(await p.locator('dialog').count(),0);
+   if(next==='create'){
+    await p.evaluate(()=>{window.groupId='30000000-0000-4000-8000-000000000003';});await open();await select();await confirm();
+    await p.waitForFunction(()=>app.state.selected===groupId&&app.state.groupSuccessRevision>0);await frame();assert.equal(await p.locator('dialog').count(),0);
+   }else await p.locator('.conversation-list .conversation').click();
+   const selected=await p.evaluate(()=>app.state.selected),draft='Draft for the latest '+next;
+   await p.locator('#message').fill(draft);
+   await p.evaluate(()=>{finishMembers();window.finishMembers=undefined;});await p.waitForFunction(()=>!app.groupScanning);await frame();
+   assert.equal(await p.evaluate(()=>app.state.selected),selected,'old member read must not replace '+next+' selection');
+   assert.equal(await p.locator('#message').inputValue(),draft,'latest conversation draft stays attached to selected conversation');
+   assert.equal(await p.evaluate(()=>bodies.length),next==='create'?2:1);
+  }
+  console.log('PASS actual React delayed member read preserves later CREATE/manual navigation and draft');
   for(const mode of ['rejected','unknown']){
    await p.evaluate(()=>app.stop());await p.evaluate(value=>{app.publish({session,friends,friendsStatus:'ready'});window.mutationMode=value;},mode);
    await open();await select();await confirm();await p.waitForTimeout(50);await frame();

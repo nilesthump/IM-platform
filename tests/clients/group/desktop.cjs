@@ -51,4 +51,36 @@ const rows=[A,B].map(id=>({conversationId:C,kind:'GROUP',createdBy:A,createdAt:t
  const unknown=new Error('controlled native bug');window.__TAURI_INTERNALS__.invoke=async()=>{throw unknown};await assert.rejects(()=>app.refreshGroups(),e=>e===unknown);
  await app.stop();assert.equal(app.state.groups.length,0);assert.equal(app.groupOperation,undefined);
  console.log('Group Desktop actual native adapter retry/snapshot/unknown/isolation behavior PASS');
+ // A confirmed mutation must not defer its navigation until an older member read finishes.
+ for(const next of ['create','manual','retired','unknown']){
+  const app=new Workspace(),held=deferred(),entered=deferred(),later='30000000-0000-4000-8000-000000000002';
+  const sentinel=new Error('owned stale member read');let posts=0,gets=0;
+  window.__TAURI_INTERNALS__.invoke=async(command,args)=>{
+   assert.equal(command,'native_https');let value,status=200;
+   if(args.method==='POST'){const q=JSON.parse(Buffer.from(args.body).toString());value={requestId:q.requestId,conversationId:++posts===1?C:later,addedMemberUserIds:[A,B],createdAt:time};status=201;}
+   else{if(++gets===1){entered.resolve();await held.promise;}const q=new URL(args.url).searchParams;value={requestId:q.get('requestId'),items:rows,hasMore:false,next:{afterConversationId:'',afterMemberUserId:''}};}
+   return [status,{'content-type':'application/json','cache-control':'no-store'},Array.from(Buffer.from(JSON.stringify(value)))];
+  };
+  app.state={...app.state,session:{userId:A,sessionId:R,sessionEpoch:1n,accessToken:'controlled-only'}};
+  const first=app.createGroup([B]);await entered.promise;
+  if(next==='create')await app.createGroup([B]);else{if(next==='retired')await app.stop();await app.open(later);}
+  assert.equal(app.state.selected,later);
+  if(next==='unknown'){const rejection=assert.rejects(first,e=>e===sentinel);held.reject(sentinel);await rejection;}else{held.resolve();await first;}
+  assert.equal(app.state.selected,later,next+': old read must preserve latest navigation');
+  assert.equal(posts,next==='create'?2:1);assert.equal(gets,next==='create'?2:1);
+ }
+ console.log('Desktop delayed member read preserves later CREATE/manual selection, retired generation and unknown cause PASS');
+ {
+  const app=new Workspace(),opening=deferred(),entered=deferred();let calls=0;
+  window.__TAURI_INTERNALS__.invoke=async(command,args)=>{
+   assert.equal(command,'native_https');assert.equal(args.method,'POST','retired open must not start a member read for the new account');calls++;
+   const q=JSON.parse(Buffer.from(args.body).toString());return [201,{'content-type':'application/json','cache-control':'no-store'},Array.from(Buffer.from(JSON.stringify({requestId:q.requestId,conversationId:C,addedMemberUserIds:[A,B],createdAt:time})))];
+  };
+  app.state={...app.state,session:{userId:A,sessionId:R,sessionEpoch:1n,accessToken:'controlled-only'}};
+  app.sync={openConversation:()=>{entered.resolve();return opening.promise},close:async()=>{}};
+  const pending=app.createGroup([B]);await entered.promise;await app.stop();
+  app.state={...app.state,session:{userId:B,sessionId:R,sessionEpoch:1n,accessToken:'controlled-only'}};
+  opening.resolve();await pending;assert.equal(calls,1);assert.equal(app.state.selected,'');assert.deepEqual(app.state.groups,[]);
+ }
+ console.log('Desktop retired post-confirmation Sync cannot refresh a replacement account PASS');
 })().catch(e=>{console.error(e);process.exitCode=1});

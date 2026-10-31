@@ -150,7 +150,7 @@ export class Workspace {
   async retryGroup(){const s=this.state.session,g=this.generation,op=this.groupOperation;if(!s||!op||op.account!==s.userId||this.state.groupBusy)return;
     this.publish({groupBusy:true,groupError:'',groupStatus:'loading'});
     try{const answer=await this.groupHttp().mutate(op.requestId,op.targets,new AbortController().signal,op.conversation);if(g!==this.generation)return;
-      this.groupOperation=undefined;this.publish({groupBusy:false,groupStatus:'success',groupSuccessRevision:this.state.groupSuccessRevision+1});await this.refreshGroups();if(g===this.generation&&this.state.selected!==answer.conversationId)await this.open(answer.conversationId);
+      this.groupOperation=undefined;this.publish({groupBusy:false,groupStatus:'success',groupSuccessRevision:this.state.groupSuccessRevision+1});if(g===this.generation&&this.state.selected!==answer.conversationId)await this.open(answer.conversationId);if(g===this.generation)await this.refreshGroups();
     }catch(error){this.failure(error,g===this.generation);if(g!==this.generation)return;if(error instanceof GroupFailure&&error.kind==='authentication'){await this.expire();return;}
       const rejected=error instanceof GroupFailure&&error.kind==='rejected';if(rejected)this.groupOperation=undefined;
       this.publish({groupBusy:false,groupStatus:rejected?'rejected':'unconfirmed',groupError:error instanceof GroupFailure?error.code||error.kind:'protocol'});}

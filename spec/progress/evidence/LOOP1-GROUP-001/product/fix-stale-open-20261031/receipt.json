@@ -1,0 +1,237 @@
+{
+  "base": "6b25473e434c04485c2b819220cf33acc85327e1",
+  "candidate": "commit containing this receipt; external commit-binding.json supplies exact SHA",
+  "branch": "task/LOOP1-GROUP-001-resume",
+  "worktree": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+  "writer": "/root/completion_coordinator/fix_stale_open_1031",
+  "finding": "REG6B-P2-001",
+  "review_report_sha256": "b2d43570d744f092392b5a3627b9c83038131b9d71158bd8140687d7627e44f9",
+  "external_root": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-stale-open-1031",
+  "repair": "Move confirmed group navigation before awaiting member refresh; preserve the current-generation check before navigation and check it again after awaited open before starting a member refresh. No added state or abstraction. Existing original request identity and catches unchanged.",
+  "files": {
+    "clients/desktop/src/application/ui/workspace.ts": "054bc8e40756057bfd8155e8d017443ae1a8a49351f2dfb322cd7891441e7e16",
+    "tests/clients/group/desktop.cjs": "3350c63209d2fe6662c92eaf8f92f0c75dde4f923a2c97776a00ce0fc841081b",
+    "tests/clients/group/desktop-picker.cjs": "b4ea2c3149344be374f25abeae3e4080fea9fe7e47363b18be680459e72fcd35"
+  },
+  "verification": [
+    {
+      "label": "frozen_baseline",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "exit": 0,
+      "elapsed": 1.172,
+      "log_sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989"
+    },
+    {
+      "label": "planning_baseline",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_s2_planning.py"
+      ],
+      "exit": 0,
+      "elapsed": 2.11,
+      "log_sha256": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426"
+    },
+    {
+      "label": "architecture_baseline",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit": 1,
+      "elapsed": 10.406,
+      "log_sha256": "f57ab5a788ee6b7701842f6c12bbcf5945862222a3c39b21b5279ae8958e33e1"
+    },
+    {
+      "label": "architecture-tests_baseline",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture"
+      ],
+      "exit": 1,
+      "elapsed": 35.047,
+      "log_sha256": "325383f41570f40aac2a544de19eef09a0ae8e86932dac8c2f119cfaa3d75150"
+    },
+    {
+      "label": "ci-tests_baseline",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci"
+      ],
+      "exit": 0,
+      "elapsed": 7.062,
+      "log_sha256": "2fb7eac4a2e87097455b9a641ea3ac422dd572acc6c01575599b143954e9c9e2"
+    },
+    {
+      "label": "probe_red",
+      "command": [
+        "node",
+        "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-stale-open-1031\\desktop-stale-open.cjs"
+      ],
+      "exit": 1,
+      "elapsed": 0.766,
+      "log_sha256": "bb4e79138df6c288d2141730011051fae8d72ae83438318e1d2e37778708e3ad"
+    },
+    {
+      "label": "group_red",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "exit": 1,
+      "elapsed": 11.297,
+      "log_sha256": "e3ffe05a10baaa944c45adf74a61c043a238bd2ebd5dcbb669f0a9de98fd7662"
+    },
+    {
+      "label": "react_red",
+      "command": [
+        "node",
+        "tests/clients/group/desktop-picker.cjs",
+        "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\desktop\\node_modules",
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright",
+        "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+      ],
+      "exit": 1,
+      "elapsed": 5.203,
+      "log_sha256": "d7148d1f40fb4e9ce83a5ca61b5ded8bca4d9a1d7f7a15da3cd74b9042a7f5b2"
+    },
+    {
+      "label": "group_green",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "exit": 0,
+      "elapsed": 5.359,
+      "log_sha256": "4e09119cdccbb56e94dd2e542b95f8b5566e31da7b0cbf51583c884c8f8f3631"
+    },
+    {
+      "label": "react_green",
+      "command": [
+        "node",
+        "tests/clients/group/desktop-picker.cjs",
+        "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\desktop\\node_modules",
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright",
+        "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+      ],
+      "exit": 0,
+      "elapsed": 5.891,
+      "log_sha256": "70b38767050c7eee87626c53058664c82da46d5b237fdaef0817949ee6c22569"
+    },
+    {
+      "label": "probegreen_final",
+      "command": [
+        "node",
+        "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-stale-open-1031\\desktop-stale-open-green.cjs"
+      ],
+      "exit": 0,
+      "elapsed": 0.735,
+      "log_sha256": "c94974f5c2a43edade4ad2be308cff3faedde2644f56aac1129c696634ea6c46"
+    },
+    {
+      "label": "group_final",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "exit": 0,
+      "elapsed": 5.828,
+      "log_sha256": "f08ad5e2735c51c248ea61f04c072239e9db1d257f216932dcf968688d8d5a28"
+    },
+    {
+      "label": "frozen_final",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "exit": 0,
+      "elapsed": 1.281,
+      "log_sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989"
+    },
+    {
+      "label": "planning_final",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_s2_planning.py"
+      ],
+      "exit": 0,
+      "elapsed": 0.25,
+      "log_sha256": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426"
+    },
+    {
+      "label": "planning_recovery",
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_s2_planning.py"
+      ],
+      "exit": 0,
+      "elapsed": 0.641,
+      "log_sha256": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426"
+    },
+    {
+      "label": "control_final",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit": 1,
+      "elapsed": 39.046,
+      "log_sha256": "d93fa8492cf0105c7c9703defc8c4f3a0984ad14aeb598efa25764436d12195e"
+    }
+  ],
+  "regression": "Actual Workspace/nativeFetch controlled invoke: two successful CREATEs with first GET held; manual selection, old unknown member-read cause and retired generation. Actual React Shell/GroupPanel/Workspace: later CREATE/manual selection and draft retained on old read completion; prior original-ID retry, locale/reopen, CREATE/ADD, rejection/unknown, new-picker and account retirement assertions preserved. Deferred post-confirmation Sync retirement cannot start reads for a replacement account.",
+  "limitations": [
+    "Direct architecture/all and architecture suite FAIL on ignored generated build artifacts; originals retained and outputs not deleted. Coordinator performs final exact tracked-snapshot/control verification after clean commit; hosted CI still required.",
+    "No real service/Windows/Android operations by this Fix Agent. Build after clean commit is optional and externally bound; installation/runtime remains windows_finish_1031/coordinator-owned.",
+    "Recorder prospective_resume partial: startup/direct reads, apply_patch edits, external helper authoring and diagnostic reads outside capture. Prompt source coordinator_summary despite default prompt_capture full. Finish honestly FAIL; structural validation separate.",
+    "No push, PR, CI, integration or main sync performed. Fresh regular and DIFFERENT fresh error review on new final SHA pending. GROUP active/S2 OPEN."
+  ],
+  "main_sha_observed": "3d30872d3d18c55fa8156a5ce1133281ffaa4e7e",
+  "main_sync": "PENDING; main repository not modified",
+  "last_known_good": "3d30872d3d18c55fa8156a5ce1133281ffaa4e7e",
+  "instrumentation_failures": [
+    "First recovery.py denied writing new receipt directory; original recorded exit1 retained. Retried approved managed worktree writes successfully. Initial direct metadata write CRLF caused git diff whitespace failure; LF normalized before commit."
+  ],
+  "control_limitation": "Development exit1: only3035 ignored generated-artifact architecture findings; required recovery-format checks passed. Final exact tracked-snapshot/control is coordinator-owned."
+}
