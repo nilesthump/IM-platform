@@ -11,7 +11,7 @@ Current Task State: `active`
 Execution Status: active
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: Desktop native DOM Fix after51f0f714; exact SHA externally bound in fix-native-dom-1031/commit-binding.json.
+Product Source: de88cf326c520801693480e193cbd50dee9b0853; current metadata follows this source and does not alter product inputs.
 Coordinator: /root/completion_coordinator
 
 ## Immediately Relevant Completed Work
@@ -20,9 +20,16 @@ Human authorized full GROUP. Backend PR70/main3d30872 remains accepted. Source51
 
 ## Current Blockers
 
-GROUP unfinished; S2 OPEN. NEW final-SHA fresh regular and DIFFERENT fresh error review PENDING. Source51 regular PASS/error FAIL (initial error PASS superseded) remain historical. Native G01-G09/Architect, exact-head hosted CI, protected integration, actual-main and safe main synchronization remain incomplete. Windows source51 fresh real201 closes picker and preserves new picker/draft during held memberGET PASS. Old windows-finish21 PNG batch FAILED: identical JPEG reused, wrong dimensions; originals retained. Architect37-original bounded review requires6 Windows recaptures; no UI source fix. Genuine root1029/root1031/new51 images remain valid only within their bindings. Android final6b APK346cb... unchanged,73inputs currently bind51; AVD stopped,133system CAs omit currentv5. Final actual TLS close/new picker/friend loading/error needs specific temporary trust authorization. Fix has no runtime/trust/install lease.
+GROUP unfinished; S2 OPEN. NEW final-SHA fresh regular and DIFFERENT fresh error review PENDING. Source51 regular PASS/error FAIL (initial error PASS superseded) remain historical. Native G01-G09/Architect, exact-head hosted CI, protected integration, actual-main and safe main synchronization remain incomplete. Windows source51 fresh real201 closes picker and preserves new picker/draft during held memberGET PASS. Old windows-finish21 PNG batch FAILED: identical JPEG reused, wrong dimensions; originals retained. Architect37-original bounded review requires6 Windows recaptures; no UI source fix. Genuine root1029/root1031/new51 images remain valid only within their bindings. Android final6b APK346cb... unchanged,73inputs currently bind51; AVD stopped,133system CAs omit currentv5. Final actual TLS close/new picker/friend loading/error needs specific temporary trust authorization. No runtime/trust/install lease active. Both new Desktop NSIS attempts failed from memory exhaustion; C free about160MB and virtual headroom below1GB at the last observation. Only owned idle IM+4384 was stopped after path/hash verification; no user process was terminated. New Windows captures wait for a source-bound package. Android temporary v5 trust remains specifically unauthorized.
 
 ## Verification
+
+- Command: `python -Xutf8 -B tests/clients/group/verify.py`
+  - Result: actual-chain RED1 then final GREEN0/7.969s; same-object unknown exceptions and signal cancellations preserve failure. This is local regression, not runtime or hosted acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-native-dom-20261031/receipt.json`
+- Command: `python -Xutf8 -B tests/clients/gui/native.py package --bundles nsis -- --jobs 1`
+  - Result: exit1/10.531s after first attempt exit1/26.469s; both rustc allocation failures. No de88 installer exists; installed source51 unchanged. Resources must recover before another build.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/coordinator-20261031/receipt.json`
 
 - `python -Xutf8 -B tests/clients/group/verify.py`: original baseline0 after preserved npm cache EPERM; added regression RED1, final GREEN0/7.969s. Real Web/Desktop compile and actual adapter/group/Workspace behavior,16 unknown-error matrix cells plus2 native cancellation cases.
 - Copied independent native-dom-probe: RED1 then GREEN0; original reviewer evidence untouched. Copied probe contains historical51 candidate label; final source bound separately.
@@ -36,11 +43,11 @@ Desktop workspace.ts predicate, existing desktop.cjs tests, Task/current and new
 
 ## Known Failures, Risks, and Assumptions
 
-All RED, npm permission and generated-output failures retained. Recorder R-FIX-NATIVE-DOM-1031 prospective_resume is partial: startup/direct reads/edits/helper authoring outside capture; coordinator-summary prompt explicitly marked; early baseline command overlapped probe capture. Finish honestly FAIL; final validation externally recorded. Prior observer overwrite disclosure remains at coordinator-1029/observer-disclosure/receipt.json. Local/Recorder PASS is not acceptance.
+All RED, npm permission and generated-output failures retained. First de88 control also exposed missing standard recovery field labels (corrected here) and27 PermissionErrors because read-only snapshot attributes propagated into copy2 test fixtures; that verification-artifact failure is preserved and is not a product failure. Outer log printing also hit GBK encoding; rerun uses UTF8. Snapshot bytes were verified, no sealed original bytes deleted or rewritten. Recorder R-FIX-NATIVE-DOM-1031 prospective_resume is partial: startup/direct reads/edits/helper authoring outside capture; coordinator-summary prompt explicitly marked; early baseline command overlapped probe capture. Finish honestly FAIL; final validation externally recorded. Prior observer overwrite disclosure remains at coordinator-1029/observer-disclosure/receipt.json. Local/Recorder PASS is not acceptance.
 
 ## Next Exact Action
 
-Commit owned files, bind exact source/clean state and release source writer. Build existing NSIS and bind72inputs/package externally without installation. Coordinator obtains NEW regular then DIFFERENT error PASS on final SHA before push/CI-triggering PR, serializes guard installation/runtime/6 Windows recaptures and Android trust-dependent evidence, then Architect/full matrix/exact-head hosted/protected integration/actual-main/safe synchronization. Do not mark GROUP done or advance S2.
+Final metadata control and fresh regular then DIFFERENT fresh error review on the same final candidate; no push/CI-triggering PR before both PASS. Build/install Desktop only after resource recovery, then execute prepared6 fresh Windows captures and independent Architect review. Obtain specific owned-emulator v5 trust authorization for final Android TLS states; complete G07 metadata ordering/isolation mapping and native G01-G09 before integration. Exact-head hosted CI, protected integration, actual-main and safe main synchronization remain required. Do not mark GROUP done or advance S2.
 
 ## Last Known Good Commit
 
@@ -52,7 +59,7 @@ Commit owned files, bind exact source/clean state and release source writer. Bui
 
 ## Uncommitted Changes / Ownership
 
-Sole source writer /root/completion_coordinator/fix_native_dom_1031 owns only the two source/test files and recovery files until clean commit, then releases to coordinator. Exact commit-binding.json records SHA/clean/release. Build afterward does not authorize source edits or installation.
+All product Fix writers released at clean de88. Coordinator alone owns this Task/current/thin evidence metadata update until commit; regular reviewer is read-only. Windows capture agent prepared scripts and released, no active UI/proxy; AVD stopped. Main782 unknown files and2 tracked changes untouched. External candidate binding records the metadata commit and clean state.
 
 ## Architecture Conflicts / ACP / ADR
 
