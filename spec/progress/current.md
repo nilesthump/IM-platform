@@ -11,53 +11,49 @@ Current Task State: `active`
 Execution Status: active
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: unchanged 2c4faf1647128a58200d5fc70af0435e0f82fc66; final harness-only Fix SHA in linked external fix-route-causes-1105/commit.json.
+Product Source: unchanged from 7fefbafef11ee103ec14477d1a1623f4cab7a7ea (runtime base2c4faf16); new fixture-only Fix SHA in external fix-desktop-render-fixture-1105/commit.json.
 Coordinator: /root/completion_coordinator
 
 ## Immediately Relevant Completed Work
 
-Final2c Control Acceptance and fresh full regular Review passed. DIFFERENT fresh specialist failed EH-2C4F-P2-001 in the Web G06 test runner: route errors could lose their original cause during abort cleanup or subsequent UI waits. This fresh Fix retains exact values (including falsy throws), waits for owned route callbacks before final reporting and preserves independent route/UI/browser/report failures. Public redaction remains separate. Actual old runner RED1 → fixed13-case GREEN0 and complete group verifier0; no product source changed.
+Exact7fef Control Acceptance and fresh regular/different fresh error reviews PASS (reports135de753/4b0a5343). G01–G08 independent runtime audit a01c1ed9 and G09 visual838b0cfb plus regular functional assessment accepted bounded evidence on7fef. Original hashes/reports are linked in the Fix receipt.
 
-Current installed AAC Windows and actual2c Web G06 before/after response-loss supplements are complete: original request retry, real PG/response identity, automatic picker close and new group selection. Android final runtime and G07 temporary trust cleanup are complete. Final2c G09 Architect PASS is bounded visual approval. Independent runtime auditor found G01–G08 evidence sufficient, including88 G07 assertions/182 raw hashes, and awaits final new-SHA input binding. These are bounded records, not whole GROUP/CI acceptance.
+Real push42050106686 and PR99 run42050378269 both finished FAIL on7fef: each14jobs=12success/Linuxfailure/gatefailure. The existing DIRECT renderer fixture lacked required groups after SQLx/TLS checks passed. This Fix adds only groups:[]; actual current-source compiled renderer RED1→GREEN0, all original assertions retained. Existing Desktop SEND direct suite with qualified unchanged SQLx probe and controlled builtin TLS/WSS PASS0/11.469s,8sends/0fixture errors. Product/GUI inputs are unchanged.
 
 ## Current Blockers
 
-New Fix SHA requires clean Control, fresh full regular Review and DIFFERENT fresh error specialist;2c PASS cannot transfer and2c specialist FAIL forbids its push. Final runtime/Architect source binding, exact-head required hosted CI, protected integration, actual-main and safe main synchronization remain. GROUP active/S2 OPEN; no architecture conflict.
+New fixture Fix SHA needs clean Control, fresh full regular then DIFFERENT fresh error review before any push/CI-triggering PR update. Rebind unchanged G01–G09 inputs, then exact-head required hosted CI, protected integration, actual-main and safe main synchronization.7fef was never merged. GROUP active/S2 OPEN; no architecture conflict.
 
 ## Verification
 
-- Command: `python -Xutf8 -B fix-route-causes-1105/baseline-v2.py`
-  - Result: canonical hash/S2 planning/source architecture/architecture tests/CI tests all exit0 on exact2c qualified export.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
-- Command: `node tests/clients/group/route-failures.cjs <exact-git-2c-web.cjs>`
-  - Result: RED exit1 on actual route/abort/UI-wait/falsy causes. Corrected fixture explicitly executes callback; initial miswired fixture excluded.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
-- Command: `node tests/clients/group/route-failures.cjs`
-  - Result:13 actual runner boundary cases PASS0/0.344s; original identities and nonzero failure/public redaction/cleanup retained.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
-- Command: `python -Xutf8 -B tests/clients/group/verify.py`
-  - Result: PASS0/6.859s; locked install/compile, existing cleanup/behavior/native-state tests and new callback regression. No real service/device acceptance claimed by this command.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
+- `python -Xutf8 -B fix-desktop-render-fixture-1105/baseline.py`: canonical hash/S2 planning/source architecture/architecture tests/CI tests all exit0 on qualified exact7fef export.
+- TypeScript5.9.3 actual shared and Desktop compile: exit0/0 after preserved initial missing shared compiler/write-permission failures.
+- `node tests/clients/errors/desktop_render.mjs`: exact old fixture RED1/0.125s (groups.find), one-field corrected fixture GREEN0/0.110s; SENDING/SENT/FAILED/nullable ACK positives and unknown state/body/identity negatives retained.
+- `python -Xutf8 -B fix-desktop-render-fixture-1105/direct-send.py`: unchanged `tests/clients/send/desktop.mjs` PASS0/11.469s on actual SQLx+existing TLS fixture, including native reads/rollback/observer propagation and renderer. Probe SHA b50eb4d6; native/storage/build inputs unchanged86b287→7fef and locally hash-verified. Direct existing suite only; not the full tools/verify_client_send.py build wrapper or Go/GUI acceptance.
+
+- `python -Xutf8 -B fix-desktop-render-fixture-1105/direct-sync.py`: Existing unchanged Desktop SYNC direct suite also PASS0/25.297s: actual SQLx+controlled HTTPS/WSS,205→208 pagination,9frames/8user pages/8conversation pages/u-200 continuation,0fixture errors; restart/rollback/account and untrusted-CA checks retained. Not the full build wrapper or Go/GUI acceptance.
+
+Exact commands/raw outputs/hashes: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-desktop-render-fixture-20261105/receipt.json`.
 
 ## Changed Files or Migrations
 
-Existing Web G06 runner, one callback regression and its existing group verifier registration; Task/current and thin Fix receipt. No product/native/backend/shared/contracts/dependencies/schema/layout changes. Previous Task/current exact bytes and original reports are archived externally.
+One field in existing tests/clients/errors/desktop_render.mjs, Task/current and thin receipt. No product/backend/shared/native/contracts/dependencies/schema/layout change. Old Task/current and coordinator's scope registration are archived byte-exact.
 
 ## Known Failures, Risks, and Assumptions
 
-G07 same empty group progressed3→4→5 members: C Web/Desktop/Mobile online for ADD C, A Web/Desktop for ADD U, B Web/Desktop for ADD D. Actual PG remains0 messages. Its supervisor exit1/four auxiliary Playwright response-body capture failures are retained; remaining actual pages, SQLite, PG and original UI were independently judged sufficient, not relabelled a whole-run PASS. Segmented roles do not claim nine simultaneous terminals. Old21 cached Windows pictures remain INVALID; old36 close FAIL remains historical.
+Both real7fef CI FAIL/logs remain original; no flaky label or premature acceptance. G07 supervisor exit1/four auxiliary body-capture failures remain; independent88checks/182raw hashes accept phased same-group3→4→5-member evidence, not nine simultaneous terminals. Old21cached Windows images remainINVALID; old36close FAIL remains historical.
 
-Android v6 trust removed,134 original CAs and inactive v4 staging restored; actual default SDK rejects v6, original test APK restored, owned AVD stopped. Five Web and ABC Desktop fixture sessions are revoked/refreshNULL after actual UI logout; owned browser/proxies closed. Global cleanup verified original six containers stopped with original IDs/mounts/volumes preserved and exact new v6 front removed without volumes. Windows user-installed v6 trust remains. No runtime lease remains.
+Android v6 trust cleanup restored134original CAs/inactive staging/test APK; actual default SDK rejectedv6 and owned AVD stopped. Five WEB+ABC DESKTOP fixture sessions revoked/refreshNULL; six original stopped containers/IDs/mounts/volumes restored; only newv6front removed without volumes. Windows user-installed v6trust remains. No runtime lease or GUI rebuild/retest this Fix.
 
-Initial baseline wrapper cwd and test-fixture wiring failures, npm-cache EPERM and successful qualified retries remain explicit. Recorder trace is partial due to direct startup/reads/edits/helper authoring and will finish FAIL honestly with structural validation. This is instrumentation disclosure, not product acceptance. No credentials/private diagnostics are included.
+Recorder trace is partial due direct startup/reads/helper authoring and summarized delegated prompt; finish FAIL honestly with default structural validation recorded externally. Initial compile environment failures are retained. Local/Recorder evidence is not acceptance; no credentials/private diagnostics included.
 
 ## Next Exact Action
 
-Bind clean new Fix SHA and unchanged product/runtime evidence; run Control, fresh regular then DIFFERENT fresh error review. Complete final independent G01–G09 candidate binding, required exact-head hosted CI, protected integration, actual-main and safe H:/IM-platform synchronization. Stop after GROUP; do not advance S2 Gate or select another task.
+Coordinator obtains new clean Fix SHA from external commit.json, runs Control Acceptance, fresh full regular then DIFFERENT fresh error review. After both PASS, bind unchanged G01–G09 and update candidate CI; require all exact-head jobs, protected integration, actual-main and safe H:/IM-platform synchronization. Stop after GROUP; no S2 Gate/next task.
 
 ## Last Known Good Commit
 
-`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main. Product synchronization PENDING. Main recovery/s1-handoff-20261001 has780 untracked+2tracked unknown paths; root's read-only baseline found zero candidate collisions and remote main unchanged. Recheck and preserve unknown bytes/index/status before safe synchronization.
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main.7fef not merged; product synchronization PENDING. Main recovery/s1-handoff-20261001 has780untracked+2tracked unknown paths per coordinator; this Fix did not inspect private contents or touch main. Recheck/preserve bytes/index/status before synchronization.
 
 ## Latest Checkpoint
 
@@ -65,8 +61,8 @@ Bind clean new Fix SHA and unchanged product/runtime evidence; run Control, fres
 
 ## Uncommitted Changes / Ownership
 
-/root/completion_coordinator/fix_route_causes is the sole repository writer until its clean commit, then returns ownership to coordinator. Review/runtime agents have no repository write lease. Main unknown work is untouched.
+/root/completion_coordinator/fix_desktop_fixture is sole repository writer until its clean four-file commit, then ownership returns to coordinator. Other agents have no write lease. Main unknown work untouched. Clean commit/SHA/status and Recorder closure are external, linked by receipt.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Existing standard JavaScript AggregateError and a local owned callback list serve this demonstrated route/cleanup boundary; no new framework, dependency, public contract or product behavior.
+None. The existing valid DIRECT fixture supplies its required empty groups list; every original assertion remains. No product fallback or new mechanism.

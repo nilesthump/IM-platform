@@ -10,15 +10,17 @@ client_supplement_phase: group_product
 
 ## Current recovery — 2026-11-05
 
-Human scope remains complete GROUP on Web, installed Windows Tauri and Android, stopping after GROUP acceptance and safe synchronization; no S2 Gate/next task. Managed root H:/.codex/worktrees/g-8802/IM-platform; branch task/LOOP1-GROUP-001-resume; accepted backend/main/LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e.
+Human scope remains complete GROUP on Web, installed Windows Tauri and Android, stopping after GROUP acceptance and safe synchronization; no S2 Gate/next task. Managed root H:/.codex/worktrees/g-8802/IM-platform; branch task/LOOP1-GROUP-001-resume; accepted backend/main/LKG 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e.
 
-Product source2c4faf1647128a58200d5fc70af0435e0f82fc66 passed Control Acceptance/fresh full regular Review; DIFFERENT specialist FAIL EH-2C4F-P2-001 identified loss of route/abort/UI-wait causes in tests/clients/group/web.cjs. This fresh harness-only Fix keeps exact original/falsy values, independent cleanup failures and owned callbacks until final reporting. Actual git2c callback RED1 → fixed13cases GREEN0; existing full group verifier0. All product inputs remain unchanged. New committed SHA is recorded externally in fix-route-causes-1105/commit.json and requires fresh Control and both reviews; no push/CI-triggering PR before both PASS.
+Candidate 7fefbafef11ee103ec14477d1a1623f4cab7a7ea passed Control Acceptance, fresh regular Review (report SHA256 135de75300c6c2873e15f7590d0c755ec0bf3d9103f89362f5ec8db231d80a8c) and DIFFERENT fresh error review (4b0a534381c29a8e7e0b7f41e34399848b1a5a317ea56e8710751dd1f585ec2f). Independent G01–G08 runtime audit (a01c1ed957094f230594cf67dc1aa747f836208f649bf7375d84b16188296892), bounded G09 visual approval (838b0cfbd8fe8dbef6c44a10efe8f0b46dce36961e37c9108103685901385562) and regular review's G09 functional assessment bind that exact candidate. These records are preserved, not whole GROUP acceptance.
 
-Current AAC Windows and2c Web actual G06 before/after loss supplements are complete with original request/real PG/reply equality and success close/selection. Final2c G09 Architect PASS is bounded visual approval. Independent runtime auditor reports G01–G08 sufficient, including same empty group C three-client discovery and A/B existing-member cross-client3→4→5 updates (88 G07 assertions,182 raw hashes), awaiting final new-SHA binding. G07 supervisor exit1/four auxiliary body-capture failures remain disclosed; remaining actual PG/SQLite/pages/original UI suffice per independent auditor, not a relabelled run PASS.
+Real hosted push 42050106686 and PR99 run 42050378269 both completed FAIL on exact 7fef: each 14 jobs = 12 success, Linux failure and aggregate gate failure. The Linux Desktop SEND step reached actual SQLx/TLS checks, then the existing compiled-renderer DIRECT fixture omitted required groups. This is a reproducible fixture defect, not flaky infrastructure. 7fef was not merged; main remains accepted 3d30872.
 
-Android temporary v6 trust cleanup/SDK rejection/134 CA restoration/test APK restoration/AVD stop complete. Actual UI logout and final PG confirm five WEB+ABC DESKTOP sessions revoked/refreshNULL and group5 members/0 messages. Global runtime cleanup restored six original stopped containers/volumes and removed only the new v6 front; no runtime lease remains. Windows manual v6 trust remains. Original FAIL/RED/Recorder and old21 INVALID Windows images remain unchanged.
+This fresh Fix only adds groups:[] to tests/clients/errors/desktop_render.mjs; every existing SENDING/SENT/FAILED/nullable ACK positive and unknown state/body/identity negative assertion remains. Actual current-source compiled renderer RED exit1 → unchanged assertions GREEN exit0. Existing desktop.mjs direct suite on hash-qualified unchanged SQLx probe and existing controlled TLS fixture PASS0/11.469s, 8 sends/0 fixture errors. This is not a full tools/verify_client_send.py build-wrapper run, Go durable-ACK or GUI acceptance. All product/native/backend/shared/contracts/GUI inputs remain unchanged. Existing unchanged Desktop SYNC direct suite also PASS0/25.297s: actual SQLx+controlled HTTPS/WSS,205→208 pagination,9frames/8user pages/8conversation pages/u-200 continuation,0fixture errors; restart/rollback/account and untrusted-CA checks retained. Not the full build wrapper or Go/GUI acceptance. Five activation baseline checks pass on exact 7fef qualified export. Initial missing shared compiler/default-output write-permission failures are retained; qualified TypeScript5.9.3 compile retry passes for both shared and Desktop.
 
-Final candidate binding, fresh full regular→different fresh specialist, required exact-head hosted CI, protected integration, actual-main and safe main synchronization remain. GROUP active/group_product; S2 OPEN. Current verified commands, hashes, bounded limitations and archived previous Task/current are in `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`. No self-acceptance.
+New Fix SHA is recorded after commit in external fix-desktop-render-fixture-1105/commit.json and requires new clean Control, fresh full regular then DIFFERENT fresh error review before push/CI-triggering PR update. Prior reviews do not transfer automatically. Final unchanged G01–G09 source binding, required exact-head hosted CI, protected integration, actual-main and safe main synchronization remain. GROUP active/group_product; S2 OPEN. Commands, original reports/log hashes, archived Task/current, known limits and next actions are linked by `spec/progress/evidence/LOOP1-GROUP-001/product/fix-desktop-render-fixture-20261105/receipt.json`. No self-acceptance.
+
+Android temporary v6 trust/134 original CA/test APK restoration and owned AVD stop remain complete. Five WEB and ABC DESKTOP fixture sessions were revoked; original six stopped containers/IDs/mounts/volumes restored and new v6 front removed without volumes. Windows user-installed v6 trust remains. No runtime lease is reopened. G07 supervisor exit1/four auxiliary body-capture failures, old21 INVALID Windows images, old36 close FAIL and all partial Recorder traces remain historical facts; independent evidence accepts phased G07 coverage, not nine simultaneous clients.
 
 # Goal
 
@@ -52,7 +54,7 @@ client_runtime: Android
 
 # Allowed Paths
 
-普通业务按服务职责窄列，allowed_paths不豁免canonical。首契约已独立接受/集成/安全同步，当前完整GROUP产品按下述Product Activation登记分阶段继续；确有新增输入先修Task范围，不在实施后追认。当前交付为 Human 已授权的完整 GROUP 三端；本轮 Fix 仅修现 Web G06 test runner 的 route/abort/UI-wait 原因保留，补实际回调回归并更新恢复记录；无产品源码变更。具体 runtime/trust 租约单独核验；无跨服务迁移。
+普通业务按服务职责窄列，allowed_paths不豁免canonical。首契约已独立接受/集成/安全同步，当前完整GROUP产品按下述Product Activation登记分阶段继续；确有新增输入先修Task范围，不在实施后追认。当前交付为 Human 已授权的完整 GROUP 三端；本轮 Fix 仅为现 Desktop Messages DIRECT renderer 测试夹具补 groups:[]，保留全部现正反断言并更新真实托管失败恢复记录；无产品源码变更。具体 runtime/trust 租约单独核验；无跨服务迁移。
 
 - `contracts/http/group.openapi.json`（建群/加人/本人会话快照；唯一新增HTTP权威）
 - `contracts/http/verify-group.py`（标准库/现有validator适配，不新依赖）
@@ -124,6 +126,7 @@ client_runtime: Android
 - `clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt`（仅现metadata读写/群身份投影；不改消息写入/草稿/SQLite事务adapter）
 - `clients/mobile/app/src/androidTest/kotlin/im/platform/client/group/**`
 - `tests/clients/group/**`
+- `tests/clients/errors/desktop_render.mjs` (2026-11-05 coordinator registration after exact7fef hosted Linux CI failure: only supply the current-required `groups:[]` in the existing compiled Desktop Messages valid DIRECT fixture. Preserve every existing SENDING/SENT/FAILED/nullable ACK positive and unknown state/body/identity negative assertion; no production fallback, dependency, renderer, send semantics or generic fixture mechanism change. Reproduce the actual compiled renderer failure, then run its unchanged assertions and the existing applicable send verifier.)
 - `tests/clients/web/behavior.mjs` and `tests/clients/web/regressions.mjs` (2026-11-05 coordinator scope registration for the mandatory existing Web regression: only add the controlled GET /v1/conversations canonical empty terminal page with correlated requestId and no-store, and current-required View fixture fields such as groups:[] for the existing Messages renderer; preserve every prior assertion and unknown-error propagation. No production/contract change.)
 - `tests/contract/group/**`（Fix R5新增的 `tests/contract/group/test_verification_failures.py` 原6测试方法保持；Fix R6仅在该文件追加R6-P2-002现E2E实际SQL/断言边界的有意义回归：精确两真实记录正例、单LF记录别名及必要缺失/额外/重复/乱序/大小写错/native非零反例，隔离边界证据不冒称真实Docker/TLS接受。原test_group.py全部22测试方法、35valid/30invalid对象与helpers保持）
 - `tests/integration/group/**`
@@ -149,10 +152,10 @@ The first public contract slice was independently frozen, integrated and synchro
 
 product_owner: /root/completion_coordinator
 product_registration: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
-product_G01_G09: INDEPENDENT_RUNTIME_SUFFICIENT_PENDING_NEW_SHA_BINDING_AND_FINAL_ACCEPTANCE
-product_regular_review: FINAL_HARNESS_FIX_SHA_PENDING_FRESH_FULL_REVIEW_AFTER_2C4F_PASS
-product_error_handling_review: EH_2C4F_P2_001_FIXED_LOCALLY_NEW_SHA_PENDING_DIFFERENT_FRESH_SPECIALIST_AFTER_REGULAR_PASS
-product_hosted_acceptance: PENDING_FINAL_CANDIDATE_BOTH_FRESH_REVIEWS
+product_G01_G09: ACCEPTED_BOUNDED_ON_7FEF_PENDING_FIX_SHA_UNCHANGED_INPUT_BINDING
+product_regular_review: PASS_7FEF_135DE753_NEW_FIX_SHA_PENDING_FRESH_FULL_REVIEW
+product_error_handling_review: PASS_7FEF_4B0A5343_NEW_FIX_SHA_PENDING_DIFFERENT_FRESH_SPECIALIST_AFTER_REGULAR_PASS
+product_hosted_acceptance: FAIL_7FEF_PUSH42050106686_PR42050378269_NEW_FIX_PENDING_DUAL_REVIEW_AND_CI
 product_main_sync: PENDING_PRODUCT
 
 The Human full-GROUP resumption supersedes old backend-only/phase-only stops. Exactly one assigned-worktree writer owns each serial fix; separate qualified runtime leases do not grant source writes. No new public contract/native schema/ACK/security/compatibility/dependency authority is granted. Original activation and past grants are preserved in the archived Task, not treated as current owners or new trust authorization.
@@ -165,7 +168,7 @@ The Human full-GROUP resumption supersedes old backend-only/phase-only stops. Ex
 - 新group fixture仅自有随机用户/会话/request、唯一条件trigger/function/loopback listeners/processes；不复用遗漏receipt清理的旧messageFixture。PG每写点conversation/member（含批中途）/receipt/user_sync INSERT及UPDATE/Outbox真实trigger拒绝；deferred constraint trigger在实际COMMIT等待/抛错，独立连接核成功前不可见/确定失败全零。test-only装置仅包装既有锁定pgx BuildFrontend在TLS/SASL既有协商之后的IO，使用既有pgproto3与标准库，转发真实COMMIT→观察真正PG CommandComplete COMMIT成功→先独立直连核完整durable，再仅截客户端COMMIT响应/EOF→Core保留真实IO cause正常失败→原ID正常重试原结果，无mock Commit/生产hook/新代理机制/新依赖。auth帧与connConfig不记录/打印，unknown装置错误测试失败。群user按稳定升序FOR NO KEY UPDATE互斥并阻UserSync SHARE，保持现FK KEY SHARE兼容；Session/member/conversation随后按既有职责锁定并重检。真实logout持Session及send持conversation时的条件trigger屏障回归核无user FK锁环，不为群改旧Auth/Message。
 - G06单独owned HTTPS relay仅群POST原序列化bytes：首次不转发证明零commit；另一情形转发后独立PG证明完整提交才截客户端响应；三端真实未确认/原ID与memberUserIds点击重试。不能拿旧message ACK relay冒充群HTTP覆盖。清理保留body及cleanup两因；drop仅own triggers/functions/fixture FK依赖（含receipts），关闭own监听/连接/进程并排空goroutines，schema inventory前后保持非own项。不操作unknown资源/数据。
 
-| G | 本产品必须建立的真实证据（已有部分执行，完整候选绑定未完成） |
+| G | 本产品必须建立的真实证据（已在7fef独立绑定；本Fix候选须复核未变输入） |
 | --- | --- |
 | G01 | A-B好友、A建群+B；B-C好友/A-C非好友而B以MEMBER加C；三人同群发现互发及非好友sender真实身份，PG单GROUP/成员/receipt/events/Outbox与实际三端入口绑定 |
 | G02 | TLS入口非member/失效Session/非friend/mixed/DIRECT/伪actor/读取和消息越权拒绝，canonical状态码与request关联、全部表零新效果 |
@@ -239,7 +242,7 @@ Web/Desktop沿既有TypeScript分层和各端独立React视觉；Android Kotlin/
 
 # Evidence
 
-spec/progress/evidence/LOOP1-GROUP-001/；已接受contract/backend历史保持。G01..G09原始DB/请求/故障/三端入口/截图/Architect/双审/hosted/protectedmain/sync按候选SHA保存和绑定。三端真实runtime和截图已执行，独立审计认为运行证据充分；最终候选绑定/双审/hosted接受和同步仍PENDING。
+spec/progress/evidence/LOOP1-GROUP-001/；已接受contract/backend历史保持。G01..G09原始DB/请求/故障/三端入口/截图/Architect/双审/hosted/protectedmain/sync按候选SHA保存和绑定。三端真实runtime/截图及G09功能已在7fef获独立bounded接受，两审已PASS；两次真实hosted均FAIL。当前仅fixture Fix新SHA的输入绑定/两审/hosted接受/同步仍PENDING，详见本轮thin receipt。
 
 # Completion Metadata
 
@@ -253,12 +256,12 @@ main_sync_evidence: unavailable
 
 # Handoff
 
-Completed: fresh harness-only Fix EH-2C4F-P2-001 after2c Control/regular PASS and different specialist FAIL. Actual old runner RED1 and fixed13 boundary cases GREEN0 cover exact route/falsy/abort/UI-wait/retry/late-cleanup causes; existing complete group verifier0/6.859s. Corrected baseline five checks0. Commands/results/evidence: current.md and `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`. Initial fixture wiring/cwd/npm cache failures are preserved and correctly excluded from product evidence.
+Completed: fresh minimal Desktop renderer fixture Fix after exact7fef hosted push42050106686 and PR42050378269 both FAIL. Actual current-source compiled renderer RED1 → GREEN0; existing unchanged Desktop SEND suite PASS0/11.469s with real SQLx probe, controlled builtin TLS/WSS,8 sends and no fixture errors. Existing all positive/negative renderer assertions preserved. Existing unchanged Desktop SYNC direct suite also PASS0/25.297s: actual SQLx+controlled HTTPS/WSS,205→208 pagination,9frames/8user pages/8conversation pages/u-200 continuation,0fixture errors; restart/rollback/account and untrusted-CA checks retained. Not the full build wrapper or Go/GUI acceptance. Five baseline checks PASS; first local compile environment failures retained and qualified retry0. Commands/results/hashes and original7fef reviews/runtime/visual/CI failures: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-desktop-render-fixture-20261105/receipt.json`.
 
-Changed files: tests/clients/group/web.cjs, route-failures.cjs, verify.py, Task/current and thin receipt. No product/UI/backend/native/contracts changes. Sole writer /root/completion_coordinator/fix_route_causes returns ownership after clean commit. Prior history archived byte-exact; main780 untracked+2tracked unknown untouched; LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e and synchronization PENDING. Checkpoint spec/progress/checkpoints/2026-10-28-group-windows-feedback.md. Partial Recorder finishes FAIL honestly/structural validation; not product acceptance.
+Changed files: tests/clients/errors/desktop_render.mjs, this Task, current.md and one thin receipt only. Product source and all GUI/runtime inputs unchanged. Sole writer /root/completion_coordinator/fix_desktop_fixture returns ownership after its clean commit; exact SHA and clean status are in external fix-desktop-render-fixture-1105/commit.json. No push/PR/merge/main sync. Original Task/current and pre-registered scope Task archived byte-exact. Main780 untracked+2tracked unknown untouched; LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e, synchronization PENDING. Latest checkpoint spec/progress/checkpoints/2026-10-28-group-windows-feedback.md.
 
-Known runtime boundary: G07 auxiliary body observer run FAIL remains, independently sufficient actual evidence awaits new-SHA binding. Android trust/AVD and all temporary/global task runtime cleanup complete per linked receipts; Windows user manual CA remains. Final source reviews/CI/actual-main/safe sync are still mandatory.
+Known limits: direct existing-suite verification is not the full SEND build wrapper/Go or GUI acceptance. G07 auxiliary observer FAIL and prior invalid images remain disclosed. Android/task runtime cleanup retained; Windows manual CA remains. Recorder trace is partial (direct startup/reads/helper authoring and summarized delegated prompt); finish FAIL honestly, default structural validation result recorded externally. Recorder is not acceptance.
 
 # Next Action
 
-Coordinator binds clean Fix SHA and unchanged product/runtime evidence, executes final Control and delegates fresh full regular then DIFFERENT fresh error specialist; both renewed after any source fix. Final G01–G09 binding, exact-head required CI/protected integration/actual-main/safe H:/IM-platform synchronization precede done. Stop at full GROUP; no S2 Gate or next task.
+Coordinator binds the clean Fix SHA and unchanged product/G01–G09 inputs, executes new Control Acceptance, delegates fresh full regular then DIFFERENT fresh error specialist; both renewed after any Fix. Only both PASS permit candidate push/PR99 update. Required exact-head hosted jobs, protected integration, actual-main and safe H:/IM-platform synchronization precede done. Stop after full GROUP; no S2 Gate or next task.
