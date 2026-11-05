@@ -52,5 +52,61 @@ module.exports=async function confirmedMutation(out){
  });
  retired.session={...session};const operation=retired.createGroup([B]);await within(reading);retired.dispose();retired.session={...session,userId:B};release();await within(operation);
  assert.equal(retired.view().selected,'');assert.deepEqual(retired.view().groups,[]);assert.deepEqual(retired.view().confirmedGroups,[]);retired.dispose();
+ // Real member reads and subscribed observers can fail independently. Finalizing
+ // loading must preserve both causes, without changing single-failure identity.
+ for(const read of ['ok','unknown','known'])for(const endingFails of [false,true]){
+  const readCause=read==='known'?new TypeError('member transport failed'):new Error('member read failed');
+  const observerCause=new Error('ending observer failed');let recover=false;
+  const client=new WebClient('https://owned.invalid',async url=>{
+   if(!recover&&read!=='ok')throw readCause;
+   return response({requestId:new URL(url).searchParams.get('requestId'),items:rows,hasMore:false,next:{afterConversationId:'',afterMemberUserId:''}});
+  });
+  client.session={...session};const unsubscribe=client.subscribe(()=>{if(endingFails&&!client.view().groupReadBusy)throw observerCause;});
+  try{
+   let rejected=false,cause,result;try{result=await client.refreshGroups();}catch(error){rejected=true;cause=error;}
+   assert.equal(rejected,read==='unknown'||endingFails,`${read}/${endingFails}: rejection`);
+   if(read==='unknown'&&!endingFails)assert.equal(cause,readCause);
+   if(read==='ok'&&endingFails)assert.equal(cause,observerCause);
+   if(read!=='ok'&&endingFails){
+    assert.ok(cause instanceof AggregateError,'read and ending failures must both survive');assert.equal(cause.errors.length,2);assert.equal(cause.errors[1],observerCause);
+    if(read==='unknown')assert.equal(cause.errors[0],readCause);
+    else {assert.equal(cause.errors[0].kind,'transport');assert.equal(cause.errors[0].cause,readCause);}
+   }
+   if(!rejected)assert.equal(result,read==='ok');
+   if(read==='known')assert.equal(client.view().groupReadError,'transport');
+   assert.equal(client.view().groupReadBusy,false);assert.equal(client.groupScanning,undefined);
+   unsubscribe();recover=true;assert.equal(await client.refreshGroups(),true);assert.deepEqual(client.view().groups,rows);assert.equal(client.view().groupReadError,'');
+  }finally{unsubscribe();client.dispose();}
+ }
+ // JavaScript permits any thrown value; undefined/null must not mean "no error".
+ for(const readCause of [undefined,null,0,'',NaN])for(const endingFails of [false,true]){
+  const observerCause=new Error('ending observer failed');
+  const client=new WebClient('https://owned.invalid',async()=>{throw readCause;});client.session={...session};
+  const unsubscribe=client.subscribe(()=>{if(endingFails&&!client.view().groupReadBusy)throw observerCause;});
+  try{
+   let rejected=false,cause;try{await client.refreshGroups();}catch(error){rejected=true;cause=error;}
+   assert.equal(rejected,true);
+   if(endingFails){assert.ok(cause instanceof AggregateError);assert.deepEqual(cause.errors,[readCause,observerCause]);}
+   else assert.ok(Object.is(cause,readCause),'single thrown value is unchanged');
+   assert.equal(client.view().groupReadBusy,false);assert.equal(client.groupScanning,undefined);
+  }finally{unsubscribe();client.dispose();}
+ }
+ // A notification of the known error can fail before loading ends as well.
+ for(const endingFails of [false,true]){
+  const readCause=new TypeError('member transport failed'),reportCause=new Error('error observer failed'),endingCause=new Error('ending observer failed');
+  const client=new WebClient('https://owned.invalid',async()=>{throw readCause;});client.session={...session};
+  const unsubscribe=client.subscribe(()=>{
+   if(client.view().groupReadError&&client.view().groupReadBusy)throw reportCause;
+   if(endingFails&&!client.view().groupReadBusy)throw endingCause;
+  });
+  try{
+   await assert.rejects(client.refreshGroups(),error=>{
+    assert.ok(error instanceof AggregateError);assert.equal(error.errors[0].cause,readCause);
+    assert.deepEqual(error.errors.slice(1),endingFails?[reportCause,endingCause]:[reportCause]);return true;
+   });
+   assert.equal(client.view().groupReadBusy,false);assert.equal(client.groupScanning,undefined);
+  }finally{unsubscribe();client.dispose();}
+ }
  console.log('PASS Web confirmed CREATE/ADD held/read failure, honest snapshot, unknown cause, selection and account isolation');
+ console.log('PASS Web member-read and ending-observer single/dual causes, falsy throws and recovery');
 };

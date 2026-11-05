@@ -126,6 +126,7 @@ export class WebClient {
     this.groupDirty=true;if(this.groupScanning)return this.groupScanning;
     this.publish({groupReadBusy:true,groupReadError:''});
     this.groupScanning=(async()=>{
+    const failures:unknown[]=[];
     try{const http=new GroupHttp(this.http.origin,s.userId,s.accessToken,this.fetcher);
       while(this.groupDirty&&this.alive(g)){this.groupDirty=false;let after={...start};const rows=new Map<string,MemberRow>();let last:MemberRow|undefined;
         for(;;){const p=await http.members(crypto.randomUUID(),this.abort.signal,after);if(!this.alive(g))return false;
@@ -137,8 +138,21 @@ export class WebClient {
         const waiting=this.waitingGroupFrames;this.waitingGroupFrames=[];for(const frame of waiting){if(this.authorized(frame.message.conversationId))this.repository.realtime(frame.requestId,frame.message);}if(waiting.length)this.publish();
       }
       return this.alive(g);
-    }catch(error){this.error(error,g);if(this.alive(g))this.publish({groupReadError:error instanceof GroupFailure?error.code||error.kind:'protocol'});return false;}
-    finally{if(this.alive(g)){this.groupScanning=undefined;this.publish({groupReadBusy:false});}}
+    }catch(error){
+      failures.push(error);
+      try{this.error(error,g);if(this.alive(g))this.publish({groupReadError:error instanceof GroupFailure?error.code||error.kind:'protocol'});return false;}
+      catch(reportError){
+        if(Object.is(reportError,error))throw reportError;
+        failures.push(reportError);throw new AggregateError(failures,'Group read and error notification failed');
+      }
+    }finally{if(this.alive(g)){
+      this.groupScanning=undefined;
+      // Observers can also fail while ending loading; retain the read/report causes.
+      try{this.publish({groupReadBusy:false});}catch(error){
+        if(failures.length)throw new AggregateError([...failures,error],'Group read and final notification failed');
+        throw error;
+      }
+    }}
     })();return this.groupScanning;
   }
   dispose(){this.clear('');this.listeners.clear();}
