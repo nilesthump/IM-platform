@@ -11,58 +11,45 @@ Current Task State: `active`
 Execution Status: active
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: de88cf326c520801693480e193cbd50dee9b0853; this fix changes test harnesses and metadata only.
+Product Source: de88cf326c520801693480e193cbd50dee9b0853 (unchanged by current test-only Fix)
 Coordinator: /root/completion_coordinator
 
-## Immediately Relevant Completed Work
+## Completed Work and Verification
 
-Human authorized full GROUP. Backend PR70/main3d30872 remains accepted. Exact356 fresh regular PASS was followed by different error review FAIL3 (runtime cleanup launch, Desktop browser close, Web report-write cleanup). Fresh Fix preserves all original causes, attempts required cleanup/report independently, and only outputs PASS after successful cleanup/report. Web durable result is FAIL on close failure; public errors remain sanitized. Two formal actual-runner boundary regressions join the existing group verifier. No product/native/contract/dependency change.
+f7ea fresh regular FAIL REG-F7EA-P2-001 found obsolete Web runner controls. Fresh Fix updates two runner chains to New chat/dialog Confirm and ellipsis Add members; actual success must close the picker and select the returned group. G06 reopens/reselects for each mode, preserving original IDs/targets/responses and DB checkpoints. Prior f7ea operation/report/cleanup error preservation remains intact. No product/build/native/contract/dependency changes.
 
-Resource recovery enabled Desktop NSIS build exit0/101.969s; all72 build inputs rechecked unchanged. Guarded installed SHA256 aac613549d21306b7d72b525fb21d5ce05ca76d1f08a7a121d555dee14f4a70e differs from release only by the documented three-byte NSS/UNK marker. AppData/credentials/DB preserved. Earlier two memory-failure builds remain historical. Web G07 repeated/older actual browser proof is bounded PASS; it includes real fixture WEB login/session write, not zero database writes.
-
-## Current Blockers
-
-GROUP unfinished; S2 OPEN. New final-SHA fresh regular and DIFFERENT fresh error review PENDING;356 error FAIL3 is not acceptance. Windows recaptures/Architect and remaining native G07 mapping remain pending coordinator validation. Old21-image batch remains INVALID because cached identical JPEGs were reused; original valid root1029/root1031 images keep their exact bounds. Android unchanged final6b APK346cb... still needs specific temporary owned-emulator v5 trust authorization for final real TLS close/new picker/friend loading/error. Do not treat prior certificate or Desktop control authorization as that grant. Full native G01-G09, exact-head hosted CI, protected integration, actual-main and safe main synchronization remain incomplete.
-
-## Verification
-
+- Command: `node tests/clients/group/web-runners.cjs <root> <desktop-node-modules> <playwright> <Edge>`
+  - Result: actual complete runner React/WebClient regression RED1 on old controls → GREEN0 on both runners. Controlled service/login only; not TLS/DB acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-runners-20261105/receipt.json`
 - Command: `python -Xutf8 -B tests/clients/group/verify.py`
-  - Result: exit0/4.765s; Python8 and JS26 actual-runner boundary cases plus existing compiled Web/Desktop/Workspace behavior. Original356 runner regressions RED1; report close-only false-PASS is explicitly rejected. Boundary cases use controlled dependencies and are not runtime acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
-- Command: `node tests/clients/group/desktop-picker.cjs <root> <desktop-node-modules> <playwright> <Edge>`
-  - Result: exit0/4.156s; actual React lifecycle, original request retry, confirmed close, later picker/navigation and drafts, unknown failure propagation; native invoke controlled.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
-- Command: `node tests/clients/group/desktop-friends.cjs <root> <desktop-node-modules> <playwright> <Edge>`
-  - Result: exit0/1.687s; actual refreshFriends pending/failure/empty and original unknown Retry/Cancel. No backend or native UI operation.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
-- Command: `python -Xutf8 -B tests/clients/gui/native.py package --bundles nsis -- --jobs 1`
-  - Result: coordinator recovered build exit0/101.969s at356, unchanged de88 product72inputs. Installed binding is source-bound; this is not UI acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-harness-cleanup-20261031/receipt.json`
+  - Result: exit0; existing Python/26 JS cleanup boundary cases and compiled Web/Desktop/wire behavior preserved.
+  - Evidence: same receipt; exact argv/exit/duration/raw output in external fix-web-runners-1105/research.
+- Command: Task minimum five baseline commands on exact f7ea committed snapshot.
+  - Result: all exit0. Ignored generated worktree outputs untouched.
+  - Evidence: external fix-web-runners-1105/baseline.json.
 
-## Changed Files or Migrations
+## Known Failures and Remaining Work
 
-Only tests/clients/group runtime.py, desktop-friends.cjs, desktop-picker.cjs, web.cjs, web-ui.cjs; two new formal regressions and existing verify.py entry; Task/current/new thin receipt. No migration, client, native, shared, dependency, backend or contract change. Standard Python/Node exception groups retain original causes; Python3.11 was already required by existing tomllib use.
+GROUP unfinished; S2 OPEN. Final Fix SHA fresh regular and DIFFERENT fresh error review PENDING; no push or CI-triggering PR before both pass. Windows fresh recovery bound six recaptures and duplicate+older actual UserSync/SQLite/cleanup as BOUNDED_PASS; fresh Architect review remains pending; old21 cached-image batch stays INVALID. Previous valid evidence may only be reused with unchanged-source binding. Android final6b APK346cb... unchanged; final real TLS close/new picker/friend states still pending. v5 CA expired; new v6/temporary owned-emulator trust helper prepared without authorization or trust write. Specific request: external android-final-runtime-1105/trust-approval-request.json.
 
-## Known Failures, Risks, and Assumptions
-
-All original review/probe/RED/build failures retained. Boundary tests do not prove real device/browser cleanup or absence of credential residue. Actual runtime.py private-file removal can fail; this now fails explicitly and preserves the operation failure. Previous current/task bytes are archived externally under fix-harness-cleanup-1031, hash-bound by the new thin receipt. Prior ignored generated-artifact architecture failures and snapshot read-only-copy failure remain historical; final clean committed control belongs to coordinator. Observer overwrite disclosure remains coordinator-1029/observer-disclosure/receipt.json. Recorder R-FIX-HARNESS-PREP-1031 prospective_resume is partial (startup/direct reads/helper authoring/edits outside capture), honestly finishes FAIL with final validation external. Local/Recorder PASS is not acceptance.
+Full G01-G09, Architect, exact-head hosted CI, protected integration, actual-main and safe H:/IM-platform synchronization remain mandatory. Historical source/review/build/runtime failures and the regression wrapper correction remain preserved. Research trace partial (direct startup/read/authoring/edit operations and summarized delegation prompt); Recorder finish FAIL/validation is instrumentation, not acceptance.
 
 ## Next Exact Action
 
-Commit this verified harness Fix, then coordinator performs fresh regular followed by DIFFERENT fresh error review of the same final SHA; no push/CI-triggering PR until both PASS. Windows capture agent owns its UI/proxy work. Finish bounded native G07 proofs, specific Android trust authorization and real final TLS states, then Architect/native G01-G09 mapping, exact-head hosted CI/protected integration/actual-main and safe main sync. Do not mark GROUP done or advance S2.
+Commit bounded validated Fix, release writer, obtain fresh final-SHA regular then different error review; continue pending native/Architect evidence and actual hosted/integration/safe sync. Stop after GROUP; do not advance S2 or another task. New trust writes require specific Human authorization.
 
 ## Last Known Good Commit
 
-`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main; full GROUP synchronization PENDING. Latest read-only main preflight found780 untracked and2 tracked changes, no exactpath overlap; preserve all unknown work. Historical782 count retained without inferred cause; final sync must requalify paths/hashes/prefix collisions.
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main. Synchronization PENDING. Last main preflight780 untracked+2tracked, historical782 without inferred cause; preserve every unknown path/hash/index and requalify final sync.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-10-28-group-windows-feedback.md` is bounded recovery, not full GROUP acceptance.
+`spec/progress/checkpoints/2026-10-28-group-windows-feedback.md` (bounded recovery, not full GROUP).
 
 ## Uncommitted Changes / Ownership
 
-/root/completion_coordinator/fix_harness_cleanup_1031 solely owns the eight listed harness/regression files, Task/current and new thin receipt until clean commit, then writer releases to coordinator. No other source writer. Windows capture agent has separate exclusive native UI/runtime lease, not repository writes. Android trust untouched. Main unknown work untouched. External final receipt binds the committed candidate and clean state; no self-review acceptance.
+/root/completion_coordinator/fix_web_runners_1105 owns only tests/clients/group/web.cjs, web-ui.cjs, new web-runners.cjs, Task/current and new thin receipt until clean commit, then writer releases to coordinator. External runtime/certificate owners have no source lease. Main unknown work untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
-None identified. Existing technology/source boundaries and public contracts unchanged; no new runtime, dependency, protocol or security authority.
+None. Exact original Task/current bytes and stacked history are archived under external fix-web-runners-1105, hash-bound in the new receipt. All authority/allowed paths/acceptance/verification remain in the Task; no authority or acceptance relaxation.
