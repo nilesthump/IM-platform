@@ -8,6 +8,7 @@ const terminal={requestId:R,items:[row(A),row(B)],hasMore:false,next:{afterConve
 const result={requestId:R,conversationId:C,addedMemberUserIds:[A,B],createdAt:time};
 const response=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
 (async()=>{
+ await require('./web-confirmed.cjs')(process.argv[2]);
  assert.deepEqual(wire.targets([B,B],A),[B]);
  assert.throws(()=>wire.targets([A],A));assert.throws(()=>wire.result({...result,addedMemberUserIds:[B]},R,A,[B]));
  assert.equal(wire.page(terminal,R).items.length,2);
@@ -54,18 +55,18 @@ const response=(value,status=200)=>new Response(JSON.stringify(value),{status,he
   return response({...terminal,requestId});
  });
  concurrent.session={...client.session};const oldScanJob=concurrent.refreshGroups();const creating=concurrent.createGroup([B]);await mutated;releaseOldScan();await Promise.all([oldScanJob,creating]);
- assert.equal(concurrent.view().selected,C,'create waits for dirty scan before selecting new group');assert.equal(concurrent.view().groupStatus,'success');concurrent.dispose();
+ assert.equal(concurrent.view().selected,C,'dirty scan preserves the confirmed selection');assert.equal(concurrent.view().groupStatus,'success');concurrent.dispose();
  const confirmedBodies=[];let snapshotFails=true;
  const recovering=new WebClient('https://example.invalid',async(url,init)=>{if(url.includes('/v1/groups')){confirmedBodies.push(init.body);return response({...result,requestId:JSON.parse(init.body).requestId},201)}if(snapshotFails)throw new TypeError('snapshot unavailable');return response({...terminal,requestId:new URL(url).searchParams.get('requestId')})});
- recovering.session={...client.session};await recovering.createGroup([B]);assert.equal(recovering.view().groupStatus,'unconfirmed');assert.equal(recovering.view().selected,'');snapshotFails=false;await recovering.retryGroup();assert.equal(recovering.view().selected,C);assert.equal(confirmedBodies[0],confirmedBodies[1],'snapshot failure preserves original mutation identity');recovering.dispose();
+ recovering.session={...client.session};await recovering.createGroup([B]);assert.equal(recovering.view().groupStatus,'success');assert.equal(recovering.view().selected,C);assert.equal(recovering.view().groupReadError,'transport');snapshotFails=false;await recovering.refreshGroups();assert.equal(recovering.view().selected,C);assert.equal(confirmedBodies.length,1,'snapshot recovery does not resend confirmed mutation');recovering.dispose();
  const before=scanning.view().groups;scanning.fetcher=async(url)=>response({...terminal,requestId:new URL(url).searchParams.get('requestId'),items:[row(B),row(A)]});
- await scanning.refreshGroups();assert.deepEqual(scanning.view().groups,before,'invalid page preserves previous projection');assert.equal(scanning.view().groupError,'protocol');
+ await scanning.refreshGroups();assert.deepEqual(scanning.view().groups,before,'invalid page preserves previous projection');assert.equal(scanning.view().groupReadError,'protocol');
  const many=Array.from({length:205},(_,i)=>row('20000000-0000-4000-8000-'+String(i+1).padStart(12,'0')));let manyCalls=0;
  const paged=new WebClient('https://example.invalid',async(url)=>{const q=new URL(url).searchParams;manyCalls++;const offset=q.has('afterMemberUserId')?many.findIndex(x=>x.member.user.userId===q.get('afterMemberUserId'))+1:0;const items=many.slice(offset,offset+100);const hasMore=offset+items.length<many.length;return response({requestId:q.get('requestId'),items,hasMore,next:hasMore?{afterConversationId:C,afterMemberUserId:items.at(-1).member.user.userId}:{afterConversationId:'',afterMemberUserId:''}})});
  paged.session={...client.session};await paged.refreshGroups();assert.equal(manyCalls,3);assert.equal(paged.view().groups.length,205);
  let lateRelease;const lateHeld=new Promise(resolve=>lateRelease=resolve);
  const retired=new WebClient('https://example.invalid',async(url)=>{await lateHeld;return response({...terminal,requestId:new URL(url).searchParams.get('requestId')})});retired.session={...client.session};const late=retired.refreshGroups();await Promise.resolve();retired.dispose();lateRelease();await late;assert.deepEqual(retired.view().groups,[],'retired session cannot publish scan');
- let splitCalls=0;paged.fetcher=async(url)=>{const q=new URL(url).searchParams;return response(++splitCalls===1?{...short,requestId:q.get('requestId')}:{...terminal,requestId:q.get('requestId'),items:[{...row(B),createdBy:B}]})};await paged.refreshGroups();assert.equal(paged.view().groups.length,205,'inconsistent metadata across pages preserves previous snapshot');assert.equal(paged.view().groupError,'protocol');paged.dispose();
+ let splitCalls=0;paged.fetcher=async(url)=>{const q=new URL(url).searchParams;return response(++splitCalls===1?{...short,requestId:q.get('requestId')}:{...terminal,requestId:q.get('requestId'),items:[{...row(B),createdBy:B}]})};await paged.refreshGroups();assert.equal(paged.view().groups.length,205,'inconsistent metadata across pages preserves previous snapshot');assert.equal(paged.view().groupReadError,'protocol');paged.dispose();
  client.dispose();assert.deepEqual(client.view().groups,[]);assert.equal(client.groupOperation,undefined);
  console.log('Group Web retry/scan/dirty/isolation behavior PASS');
  console.log('Group wire/HTTP behavior PASS');

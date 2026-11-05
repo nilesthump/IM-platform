@@ -11,54 +11,53 @@ Current Task State: `active`
 Execution Status: active
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: de88cf326c520801693480e193cbd50dee9b0853 (unchanged by 647 test Fix and current metadata Fix)
+Product Source: Web confirmation fix in this candidate after 403dad2ef10275cab8999daa8b0384d2e7368b9a; native inputs unchanged. Exact committed SHA recorded in linked external commit.json after commit.
 Coordinator: /root/completion_coordinator
 
 ## Immediately Relevant Completed Work
 
-Web runner Fix 647e2f029ac39fa2b647408940fae626e658b93d follows New chat/dialog Confirm and ellipsis Add members, asserting successful close and returned-group selection; original G06 request/targets and f7ea cleanup-error preservation remain. Local actual-component runner RED→GREEN is complete. This Fix restores mandatory recovery headings without changing product/tests/checkers.
+403 full regular review PASS was followed by different specialist FAIL EH-403-P2-001. This fresh Fix separates confirmed Web CREATE/ADD from member reads: picker closes and returned group opens immediately; real member loading/failure and read-only retry remain visible. No fabricated member rows or history. Actual WebClient and React RED→GREEN covers held/failed reads, original retry after cancel/language reopen, draft/selection, newer picker/navigation, unknown cause and account retirement. Two old Web fixtures now handle the canonical member read; all old assertions remain.
 
-Windows fresh Architect PASS_BOUNDED_WINDOWS_VISUAL closes ARCH51-EVIDENCE-001 with six replacement originals and unchanged-source bindings; Windows G07 duplicate/older actual UserSync and SQLite evidence independently bound as BOUNDED_PASS. Backend 52 inputs and three accepted receipts were rehashed unchanged. These bounded results do not establish full GROUP acceptance. Original reports and hashes are linked by the new recovery receipt.
+Windows six replacement originals have bounded Architect approval; old21 cached images remain INVALID. Android owner completed real runtime and trust cleanup; coordinator-reported acceptance-index is linked in the Fix receipt. Android bounded Architect PASS (19 new plus8 existing originals) is reported; final full GROUP evidence binding remains pending. These are bounded results, not GROUP acceptance.
 
 ## Current Blockers
 
-647 regular review ended early FAIL REG-647E-P2-001 on 10 recovery diagnostics; it did not complete the 50-file semantic review. After this metadata Fix, unchanged Control Acceptance and fresh full regular → DIFFERENT fresh error review must cover the final SHA. Both reviews, full G01-G09 evidence binding, remaining Android/Architect, exact-head hosted CI, protected integration, actual-main and safe synchronization are pending. No push/CI-triggering PR before both reviews PASS; GROUP remains active, S2 OPEN.
+No current source blocker reported by this Fix. Both fresh reviews on this NEW final SHA are pending; 403 PASS cannot transfer. Final Control Acceptance, real Web affected-state/Architect binding, complete G01-G09, exact-head hosted CI, protected integration, actual-main and safe synchronization remain pending. No push/CI-triggering PR before both reviews PASS. GROUP active; S2 OPEN.
 
 ## Verification
 
-- Command: `node tests/clients/group/web-runners.cjs <root> <desktop-node-modules> <playwright> <Edge>`
-  - Result: previous 647 Fix local RED1→GREEN0, 4.828s; complete current React/WebClient runners with controlled service/login, not real TLS/DB acceptance.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-runners-20261105/receipt.json`
 - Command: `python -Xutf8 -B tests/clients/group/verify.py`
-  - Result: previous 647 Fix exit0, 5.453s; Python/26 JS cleanup boundary cases and compiled Web/Desktop/wire behavior preserved.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-runners-20261105/receipt.json`
+  - Result: exit0; actual compiled Web/Desktop/wire, original cleanup regression and new confirmation/read isolation assertions.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-confirm-20261105/receipt.json`
+- Command: `node tests/clients/group/web-runners.cjs <root> <desktop-node-modules> <playwright> <Edge>`
+  - Result: actual React RED1→GREEN0; held CREATE confirmation, failed ADD read, original-request/language/cancel/draft and newer-picker coverage. Controlled service/login only.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-confirm-20261105/receipt.json`
+- Command: `python -Xutf8 -B tests/clients/web/verify.py` and `python -Xutf8 -B tests/clients/i18n/verify.py`
+  - Result: exit0; final exact source-snapshot Web locked build/behavior/appearance and language regression. Earlier generated-output and incomplete-fixture FAIL originals retained.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-confirm-20261105/receipt.json`
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: current Fix startup exit0 on exact 647 snapshot; frozen integrity, S2 planning, tests/architecture and tests/ci also exit0. Full argv/results in linked baseline.json.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-recovery-headings-20261105/receipt.json`
-
-- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
-  - Result: exit1, 31.141s; all 10 original recovery diagnostics eliminated. Sole remaining failure is architecture test scanning existing ignored Desktop dist/build outputs; preserved untouched. Not Control PASS; exact final committed Acceptance remains pending.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-recovery-headings-20261105/receipt.json`
+  - Result: exit0 on final source snapshot; startup frozen integrity, planning, tests/architecture and tests/ci also exit0 on exact403 snapshot. Final committed Control Acceptance pending.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-confirm-20261105/receipt.json`
 
 ## Changed Files or Migrations
 
-This Fix changes only current.md, the active GROUP Task and the new recovery receipt. Before 647 bytes are archived and hash-bound. No source, test, checker, migration, contract, dependency, native or runtime change. Earlier stacked history and failed evidence remain preserved.
+Web application client, Shell, ConversationList; group regressions and two explicitly registered existing Web controlled fixtures; this current state, active Task and new Fix receipt. No backend/native/shared/contracts/dependencies/migrations. Before-current/Task bytes archived externally; old source snapshots and evidence remain untouched.
 
 ## Known Failures, Risks, and Assumptions
 
-Old 21 cached Windows images remain INVALID; six replacements close only the bounded Windows finding. Android final 6b product inputs/APK remain unchanged, but current real Go/TLS confirmed close/navigation, friend states, G07 evidence and fresh Architect binding are pending under /root/completion_coordinator/android_runtime_1105.
+The original403 specialist failure and all RED/helper/verifier failures remain recorded. Known metadata failure no longer masquerades as unconfirmed mutation; unknown exceptions still fail normally. Generated Desktop artifacts remain untouched; isolated exact source snapshots support verification. New UI state requires actual Web evidence/Architect approval and final independent acceptance.
 
-Human explicitly authorized temporary v6 trust and cleanup on owned im_group_g8802/emulator-5590; thumbprint E6030738DB3EF622EDAAC4B38882396077475C69. Windows manual import is verified. Root's owned v6 TLS front 811256 reports default-trust health 200; Android owner holds exclusive runtime/fault/cleanup lease and must restore original trust/mounts/services, preserving DB/credentials/volumes. Authorization is not execution or acceptance. v5 remains expired. Exact authorization/runtime originals are linked in the receipt.
+Android cleanup is bounded: approved v6 temporary trust removed,134 original CAs restored, actual SDK SSLHandshakeException rejects v6, owned AVD stopped and18444 closed. Global8443 remains owned by coordinator for Web acceptance; no claim of all-service cleanup. Windows manual v6 trust remains as authorized. Android bounded Architect PASS is linked by coordinator; screenshots are not protocol/transaction acceptance.
 
-Research capture is partial: direct startup/reads/helper authoring plus summarized delegation prompt are outside capture; Recorder finish FAIL/structural validation is not product acceptance. Historical failures remain immutable.
+Research is partial due to direct startup/reads/edits and helper authoring; honest Recorder FAIL/structural validation is not Task acceptance. Main unknown files remain untouched.
 
 ## Next Exact Action
 
-Metadata fix is locally verified with the recorded generated-output limitation; after its clean commit, coordinator runs unchanged Control Acceptance on the exact new committed snapshot. After PASS delegate fresh full regular followed by different fresh error review; continue Android/Architect and full acceptance/integration/safe sync. Stop after GROUP; do not advance S2 or another task.
+After clean Fix commit, coordinator binds exact SHA/source bytes, runs final Control Acceptance and delegates fresh full regular review then a different fresh error-handling specialist. Real affected Web runtime/Architect can run against that frozen source in parallel with read-only review. Resolve remaining full GROUP acceptance/hosted/integration/safe sync. Stop after GROUP; do not advance S2 or another task.
 
 ## Last Known Good Commit
 
-`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main. Product synchronization PENDING. Last qualified main recovery/s1-handoff-20261001 has 780 untracked+2tracked unknown; historical 782 preserved without inferred cause. Requalify and preserve all unknown paths/hash/index during final safe synchronization.
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main. Product synchronization PENDING. Last qualified main recovery/s1-handoff-20261001 has780 untracked+2tracked unknown; historical782 count preserved without inferred cause. Requalify and preserve unknown paths/hash/index before safe sync.
 
 ## Latest Checkpoint
 
@@ -66,8 +65,8 @@ Metadata fix is locally verified with the recorded generated-output limitation; 
 
 ## Uncommitted Changes / Ownership
 
-/root/completion_coordinator/fix_metadata_647_1105 owns only the two recovery Markdown files and new receipt until clean commit; writer then returns to coordinator. Android runtime owner has no repository write lease. Unknown main work is untouched.
+/root/completion_coordinator/fix_web_confirm_1105 is sole source writer for the listed Fix until clean commit; lease returns to coordinator afterward. Other runtime/review agents have no repository write lease. Main unknown work untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
-None for this metadata Fix. All authority, allowed paths, acceptance and verification remain in the Task. No acceptance relaxation; old and new archive receipts preserve history.
+None. Existing React/TypeScript/current contracts and approved memory-only Web boundaries suffice. No authority or acceptance relaxation; minimal temporary identity derives only from validated mutation response and ends with its account lifecycle.

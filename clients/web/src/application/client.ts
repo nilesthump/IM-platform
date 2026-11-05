@@ -8,10 +8,10 @@ import {Http,auth,user,friends,ApiFailure} from './http.js';
 import type {User,Friend,Session} from './http.js';
 import {MemoryRepository} from './repository.js';
 export type Connection = 'idle'|'ready'|'connecting'|'failed'|'protocol_error'|'offline';
-export interface View {groups:MemberRow[];groupBusy:boolean;groupError:string;groupStatus:string;session:boolean;authBusy:boolean;notice:string;connection:Connection;sync:string;user?:User;friends:Friend[];friendsBusy:boolean;friendsError:string;profileBusy:boolean;profileError:string;searchBusy:boolean;searchError:string;searchResults:User[];selected:string;revision:number}
+export interface View {groups:MemberRow[];confirmedGroups:string[];groupReadBusy:boolean;groupReadError:string;groupSuccessRevision:number;groupBusy:boolean;groupError:string;groupStatus:string;session:boolean;authBusy:boolean;notice:string;connection:Connection;sync:string;user?:User;friends:Friend[];friendsBusy:boolean;friendsError:string;profileBusy:boolean;profileError:string;searchBusy:boolean;searchError:string;searchResults:User[];selected:string;revision:number}
 export class WebClient {
   readonly repository=new MemoryRepository();
-  private state:View={groups:[],groupBusy:false,groupError:'',groupStatus:'',session:false,authBusy:false,notice:'',connection:'idle',sync:'',friends:[],friendsBusy:false,friendsError:'',profileBusy:false,profileError:'',searchBusy:false,searchError:'',searchResults:[],selected:'',revision:0};
+  private state:View={groups:[],confirmedGroups:[],groupReadBusy:false,groupReadError:'',groupSuccessRevision:0,groupBusy:false,groupError:'',groupStatus:'',session:false,authBusy:false,notice:'',connection:'idle',sync:'',friends:[],friendsBusy:false,friendsError:'',profileBusy:false,profileError:'',searchBusy:false,searchError:'',searchResults:[],selected:'',revision:0};
   private listeners=new Set<()=>void>();private session?:Session;private generation=0;private abort=new AbortController();private socket?:WebSocket;private friendRevision=0;private userCursor="0";private userSyncing=false;private userPoll?:ReturnType<typeof setInterval>;private reconnectTimer?:ReturnType<typeof setTimeout>;private refreshTimer?:ReturnType<typeof setTimeout>;private pending=new Map<string,{conversation:string;timer:ReturnType<typeof setTimeout>}>();private opened=new Set<string>();private syncing=new Map<string,{again:boolean}>();private bind='';private device=crypto.randomUUID();private refreshing?:Promise<void>;
   readonly http:Http;
   constructor(origin:string,private fetcher:typeof fetch=(input,init)=>fetch(input,init),private socketFactory:(url:string)=>WebSocket=url=>new WebSocket(url),private timeout=10000){this.http=new Http(origin,fetcher);}
@@ -20,7 +20,7 @@ export class WebClient {
   private publish(p:Partial<View>={}){this.state={...this.state,...p,revision:this.state.revision+1};for(const f of this.listeners)f();}
   private metadata(){return {clientType:'WEB',deviceId:this.device,clientVersion:'0.1.0',protocolVersion:'1'};}
   private alive(g:number){return g===this.generation;}
-  private clear(notice:string){this.generation++;this.groupScanning=undefined;this.groupDirty=false;this.groupOperation=undefined;this.waitingGroupFrames=[];this.abort.abort();this.abort=new AbortController();clearTimeout(this.reconnectTimer);clearTimeout(this.refreshTimer);clearInterval(this.userPoll);this.userPoll=undefined;this.userCursor="0";this.userSyncing=false;this.friendRevision++;for(const p of this.pending.values())clearTimeout(p.timer);this.pending.clear();this.opened.clear();this.syncing.clear();this.socket?.close();this.socket=undefined;this.session=undefined;this.repository.reset();this.state={groups:[],groupBusy:false,groupError:'',groupStatus:'',session:false,authBusy:false,notice,connection:'idle',sync:'',friends:[],friendsBusy:false,friendsError:'',profileBusy:false,profileError:'',searchBusy:false,searchError:'',searchResults:[],selected:'',revision:this.state.revision};this.publish();}
+  private clear(notice:string){this.generation++;this.groupScanning=undefined;this.groupDirty=false;this.groupOperation=undefined;this.waitingGroupFrames=[];this.abort.abort();this.abort=new AbortController();clearTimeout(this.reconnectTimer);clearTimeout(this.refreshTimer);clearInterval(this.userPoll);this.userPoll=undefined;this.userCursor="0";this.userSyncing=false;this.friendRevision++;for(const p of this.pending.values())clearTimeout(p.timer);this.pending.clear();this.opened.clear();this.syncing.clear();this.socket?.close();this.socket=undefined;this.session=undefined;this.repository.reset();this.state={groups:[],confirmedGroups:[],groupReadBusy:false,groupReadError:'',groupSuccessRevision:0,groupBusy:false,groupError:'',groupStatus:'',session:false,authBusy:false,notice,connection:'idle',sync:'',friends:[],friendsBusy:false,friendsError:'',profileBusy:false,profileError:'',searchBusy:false,searchError:'',searchResults:[],selected:'',revision:this.state.revision};this.publish();}
   private error(e:unknown,g:number){if(!(e instanceof ApiFailure || e instanceof SyncFailure || e instanceof WireFailure || e instanceof GroupFailure))throw e;if(!this.alive(g))return;if(e instanceof ApiFailure&&e.status===401||e instanceof SyncFailure&&e.kind==='authentication'||e instanceof GroupFailure&&e.kind==='authentication')this.clear('会话已过期，请重新登录。');}
   async login(username:string,password:string){this.clear('');const g=this.generation;this.publish({authBusy:true});try {const s=auth(await this.http.request('/v1/auth/login','POST',{...this.metadata(),username,password},undefined,this.abort.signal));if(!this.alive(g))return;this.session=s;this.publish({session:true,authBusy:false,notice:'已登录 · 消息仅保留在当前页面内存'});this.connected();void this.loadFriends();void this.loadProfile();}catch(e){this.error(e,g);if(this.alive(g))this.publish({authBusy:false,notice:e instanceof ApiFailure&&e.status===401?'账号或密码不正确。':'登录失败，请检查网络后重试。'});}}
   async refresh(){if(this.refreshing)return this.refreshing;const g=this.generation;this.publish({authBusy:true,notice:'正在刷新会话…'});this.refreshing=(async()=>{try {const s=auth(await this.http.request('/v1/auth/refresh/web','POST',this.metadata(),undefined,this.abort.signal));if(!this.alive(g))return;if(this.session&&(s.userId!==this.session.userId||s.sessionId!==this.session.sessionId||s.sessionEpoch!==this.session.sessionEpoch)){this.clear('会话已被替换，请重新登录。');return;}this.session=s;this.publish({session:true,authBusy:false,notice:'会话已刷新'});this.socket?.close();this.connected();void this.loadFriends();void this.loadProfile();}catch(e){this.error(e,g);if(this.alive(g))this.publish({authBusy:false,notice:'会话刷新失败，请重试或重新登录。'});}finally{this.refreshing=undefined;}})();return this.refreshing;}
@@ -95,7 +95,7 @@ export class WebClient {
   private groupOperation?:Readonly<{account:string;requestId:string;targets:readonly string[];conversation?:string}>;
   private waitingGroupFrames:{requestId:string;message:RealtimeMessage}[]=[];
   private groupScanning?:Promise<boolean>;private groupDirty=false;
-  private authorized(c:string){return this.state.friends.some(f=>f.directConversationId===c)||this.state.groups.some(r=>r.conversationId===c);}
+  private authorized(c:string){return this.state.friends.some(f=>f.directConversationId===c)||this.state.groups.some(r=>r.conversationId===c)||this.state.confirmedGroups.includes(c);}
   async createGroup(ids:string[],conversation?:string){
     const s=this.session;if(!s||this.state.groupBusy||this.groupOperation)return;
     this.groupOperation=Object.freeze({account:s.userId,requestId:crypto.randomUUID(),targets:Object.freeze(targets(ids,s.userId)),conversation});
@@ -104,16 +104,27 @@ export class WebClient {
   async retryGroup(){
     const s=this.session,g=this.generation,op=this.groupOperation;if(!s||!op||op.account!==s.userId||this.state.groupBusy)return;
     this.publish({groupBusy:true,groupError:'',groupStatus:'loading'});
-    try{const answer=await new GroupHttp(this.http.origin,s.userId,s.accessToken,this.fetcher).mutate(op.requestId,op.targets,this.abort.signal,op.conversation);
-      if(!this.alive(g))return;if(!await this.refreshGroups()){if(this.alive(g))this.publish({groupBusy:false,groupStatus:'unconfirmed'});return;}if(!this.alive(g))return;if(!this.authorized(answer.conversationId))throw new WireFailure();this.open(answer.conversationId);this.groupOperation=undefined;this.publish({groupBusy:false,groupStatus:'success'});
+    let answer;
+    try{answer=await new GroupHttp(this.http.origin,s.userId,s.accessToken,this.fetcher).mutate(op.requestId,op.targets,this.abort.signal,op.conversation);
     }catch(error){this.error(error,g);if(!this.alive(g))return;
       const rejected=error instanceof GroupFailure&&error.kind==='rejected';if(rejected)this.groupOperation=undefined;
       this.publish({groupBusy:false,groupStatus:rejected?'rejected':'unconfirmed',groupError:error instanceof GroupFailure?error.code||error.kind:'protocol'});
+      return;
     }
+    if(!this.alive(g))return;
+    // Only a validated committed response grants this temporary identity. It is
+    // not a member snapshot or history baseline, and is cleared with the account.
+    if(!this.state.groups.some(r=>r.conversationId===answer.conversationId))this.publish({confirmedGroups:[...new Set([...this.state.confirmedGroups,answer.conversationId])]});
+    this.groupOperation=undefined;this.open(answer.conversationId);
+    this.publish({groupBusy:false,groupStatus:'success',groupSuccessRevision:this.state.groupSuccessRevision+1});
+    // A failed/held read must not undo confirmation or retain a mutation retry.
+    // Awaiting still propagates unknown read failures to the operation's caller.
+    await this.refreshGroups();
   }
   async refreshGroups():Promise<boolean>{
     const s=this.session,g=this.generation;if(!s)return false;
     this.groupDirty=true;if(this.groupScanning)return this.groupScanning;
+    this.publish({groupReadBusy:true,groupReadError:''});
     this.groupScanning=(async()=>{
     try{const http=new GroupHttp(this.http.origin,s.userId,s.accessToken,this.fetcher);
       while(this.groupDirty&&this.alive(g)){this.groupDirty=false;let after={...start};const rows=new Map<string,MemberRow>();let last:MemberRow|undefined;
@@ -121,12 +132,13 @@ export class WebClient {
           for(const r of p.items){if(last?.conversationId===r.conversationId&&(last.kind!==r.kind||last.createdBy!==r.createdBy||last.createdAt!==r.createdAt))throw new WireFailure();rows.set(r.conversationId+'/'+r.member.user.userId,r);last=r;}
           if(!p.hasMore)break;after=p.next;
         }
-        this.publish({groups:[...rows.values()].filter(r=>r.kind==='GROUP'),groupError:''});
+        const groups=[...rows.values()].filter(r=>r.kind==='GROUP');
+        this.publish({groups,confirmedGroups:this.state.confirmedGroups.filter(c=>!groups.some(r=>r.conversationId===c)),groupReadError:''});
         const waiting=this.waitingGroupFrames;this.waitingGroupFrames=[];for(const frame of waiting){if(this.authorized(frame.message.conversationId))this.repository.realtime(frame.requestId,frame.message);}if(waiting.length)this.publish();
       }
       return this.alive(g);
-    }catch(error){this.error(error,g);if(this.alive(g))this.publish({groupError:error instanceof GroupFailure?error.code||error.kind:'protocol'});return false;}
-    finally{if(this.alive(g))this.groupScanning=undefined;}
+    }catch(error){this.error(error,g);if(this.alive(g))this.publish({groupReadError:error instanceof GroupFailure?error.code||error.kind:'protocol'});return false;}
+    finally{if(this.alive(g)){this.groupScanning=undefined;this.publish({groupReadBusy:false});}}
     })();return this.groupScanning;
   }
   dispose(){this.clear('');this.listeners.clear();}

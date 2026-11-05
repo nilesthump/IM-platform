@@ -14,6 +14,7 @@ async function setup(handler,timeout=10000){
   if(url.endsWith('/auth/login'))return json(auth);
   if(url.endsWith('/users/me'))return json({user:{userId:u,username:'alice',displayName:'Alice'}});
   if(url.endsWith('/friends'))return json({friends:[{user:{userId:peer,username:'bob',displayName:'Bob'},friendshipId:id(6),directConversationId:c}]});
+if(new URL(url).pathname==='/v1/conversations'){assert.equal(options.method,'GET');return json({requestId:new URL(url).searchParams.get('requestId'),items:[],hasMore:false,next:{afterConversationId:'',afterMemberUserId:''}});}
   if(url.endsWith('/sync/user')){const b=JSON.parse(options.body);return json({syncVersion:'1.0',type:'sync.user.page',requestId:b.requestId,events:[],nextCursor:b.cursor,hasMore:false});}
   return handler(url,options);
  };
@@ -123,7 +124,7 @@ console.log('PASS Web regression: late ACK identity, both terminal-page crossing
  }
  {
   let projectionFail=true;const cursors=[];
-  const api=async(url,options)=>{if(url.endsWith('/auth/login'))return json(auth);if(url.endsWith('/users/me'))return json({user:{userId:u,username:'alice',displayName:'Alice'}});if(url.endsWith('/friends'))return cursors.length&&projectionFail?json({requestId:id(999),error:{code:'VALIDATION_FAILED'}},400):json(list(cursors.length?7:2));if(url.endsWith('/sync/user')){const b=JSON.parse(options.body);cursors.push(b.cursor);return json({syncVersion:'1.0',type:'sync.user.page',requestId:b.requestId,events:[{eventId:id(30),cursor:'opaque-friend-1',kind:'friend.changed',subjectId:id(7),revision:1}],nextCursor:'opaque-friend-1',hasMore:false});}throw Error('Unexpected path');};
+  const api=async(url,options)=>{if(new URL(url).pathname==='/v1/conversations'){assert.equal(options.method,'GET');return json({requestId:new URL(url).searchParams.get('requestId'),items:[],hasMore:false,next:{afterConversationId:'',afterMemberUserId:''}});}if(url.endsWith('/auth/login'))return json(auth);if(url.endsWith('/users/me'))return json({user:{userId:u,username:'alice',displayName:'Alice'}});if(url.endsWith('/friends'))return cursors.length&&projectionFail?json({requestId:id(999),error:{code:'VALIDATION_FAILED'}},400):json(list(cursors.length?7:2));if(url.endsWith('/sync/user')){const b=JSON.parse(options.body);cursors.push(b.cursor);return json({syncVersion:'1.0',type:'sync.user.page',requestId:b.requestId,events:[{eventId:id(30),cursor:'opaque-friend-1',kind:'friend.changed',subjectId:id(7),revision:1}],nextCursor:'opaque-friend-1',hasMore:false});}throw Error('Unexpected path');};
   const client=new WebClient('https://regression.invalid',api,()=>({close(){},send(){}}));
   try{await client.login('alice','controlled');await new Promise(r=>setTimeout(r,0));await client.syncFriends();assert.equal(client.userCursor,'0');assert.equal(client.view().friends[0].user.userId,peer);projectionFail=false;await client.syncFriends();assert.deepEqual(cursors,['0','0']);assert.equal(client.userCursor,'opaque-friend-1');assert.equal(client.view().friends[0].user.userId,id(7));}finally{client.dispose();}
  }
@@ -172,7 +173,7 @@ console.log('PASS Web UTF8/read classification and retired refresh unknown-error
  try{
   const modules={};for(const name of ["Messages","FriendsPanel"]){const code=readFileSync(root+"/web/src/ui/components/"+name+".js","utf8").replace(/^import .*;\r?\n/gm,"");const output=root+"/"+name+"-probe.mjs";writeFileSync(output,"const {React,useText,useDisplayText}=globalThis.__webRenderer;\n"+code);modules[name]=await import(pathToFileURL(output));}
   const row={requestId:"controlled-request",senderId:u,conversationId:c,content:{kind:"TEXT",text:"controlled body"},state:"SENDING"};
-  const render=m=>renderToStaticMarkup(React.createElement(modules.Messages.Messages,{v:{user:{userId:u}},messages:[m],retry:()=>{}}));
+  const render=m=>renderToStaticMarkup(React.createElement(modules.Messages.Messages,{v:{user:{userId:u},groups:[]},messages:[m],retry:()=>{}}));
   for(const state of ["SENDING","SENT","FAILED"])assert.match(render({...row,state}),/controlled body/);
   for(const invalid of [{...row,state:"UNKNOWN"},{...row,requestId:""},{...row,content:{kind:"TEXT",text:null}}])assert.throws(()=>render(invalid),/Invalid message/);
   const noMatch=translate("en","friends.noMatch"),base={friends:[],friendsBusy:false,friendsError:"",searchBusy:false,searchError:"",searchResults:[],user:{userId:u}};let searched=true;

@@ -46,4 +46,49 @@ async function run(file){
  }catch(e){failures.push(e);}finally{if(!closed)try{await close();}catch(e){failures.push(e);}}
  if(failures.length===1)throw failures[0];if(failures.length)throw new AggregateError(failures,file+' regression');console.log('PASS '+file+' actual React and WebClient group flow; controlled service/login');
 }
-(async()=>{const failures=[];for(const file of ['web.cjs','web-ui.cjs'])try{await run(file);}catch(e){failures.push(e);}if(failures.length)throw new AggregateError(failures,'Web runner UI regressions');})().catch(e=>{console.error(e);process.exitCode=1});
+async function confirmedRead(){
+ const browser=await chromium.launch({executablePath:browserPath,headless:true}),errors=[],failures=[];
+ let release,mode='ok',created=false,mutations=0;const attempts=[],held=new Promise(r=>release=r);
+ const gid='30000000-0000-4000-8000-000000000001',time='2026-11-05T00:00:00Z';
+ try{
+  const page=await browser.newPage();page.setDefaultTimeout(2500);page.on('pageerror',e=>errors.push(e));
+  await page.route('**/*',async route=>{
+   const req=route.request(),url=new URL(req.url());
+   if(url.pathname==='/')return route.fulfill({contentType:'text/html',body:'<div id="root"></div>'});
+   if(url.pathname==='/logo.png')return route.fulfill({status:404,body:''});
+   if(req.method()==='POST'){
+    attempts.push(req.postDataJSON());if(attempts.length===1)return route.abort('failed');
+    mutations++;created=true;const adding=url.pathname.endsWith('/members'),body=req.postDataJSON();
+    return route.fulfill({status:adding?200:201,contentType:'application/json',headers:{'cache-control':'no-store'},body:JSON.stringify({requestId:body.requestId,conversationId:gid,addedMemberUserIds:adding?[]:[accounts.A.userId,accounts.B.userId],createdAt:time})});
+   }
+   assert.equal(url.pathname,'/v1/conversations');
+   if(mode==='held')await held;if(mode==='failure')return route.abort('failed');
+   const items=created?['A','B'].map(who=>{const {userId,username,displayName}=accounts[who];return {conversationId:gid,kind:'GROUP',createdBy:accounts.A.userId,createdAt:time,member:{user:{userId,username,displayName},role:who==='A'?'OWNER':'MEMBER',joinedAt:time}}}):[];
+   await route.fulfill({contentType:'application/json',headers:{'cache-control':'no-store'},body:JSON.stringify({requestId:url.searchParams.get('requestId'),items,hasMore:false,next:{afterConversationId:'',afterMemberUserId:''}})});
+  });
+  await page.goto('https://owned.invalid');await page.addScriptTag({content:boot});await page.evaluate(()=>app.login('fixture_a'));
+  const newGroup=async()=>{await page.getByRole('button',{name:'New chat',exact:true}).click();await page.getByRole('button',{name:'Create group',exact:true}).click();};
+  await page.locator('button.conversation').filter({hasText:'@fixture_b'}).click();await page.getByLabel('Message',{exact:true}).fill('draft retained');
+  await newGroup();await page.getByLabel('Search friends',{exact:true}).fill('fixture_b');await page.locator('dialog input[type=checkbox]').check();await page.getByRole('button',{name:'Confirm',exact:true}).click();await page.getByRole('button',{name:'Retry original request',exact:true}).waitFor();await page.getByRole('button',{name:'Cancel',exact:true}).click();
+  await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('button',{name:'简体中文',exact:true}).click();await page.locator('.rail nav button').first().click();await page.getByRole('button',{name:'新聊天',exact:true}).click();await page.getByRole('button',{name:'创建群聊',exact:true}).click();
+  assert.equal(await page.getByLabel('搜索好友',{exact:true}).inputValue(),'fixture_b');assert.equal(await page.locator('dialog input[type=checkbox]').isChecked(),true);await page.getByRole('button',{name:'重试原请求',exact:true}).waitFor();await page.getByRole('button',{name:'取消',exact:true}).click();
+  await page.locator('.rail-footer button.nav').first().click();await page.getByRole('button',{name:'English',exact:true}).click();await page.locator('.rail nav button').first().click();await newGroup();mode='held';await page.getByRole('button',{name:'Retry original request',exact:true}).click();
+  await page.waitForFunction(()=>app.view().groupStatus==='success');
+  await page.waitForFunction(()=>document.querySelector('dialog')===null);
+  assert.equal(await page.evaluate(()=>app.view().selected),gid);assert.equal(await page.locator('button.conversation.active').count(),1);assert.match(await page.locator('button.conversation.active').innerText(),/30000000/);
+  assert.deepEqual(attempts[0],attempts[1]);assert.equal(await page.getByLabel('Message',{exact:true}).inputValue(),'draft retained');
+  assert.equal(await page.getByRole('button',{name:'Retry original request',exact:true}).count(),0);
+  await page.getByRole('button',{name:'Members',exact:true}).click();assert.equal(await page.locator('.group-management .group-person').count(),0);assert.match(await page.locator('.group-management').innerText(),/Loading/);
+  await page.locator('button.conversation').filter({hasText:'@fixture_b'}).click();
+  const direct=await page.evaluate(()=>app.view().selected);await newGroup();await page.getByLabel('Search friends',{exact:true}).fill('fixture_b');await page.locator('dialog input[type=checkbox]').check();
+  mode='ok';release();await page.waitForFunction(()=>!app.view().groupReadBusy);
+  assert.equal(await page.evaluate(()=>app.view().selected),direct);assert.equal(await page.locator('dialog[open]').count(),1);assert.equal(await page.getByLabel('Search friends',{exact:true}).inputValue(),'fixture_b');assert.equal(await page.locator('dialog input[type=checkbox]').isChecked(),true);
+  await page.getByRole('button',{name:'Cancel',exact:true}).click();await page.locator('button.conversation').filter({hasText:'30000000'}).click();await page.getByRole('button',{name:'Members',exact:true}).click();await page.getByRole('button',{name:'Add members',exact:true}).click();await page.locator('dialog input[type=checkbox]').check();
+  mode='failure';await page.getByRole('button',{name:'Confirm',exact:true}).click();await page.waitForFunction(()=>app.view().groupReadError==='transport');assert.equal(await page.locator('dialog').count(),0);assert.equal(await page.evaluate(()=>app.view().selected),gid);assert.equal(await page.evaluate(()=>app.view().groupStatus),'success');
+  assert.match(await page.locator('.group-management [role=alert]').innerText(),/Group request failed/);assert.equal(await page.getByRole('button',{name:'Retry original request',exact:true}).count(),0);
+  mode='ok';await page.locator('.group-management').getByRole('button',{name:'Retry',exact:true}).click();await page.waitForFunction(()=>!app.view().groupReadBusy&&!app.view().groupReadError);assert.equal(await page.locator('.group-management .group-person').count(),2);assert.equal(mutations,2);assert.deepEqual(errors,[]);
+ }catch(e){failures.push(e);}finally{release();try{await browser.close();}catch(e){failures.push(e);}}
+ if(failures.length===1)throw failures[0];if(failures.length)throw new AggregateError(failures,'confirmed read UI and cleanup failed');
+ console.log('PASS actual React confirmed CREATE held / ADD failed reads, honest management, newer selection/picker and read-only recovery');
+}
+(async()=>{const failures=[];for(const file of ['web.cjs','web-ui.cjs'])try{await run(file);}catch(e){failures.push(e);}try{await confirmedRead();}catch(e){failures.push(e);}if(failures.length)throw new AggregateError(failures,'Web runner UI regressions');})().catch(e=>{console.error(e);process.exitCode=1});

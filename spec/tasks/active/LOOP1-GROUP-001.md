@@ -126,6 +126,7 @@ client_runtime: Android
 - `clients/mobile/app/src/main/kotlin/im/platform/client/storage/Repository.kt`（仅现metadata读写/群身份投影；不改消息写入/草稿/SQLite事务adapter）
 - `clients/mobile/app/src/androidTest/kotlin/im/platform/client/group/**`
 - `tests/clients/group/**`
+- `tests/clients/web/behavior.mjs` and `tests/clients/web/regressions.mjs` (2026-11-05 coordinator scope registration for the mandatory existing Web regression: only add the controlled GET /v1/conversations canonical empty terminal page with correlated requestId and no-store, and current-required View fixture fields such as groups:[] for the existing Messages renderer; preserve every prior assertion and unknown-error propagation. No production/contract change.)
 - `tests/contract/group/**`（Fix R5新增的 `tests/contract/group/test_verification_failures.py` 原6测试方法保持；Fix R6仅在该文件追加R6-P2-002现E2E实际SQL/断言边界的有意义回归：精确两真实记录正例、单LF记录别名及必要缺失/额外/重复/乱序/大小写错/native非零反例，隔离边界证据不冒称真实Docker/TLS接受。原test_group.py全部22测试方法、35valid/30invalid对象与helpers保持）
 - `tests/integration/group/**`
 - `tests/clients/i18n/verify.mjs`（群资源键/参数负例）
@@ -151,8 +152,8 @@ The first public contract slice was independently frozen, integrated and synchro
 product_owner: /root/completion_coordinator
 product_registration: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
 product_G01_G09: PARTIAL_RUNTIME_EVIDENCE_PENDING_FINAL_BINDING
-product_regular_review: REG_647E_P2_001_EARLY_FAIL_METADATA_FIX_FINAL_SHA_FULL_REVIEW_PENDING
-product_error_handling_review: NEW_FINAL_SHA_PENDING_AFTER_REGULAR_PASS
+product_regular_review: FINAL_FIX_SHA_PENDING_FRESH_FULL_REVIEW_AFTER_403_REGULAR_PASS
+product_error_handling_review: EH_403_P2_001_FIXED_NEW_SHA_PENDING_DIFFERENT_FRESH_SPECIALIST_AFTER_REGULAR_PASS
 product_hosted_acceptance: PENDING_FINAL_CANDIDATE_BOTH_FRESH_REVIEWS
 product_main_sync: PENDING_PRODUCT
 
@@ -180,7 +181,7 @@ The Human full-GROUP resumption supersedes old backend-only/phase-only stops. Ex
 
 三端应用层保存不可变pending群操作（account/endpoint/type/conversation/requestId/memberUserIds）；同账号refresh/rebind保留内存operation/metadata并绑定新generation，logout/expire/account switch清除，旧closed Repository不继续使用。严格验证群HTTP具体201/200/status和canonicalbody，不把GROUP_REQUEST_CONFLICT丢成generic失败。Web全部friend-only open/send/ACK/realtime/sync gates须接授权snapshot；元数据前首条realtime竞态不得用seq1历史baseline掩盖。TS/Kotlin Repository只账号生命周期内存群snapshot/identity，SQLite v2/原user_state revision+cursor事务保持，不塞成员JSON、不改native/schema。senderId关联授权PublicUser displayName+@username，离线缺真实名称诚实显示可区分ID。Native既有10秒Sync idle衔接独立from-origin持续分页，不能被friend cursor相等早退跳过。
 
-真实构建复用现native.py package/gradle与现Send/Sync/i18n回归；group Android instrumentation用既有-PimSendInstrumentation runner选择器。native.py gui-mobile含旧admin/send-runtime ANDROID_USER_HOME/AVD_HOME，禁止盲用/接管；group runtime只新own childenv+实际serial/源构建安装hash，不创建H:/clone/copy/独立产品实现目录、不改旧harness或WT外产品源。当前仅 /root/completion_coordinator/android_runtime_1105 持有专属 Android/现owned服务/fault/cleanup 租约；Human明确批准 im_group_g8802/emulator-5590 的 v6 临时信任及验收后清理，具体原件见本轮 recovery receipt。其他设备/系统信任无新增授权，历史租约不继承。运行前核真实对象与默认TLS，保留原状态并验证恢复；禁止证书绕过。
+真实构建复用现native.py package/gradle与现Send/Sync/i18n回归；group Android instrumentation用既有-PimSendInstrumentation runner选择器。native.py gui-mobile含旧admin/send-runtime ANDROID_USER_HOME/AVD_HOME，禁止盲用/接管；group runtime只新own childenv+实际serial/源构建安装hash，不创建H:/clone/copy/独立产品实现目录、不改旧harness或WT外产品源。本轮 Android runtime 已完成并清理临时 v6 信任（134 原CA恢复、实际SDK拒绝v6、owned AVD停、18444关闭），独立 bounded Architect PASS；原件由 current.md/Fix receipt 链接。Human 对 im_group_g8802/emulator-5590 的临时信任授权及清理事实保持，其他设备/系统信任无新增授权，历史租约不继承。全局8443由 coordinator 保留用于新 Web 候选验收；web_confirm_runtime_1105 等待精确提交后独占执行。任何运行仍须资格核验、保留原状态并验证恢复，禁止证书绕过；不宣称所有服务已清理。
 
 最终必须同时满足全部G01..G09、旧Auth/Sync/WSS/Plugin及三端Send/Sync/Web/i18n回归、责任/依赖/Minimality/ErrorHandling、真实截图Architect、最终SHA fresh常规→different fresh专项（任何fix两项重做）→实际required exact-head hosted→protected integration→actual-main/tree→保存未知main安全同步，才可GROUP done。firstslice接受、local/Recorder/截图都不替代产品接受或S2 Gate；当前GROUP active/group_product、S2 OPEN。产品运行原件保存spec/progress/evidence/LOOP1-GROUP-001/product/；此前PHASE1仅外部registration receipt的限制已随root明确PHASE2 grant结束。
 
@@ -254,10 +255,10 @@ main_sync_evidence: unavailable
 
 # Handoff
 
-Completed: 647 Web runner local RED/GREEN and cleanup regression; this metadata-only Fix restores every machine-required heading. The actual unchanged Control Development removes all 10 recovery diagnostics but remains exit1 only because its architecture test scans existing ignored Desktop dist/build outputs; those outputs are untouched. Commands/results/evidence are in current.md Verification and the new recovery receipt; final committed Control Acceptance and fresh full regular/error reviews are pending. Windows bounded Architect/G07 and backend reuse are linked there, Android runtime/Architect/full G01-G09/hosted/integration/safe sync remain incomplete. Historical FAIL and invalid Windows batch are preserved.
+Completed: fresh Web Fix for EH-403-P2-001 after403 regular PASS/specialist FAIL. Validated CREATE/ADD closes the picker and selects its group before member reads; no fabricated snapshot/history. Independent read status/recovery, late navigation/picker isolation, original-request retry and unknown-error propagation have actual WebClient/React RED→GREEN. Existing full Web fixture GET branches were registered above before editing; all prior assertions retained. Verification Command/Result/Evidence and honest failed attempts are in current.md and spec/progress/evidence/LOOP1-GROUP-001/product/fix-web-confirm-20261105/receipt.json. Native/backend/contracts unchanged; Android final runtime/trust cleanup and bounded Architect PASS are reported by coordinator with acceptance-index binding; affected Web Architect/full GROUP acceptance remains pending.
 
-Changed files: spec/progress/current.md, this Task, and spec/progress/evidence/LOOP1-GROUP-001/product/fix-recovery-headings-20261105/receipt.json only; no migrations/source/tests/runtime edits. Sole metadata writer /root/completion_coordinator/fix_metadata_647_1105 releases to coordinator after clean commit; Android runtime lease is separate. Preserve 780 untracked+2tracked unknown main work (historical 782 unexplained). LKG 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e; branch task/LOOP1-GROUP-001-resume; synchronization PENDING. Latest checkpoint spec/progress/checkpoints/2026-10-28-group-windows-feedback.md. No architecture conflict. Recorder prospective_resume trace is partial and finishes FAIL honestly; structural validity is not Task acceptance.
+Changed files: three existing Web product files, group regressions, two registered legacy Web fixtures, this Task/current and new Fix receipt. Sole writer /root/completion_coordinator/fix_web_confirm_1105 releases after clean commit. Preserve780 untracked+2tracked unknown main paths; no runtime/service/GUI/credentials touched by this Fix. LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e; branch task/LOOP1-GROUP-001-resume; synchronization PENDING. Latest checkpoint spec/progress/checkpoints/2026-10-28-group-windows-feedback.md. No architecture conflict. Partial Recorder finishes FAIL honestly; structural validity is not acceptance.
 
 # Next Action
 
-After the minimal metadata commit, coordinator runs unchanged tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance on an exact new committed snapshot; only after PASS delegate fresh full regular review then a different fresh error-handling specialist on that final SHA. Continue remaining Android/Architect and complete GROUP acceptance/integration/safe synchronization; do not advance S2 or the next task.
+Coordinator binds the clean Fix SHA and runs final Control Acceptance, fresh full regular Review then DIFFERENT fresh error-handling Review; any fix renews both. Complete affected real Web runtime/Architect and remaining G01-G09/Architect evidence, then exact-head required CI/protected integration/actual-main/safe H:/IM-platform synchronization. No push before both reviews PASS; no GROUP done or S2 advancement before full applicable acceptance.

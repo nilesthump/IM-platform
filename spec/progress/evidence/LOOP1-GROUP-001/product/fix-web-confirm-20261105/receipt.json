@@ -1,0 +1,439 @@
+{
+  "task": "LOOP1-GROUP-001",
+  "fixer": "/root/completion_coordinator/fix_web_confirm_1105",
+  "base": "403dad2ef10275cab8999daa8b0384d2e7368b9a",
+  "candidate": "Commit containing this receipt; exact post-commit binding is external fix-web-confirm-1105/commit.json",
+  "branch": "task/LOOP1-GROUP-001-resume",
+  "result": "LOCAL_FIX_VERIFIED_INDEPENDENT_ACCEPTANCE_PENDING",
+  "finding": "EH-403-P2-001",
+  "prior_regular": {
+    "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-regular-403-1105\\report.json",
+    "sha256": "ae4d6eeaf50b82fa20dc645e9875be8ad1ffd18f796211e332b1ef6ba22f679f",
+    "bytes": 29736
+  },
+  "prior_specialist": {
+    "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-403-1105\\report.json",
+    "sha256": "54fd2e088d810a2fdeee591895410ccbdfac465d2a5e28d694127e0205126546",
+    "bytes": 16715
+  },
+  "archive": [
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\current-before.md",
+      "sha256": "21fcc5b8ded12d59e301c2625416d9b0b066c9e1f291c9d5916ca97977eb39d2",
+      "bytes": 6266
+    },
+    {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\task-before.md",
+      "sha256": "e7f5e7a6b496d05c515c875aa2a8d9be79f5a3f76776c14644ceb4342d1eeb77",
+      "bytes": 41349
+    }
+  ],
+  "implementation": "Validated group mutation retires the original operation and publishes selected conversation plus success revision before member reads. Identity-only confirmations permit navigation without fabricated MemberRow/history and are replaced by real projection or cleared on account retirement. Member loading/failure has separate state and read-only recovery. Shell observes confirmation rather than eventual read completion; late reads cannot close newer picker or select over newer navigation. Unknown causes still reject. No dependencies/native/backend/contracts/storage changes.",
+  "retained_catches": [
+    "Mutation catch only encloses actual GroupHttp mutation; canonical rejection retires operation, transport/protocol uncertainty retains original identity, authentication retires session, unknown exceptions propagate.",
+    "Member scan catch projects only known API/group/wire failures into independent read error; keeps previous projection; authentication clears account; unknown exceptions propagate. finally resets read busy only for current generation."
+  ],
+  "fixture_scope": "Coordinator authorized and Task registered two existing Web fixture files before writes. Strict GET /v1/conversations canonical empty terminal responses and the required groups:[] View field for the existing Messages renderer only; all old assertions/error behavior kept. All three incomplete-fixture failures preserved.",
+  "verification": [
+    {
+      "command": [
+        "H:/node.js/node.exe",
+        "tests/clients/group/behavior.cjs",
+        "C:/Users/21441/.codex/visualizations/2026/10/23/01a16733-cff1-7573-ad3b-65f45068986a/group-completion-20261025/fix-web-confirm-1105/compiled/output"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit": 1,
+      "elapsed": 0.5619999999980791,
+      "name": "behavior-red",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\behavior-red.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\behavior-red.stderr",
+        "sha256": "649c20e70da38937ff20b3b8412328a9b0de3dd3503da9923a1ea293dd41d17e",
+        "bytes": 489
+      }
+    },
+    {
+      "command": [
+        "H:/node.js/node.exe",
+        "tests/clients/group/web-runners.cjs",
+        "H:/.codex/worktrees/g-8802/IM-platform",
+        "H:/.codex/worktrees/g-8802/IM-platform/clients/desktop/node_modules",
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright",
+        "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit": 1,
+      "elapsed": 14.59400000000096,
+      "name": "react-red",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\react-red.stdout",
+        "sha256": "b969e6c0e09671e446753c8f0cbe8a84d166a1ac67b85058923fe27d07f71d4f",
+        "bytes": 159
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\react-red.stderr",
+        "sha256": "61edbc63ff3a1e8f7c5c3bf154ce04570879338adaa1a7916a431e1958c2fa28",
+        "bytes": 472
+      }
+    },
+    {
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "C:/Users/21441/.codex/visualizations/2026/10/23/01a16733-cff1-7573-ad3b-65f45068986a/group-completion-20261025/fix-web-confirm-1105/compile.py"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit": 0,
+      "elapsed": 2.563000000001921,
+      "name": "compile-green",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\compile-green.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\compile-green.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "H:/node.js/node.exe",
+        "tests/clients/group/behavior.cjs",
+        "C:/Users/21441/.codex/visualizations/2026/10/23/01a16733-cff1-7573-ad3b-65f45068986a/group-completion-20261025/fix-web-confirm-1105/compiled/output"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit": 0,
+      "elapsed": 0.5159999999996217,
+      "name": "behavior-green",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\behavior-green.stdout",
+        "sha256": "81070d9fc0bdfcaf827ca5d775bbf5ed32a5907c064a2a171c2fac3eb3590464",
+        "bytes": 197
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\behavior-green.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "H:/node.js/node.exe",
+        "tests/clients/group/web-runners.cjs",
+        "H:/.codex/worktrees/g-8802/IM-platform",
+        "H:/.codex/worktrees/g-8802/IM-platform/clients/desktop/node_modules",
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright",
+        "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit": 0,
+      "elapsed": 11.670999999998457,
+      "name": "react-final",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\react-final.stdout",
+        "sha256": "f0775c8f9a209ccf5d2eeee9d4e2f5f6e607849d46e82957be207f2cafe8d39e",
+        "bytes": 285
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\react-final.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit": 0,
+      "elapsed": 6.359000000000378,
+      "name": "group-final",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\group-final.stdout",
+        "sha256": "66989feeedf64ba8a4f1dbcfa9effc73c96ee7acdc663d5c4e523aa50cb2d0d5",
+        "bytes": 801
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\group-final.stderr",
+        "sha256": "84fec54bc2f7c26ce356d74cc926da3b6b6b37ee21393c94e899b264bca317d5",
+        "bytes": 108
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/i18n/verify.py"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit": 0,
+      "elapsed": 4.7810000000026776,
+      "name": "i18n",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\i18n.stdout",
+        "sha256": "9ab75e78d2ccda11bbabf0941c6e43822f30c14e890218cd30273cc0b8cfc35c",
+        "bytes": 317
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\i18n.stderr",
+        "sha256": "712c97cf67cf42f57702333f159fe12d12d9276e350d26fdb6243b386bf25a87",
+        "bytes": 111
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/web/verify.py"
+      ],
+      "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\source-snapshot-v4",
+      "exit": 0,
+      "elapsed": 17.343999999997322,
+      "name": "fixed-v4-web-full",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\fixed-v4-web-full.stdout",
+        "sha256": "599f31e719e851c8107ea788ff8b7e6aa3f3a8a134f21daadcb1a877838a1e4f",
+        "bytes": 2653
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\fixed-v4-web-full.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\source-snapshot-v4",
+      "exit": 0,
+      "elapsed": 2.625,
+      "name": "fixed-v4-architecture",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\fixed-v4-architecture.stdout",
+        "sha256": "7b3b1a797141f44f6a014c3c97c2d38c1266a13e049aadf7fc48f50a5f2081cf",
+        "bytes": 284111
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\fixed-v4-architecture.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-403dad2e",
+      "exit": 0,
+      "elapsed": 1.0310000000026776,
+      "name": "baseline-cwd-0",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-0.stdout",
+        "sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989",
+        "bytes": 164
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-0.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_s2_planning.py"
+      ],
+      "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-403dad2e",
+      "exit": 0,
+      "elapsed": 1.7339999999967404,
+      "name": "baseline-cwd-1",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-1.stdout",
+        "sha256": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426",
+        "bytes": 77
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-403dad2e",
+      "exit": 0,
+      "elapsed": 3.1570000000028813,
+      "name": "baseline-cwd-2",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-2.stdout",
+        "sha256": "7b3b1a797141f44f6a014c3c97c2d38c1266a13e049aadf7fc48f50a5f2081cf",
+        "bytes": 284111
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture"
+      ],
+      "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-403dad2e",
+      "exit": 0,
+      "elapsed": 21.17199999999866,
+      "name": "baseline-cwd-3",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-3.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-3.stderr",
+        "sha256": "95a35ad12d50f8a0dcf14891cc5ea76f0a64bc322768b5ed46dd3814a463adf4",
+        "bytes": 210
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci"
+      ],
+      "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-403dad2e",
+      "exit": 0,
+      "elapsed": 10.828000000001339,
+      "name": "baseline-cwd-4",
+      "stdout": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-4.stdout",
+        "sha256": "d260103c650a82689a727c276f85b42ca0d9c582efe3e36b8536e41390b8cea6",
+        "bytes": 410
+      },
+      "stderr": {
+        "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-web-confirm-1105\\baseline-cwd-4.stderr",
+        "sha256": "9f17b76d392c092e491bfc21db9d6de735fa90507c410382cb211e0b8e217bdf",
+        "bytes": 286
+      }
+    }
+  ],
+  "source_inputs": [
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\web\\src\\application\\client.ts",
+      "sha256": "1b233ec7c4b950d818ffbe0055d39759bb20d0c786aa597e480c0df206f399a5",
+      "bytes": 20960,
+      "repository_path": "clients/web/src/application/client.ts"
+    },
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\web\\src\\ui\\components\\Shell.tsx",
+      "sha256": "6d66d415558a58eba6f6262f84f098752a750876fc0e1878c48fe283d9a12030",
+      "bytes": 7159,
+      "repository_path": "clients/web/src/ui/components/Shell.tsx"
+    },
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\web\\src\\ui\\components\\ConversationList.tsx",
+      "sha256": "ff57172968925e93e2790ccd2849e1679076d16ff1e299cca8f580084eaf1b34",
+      "bytes": 2321,
+      "repository_path": "clients/web/src/ui/components/ConversationList.tsx"
+    },
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\tests\\clients\\group\\behavior.cjs",
+      "sha256": "a9566d2700fbfdcaf2dcddb3a6ab3a7f7ed98c1bbc4cff1ba8cb54dcfcccf255",
+      "bytes": 9226,
+      "repository_path": "tests/clients/group/behavior.cjs"
+    },
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\tests\\clients\\group\\web-confirmed.cjs",
+      "sha256": "90bfba59505d534d062f0e978dd0c21b5b25ce439d6424cbd315aeb8641ee280",
+      "bytes": 6248,
+      "repository_path": "tests/clients/group/web-confirmed.cjs"
+    },
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\tests\\clients\\group\\web-runners.cjs",
+      "sha256": "51fd1193c1142197e67a7ef9e83a50de115356d6b0dd32ab5f78cb37d0f74646",
+      "bytes": 16031,
+      "repository_path": "tests/clients/group/web-runners.cjs"
+    },
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\tests\\clients\\web\\behavior.mjs",
+      "sha256": "f0d13ae86c0d7b3bc1c43870399810f03a4c67f8068b827c24c35dbdd3a43adb",
+      "bytes": 6772,
+      "repository_path": "tests/clients/web/behavior.mjs"
+    },
+    {
+      "path": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\tests\\clients\\web\\regressions.mjs",
+      "sha256": "b603b31e2e34cfa32d3a96dcb9b31b1476c08fdc4e252be95787d126dcf1ab2e",
+      "bytes": 22371,
+      "repository_path": "tests/clients/web/regressions.mjs"
+    }
+  ],
+  "limitations": [
+    "Controlled-fetch and headless actual React tests are not Go/TLS/PG runtime or Architect acceptance; final real Web run remains coordinator responsibility.",
+    "403 regular PASS followed by specialist FAIL; this new SHA requires BOTH fresh reviews before push/CI. Final Control Acceptance, G01-G09 binding/Architect/hosted/integration/actual-main/safe main synchronization remain pending.",
+    "Web verifier initially scanned 3035 pre-existing ignored Desktop artifacts. Exact source snapshots exclude generated files without deleting them. First baseline helper mistakenly ran child commands at assigned repo despite intended snapshot cwd; those receipts are superseded by baseline-cwd-* actual snapshot runs. A UTF-8 output failure and non-Git snapshot Recorder invocation also remain exposed.",
+    "Research trace is partial: startup, some reads and edits/helper authoring outside Recorder. Finish FAIL honestly; validation is structural only. No old evidence or unknown main files edited."
+  ],
+  "android_reported": {
+    "architect": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\architect-android-1105\\report.json",
+      "sha256": "56fc604c2c30519de25095e411a2b2d6f7fd29013f295eeccc4b9dee8d88b5a6",
+      "bytes": 96384
+    },
+    "windows_recipient_supplement": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\windows-recipients-1105\\receipt.json",
+      "sha256": "d64d8dc0a39a73799f5ae25328520591077eff0a7bcea58c7f87eb66392e1409",
+      "bytes": 11205
+    },
+    "acceptance_index": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\android-final-runtime-1105\\runtime\\acceptance-index.json",
+      "sha256": "33914111da5a731b21b75c33763d0405af7b449e6c27f3f072c42b92930421f3",
+      "bytes": 107282
+    },
+    "cleanup": "Coordinator reports 134 original CAs restored, actual SDK rejects v6, owned AVD stopped and18444 closed; bounded Android Architect PASS is independently reported. Global8443 remains for coordinator Web acceptance, not all-service cleanup."
+  },
+  "main_sync": "PENDING; preserve 780 untracked plus 2 tracked unknown main paths; accepted LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e",
+  "stage": "S2 OPEN; do not advance after GROUP"
+}
