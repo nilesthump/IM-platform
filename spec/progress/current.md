@@ -11,53 +11,53 @@ Current Task State: `active`
 Execution Status: active
 Assigned Worktree: H:/.codex/worktrees/g-8802/IM-platform
 Task Branch: task/LOOP1-GROUP-001-resume
-Product Source: local Web read-cause Fix after4733e898dab1e26ede0cdb546fb168bb0682536d; exact committed SHA in linked external fix-read-causes-1105/commit.json.
+Product Source: unchanged 2c4faf1647128a58200d5fc70af0435e0f82fc66; final harness-only Fix SHA in linked external fix-route-causes-1105/commit.json.
 Coordinator: /root/completion_coordinator
 
 ## Immediately Relevant Completed Work
 
-4733 final Control and fresh regular PASS were followed by DIFFERENT fresh specialist FAIL EH-4733-P2-001. This narrow Fix preserves original Web member-read failures when observers also throw during error/final loading notification; a single thrown value stays unchanged, dual causes remain inspectable. Actual WebClient RED1→GREEN0 plus known/falsy/report-observer/final-observer/recovery assertions and existing group/Web/i18n/architecture checks pass. Only one product source file changed; no layout or contract changes.
+Final2c Control Acceptance and fresh full regular Review passed. DIFFERENT fresh specialist failed EH-2C4F-P2-001 in the Web G06 test runner: route errors could lose their original cause during abort cleanup or subsequent UI waits. This fresh Fix retains exact values (including falsy throws), waits for owned route callbacks before final reporting and preserves independent route/UI/browser/report failures. Public redaction remains separate. Actual old runner RED1 → fixed13-case GREEN0 and complete group verifier0; no product source changed.
 
-4733 real Web Go/TLS CREATE/ADD confirms immediate picker close/returned selection while member reads are held, fail and recover (33 public raw artifacts, six PNGs). Current AAC Windows after-commit loss confirms ZH/EN reopen, native same-session refresh, original-ID retry, automatic close/selection and identical201/PG1GROUP/1receipt/2members/4Sync/4Outbox. Android final runtime/trust cleanup and bounded Architect PASS cover19 new originals plus qualified prior layouts. Final4733 G09 Architect PASS is bounded visual approval, not whole functional G09/GROUP. All reports/hashes and archived old Task/current are linked by spec/progress/evidence/LOOP1-GROUP-001/product/fix-read-causes-20261105/receipt.json; new Fix requires affected evidence binding.
+Current installed AAC Windows and actual2c Web G06 before/after response-loss supplements are complete: original request retry, real PG/response identity, automatic picker close and new group selection. Android final runtime and G07 temporary trust cleanup are complete. Final2c G09 Architect PASS is bounded visual approval. Independent runtime auditor found G01–G08 evidence sufficient, including88 G07 assertions/182 raw hashes, and awaits final new-SHA input binding. These are bounded records, not whole GROUP/CI acceptance.
 
 ## Current Blockers
 
-No architecture/source blocker reported after local Fix. Final SHA Control, fresh full regular then DIFFERENT fresh error review are pending;4733 review status cannot transfer. Supplemental Windows before-forward G06 is in progress after root restored exact services/strict TLS; Web before-forward supplement and full G01-G09 independent mapping/acceptance remain. Hosted CI/protected integration/actual-main/safe sync are pending. No push or CI-triggering PR until both final reviews PASS; GROUP active/S2 OPEN.
+New Fix SHA requires clean Control, fresh full regular Review and DIFFERENT fresh error specialist;2c PASS cannot transfer and2c specialist FAIL forbids its push. Final runtime/Architect source binding, exact-head required hosted CI, protected integration, actual-main and safe main synchronization remain. GROUP active/S2 OPEN; no architecture conflict.
 
 ## Verification
 
-- Command: `python -Xutf8 -B fix-read-causes-1105/checks.py red`
-  - Result: actual current WebClient compiled with locked TypeScript ES2022; RED assertion exit1 → GREEN exit0. Later additional report-observer cases passed in full group verifier.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-read-causes-20261105/receipt.json`
+- Command: `python -Xutf8 -B fix-route-causes-1105/baseline-v2.py`
+  - Result: canonical hash/S2 planning/source architecture/architecture tests/CI tests all exit0 on exact2c qualified export.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
+- Command: `node tests/clients/group/route-failures.cjs <exact-git-2c-web.cjs>`
+  - Result: RED exit1 on actual route/abort/UI-wait/falsy causes. Corrected fixture explicitly executes callback; initial miswired fixture excluded.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
+- Command: `node tests/clients/group/route-failures.cjs`
+  - Result:13 actual runner boundary cases PASS0/0.344s; original identities and nonzero failure/public redaction/cleanup retained.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
 - Command: `python -Xutf8 -B tests/clients/group/verify.py`
-  - Result: exit0/7.047s and exit0/3.844s; all existing assertions retained, plus actual WebClient single/dual/three-cause, falsy throws, loading cleanup and next-read recovery.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-read-causes-20261105/receipt.json`
-- Command: `python -Xutf8 -B tests/clients/web/verify.py`
-  - Result: exit0/17.047s and exit0/1.750s on read-only4733 source export with exact changed source/test bytes. Existing locked Web build/behavior/appearance passed; generated native artifacts untouched.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-read-causes-20261105/receipt.json`
-- Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: five startup checks exit0 on exact4733 snapshot; canonical33b7b2a0 unchanged. Prior4733 Control Acceptance exit0; final new SHA Control Acceptance remains pending with coordinator.
-  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-read-causes-20261105/receipt.json`
+  - Result: PASS0/6.859s; locked install/compile, existing cleanup/behavior/native-state tests and new callback regression. No real service/device acceptance claimed by this command.
+  - Evidence: `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`
 
 ## Changed Files or Migrations
 
-Web application client; existing group web-confirmed regression; active Task/current and new thin Fix receipt. No backend/native/shared/contracts/dependencies/migrations/layout changes. Exact previous recovery bytes archived externally; old immutable snapshots/reviews/FAIL/Recorder artifacts preserved.
+Existing Web G06 runner, one callback regression and its existing group verifier registration; Task/current and thin Fix receipt. No product/native/backend/shared/contracts/dependencies/schema/layout changes. Previous Task/current exact bytes and original reports are archived externally.
 
 ## Known Failures, Risks, and Assumptions
 
-EH4733 original specialist FAIL and actual RED remain. Initial own baseline launch failed on H temporary-directory permissions before checks; authorized retry ran all five checks. Old21 cached Windows images remain INVALID; old36 retry-success-close FAIL is not repaired evidence. Supplemental current before-forward cases are not yet claimed PASS. Bounded screenshots and unchanged source inputs do not replace final functional/source/CI acceptance.
+G07 same empty group progressed3→4→5 members: C Web/Desktop/Mobile online for ADD C, A Web/Desktop for ADD U, B Web/Desktop for ADD D. Actual PG remains0 messages. Its supervisor exit1/four auxiliary Playwright response-body capture failures are retained; remaining actual pages, SQLite, PG and original UI were independently judged sufficient, not relabelled a whole-run PASS. Segmented roles do not claim nine simultaneous terminals. Old21 cached Windows pictures remain INVALID; old36 close FAIL remains historical.
 
-Android cleanup is complete and bounded: approved v6 temporary trust removed,134 original CAs restored, actual SDK SSLHandshakeException rejects v6, owned AVD stopped,18444 closed. Windows manual v6 trust remains authorized. Earlier Web18446/fixtureWEB sessions and Windows after-retry temporary relay were cleaned; global services now remain root/coordinator-owned for G06 supplement. Recent Docker daemon interruption recovered by normal Desktop restart and strict TLS200 per runtime owner; no claim all global services are cleaned.
+Android v6 trust removed,134 original CAs and inactive v4 staging restored; actual default SDK rejects v6, original test APK restored, owned AVD stopped. Five Web and ABC Desktop fixture sessions are revoked/refreshNULL after actual UI logout; owned browser/proxies closed. Global cleanup verified original six containers stopped with original IDs/mounts/volumes preserved and exact new v6 front removed without volumes. Windows user-installed v6 trust remains. No runtime lease remains.
 
-Research trace is partial due to direct startup/reads/edits/helper authoring; Recorder will honestly finish FAIL with structural validation. This is instrumentation disclosure, not product acceptance or a test waiver. No secrets/private Web attempt4 diagnostics are included in the receipt. Main unknown work remains untouched.
+Initial baseline wrapper cwd and test-fixture wiring failures, npm-cache EPERM and successful qualified retries remain explicit. Recorder trace is partial due to direct startup/reads/edits/helper authoring and will finish FAIL honestly with structural validation. This is instrumentation disclosure, not product acceptance. No credentials/private diagnostics are included.
 
 ## Next Exact Action
 
-Coordinator binds clean Fix SHA/affected evidence and final Control Acceptance; fresh full regular then DIFFERENT fresh error specialist. Complete current Windows/Web G06 before-forward supplement and remaining full G01-G09 independent acceptance. Only then exact-head required hosted CI/protected integration/actual-main/safe H:/IM-platform synchronization. Stop after GROUP; no S2 Gate or next task advancement.
+Bind clean new Fix SHA and unchanged product/runtime evidence; run Control, fresh regular then DIFFERENT fresh error review. Complete final independent G01–G09 candidate binding, required exact-head hosted CI, protected integration, actual-main and safe H:/IM-platform synchronization. Stop after GROUP; do not advance S2 Gate or select another task.
 
 ## Last Known Good Commit
 
-`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main. Product synchronization PENDING. Main recovery/s1-handoff-20261001 last qualified780 untracked+2tracked unknown; historical782 count preserved without inferred cause. Requalify and preserve unknown paths/bytes/index for safe sync.
+`3d30872d3d18c55fa8156a5ce1133281ffaa4e7e` accepted backend/main. Product synchronization PENDING. Main recovery/s1-handoff-20261001 has780 untracked+2tracked unknown paths; root's read-only baseline found zero candidate collisions and remote main unchanged. Recheck and preserve unknown bytes/index/status before safe synchronization.
 
 ## Latest Checkpoint
 
@@ -65,8 +65,8 @@ Coordinator binds clean Fix SHA/affected evidence and final Control Acceptance; 
 
 ## Uncommitted Changes / Ownership
 
-/root/completion_coordinator/fix_4733_read_causes is sole repository writer for this narrow Fix until clean commit; then returns the lease to coordinator. Runtime/review agents have no repository write lease. Main unknown work untouched.
+/root/completion_coordinator/fix_route_causes is the sole repository writer until its clean commit, then returns ownership to coordinator. Review/runtime agents have no repository write lease. Main unknown work is untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. Existing TypeScript ES2022 built-in AggregateError retains distinct failures inside this existing method; no dependency or generic error framework. Existing known-failure recovery, retirement, memory-only Web and approved source boundaries remain.
+None. Existing standard JavaScript AggregateError and a local owned callback list serve this demonstrated route/cleanup boundary; no new framework, dependency, public contract or product behavior.

@@ -10,15 +10,15 @@ client_supplement_phase: group_product
 
 ## Current recovery — 2026-11-05
 
-Human scope remains complete GROUP on Web, installed Windows Tauri and Android, stopping after GROUP acceptance and safe synchronization; no S2 Gate/next task. Managed root H:/.codex/worktrees/g-8802/IM-platform; branch task/LOOP1-GROUP-001-resume; accepted backend/main/LKG 3d30872d3d18c55fa8156a5ce1133281ffaa4e7e.
+Human scope remains complete GROUP on Web, installed Windows Tauri and Android, stopping after GROUP acceptance and safe synchronization; no S2 Gate/next task. Managed root H:/.codex/worktrees/g-8802/IM-platform; branch task/LOOP1-GROUP-001-resume; accepted backend/main/LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e.
 
-4733e898dab1e26ede0cdb546fb168bb0682536d passed final Control and fresh full regular Review, then DIFFERENT fresh specialist failed EH-4733-P2-001: ending a Web member read could replace the original unknown failure with an observer failure. This fresh Fix changes only client.ts product logic, preserving exact single thrown values and all read/report/final-notification causes with built-in AggregateError. Real WebClient RED1→GREEN0, known/falsy/observer/recovery cases, existing group/Web/i18n and architecture regressions passed locally. Final committed SHA is recorded externally in fix-read-causes-1105/commit.json; both fresh reviews and exact-head Control must be renewed. No push/CI-triggering PR before both reviews PASS.
+Product source2c4faf1647128a58200d5fc70af0435e0f82fc66 passed Control Acceptance/fresh full regular Review; DIFFERENT specialist FAIL EH-2C4F-P2-001 identified loss of route/abort/UI-wait causes in tests/clients/group/web.cjs. This fresh harness-only Fix keeps exact original/falsy values, independent cleanup failures and owned callbacks until final reporting. Actual git2c callback RED1 → fixed13cases GREEN0; existing full group verifier0. All product inputs remain unchanged. New committed SHA is recorded externally in fix-route-causes-1105/commit.json and requires fresh Control and both reviews; no push/CI-triggering PR before both PASS.
 
-4733 actual Web Go/TLS CREATE/ADD held→failed→retried member reads prove immediate success close/selection and honest snapshots (33 public raw artifacts, six PNGs). Current installed AAC Windows after-commit response-loss case proves ZH/EN cancel/reopen, same-session native refresh, original-request retry, automatic close/selection, identical original201 result and unchanged PG1GROUP/1receipt/2members/4Sync/4Outbox. Android real runtime,19 originals and temporary v6 trust cleanup are complete with bounded independent Architect PASS. Final4733 G09 Architect is PASS_BOUNDED_FINAL_G09_VISUAL; this is not whole G09 functional or GROUP acceptance, and the new Fix needs affected-source/evidence binding. Old21 cached Windows images remain INVALID; old36 close failure remains a failure.
+Current AAC Windows and2c Web actual G06 before/after loss supplements are complete with original request/real PG/reply equality and success close/selection. Final2c G09 Architect PASS is bounded visual approval. Independent runtime auditor reports G01–G08 sufficient, including same empty group C three-client discovery and A/B existing-member cross-client3→4→5 updates (88 G07 assertions,182 raw hashes), awaiting final new-SHA binding. G07 supervisor exit1/four auxiliary body-capture failures remain disclosed; remaining actual PG/SQLite/pages/original UI suffice per independent auditor, not a relabelled run PASS.
 
-After a temporary Docker daemon interruption, root reported normal Desktop restart and exact services restored with strict TLS health200. Supplemental current Windows before-forward G06 is in progress under root/coordinator runtime ownership; no result is claimed here. Remaining Web before-forward supplement, final G01-G09 mapping, final-SHA evidence binding/independent acceptance, both fresh source reviews, actual required exact-head hosted CI, protected integration, actual-main and safe H:/IM-platform synchronization remain required. GROUP active/group_product; S2 OPEN.
+Android temporary v6 trust cleanup/SDK rejection/134 CA restoration/test APK restoration/AVD stop complete. Actual UI logout and final PG confirm five WEB+ABC DESKTOP sessions revoked/refreshNULL and group5 members/0 messages. Global runtime cleanup restored six original stopped containers/volumes and removed only the new v6 front; no runtime lease remains. Windows manual v6 trust remains. Original FAIL/RED/Recorder and old21 INVALID Windows images remain unchanged.
 
-Exact prior Task/current bytes and reports are archived/bound by spec/progress/evidence/LOOP1-GROUP-001/product/fix-read-causes-20261105/receipt.json. Historical failures and prior source/screenshot/Recorder originals are preserved. Recovery details below and current.md supersede the archived647/403 narrative without rewriting that history.
+Final candidate binding, fresh full regular→different fresh specialist, required exact-head hosted CI, protected integration, actual-main and safe main synchronization remain. GROUP active/group_product; S2 OPEN. Current verified commands, hashes, bounded limitations and archived previous Task/current are in `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`. No self-acceptance.
 
 # Goal
 
@@ -52,7 +52,7 @@ client_runtime: Android
 
 # Allowed Paths
 
-普通业务按服务职责窄列，allowed_paths不豁免canonical。首契约已独立接受/集成/安全同步，当前完整GROUP产品按下述Product Activation登记分阶段继续；确有新增输入先修Task范围，不在实施后追认。当前交付为 Human 已授权的完整 GROUP 三端；本轮 Fix 仅修 Web member-read/observer 双因保留，补现 group 回归并更新恢复记录。具体 runtime/trust 租约单独核验；无跨服务迁移。
+普通业务按服务职责窄列，allowed_paths不豁免canonical。首契约已独立接受/集成/安全同步，当前完整GROUP产品按下述Product Activation登记分阶段继续；确有新增输入先修Task范围，不在实施后追认。当前交付为 Human 已授权的完整 GROUP 三端；本轮 Fix 仅修现 Web G06 test runner 的 route/abort/UI-wait 原因保留，补实际回调回归并更新恢复记录；无产品源码变更。具体 runtime/trust 租约单独核验；无跨服务迁移。
 
 - `contracts/http/group.openapi.json`（建群/加人/本人会话快照；唯一新增HTTP权威）
 - `contracts/http/verify-group.py`（标准库/现有validator适配，不新依赖）
@@ -149,9 +149,9 @@ The first public contract slice was independently frozen, integrated and synchro
 
 product_owner: /root/completion_coordinator
 product_registration: FULL_GROUP_PRODUCT_RESUMED_BY_HUMAN
-product_G01_G09: PARTIAL_RUNTIME_EVIDENCE_PENDING_FINAL_BINDING
-product_regular_review: FINAL_FIX_SHA_PENDING_FRESH_FULL_REVIEW_AFTER_4733_REGULAR_PASS
-product_error_handling_review: EH_4733_P2_001_FIXED_LOCALLY_NEW_SHA_PENDING_DIFFERENT_FRESH_SPECIALIST_AFTER_REGULAR_PASS
+product_G01_G09: INDEPENDENT_RUNTIME_SUFFICIENT_PENDING_NEW_SHA_BINDING_AND_FINAL_ACCEPTANCE
+product_regular_review: FINAL_HARNESS_FIX_SHA_PENDING_FRESH_FULL_REVIEW_AFTER_2C4F_PASS
+product_error_handling_review: EH_2C4F_P2_001_FIXED_LOCALLY_NEW_SHA_PENDING_DIFFERENT_FRESH_SPECIALIST_AFTER_REGULAR_PASS
 product_hosted_acceptance: PENDING_FINAL_CANDIDATE_BOTH_FRESH_REVIEWS
 product_main_sync: PENDING_PRODUCT
 
@@ -179,7 +179,7 @@ The Human full-GROUP resumption supersedes old backend-only/phase-only stops. Ex
 
 三端应用层保存不可变pending群操作（account/endpoint/type/conversation/requestId/memberUserIds）；同账号refresh/rebind保留内存operation/metadata并绑定新generation，logout/expire/account switch清除，旧closed Repository不继续使用。严格验证群HTTP具体201/200/status和canonicalbody，不把GROUP_REQUEST_CONFLICT丢成generic失败。Web全部friend-only open/send/ACK/realtime/sync gates须接授权snapshot；元数据前首条realtime竞态不得用seq1历史baseline掩盖。TS/Kotlin Repository只账号生命周期内存群snapshot/identity，SQLite v2/原user_state revision+cursor事务保持，不塞成员JSON、不改native/schema。senderId关联授权PublicUser displayName+@username，离线缺真实名称诚实显示可区分ID。Native既有10秒Sync idle衔接独立from-origin持续分页，不能被friend cursor相等早退跳过。
 
-真实构建复用现native.py package/gradle与现Send/Sync/i18n回归；group Android instrumentation用既有-PimSendInstrumentation runner选择器。native.py gui-mobile含旧admin/send-runtime ANDROID_USER_HOME/AVD_HOME，禁止盲用/接管；group runtime只新own childenv+实际serial/源构建安装hash，不创建H:/clone/copy/独立产品实现目录、不改旧harness或WT外产品源。本轮 Android runtime 已完成并清理临时 v6 信任（134 原CA恢复、实际SDK拒绝v6、owned AVD停、18444关闭），独立 bounded Architect PASS；原件由 current.md/Fix receipt 链接。Human 对 im_group_g8802/emulator-5590 的临时信任授权及清理事实保持，其他设备/系统信任无新增授权，历史租约不继承。此前4733 Web runtime已完成并清理自己的18446代理/浏览器/WEB测试会话；全局8443当前由 root/coordinator 保留用于 supplemental G06 真实验收。任何运行仍须资格核验、保留原状态并验证恢复，禁止证书绕过；不宣称所有服务已清理。
+真实构建复用现native.py package/gradle与现Send/Sync/i18n回归；group Android instrumentation用既有-PimSendInstrumentation runner选择器。native.py gui-mobile含旧admin/send-runtime ANDROID_USER_HOME/AVD_HOME，禁止盲用/接管；group runtime只新own childenv+实际serial/源构建安装hash，不创建H:/clone/copy/独立产品实现目录、不改旧harness或WT外产品源。本轮 Android runtime 已完成并清理临时 v6 信任（134 原CA恢复、实际SDK拒绝v6、owned AVD停、18444关闭），独立 bounded Architect PASS；原件由 current.md/Fix receipt 链接。Human 对 im_group_g8802/emulator-5590 的临时信任授权及清理事实保持，其他设备/系统信任无新增授权，历史租约不继承。此前4733 Web runtime已完成并清理自己的18446代理/浏览器/WEB测试会话；全局临时入口与原五服务已按最终cleanup receipt恢复初始停止状态，原卷保留；当前无运行租约。任何运行仍须资格核验、保留原状态并验证恢复，禁止证书绕过；不宣称所有服务已清理。
 
 最终必须同时满足全部G01..G09、旧Auth/Sync/WSS/Plugin及三端Send/Sync/Web/i18n回归、责任/依赖/Minimality/ErrorHandling、真实截图Architect、最终SHA fresh常规→different fresh专项（任何fix两项重做）→实际required exact-head hosted→protected integration→actual-main/tree→保存未知main安全同步，才可GROUP done。firstslice接受、local/Recorder/截图都不替代产品接受或S2 Gate；当前GROUP active/group_product、S2 OPEN。产品运行原件保存spec/progress/evidence/LOOP1-GROUP-001/product/；此前PHASE1仅外部registration receipt的限制已随root明确PHASE2 grant结束。
 
@@ -239,7 +239,7 @@ Web/Desktop沿既有TypeScript分层和各端独立React视觉；Android Kotlin/
 
 # Evidence
 
-spec/progress/evidence/LOOP1-GROUP-001/；已接受contract/backend历史保持。G01..G09原始DB/请求/故障/三端入口/截图/Architect/双审/hosted/protectedmain/sync按候选SHA保存和绑定。客户端本地/部分runtime证据已执行，完整接受和同步仍PENDING。
+spec/progress/evidence/LOOP1-GROUP-001/；已接受contract/backend历史保持。G01..G09原始DB/请求/故障/三端入口/截图/Architect/双审/hosted/protectedmain/sync按候选SHA保存和绑定。三端真实runtime和截图已执行，独立审计认为运行证据充分；最终候选绑定/双审/hosted接受和同步仍PENDING。
 
 # Completion Metadata
 
@@ -253,10 +253,12 @@ main_sync_evidence: unavailable
 
 # Handoff
 
-Completed: fresh Fix for EH-4733-P2-001 after4733 Control/regular PASS and different specialist FAIL. Actual WebClient RED→GREEN preserves single unknown thrown values, simultaneous read/observer causes, known-error presentation, final busy/scanning cleanup and subsequent read recovery. Existing group verifier, full Web locked build/behavior/appearance, i18n and source-architecture checks exit0; five startup baseline checks exit0. Command/Result/Evidence are in current.md and spec/progress/evidence/LOOP1-GROUP-001/product/fix-read-causes-20261105/receipt.json. This Fix performs no runtime/GUI/service/account operation; preceding bounded runtime/Architect reports are hash-linked, not self-accepted or automatically transferred to the new SHA.
+Completed: fresh harness-only Fix EH-2C4F-P2-001 after2c Control/regular PASS and different specialist FAIL. Actual old runner RED1 and fixed13 boundary cases GREEN0 cover exact route/falsy/abort/UI-wait/retry/late-cleanup causes; existing complete group verifier0/6.859s. Corrected baseline five checks0. Commands/results/evidence: current.md and `spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json`. Initial fixture wiring/cwd/npm cache failures are preserved and correctly excluded from product evidence.
 
-Changed files: clients/web/src/application/client.ts, existing tests/clients/group/web-confirmed.cjs, Task/current and thin Fix receipt. Sole writer /root/completion_coordinator/fix_4733_read_causes releases after clean commit. All original histories preserved, including old21 invalid Windows captures and previous FAIL/RED/Recorder traces. Main780 untracked+2tracked unknown paths untouched; LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e; branch task/LOOP1-GROUP-001-resume; synchronization PENDING. Checkpoint spec/progress/checkpoints/2026-10-28-group-windows-feedback.md. No architecture conflict; no native/backend/contracts/dependency change. Recorder is partial (direct startup/reads/edits/helper authoring), to finish FAIL honestly with structural validation; not product acceptance.
+Changed files: tests/clients/group/web.cjs, route-failures.cjs, verify.py, Task/current and thin receipt. No product/UI/backend/native/contracts changes. Sole writer /root/completion_coordinator/fix_route_causes returns ownership after clean commit. Prior history archived byte-exact; main780 untracked+2tracked unknown untouched; LKG3d30872d3d18c55fa8156a5ce1133281ffaa4e7e and synchronization PENDING. Checkpoint spec/progress/checkpoints/2026-10-28-group-windows-feedback.md. Partial Recorder finishes FAIL honestly/structural validation; not product acceptance.
+
+Known runtime boundary: G07 auxiliary body observer run FAIL remains, independently sufficient actual evidence awaits new-SHA binding. Android trust/AVD and all temporary/global task runtime cleanup complete per linked receipts; Windows user manual CA remains. Final source reviews/CI/actual-main/safe sync are still mandatory.
 
 # Next Action
 
-Coordinator binds clean Fix SHA, final Control Acceptance and affected evidence; fresh full regular Review then DIFFERENT fresh error-handling Review, renewing both for any further source fix. Finish current Windows/Web G06 before-forward supplement and full G01-G09 independent acceptance, then exact-head required CI/protected integration/actual-main/safe H:/IM-platform synchronization. No push before both reviews PASS; no GROUP done/S2 advancement before all applicable acceptance and synchronization.
+Coordinator binds clean Fix SHA and unchanged product/runtime evidence, executes final Control and delegates fresh full regular then DIFFERENT fresh error specialist; both renewed after any source fix. Final G01–G09 binding, exact-head required CI/protected integration/actual-main/safe H:/IM-platform synchronization precede done. Stop at full GROUP; no S2 Gate or next task.

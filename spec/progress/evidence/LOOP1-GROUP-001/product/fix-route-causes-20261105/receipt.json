@@ -1,0 +1,146 @@
+{
+  "task": "LOOP1-GROUP-001",
+  "fixer": "/root/completion_coordinator/fix_route_causes",
+  "baseSHA": "2c4faf1647128a58200d5fc70af0435e0f82fc66",
+  "candidateSHA": "Recorded after commit in external fix-route-causes-1105/commit.json; no self-referential SHA claim.",
+  "scope": [
+    "tests/clients/group/web.cjs",
+    "tests/clients/group/route-failures.cjs",
+    "tests/clients/group/verify.py",
+    "spec/tasks/active/LOOP1-GROUP-001.md",
+    "spec/progress/current.md",
+    "spec/progress/evidence/LOOP1-GROUP-001/product/fix-route-causes-20261105/receipt.json"
+  ],
+  "fix": "EH-2C4F-P2-001: actual route callbacks keep exact original/falsy failures and abort cleanup causes, even if UI waiting fails or a retry callback fails. Browser close and callback drain precede final FAIL/report. Public Call log projection does not replace original causes.",
+  "verification": {
+    "baseline": "baseline-v2 five actual exact-export checks exit0",
+    "red": "red-v2 executes exact git2c runner and fails original-cause assertions exit1",
+    "green": "green-v3 callback13cases exit0/0.344s and complete group verifier exit0/6.859s; existing cleanup and product assertions retained"
+  },
+  "disclosures": [
+    "Initial baseline wrapper incorrectly labelled export cwd but Recorder ran WT with ignored desktop/dist; FAIL preserved, baseline-v2 explicitly changes actual subprocess cwd and all five pass.",
+    "Initial red/green fixture omitted optional getByRole options and failed before callback; invalid reproduction excluded. red-v2 proves actual old callback failure after correcting only fixture ports.",
+    "green-v2 complete group failed at npm cache EPERM; authorized actual-user green-v3 completed locked install/compile/regressions.",
+    "Direct startup/read/helper authoring/editing are outside the partial Recorder; final instrumentation result FAIL with structural validation, not product acceptance.",
+    "G07 supervisor retains exit1 and four auxiliary response body capture failures; independent reviewer found remaining actual metadata/DB/UI evidence sufficient, final report waits new product hash binding.",
+    "No product/client/backend/contracts/layout/native inputs changed; new final regular/error/Control/hosted/integration/main sync are still required."
+  ],
+  "priorAndRuntimeEvidence": {
+    "final-error-2c4f-1105/report.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-2c4f-1105\\report.json",
+      "sha256": "cbe36789059a9c183849b709cc8dd0dec10669178898185cdc3523c761f719e2"
+    },
+    "final-error-2c4f-1105/finding-scope-addendum.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-2c4f-1105\\finding-scope-addendum.json",
+      "sha256": "feefd6b8dc1d81804ab88013d4888b3ee26497db8e536826c5e160900dcfaad7"
+    },
+    "final-regular-2c4f-1105/report.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-regular-2c4f-1105\\report.json",
+      "sha256": "edb12611b0f42574c33389dc975406d6a8189af843440e08b2590ac1bb2267ca"
+    },
+    "final-regular-2c4f-1105/control-v2.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-regular-2c4f-1105\\control-v2.json",
+      "sha256": "d68be7ce934e87f3a7ddd9330c8b011747c9ec4035bfbf18c295cba6c0ead50d"
+    },
+    "architect-final-2c4f/report.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\architect-final-2c4f\\report.json",
+      "sha256": "d985431d0899bc327a31c3086a40b35d9f6dcd61b1fe5a3b70f24f6eda4e19a4"
+    },
+    "coordinator-1105/native-backend-binding-2c4faf16.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\coordinator-1105\\native-backend-binding-2c4faf16.json",
+      "sha256": "81fa8296ef9f35ccc8bbbf390e27ccb5384186a3a63779ab2af75e89695d83d8"
+    },
+    "windows-final-before-1105/ui-receipt.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\windows-final-before-1105\\ui-receipt.json",
+      "sha256": "9e3e1a28be4b313943fb35b7fbfedfb97434e0fdb59ba7887ace0ccb1ece69bc"
+    },
+    "windows-final-before-1105/backend-receipt.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\windows-final-before-1105\\backend-receipt.json",
+      "sha256": "d3c390dc519e1caf659660f484afb111ded858e0d01c55adaacd042b96567c25"
+    },
+    "windows-final-retry-1105/ui-receipt.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\windows-final-retry-1105\\ui-receipt.json",
+      "sha256": "9a9613112a2d59fc46bfb0b62bfbe0039e212b07665087a3ca66a589c7aed5d0"
+    },
+    "windows-final-retry-1105/backend-receipt.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\windows-final-retry-1105\\backend-receipt.json",
+      "sha256": "ac84883e57d77d65cdd5e2749a887098194276de2dc3175ad51dd7a498baca2c"
+    },
+    "web-before-final-1105/execution.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\web-before-final-1105\\execution.json",
+      "sha256": "d43a8fe654277b0791acae05147af227e9c2db5fa6ac9645924462dad957947c"
+    },
+    "g07-multi-1105/receipt.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\g07-multi-1105\\receipt.json",
+      "sha256": "bd9e008521192b912cf6dbf3323324c768ab33274e57714316f9cf28c47cd246"
+    },
+    "g07-multi-1105/final-readonly-db.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\g07-multi-1105\\final-readonly-db.json",
+      "sha256": "b283f318da4a3cd390b6752f1d64da8fe5bdeb3cb093cfb3d6aa2fc6baccc88c"
+    },
+    "android-g07-multi-1105/receipt.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\android-g07-multi-1105\\receipt.json",
+      "sha256": "46ab36be9b229c1648b24ee41fac4abae4fc8483a6afa71619d4fac5e1220115"
+    },
+    "final-runtime-acceptance-1105/g07-finalchecks.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-runtime-acceptance-1105\\g07-finalchecks.json",
+      "sha256": "c68085986fe02eb9f34af314ad2b3766604091e8acc7a404d1f5bb1391a9a58c"
+    },
+    "root-1105/cleanup-final-receipt.json": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\root-1105\\cleanup-final-receipt.json",
+      "sha256": "7523aa98c2a031b62d449345893f907d7603f7a75e3e0432d7e5e75bbf3be6e5"
+    }
+  },
+  "ownPublicFiles": {
+    "baseline-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-0.stdout": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989",
+    "baseline-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-1.stdout": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426",
+    "baseline-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-2.stdout": "f57ab5a788ee6b7701842f6c12bbcf5945862222a3c39b21b5279ae8958e33e1",
+    "baseline-3.stderr": "21e726c7d656d3e029781acd8282db38ef6bbde79df1c2d78ddad00ed730ac32",
+    "baseline-3.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-4.stderr": "d33182a26cca8cebff69e2921eb31890f2d9551c27d4715d44fbb82befde6c9b",
+    "baseline-4.stdout": "d260103c650a82689a727c276f85b42ca0d9c582efe3e36b8536e41390b8cea6",
+    "baseline-v2-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-v2-0.stdout": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e",
+    "baseline-v2-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-v2-1.stdout": "3df1e5253d74266b23647092f1519cf9376fb83445dd70df9bf0e01569fcc43f",
+    "baseline-v2-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-v2-2.stdout": "c3d741c1af74259642cc9ae2b1fc1e786c10c2c595e7a2364072c1a1bf5f2cb6",
+    "baseline-v2-3.stderr": "88ea310bdba3d1b3361426f1266d5a7e7e27b2bea37955776d3153e4a3f017bf",
+    "baseline-v2-3.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline-v2-4.stderr": "562ac538f850f2b68193ca8ed8268ca970b967117846ae508bbc64cdda6b6e07",
+    "baseline-v2-4.stdout": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52",
+    "baseline-v2.json": "0a6d2e53ec9f1b24d1a3ce28684801db1850529c906cca0f345db5c9676cb1f2",
+    "baseline-v2.py": "485b11d7d66f6ecf8683460c9368a26cc701a5796ee63e1bcfa25a27e31f410f",
+    "baseline.json": "37f02e79697b428d7859b8d649dd554b1a3492be7b51e6b13ae49cc1a4001da5",
+    "current.md.before": "40839a0804f18b9dc9778a3bf69e1020e97d03cf53def4b7c4c0d838d64998ec",
+    "green-0.stderr": "74e8019a1c7c2005435c038c51bc57b75c038e43942356ed7a2b9a4f904c9829",
+    "green-0.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "green-1.stderr": "ee77c409d06a1e20aae6b004cf77deee764c7c4853c92bd7a44faaf0b01d1f90",
+    "green-1.stdout": "e44b52001632ba94bc1cfb89f20568398e456bb0c1c58ed68d38a88abcf5ef58",
+    "green-v2-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "green-v2-0.stdout": "2b2eb4606557a4d171b0b5c7dc18a28869af3725db8172659bc0c59f9c353bcf",
+    "green-v2-1.stderr": "743bbe441dd146290426a72eea71b08b94a8dabd3e7b0e53e628781214d901ea",
+    "green-v2-1.stdout": "ffd153b00c6a800d6ef21d32e89968f6e6094c0b83cf9e7dcea7edd89a173343",
+    "green-v2.json": "107a5a3104113b20cf3d29084abd5487dcca05295bfffe390c440231a9fac944",
+    "green-v3-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "green-v3-0.stdout": "2b2eb4606557a4d171b0b5c7dc18a28869af3725db8172659bc0c59f9c353bcf",
+    "green-v3-1.stderr": "01fb198f7ec95b20434881239441f9110b676692099e087cbb8e68d344eb916d",
+    "green-v3-1.stdout": "65f300b03e7569b5b9344d70c44242f2441dbf3741b8ef556f20b081f4af80cd",
+    "green-v3.json": "61651293806f19b3d7a51f4932251e5cbfffb763600436e8de1ea9f46f751ef0",
+    "green.json": "63e01fffda0f3e86338e24fb49bb3c2c62f6350f4f09c2aa2923ed0fefc0aa45",
+    "LOOP1-GROUP-001.md.before": "b0cf82aa9e876eb97f56f52008b45c4e9874a0681bbb4ff2a136928a3a79e76e",
+    "prompt.txt": "f097bc2c749f9c4ed6e18602002f1b2c65e2e63cd7ddf1110bf51fa816669f48",
+    "red-0.stderr": "74e8019a1c7c2005435c038c51bc57b75c038e43942356ed7a2b9a4f904c9829",
+    "red-0.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "red-v2-0.stderr": "335e1472a1bff8502c2b073e99bd257350acf4ff6141e29cd3bdcd6ea154645d",
+    "red-v2-0.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "red-v2.json": "3ce4756d2690ed6af5071c94134a633148fd3b5e87245f8f7f2ff97be2c0cb05",
+    "red.json": "472f726ae38dc2493ae1030c48f60fe47b7afacab36181312da954d1973d0c99",
+    "run.py": "e24c78a38b32d3c39c9403c6afbee90a6af20d3a05fb488913a5eff1c20c6ee7",
+    "web-2c4f.cjs": "8b6f3919de5ca069397f02a942bd1ed493a128e18169f986610352f37d67a1d3"
+  },
+  "productAcceptance": "PENDING final new-SHA independent source/runtime binding, hosted CI, protected integration and safe main synchronization"
+}
