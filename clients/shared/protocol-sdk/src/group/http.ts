@@ -16,15 +16,15 @@ export class GroupHttp {
     if(response.status>=500)throw new GroupFailure('transport');
     if(response.headers.get('cache-control')!=='no-store'||!/^application\/json(?:\s*;|$)/i.test(response.headers.get('content-type')??''))throw new GroupFailure('protocol');
     const reader=response.body?.getReader();if(!reader)throw new GroupFailure('transport');
-    const decoder=new TextDecoder('utf-8',{fatal:true});let raw='',size=0;let primary:unknown;
+    const decoder=new TextDecoder('utf-8',{fatal:true});let raw='',size=0;let primary:unknown,hasPrimary=false;
     try{for(;;){let part:ReadableStreamReadResult<Uint8Array>;
       try{part=await reader.read();}catch(error){if(this.transport(error))throw new GroupFailure('transport','',{cause:error});throw error;}
       if(part.done)break;size+=part.value.byteLength;if(size>6*1024*1024)throw new GroupFailure('protocol');
       try{raw+=decoder.decode(part.value,{stream:true});}catch(error){if(error instanceof TypeError)throw new GroupFailure('protocol','',{cause:error});throw error;}
     }
     try{raw+=decoder.decode();}catch(error){if(error instanceof TypeError)throw new GroupFailure('protocol','',{cause:error});throw error;}
-    }catch(error){primary=error;throw error;}finally{try{await reader.cancel();}catch(error){
-      if(primary!==undefined){if(error===primary||primary instanceof Error&&error===primary.cause)throw primary;throw new AggregateError([primary,error],'Group response and cleanup failed');}
+    }catch(error){hasPrimary=true;primary=error;throw error;}finally{try{await reader.cancel();}catch(error){
+      if(hasPrimary){if(error===primary||primary instanceof Error&&error===primary.cause)throw primary;throw new AggregateError([primary,error],'Group response and cleanup failed');}
       if(this.transport(error))throw new GroupFailure('transport','',{cause:error});throw error;
     }}
     const value=parse(raw,6*1024*1024);

@@ -28,6 +28,17 @@ const response=(value,status=200)=>new Response(JSON.stringify(value),{status,he
  const lost=new TypeError('response lost');
  await assert.rejects(()=>new GroupHttp('https://example.invalid',A,'fixture-token',async()=>{throw lost}).mutate(R,[B],new AbortController().signal),e=>e instanceof GroupFailure&&e.kind==='transport'&&e.cause===lost);
  await assert.rejects(()=>new GroupHttp('https://example.invalid',A,'fixture-token',async()=>response({requestId:R,error:{code:'GROUP_REQUEST_CONFLICT',message:'Rejected'}},409)).mutate(R,[B],new AbortController().signal),e=>e.kind==='rejected'&&e.code==='GROUP_REQUEST_CONFLICT');
+ // Undefined is a real thrown value, including when cleanup fails too.
+ for(const cleanup of [new TypeError('cleanup failed'),undefined,null]){
+  let cancelled=0;
+  const broken=new GroupHttp('https://example.invalid',A,'fixture-token',async()=>({redirected:false,status:200,headers:new Headers({'content-type':'application/json','cache-control':'no-store'}),body:{getReader:()=>({read:async()=>{throw undefined;},cancel:async()=>{cancelled++;if(cleanup!==null)throw cleanup;}})}}));
+  await assert.rejects(broken.members(R,new AbortController().signal),error=>{
+   if(cleanup===undefined||cleanup===null)assert.equal(error,undefined);
+   else {assert.ok(error instanceof AggregateError);assert.deepEqual(error.errors,[undefined,cleanup]);}
+   return true;
+  });
+  assert.equal(cancelled,1);
+ }
  const invalidUtf=new Uint8Array([0xc0,0x80]);
  await assert.rejects(()=>new GroupHttp('https://example.invalid',A,'fixture-token',async()=>new Response(invalidUtf,{status:201,headers:{'content-type':'application/json','cache-control':'no-store'}})).mutate(R,[B],new AbortController().signal),e=>e.kind==='protocol');
  const {WebClient}=require(path.join(process.argv[2],'web/src/application/client.js'));

@@ -66,3 +66,11 @@ Coordinator obtains new clean Fix SHA from external commit.json, runs Control Ac
 ## Architecture Conflicts / ACP / ADR
 
 None. The existing valid DIRECT fixture supplies its required empty groups list; every original assertion remains. No product fallback or new mechanism.
+
+## Latest Fix — 2026-11-06 (supersedes earlier fixture-only recovery)
+
+REG13A-P2-001 fixed with separate primary-occurrence flag in shared GroupHttp, preserving undefined read failure alongside distinct cleanup failure and same-value identity behavior. Existing group behavior suite adds both undefined/TypeError and undefined/undefined regressions plus exactly-once cancellation. Actual compiled full group verifier RED1 then GREEN0. Initial npm cache EPERM and direct-WT architecture baseline failure caused by ignored generated dist are preserved, not accepted; canonical/planning passed. Coordinator clean13a baseline and final clean candidate verification remain required.
+
+Evidence: spec/progress/evidence/LOOP1-GROUP-001/product/fix-primary-20261106/receipt.json. External fix-primary-1106 includes archived records and partial Recorder (finished FAIL, structural validation0). Sole writer /root/finish_group_1106/fix_primary owns these five files until commit; commit SHA/status in external commit.json. Assigned root/branch unchanged; main untouched. LKG3d30872; GROUP active/S2 OPEN. Regular review13a FAIL report26c5c158 remains; final regular and different fresh error review PENDING. No push/CI/runtime/trust/native rebuild or synchronization. Shared product source changed: prior binary/evidence binding requires coordinator assessment/rebuild. Next: clean Control, fresh two reviews, updated artifact/runtime binding, exact-head hosted acceptance, protected integration/actual-main/safe synchronization.
+
+Qualified exact13a baseline: external finish-group-1106/baseline.json, five checks exit0 (coordinator). Final SHA clean checks remain pending. Successful cleanup after undefined primary also added; full group suite rerun exit0/5.588s after Recorder closure, outside partial trace. No primary failure is converted to success.

@@ -22,6 +22,10 @@ New Fix SHA is recorded after commit in external fix-desktop-render-fixture-1105
 
 Android temporary v6 trust/134 original CA/test APK restoration and owned AVD stop remain complete. Five WEB and ABC DESKTOP fixture sessions were revoked; original six stopped containers/IDs/mounts/volumes restored and new v6 front removed without volumes. Windows user-installed v6 trust remains. No runtime lease is reopened. G07 supervisor exit1/four auxiliary body-capture failures, old21 INVALID Windows images, old36 close FAIL and all partial Recorder traces remain historical facts; independent evidence accepts phased G07 coverage, not nine simultaneous clients.
 
+# Fix registration — 2026-11-06 REG13A-P2-001
+
+Supersedes the preceding fixture-only scope for this fresh Fix. Sole writer /root/finish_group_1106/fix_primary; exact base13a77819. Narrow allowed existing paths: clients/shared/protocol-sdk/src/group/http.ts and tests/clients/group/behavior.cjs, Task/current and thin evidence receipt. Track primary occurrence independently from its undefined value; preserve distinct read/cancel causes and existing same-error/cause behavior. No contract, native, dependency or runtime changes. Both final-SHA reviews, artifact/evidence binding assessment, hosted CI and main sync remain pending.
+
 # Goal
 
 创建者从本人好友选至少一人建群并自动加入；任意有效群成员从本人的好友列表添加新成员。三端显示真实群成员和非好友发言者身份，复用现 Send/ACK/seq/Outbox/Sync 和 i18n，完整完成 G01..G09。
@@ -265,3 +269,11 @@ Known limits: direct existing-suite verification is not the full SEND build wrap
 # Next Action
 
 Coordinator binds the clean Fix SHA and unchanged product/G01–G09 inputs, executes new Control Acceptance, delegates fresh full regular then DIFFERENT fresh error specialist; both renewed after any Fix. Only both PASS permit candidate push/PR99 update. Required exact-head hosted jobs, protected integration, actual-main and safe H:/IM-platform synchronization precede done. Stop after full GROUP; no S2 Gate or next task.
+
+## Latest Fix — 2026-11-06 (supersedes earlier fixture-only recovery)
+
+REG13A-P2-001 fixed with separate primary-occurrence flag in shared GroupHttp, preserving undefined read failure alongside distinct cleanup failure and same-value identity behavior. Existing group behavior suite adds both undefined/TypeError and undefined/undefined regressions plus exactly-once cancellation. Actual compiled full group verifier RED1 then GREEN0. Initial npm cache EPERM and direct-WT architecture baseline failure caused by ignored generated dist are preserved, not accepted; canonical/planning passed. Coordinator clean13a baseline and final clean candidate verification remain required.
+
+Evidence: spec/progress/evidence/LOOP1-GROUP-001/product/fix-primary-20261106/receipt.json. External fix-primary-1106 includes archived records and partial Recorder (finished FAIL, structural validation0). Sole writer /root/finish_group_1106/fix_primary owns these five files until commit; commit SHA/status in external commit.json. Assigned root/branch unchanged; main untouched. LKG3d30872; GROUP active/S2 OPEN. Regular review13a FAIL report26c5c158 remains; final regular and different fresh error review PENDING. No push/CI/runtime/trust/native rebuild or synchronization. Shared product source changed: prior binary/evidence binding requires coordinator assessment/rebuild. Next: clean Control, fresh two reviews, updated artifact/runtime binding, exact-head hosted acceptance, protected integration/actual-main/safe synchronization.
+
+Qualified exact13a baseline: external finish-group-1106/baseline.json, five checks exit0 (coordinator). Final SHA clean checks remain pending. Successful cleanup after undefined primary also added; full group suite rerun exit0/5.588s after Recorder closure, outside partial trace. No primary failure is converted to success.
