@@ -1,3 +1,4 @@
+import {GroupPanel} from './GroupPanel.js';
 import {LanguageContext,useText,useDisplayText} from "../i18n/context.js";
 import {WindowBar} from "./WindowBar.js";
 import {Navigation} from "./Navigation.js";
@@ -21,6 +22,13 @@ export function Shell(){const s=useSyncExternalStore(app.observe,app.snapshot);
 }
 function WorkspaceShell(){const t=useText();const display=useDisplayText();
   const s=useSyncExternalStore(app.observe,app.snapshot),[registering,setRegistering]=useState(false),[confirmation,setConfirmation]=useState(""),[registered,setRegistered]=useState(false),[username,setUsername]=useState(""),[password,setPassword]=useState(""),[query,setQuery]=useState(""),[draft,setDraft]=useState(""),[maximized,setMaximized]=useState(false);
+  const [menu,setMenu]=useState(false),[picker,setPicker]=useState<{conversation?:string}|null>(null),[pickerVisible,setPickerVisible]=useState(false),[management,setManagement]=useState(false);
+  const submitGroup=app.createGroup.bind(app),retryGroup=app.retryGroup.bind(app);
+  // Close on the confirmed mutation, before its subsequent history/metadata reads settle.
+  useEffect(()=>{setPicker(null);},[s.groupSuccessRevision]);
+  function showPicker(conversation?:string){if(s.groupStatus!=='unconfirmed')setPicker({conversation});setPickerVisible(true);setMenu(false);}
+  useEffect(()=>{setManagement(false);},[s.selected]);
+  useEffect(()=>{if(!s.session){if(s.groupStatus!=='unconfirmed')setPicker(null);setMenu(false);setManagement(false);}},[s.session,s.groupStatus]);
   const [composerHeight,setComposerHeight]=useState(72),textarea=useRef<HTMLTextAreaElement>(null),resize=useRef<{y:number;height:number}|null>(null);
   useEffect(()=>{void app.start();},[]);
   useEffect(()=>{let active=true;const refresh=()=>{void windowMaximized().then(value=>{if(active)setMaximized(value);});};refresh();window.addEventListener("resize",refresh);return()=>{active=false;window.removeEventListener("resize",refresh);};},[]);
@@ -35,12 +43,12 @@ function WorkspaceShell(){const t=useText();const display=useDisplayText();
       {authenticated&&<Header s={s} prefs={prefs} preferences={preferences} run={run}/>}
       {s.error&&<div className="notice" role="alert"><span>{display(s.error)}</span>{s.session&&<button disabled={!s.session} onClick={()=>run(reconnect())}>{t("auth.reconnect")}</button>}</div>}
       {!authenticated?<AuthPanel s={s} registering={registering} setRegistering={setRegistering} confirmation={confirmation} setConfirmation={setConfirmation} registered={registered} setRegistered={setRegistered} username={username} setUsername={setUsername} password={password} setPassword={setPassword} register={register} login={login} restore={restore} run={run}/>:
-      s.page==="Chat"?<section className="chat-layout"><ConversationList s={s} page={page} open={open} run={run}/>
-      <div className="chat-pane glass">{s.selected&&<><div className="chat-heading"><span className="avatar">{friend?.user.displayName[0]??"#"}</span><div><h2>{title}</h2><small>{s.connection==="ready"?t("sync.connected"):t("sync.offline")}</small></div><button className="quiet" disabled={!s.session} onClick={()=>run(reconnect())}>{t("auth.reconnect")}</button></div><Messages s={s} retry={retry} run={run}/><Composer s={s} draft={draft} setDraft={setDraft} send={send} run={run} textarea={textarea} composerHeight={composerHeight} setComposerHeight={setComposerHeight} resize={resize}/></>}</div></section>:
-      s.page==="Friends"?<FriendsPanel s={s} query={query} setQuery={setQuery} search={search} add={add} open={open} run={run}/>:
+      s.page==="Chat"?<section className="chat-layout"><ConversationList newChat={<div className="new-chat" onKeyDown={e=>{if(e.key==='Escape')setMenu(false);}}><button className="quiet" aria-expanded={menu} onClick={()=>setMenu(!menu)}>{t("chat.new")}</button>{menu&&<div className="new-chat-menu"><button onClick={()=>{setMenu(false);page('Friends');}}>{t('group.friend')}</button><button onClick={()=>showPicker()}>{t('group.create')}</button></div>}</div>} s={s} page={page} open={open} run={run}/>
+      <div className="chat-pane glass">{s.selected&&<><div className="chat-heading"><span className="avatar">{friend?.user.displayName[0]??"#"}</span><div><h2>{title}</h2><small>{s.connection==="ready"?t("sync.connected"):t("sync.offline")}</small></div><button className="quiet" disabled={!s.session} onClick={()=>run(reconnect())}>{t("auth.reconnect")}</button>{s.groups.some(r=>r.conversationId===s.selected)&&<button aria-label={t('group.members')} aria-expanded={management} onClick={()=>setManagement(!management)}>…</button>}</div><Messages s={s} retry={retry} run={run}/><Composer s={s} draft={draft} setDraft={setDraft} send={send} run={run} textarea={textarea} composerHeight={composerHeight} setComposerHeight={setComposerHeight} resize={resize}/></>}</div>{management&&s.groups.some(r=>r.conversationId===s.selected)&&<aside className="group-management"><h2>{t('group.title')}</h2><p>{s.selected}</p><h3>{t('group.members')}</h3>{s.groups.filter(r=>r.conversationId===s.selected).map(r=><div className="group-person" key={r.member.user.userId}><span className="avatar">{r.member.user.userId.slice(0,1)}</span><span>{r.member.user.displayName}</span></div>)}<button onClick={()=>showPicker(s.selected)}>{t('group.add')}</button></aside>}</section>:
+      s.page==="Friends"?<><FriendsPanel s={s} query={query} setQuery={setQuery} search={search} add={add} open={open} run={run}/></>:
       s.page==="AI"?<AIPlaceholder />:
       s.page==="Plugin"?<PluginPlaceholder />:
       <SettingsPanel selectLanguage={app.selectLanguage.bind(app)} language={s.language} languageStored={s.languageStored} s={s} prefs={prefs} preferences={preferences} refresh={refresh} disconnect={disconnect} reconnect={reconnect} testNotification={testNotification} logout={logout} run={run}/>}
-    </main></div></div>;
+    {picker&&<GroupPanel v={s} conversation={picker.conversation} submit={submitGroup} retry={retryGroup} visible={pickerVisible} close={()=>{setPickerVisible(false);if(s.groupStatus!=='unconfirmed')setPicker(null);}}/>}</main></div></div>;
 }
 

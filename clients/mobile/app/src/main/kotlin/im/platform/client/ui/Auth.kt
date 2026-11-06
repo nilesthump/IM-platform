@@ -20,7 +20,18 @@ class Auth(val endpoint:String,private val preferences:Preferences) {
     init{serverOrigin(endpoint)}
     private fun metadata()=JSONObject().put("clientType","MOBILE").put("deviceId","im-mobile").put("clientVersion","0.1.0").put("protocolVersion","1")
     private fun transportCleanup(error:Throwable):Boolean=error is java.io.IOException && error.suppressed.all(::transportCleanup)
-    suspend fun request(path:String,method:String="GET",body:JSONObject?=null,authenticated:Boolean=true,accessToken:String?=null):Any=withContext(Dispatchers.IO){
+    private fun groupError(value:Any,status:Int,request:String?,listing:Boolean):Nothing {
+        val codes=mapOf(400 to setOf("VALIDATION_FAILED"),401 to setOf("AUTH_REQUIRED","AUTH_TOKEN_INVALID","AUTH_TOKEN_EXPIRED","AUTH_SESSION_REVOKED","AUTH_SESSION_EPOCH_STALE","AUTH_CLIENT_TYPE_MISMATCH"),403 to setOf("AUTHORIZATION_DENIED"),409 to setOf("GROUP_REQUEST_CONFLICT"))
+        if(status !in codes || listing && status !in listOf(400,401))throw ApiFailure("invalid_server_response")
+        val p=Wire.obj(value,setOf("requestId","error"));if(p["requestId"]!=request)throw ApiFailure("invalid_server_response")
+        val raw=p["error"] as? Map<*,*>?:throw ApiFailure("invalid_server_response")
+        val e=Wire.obj(raw,if(raw.containsKey("violations"))setOf("code","message","violations")else setOf("code","message"))
+        val code=e["code"] as? String?:throw ApiFailure("invalid_server_response")
+        if(code !in codes.getValue(status)||(e["message"] as? String).isNullOrEmpty())throw ApiFailure("invalid_server_response")
+        if(e.containsKey("violations")){val violations=e["violations"] as? List<*>?:throw ApiFailure("invalid_server_response");for(v in violations){val q=Wire.obj(v,setOf("field","reason"));if((q["field"] as? String).isNullOrEmpty()||(q["reason"] as? String).isNullOrEmpty())throw ApiFailure("invalid_server_response")}}
+        throw ApiFailure(if(status==401)"session_expired"else code)
+    }
+    suspend fun request(path:String,method:String="GET",body:JSONObject?=null,authenticated:Boolean=true,accessToken:String?=null,groupExpected:Int?=null,groupRequest:String?=null):Any=withContext(Dispatchers.IO){
         val connection=URL(endpoint+path).openConnection() as HttpsURLConnection
         try {
             var primary:Throwable?=null
@@ -28,12 +39,12 @@ class Auth(val endpoint:String,private val preferences:Preferences) {
             connection.instanceFollowRedirects=false;connection.requestMethod=method;connection.connectTimeout=15000;connection.readTimeout=15000;connection.useCaches=false;connection.setRequestProperty("Content-Type","application/json")
             if(authenticated){val token=accessToken?:session?.accessToken?:throw ApiFailure("session_expired","Session expired");connection.setRequestProperty("Authorization","Bearer "+token)}
             if(body!=null){connection.doOutput=true;val bytes=body.toString().toByteArray(Charsets.UTF_8);connection.setFixedLengthStreamingMode(bytes.size);connection.outputStream.use {it.write(bytes)}}
-            val status=connection.responseCode;if(status==204)return@withContext emptyMap<String,Any>()
+            val status=connection.responseCode;if(groupExpected!=null && status>=500)throw ApiFailure("connection_unavailable");if(groupExpected!=null && (connection.getHeaderField("Cache-Control")!="no-store" || status in 200..299 && status!=groupExpected))throw ApiFailure("invalid_server_response");if(status==204)return@withContext emptyMap<String,Any>()
             if(status in 300..399 || connection.contentType?.matches(Regex("(?i)application/json(?:\\s*;.*)?"))!=true)throw ApiFailure("invalid_server_response","Invalid server response")
             val output=java.io.ByteArrayOutputStream();val stream=if(status in 200..299)connection.inputStream else connection.errorStream
             (stream?:throw ApiFailure("connection_unavailable","Connection unavailable")).use{val buffer=ByteArray(8192);while(true){val n=it.read(buffer);if(n<0)break;if(output.size()+n>1048576)throw ApiFailure("invalid_server_response","Invalid server response");output.write(buffer,0,n)}}
             val raw=Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(output.toByteArray())).toString();val result=Wire.parse(raw,1048576)
-            if(status !in 200..299){val code=((result as? Map<*,*>)?.get("error") as? Map<*,*>)?.get("code") as? String;throw ApiFailure(if(status==401 && code=="AUTH_INVALID_CREDENTIALS")"invalid_credentials" else if(status==401)"session_expired" else code?:"request_failed",if(status==401 && code=="AUTH_INVALID_CREDENTIALS")"Invalid username or password" else if(status==401)"Session expired" else code?:"Request failed")};result
+            if(groupExpected!=null){val correlated=Wire.obj(result,if(status in 200..299)if(path.startsWith("/v1/conversations?"))setOf("requestId","items","hasMore","next")else setOf("requestId","conversationId","addedMemberUserIds","createdAt")else setOf("requestId","error"));if(correlated["requestId"]!=groupRequest)throw ApiFailure("invalid_server_response")};if(groupExpected!=null && status !in 200..299)groupError(result,status,groupRequest,method=="GET");if(status !in 200..299){val code=((result as? Map<*,*>)?.get("error") as? Map<*,*>)?.get("code") as? String;throw ApiFailure(if(status==401 && code=="AUTH_INVALID_CREDENTIALS")"invalid_credentials" else if(status==401)"session_expired" else code?:"request_failed",if(status==401 && code=="AUTH_INVALID_CREDENTIALS")"Invalid username or password" else if(status==401)"Session expired" else code?:"Request failed")};result
             }catch(error:Throwable){primary=error;throw error}
             finally{try{connection.disconnect()}catch(cleanup:Throwable){val original=primary;if(original==null)throw cleanup;if(cleanup!==original)original.addSuppressed(cleanup)}}
         }catch(error:Exception){

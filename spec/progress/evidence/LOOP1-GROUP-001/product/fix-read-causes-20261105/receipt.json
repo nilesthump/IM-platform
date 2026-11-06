@@ -1,0 +1,391 @@
+{
+  "task": "LOOP1-GROUP-001",
+  "kind": "Fresh Fix, local evidence; not independent acceptance",
+  "finding": "EH-4733-P2-001",
+  "base": "4733e898dab1e26ede0cdb546fb168bb0682536d",
+  "branch": "task/LOOP1-GROUP-001-resume",
+  "writer": "/root/completion_coordinator/fix_4733_read_causes",
+  "scope": "One Web product file, existing group regression, recovery metadata; no runtime/GUI operations",
+  "minimality": "Builtin AggregateError locally retains read/report/final-observer failures. No generic framework, dependency, UI, contract or native change. Exact single thrown values and handled known errors retain existing behavior.",
+  "archive": [
+    {
+      "source": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\spec\\tasks\\active\\LOOP1-GROUP-001.md",
+      "archive": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\previous-task.md",
+      "sha256": "7951b08be7caf29518b622dca972b0161e2eedfab5acab1ae6904a0a18d295fe"
+    },
+    {
+      "source": "H:\\.codex\\worktrees\\g-8802\\IM-platform\\spec\\progress\\current.md",
+      "archive": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\previous-current.md",
+      "sha256": "d3754ef5340e353d750b713186411b47420dc41462445a10d8ff75c6dc3dae4b"
+    }
+  ],
+  "local_checks": {
+    "baseline": [
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "tools/verify_frozen_architecture.py"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-4733e898",
+        "exit": 0,
+        "seconds": 0.48400000000401633,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-0.stdout",
+          "sha256": "05640286aee656960091d45bd67f2cd2be6c8a9877f0cdc6c6824e8a6b07a38e"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-0.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "ci/check_s2_planning.py"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-4733e898",
+        "exit": 0,
+        "seconds": 1.235000000000582,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-1.stdout",
+          "sha256": "3df1e5253d74266b23647092f1519cf9376fb83445dd70df9bf0e01569fcc43f"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "ci/check_architecture.py",
+          "--scope",
+          "all",
+          "--json"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-4733e898",
+        "exit": 0,
+        "seconds": 2.0469999999986612,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-2.stdout",
+          "sha256": "c3d741c1af74259642cc9ae2b1fc1e786c10c2c595e7a2364072c1a1bf5f2cb6"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-2.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/architecture"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-4733e898",
+        "exit": 0,
+        "seconds": 18.875,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-3.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-3.stderr",
+          "sha256": "3c82bc15cd55c91e6aee170b687cfe35725bb9eae56e223f1c84e814d3c6b79c"
+        }
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/ci"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-4733e898",
+        "exit": 0,
+        "seconds": 9.889999999999418,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-4.stdout",
+          "sha256": "92c2b8c43bdb71a6e4ccb5c062e9afd9992fa86eee07cb3c1d4a543c1e687b52"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\baseline-4.stderr",
+          "sha256": "8fe5c980145a9d7499e33ad9e86ce66bce1415b2b9f9f20759ff75aa47291198"
+        }
+      }
+    ],
+    "red": [
+      {
+        "argv": [
+          "H:/node.js/node.exe",
+          "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\desktop\\node_modules\\typescript\\bin\\tsc",
+          "--strict",
+          "--target",
+          "ES2022",
+          "--module",
+          "commonjs",
+          "--moduleResolution",
+          "node",
+          "--lib",
+          "ESNext,DOM,DOM.Iterable",
+          "--rootDir",
+          "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients",
+          "--outDir",
+          "H:\\.codex\\toolchains\\client-gui\\tmp\\fix-read-causes-1105\\red",
+          "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\web\\src\\application\\client.ts"
+        ],
+        "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "exit": 0,
+        "seconds": 1.0780000000013388,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\red-0.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\red-0.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "argv": [
+          "H:/node.js/node.exe",
+          "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\run-regression.cjs",
+          "H:\\.codex\\toolchains\\client-gui\\tmp\\fix-read-causes-1105\\red"
+        ],
+        "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "exit": 1,
+        "seconds": 0.21899999999732245,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\red-1.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\red-1.stderr",
+          "sha256": "5dbf90611ac7bb9ce876e9fa6c8cab5ceb9f87579db6609ff2ff772d73db0412"
+        }
+      }
+    ],
+    "green": [
+      {
+        "argv": [
+          "H:/node.js/node.exe",
+          "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\desktop\\node_modules\\typescript\\bin\\tsc",
+          "--strict",
+          "--target",
+          "ES2022",
+          "--module",
+          "commonjs",
+          "--moduleResolution",
+          "node",
+          "--lib",
+          "ESNext,DOM,DOM.Iterable",
+          "--rootDir",
+          "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients",
+          "--outDir",
+          "H:\\.codex\\toolchains\\client-gui\\tmp\\fix-read-causes-1105\\green",
+          "H:\\.codex\\worktrees\\g-8802\\IM-platform\\clients\\web\\src\\application\\client.ts"
+        ],
+        "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "exit": 0,
+        "seconds": 0.9530000000013388,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\green-0.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\green-0.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "argv": [
+          "H:/node.js/node.exe",
+          "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\run-regression.cjs",
+          "H:\\.codex\\toolchains\\client-gui\\tmp\\fix-read-causes-1105\\green"
+        ],
+        "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "exit": 0,
+        "seconds": 0.13999999999941792,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\green-1.stdout",
+          "sha256": "2e23199542b517d0e0877e2013241054d2ee40a38ea6b032bccea3a6d48a7416"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\green-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ],
+    "units": [
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "tests/clients/group/verify.py"
+        ],
+        "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "exit": 0,
+        "seconds": 7.046999999998661,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\units-0.stdout",
+          "sha256": "283dbc04298142cea7ff578498348ad1ceff87b5c26145569e6ce29612b3fa39"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\units-0.stderr",
+          "sha256": "62d4e1081602399ae46afd4288aceea76e22ceb7d56db3e2134572fd616d8051"
+        }
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "tests/clients/i18n/verify.py"
+        ],
+        "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+        "exit": 0,
+        "seconds": 3.8439999999973224,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\units-1.stdout",
+          "sha256": "c0bed87d992cd20619d799d8af6495cfa4e08aa4fc2e2fdc6dee8add901a3f59"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\units-1.stderr",
+          "sha256": "6f5a71068d124fc87f18bf1d571739e07018085c4076f85c65cd9e0bb42f21d3"
+        }
+      }
+    ],
+    "snapshot": [
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "ci/check_architecture.py",
+          "--scope",
+          "all",
+          "--json"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\source-snapshot",
+        "exit": 0,
+        "seconds": 1.75,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\snapshot-0.stdout",
+          "sha256": "c3d741c1af74259642cc9ae2b1fc1e786c10c2c595e7a2364072c1a1bf5f2cb6"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\snapshot-0.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "tests/clients/web/verify.py"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\source-snapshot",
+        "exit": 0,
+        "seconds": 17.04699999999866,
+        "stdout": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\snapshot-1.stdout",
+          "sha256": "f86628e596cb4f77b1c43b8e1ecd879b798c8a5b490c6442f101e1ebcbd425ef"
+        },
+        "stderr": {
+          "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\snapshot-1.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ]
+  },
+  "prior_bounded_evidence": {
+    "regular4733": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-regular-4733-1105\\report.json",
+      "sha256": "5765530dcb0998ee79fcae44088474128a3743bf3e27562bbbca20f93166397c"
+    },
+    "error4733": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-4733-1105\\report.json",
+      "sha256": "1f6025ee983139adbbdb0ea4f9b75f2c2b00aa2e8250c75ca6006e31676ad874"
+    },
+    "independentProbe": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-4733-1105\\probe.json",
+      "sha256": "b6c6b0a88caaf6d3b7392a0ca99598ca00e6f11b758b45f21550796ebdd97a00"
+    },
+    "control4733": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\coordinator-1105\\control-4733-1105.json",
+      "sha256": "5ae57ab6065efae0a1c6944ba28453cd0586050a88f5fe317a7f5b05f359905e"
+    },
+    "nativeBackend4733": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\coordinator-1105\\native-backend-binding-4733e898.json",
+      "sha256": "5055f10c606c86098e1a2abd0d1a58730bb5329d84654ab2a6fbc9178544e088"
+    },
+    "webRuntime4733": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\web-confirmed-runtime-1105\\final-receipt.md",
+      "sha256": "6369dc43f939cc2673bf6a078474705bdef9854bc0ddf8cd1b840f9316c72d38"
+    },
+    "webRuntimeManifest": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\web-confirmed-runtime-1105\\verified-runtime-evidence.json",
+      "sha256": "e51780591b06199b2dc10219cc719207ba9451c47c6457c5d3311075845d658f"
+    },
+    "windowsRetryUI4733": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\windows-final-retry-1105\\ui-receipt.json",
+      "sha256": "9a9613112a2d59fc46bfb0b62bfbe0039e212b07665087a3ca66a589c7aed5d0"
+    },
+    "windowsRetryBackend": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\windows-final-retry-1105\\backend-receipt.json",
+      "sha256": "ac84883e57d77d65cdd5e2749a887098194276de2dc3175ad51dd7a498baca2c"
+    },
+    "androidRuntime": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\android-final-runtime-1105\\runtime\\acceptance-index.json",
+      "sha256": "33914111da5a731b21b75c33763d0405af7b449e6c27f3f072c42b92930421f3"
+    },
+    "androidArchitect": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\architect-android-1105\\report.json",
+      "sha256": "56fc604c2c30519de25095e411a2b2d6f7fd29013f295eeccc4b9dee8d88b5a6"
+    },
+    "androidCleanupAudit": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\root-1105\\android-cleanup-audit.json",
+      "sha256": "408007bcfe904c862b73331a44269f52ac5503f7c2757c84af4af4d4d4a3091b"
+    },
+    "architect4733": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\architect-final-4733\\report.json",
+      "sha256": "226283f801bd4bd2fdbe9ef8fcef8a2a0237748814ab78c10efbb669be218087"
+    },
+    "acceptanceDiscovery": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\root-1105\\acceptance-discovery-map.json",
+      "sha256": "ff3401feb128066fc1e709258e46bd59f4b7407b86845f15c81b6deac9df775c"
+    },
+    "g06g07Discovery": {
+      "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\root-1105\\g06-g07-final-discovery.json",
+      "sha256": "1e4e352de7a476300d503b28b2b7e0d754c13864f7c4efb9867060f1665ed4f3"
+    }
+  },
+  "source_snapshot": {
+    "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-read-causes-1105\\snapshot-binding.json",
+    "sha256": "9b089eca4a981615e48e13ed2893c6640558ccd4760fd4fdfda88058153d0089"
+  },
+  "limitations": [
+    "Prior bounded runtime/Architect/source reviews do not accept this future SHA; coordinator must rebind affected evidence and renew both fresh source reviews.",
+    "Current supplemental Windows/Web G06 before-forward and full G01-G09 independent acceptance remain open.",
+    "Initial baseline launch PermissionError is recorded; approved retry actual five checks passed.",
+    "Recorder prospective_resume is incomplete (direct reads/edits/helper authoring); honest finish FAIL and validation receipt follow externally.",
+    "No hosted CI/integration/actual-main/safe sync performed; main780+2 unknown untouched."
+  ],
+  "postcommit": "External fix-read-causes-1105/commit.json records exact committed SHA/status; recorder-final.json records actual instrumentation closure."
+}

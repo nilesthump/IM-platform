@@ -1,0 +1,281 @@
+{
+  "task": "LOOP1-GROUP-001",
+  "base": "51f0f714c065dd1056f97d203b06ad31db292137",
+  "fix": "EH51-P2-001",
+  "scope": "One existing native group transport predicate; real compiled chain regression. No native/shared/contract changes.",
+  "reason": "Current Workspace group signals cannot be cancelled by an owner; only exact NativeTransportFailure is known transport. Unknown DOM and real cancellation propagate.",
+  "review_input": {
+    "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-51-1031\\final-report.json",
+    "sha256": "04111eb2ee12afdfe10c8f01fbde1d7b24d8ba642a3c35f4a67c8fc4ed6a95fc",
+    "result": "FAIL_EH51-P2-001",
+    "initial_PASS": "superseded preserved"
+  },
+  "external": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031",
+  "results": {
+    "frozen_baseline": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\frozen_baseline.json",
+      "sha256": "1a24adbe877e84b1229955642a7ce8974003021185c9ffb7400b87111549eba0",
+      "label": "frozen_baseline",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "exit": 0,
+      "elapsed": 0.578,
+      "log_sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989"
+    },
+    "planning_baseline": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\planning_baseline.json",
+      "sha256": "28f9843495559413e769fd9e131ad5ddc77bb9edcfa685cde6f65a73bc5a9fc7",
+      "label": "planning_baseline",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_s2_planning.py"
+      ],
+      "exit": 0,
+      "elapsed": 0.469,
+      "log_sha256": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426"
+    },
+    "architecture_baseline": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\architecture_baseline.json",
+      "sha256": "9e792f4b28effa4de22b2da492ac97ebbb8223e9acd6743f08001ddfac1dd5ab",
+      "label": "architecture_baseline",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_architecture.py",
+        "--scope",
+        "all",
+        "--json"
+      ],
+      "exit": 1,
+      "elapsed": 6.438,
+      "log_sha256": "f57ab5a788ee6b7701842f6c12bbcf5945862222a3c39b21b5279ae8958e33e1"
+    },
+    "architecture_tests_baseline": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\architecture_tests_baseline.json",
+      "sha256": "b84c46d25eff41c19e99e9693b00f6ef57b6f7c2d57966231bae63a0fe6af64e",
+      "label": "architecture_tests_baseline",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/architecture"
+      ],
+      "exit": 1,
+      "elapsed": 30.484,
+      "log_sha256": "5bef42f0f8da4fb22e6dc6b1d61226ea17450475ac0486aa4e2928d53d38ad1d"
+    },
+    "ci_baseline": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\ci_baseline.json",
+      "sha256": "799911e7048c85be0062c1a150e109b83743aac68e09d1c316bca22ab88dc256",
+      "label": "ci_baseline",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci"
+      ],
+      "exit": 0,
+      "elapsed": 7.687,
+      "log_sha256": "03236fc84a85764daf66ec9478d91c62c9e26145434e30ecf25b8bd6eb9ec454"
+    },
+    "group_baseline": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\group_baseline.json",
+      "sha256": "edebb17c5f0d03abfeb73935e0989195b249fb5796a1396b1d8c2d3886865066",
+      "label": "group_baseline",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "exit": 1,
+      "elapsed": 2.641,
+      "log_sha256": "7a67a71d646ffe5599c47f13041c1b3d30223aae3aa323b1e9a919bebcd2acfb"
+    },
+    "group_baseline_retry": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\group_baseline_retry.json",
+      "sha256": "163645702c6b983050c1e1baffeb973d02f453b154bc85c2dfea9de9e38bb666",
+      "label": "group_baseline_retry",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "exit": 0,
+      "elapsed": 8.422,
+      "log_sha256": "c1504adb39448efd88a1abda61fd1688df41b86462cb9c68839b75a9a3e1a0d3"
+    },
+    "group_red": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\group_red.json",
+      "sha256": "d4f9e1da83f229db5f2bd71771a3c3bb2e44be8edc97bb1aca55eaf9f481ddf4",
+      "label": "group_red",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "exit": 1,
+      "elapsed": 5.484,
+      "log_sha256": "5bf24d5c9611f8da1379c9baae3a466ba99eba7ee45047239e2cd3c37c682bcf"
+    },
+    "group_green": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\group_green.json",
+      "sha256": "a5bfe6523d665b2a190f4e2a7eef5d5852093cdedd982258343c972da8a1a55d",
+      "label": "group_green",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tests/clients/group/verify.py"
+      ],
+      "exit": 0,
+      "elapsed": 7.969,
+      "log_sha256": "cc16c64c1a2ae829662e7c3aef1e5be6032bc521551e5c2cc99c04d2cd6f617f"
+    },
+    "probe_red": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\probe_red.json",
+      "sha256": "6dbd71cd7f3a0457cd6df8e8035536ddf670b7174f757ee32a2e6e2982f733b3",
+      "label": "probe_red",
+      "command": [
+        "node",
+        "C:/Users/21441/.codex/visualizations/2026/10/23/01a16733-cff1-7573-ad3b-65f45068986a/group-completion-20261025/fix-native-dom-1031/native-dom-probe.cjs"
+      ],
+      "exit": 1,
+      "elapsed": 0.734,
+      "log_sha256": "edcdc2804fedb2621d58b3d5a00355aa212447010b4b5dc743bb61b66e8feed1"
+    },
+    "probe_green": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\probe_green.json",
+      "sha256": "0ed742ea0893b4f80b46bfae05f6c9f73be3a47d3aab7cd307d5a914ed944db9",
+      "label": "probe_green",
+      "command": [
+        "node",
+        "C:/Users/21441/.codex/visualizations/2026/10/23/01a16733-cff1-7573-ad3b-65f45068986a/group-completion-20261025/fix-native-dom-1031/native-dom-probe.cjs"
+      ],
+      "exit": 0,
+      "elapsed": 6.016,
+      "log_sha256": "b8682f828337c527bae1248f930b6247c0786b1d9d15b5cafe1ce6efa5a22c17"
+    },
+    "react_green": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\react_green.json",
+      "sha256": "40de6a4186a76236c589014e69cc098f52075d1b3429bee11c8ef99fc6f79844",
+      "label": "react_green",
+      "command": [
+        "node",
+        "tests/clients/group/desktop-picker.cjs",
+        "H:/.codex/worktrees/g-8802/IM-platform",
+        "H:/.codex/worktrees/g-8802/IM-platform/clients/desktop/node_modules",
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright",
+        "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+      ],
+      "exit": 0,
+      "elapsed": 8.641,
+      "log_sha256": "70b38767050c7eee87626c53058664c82da46d5b237fdaef0817949ee6c22569"
+    },
+    "frozen_final": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\frozen_final.json",
+      "sha256": "9f3be147270b9b0e1676e9fb31e9f593a57305f929dd9d5dd6380698e1bcfce7",
+      "label": "frozen_final",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "tools/verify_frozen_architecture.py"
+      ],
+      "exit": 0,
+      "elapsed": 0.281,
+      "log_sha256": "74a9920ae5bd83d694d654231231b7a74b66bd47bf05de9b45cb6dabd7d39989"
+    },
+    "planning_final": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\planning_final.json",
+      "sha256": "bf49646332e4d78c034e90336c98a0f8cb68a239abf045ab3e9631f9fbe4aad5",
+      "label": "planning_final",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "ci/check_s2_planning.py"
+      ],
+      "exit": 0,
+      "elapsed": 0.266,
+      "log_sha256": "da25c57ead20198d302d441479af13535190171558bf1ce64e4ad5df729ed426"
+    },
+    "ci_final": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\ci_final.json",
+      "sha256": "c5f2daf8652bd36fd93279a6b2ede3ac11906f232bcd159e612c1648ec3db067",
+      "label": "ci_final",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+        "-Xutf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/ci"
+      ],
+      "exit": 0,
+      "elapsed": 8.234,
+      "log_sha256": "24bcf6609f54760482f946e8db05734015988a0ab563cd91a23fa0db83f98724"
+    },
+    "control_final": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\control_final.json",
+      "sha256": "da11f46da26bc3a212ca97c8d89faff34f81d1ea7d0827ff4ca6c0714f7f034d",
+      "label": "control_final",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit": 1,
+      "elapsed": 33.672,
+      "log_sha256": "041b3095e304ab8e53d600e74f3e743d869a29e15434dc6fdbf59a4ddbe187a1"
+    },
+    "control_retry": {
+      "receipt": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-native-dom-1031\\control_retry.json",
+      "sha256": "5409cf1fa835de39e0def6a1b2d28441dfb4cbdcd4544cab88ce8483d1e9aaf6",
+      "label": "control_retry",
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "exit": 1,
+      "elapsed": 30.734,
+      "log_sha256": "62a44f60601abc75028b793fe3e0de58652b4d19e77af9a542d3f196e52c59ad"
+    }
+  },
+  "source_sha": "bound after clean commit in external commit-binding.json",
+  "native_build": "after source commit; external package-binding.json if successful; no install",
+  "regular_review": "NEW PENDING",
+  "error_review": "NEW DIFFERENT PENDING",
+  "acceptance": "NOT ACCEPTED; runtime/Architect/hosted/integration/main-sync pending",
+  "main_sha": "3d30872d3d18c55fa8156a5ce1133281ffaa4e7e",
+  "main_sync": "PENDING",
+  "recorder": "prospective_resume partial; honest FAIL planned, final receipt records actual finish/validate; startup/direct reads/helper edits and initial command overlap disclosed",
+  "writer": "/root/completion_coordinator/fix_native_dom_1031",
+  "preserved_helper_failure": "recovery.py initial direct write was denied PermissionError; exact authorized escalation succeeded; no partial product edit."
+}

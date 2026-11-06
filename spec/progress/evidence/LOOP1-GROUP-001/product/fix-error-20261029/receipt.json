@@ -1,0 +1,72 @@
+{
+  "base": "93f2eb7825b219566ad50456bef89e8de746cd5d",
+  "actor": "/root/completion_coordinator/fix_eh93",
+  "sourceSHA": "the commit containing this receipt; external commit-binding.json records exact SHA after commit",
+  "result": "local regression complete; both new independent reviews required",
+  "sourceFiles": {
+    "clients/desktop/src/application/ui/workspace.ts": "eabb77ccb87be951cabe8a0cca6014becdc804f26ca32fa259790dd5fc9c5189",
+    "tests/clients/group/desktop.cjs": "c0f57949c47029c7318e1a86279bd4b099099470d6912f0c105417941f375527",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/group/GroupRuntimeInstrumentation.kt": "aaacfa0d1eb159c5111b83f28f9ca54cb52a43431a9248abb828e082acf0ed63",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/group/FriendLoadInstrumentation.kt": "55cb5dc087f858eac5572dfd729163674f8e94b37d0e089bd5c475e1055f70d6",
+    "clients/mobile/app/src/androidTest/kotlin/im/platform/client/group/CleanupInstrumentation.kt": "e2187dcc142d9b10c63dc469fea9ddb0232807db3296468b5f0844a3e7289d22"
+  },
+  "specialistFindingAuthority": {
+    "path": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\final-error-93-1029\\report.json",
+    "sha256": "d09ada3fe11133c7ba7398157758f42ae0c016f51d6b25d184b31934ecee0162",
+    "result": "FAIL; two P2"
+  },
+  "desktop": {
+    "command": "python -Xutf8 -B tests/clients/group/verify.py",
+    "red": "exit1: loading !== error using actual compiled Workspace",
+    "green": "exit0: known/unknown GET failure terminates loading; GET-only recovery; generation/owner/revision isolation; observer dual-cause; retained Web/Desktop group assertions"
+  },
+  "android": {
+    "serial": "emulator-5590",
+    "avd": "im_group_g8802",
+    "api": 34,
+    "selinux": "Enforcing",
+    "apkSHA256": "bd5bf36f39354f95819794debde42042f429fc4d7661390cf7428bc3020380bf",
+    "checks": [
+      {
+        "runner": "CleanupInstrumentation",
+        "buildSeconds": 12.375,
+        "testApkSHA256": "ab68553642ab7b33297b14051be001552eee9ebd6a1228d51a4fb5f050127b3e",
+        "result": "PASS",
+        "runtimeSeconds": 0.734,
+        "output": "INSTRUMENTATION_RESULT: result=PASS\nINSTRUMENTATION_RESULT: scope=two actual harness reporting/finally paths: success, primary, cleanup, dual; scope cancellation still closes repository\nINSTRUMENTATION_CODE: -1\n"
+      },
+      {
+        "runner": "FriendLoadInstrumentation",
+        "buildSeconds": 11.375,
+        "testApkSHA256": "aaf5cbef1916dff4085baa333fa7c75bcaee27ace3ad90b7a4d7cd3191a6250d",
+        "result": "PASS",
+        "runtimeSeconds": 1.0,
+        "output": "INSTRUMENTATION_RESULT: result=PASS\nINSTRUMENTATION_RESULT: scope=actual VM.add PUT then GET, terminal error, GET-only empty recovery, unknown propagation; controlled transport, not TLS acceptance\nINSTRUMENTATION_CODE: -1\n"
+      }
+    ],
+    "limits": "Controlled failures and transport; no new TLS/product GUI acceptance"
+  },
+  "actualFixtureFault": {
+    "red": "actual GroupRuntime read EISDIR held in Bundle then nonempty-directory cleanup crash loses primary",
+    "green": "actual GroupRuntime reports EISDIR primary and suppressed cleanup failure, RESULT_CANCELED/FAIL",
+    "fixtureRestoredAbsent": true
+  },
+  "evidenceRoot": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-eh93-1029",
+  "evidenceFiles": {
+    "red-group-receipt.json": "1c2dd7a2519e927bd02734faf6180c7a8552ef1e9166599aa08b010a8ee4cd92",
+    "green-group-receipt.json": "658c075b96161b2e0a3be39bb8e903f3c2672294b721a1b96ecfc69d5c4aee0f",
+    "android-checks.json": "3efa012772a42c365aa299e926e07aca9642a6caf1b5e4b4993b56f6eec7e26d",
+    "red-group-runtime.txt": "f3ca40e0a3bf20eaf9ab861db129a85ecafc52160588fc2089c7bb0239bc1d94",
+    "red-group-logcat.txt": "15eeead3848a11a8587d7cf07670231889c3605ee7eb0d1d44a668c23d705031",
+    "green-group-runtime.txt": "f7481fa0f6cc9f9c3ee59f3041af26ccf39ec4573e629b231f0f349c8570a1ed",
+    "CleanupInstrumentation-result.txt": "813d9d42ac595fea3c26b57b60f6df32a1133f20480686c2ef31b9e4b7e07ac1",
+    "FriendLoadInstrumentation-result.txt": "97c216184271d21c97992ecf308f674835e39239364a921624d09f6422ff03e2"
+  },
+  "limitations": [
+    "No new TLS/Windows acceptance",
+    "No architecture/contracts/native/backend/production Android changes",
+    "Recorder is partial; startup/direct reads/helper edits/commit tail not complete prospective trace",
+    "Original reviewer probe was executed before its output side effect was noticed; it rewrote its desktop-friends-observed.json with the same observed failed state. It is not claimed immutable by this run; no reviewer report was edited.",
+    "Desktop package pending after commit; exact-source native runtime/hosted CI/integration/main sync still required"
+  ]
+}

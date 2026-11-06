@@ -8,9 +8,9 @@ export async function verifyScheduling(root,out,ts,loaded){
  const stripped=source.replace(/^import .*;\r?\n/gm,'');
  const js=ts.transpileModule(stripped,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022}}).outputText;
  class NativeCapabilityFailure extends Error {}
- const fixture={NativeCapabilityFailure,ApiFailure:class extends Error {},WireFailure:class extends Error {},SyncFailure:class extends Error {},SendStorageFailure:class extends Error {}};globalThis.__i18nScheduling=fixture;
+ const fixture={NativeCapabilityFailure,GroupFailure:class extends Error {},ApiFailure:class extends Error {},WireFailure:class extends Error {},SyncFailure:class extends Error {},SendStorageFailure:class extends Error {}};globalThis.__i18nScheduling=fixture;
  const filename=join(out,'scheduling-workspace.mjs');
- writeFileSync(filename,'const {language,appearance,trayText,defaults,translate,validLocale,NativeCapabilityFailure,ApiFailure,WireFailure,SyncFailure,SendStorageFailure}=globalThis.__i18nScheduling;\n'+js);
+ writeFileSync(filename,'const {language,appearance,trayText,defaults,translate,validLocale,NativeCapabilityFailure,GroupFailure,ApiFailure,WireFailure,SyncFailure,SendStorageFailure}=globalThis.__i18nScheduling;\n'+js);
  const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b});return{promise,resolve,reject}};
  const tick=()=>new Promise(r=>setImmediate(r));
  const initial=deferred(),save=deferred(),calls=[],disk=[];

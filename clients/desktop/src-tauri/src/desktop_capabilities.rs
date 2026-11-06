@@ -96,7 +96,7 @@ pub fn setup(app:&mut tauri::App)->Result<(),Box<dyn std::error::Error>>{
     let menu=tauri::menu::Menu::with_items(app,&[&open,&hide,&quit])?;
     app.manage(TrayPresentation{open,hide,quit});
     let icon=app.default_window_icon().ok_or("Application icon unavailable")?.clone();
-    tauri::tray::TrayIconBuilder::with_id("im-plus").icon(icon).tooltip("IM+ · Your workspace").menu(&menu).on_menu_event(|app,event|match event.id.as_ref(){"open"=>show(app),"hide"=>{if let Some(w)=app.get_webview_window("main"){w.hide().expect("Window hide failed");}},"quit"=>app.exit(0),_=>{}}).build(app)?;
+    tauri::tray::TrayIconBuilder::with_id("im-plus").icon(icon).tooltip("IM+ · Your workspace").menu(&menu).show_menu_on_left_click(false).on_tray_icon_event(|tray,event|{if matches!(event,tauri::tray::TrayIconEvent::Click{button:tauri::tray::MouseButton::Left,button_state:tauri::tray::MouseButtonState::Up,..}){show(tray.app_handle());}}).on_menu_event(|app,event|match event.id.as_ref(){"open"=>show(app),"hide"=>{if let Some(w)=app.get_webview_window("main"){w.hide().expect("Window hide failed");}},"quit"=>app.exit(0),_=>{}}).build(app)?;
     Ok(())
 }
 

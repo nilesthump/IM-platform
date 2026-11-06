@@ -349,6 +349,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python3 -B -m unittest discover -s tests/contract -p test_sync_transport.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python3 -B tests/clients/group/verify.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python3 -B contracts/http/verify-group.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python3 -B -m unittest discover -s tests/contract/group -p "test_*.py" -v

@@ -1,0 +1,148 @@
+{
+  "task": "LOOP1-GROUP-001",
+  "fixer": "/root/completion_coordinator/fix_metadata_647_1105",
+  "scope": "metadata only; no self acceptance",
+  "base": "647e2f029ac39fa2b647408940fae626e658b93d",
+  "product_source": "de88cf326c520801693480e193cbd50dee9b0853",
+  "finding": "REG-647E-P2-001",
+  "change": "Restore exact checker-required current sections and Task Handoff/Next Action; refresh bounded evidence/authorization/ownership facts without changing acceptance.",
+  "before": [
+    {
+      "path": "spec/progress/current.md",
+      "archive": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-recovery-headings-1105\\before-current.md",
+      "sha256": "f2e576c51e14022ad7e4a5218bc9cbee1b676e1e4461cd886c195b0da2229e4f",
+      "bytes": 4362
+    },
+    {
+      "path": "spec/tasks/active/LOOP1-GROUP-001.md",
+      "archive": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-recovery-headings-1105\\before-task.md",
+      "sha256": "3bdc531f8bfbb6b5d0a4ccf519d9fed34db9d84ababef658617d203b08e2b3d7",
+      "bytes": 40474
+    }
+  ],
+  "external_root": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025",
+  "evidence_sha256": {
+    "final-regular-647e-1105/report.json": "d487ab27cf6bfdbe9628e7d57870d4fc79f9c6aa860b0df29de1575887b0ea93",
+    "architect-windows-1105/report.json": "ed1e9292c3fbc12296f04133a31d3cb51eb92b9b26a1ec2b3482b41929431fda",
+    "android-final-runtime-1105/trust-approval-granted.json": "e843a6d887cc522a30cd3de3120dcc9b2bcec00944320f2166bbaeff22aee242",
+    "root-1105/v6-windows-trust.json": "7342cac6463800fb539cb92cb69d710f7e12d28eb42afb3b2552e63263866eee",
+    "coordinator-1105/backend-reuse-647e2f02.json": "68de1319ed1794a259600f7890232d92d145d8a0c6e40712593444214c893973",
+    "fix-web-runners-1105/final-receipt.json": "3e3da321af22394cef0fae590ea8c5c309172546dc5269dab77ab70d383178b9",
+    "windows-recover-1105/evidence-audit.json": "6a549c1e0389e85363bf877e7b71372e8294e26e72e460ae705c5465ddeeaf26",
+    "root-1105/runtime-before.json": "e70d7b168dcee734441b0535a42954900959886bf59efb037d39ec9031cad378",
+    "root-1105/runtime-created.json": "47a6ec1cd78f923b3d533604c2c71ed67edb4a0b2371dc114957f81e188f1764",
+    "root-1105/runtime-ready.json": "c41bf4e24137068c5edb272e5f878b123bf3033733a5fc2b5647124425c1bdc5"
+  },
+  "baseline": {
+    "source": "647e2f029ac39fa2b647408940fae626e658b93d",
+    "method": "Exact committed byte-verified snapshot, read-only inputs",
+    "checks": [
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "tools/verify_frozen_architecture.py"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-647e2f02",
+        "exit_code": 0,
+        "elapsed_seconds": 0.343,
+        "stdout": "baseline-0.stdout",
+        "stderr": "baseline-0.stderr"
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "ci/check_s2_planning.py"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-647e2f02",
+        "exit_code": 0,
+        "elapsed_seconds": 1.188,
+        "stdout": "baseline-1.stdout",
+        "stderr": "baseline-1.stderr"
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "ci/check_architecture.py",
+          "--scope",
+          "all",
+          "--json"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-647e2f02",
+        "exit_code": 0,
+        "elapsed_seconds": 1.719,
+        "stdout": "baseline-2.stdout",
+        "stderr": "baseline-2.stderr"
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/architecture"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-647e2f02",
+        "exit_code": 0,
+        "elapsed_seconds": 22.828,
+        "stdout": "baseline-3.stdout",
+        "stderr": "baseline-3.stderr"
+      },
+      {
+        "argv": [
+          "C:\\Users\\21441\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-Xutf8",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/ci"
+        ],
+        "cwd": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\arch-647e2f02",
+        "exit_code": 0,
+        "elapsed_seconds": 12.062,
+        "stdout": "baseline-4.stdout",
+        "stderr": "baseline-4.stderr"
+      }
+    ]
+  },
+  "verification": {
+    "actual_control_development": {
+      "command": [
+        "C:/Users/21441/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "H:\\.codex\\worktrees\\g-8802\\IM-platform\\tools\\verify-loop1-ctrl-002.ps1",
+        "-Mode",
+        "Development"
+      ],
+      "cwd": "H:\\.codex\\worktrees\\g-8802\\IM-platform",
+      "exit_code": 1,
+      "seconds": 31.141,
+      "mode": "Development; NOT acceptance",
+      "checker_sha256": "9d5d2e307738d34aad43fd51784dbb3dd6d0c8a6f644a84215c24060c9216db8",
+      "stdout_sha256": "9a74742f8e43642a39499e717750591b03ca531667e2b53781c88631a82a7fbb",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "raw_stdout": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-recovery-headings-1105\\control-development.stdout",
+    "raw_stderr": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-recovery-headings-1105\\control-development.stderr",
+    "interpretation": "All10 original recovery diagnostics eliminated. Whole unchanged Development checker still exit1 solely from architecture test seeing existing ignored Desktop dist/build outputs (3035 findings); source and generated artifacts untouched. This is not a Control PASS. Coordinator must run unchanged Acceptance on exact final committed snapshot.",
+    "baseline_tests": "88 architecture tests,1 existing skip;35 CI tests,4 existing skips. All five startup commands exit0 on exact647 committed snapshot."
+  },
+  "remaining": "Android/runtime/Architect/full G01-G09 binding, exact-head hosted, protected integration, actual-main and safe main sync; GROUP active/S2 OPEN",
+  "research": {
+    "root": "C:\\Users\\21441\\.codex\\visualizations\\2026\\10\\23\\01a16733-cff1-7573-ad3b-65f45068986a\\group-completion-20261025\\fix-recovery-headings-1105\\research",
+    "run_id": "R-FIX-RECOVERY-HEADINGS-1105",
+    "capture": "prospective_resume partial: direct startup/reads/helper authoring and summarized delegation prompt outside capture; finish FAIL honestly, validation separate",
+    "acceptance": false
+  }
+}
