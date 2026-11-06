@@ -295,6 +295,18 @@ Current Task State: active
         for secret in secrets:
             self.assertNotIn(secret, durable)
 
+    def test_short_sensitive_name_suffixes_are_redacted(self):
+        # The suffix guard previously ignored names shorter than six
+        # characters, leaving api_token/session_token/auth_token in clear.
+        structured = {"api_token": "SYNTHETIC_API_TOKEN_XY", "session_token": "SYNTHETIC_SESSION_XY",
+                      "auth_token": "SYNTHETIC_AUTH_XY", "safe_field": "SYNTHETIC_KEEP_XY"}
+        safe, changed = recorder.redact_value(structured)
+        self.assertTrue(changed)
+        self.assertEqual("[REDACTED]", safe["api_token"])
+        self.assertEqual("[REDACTED]", safe["session_token"])
+        self.assertEqual("[REDACTED]", safe["auth_token"])
+        self.assertEqual("SYNTHETIC_KEEP_XY", safe["safe_field"])
+
     def test_committed_repository_artifacts_validate(self):
         actual = Path(__file__).resolve().parents[2]
         recorder.cmd_validate_repository(self.ns(allow_partial=False), actual, actual / "research")
