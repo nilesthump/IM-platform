@@ -50,6 +50,14 @@ class PathMatrixTests(unittest.TestCase):
         for path in ("tools/verify_client_send.py", "tests/clients/send/desktop.mjs", "tests/clients/send/tls_fixture.py"):
             self.assert_jobs(path,expected)
 
+    def test_contract_suite_selects_shared_runner(self):
+        # The shared job is the only CI consumer of tests/contract; a
+        # contract-suite-only change previously selected zero CI jobs.
+        for path in ("tests/contract/test_sync_transport.py",
+                     "tests/contract/group/test_group.py",
+                     "tests/contract/group/test_verification_failures.py"):
+            self.assert_jobs(path, {"shared"})
+
     def test_deleted_send_fixture_still_runs_actual_checks(self):
         with tempfile.TemporaryDirectory() as temp:
             root=pathlib.Path(temp)
