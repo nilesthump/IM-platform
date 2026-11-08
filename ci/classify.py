@@ -31,6 +31,7 @@ def classify(paths):
             or parts[:2] in (["spec", "architecture"], ["spec", "handoff"],
                              ["spec", "tasks"], ["spec", "batches"],
                              ["spec", "acceptance"], ["spec", "governance"],
+                             ["spec", "domain"], ["spec", "invariants"],
                              ["tests", "architecture"], ["tools", "architecture"])
             or path.startswith("tools/verify-frozen-architecture")
             or path == "tools/verify_frozen_architecture.py"
