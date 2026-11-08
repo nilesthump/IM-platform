@@ -37,8 +37,11 @@ def classify(paths):
             or path.startswith("tools/verify-loop1-ctrl-")
             or path.startswith("tools/verify-loop1-min-")
         )
-        if parts[:3] in (["tests", "clients", "sqlite"], ["tests", "clients", "send"]) or path in {"tools/verify-client-sqlite.ps1", "tools/verify_client_sqlite.py", "tools/verify_client_send.py"}:
+        if parts[:3] in (["tests", "clients", "sqlite"], ["tests", "clients", "send"]) or path in {"tools/verify-client-sqlite.ps1", "tools/verify_client_sqlite.py", "tools/verify_client_send.py", "tools/verify_client_sync.py"}:
             selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
+        if parts[:3] == ["tests", "clients", "sync"]:
+            # go_smoke.py additionally runs directly inside the deploy job.
+            selected.update({"architecture", "desktop", "mobile", "shared", "compatibility", "deploy"})
         if parts[0] == "clients":
             selected.add("architecture")
         if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:
