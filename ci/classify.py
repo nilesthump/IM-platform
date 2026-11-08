@@ -41,6 +41,12 @@ def classify(paths):
             selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
         if parts[0] == "clients":
             selected.add("architecture")
+        if parts[:3] == ["tests", "clients", "web"]:
+            # The web job discovers the suite and web verify also runs in compatibility.
+            selected.update({"web", "compatibility"})
+        if parts[:3] == ["tests", "clients", "gui"]:
+            # gui/auth.mjs runs in desktop and gui/android.py runs in mobile.
+            selected.update({"desktop", "mobile"})
         if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:
             selected.update(JOBS)
         if governance:
