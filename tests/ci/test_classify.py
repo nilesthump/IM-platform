@@ -91,6 +91,12 @@ class PathMatrixTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assert_jobs(path, {"deploy"})
 
+    def test_sync_verifier_tools_select_their_actual_jobs(self):
+        # tools/verify_sync_transport.py runs in the shared job; the runtime
+        # verifier runs in the deploy job. Both were previously zero-selected.
+        self.assert_jobs("tools/verify_sync_transport.py", {"shared"})
+        self.assert_jobs("tools/verify_sync_runtime.py", {"deploy"})
+
     def test_e2e_paths_select_go_deploy_and_boundaries(self):
         for path in ("tests/e2e/go_tls_messaging.py", "tests/e2e/README.md"):
             with self.subTest(path=path):
