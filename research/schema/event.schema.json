@@ -1,16 +1,17 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:im-platform:research-recorder:event:1.0.0",
+  "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "seq", "timestamp", "run_id", "task_id", "role", "event_type", "data", "previous_event_hash", "event_hash"],
   "properties": {
     "schema_version": {"const": "1.0.0"},
     "seq": {"type": "integer", "minimum": 1},
     "timestamp": {"type": "string"},
-    "run_id": {"type": "string", "pattern": "^R-"},
+    "run_id": {"type": "string", "pattern": "^R-[A-Za-z0-9_.:-]+$"},
     "task_id": {"type": "string"},
     "role": {"enum": ["implementation", "review", "fix", "coordinator", "human", "ci", "bootstrap"]},
-    "event_type": {"type": "string"},
+    "event_type": {"type": "string", "enum": ["architecture_conflict", "ci_finished", "ci_started", "command_finished", "command_started", "external_blocker", "finding_created", "git_state_observed", "human_decision", "instrumentation_warning", "model_metadata", "prompt_registered", "repair_finished", "repair_started", "review_finished", "review_started", "run_finished", "run_started", "task_state_observed", "test_result", "verification_result"]},
     "data": {"type": "object"},
     "previous_event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
