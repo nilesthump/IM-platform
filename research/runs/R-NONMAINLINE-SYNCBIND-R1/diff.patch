@@ -1,0 +1,37 @@
+diff --git a/tools/verify_sync_runtime.py b/tools/verify_sync_runtime.py
+index 123e31a3..bc5ce351 100644
+--- a/tools/verify_sync_runtime.py
++++ b/tools/verify_sync_runtime.py
+@@ -133,8 +133,18 @@ def main():
+                 INSERT INTO user_sync_events(user_id,event_type,payload) VALUES('{users[0][0]}','session.revoked','{{}}');
+                 END $$;""")
+             ws = harness.WS(context, port)
+-            ws.send(harness.frame("auth.bind", {"accessToken": users[0][1]}))
+-            require(ws.read()["payload"]["status"] == "bound", "WSS authentication failed")
++            # The bind acknowledgment is correlated like every other frame in
++            # this file; an unsolicited bound-looking frame is not evidence of
++            # an authenticated socket.
++            bind = harness.frame("auth.bind", {"accessToken": users[0][1]})
++            ws.send(bind)
++            for _ in range(10):
++                ack = ws.read()
++                if ack["type"] == "auth.ack" and ack["requestId"] == bind["requestId"]:
++                    require(ack["payload"]["status"] == "bound", "WSS authentication failed")
++                    break
++            else:
++                raise AssertionError("Bind acknowledgment missing")
+             for i in range(205):
+                 frame = harness.frame("message.send", {"conversationId": conversation, "content": {"kind": "TEXT", "text": "sync " + str(i)}})
+                 ws.send(frame)
+
+# Untracked paths observed; content intentionally not captured
+# ?? research/prompts/P-NONMAINLINE.SYNCBIND.R1/metadata.json
+# ?? research/prompts/P-NONMAINLINE.SYNCBIND.R1/prompt.txt
+# ?? research/runs/R-NONMAINLINE-SYNCBIND-R1/blobs/C-2b0677d4-0069-432e-b05f-ed449b2ceec1.stderr.txt
+# ?? research/runs/R-NONMAINLINE-SYNCBIND-R1/blobs/C-2b0677d4-0069-432e-b05f-ed449b2ceec1.stdout.txt
+# ?? research/runs/R-NONMAINLINE-SYNCBIND-R1/blobs/C-93b3f73c-b8e3-4d1c-a2e5-7196546e81f2.stderr.txt
+# ?? research/runs/R-NONMAINLINE-SYNCBIND-R1/blobs/C-93b3f73c-b8e3-4d1c-a2e5-7196546e81f2.stdout.txt
+# ?? research/runs/R-NONMAINLINE-SYNCBIND-R1/events.jsonl
+# ?? research/runs/R-NONMAINLINE-SYNCBIND-R1/initial_state.json
+# ?? research/runs/R-NONMAINLINE-SYNCBIND-R1/metadata.json
+# ?? tools/__pycache__/verify_sync_runtime.cpython-313.pyc
