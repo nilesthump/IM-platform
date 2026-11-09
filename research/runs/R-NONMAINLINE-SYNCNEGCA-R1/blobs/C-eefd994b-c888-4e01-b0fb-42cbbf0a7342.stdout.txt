@@ -1,0 +1,10 @@
+Case A (self-signed, untrusted):
+   OLD: PASS (bare except)
+   NEW: PASS (no-trusted-issuer reason, verify_code=18)
+Case B (trusted CA, hostname mismatch):
+   OLD: PASS (bare except)
+   NEW: LOUD FAILURE 'Untrusted-CA probe failed for wrong reason' (verify_code=62)
+Case C (trusted CA missing keyUsage, code 92):
+   OLD: PASS (bare except)
+   NEW: LOUD FAILURE 'Untrusted-CA probe failed for wrong reason' (verify_code=92)
+   REJECT(62,64)-style: PASS (verify_code=92) <- vacuous
