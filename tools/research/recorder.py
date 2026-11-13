@@ -116,8 +116,11 @@ def sensitive_key(key: object) -> bool:
     if not isinstance(key, str):
         return False
     normalized = re.sub(r"[^a-z0-9]", "", key.casefold())
+    # Redaction is defense in depth: every sensitive name may match as a
+    # suffix, including short ones like "token" (api_token, session_token),
+    # and a longer name wins only by matching more of the key.
     return normalized in SENSITIVE_KEY_NAMES or any(
-        normalized.endswith(name) for name in SENSITIVE_KEY_NAMES if len(name) >= 6
+        normalized.endswith(name) for name in SENSITIVE_KEY_NAMES
     )
 
 
