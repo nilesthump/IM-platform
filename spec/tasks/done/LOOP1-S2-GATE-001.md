@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-S2-GATE-001
 title: S2 Gate evidence verification and recovery checkpoint
-status: review
+status: done
 owner: /root/resume_next
 stage: S2
 gate: S2
@@ -79,22 +79,20 @@ spec/progress/evidence/LOOP1-S2-GATE-001/. Recovery research root: C:/Users/2144
 
 # Handoff
 
-Assessment62dc57dd9a52fac1a5ff70616f3906bb7621aa7d independently accepted, protected PR101 integrated at8acdce95e19d675766d29c0db665b90792ae3485 and safely synchronized; main782 unknown files/index/status/branch preservation independently verified. Full push14required and PR/main5selected jobs PASS. Regular/error review and fresh substantive Gate audit exact reports in closure-receipt.json. New recoverable checkpoint2026-11-13-s2-gate.md added. Checkpoint acceptance and the unconditional independent S2 Gate seal remain pending, so this Task stays review and S2 stays OPEN. Original ae9f5c4f regular Review FAIL found that conditional prose cannot override machine PASS/done; the correction preserves that failure and restores truthful machine state. No new candidate acceptance is claimed.
+S2 Gate independently PASS at accepted checkpoint main `0226bba0e502e58bfa090f0def81d2c37cac14f1` (candidate `7226843f942b195a5b24c9dc46ef7e8e75a2bcfc`), after fresh dual reviews, exact-head hosted/protected integration/actual-main, safe synchronization and independent final Gate judgement. Exact seal path/hash: spec/progress/evidence/LOOP1-S2-GATE-001/final-status-receipt.json. All ten S2 task obligations, bounded Windows tool verification and new recoverable checkpoint are accepted. S1 PASS retained; no Java activation.
 
-Last known good8acdce95e19d675766d29c0db665b90792ae3485. Fresh Fix Agent /root/resume_next/s2_checkpoint_fix owns only the narrow recovery-state correction until commit and lease release; coordinator /root/resume_next resumes afterward. All source changes occur in assigned managed root H:/.codex/worktrees/s2/IM-platform, branch task/LOOP1-S2-GATE-001. Earlier Python2/GBK/Go-cache and Control entry-point failures retained; final local baseline/Control PASS. GitHub connector403 and sandbox gh401 resolved through existing normal keyring under approved unsandboxed execution, no credential extraction/config change. Research incomplete capture remains disclosed.
+This status-only record reflects established acceptance; its own administrative publication still requires fresh regular/different error reviews, exact-head CI, protected integration/actual-main/safe sync, then external final publication receipt. It does not add a new Stage Gate prerequisite or claim an unknown future SHA accepted. Source product/contracts/migration unchanged; original P2 FAIL and environment/network/auth errors remain recorded. Coordinator /root/resume_next owns only status metadata in managed H:/.codex/worktrees/s2/IM-platform, branch task/LOOP1-S2-GATE-001. Last known good `0226bba0e502e58bfa090f0def81d2c37cac14f1`; main782 unknown files preserved.
 
-# Assessment Acceptance Metadata
+# Completion Metadata
 
-P2 correction local verification: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development` PASS exit0/29.031s, task review/S2 OPEN; existing frozen verifier PASS. Recorder R-S2-CHECKPOINT-FIX-20261113 records exact commands/output hashes; early read-only startup and external script authoring were outside its prospective trace. This local result is not independent acceptance. New correction regular Review PENDING and different fresh error Review PENDING.
-
-accepted_candidate_sha: 62dc57dd9a52fac1a5ff70616f3906bb7621aa7d
-integrated_main_sha: 8acdce95e19d675766d29c0db665b90792ae3485
-assessment_acceptance_result: PASS
+acceptance_result: PASS
+accepted_candidate_sha: 7226843f942b195a5b24c9dc46ef7e8e75a2bcfc
+integrated_main_sha: 0226bba0e502e58bfa090f0def81d2c37cac14f1
 main_sync_result: PASS
-checkpoint_acceptance: PENDING
-final_gate_acceptance: PENDING
-independent_gate_evidence: spec/progress/evidence/LOOP1-S2-GATE-001/closure-receipt.json
+independent_review_evidence: spec/progress/evidence/LOOP1-S2-GATE-001/final-status-receipt.json
+hosted_acceptance_evidence: spec/progress/evidence/LOOP1-S2-GATE-001/final-status-receipt.json
+main_sync_evidence: spec/progress/evidence/LOOP1-S2-GATE-001/final-status-receipt.json
 
 # Next Action
 
-Accept and safely synchronize this review/OPEN checkpoint candidate through fresh regular Review, different fresh error review, exact-head hosted CI, protected integration and actual-main verification. Then obtain the unconditional independent S2 Gate seal. Only after that established acceptance, record done/PASS in a bounded status-only candidate with applicable independent acceptance. Stop after S2 Gate; no Java activation.
+Complete only this bounded status-record publication through fresh regular/different error reviews, exact-head hosted/protected integration/actual-main/safe sync and external final publication receipt. Stop after S2 Gate PASS; do not activate Java. Future user-directed work resolves canonical S3 prerequisites and creates its own scoped Task Spec.
