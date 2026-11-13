@@ -1,0 +1,17 @@
+{
+  "observer": "/root",
+  "date": "2026-11-13",
+  "purpose": "S2 deferred Windows helper/native-host regression",
+  "ordinary_exec": "PASS: multiple PowerShell read-only startup commands completed",
+  "skill": "C:/Users/21441/.codex/plugins/cache/openai-bundled/computer-use/26.1106.51428/skills/computer-use/SKILL.md",
+  "initialization": "if (!globalThis.sky) { const { sky } = await import('@oai/sky'); globalThis.sky = sky; }",
+  "native_call": "globalThis.gateWindows = await sky.list_windows(); nodeRepl.write(JSON.stringify({success:true,windowCount:gateWindows.length}));",
+  "observed_result": {
+    "windowCount": 2,
+    "success": true
+  },
+  "tool": "mcp__node_repl__js",
+  "security_changes": false,
+  "ui_input": false,
+  "limitations": "Read-only initialization/enumeration only; not a product GUI or Stage Gate acceptance."
+}
