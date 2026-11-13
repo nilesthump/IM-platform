@@ -65,3 +65,7 @@ Native authority freeze independently accepted: candidate `89cacae924be7ae3e85c1
 ## S2 群聊规划候选（2026-10-15）
 
 baseline的group_revision_adr/group_approval_source/group_previous_sha256解析Human批准的[ADR-0013](decisions/ADR-0013-group-planning.md)、canonical§4.3/§6.7/§15/§19/§20/附录A/B及本轮当前hash。I18N→LOOP1-GROUP-001→S2 Gate；[群领域](../domain/group.md)、[不变量](../invariants/group.md)、[验收](../acceptance/group.md)与[产品Task](../tasks/backlog/LOOP1-GROUP-001.md)从属canonical/contracts。语言激活仍I18N。独立两审/精确CI/受保护合入/实际main/安全同步PENDING；GROUP backlog、S2 OPEN。本轮只规划及接受同步后STOP，旧接受/PDF/FAIL/Recorder保持。
+
+## Java technology candidate (2026-11-13)
+
+Resolve baseline java_revision_adr and java_approval_source for [ADR-0014](decisions/ADR-0014-java-technology.md) and canonical §3.2. Human-approved minimal Java stack plus BCrypt-only compatibility primitive; independent freeze acceptance pending. No Java product activation; S1/S2 PASS retained, S3 OPEN.
