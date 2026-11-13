@@ -114,8 +114,10 @@ class SourceTests(unittest.TestCase):
     def java_errors(self):
         return checker.check_java(self.root)[0]
 
-    def test_current_java_placeholder_valid_and_no_early_business_required(self):
-        self.put("backend/java/InfraPlaceholder.java", (ROOT / "backend/java/InfraPlaceholder.java").read_text(encoding="utf-8"))
+    def test_historical_java_placeholder_valid_before_business(self):
+        # Keep the pre-business positive control independently of the current
+        # product tree, where SRC-06 now requires deleting the placeholder.
+        self.put("backend/java/InfraPlaceholder.java", 'public class InfraPlaceholder {public static void main(String[] args){String route="/__infra/health";}}')
         self.assertEqual([], self.java_errors())
         self.assertEqual([], checker.check_java(ROOT)[0])
 
@@ -188,6 +190,17 @@ class SourceTests(unittest.TestCase):
     def test_java_unicode_import_cannot_bypass_dependency(self):
         self.java_base()
         self.put("backend/java/gateway/Connection.java", r'package im.gateway; import im.\u0063ore.Service; public class Connection {public static void call(){Service.start();}}')
+        self.assert_contains(self.java_errors(), "gateway directly depends on core")
+
+    def test_java_gateway_spring_jdbc_is_external_framework(self):
+        self.java_base()
+        self.put("backend/java/gateway/SessionCheck.java", 'package im.gateway; import org.springframework.jdbc.core.JdbcTemplate; public class SessionCheck {public Object read(JdbcTemplate db){return db.queryForList("SELECT session_epoch FROM sessions");}}')
+        self.assertEqual([], self.java_errors())
+
+    def test_java_spring_namespace_cannot_disguise_local_core(self):
+        self.java_base()
+        self.put("backend/java/core/Disguised.java", 'package org.springframework.jdbc.core; public class Disguised {public static void run(){}}')
+        self.put("backend/java/gateway/SessionCheck.java", 'package im.gateway; import org.springframework.jdbc.core.Disguised; public class SessionCheck {public void read(){Disguised.run();}}')
         self.assert_contains(self.java_errors(), "gateway directly depends on core")
 
     def test_future_java_business_root_and_shared_disguise(self):

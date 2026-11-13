@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-JAVA-ARCH-001
 title: Freeze Human-approved minimal Java technology
-status: review
+status: done
 owner: /root/java_start
 stage: S3
 gate: S3
@@ -28,6 +28,8 @@ Exact Human approvals in human-approval.txt authorize freezing §3.2 minimal Spr
 - LOOP1-S2-GATE-001 (done; independent final publication seal binds main98e0659673aa8a3bf54fb2a9936a26a5fae7d000).
 
 # Allowed Paths
+
+- spec/progress/checkpoints/2026-11-13-java-authority.md (Coordinator-authorized stable freeze closure)
 
 - spec/tasks/active/LOOP1-JAVA-ARCH-001.md
 - spec/tasks/review/LOOP1-JAVA-ARCH-001.md
@@ -80,3 +82,17 @@ Fresh regular and different fresh error reviews of final committed candidate bef
 # Fresh Fix 1 recovery
 
 Original5f008172 regular PASS/error specialist FAIL preserved in evidence/fix1.md. Human approved necessary Auth Session Outbox/JNATS. Fresh /root/java_auth fixes phase consistency and wrong-root/foreign-namespace Maven false success only. Local frozen/sourceall/97 architecture tests (1 existing skip)/35 CI tests (4 existing skips)/Control Development PASS; final fixed SHA requires NEW regular and different error reviews before CI, then applicable hosted/integration/main sync. No product activation.
+
+# Accepted source closure
+
+Candidate2875f3508a43b575f21a8c97605205e1cbb0bebb independently accepted in fresh regular2 and different specialist2, exact candidate push43413075870/PR43413228525 and PR104 actual main e4aee5ce2c4327904990d5c651267ca5eaae389d run43414440917 all14required jobs PASS. Safe main synchronization preserves782unknown paths, branch/status/index. Immutable earlier pending/failure records retained. Evidence acceptance.json binds external proofs. Source freeze done; this truthful administrative publication accompanies Java Auth and requires its own new candidate chain. No S3 PASS.
+
+# Completion Metadata
+
+acceptance_result: PASS
+accepted_candidate_sha: 2875f3508a43b575f21a8c97605205e1cbb0bebb
+integrated_main_sha: e4aee5ce2c4327904990d5c651267ca5eaae389d
+main_sync_result: PASS
+independent_review_evidence: spec/progress/evidence/LOOP1-JAVA-ARCH-001/acceptance.json
+hosted_acceptance_evidence: spec/progress/evidence/LOOP1-JAVA-ARCH-001/acceptance.json
+main_sync_evidence: spec/progress/evidence/LOOP1-JAVA-ARCH-001/acceptance.json

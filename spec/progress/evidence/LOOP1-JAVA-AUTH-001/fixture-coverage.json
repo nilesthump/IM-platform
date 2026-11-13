@@ -1,0 +1,610 @@
+{
+  "kind": "local_live_verification_not_acceptance",
+  "task": "LOOP1-JAVA-AUTH-001",
+  "freeze_candidate": "2875f3508a43b575f21a8c97605205e1cbb0bebb",
+  "activation": "AUTHORIZED_AFTER_ACCEPTED_MAIN_e4aee5ce",
+  "inputs": [
+    {
+      "path": "contracts/fixtures/auth-user-friend/positive.json",
+      "sha256": "7eef05b5b77a419a7ef8f36abf88721fd147b7b686c5c7fa4c5fc424fdf76d1c"
+    },
+    {
+      "path": "contracts/fixtures/auth-user-friend/negative.json",
+      "sha256": "1d6df9be8f11c5cde3e7ca71719c14de57b2d3583cb0abe63d8aa4bda0d711bb"
+    },
+    {
+      "path": "contracts/fixtures/websocket/golden.json",
+      "sha256": "8fc5fa751707fcfb6b986bb75746237248212f35552e6063d77d24bd65c0dda4"
+    }
+  ],
+  "scenarios": [
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/positive.json",
+      "scenario_id": "registration-and-authorized-user-search",
+      "step_count": 2,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/positive.json",
+      "scenario_id": "same-slot-login-replaces-only-that-slot",
+      "step_count": 5,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/positive.json",
+      "scenario_id": "native-refresh-rotates-current-session-credential",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/positive.json",
+      "scenario_id": "web-refresh-rotates-secure-cookie",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/positive.json",
+      "scenario_id": "logout-revokes-session-refresh-and-connection",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/positive.json",
+      "scenario_id": "friend-add-normalizes-and-reuses-direct",
+      "step_count": 2,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Friend business belongs to LOOP1-JAVA-IM-001",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "invalid-credentials",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "token-in-query-rejected",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "invalid-client-type",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "refresh-client-type-mismatch",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "unsupported-protocol-version",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "missing-authentication",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "authorization-binding-mismatch",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "invalid-access-token",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "expired-access-token",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "revoked-session-token",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "username-already-exists",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "friend-target-not-found",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Friend business belongs to LOOP1-JAVA-IM-001",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "friendship-state-conflict",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Friend business belongs to LOOP1-JAVA-IM-001",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "friend-add-authorization-denied",
+      "step_count": 1,
+      "status": "DEFERRED_BY_HUMAN",
+      "authority_reason": "ADR-0004 and contracts/fixtures/auth-user-friend/loop1-exceptions.json; never counts PASS",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "web-refresh-missing-cookie",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "native-refresh-missing-token",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "friend-self-rejected",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Friend business belongs to LOOP1-JAVA-IM-001",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "duplicate-friendship-divergence-rejected",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Friend business belongs to LOOP1-JAVA-IM-001",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "non-normalized-pair-divergence-rejected",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Friend business belongs to LOOP1-JAVA-IM-001",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "stale-session-epoch-rejected",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/auth-user-friend/negative.json",
+      "scenario_id": "revoked-refresh-token-rejected",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/User endpoint or unauthenticated access boundary; AUF-A-001/006/007/008",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "bind-valid-session",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "durable-send-and-created",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "idempotent-retry",
+      "step_count": 2,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "same-request-different-conversation",
+      "step_count": 2,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "group-single-message",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "duplicate-fanout",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "out-of-order-fanout",
+      "step_count": 2,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "ping-before-bind",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "unauthenticated-send",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "non-member-send",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "rollback-before-ack",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "conflicting-retry",
+      "step_count": 2,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "stale-epoch-bind",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "expired-token-bind",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "wrong-client-type-bind",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "invalid-signature-bind",
+      "step_count": 1,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "wrong-conversation-fanout",
+      "step_count": 1,
+      "status": "NOT_APPLICABLE_YET",
+      "authority_reason": "Message/fanout behavior belongs to LOOP1-JAVA-IM-001; not Auth product scope",
+      "profiles": [],
+      "runtime_result": "UNEXECUTED"
+    },
+    {
+      "fixture": "contracts/fixtures/websocket/golden.json",
+      "scenario_id": "revoked-socket",
+      "step_count": 2,
+      "status": "EXECUTED_LOCAL",
+      "authority_reason": "Auth/WSS boundary under canonical §7.2/§7.3 and AUF-A-002/003/006",
+      "profiles": [
+        "go",
+        "java"
+      ],
+      "runtime_result": {
+        "java": "PASS",
+        "go": "PASS"
+      }
+    }
+  ],
+  "counts": {
+    "DEFERRED_BY_HUMAN": 1,
+    "NOT_APPLICABLE_YET": 16,
+    "REQUIRED_PLANNED_UNEXECUTED": 28
+  },
+  "additional_required_checks": [
+    "Three concurrent login slots and same-slot atomic epoch replacement",
+    "Refresh rotation/replay rejection and logout socket close",
+    "SessionOutbox commit/rollback and publish-loss recovery; reconnect DB authority",
+    "Go-created account -> Java login and Java-created account -> Go login, sequential profiles same database",
+    "Credentials absent from queries, responses, captured application logs",
+    "No unknown fixture omissions; normalized fixture expected results for both profiles",
+    "HTTPS/WSS actual deployment entry smoke distinct from component HTTP/WS evidence"
+  ],
+  "environment": "Local Docker readiness unresolved; hosted actual PG/NATS integration mandatory; no unset-variable skips"
+}
