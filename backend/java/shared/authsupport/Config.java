@@ -10,6 +10,8 @@ import org.postgresql.ds.PGSimpleDataSource;
 public final class Config {
     public String postgresHost,postgresUser,postgresDatabase,postgresPasswordFile,jwtSigningKeyFile,coreUrl,natsUrl;
     public int postgresPort;
+    public int accessTokenSeconds=900, refreshTokenSeconds=2592000;
+    public String publicOrigin;
     private byte[] key;
     private DataSource database;
     public static Config read(String filename)throws java.io.IOException {
@@ -19,6 +21,11 @@ public final class Config {
         if(cfg.postgresPort<1||cfg.postgresPort>65535)throw new IllegalArgumentException("Invalid database port");
         for(String v:new String[]{cfg.postgresHost,cfg.postgresUser,cfg.postgresDatabase,cfg.postgresPasswordFile,cfg.jwtSigningKeyFile,cfg.coreUrl,cfg.natsUrl})
             if(v==null||v.isBlank())throw new IllegalArgumentException("Runtime configuration incomplete");
+        if(cfg.accessTokenSeconds<=0||cfg.refreshTokenSeconds<=cfg.accessTokenSeconds)throw new IllegalArgumentException("Token durations must be positive; refresh must outlive access");
+        if(cfg.publicOrigin!=null){
+            java.net.URI origin=java.net.URI.create(cfg.publicOrigin);
+            if(!"https".equals(origin.getScheme())||origin.getHost()==null||origin.getRawUserInfo()!=null||origin.getRawQuery()!=null||origin.getRawFragment()!=null||!origin.getRawPath().isEmpty())throw new IllegalArgumentException("publicOrigin must be an exact HTTPS origin");
+        }
         Path parent=file.toAbsolutePath().getParent();
         String password=Files.readString(parent.resolve(cfg.postgresPasswordFile)).strip();
         cfg.key=Files.readString(parent.resolve(cfg.jwtSigningKeyFile)).strip().getBytes(StandardCharsets.UTF_8);

@@ -2,7 +2,7 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/java_auth_impl
+owner: /root/java_auth_fix1
 stage: S3
 gate: S3
 ---
@@ -120,3 +120,7 @@ Regular Review: PENDING final committed SHA. Different error specialist: PENDING
 # Next Action
 
 Coordinator delegates fresh regular Review of the committed candidate, then different fresh error specialist; any fix requires fresh contexts and both final-SHA reviews again. Only then hosted CI/integration/main sync. No product done claim.
+
+Fresh regular Review of 2e5ad53: FAIL. Fresh Fix /root/java_auth_fix1 now repairing five findings plus Go terminal-observation acceptance failure; task remains review throughout repair. No candidate publication. Both final-SHA reviews will restart.
+
+Fix1 completed local repairs and verification; see spec/progress/evidence/LOOP1-JAVA-AUTH-001/fix1.md and fix1-commands.json. Commit/clean Control then NEW regular and different error reviews finalSHA; prior FAIL immutable. No push or acceptance claim.

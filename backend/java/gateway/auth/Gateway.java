@@ -69,7 +69,7 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         return response.body(result.body());
     }
     @Override public void registerWebSocketHandlers(WebSocketHandlerRegistry registry){
-        registry.addHandler(new Socket(),"/v1/ws").setAllowedOrigins("http://tauri.localhost").addInterceptors(new HandshakeInterceptor(){
+        registry.addHandler(new Socket(),"/v1/ws").setAllowedOrigins(config.publicOrigin==null?new String[]{"http://tauri.localhost"}:new String[]{"http://tauri.localhost",config.publicOrigin}).addInterceptors(new HandshakeInterceptor(){
             public boolean beforeHandshake(ServerHttpRequest r,ServerHttpResponse response,WebSocketHandler h,Map<String,Object> attributes){if(r.getURI().getRawQuery()!=null){response.setStatusCode(org.springframework.http.HttpStatus.BAD_REQUEST);return false;}return true;}
             public void afterHandshake(ServerHttpRequest r,ServerHttpResponse response,WebSocketHandler h,Exception error){}
         });
@@ -101,7 +101,7 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         private void reject(WebSocketSession socket,String request,String code)throws IOException {try{send(socket,frame("auth.ack",request,Map.of("status","rejected","error",Map.of("code",code,"message","Request rejected"))));}finally{socket.close();}}
         @Override protected void handleTextMessage(WebSocketSession socket,TextMessage message)throws Exception {
             JsonNode e;try{e=JSON.readTree(message.getPayload());}catch(com.fasterxml.jackson.core.JsonProcessingException malformed){socket.close(CloseStatus.BAD_DATA);return;}
-            if(e==null||!e.isObject()||e.size()!=4||!e.path("protocolVersion").asText().equals("1.0")||!e.path("requestId").asText().matches("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}")||!e.path("type").isTextual()||!e.path("payload").isObject()){socket.close(CloseStatus.BAD_DATA);return;}
+            if(e==null||!e.isObject()||e.size()!=4||!e.path("protocolVersion").isTextual()||!e.path("protocolVersion").textValue().equals("1.0")||!e.path("requestId").isTextual()||!e.path("requestId").textValue().matches("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}")||!e.path("type").isTextual()||!e.path("payload").isObject()){socket.close(CloseStatus.BAD_DATA);return;}
             String type=e.get("type").textValue(),id=e.get("requestId").textValue();JsonNode payload=e.get("payload");
             if(type.equals("ping")||type.equals("pong")){if(payload.size()!=0){socket.close(CloseStatus.BAD_DATA);return;}if(type.equals("ping"))send(socket,frame("pong",id,Map.of()));return;}
             Tokens.Claims current=bound.get(socket);

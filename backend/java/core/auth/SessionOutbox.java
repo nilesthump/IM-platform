@@ -21,7 +21,8 @@ public final class SessionOutbox implements AutoCloseable {
             try{
                 while(!stopping){
                     if(nats.getStatus()==Connection.Status.CONNECTED){
-                        publishBatch(db,transaction,nats);
+                        try{publishBatch(db,transaction,nats);}
+                        catch(PublicationTimeout timeout){System.err.println("Session publication timed out; transaction rolled back; retrying next tick");}
                     }
                     Thread.sleep(500);
                 }
@@ -29,13 +30,14 @@ public final class SessionOutbox implements AutoCloseable {
         });
         worker.start();
     }
+    private static final class PublicationTimeout extends RuntimeException { PublicationTimeout(java.util.concurrent.TimeoutException cause){super(cause);} }
     static void publishBatch(JdbcTemplate db,TransactionTemplate transaction,Connection nats){
         transaction.executeWithoutResult(status->{
             var rows=db.queryForList("SELECT event_id,payload::text AS payload FROM outbox_events WHERE event_type='session.revoked' AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED");
             for(var row:rows)nats.publish("session.revoked",row.get("payload").toString().getBytes(StandardCharsets.UTF_8));
             if(!rows.isEmpty()){
                 try{nats.flush(Duration.ofSeconds(2));}
-                catch(java.util.concurrent.TimeoutException failure){throw new IllegalStateException("Session publication timeout; pending transaction rolls back",failure);}
+                catch(java.util.concurrent.TimeoutException failure){throw new PublicationTimeout(failure);}
                 catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException(interrupted);}
                 for(var row:rows)db.update("UPDATE outbox_events SET published_at=now(),attempts=attempts+1 WHERE event_id=?",row.get("event_id"));
             }

@@ -24,7 +24,8 @@ public class CoreAuth {
     private final JdbcTemplate db;
     private final TransactionTemplate tx;
     private final Tokens tokens;
-    public CoreAuth(Config config){db=new JdbcTemplate(config.database());tx=new TransactionTemplate(new DataSourceTransactionManager(config.database()));tokens=new Tokens(config.signingKey());}
+    private final Config config;
+    public CoreAuth(Config config){this.config=config;db=new JdbcTemplate(config.database());tx=new TransactionTemplate(new DataSourceTransactionManager(config.database()));tokens=new Tokens(config.signingKey());}
     @ExceptionHandler(ApiFailure.class)
     public ResponseEntity<?> rejection(ApiFailure error){return ResponseEntity.status(error.status).header("Cache-Control","no-store").body(Map.of("error",Map.of("code",error.code,"message",error.publicMessage),"requestId",UUID.randomUUID().toString()));}
     private static ApiFailure invalid(String message){return new ApiFailure(400,"VALIDATION_FAILED",message);}
@@ -72,10 +73,10 @@ public class CoreAuth {
     private record Session(UUID user,UUID id,String type,long epoch,boolean replaced,String refresh){}
     private ResponseEntity<?> sessionResponse(Session s)throws java.io.IOException {
         long now=Instant.now().getEpochSecond();Map<String,Object> result=new LinkedHashMap<>();
-        result.put("accessToken",tokens.sign(new Tokens.Claims(s.user.toString(),s.id.toString(),s.type,s.epoch,now,now+900)));result.put("accessTokenExpiresInSeconds",900);
+        result.put("accessToken",tokens.sign(new Tokens.Claims(s.user.toString(),s.id.toString(),s.type,s.epoch,now,now+config.accessTokenSeconds)));result.put("accessTokenExpiresInSeconds",config.accessTokenSeconds);
         ResponseEntity.BodyBuilder response=ResponseEntity.ok().header("Cache-Control","no-store");
-        if(s.type.equals("WEB")){response.header("Set-Cookie","__Host-im_refresh="+s.refresh+"; Path=/; Max-Age=2592000; HttpOnly; Secure; SameSite=Strict");result.put("refreshTokenDelivery","HTTP_ONLY_SECURE_COOKIE");}
-        else{result.put("refreshToken",s.refresh);result.put("refreshTokenExpiresInSeconds",2592000);result.put("refreshTokenDelivery","RESPONSE_BODY_FOR_OS_SECURE_STORAGE");}
+        if(s.type.equals("WEB")){response.header("Set-Cookie","__Host-im_refresh="+s.refresh+"; Path=/; Max-Age="+config.refreshTokenSeconds+"; HttpOnly; Secure; SameSite=Strict");result.put("refreshTokenDelivery","HTTP_ONLY_SECURE_COOKIE");}
+        else{result.put("refreshToken",s.refresh);result.put("refreshTokenExpiresInSeconds",config.refreshTokenSeconds);result.put("refreshTokenDelivery","RESPONSE_BODY_FOR_OS_SECURE_STORAGE");}
         return response.body(Map.of("session",Map.of("sessionId",s.id.toString(),"userId",s.user.toString(),"clientType",s.type,"sessionEpoch",s.epoch,"status","ACTIVE"),"tokens",result,"replacedExistingSession",s.replaced));
     }
     @RequestMapping("/__infra/health") public String health(){return "profile=java role=core";}
@@ -115,7 +116,7 @@ public class CoreAuth {
             Map<String,Object> old=one("SELECT session_id,session_epoch,status FROM sessions WHERE user_id=? AND client_type=?",uid,type);
             long epoch=old==null?1:Math.addExact(number(old,"session_epoch"),1);boolean replaced=old!=null&&"ACTIVE".equals(string(old,"status"));
             UUID sid=UUID.randomUUID();String refresh=Tokens.random();
-            db.update("INSERT INTO sessions(user_id,client_type,session_id,session_epoch,refresh_token_hash,status,device_id,expires_at) VALUES(?,?,?,?,?,'ACTIVE',?,?) ON CONFLICT(user_id,client_type) DO UPDATE SET session_id=EXCLUDED.session_id,session_epoch=EXCLUDED.session_epoch,refresh_token_hash=EXCLUDED.refresh_token_hash,status='ACTIVE',device_id=EXCLUDED.device_id,expires_at=EXCLUDED.expires_at,updated_at=now()",uid,type,sid,epoch,Tokens.hash(refresh),field(b,"deviceId"),Timestamp.from(Instant.now().plusSeconds(2592000)));
+            db.update("INSERT INTO sessions(user_id,client_type,session_id,session_epoch,refresh_token_hash,status,device_id,expires_at) VALUES(?,?,?,?,?,'ACTIVE',?,?) ON CONFLICT(user_id,client_type) DO UPDATE SET session_id=EXCLUDED.session_id,session_epoch=EXCLUDED.session_epoch,refresh_token_hash=EXCLUDED.refresh_token_hash,status='ACTIVE',device_id=EXCLUDED.device_id,expires_at=EXCLUDED.expires_at,updated_at=now()",uid,type,sid,epoch,Tokens.hash(refresh),field(b,"deviceId"),Timestamp.from(Instant.now().plusSeconds(config.refreshTokenSeconds)));
             if(replaced)revoke(uid,uuid(string(old,"session_id")),"REPLACED");
             return new Session(uid,sid,type,epoch,replaced,refresh);
         });
@@ -136,7 +137,7 @@ public class CoreAuth {
             if(!type.equals(string(row,"client_type")))throw new ApiFailure(401,"AUTH_CLIENT_TYPE_MISMATCH","Refresh credential does not belong to the declared client type.");
             if(!"ACTIVE".equals(string(row,"status"))||!((Timestamp)row.get("expires_at")).toInstant().isAfter(Instant.now()))throw new ApiFailure(401,"AUTH_SESSION_REVOKED","Session has been revoked.");
             if(!field(b,"deviceId").equals(string(row,"device_id")))throw new ApiFailure(401,"AUTH_CLIENT_TYPE_MISMATCH","Refresh token does not match the active client session.");
-            String next=Tokens.random();UUID uid=uuid(string(row,"user_id"));db.update("UPDATE sessions SET refresh_token_hash=?,expires_at=?,updated_at=now() WHERE user_id=? AND client_type=?",Tokens.hash(next),Timestamp.from(Instant.now().plusSeconds(2592000)),uid,type);
+            String next=Tokens.random();UUID uid=uuid(string(row,"user_id"));db.update("UPDATE sessions SET refresh_token_hash=?,expires_at=?,updated_at=now() WHERE user_id=? AND client_type=?",Tokens.hash(next),Timestamp.from(Instant.now().plusSeconds(config.refreshTokenSeconds)),uid,type);
             return new Session(uid,uuid(string(row,"session_id")),type,number(row,"session_epoch"),false,next);
         });return sessionResponse(Objects.requireNonNull(session));
     }

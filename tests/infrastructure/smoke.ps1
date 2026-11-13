@@ -84,6 +84,12 @@ try {
     }
     if ($Profile -eq 'java') {
         $base = "https://localhost:$port"
+        foreach ($origin in @($base, 'http://tauri.localhost', 'https://foreign.invalid')) {
+            $probe = Read-TlsResponse '/v1/ws' @('Upgrade: websocket', 'Connection: Upgrade', 'Sec-WebSocket-Version: 13', "Sec-WebSocket-Key: $key", "Origin: $origin", 'X-Forwarded-Host: foreign.invalid', 'X-Forwarded-Proto: https', 'Forwarded: host=foreign.invalid;proto=https')
+            $status = if ($origin -eq 'https://foreign.invalid') {403} else {101}
+            if ($probe.Status -notmatch "^HTTP/1\.[01] $status ") { throw "Browser Origin policy mismatch: $($probe.Status)" }
+        }
+
         $username = "tls$([Guid]::NewGuid().ToString('N'))"
         $password = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
         # This disposable Compose endpoint uses Caddy's local CA. Certificate
@@ -92,6 +98,7 @@ try {
         $login = Invoke-RestMethod -Uri "$base/v1/auth/login" -Method Post -SkipCertificateCheck -ContentType 'application/json' -Body (@{ username=$username; password=$password; clientType='DESKTOP'; deviceId='tls-smoke'; clientVersion='1.0.0'; protocolVersion='1' } | ConvertTo-Json)
         if ($login.session.userId -ne $registration.user.userId -or $login.session.status -ne 'ACTIVE') { throw 'TLS Auth session mismatch' }
         $socket = [System.Net.WebSockets.ClientWebSocket]::new()
+        $socket.Options.SetRequestHeader("Origin",$base)
         $httpHandler = [System.Net.Http.HttpClientHandler]::new()
         $httpHandler.ServerCertificateCustomValidationCallback = [System.Net.Http.HttpClientHandler]::DangerousAcceptAnyServerCertificateValidator
         $invoker = [System.Net.Http.HttpMessageInvoker]::new($httpHandler)

@@ -17,6 +17,7 @@ public final class AuthFixtureRunner {
     final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     final String base,profile; final Path root; final Config config; final Tokens codec;
     final Map<String,JsonNode> positive,negative,wss;
+    final Set<String> secrets=ConcurrentHashMap.newKeySet();
     final Set<String> passed=new LinkedHashSet<>();
     AuthFixtureRunner(String base,String profile,Path root,Config config)throws Exception{
         this.base=base;this.profile=profile;this.root=root;this.config=config;codec=new Tokens(config.signingKey());
@@ -30,7 +31,7 @@ public final class AuthFixtureRunner {
         Normalize(String username){this.username=username;}
         void check(JsonNode expected,JsonNode actual,String path){
             require(actual!=null,"Missing "+path);
-            if(expected.isObject()){require(actual.isObject(),"Object "+path);expected.fields().forEachRemaining(e->check(e.getValue(),actual.get(e.getKey()),path+"."+e.getKey()));}
+            if(expected.isObject()){require(actual.isObject(),"Object "+path);require(actual.size()==expected.size(),"Unexpected response fields "+path);expected.fields().forEachRemaining(e->check(e.getValue(),actual.get(e.getKey()),path+"."+e.getKey()));}
             else if(expected.isArray()){require(actual.isArray()&&expected.size()==actual.size(),"Array "+path);for(int i=0;i<expected.size();i++)check(expected.get(i),actual.get(i),path+"["+i+"]");}
             else if(expected.isTextual()){
                 require(actual.isTextual(),"Text "+path);String e=expected.textValue(),a=actual.textValue();
@@ -49,13 +50,37 @@ public final class AuthFixtureRunner {
         Map<String,String> headers=new LinkedHashMap<>();if(token!=null)headers.put("Authorization","Bearer "+token);if(cookie!=null)headers.put("Cookie",cookie);
         return callHeaders(method,path,body,headers);
     }
+    void collect(JsonNode node){
+        if(node==null)return;
+        if(node.isObject())node.fields().forEachRemaining(e->{if(Set.of("password","accessToken","refreshToken").contains(e.getKey())&&e.getValue().isTextual())secrets.add(e.getValue().textValue());else collect(e.getValue());});
+        else if(node.isArray())node.forEach(this::collect);
+    }
+    void noLeak(String value){for(String secret:secrets)if(!secret.isEmpty())require(!value.contains(secret),"Credential material leaked");}
+    void checkDisclosure(JsonNode reply,HttpHeaders headers){
+        JsonNode copy=reply.deepCopy();
+        if(copy.has("tokens")){
+            JsonNode tokens=copy.get("tokens");boolean web="WEB".equals(copy.path("session").path("clientType").asText());
+            Set<String> allowed=web?Set.of("accessToken","accessTokenExpiresInSeconds","refreshTokenDelivery"):Set.of("accessToken","accessTokenExpiresInSeconds","refreshTokenDelivery","refreshToken","refreshTokenExpiresInSeconds");
+            require(tokens.isObject()&&tokens.size()==allowed.size(),"Unexpected token response fields");tokens.fieldNames().forEachRemaining(k->require(allowed.contains(k),"Unexpected token response fields"));
+            ((ObjectNode)tokens).remove(List.of("accessToken","refreshToken"));
+        }
+        noLeak(copy.toString());headers.map().forEach((key,values)->{
+            if(key.equalsIgnoreCase("set-cookie"))for(String cookie:values){
+                require("WEB".equals(reply.path("session").path("clientType").asText())&&cookie.startsWith("__Host-im_refresh="),"Unexpected credential cookie");
+                noLeak(cookie.substring(cookie.indexOf(';')));
+            }else values.forEach(this::noLeak);
+        });
+    }
     Reply callHeaders(String method,String path,JsonNode body,Map<String,String> headers)throws Exception{
+        collect(body);headers.forEach((key,value)->{if(key.equalsIgnoreCase("Authorization"))secrets.add(value.replaceFirst("^Bearer ",""));if(key.equalsIgnoreCase("Cookie"))secrets.add(value.split("=",2)[1]);});
         var request=HttpRequest.newBuilder(URI.create(base+path)).timeout(Duration.ofSeconds(10));
         headers.forEach(request::header);
         if(body!=null)request.header("Content-Type","application/json");
         request.method(method,body==null?HttpRequest.BodyPublishers.noBody():HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(body)));
         var response=http.send(request.build(),HttpResponse.BodyHandlers.ofString());
-        return new Reply(response.statusCode(),response.body().isBlank()?NullNode.instance:JSON.readTree(response.body()),response.headers());
+        JsonNode result=response.body().isBlank()?NullNode.instance:JSON.readTree(response.body());collect(result);
+        response.headers().allValues("set-cookie").forEach(cookie->secrets.add(cookie.split(";",2)[0].split("=",2)[1]));
+        checkDisclosure(result,response.headers());return new Reply(response.statusCode(),result,response.headers());
     }
     static ObjectNode body(JsonNode source,String username){ObjectNode b=source==null?JSON.createObjectNode():source.deepCopy();if(b.path("username").asText().equalsIgnoreCase("alice")){String old=b.get("username").textValue();b.put("username",old.equals(old.toUpperCase(Locale.ROOT))?username.toUpperCase(Locale.ROOT):username);}return b;}
     Reply step(JsonNode step,Normalize n,String token,String cookie,ObjectNode override)throws Exception{
@@ -109,6 +134,10 @@ public final class AuthFixtureRunner {
         step(step(negative,"revoked-session-token",0),n,desktop.token(),null,null);passed.add("revoked-session-token");
         try(var db=config.database().getConnection();var q=db.prepareStatement("SELECT status,refresh_token_hash FROM sessions WHERE user_id=? AND client_type='DESKTOP'")){q.setObject(1,UUID.fromString(user));try(var rs=q.executeQuery()){require(rs.next()&&rs.getString(1).equals("REVOKED")&&rs.getString(2)==null,"Logout persistence");}}
         concurrent(login,user);
+        for(String key:List.of("password","refreshToken")){
+            ObjectNode leaked=refreshed.body.deepCopy();if(key.equals("refreshToken"))((ObjectNode)leaked.get("tokens")).put(key,oldRefresh);else leaked.put("extra",login.get("password").textValue());
+            boolean detected=false;try{checkDisclosure(leaked,refreshed.headers);}catch(AssertionError expected){detected=true;}require(detected,"Response disclosure mutation undetected");
+        }
         if(profile.equals("java")){
             // Persisted corruption is an internal invariant failure, never an
             // ordinary wrong-password outcome. Restore the fixture row exactly.
@@ -134,20 +163,44 @@ public final class AuthFixtureRunner {
         System.out.println("FIXTURE_MUTATION "+profile+" expected-code and request-username detected");
     }
     static ObjectNode frame(String type,Object payload){ObjectNode n=JSON.createObjectNode();n.put("protocolVersion","1.0").put("type",type).put("requestId",UUID.randomUUID().toString());n.set("payload",JSON.valueToTree(payload));return n;}
-    final class Socket implements WebSocket.Listener,AutoCloseable{
-        final BlockingQueue<Object> messages=new LinkedBlockingQueue<>();final StringBuilder text=new StringBuilder();WebSocket ws;
-        public void onOpen(WebSocket ws){ws.request(1);}
-        public CompletionStage<?> onText(WebSocket ws,CharSequence data,boolean last){text.append(data);if(last){messages.add(text.toString());text.setLength(0);}ws.request(1);return null;}
-        public CompletionStage<?> onClose(WebSocket ws,int status,String reason){messages.add(Integer.valueOf(status));return null;}
-        public void onError(WebSocket ws,Throwable error){messages.add(error);}
-        void send(JsonNode value)throws Exception{ws.sendText(JSON.writeValueAsString(value),true).get(5,TimeUnit.SECONDS);}
-        Object receive()throws Exception{Object value=messages.poll(5,TimeUnit.SECONDS);require(value!=null,"WSS timeout");if(value instanceof Throwable t)throw new AssertionError("WSS transport",t);return value;}
+    // A synchronous RFC6455 test client observes TCP EOF directly. The JDK
+    // async client intermittently never delivered EOF after Go's abrupt close.
+    final class Socket implements AutoCloseable {
+        final java.net.Socket tcp; final java.io.InputStream input; final java.io.OutputStream output;
+        Socket()throws Exception{
+            URI uri=URI.create(base);tcp=new java.net.Socket();tcp.connect(new InetSocketAddress(uri.getHost(),uri.getPort()),5000);tcp.setSoTimeout(5000);
+            input=tcp.getInputStream();output=tcp.getOutputStream();
+            String key=Base64.getEncoder().encodeToString(new byte[16]);
+            output.write(("GET /v1/ws HTTP/1.1\r\nHost: "+uri.getAuthority()+"\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: "+key+"\r\n\r\n").getBytes(java.nio.charset.StandardCharsets.US_ASCII));output.flush();
+            java.io.ByteArrayOutputStream headers=new java.io.ByteArrayOutputStream();int state=0;
+            while(state<4){int b=input.read();require(b>=0&&headers.size()<8192,"Incomplete WSS upgrade");headers.write(b);state=b==new int[]{13,10,13,10}[state]?state+1:(b==13?1:0);}
+            String response=headers.toString(java.nio.charset.StandardCharsets.US_ASCII);
+            require(response.startsWith("HTTP/1.1 101 "),"WSS upgrade rejected");
+            String accept=Base64.getEncoder().encodeToString(java.security.MessageDigest.getInstance("SHA-1").digest((key+"258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes(java.nio.charset.StandardCharsets.US_ASCII)));
+            require(response.toLowerCase(Locale.ROOT).contains("sec-websocket-accept: "+accept.toLowerCase(Locale.ROOT)+"\r\n"),"WSS upgrade accept mismatch");
+        }
+        void send(JsonNode value)throws Exception{
+            byte[] payload=JSON.writeValueAsBytes(value);require(payload.length<65536,"Test frame too large");
+            output.write(0x81);if(payload.length<126)output.write(0x80|payload.length);else{output.write(0xfe);output.write(payload.length>>8);output.write(payload.length);}
+            byte[] mask=new byte[4];new java.security.SecureRandom().nextBytes(mask);output.write(mask);
+            for(int i=0;i<payload.length;i++)output.write(payload[i]^mask[i%4]);output.flush();
+        }
+        Object receive()throws Exception{
+            int first=input.read();if(first<0)return Integer.valueOf(1006);
+            int second=input.read();require(second>=0&&(first&0x70)==0&&(first&0x80)!=0&&(second&0x80)==0,"Invalid server frame");
+            int length=second&127;if(length==126){byte[] size=input.readNBytes(2);require(size.length==2,"Truncated frame length");length=((size[0]&255)<<8)|(size[1]&255);}require(length!=127,"Oversize server frame");
+            byte[] data=input.readNBytes(length);require(data.length==length,"Truncated server frame");
+            int opcode=first&15;if(opcode==8)return Integer.valueOf(1000);require(opcode==1,"Unexpected server frame");return new String(data,java.nio.charset.StandardCharsets.UTF_8);
+        }
         JsonNode next()throws Exception{Object value=receive();require(value instanceof String,"WSS closed before event");return JSON.readTree((String)value);}
-        void closed()throws Exception{Object terminal=messages.poll(5,TimeUnit.SECONDS);require(terminal!=null,"WSS close timeout inputClosed="+ws.isInputClosed()+" outputClosed="+ws.isOutputClosed());if(terminal instanceof java.io.IOException transport){require(ws.isInputClosed()&&ws.isOutputClosed(),"Transport error without terminal socket");return;}if(terminal instanceof Throwable t)throw new AssertionError("WSS close transport",t);require(terminal instanceof Integer,"Expected WSS close after revocation");}
-        void afterRevoke(JsonNode input)throws Exception{try{send(input);}catch(ExecutionException failure){if(!(failure.getCause() instanceof java.io.IOException)||!ws.isOutputClosed())throw failure;}closed();}
-        public void close(){ws.abort();}
+        void closed()throws Exception{
+            try{require(receive() instanceof Integer,"Expected WSS close after event");}
+            catch(java.net.SocketException reset){require(!tcp.isClosed(),"Test closed socket before server closure");}
+        }
+        void afterRevoke(JsonNode frame)throws Exception{try{send(frame);}catch(java.net.SocketException disconnected){/* Read must independently observe terminal EOF/close. */}closed();}
+        public void close()throws java.io.IOException{tcp.close();}
     }
-    Socket socket()throws Exception{Socket s=new Socket();s.ws=http.newWebSocketBuilder().connectTimeout(Duration.ofSeconds(5)).buildAsync(URI.create(base.replaceFirst("^http","ws")+"/v1/ws"),s).get(10,TimeUnit.SECONDS);return s;}
+    Socket socket()throws Exception{return new Socket();}
     void wsStep(Socket socket,String id,Normalize n,String token)throws Exception{JsonNode step=step(wss,id,0);ObjectNode sent=step.get("in").deepCopy();if(token!=null)((ObjectNode)sent.get("payload")).put("accessToken",token);socket.send(sent);for(JsonNode e:step.get("out")){JsonNode actual=socket.next();require(actual.get("requestId").equals(sent.get("requestId")),"WSS requestId echo");n.check(e,actual,"wss");}passed.add(id);}
     void socketFixtures()throws Exception{
         String username="jws"+UUID.randomUUID().toString().replace("-","");Normalize n=new Normalize(username);
@@ -161,6 +214,9 @@ public final class AuthFixtureRunner {
             n.check(step(wss,"revoked-socket",0).get("out").get(0),bound.next(),"wss");
             long[] before=messageCounts();bound.afterRevoke(step(wss,"revoked-socket",1).get("in"));
             require(Arrays.equals(before,messageCounts()),"Post-revocation message changed persistence");passed.add("revoked-socket");
+        }
+        for(String field:List.of("protocolVersion","requestId","type","payload"))try(Socket malformed=socket()){
+            ObjectNode sent=frame("ping",Map.of());sent.put(field,1.0);malformed.send(sent);malformed.closed();
         }
         Reply reconnect=login(login);
         // Simulate a committed revocation whose optimization event was lost.
@@ -182,9 +238,33 @@ public final class AuthFixtureRunner {
         else{username=Files.readString(state);ObjectNode b=body(step(positive,"same-slot-login-replaces-only-that-slot",0).get("request").get("body"),username).put("password","profile-switch-password-"+"X".repeat(90));login(b);}
         System.out.println("PROFILE_CREDENTIAL "+profile+" "+mode+" PASS");
     }
+    void durations()throws Exception{
+        String username="ttl"+UUID.randomUUID().toString().replace("-","");
+        ObjectNode registration=JSON.createObjectNode().put("username",username).put("password","duration-test-password").put("displayName","TTL");
+        require(call("POST","/v1/auth/register",registration,null,null).status==201,"TTL setup");
+        for(String type:List.of("WEB","DESKTOP")){
+            ObjectNode request=body(step(positive,"same-slot-login-replaces-only-that-slot",0).get("request").get("body"),username).put("password","duration-test-password").put("clientType",type);
+            Reply reply=login(request);
+            for(int i=0;i<2;i++){
+                Tokens.Claims claims=codec.parse(reply.token());require(claims.expires()-claims.issued()==config.accessTokenSeconds,"Configured JWT lifetime");
+                require(reply.body.path("tokens").path("accessTokenExpiresInSeconds").asInt()==config.accessTokenSeconds,"Configured advertised access lifetime");
+                if(type.equals("WEB"))require(reply.headers.firstValue("set-cookie").orElseThrow().contains("Max-Age="+config.refreshTokenSeconds+";"),"Configured cookie lifetime");
+                else require(reply.body.path("tokens").path("refreshTokenExpiresInSeconds").asInt()==config.refreshTokenSeconds,"Configured advertised refresh lifetime");
+                try(var db=config.database().getConnection();var q=db.prepareStatement("SELECT extract(epoch FROM expires_at-now()) FROM sessions WHERE session_id=?")){q.setObject(1,UUID.fromString(claims.sessionId()));try(var rows=q.executeQuery()){require(rows.next(),"TTL session missing");double remaining=rows.getDouble(1);require(remaining>config.refreshTokenSeconds-10&&remaining<=config.refreshTokenSeconds,"Configured database expiry");}}
+                ObjectNode refresh=request.deepCopy();refresh.remove(List.of("username","password"));if(!type.equals("WEB"))refresh.put("refreshToken",reply.refresh());
+                reply=call("POST",type.equals("WEB")?"/v1/auth/refresh/web":"/v1/auth/refresh/native",refresh,null,type.equals("WEB")?reply.cookie():null);require(reply.status==200,"TTL refresh");
+            }
+        }
+        System.out.println("CONFIG nondefault token durations across login/refresh/claims/cookie/database PASS");
+    }
     public static void main(String[] args)throws Exception{
         require(args.length>=4,"base profile repository config required");AuthFixtureRunner run=new AuthFixtureRunner(args[0],args[1],Path.of(args[2]),Config.read(args[3]));
-        if(args.length==6){run.credentials(args[4],Path.of(args[5]));return;}
+        if(args.length==5){try{run.durations();}finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}return;}
+        if(args.length==6){try{run.credentials(args[4],Path.of(args[5]));}finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}return;}
+        try{run.execute();}finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}
+    }
+    void execute()throws Exception{
+        AuthFixtureRunner run=this;
         run.httpFixtures();run.socketFixtures();require(run.passed.size()==28,"Expected all 28 Auth fixtures");for(String id:run.passed)System.out.println("FIXTURE "+run.profile+" "+id+" PASS");
         System.out.println("LIVE_AUTH "+run.profile+" PASS 28 fixtures; slot concurrency, rotation, logout, real NATS revocation");
     }

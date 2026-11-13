@@ -47,6 +47,7 @@ def profile(name, build, folder, env, java, cp):
     processes=[];logs=[];stop=folder/'stop';url_file=folder/'url'
     core_port,gateway_port=port(),port()
     config=dict(postgresHost=env['PGHOST'],postgresPort=int(env['PGPORT']),postgresUser=env['PGUSER'],postgresDatabase=env['PGDATABASE'],postgresPasswordFile=str(folder/'pg-secret'),jwtSigningKeyFile=str(folder/'jwt-secret'),coreUrl=f'http://127.0.0.1:{core_port}',natsUrl=env['NATS_URL'])
+    if env.get('JAVA_AUTH_DURATION_PROBE')=='1': config.update(accessTokenSeconds=73,refreshTokenSeconds=419)
     (folder/'pg-secret').write_text(env['PGPASSWORD'],encoding='utf8')
     (folder/'jwt-secret').write_text(env['JAVA_AUTH_SIGNING_KEY'],encoding='utf8')
     config_file=folder/'config.json';config_file.write_text(json.dumps(config),encoding='utf8')
@@ -56,6 +57,7 @@ def profile(name, build, folder, env, java, cp):
     try:
         if name=='java':
             subprocess.run([java,'-cp',cp,'im.platform.core.auth.OutboxFailureProbe',str(config_file)],env=env,check=True,timeout=15)
+            subprocess.run([java,'-cp',cp,'im.platform.core.auth.OutboxRecoveryProbe',str(config_file)],env=env,check=True,timeout=30)
             for role,p in [('core',core_port),('gateway',gateway_port)]:
                 start([java,'-jar',str(build/'java-profile-1.0.0.jar'),role],dict(env,IM_CONFIG_FILE=str(config_file),IM_LISTEN_PORT=str(p)),ROOT)
             url=f'http://127.0.0.1:{gateway_port}'
@@ -80,6 +82,17 @@ def profile(name, build, folder, env, java, cp):
                 if proc.poll() is None: proc.terminate()
             for proc in reversed(processes): proc.wait(timeout=15)
         for log in logs: log.close()
+        sensitive=folder/'sensitive-values.json'
+        if sensitive.exists():
+            values=json.loads(sensitive.read_text(encoding='utf8'))
+            def check_log(text):
+                if any(value and value in text for value in values): raise AssertionError('Credential material in role log')
+            for log in logs: check_log(Path(log.name).read_text(encoding='utf8'))
+            if values:
+                try: check_log('injected leak '+values[0])
+                except AssertionError: pass
+                else: raise AssertionError('Log disclosure mutation undetected')
+            print('DISCLOSURE role logs and injected leak control PASS')
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--build-dir',type=Path,required=True)
@@ -96,14 +109,16 @@ def main():
     evidence=Path(tempfile.mkdtemp(prefix='java-auth-',dir=build));print(f'Live evidence directory: {evidence}',flush=True)
     def run(name,mode=None,state=None):
         folder=evidence/f'{name}-{mode or "fixtures"}-{len(list(evidence.iterdir()))}';folder.mkdir()
-        with profile(name,build,folder,env,java,cp) as (url,config):
+        with profile(name,build,folder,dict(env,JAVA_AUTH_DURATION_PROBE='1') if mode=='ttl' else env,java,cp) as (url,config):
             command=[java,'-cp',cp,'im.platform.tests.auth.AuthFixtureRunner',url,name,str(ROOT),str(config)]
-            if mode: command += [mode,str(state)]
+            if mode: command += [mode] if mode=='ttl' else [mode,str(state)]
             subprocess.run(command,env=env,check=True,timeout=120)
     if args.profile_switch:
         for first,second in [('go','java'),('java','go')]:
             state=evidence/f'{first}-account';run(first,'create',state);run(second,'login',state)
         print('PASS sequential same-database Go/Java credentials in both directions')
-    else: run(args.profile)
+    else:
+        run(args.profile)
+        if args.profile=='java': run('java','ttl')
 
 if __name__=='__main__': main()

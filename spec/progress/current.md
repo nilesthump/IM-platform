@@ -5,10 +5,10 @@ Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-JAVA-AUTH-001`
-Batch Status: INDEPENDENT_REVIEW_PENDING
+Batch Status: FIX_COMPLETE_REVIEW_PENDING
 Current Task: `LOOP1-JAVA-AUTH-001`
 Current Task State: `review`
-Execution Status: implementation local verification passed; final candidate independent reviews pending
+Execution Status: regular Review FAIL at 2e5ad53 repaired locally; fresh final-SHA reviews pending
 Assigned Worktree: H:/.codex/worktrees/j/IM-platform
 Task Branch: task/LOOP1-JAVA-AUTH-001
 Coordinator: /root
@@ -39,7 +39,7 @@ Environment/cache failures, corrected canonical message/route precedence, TLS ca
 
 ## Next Exact Action
 
-Commit scoped candidate, clean Control Acceptance; Coordinator delegates fresh regular then different error review. No push before both final-SHA reviews PASS. Follow hosted acceptance and main sync before done.
+Commit fresh fix candidate, clean Control Acceptance; Coordinator delegates entirely new regular then different error review. No push before both final-SHA reviews PASS. Follow hosted acceptance and main sync before done.
 
 ## Last Known Good Commit
 
@@ -51,8 +51,12 @@ Commit scoped candidate, clean Control Acceptance; Coordinator delegates fresh r
 
 ## Uncommitted Changes / Ownership
 
-/root/java_auth_impl owns only scoped changes in assigned managed j; candidate commit will leave no uncommitted task changes. Main unknown782paths/branch/index untouched. Coordinator owns subsequent independent review/integration.
+/root/java_auth_fix1 owns only scoped changes in assigned managed j; candidate commit will leave no uncommitted task changes. Main unknown782paths/branch/index untouched. Coordinator owns subsequent independent review/integration.
 
 ## Architecture Conflicts / ACP / ADR
 
 None. ADR-0014 accepted. No authority mutation in product task.
+
+Fresh regular review rejected 2e5ad53: browser Origin, Outbox retry, TTL config, leak assertions, numeric WSS version. Go terminal observation unresolved. Evidence: external java-auth-regular-review/review.md. New final SHA requires both fresh reviews; no push.
+
+Fix1 local complete: five findings repaired, actual Java/Go fixtures and stronger real recovery/TTL/disclosure/origin controls PASS. Final test-proxy rerun PASS. Details: spec/progress/evidence/LOOP1-JAVA-AUTH-001/fix1.md. Both fresh reviews remain PENDING final fixed SHA.
