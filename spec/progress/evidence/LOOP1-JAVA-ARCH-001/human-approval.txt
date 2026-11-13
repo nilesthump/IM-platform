@@ -1,0 +1,10 @@
+Initial Human prompt: 启动Java等价
+Question: 是否批准 Java 最小技术方案：Spring Boot + Spring MVC/WebSocket、Spring JDBC + PostgreSQL JDBC 驱动、Jackson；密码学使用 JDK 自带能力，不引入 ORM 或额外认证框架？后续 IM 阶段使用 JNATS。仓库 §2.3 要求核心依赖获得明确批准；批准后我会先完成架构冻结、独立审查和 CI，再实施 Auth/Session。
+Human answer: 批准此最小方案
+Supplement question: 是否补充批准 Spring Security Crypto，仅使用其 BCrypt 密码哈希能力，以兼容现有 Go 账号？不启用 Spring Security 认证框架、不修改密码存储格式，其余密码学仍用 JDK。该核心库需要依仓库 §2.3 单独明确批准。
+Human answer: 批准 bcrypt 专用库
+Source: visible parent chat, 2026-11-13; exact question/answer text transmitted by coordinator /root.
+
+Auth notification supplement question: 是否批准在 Java Auth 阶段使用 JNATS，并实现规范已有的 Session Outbox/撤销通知？范围仅限登录替换、刷新/退出等会话行为，不提前实现消息业务。这是为满足冻结规范 §7.3，需要修正刚才“JNATS 留到 IM”的阶段限制。
+Human answer: 批准 Auth 必要会话通知
+Source: visible parent chat, 2026-11-13; exact question/answer relayed by coordinator /root. This narrow approval supersedes only the IM-only JNATS phase restriction above.

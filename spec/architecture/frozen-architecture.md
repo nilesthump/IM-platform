@@ -297,6 +297,41 @@ profile 的目标是行为可替换；服务内部源码结构可以不同，但
 
 Go/Java 可采用不同内部组织方式，但所有新增框架、ORM、runtime、核心依赖必须先遵守 §2.3；结构自由不是技术选型授权。
 
+
+#### Java 最小技术决定（ADR-0014）
+
+Human 批准 Java/Spring profile 使用 Spring Boot + Spring MVC/WebSocket、Spring JDBC + PostgreSQL JDBC 驱动、Jackson；不引入 ORM 或额外认证框架。密码学使用 JDK 自带能力，唯一补充是 Spring Security Crypto 的 BCrypt 密码哈希原语，以兼容现有 Go 账号；不启用 Spring Security Web/Config/认证过滤链，不修改现有密码存储格式，不自行实现密码算法。JNATS 在 LOOP1-JAVA-AUTH-001 中仅用于 §7.3 已有的 Session Outbox/撤销通知职责，包括登录替换与退出等必要会话行为；后续 LOOP1-JAVA-IM-001 承担其既有 IM/NATS 职责。Auth 不提前实现消息业务，不扩张既有会话语义。
+
+此决定不改变公共契约、数据库 schema/migration、ACK、Session/epoch、服务边界或源码归属。Core 拥有 Auth/Session 写事务，Gateway 只读权威 Session 校验；§3/§10/§11 继续约束所有技术绑定。必要标准传递依赖只服务上述已批准栈，不授权独立使用其他框架。工具链/兼容版本在实现时验证并锁定，不能用升级扩张技术授权。以下标识仅供机器检查，不能代替逐项语义 Review。
+
+<!-- java-technology-policy -->
+```json
+{
+  "decision": "ADR-0014-java-technology",
+  "dependencies": [
+    "org.springframework.boot:spring-boot-starter-web",
+    "org.springframework.boot:spring-boot-starter-websocket",
+    "org.springframework.boot:spring-boot-starter-jdbc",
+    "org.springframework:spring-web",
+    "org.springframework:spring-webmvc",
+    "org.springframework:spring-websocket",
+    "org.springframework:spring-jdbc",
+    "org.postgresql:postgresql",
+    "com.fasterxml.jackson.core:jackson-core",
+    "com.fasterxml.jackson.core:jackson-annotations",
+    "com.fasterxml.jackson.core:jackson-databind",
+    "org.springframework.security:spring-security-crypto",
+    "io.nats:jnats"
+  ],
+  "bcrypt_only": true,
+  "jnats_phases": ["LOOP1-JAVA-AUTH-001", "LOOP1-JAVA-IM-001"],
+  "orm": false,
+  "security_framework": false
+}
+```
+
+本 Human-approved candidate 须经 fresh 常规 Review、different fresh 错误专项、适用 exact-head hosted CI、protected integration、actual-main 与安全同步后生效；冻结接受前 JAVA-AUTH 保持 backlog。本节不使 Java S0 placeholder 自动成为产品实现。
+
 <a id="section-3-3"></a>
 ### 3.3 Loop 1 单机部署
 

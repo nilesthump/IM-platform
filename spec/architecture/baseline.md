@@ -5,7 +5,7 @@
 - status: MVP planning accepted at actual main b60f116; administrative closure candidate review pending
 - canonical_format: `markdown`
 - repository_path: `spec/architecture/frozen-architecture.md`
-- sha256: `33b7b2a0a29b555b8c2842383890ae67fc382286b582b4681d2cd78b9f5829ca`
+- sha256: `a52e871d4f48708c1fa7e06ea2e4ffae3922a93a9be6128cb79b3292b6b36bef`
 - previous_canonical_format: `pdf`
 - previous_repository_path: `scalable-distributed-im-architecture.pdf`
 - previous_sha256: `546915f639f30cd294f11390da3ade2ce6a85b620bf55727c2a90ca6017d7510`
@@ -154,3 +154,13 @@ APPROVED_PENDING_FREEZE。沿用v1.1，最新canonical hash只绑定本候选字
 - group_previous_sha256: `efbe04c7eb308904d1759b8e145a32363620ed8c14daef58f09c644bdc897bdc`
 
 当前canonical hash仅绑定本轮候选字节；v1.1、PDF与旧supplement/其他ADR谱系不变。Human明确授权最小群聊规划，fresh常规Review、different fresh错误专项、exact-head hostedCI、protected integration、actual-main和安全主目录同步PENDING。产品GROUP backlog/S2 OPEN；本轮终点为规划接受及同步后STOP，不实施群聊。
+
+## Human-approved Java technology candidate
+
+- java_revision_adr: `spec/architecture/decisions/ADR-0014-java-technology.md`
+- java_revision_task_id: `LOOP1-JAVA-ARCH-001`
+- java_approval_source: `spec/progress/evidence/LOOP1-JAVA-ARCH-001/human-approval.txt`
+- java_approval_sha256: `6e8a88246bd9543cf333248e829593b42c09f3adcf3030345f8bd9191b6a72b9`
+- java_previous_sha256: `33b7b2a0a29b555b8c2842383890ae67fc382286b582b4681d2cd78b9f5829ca`
+
+APPROVED_PENDING_FREEZE; previous acceptance/PDF unchanged. New dual Review/exact-head CI/integration/actual-main/safe sync pending. JAVA-AUTH backlog; S3 OPEN.

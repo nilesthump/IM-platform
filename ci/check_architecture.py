@@ -808,6 +808,12 @@ def main(argv=None):
         checker = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(checker)
         errors += checker.check(args.root)
+    if args.scope in {"java", "governance", "all"}:
+        import importlib.util
+        java_spec = importlib.util.spec_from_file_location("java_technology_controls", ROOT / "ci/check_java_technology.py")
+        java_checker = importlib.util.module_from_spec(java_spec)
+        java_spec.loader.exec_module(java_checker)
+        errors += java_checker.check(args.root)
     if args.scope in {"clients", "all"}:
         errors += check_clients(args.root)
     for language, checker in (("go", check_go), ("java", check_java)):
