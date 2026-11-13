@@ -5,54 +5,52 @@ Current Stage: `S2`
 Current Gate: `S2`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-S2-GATE-001`
-Batch Status: REVIEW
+Batch Status: CHECKPOINT_ACCEPTANCE_PENDING
 Current Task: `LOOP1-S2-GATE-001`
 Current Task State: `review`
-Execution Status: S2 Gate assessment awaiting independent candidate acceptance
+Execution Status: checkpoint candidate awaiting independent acceptance and safe sync
 Assigned Worktree: H:/.codex/worktrees/s2/IM-platform
 Task Branch: task/LOOP1-S2-GATE-001
 Coordinator: /root/resume_next
 
 ## Immediately Relevant Completed Work
 
-GROUP final external seal discharges administrative pending-at-commit records: candidate2194377a87c6168266f3b4431c4dc9b71d036b21, PR100/main555fd18e2f698189104360604eb2535d3c3b05c9. Fresh read-only auditor verified10 referenced hashes including independent reviews/CI and safe synchronization preserving782 unknown files. Latest Human request authorizes the next dependency-satisfied work; canonical next step is S2 Gate, before Java Auth.
+Assessment62dc57dd independently accepted through protected PR101/main8acdce95. Full first-push14required jobs PASS; PR/main5selected PASS,8normallyinactive. Guarded main sync and fresh independent782-file preservation audit PASS. Ten S2 task chains and deferred Windows tooling verified; fresh Gate judge substantive PASS retained final checkpoint condition. This candidate supplies the pending checkpoint/current recovery record. Both machine fields and narrative remain review/OPEN until checkpoint acceptance and the independent S2 Gate seal exist.
 
 ## Current Blockers
 
-No Stage PASS yet. Initial disposable Go test cache permission failure resolved with a process-local owned writable GOCACHE. Full S2 matrix now binds10 tasks/595 manifest entries/55 administrative references with zero final mismatch. Deferred Windows tooling observation bound. New candidate independent acceptance remains pending.
+No product gap found. Checkpoint candidate independent reviews/CI/integration/sync and the unconditional independent S2 Gate seal remain pending. Original ae9f5c4f regular Review FAIL found premature machine PASS/done; this correction restores review/OPEN. No Java activation.
 
 ## Verification
 
-- Command: `python -Xutf8 -B -m unittest discover -s tests/architecture`
-  - Result: PASS88 tests/1existing skip/25.705s after owned child-process GOCACHE; initial access-denied failure retained. Frozen/planning/full architecture PASS; CI35 PASS/4existing skips.
-  - Evidence: `spec/progress/evidence/LOOP1-S2-GATE-001/baseline.md`
-
-Initial Python2 and Recorder GBK failures retained; corrected Python3/-Xutf8. Local evidence is not Gate PASS.
+- Command: `pwsh -NoProfile -File tools/verify-loop1-ctrl-002.ps1 -Mode Development`
+  - Result: PASS exit0/29.031s on the P2 metadata correction, task review/S2 OPEN; local verification only. Prior assessment62dc57dd clean Acceptance/independent reviews/hosted/sync remain accepted; the corrected checkpoint candidate requires fresh independent reviews and hosted acceptance.
+  - Evidence: `spec/progress/evidence/LOOP1-S2-GATE-001/closure-receipt.json`
 
 ## Changed Files or Migrations
 
-Only Gate Task/current/evidence/checkpoint paths authorized. No product/schema/contract change.
+Task/current/checkpoint recovery evidence only. Product/contracts/migration0002 unchanged.
 
 ## Known Failures, Risks, and Assumptions
 
-Inherited bounded runtime evidence and historical failures remain unchanged. Early recovery reads were outside Recorder; prospective_resume explicitly incomplete. No helper/ACL/trust changes. Main unknown tracked and untracked work preserved.
+Historical bounded evidence/failures/skips retained. Python2/GBK/Go-cache/Control-entry failures resolved without product/checker changes. Connector403/sandbox401 corrected through existing keyring with approved unsandboxed gh; no config/security change. Incomplete Recorder is not acceptance. Original ae9f5c4f P2 recovery-state Review FAIL remains preserved in closure-receipt.json; new correction requires fresh reviews on its final SHA.
 
 ## Next Exact Action
 
-Obtain clean committed Control Acceptance, then fresh regular Review and different error specialist on final committed SHA, exact-head hosted acceptance, protected integration/actual-main/safe synchronization. Keep S2 OPEN until independently accepted.
+Accept and safely synchronize this review/OPEN checkpoint candidate through fresh regular Review, different fresh error review, exact-head hosted CI, protected integration and actual-main verification. Then obtain the unconditional independent S2 Gate seal. Only after that established acceptance, record done/PASS in a bounded status-only candidate with applicable independent acceptance. Stop after S2 Gate; no Java activation.
 
 ## Last Known Good Commit
 
-`555fd18e2f698189104360604eb2535d3c3b05c9` (GROUP final accepted and synchronized main).
+`8acdce95e19d675766d29c0db665b90792ae3485` accepted and safely synchronized assessment.
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-11-06-group-completion.md`; S2 Gate assessment candidate evidence at `spec/progress/evidence/LOOP1-S2-GATE-001/assessment.md`; accepted Gate checkpoint pending independent acceptance.
+`spec/progress/checkpoints/2026-11-13-s2-gate.md`
 
 ## Uncommitted Changes / Ownership
 
-/root/resume_next sole writer owns new Gate metadata in assigned managed worktree. Main unrelated changes unknown/preserved; no main writes performed.
+/root/resume_next/s2_checkpoint_fix owns the narrow metadata correction during the delegated sole-writer lease; ownership returns to /root/resume_next after commit. Main782 unknown files/status/index/branch preserved; no unrelated writes.
 
 ## Architecture Conflicts / ACP / ADR
 
-None. S1 PASS retained; S2 OPEN. S3 not activated.
+None. S1 PASS retained; S2 OPEN and current task review. No S3 implementation.

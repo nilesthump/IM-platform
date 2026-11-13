@@ -1,0 +1,9 @@
+# S2 Gate checkpoint acceptance candidate
+
+Accepted assessment candidate `62dc57dd9a52fac1a5ff70616f3906bb7621aa7d` passed fresh regular and different error reviews, full first-push CI43391606401 (14 required successes), PR43392743889 (5 required successes/8 normally inactive), protected PR101 and actual-main43393248671 (5 required successes/8 inactive). Actual main `8acdce95e19d675766d29c0db665b90792ae3485` has the identical reviewed tree; guarded synchronization passed with782 unknown files/status/branch/unrelated index preserved.
+
+Fresh independent Gate judge checked the substantive S2 obligations and independently repeated main preservation verification. Its verdict is PASS_SUBSTANTIVE_S2_OBLIGATIONS_FINAL_CHECKPOINT_PENDING, not an unconditional Stage PASS. This bounded candidate adds the required recoverable checkpoint/current record; it changes no product, contracts, architecture or CI. Task and machine state remain review/OPEN. Accept and synchronize the checkpoint candidate first, then obtain the unconditional independent Stage seal. Only afterward record actual done/PASS through a bounded status-only candidate and its applicable independent acceptance.
+
+Exact original paths/hashes and limitations are in closure-receipt.json. Original failure snapshots, scoped decisions and Recorder gaps remain immutable. The only newly resolved deferred item was supported Windows tooling launch/initialization, not a new product runtime replay. Stop after S2 Gate; no Java task activation.
+
+Original candidate ae9f5c4f5a202ce8fc9b0146cee12e9e0ab045c5 failed independent regular Review: conditional prose did not neutralize premature machine PASS/done. The exact immutable FAIL report is hash-bound in closure-receipt.json. This fix changes only recovery metadata; it does not weaken Gate requirements or reinterpret substantive PASS as Stage PASS.
