@@ -46,4 +46,22 @@ class JavaTechnologyControls(unittest.TestCase):
         self.pom('junit-jupiter','org.junit.jupiter');self.assertTrue(checker.check(self.root))
     def test_missing_policy_fails(self):
         (self.root/'spec/architecture/frozen-architecture.md').unlink();self.assertTrue(checker.check(self.root))
+    def test_wrong_root_and_foreign_namespaces_fail(self):
+        dependency = '<dependency><groupId>org.hibernate.orm</groupId><artifactId>hibernate-core</artifactId></dependency>'
+        documents = [
+            '<not-a-pom/>',
+            '<project xmlns="urn:unknown"><dependencies>'+dependency+'</dependencies></project>',
+            '<project xmlns="http://maven.apache.org/POM/4.0.0"><dependencies xmlns="urn:unknown">'+dependency+'</dependencies></project>',
+            '<project><foreign:dependencies xmlns:foreign="urn:unknown">'+dependency+'</foreign:dependencies></project>',
+        ]
+        for document in documents:
+            self.put('backend/java/pom.xml',document)
+            self.assertTrue(any('unsupported Maven root or namespace' in error for error in checker.check(self.root)),document)
+    def test_standard_maven_namespaces_pass_and_still_check_dependencies(self):
+        for prefix, declaration in [('', 'xmlns="http://maven.apache.org/POM/4.0.0"'), ('m:', 'xmlns:m="http://maven.apache.org/POM/4.0.0"')]:
+            document = '<{p}project {ns}><{p}dependencies><{p}dependency><{p}groupId>org.postgresql</{p}groupId><{p}artifactId>postgresql</{p}artifactId></{p}dependency></{p}dependencies></{p}project>'.format(p=prefix,ns=declaration)
+            self.put('backend/java/pom.xml',document)
+            self.assertEqual([],checker.check(self.root))
+            self.put('backend/java/pom.xml',document.replace('org.postgresql','org.hibernate.orm').replace('>postgresql<','>hibernate-core<'))
+            self.assertTrue(checker.check(self.root))
 if __name__=='__main__':unittest.main()

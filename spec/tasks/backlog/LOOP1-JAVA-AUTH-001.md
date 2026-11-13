@@ -35,11 +35,11 @@ Fresh regular then different fresh specialist review final SHA before CI, repeat
 
 # Acceptance
 
-Same canonical Auth/Session positive/negative fixtures, three login slots, atomic epoch replacement, auth.bind, revocation-before-close, refresh/logout and no secrets in errors/logs/query. Go-created account authenticates on Java and Java-created account on Go with existing schema/password format. Exact runtime tests and source ownership/import controls, fresh reviews/exact-head hosted CI/protected integration/actual-main/safe sync required. No inferred S3 Gate PASS.
+Same canonical Auth/Session positive/negative fixtures, three login slots, atomic epoch replacement, auth.bind, transactional Session Outbox and JNATS notification, revocation-before-close, refresh/logout and no secrets in errors/logs/query. Go-created account authenticates on Java and Java-created account on Go with existing schema/password format. Exact runtime tests and source ownership/import controls, fresh reviews/exact-head hosted CI/protected integration/actual-main/safe sync required. No inferred S3 Gate PASS.
 
 # Forbidden
 
-No implementation before dependencies and narrow paths are complete; no Friend/Message/Sync/Outbox business expansion, no contract/schema/ACK/security changes, no permanent Java placeholder exception.
+No implementation before dependencies and narrow paths are complete; no Friend/Message/Sync business expansion or generic/message Outbox work; necessary canonical §7.3 Session Outbox and JNATS revocation delivery are in scope, no contract/schema/ACK/security changes, no permanent Java placeholder exception.
 
 # Minimality
 

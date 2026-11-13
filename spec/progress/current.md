@@ -19,13 +19,13 @@ S1/S2 PASS retained. S2 final publication independently accepted at main98e06596
 
 ## Current Blockers
 
-No missing Human technology decision. Freeze independent acceptance pending; JAVA-AUTH remains backlog.
+Original5f008172 error specialist FAIL (phase conflict and XML verification gap). Latest Human supplement resolves Auth Session notification authority; fresh fixes pending new two reviews. JAVA-AUTH remains backlog.
 
 ## Verification
 
 - Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: candidate frozen/sourceall/Control Development PASS; architecture95 tests with1 existing skip; CI35 tests with4 existing skips. Local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-ARCH-001/verification.md`
+  - Result: Fix 1 frozen/sourceall/Control Development PASS; architecture97 tests with1 existing skip; CI35 tests with4 existing skips. Local evidence only.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-ARCH-001/fix1.md`
 
 ## Changed Files or Migrations
 
@@ -49,8 +49,12 @@ Fresh regular Review of committed candidate, then different fresh error review o
 
 ## Uncommitted Changes / Ownership
 
-/root/java_start owns only task candidate changes in assigned managed j worktree. Main unknown tracked/untracked files, index and branch untouched.
+/root/java_auth owns only fresh Fix 1 changes in assigned managed j worktree. Main unknown tracked/untracked files, index and branch untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
 Human approved required stack and BCrypt-only supplement; ADR-0014 candidate awaits freeze acceptance. No Java product activation.
+
+## Fresh Fix 1
+
+See spec/progress/evidence/LOOP1-JAVA-ARCH-001/fix1.md. Original regular PASS/error FAIL retained; both reviews PENDING on final fixed SHA. No push/CI before new two-review PASS.

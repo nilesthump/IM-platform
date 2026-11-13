@@ -21,7 +21,7 @@ Freeze the Human-approved Java stack and BCrypt-only compatibility supplement be
 
 # Technology Authorization
 
-Exact Human approvals in human-approval.txt authorize freezing §3.2 minimal Spring Boot/MVC/WebSocket/JDBC, PostgreSQL JDBC, Jackson, JDK cryptography, BCrypt-only Spring Security Crypto and later IM JNATS. Candidate authority is not effective until independently accepted. No product dependency added.
+Exact Human approvals in human-approval.txt authorize freezing §3.2 minimal Spring Boot/MVC/WebSocket/JDBC, PostgreSQL JDBC, Jackson, JDK cryptography, BCrypt-only Spring Security Crypto and narrowly required Auth Session Outbox/JNATS (latest Human supplement), with other IM duties deferred. Candidate authority is not effective until independently accepted. No product dependency added.
 
 # Dependencies
 
@@ -76,3 +76,7 @@ Managed H:/.codex/worktrees/j/IM-platform, branch task/LOOP1-JAVA-ARCH-001; root
 # Next Action
 
 Fresh regular and different fresh error reviews of final committed candidate before GitHub CI.
+
+# Fresh Fix 1 recovery
+
+Original5f008172 regular PASS/error specialist FAIL preserved in evidence/fix1.md. Human approved necessary Auth Session Outbox/JNATS. Fresh /root/java_auth fixes phase consistency and wrong-root/foreign-namespace Maven false success only. Local frozen/sourceall/97 architecture tests (1 existing skip)/35 CI tests (4 existing skips)/Control Development PASS; final fixed SHA requires NEW regular and different error reviews before CI, then applicable hosted/integration/main sync. No product activation.

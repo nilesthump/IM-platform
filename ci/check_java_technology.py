@@ -25,7 +25,7 @@ def policy(root):
     value = json.loads(match.group(1))
     if (value.get('decision') != 'ADR-0014-java-technology' or value.get('bcrypt_only') is not True
             or value.get('orm') is not False or value.get('security_framework') is not False
-            or value.get('jnats_phase') != 'LOOP1-JAVA-IM-001'
+            or value.get('jnats_phases') != ['LOOP1-JAVA-AUTH-001', 'LOOP1-JAVA-IM-001']
             or not isinstance(value.get('dependencies'),list)
             or not all(isinstance(x,str) and ':' in x for x in value['dependencies'])):
         raise ValueError('Java policy shape/bounds invalid')
@@ -51,7 +51,13 @@ def check(root):
                 tree=ET.fromstring(path.read_text(encoding='utf8'))
             except (OSError,ET.ParseError) as error:
                 errors.append('JAVA-TECH '+relative+': malformed Maven input: '+str(error));continue
-            # Strip only Maven namespace; any other namespace remains unknown.
+            # Unknown XML structures cannot stand in for a verified Maven model.
+            namespace = '{http://maven.apache.org/POM/4.0.0}'
+            if tree.tag not in {'project', namespace+'project'} or any(
+                    element.tag.startswith('{') and not element.tag.startswith(namespace)
+                    for element in tree.iter()):
+                errors.append('JAVA-TECH '+relative+': unsupported Maven root or namespace');continue
+            # Normalize only the recognized Maven namespace after validation.
             for element in tree.iter():
                 element.tag=element.tag.removeprefix('{http://maven.apache.org/POM/4.0.0}')
             for node in tree.iter():
