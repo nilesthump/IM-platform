@@ -33,7 +33,7 @@ import java.io.UncheckedIOException;
 @EnableWebSocket
 @RestController
 public class Gateway implements WebSocketConfigurer,DisposableBean {
-    private static final ObjectMapper JSON=new ObjectMapper();
+    private static final ObjectMapper JSON=new ObjectMapper().enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
     private final Config config;
     private final JdbcTemplate db;
     private final Tokens tokens;

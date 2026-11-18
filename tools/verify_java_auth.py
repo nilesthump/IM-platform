@@ -87,10 +87,16 @@ def profile(name, build, folder, env, java, cp):
             values=json.loads(sensitive.read_text(encoding='utf8'))
             def check_log(text):
                 if any(value and value in text for value in values): raise AssertionError('Credential material in role log')
-            for log in logs: check_log(Path(log.name).read_text(encoding='utf8'))
-            if values:
-                try: check_log('injected leak '+values[0])
-                except AssertionError: pass
+            def check_log_file(path): check_log(path.read_text(encoding='utf8'))
+            for log in logs: check_log_file(Path(log.name))
+            # A separate captured-log mutation never modifies original role output.
+            # Cover every actual submitted/issued value, including WSS-only tokens.
+            mutation=folder/'disclosure-mutation.log'
+            for value in values:
+                mutation.write_text('EXPLICIT TEST MUTATION: '+value,encoding='utf8')
+                try: check_log_file(mutation)
+                except AssertionError as failure:
+                    if str(failure)!='Credential material in role log': raise
                 else: raise AssertionError('Log disclosure mutation undetected')
             print('DISCLOSURE role logs and injected leak control PASS')
 

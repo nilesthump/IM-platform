@@ -5,10 +5,10 @@ Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-JAVA-AUTH-001`
-Batch Status: FIX_COMPLETE_REVIEW_PENDING
+Batch Status: FIX2_COMPLETE_REVIEW_PENDING
 Current Task: `LOOP1-JAVA-AUTH-001`
 Current Task State: `review`
-Execution Status: regular Review FAIL at 2e5ad53 repaired locally; fresh final-SHA reviews pending
+Execution Status: Fix2 local verification complete; final committed candidate dual reviews pending
 Assigned Worktree: H:/.codex/worktrees/j/IM-platform
 Task Branch: task/LOOP1-JAVA-AUTH-001
 Coordinator: /root
@@ -19,7 +19,7 @@ Accepted ADR-0014 source/main e4aee5ce is safely synchronized. Java Auth/Session
 
 ## Current Blockers
 
-No architecture or local runtime blocker. Final candidate needs fresh regular Review, different fresh error specialist, hosted exact-head CI, protected integration/actual-main verification and safe synchronization.
+Fresh disposable PostgreSQL/NATS and canonical migrations, Go Gateway/integration suites, real Go TLS13 smoke and Development Control passed. Final-SHA dual reviews and hosted acceptance remain pending; no Task PASS.
 
 ## Verification
 
@@ -31,7 +31,7 @@ Maven5tests, sourceall, architecture99tests (1 platform skip), CI38tests (4 plat
 
 ## Changed Files or Migrations
 
-Scoped Java roles/crypto/config/build, shared fixture harness and explicit Go test-only host, Java real CI/deployment wiring, narrow source-guard/test transition, accepted freeze closure and Auth recovery metadata. No contracts/schema/migrations or Go product behavior changed.
+Scoped Java roles/crypto/config/build, fixture harness, CI/deployment wiring and recovery metadata. Fix2 additionally contains the Coordinator-authorized Go Gateway complete-JSON read-boundary correction; no contracts/schema/migrations/ACK changes. Latest local results and pending checks are in fix2-stop.md; CI controls now contain39 tests.
 
 ## Known Failures, Risks, and Assumptions
 
@@ -39,7 +39,7 @@ Environment/cache failures, corrected canonical message/route precedence, TLS ca
 
 ## Next Exact Action
 
-Commit fresh fix candidate, clean Control Acceptance; Coordinator delegates entirely new regular then different error review. No push before both final-SHA reviews PASS. Follow hosted acceptance and main sync before done.
+Complete resumed Go TLS and control checks; commit owned Fix2, run clean Control Acceptance, then Coordinator delegates entirely new regular/error reviews on final SHA. No push before both PASS. Historical stop and earlier verification remain in fix2-stop.md; resumed evidence is fix2-resume-20261118.md.
 
 ## Last Known Good Commit
 
@@ -51,7 +51,7 @@ Commit fresh fix candidate, clean Control Acceptance; Coordinator delegates enti
 
 ## Uncommitted Changes / Ownership
 
-/root/java_auth_fix1 owns only scoped changes in assigned managed j; candidate commit will leave no uncommitted task changes. Main unknown782paths/branch/index untouched. Coordinator owns subsequent independent review/integration.
+/root/java_auth_fix2 owns uncommitted scoped repairs in assigned managed j; /root owns final stop/cleanup corrections to current.md and fix2-stop.md. Main unknown782paths/branch/index untouched. No commit or push; see fix2-stop.md for recovery.
 
 ## Architecture Conflicts / ACP / ADR
 

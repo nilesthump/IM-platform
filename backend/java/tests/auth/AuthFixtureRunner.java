@@ -13,7 +13,7 @@ import java.sql.*;
 
 /** The same real-endpoint assertions run unchanged against both deployed role implementations. */
 public final class AuthFixtureRunner {
-    static final ObjectMapper JSON=new ObjectMapper();
+    static final ObjectMapper JSON=new ObjectMapper().enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
     final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     final String base,profile; final Path root; final Config config; final Tokens codec;
     final Map<String,JsonNode> positive,negative,wss;
@@ -72,6 +72,8 @@ public final class AuthFixtureRunner {
         });
     }
     Reply callHeaders(String method,String path,JsonNode body,Map<String,String> headers)throws Exception{
+        String query=URI.create(base+path).getRawQuery();
+        if(query!=null)for(String part:query.split("&")){String[] pair=part.split("=",2);if(pair.length==2&&Set.of("token","accessToken","refreshToken","password").contains(URLDecoder.decode(pair[0],java.nio.charset.StandardCharsets.UTF_8)))secrets.add(URLDecoder.decode(pair[1],java.nio.charset.StandardCharsets.UTF_8));}
         collect(body);headers.forEach((key,value)->{if(key.equalsIgnoreCase("Authorization"))secrets.add(value.replaceFirst("^Bearer ",""));if(key.equalsIgnoreCase("Cookie"))secrets.add(value.split("=",2)[1]);});
         var request=HttpRequest.newBuilder(URI.create(base+path)).timeout(Duration.ofSeconds(10));
         headers.forEach(request::header);
@@ -175,12 +177,16 @@ public final class AuthFixtureRunner {
             java.io.ByteArrayOutputStream headers=new java.io.ByteArrayOutputStream();int state=0;
             while(state<4){int b=input.read();require(b>=0&&headers.size()<8192,"Incomplete WSS upgrade");headers.write(b);state=b==new int[]{13,10,13,10}[state]?state+1:(b==13?1:0);}
             String response=headers.toString(java.nio.charset.StandardCharsets.US_ASCII);
+            noLeak(response);
             require(response.startsWith("HTTP/1.1 101 "),"WSS upgrade rejected");
             String accept=Base64.getEncoder().encodeToString(java.security.MessageDigest.getInstance("SHA-1").digest((key+"258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes(java.nio.charset.StandardCharsets.US_ASCII)));
             require(response.toLowerCase(Locale.ROOT).contains("sec-websocket-accept: "+accept.toLowerCase(Locale.ROOT)+"\r\n"),"WSS upgrade accept mismatch");
         }
         void send(JsonNode value)throws Exception{
-            byte[] payload=JSON.writeValueAsBytes(value);require(payload.length<65536,"Test frame too large");
+            collect(value);sendRaw(JSON.writeValueAsString(value));
+        }
+        void sendRaw(String value)throws Exception{
+            byte[] payload=value.getBytes(java.nio.charset.StandardCharsets.UTF_8);require(payload.length<65536,"Test frame too large");
             output.write(0x81);if(payload.length<126)output.write(0x80|payload.length);else{output.write(0xfe);output.write(payload.length>>8);output.write(payload.length);}
             byte[] mask=new byte[4];new java.security.SecureRandom().nextBytes(mask);output.write(mask);
             for(int i=0;i<payload.length;i++)output.write(payload[i]^mask[i%4]);output.flush();
@@ -190,9 +196,10 @@ public final class AuthFixtureRunner {
             int second=input.read();require(second>=0&&(first&0x70)==0&&(first&0x80)!=0&&(second&0x80)==0,"Invalid server frame");
             int length=second&127;if(length==126){byte[] size=input.readNBytes(2);require(size.length==2,"Truncated frame length");length=((size[0]&255)<<8)|(size[1]&255);}require(length!=127,"Oversize server frame");
             byte[] data=input.readNBytes(length);require(data.length==length,"Truncated server frame");
+            noLeak(new String(data,java.nio.charset.StandardCharsets.UTF_8));
             int opcode=first&15;if(opcode==8)return Integer.valueOf(1000);require(opcode==1,"Unexpected server frame");return new String(data,java.nio.charset.StandardCharsets.UTF_8);
         }
-        JsonNode next()throws Exception{Object value=receive();require(value instanceof String,"WSS closed before event");return JSON.readTree((String)value);}
+        JsonNode next()throws Exception{Object value=receive();require(value instanceof String,"WSS closed before event");return receivedFrame((String)value);}
         void closed()throws Exception{
             try{require(receive() instanceof Integer,"Expected WSS close after event");}
             catch(java.net.SocketException reset){require(!tcp.isClosed(),"Test closed socket before server closure");}
@@ -201,6 +208,7 @@ public final class AuthFixtureRunner {
         public void close()throws java.io.IOException{tcp.close();}
     }
     Socket socket()throws Exception{return new Socket();}
+    JsonNode receivedFrame(String value)throws Exception{noLeak(value);return JSON.readTree(value);}
     void wsStep(Socket socket,String id,Normalize n,String token)throws Exception{JsonNode step=step(wss,id,0);ObjectNode sent=step.get("in").deepCopy();if(token!=null)((ObjectNode)sent.get("payload")).put("accessToken",token);socket.send(sent);for(JsonNode e:step.get("out")){JsonNode actual=socket.next();require(actual.get("requestId").equals(sent.get("requestId")),"WSS requestId echo");n.check(e,actual,"wss");}passed.add(id);}
     void socketFixtures()throws Exception{
         String username="jws"+UUID.randomUUID().toString().replace("-","");Normalize n=new Normalize(username);
@@ -218,6 +226,16 @@ public final class AuthFixtureRunner {
         for(String field:List.of("protocolVersion","requestId","type","payload"))try(Socket malformed=socket()){
             ObjectNode sent=frame("ping",Map.of());sent.put(field,1.0);malformed.send(sent);malformed.closed();
         }
+        for(String suffix:List.of("{}","NOT_JSON"))try(Socket malformed=socket()){malformed.sendRaw(frame("ping",Map.of()).toString()+suffix);malformed.closed();}
+        try(Socket whitespace=socket()){whitespace.sendRaw(frame("ping",Map.of()).toString()+" \r\n\t");require(whitespace.next().path("type").asText().equals("pong"),"Legal JSON trailing whitespace rejected");}
+        require(secrets.contains("not-a-valid-JWT"),"WSS-only submitted token missing from disclosure inventory");
+        ObjectNode leakedFrame=frame("auth.ack",Map.of("status","rejected","error",Map.of("code","AUTH_TOKEN_INVALID","message","invalid")));
+        leakedFrame.put("extra","not-a-valid-JWT");boolean detected=false;
+        try{receivedFrame(leakedFrame.toString());}catch(AssertionError expected){require(expected.getMessage().equals("Credential material leaked"),"Unrelated frame mutation failure");detected=true;}
+        require(detected,"WSS-only credential frame mutation undetected");
+        ObjectNode leakedReply=JSON.createObjectNode().put("extra","not-a-valid-JWT");detected=false;
+        try{checkDisclosure(leakedReply,HttpHeaders.of(Map.of(),(a,b)->true));}catch(AssertionError expected){require(expected.getMessage().equals("Credential material leaked"),"Unrelated response mutation failure");detected=true;}
+        require(detected,"WSS-only credential response mutation undetected");
         Reply reconnect=login(login);
         // Simulate a committed revocation whose optimization event was lost.
         // Reconnect must consult Session persistence, never cached bind state.

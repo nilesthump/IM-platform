@@ -2,7 +2,7 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/java_auth_fix1
+owner: /root/java_auth_fix2
 stage: S3
 gate: S3
 ---
@@ -50,6 +50,7 @@ Accepted ADR-0014: Spring Boot MVC/WebSocket, Spring JDBC/PostgreSQL driver, Jac
 - backend/java/plugin-host/Health.java (retain non-business health role required by existing Compose; no plugin execution)
 - backend/java/tests/auth/** (unit and same-fixture blackbox tests, JDBC state assertions and profile-switch credential checks)
 - backend/go/tests/java_auth_profile_test.go (explicit opt-in real Go Core/Gateway ephemeral test listeners for the shared blackbox runner; Coordinator authorized before edit, no Go product changes)
+- backend/go/gateway/gateway.go (Coordinator authorized Fix2 only: replace prefix-decoding ReadJSON with complete-message decoding at existing serve boundary; same canonical single JSON envelope, limits, frame handling and ACK semantics. Shared malformed-suffix failure is present evidence; no other Go product edits.)
 - tools/verify_java_auth.py (bounded build/start/test/stop orchestration; standard library, no secret output)
 - .github/workflows/ci.yml (replace Java placeholder job with real build and mandatory migrated PostgreSQL/NATS tests; preserve existing jobs/gate)
 - tests/ci/test_java_auth_job.py (negative control rejects missing live tests or restored placeholder-only Java job)
@@ -80,6 +81,8 @@ No applicable runtime tests may be skipped due to unset variables. HTTPS/WSS ent
 # Forbidden
 
 No contract/schema/migration/security/ACK change, no Friend/Message/Sync business, no generic/message outbox framework, no ORM/authframework/new core library, no early plugin implementation, no permanent placeholder exception or unknown-main overwrite. No self-acceptance.
+
+Fix2 narrow Go product exception above corrects existing acceptance of malformed JSON suffixes; it does not change the public contract or compatibility rules. Verify shared malformed suffix/legal whitespace controls on both profiles, applicable Go tests, Go TLS smoke and source-all boundaries.
 
 # Minimality
 
@@ -118,6 +121,12 @@ Implementation candidate ready for fresh independent Review. Assigned managed ro
 Regular Review: PENDING final committed SHA. Different error specialist: PENDING after regular PASS. Hosted exact-head CI, integration, actual-main verification and safe main sync: PENDING. No push before both fresh reviews PASS. Accepted base remains e4aee5ce2c4327904990d5c651267ca5eaae389d; S1/S2 PASS, S3 OPEN. Unknown original-main work untouched.
 
 # Next Action
+
+2026-11-18 USER RESUME supersedes the historical stop below. Complete remaining Go suites/TLS and controls, commit Fix2 and clean Control Acceptance, then entirely new regular/error reviews. Fresh isolated services and canonical migrations are ready; Go suites passed. Resume evidence: spec/progress/evidence/LOOP1-JAVA-AUTH-001/fix2-resume-20261118.md. No publication before both final-SHA reviews PASS.
+
+User requested stop after the already-running bounded verification. No new tests, fixes, commit, push or reviews. HEAD remains rejected 4c178a90658d4367b822f4523e2957f8664ce616; accepted base e4aee5ce. Fix2 uncommitted scope and final observed results: spec/progress/evidence/LOOP1-JAVA-AUTH-001/fix2-stop.md. Resume only on user instruction: complete pending Go tests/TLS and final checks, commit/cleanControl, new regular and different error reviews, then hosted acceptance/integration/safe sync. Both reviews remain pending.
+
+Regular Review of 4c178a90658d4367b822f4523e2957f8664ce616: FAIL (CI Origin preparation, complete WSS JSON document validation, WSS-only credential disclosure coverage). Fresh Fix2 owns scoped repairs. Java focused tests pass; matching malformed-JSON negative exposed the same Go ReadJSON prefix behavior. Coordinator scope decision pending; no Go product edits yet. Both new final-SHA reviews and hosted acceptance remain pending.
 
 Coordinator delegates fresh regular Review of the committed candidate, then different fresh error specialist; any fix requires fresh contexts and both final-SHA reviews again. Only then hosted CI/integration/main sync. No product done claim.
 

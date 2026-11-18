@@ -125,7 +125,11 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 	ws.SetReadLimit(65536)
 	for {
 		var raw map[string]json.RawMessage
-		if err := ws.ReadJSON(&raw); err != nil {
+		_, frameBytes, err := ws.ReadMessage()
+		if err != nil {
+			return
+		}
+		if err := json.Unmarshal(frameBytes, &raw); err != nil {
 			return
 		}
 		if len(raw) != 4 {
