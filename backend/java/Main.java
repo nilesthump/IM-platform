@@ -11,7 +11,11 @@ public final class Main {
     public static void main(String[] args)throws Exception {
         if(args.length!=1)throw new IllegalArgumentException("Exactly one service role is required");
         Class<?> role=switch(args[0]){case "core"->CoreAuth.class;case "gateway"->Gateway.class;case "plugin-host"->Health.class;default->throw new IllegalArgumentException("Unknown role");};
-        Thread.setDefaultUncaughtExceptionHandler((thread,error)->{System.err.println("Service worker failed: "+error.getClass().getName());System.exit(1);});
+        Thread.setDefaultUncaughtExceptionHandler((thread,error)->{
+            System.err.println("Service worker failed: "+error.getClass().getName());
+            // Spring's shutdown hook joins role workers. Let the failed thread finish first.
+            Thread.ofPlatform().name("service-failure-exit").daemon(false).start(()->System.exit(1));
+        });
         SpringApplication app=new SpringApplication(role);
         Config config=args[0].equals("plugin-host")?null:Config.read(System.getenv("IM_CONFIG_FILE"));
         if(config!=null)app.addInitializers(context->context.getBeanFactory().registerSingleton("runtimeConfig",config));

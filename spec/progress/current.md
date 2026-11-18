@@ -5,17 +5,17 @@ Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-JAVA-AUTH-001`
-Batch Status: FIXTURE_FIX_REVIEW_PENDING
+Batch Status: LIFECYCLE_FIX_REVIEW_PENDING
 Current Task: `LOOP1-JAVA-AUTH-001`
 Current Task State: `review`
-Execution Status: Fixture and packaging fix ready for final-SHA dual reviews
+Execution Status: Role shutdown and WSS error fixes ready for final-SHA dual reviews
 Assigned Worktree: H:/.codex/worktrees/j/IM-platform
 Task Branch: task/LOOP1-JAVA-AUTH-001
 Coordinator: /root
 
 ## Immediately Relevant Completed Work
 
-Fresh regular review rejected 82a68477 for incomplete fixture preconditions and the Java image build inputs. Fix4 verifies Session state and distinct synthetic ownership on actual Java and Go roles and moves operator config outside the build contexts. S1/S2 PASS retained.
+The regular reviewer passed 72f1a46e. A separate error-handling specialist rejected its role termination and WSS rejection cleanup. The new candidate includes a fix and live regression coverage for both findings. S1/S2 PASS retained.
 
 ## Current Blockers
 
@@ -24,16 +24,16 @@ Awaiting both independent final-SHA reviews, hosted CI, protected integration, a
 ## Verification
 
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
-  - Result: PASS. Maven, 28 scenarios per profile, profile-switch, architecture/CI/HTTP/WSS controls and Java TLS smoke passed locally.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-AUTH-001/fixture-fix.md`
+  - Result: PASS. Maven, packaged Core/Gateway normal and fatal exits, WSS send/close failure preservation, 28 fixtures per profile, profile switching and local architecture/CI/HTTP/WSS checks passed.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-AUTH-001/lifecycle-fix.md`
 
 ## Changed Files or Migrations
 
-Java image inputs, README, shared fixture runner, synthetic fixture setup, verifier, existing CI Java job and Compose default config mount. No migration or product dependency changes.
+Java startup, Gateway rejection handling, Gateway regression probe, packaged role exit probe and live verifier. No migration or dependency change.
 
 ## Known Failures, Risks, and Assumptions
 
-See regular-review4.md and fixture-fix.md. Two distinct disposable migrated databases are now required for live fixture verification. Captured response and role log checks are bounded to available observations.
+See regular-review5.md, error-review5.md and lifecycle-fix.md. Two distinct disposable migrated databases are now required for live fixture verification. Captured response and role log checks are bounded to available observations.
 
 ## Next Exact Action
 
@@ -49,7 +49,7 @@ Coordinator delegates fresh regular review then different fresh error audit of t
 
 ## Uncommitted Changes / Ownership
 
-/root/auth_fixture_fix owns the scoped task repair in the assigned j worktree. Unknown original main work remains untouched.
+/root/auth_exit_fix owns the scoped task repair in the assigned j worktree. Unknown original main work remains untouched.
 
 ## Architecture Conflicts / ACP / ADR
 

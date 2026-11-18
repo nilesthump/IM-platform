@@ -2,7 +2,7 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/auth_fixture_fix
+owner: /root/auth_exit_fix
 stage: S3
 gate: S3
 ---
@@ -116,10 +116,8 @@ Record exact branch/SHA/range, commands/exits/timings, fixture IDs/results/exclu
 
 # Handoff
 
-Fix4 addresses the fresh regular review of rejected 82a68477. Evidence in regular-review4.md and fixture-fix.md covers the full canonical mapping and concrete verification. Both live profiles executed all 28 cases using ordinary fixture credentials and isolated test data. Compose default Java operator config is outside the checkout. S1/S2 PASS and S3 OPEN.
-
-Task branch task/LOOP1-JAVA-AUTH-001 in assigned j worktree. Fix-owned edits only. Last accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d. Both final-SHA reviews, exact-head hosted acceptance, protected integration, actual-main verification and safe main synchronization PENDING.
+The independent regular review passed 72f1a46e and the different error-handling specialist rejected it before publication. Reports and local repair evidence are under spec/progress/evidence/LOOP1-JAVA-AUTH-001/{regular-review5.md,error-review5.md,lifecycle-fix.md}. The repaired role process exits on worker failure after running Spring shutdown hooks. Both rejection paths preserve send and close failures. S1/S2 PASS, S3 OPEN. The assigned task branch is task/LOOP1-JAVA-AUTH-001 and the last accepted main is e4aee5ce2c4327904990d5c651267ca5eaae389d. No unknown main work was changed.
 
 # Next Action
 
-Coordinator obtains a fresh independent regular review of the final committed SHA and then a different fresh error-handling review on that same SHA. Only after both PASS may hosted CI begin. Keep task in review until applicable independent acceptance, protected integration, actual-main and safe main synchronization are verified.
+Coordinator delegates fresh regular review of the commit containing this handoff, then a different fresh error-handling specialist for that exact SHA. Both are pending. Exact-head hosted CI, protected integration, actual-main verification and safe synchronization are pending. Retain review state until independent acceptance and synchronization complete.

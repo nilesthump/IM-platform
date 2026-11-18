@@ -123,7 +123,11 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
     private final class Socket extends TextWebSocketHandler {
         @Override public void afterConnectionEstablished(WebSocketSession socket){socket.setTextMessageSizeLimit(65536);}
         @Override public void afterConnectionClosed(WebSocketSession socket,CloseStatus status){bound.remove(socket);}
-        private void reject(WebSocketSession socket,String request,String code)throws IOException {try{send(socket,frame("auth.ack",request,Map.of("status","rejected","error",Map.of("code",code,"message","Request rejected"))));}finally{socket.close();}}
+        private void reject(WebSocketSession socket,String ack,String request,String code)throws IOException {
+            try(socket){
+                send(socket,frame(ack,request,Map.of("status","rejected","error",Map.of("code",code,"message","Request rejected"))));
+            }
+        }
         @Override protected void handleTextMessage(WebSocketSession socket,TextMessage message)throws Exception {
             JsonNode e;try{e=JSON.readTree(message.getPayload());}catch(com.fasterxml.jackson.core.JsonProcessingException malformed){socket.close(CloseStatus.BAD_DATA);return;}
             if(e==null||!e.isObject()||e.size()!=4||!e.path("protocolVersion").isTextual()||!e.path("protocolVersion").textValue().equals("1.0")||!e.path("requestId").isTextual()||!e.path("requestId").textValue().matches("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}")||!e.path("type").isTextual()||!e.path("payload").isObject()){socket.close(CloseStatus.BAD_DATA);return;}
@@ -131,9 +135,13 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
             if(type.equals("ping")||type.equals("pong")){if(payload.size()!=0){socket.close(CloseStatus.BAD_DATA);return;}if(type.equals("ping"))send(socket,frame("pong",id,Map.of()));return;}
             Tokens.Claims current=bound.get(socket);
             if(current==null){
-                if(!type.equals("auth.bind")){try{if(type.equals("message.send"))send(socket,frame("message.ack",id,Map.of("status","rejected","error",Map.of("code","AUTH_REQUIRED","message","Request rejected"))));}finally{socket.close();}return;}
-                if(payload.size()!=1||!payload.path("accessToken").isTextual()||payload.path("accessToken").textValue().isEmpty()){reject(socket,id,"VALIDATION_FAILED");return;}
-                Tokens.Claims c;try{c=validate(payload.get("accessToken").textValue());}catch(ApiFailure rejected){reject(socket,id,rejected.code);return;}
+                if(!type.equals("auth.bind")){
+                    if(type.equals("message.send"))reject(socket,"message.ack",id,"AUTH_REQUIRED");
+                    else socket.close();
+                    return;
+                }
+                if(payload.size()!=1||!payload.path("accessToken").isTextual()||payload.path("accessToken").textValue().isEmpty()){reject(socket,"auth.ack",id,"VALIDATION_FAILED");return;}
+                Tokens.Claims c;try{c=validate(payload.get("accessToken").textValue());}catch(ApiFailure rejected){reject(socket,"auth.ack",id,rejected.code);return;}
                 bound.put(socket,c);
                 send(socket,frame("auth.ack",id,Map.of("status","bound","userId",c.userId(),"sessionId",c.sessionId(),"clientType",c.clientType(),"sessionEpoch",c.epoch())));
                 // Recheck after registry insertion so a concurrent committed revoke cannot be lost during bind.
@@ -141,7 +149,7 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
                 return;
             }
             if(current.expires()<=Instant.now().getEpochSecond()){revoke(current.sessionId(),"REVOKED");return;}
-            if(type.equals("auth.bind")){reject(socket,id,"VALIDATION_FAILED");return;}
+            if(type.equals("auth.bind")){reject(socket,"auth.ack",id,"VALIDATION_FAILED");return;}
             socket.close(); // Message business belongs to the next task; no fabricated ACK.
         }
     }

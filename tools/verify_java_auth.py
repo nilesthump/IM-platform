@@ -42,6 +42,25 @@ def healthy(url):
     except (ConnectionError,urllib.error.URLError,TimeoutError):
         return False  # Only bounded startup transport unavailability is retried.
 
+def verify_role_exits(java, build, env, config, folder):
+    for role in ('core', 'gateway'):
+        for mode in ('normal', 'failure'):
+            log = folder / f'exit-{role}-{mode}.log'
+            command = [java, '-Dloader.main=im.platform.tests.auth.RoleExitProbe',
+                       '-Dloader.path=' + str(build / 'test-classes'), '-cp', str(build / 'java-profile-1.0.0.jar'),
+                       'org.springframework.boot.loader.launch.PropertiesLauncher', role, mode]
+            with log.open('wb') as capture:
+                result = subprocess.run(command, env=dict(env, IM_LISTEN_PORT='0', IM_CONFIG_FILE=str(config)),
+                                        stdout=capture, stderr=subprocess.STDOUT, timeout=30)
+            lines = log.read_text(encoding='utf8').splitlines()
+            if f'ROLE_EXIT_READY {role} {mode}' not in lines:
+                raise AssertionError(f'{role} failed to start for {mode} shutdown')
+            errors = [line for line in lines if line.startswith('Service worker failed:')]
+            expected = ['Service worker failed: java.lang.IllegalStateException'] if mode == 'failure' else []
+            if result.returncode != int(mode == 'failure') or errors != expected:
+                raise AssertionError(f'{role} {mode} shutdown failed, exit {result.returncode}')
+            print(f'ROLE_EXIT {role} {mode} exit={result.returncode} PASS')
+
 @contextlib.contextmanager
 def profile(name, build, folder, env, java, cp, binding=None):
     processes=[];logs=[];stop=folder/'stop';url_file=folder/'url'
@@ -59,6 +78,8 @@ def profile(name, build, folder, env, java, cp, binding=None):
         subprocess.run([*seed,'prepare',str(config_file),str(binding)],env=env,check=True,timeout=30)
     try:
         if name=='java':
+            if env.get('JAVA_AUTH_DURATION_PROBE')=='1':
+                verify_role_exits(java,build,env,config_file,folder)
             subprocess.run([java,'-cp',cp,'im.platform.core.auth.OutboxFailureProbe',str(config_file)],env=env,check=True,timeout=15)
             subprocess.run([java,'-cp',cp,'im.platform.core.auth.OutboxRecoveryProbe',str(config_file)],env=env,check=True,timeout=30)
             subprocess.run([java,'-cp',cp,'im.platform.tests.auth.RevocationDeliveryProbe',str(config_file)],env=env,check=True,timeout=30)

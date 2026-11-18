@@ -73,6 +73,33 @@ public final class RevocationDeliveryProbe {
         }
     }
 
+    private static void checkRejectionFailures(Gateway gateway) throws Exception {
+        var constructor = Class.forName(Gateway.class.getName() + "$Socket").getDeclaredConstructor(Gateway.class);
+        constructor.setAccessible(true);
+        var handler = (org.springframework.web.socket.WebSocketHandler)constructor.newInstance(gateway);
+        for (String type : new String[]{"auth.bind", "message.send"}) {
+            var primary = new IllegalStateException("send invariant");
+            var secondary = new IOException("transport close failed");
+            var socket = (WebSocketSession)Proxy.newProxyInstance(WebSocketSession.class.getClassLoader(),
+                new Class<?>[]{WebSocketSession.class}, (proxy, method, args) -> switch (method.getName()) {
+                    case "hashCode" -> System.identityHashCode(proxy);
+                    case "sendMessage" -> throw primary;
+                    case "close" -> throw secondary;
+                    default -> throw new AssertionError(method.getName());
+                });
+            var frame = Map.of("protocolVersion","1.0","requestId",UUID.randomUUID().toString(),"type",type,"payload",Map.of());
+            try {
+                handler.handleMessage(socket, new TextMessage(JSON.writeValueAsString(frame)));
+                throw new AssertionError("Failed rejection returned normally");
+            } catch (IllegalStateException observed) {
+                if (observed != primary || observed.getSuppressed().length != 1 || observed.getSuppressed()[0] != secondary) {
+                    throw new AssertionError("Rejection masked send or close failure", observed);
+                }
+            }
+        }
+        System.out.println("GATEWAY both rejection paths preserve send and close failures PASS");
+    }
+
     // Inspect the existing registry and subscription without introducing product-only test hooks.
     private static Object field(Gateway gateway, String name) throws ReflectiveOperationException {
         var field = Gateway.class.getDeclaredField(name);
@@ -91,6 +118,7 @@ public final class RevocationDeliveryProbe {
         var config = Config.read(args[0]);
         var gateway = new Gateway(config);
         try (var publisher = Nats.connect(config.natsUrl)) {
+            checkRejectionFailures(gateway);
             ((Connection)field(gateway, "nats")).flush(Duration.ofSeconds(2));
             var bound = (Map<WebSocketSession, Tokens.Claims>)field(gateway, "bound");
             var errors = new LinkedBlockingQueue<Throwable>();
