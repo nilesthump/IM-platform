@@ -91,7 +91,7 @@ services:
     command: ["gateway"]
     volumes:
       - type: bind
-        source: ${IM_JAVA_CONFIG_DIR:-../backend/java/local-config}
+        source: ${IM_JAVA_CONFIG_DIR:-../../im-java-local-config}
         target: /run/im-config
         read_only: true
         bind:
@@ -109,7 +109,7 @@ services:
     command: ["core"]
     volumes:
       - type: bind
-        source: ${IM_JAVA_CONFIG_DIR:-../backend/java/local-config}
+        source: ${IM_JAVA_CONFIG_DIR:-../../im-java-local-config}
         target: /run/im-config
         read_only: true
         bind:

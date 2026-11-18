@@ -1,6 +1,11 @@
 FROM maven:3.9.15-eclipse-temurin-25 AS build
 WORKDIR /src
-COPY . .
+COPY pom.xml Main.java ./
+COPY core/auth/*.java core/auth/
+COPY gateway/auth/*.java gateway/auth/
+COPY plugin-host/*.java plugin-host/
+COPY shared/authsupport/*.java shared/authsupport/
+COPY tests/auth/*.java tests/auth/
 RUN mvn -B -Dim.build.dir=/build package
 
 FROM eclipse-temurin:25-jre-alpine

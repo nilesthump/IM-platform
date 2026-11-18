@@ -5,35 +5,33 @@ Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-JAVA-AUTH-001`
-Batch Status: PEER_FIX_REVIEW_PENDING
+Batch Status: FIXTURE_FIX_REVIEW_PENDING
 Current Task: `LOOP1-JAVA-AUTH-001`
 Current Task State: `review`
-Execution Status: Gateway peer-disconnect fix ready for final-SHA dual reviews
+Execution Status: Fixture and packaging fix ready for final-SHA dual reviews
 Assigned Worktree: H:/.codex/worktrees/j/IM-platform
 Task Branch: task/LOOP1-JAVA-AUTH-001
 Coordinator: /root
 
 ## Immediately Relevant Completed Work
 
-The Java Auth candidate implements the scoped Session paths. Fresh regular review rejected 3b8f7904 for one peer-disconnect finding. The fix isolates failed revocation delivery and preserves internal failures. S1/S2 PASS retained.
+Fresh regular review rejected 82a68477 for incomplete fixture preconditions and the Java image build inputs. Fix4 verifies Session state and distinct synthetic ownership on actual Java and Go roles and moves operator config outside the build contexts. S1/S2 PASS retained.
 
 ## Current Blockers
 
-Awaiting new regular and different error-specialist reviews of the committed fix. Exact-head hosted verification and protected integration pending.
+Awaiting both independent final-SHA reviews, hosted CI, protected integration, actual-main verification and safe main synchronization.
 
 ## Verification
 
-- Command: `python -B ci/check_architecture.py --scope all --json`
-  - Result: PASS local structural verification. Architecture and CI suites, 28 live Java fixtures and the new disconnect regression passed.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-AUTH-001/peer-fix.md`
+Local Maven, both live profiles (28 each), profile-switch, deployment smoke and structural checks are recorded in `spec/progress/evidence/LOOP1-JAVA-AUTH-001/fixture-fix.md`. The external Recorder retains command exits and durations.
 
 ## Changed Files or Migrations
 
-Peer fix changes Java Gateway, its regression probe, the live verification runner and recovery evidence. Earlier task changes appear in implementation.md and fix2-resume-20261118.md. No migration in this repair.
+Java image inputs, README, shared fixture runner, synthetic fixture setup, verifier, existing CI Java job and Compose default config mount. No migration or product dependency changes.
 
 ## Known Failures, Risks, and Assumptions
 
-regular-review3.md records the rejected candidate. The new regression drives the real NATS worker with deterministic socket outcomes. Live Java fixtures exercise actual WebSocket connections. The separate TLS smoke covers HTTPS/WSS deployment. Research capture limits and failed commands appear in peer-fix.md.
+See regular-review4.md and fixture-fix.md. Two distinct disposable migrated databases are now required for live fixture verification. Captured response and role log checks are bounded to available observations.
 
 ## Next Exact Action
 
@@ -49,7 +47,7 @@ Coordinator delegates fresh regular review then different fresh error audit of t
 
 ## Uncommitted Changes / Ownership
 
-/root/auth_fix_transport owns the scoped task repair in the assigned j worktree. Unknown original main work remains untouched.
+/root/auth_fixture_fix owns the scoped task repair in the assigned j worktree. Unknown original main work remains untouched.
 
 ## Architecture Conflicts / ACP / ADR
 

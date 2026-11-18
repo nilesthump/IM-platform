@@ -2,7 +2,7 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/auth_fix_transport
+owner: /root/auth_fixture_fix
 stage: S3
 gate: S3
 ---
@@ -108,7 +108,7 @@ Planned commands must exist before Review. Available local checks must pass. Loc
 - pwsh -NoProfile -File contracts/http/verify-auth-user-friend.ps1
 - pwsh -NoProfile -File tests/infrastructure/smoke.ps1 -Profile java; preserve -Profile go regression
 
-Live prerequisites: migrated disposable PostgreSQL16, NATS2.10, operator-owned credential/config files, Go toolchain for sequential comparison, Java/Maven, external writable build directory. Existing PGHOST/PGPORT/PGUSER/PGDATABASE/PGSSLMODE/PGPASSWORD and NATS_URL wire the harness; DB_TEST_ENABLE=1 selects existing Go suites but absence must fail the new Java acceptance command. Secrets never appear in argv/logs. Run independent migration component before app startup. Local Docker became available after the user handled its startup prompt; isolated PostgreSQL/NATS tests now execute. Hosted Java job independently provisions real PG/NATS and must actually execute all live assertions.
+Live prerequisites: two migrated disposable PostgreSQL16 databases (target PGDATABASE and distinct JAVA_AUTH_ISSUER_DATABASE), NATS2.10, operator-owned credential/config files, Go toolchain for sequential comparison, Java/Maven, external writable build directory. Existing PGHOST/PGPORT/PGUSER/PGDATABASE/PGSSLMODE/PGPASSWORD and NATS_URL wire the harness; DB_TEST_ENABLE=1 selects existing Go suites but absence must fail the new Java acceptance command. Secrets never appear in argv/logs. Run independent migration component before app startup. Local Docker became available after the user handled its startup prompt; isolated PostgreSQL/NATS tests now execute. Hosted Java job independently provisions real PG/NATS and must actually execute all live assertions.
 
 # Evidence
 
@@ -116,9 +116,9 @@ Record exact branch/SHA/range, commands/exits/timings, fixture IDs/results/exclu
 
 # Handoff
 
-Fix3 repairs the ordinary disconnected-peer revocation finding on rejected 3b8f79049e03f6934ba6b1f5b8056d761e3007ef. Ordinary peer delivery and cleanup are bounded to the retiring connection. New worker regression plus the live Java suite passed. See spec/progress/evidence/LOOP1-JAVA-AUTH-001/regular-review3.md and peer-fix.md for scope, present justification, limits and verification. Build outputs and Recorder remain external. No migrations or new dependencies. S1/S2 PASS, S3 OPEN.
+Fix4 addresses the fresh regular review of rejected 82a68477. Evidence in regular-review4.md and fixture-fix.md covers the full canonical mapping and concrete verification. Both live profiles executed all 28 cases using ordinary fixture credentials and isolated test data. Compose default Java operator config is outside the checkout. S1/S2 PASS and S3 OPEN.
 
-The assigned branch task/LOOP1-JAVA-AUTH-001 contains fixer-owned changes only. Last accepted main is e4aee5ce2c4327904990d5c651267ca5eaae389d. Final-SHA regular review PENDING, different error specialist PENDING, hosted acceptance/integration/actual-main verification/safe main synchronization PENDING. Earlier failed reviews and test runs remain in task evidence and Git history.
+Task branch task/LOOP1-JAVA-AUTH-001 in assigned j worktree. Fix-owned edits only. Last accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d. Both final-SHA reviews, exact-head hosted acceptance, protected integration, actual-main verification and safe main synchronization PENDING.
 
 # Next Action
 

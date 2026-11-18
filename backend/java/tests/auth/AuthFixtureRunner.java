@@ -73,7 +73,7 @@ public final class AuthFixtureRunner {
     }
     Reply callHeaders(String method,String path,JsonNode body,Map<String,String> headers)throws Exception{
         String query=URI.create(base+path).getRawQuery();
-        if(query!=null)for(String part:query.split("&")){String[] pair=part.split("=",2);if(pair.length==2&&Set.of("token","accessToken","refreshToken","password").contains(URLDecoder.decode(pair[0],java.nio.charset.StandardCharsets.UTF_8)))secrets.add(URLDecoder.decode(pair[1],java.nio.charset.StandardCharsets.UTF_8));}
+        if(query!=null)for(String part:query.split("&")){String[] pair=part.split("=",2);if(pair.length==2&&Set.of("token","access_token","accessToken","refreshToken","password").contains(URLDecoder.decode(pair[0],java.nio.charset.StandardCharsets.UTF_8)))secrets.add(URLDecoder.decode(pair[1],java.nio.charset.StandardCharsets.UTF_8));}
         collect(body);headers.forEach((key,value)->{if(key.equalsIgnoreCase("Authorization"))secrets.add(value.replaceFirst("^Bearer ",""));if(key.equalsIgnoreCase("Cookie"))secrets.add(value.split("=",2)[1]);});
         var request=HttpRequest.newBuilder(URI.create(base+path)).timeout(Duration.ofSeconds(10));
         headers.forEach(request::header);
@@ -87,12 +87,20 @@ public final class AuthFixtureRunner {
     static ObjectNode body(JsonNode source,String username){ObjectNode b=source==null?JSON.createObjectNode():source.deepCopy();if(b.path("username").asText().equalsIgnoreCase("alice")){String old=b.get("username").textValue();b.put("username",old.equals(old.toUpperCase(Locale.ROOT))?username.toUpperCase(Locale.ROOT):username);}return b;}
     Reply step(JsonNode step,Normalize n,String token,String cookie,ObjectNode override)throws Exception{
         JsonNode r=step.get("request"),expected=step.get("expected");String path=r.get("path").textValue();
+        // This fixture's illustrative token is also an ordinary word in its required error message.
+        // Substitute an opaque test value so a disclosure remains distinguishable from that message.
+        String queryCredential=null;
+        if(path.equals("/v1/users/me?access_token=forbidden")){
+            queryCredential="query-"+UUID.randomUUID();
+            path="/v1/users/me?access_token="+queryCredential;
+        }
         if(r.has("query")){StringJoiner query=new StringJoiner("&");r.get("query").fields().forEachRemaining(e->query.add(URLEncoder.encode(e.getKey(),java.nio.charset.StandardCharsets.UTF_8)+"="+URLEncoder.encode(e.getValue().asText().equalsIgnoreCase("alice")?n.username:e.getValue().asText(),java.nio.charset.StandardCharsets.UTF_8)));path+="?"+query;}
         ObjectNode b=body(r.get("body"),n.username);if(override!=null)b.setAll(override);
         Map<String,String> headers=new LinkedHashMap<>();
         if(r.has("headers"))r.get("headers").fields().forEachRemaining(e->{String value=e.getValue().textValue();if(value.contains("<")){if(e.getKey().equals("Authorization")){require(token!=null,"Missing fixture access token");value=value.replaceAll("<[^>]+>",java.util.regex.Matcher.quoteReplacement(token));}else if(e.getKey().equals("Cookie")){require(cookie!=null,"Missing fixture cookie");value=value.replaceAll("<[^>]+>",java.util.regex.Matcher.quoteReplacement(cookie.split("=",2)[1]));}else throw new AssertionError("Unresolved fixture header");}headers.put(e.getKey(),value);});
         Reply reply=callHeaders(r.get("method").textValue(),path,r.has("body")||override!=null?b:null,headers);
-        require(reply.status==expected.get("status").intValue(),path+" status="+reply.status+" expected="+expected.get("status"));
+        if(queryCredential!=null)require(secrets.contains(queryCredential),"Submitted query credential absent from disclosure checks");
+        require(reply.status==expected.get("status").intValue(),r.path("path").asText().split("\\?",2)[0]+" status="+reply.status+" expected="+expected.get("status"));
         if(expected.has("body"))n.check(expected.get("body"),reply.body,"body");
         if(expected.path("headers").has("Set-Cookie")){
             Map<String,String> attributes=new HashMap<>();for(String part:reply.headers.firstValue("set-cookie").orElseThrow().split(";")){String[] pair=part.strip().split("=",2);attributes.put(pair[0].toLowerCase(Locale.ROOT),pair.length==1?"":pair[1]);}
@@ -107,7 +115,42 @@ public final class AuthFixtureRunner {
     String signed(String token,String change)throws Exception{
         Tokens.Claims c=codec.parse(token);return codec.sign(new Tokens.Claims(c.userId(),change.equals("binding")?UUID.randomUUID().toString():c.sessionId(),change.equals("client")?"DESKTOP":c.clientType(),c.epoch(),change.equals("expired")?Instant.now().minusSeconds(7200).getEpochSecond():c.issued(),change.equals("expired")?Instant.now().minusSeconds(3600).getEpochSecond():c.expires()));
     }
-    void httpFixtures()throws Exception{
+    List<String> slots(String user)throws SQLException{
+        try(var db=config.database().getConnection();
+            var q=db.prepareStatement("SELECT row_to_json(s)::text FROM sessions s WHERE user_id=? ORDER BY client_type")){
+            q.setObject(1,UUID.fromString(user));
+            try(var rows=q.executeQuery()){
+                List<String> result=new ArrayList<>();
+                while(rows.next())result.add(rows.getString(1));
+                return result;
+            }
+        }
+    }
+    void checkUser(String username,String user)throws SQLException{
+        try(var db=config.database().getConnection();var q=db.prepareStatement("SELECT user_id, display_name FROM users WHERE username=?")){
+            q.setString(1,username);
+            try(var rows=q.executeQuery()){
+                require(rows.next()&&user.equals(rows.getString(1))&&"Alice".equals(rows.getString(2))&&!rows.next(),"Duplicate registration changed account");
+            }
+        }
+    }
+    String refreshValue(Reply reply){
+        return reply.refresh()!=null ? reply.refresh() : reply.cookie().split("=",2)[1];
+    }
+    void rotation(Reply before,Reply after)throws Exception{
+        JsonNode session=before.body.get("session");
+        require(session.equals(after.body.get("session")),"Refresh changed Session");
+        String oldHash=Tokens.hash(refreshValue(before)),newHash=Tokens.hash(refreshValue(after));
+        require(!oldHash.equals(newHash),"Refresh did not rotate");
+        try(var db=config.database().getConnection();var q=db.prepareStatement(
+                "SELECT session_id, refresh_token_hash FROM sessions WHERE refresh_token_hash IN (?,?)")){
+            q.setString(1,oldHash);q.setString(2,newHash);
+            try(var rows=q.executeQuery()){
+                require(rows.next()&&session.get("sessionId").asText().equals(rows.getString(1))&&newHash.equals(rows.getString(2))&&!rows.next(),"Stored refresh rotation");
+            }
+        }
+    }
+    void httpFixtures(String previousKeyToken,String bindingToken)throws Exception{
         String username="jfixture"+UUID.randomUUID().toString().replace("-","");Normalize n=new Normalize(username);
         String register="registration-and-authorized-user-search",slots="same-slot-login-replaces-only-that-slot";
         step(step(positive,register,0),n,null,null,null);
@@ -118,15 +161,38 @@ public final class AuthFixtureRunner {
         step(step(positive,slots,3),n,web2.token(),null,null);step(step(positive,slots,4),n,desktop.token(),null,null);passed.add(slots);
         String user=web2.body.path("session").path("userId").textValue();
         try(var db=config.database().getConnection();var q=db.prepareStatement("SELECT count(*) FROM sessions WHERE user_id=? AND status='ACTIVE'")){q.setObject(1,UUID.fromString(user));try(var rs=q.executeQuery()){require(rs.next()&&rs.getInt(1)==2,"Slot count");}}
+        step(step(negative,"stale-session-epoch-rejected",0),n,web1.token(),null,null);
+        List<String> originalSlots=slots(user);
+        String clientMismatch="refresh-client-type-mismatch";
+        step(step(negative,clientMismatch,0),n,null,null,override("refreshToken",refreshValue(web2)));
+        require(originalSlots.equals(slots(user)),"Mismatched client changed WEB2 slot");passed.add(clientMismatch);
         ObjectNode mobileBody=body(step(positive,slots,1).get("request").get("body"),username).put("clientType","MOBILE").put("deviceId","mobile-1");
         Reply mobile=null;for(int i=0;i<4;i++)mobile=login(mobileBody);String oldRefresh=mobile.refresh();
-        String nativeID="native-refresh-rotates-current-session-credential";Reply nativeRefresh=step(step(positive,nativeID,0),n,null,null,override("refreshToken",oldRefresh));require(!oldRefresh.equals(nativeRefresh.refresh()),"Native rotation");passed.add(nativeID);
+        String nativeID="native-refresh-rotates-current-session-credential";Reply nativeRefresh=step(step(positive,nativeID,0),n,null,null,override("refreshToken",oldRefresh));rotation(mobile,nativeRefresh);
+        ObjectNode nativeRequest=step(positive,nativeID,0).path("request").path("body").deepCopy();
+        nativeRequest.put("refreshToken",nativeRefresh.refresh());
+        Reply nativeAgain=call("POST","/v1/auth/refresh/native",nativeRequest,null,null);
+        require(nativeAgain.status==200,"Rotated native credential unusable");rotation(nativeRefresh,nativeAgain);passed.add(nativeID);
         login.put("deviceId","browser-5");for(int i=0;i<3;i++)web2=login(login);
-        String webID="web-refresh-rotates-secure-cookie";Reply refreshed=step(step(positive,webID,0),n,null,web2.cookie(),null);require(!web2.cookie().equals(refreshed.cookie()),"Cookie rotation");passed.add(webID);
-        for(String id:List.of("invalid-credentials","token-in-query-rejected","invalid-client-type","refresh-client-type-mismatch","unsupported-protocol-version","missing-authentication","authorization-binding-mismatch","invalid-access-token","expired-access-token","username-already-exists","web-refresh-missing-cookie","native-refresh-missing-token","stale-session-epoch-rejected","revoked-refresh-token-rejected")){
-            String token=switch(id){case "authorization-binding-mismatch"->signed(refreshed.token(),"binding");case "invalid-access-token"->refreshed.token()+"x";case "expired-access-token"->signed(refreshed.token(),"expired");case "stale-session-epoch-rejected"->web1.token();default->null;};
-            ObjectNode extra=switch(id){case "refresh-client-type-mismatch"->override("refreshToken",desktop.refresh());case "revoked-refresh-token-rejected"->override("refreshToken",oldRefresh);default->null;};
-            step(step(negative,id,0),n,token,null,extra);passed.add(id);
+        String webID="web-refresh-rotates-secure-cookie";Reply refreshed=step(step(positive,webID,0),n,null,web2.cookie(),null);rotation(web2,refreshed);
+        Reply webAgain=call("POST","/v1/auth/refresh/web",step(positive,webID,0).path("request").path("body"),null,refreshed.cookie());
+        require(webAgain.status==200,"Rotated WEB credential unusable");rotation(refreshed,webAgain);passed.add(webID);
+        for(String id:List.of("invalid-credentials","token-in-query-rejected","invalid-client-type","unsupported-protocol-version","missing-authentication","authorization-binding-mismatch","invalid-access-token","expired-access-token","username-already-exists","web-refresh-missing-cookie","native-refresh-missing-token","stale-session-epoch-rejected","revoked-refresh-token-rejected")){
+            String token=switch(id){case "authorization-binding-mismatch"->bindingToken;case "invalid-access-token"->previousKeyToken;case "expired-access-token"->signed(refreshed.token(),"expired");case "stale-session-epoch-rejected"->{
+                login(login);Reply epoch7=login(login),epoch8=login(login);
+                require(codec.parse(epoch7.token()).epoch()==7&&codec.parse(epoch8.token()).epoch()==8,"Stale Session setup");
+                yield epoch7.token();
+            }default->null;};
+            ObjectNode extra=switch(id){case "revoked-refresh-token-rejected"->override("refreshToken",oldRefresh);default->null;};
+            List<String> before=slots(user);
+            step(step(negative,id,0),n,token,null,extra);
+            require(before.equals(slots(user)),"Rejected request changed Session slots: "+id);
+            if(id.equals("username-already-exists"))checkUser(username,user);
+            if(id.equals("authorization-binding-mismatch")){
+                try(var db=config.database().getConnection()){BindingFixture.verify(db,codec.parse(bindingToken));}
+                step(step(negative,id,0),n,signed(refreshed.token(),"binding"),null,null);
+            }
+            passed.add(id);
         }
         try(Socket socket=socket()){
             socket.send(frame("auth.bind",Map.of("accessToken",desktop.token())));require(socket.next().path("payload").path("status").asText().equals("bound"),"Logout socket bind");
@@ -209,12 +275,27 @@ public final class AuthFixtureRunner {
     }
     Socket socket()throws Exception{return new Socket();}
     JsonNode receivedFrame(String value)throws Exception{noLeak(value);return JSON.readTree(value);}
-    void wsStep(Socket socket,String id,Normalize n,String token)throws Exception{JsonNode step=step(wss,id,0);ObjectNode sent=step.get("in").deepCopy();if(token!=null)((ObjectNode)sent.get("payload")).put("accessToken",token);socket.send(sent);for(JsonNode e:step.get("out")){JsonNode actual=socket.next();require(actual.get("requestId").equals(sent.get("requestId")),"WSS requestId echo");n.check(e,actual,"wss");}passed.add(id);}
-    void socketFixtures()throws Exception{
+    void wsStep(Socket socket,String id,Normalize n,String token)throws Exception{
+        long[] before=messageCounts();
+        JsonNode step=step(wss,id,0);ObjectNode sent=step.get("in").deepCopy();if(token!=null)((ObjectNode)sent.get("payload")).put("accessToken",token);socket.send(sent);for(JsonNode e:step.get("out")){JsonNode actual=socket.next();require(actual.get("requestId").equals(sent.get("requestId")),"WSS requestId echo");n.check(e,actual,"wss");
+            if(id.equals("bind-valid-session")){
+                Tokens.Claims claims=codec.parse(token);JsonNode binding=actual.get("payload");
+                require(claims.userId().equals(binding.get("userId").asText())&&claims.sessionId().equals(binding.get("sessionId").asText())&&claims.clientType().equals(binding.get("clientType").asText())&&claims.epoch()==binding.get("sessionEpoch").asLong(),"Bound identity differs from presented Session");
+            }
+            if(actual.path("payload").path("status").asText().equals("rejected"))socket.closed();
+        }
+        require(Arrays.equals(before,messageCounts()),"WSS fixture changed messages or outbox: "+id);passed.add(id);
+    }
+    void socketFixtures(String previousKeyToken)throws Exception{
         String username="jws"+UUID.randomUUID().toString().replace("-","");Normalize n=new Normalize(username);
         ObjectNode reg=JSON.createObjectNode().put("username",username).put("password","fixture-password-not-a-real-secret").put("displayName","Alice");require(call("POST","/v1/auth/register",reg,null,null).status==201,"WSS setup register");
         ObjectNode login=body(step(positive,"same-slot-login-replaces-only-that-slot",0).get("request").get("body"),username);Reply first=login(login);
-        for(String id:List.of("ping-before-bind","unauthenticated-send","invalid-signature-bind","expired-token-bind"))try(Socket s=socket()){wsStep(s,id,n,id.equals("invalid-signature-bind")?"not-a-valid-JWT":id.equals("expired-token-bind")?signed(first.token(),"expired"):null);}
+        try(Socket s=socket()){
+            wsStep(s,"ping-before-bind",n,null);
+            wsStep(s,"unauthenticated-send",n,null);
+        }
+        try(Socket s=socket()){wsStep(s,"invalid-signature-bind",n,previousKeyToken);}
+        try(Socket s=socket()){wsStep(s,"expired-token-bind",n,signed(first.token(),"expired"));}
         try(Socket bound=socket()){
             wsStep(bound,"bind-valid-session",n,first.token());Reply second=login(login);
             try(Socket stale=socket()){wsStep(stale,"stale-epoch-bind",n,first.token());}
@@ -228,12 +309,19 @@ public final class AuthFixtureRunner {
         }
         for(String suffix:List.of("{}","NOT_JSON"))try(Socket malformed=socket()){malformed.sendRaw(frame("ping",Map.of()).toString()+suffix);malformed.closed();}
         try(Socket whitespace=socket()){whitespace.sendRaw(frame("ping",Map.of()).toString()+" \r\n\t");require(whitespace.next().path("type").asText().equals("pong"),"Legal JSON trailing whitespace rejected");}
-        require(secrets.contains("not-a-valid-JWT"),"WSS-only submitted token missing from disclosure inventory");
+        // Preserve a credential submitted exclusively on WSS for the disclosure controls.
+        String socketOnly="malformed-wss-fixture-"+UUID.randomUUID();
+        try(Socket malformed=socket()){
+            malformed.send(frame("auth.bind",Map.of("accessToken",socketOnly)));
+            require(malformed.next().path("payload").path("error").path("code").asText().equals("AUTH_TOKEN_INVALID"),"Malformed WSS fixture rejection");
+            malformed.closed();
+        }
+        require(secrets.contains(socketOnly),"WSS-only submitted token missing from disclosure inventory");
         ObjectNode leakedFrame=frame("auth.ack",Map.of("status","rejected","error",Map.of("code","AUTH_TOKEN_INVALID","message","invalid")));
-        leakedFrame.put("extra","not-a-valid-JWT");boolean detected=false;
+        leakedFrame.put("extra",socketOnly);boolean detected=false;
         try{receivedFrame(leakedFrame.toString());}catch(AssertionError expected){require(expected.getMessage().equals("Credential material leaked"),"Unrelated frame mutation failure");detected=true;}
         require(detected,"WSS-only credential frame mutation undetected");
-        ObjectNode leakedReply=JSON.createObjectNode().put("extra","not-a-valid-JWT");detected=false;
+        ObjectNode leakedReply=JSON.createObjectNode().put("extra",socketOnly);detected=false;
         try{checkDisclosure(leakedReply,HttpHeaders.of(Map.of(),(a,b)->true));}catch(AssertionError expected){require(expected.getMessage().equals("Credential material leaked"),"Unrelated response mutation failure");detected=true;}
         require(detected,"WSS-only credential response mutation undetected");
         Reply reconnect=login(login);
@@ -243,7 +331,7 @@ public final class AuthFixtureRunner {
         try(Socket s=socket()){s.send(frame("auth.bind",Map.of("accessToken",reconnect.token())));JsonNode ack=s.next();require(ack.path("payload").path("error").path("code").asText().equals("AUTH_SESSION_REVOKED"),"Reconnect ignored authoritative revoked Session");s.closed();}
         System.out.println("SESSION "+profile+" lost-notification reconnect rejects persisted revocation PASS");
     }
-    long[] messageCounts()throws Exception{try(var db=config.database().getConnection();var q=db.createStatement();var rows=q.executeQuery("SELECT (SELECT count(*) FROM messages),(SELECT count(*) FROM outbox_events WHERE event_type LIKE 'message.%')")){require(rows.next(),"Message state query");return new long[]{rows.getLong(1),rows.getLong(2)};}}
+    long[] messageCounts()throws Exception{try(var db=config.database().getConnection();var q=db.createStatement();var rows=q.executeQuery("SELECT (SELECT count(*) FROM messages),(SELECT count(*) FROM outbox_events)")){require(rows.next(),"Message state query");return new long[]{rows.getLong(1),rows.getLong(2)};}}
     void concurrent(ObjectNode login,String user)throws Exception{
         try(var pool=Executors.newFixedThreadPool(4)){
             List<Future<Reply>> jobs=new ArrayList<>();for(int i=0;i<4;i++)jobs.add(pool.submit(()->login(login)));Set<Long> epochs=new HashSet<>();for(var job:jobs)epochs.add(job.get(15,TimeUnit.SECONDS).body.path("session").path("sessionEpoch").longValue());require(epochs.size()==4,"Concurrent login epochs");
@@ -252,7 +340,11 @@ public final class AuthFixtureRunner {
     }
     void credentials(String mode,Path state)throws Exception{
         String username;
-        if(mode.equals("create")){username="switch"+UUID.randomUUID().toString().replace("-","");ObjectNode b=JSON.createObjectNode().put("username",username).put("password","profile-switch-password-"+"X".repeat(90)).put("displayName","Switch");require(call("POST","/v1/auth/register",b,null,null).status==201,"Cross-profile register");Files.writeString(state,username);}
+        if(mode.equals("create")||mode.equals("issue")){username="switch"+UUID.randomUUID().toString().replace("-","");ObjectNode b=JSON.createObjectNode().put("username",username).put("password","profile-switch-password-"+"X".repeat(90)).put("displayName","Switch");require(call("POST","/v1/auth/register",b,null,null).status==201,"Cross-profile register");if(mode.equals("issue")){
+                ObjectNode request=body(step(positive,"same-slot-login-replaces-only-that-slot",0).path("request").path("body"),username);
+                request.put("password",b.get("password").textValue());
+                Files.writeString(state,login(request).token());
+            }else Files.writeString(state,username);}
         else{username=Files.readString(state);ObjectNode b=body(step(positive,"same-slot-login-replaces-only-that-slot",0).get("request").get("body"),username).put("password","profile-switch-password-"+"X".repeat(90));login(b);}
         System.out.println("PROFILE_CREDENTIAL "+profile+" "+mode+" PASS");
     }
@@ -277,13 +369,16 @@ public final class AuthFixtureRunner {
     }
     public static void main(String[] args)throws Exception{
         require(args.length>=4,"base profile repository config required");AuthFixtureRunner run=new AuthFixtureRunner(args[0],args[1],Path.of(args[2]),Config.read(args[3]));
-        if(args.length==5){try{run.durations();}finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}return;}
-        if(args.length==6){try{run.credentials(args[4],Path.of(args[5]));}finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}return;}
-        try{run.execute();}finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}
+        try{
+            if(args.length==5&&args[4].equals("ttl"))run.durations();
+            else if(args.length==7&&args[4].equals("fixtures"))run.execute(Files.readString(Path.of(args[5])),Files.readString(Path.of(args[6])));
+            else if(args.length==6&&Set.of("create","login","issue").contains(args[4]))run.credentials(args[4],Path.of(args[5]));
+            else throw new IllegalArgumentException("Missing fixture mode or prior-key credential");
+        }finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}
     }
-    void execute()throws Exception{
+    void execute(String previousKeyToken,String bindingToken)throws Exception{
         AuthFixtureRunner run=this;
-        run.httpFixtures();run.socketFixtures();require(run.passed.size()==28,"Expected all 28 Auth fixtures");for(String id:run.passed)System.out.println("FIXTURE "+run.profile+" "+id+" PASS");
-        System.out.println("LIVE_AUTH "+run.profile+" PASS 28 fixtures; slot concurrency, rotation, logout, real NATS revocation");
+        run.httpFixtures(previousKeyToken,bindingToken);run.socketFixtures(previousKeyToken);for(String id:run.passed)System.out.println("FIXTURE "+run.profile+" "+id+" wire checks passed");
+        require(run.passed.size()==28,"Missing canonical Auth scenario");
     }
 }
