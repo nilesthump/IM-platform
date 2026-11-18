@@ -17,15 +17,16 @@ This record explains present behavior for the mandatory fresh specialist. It doe
 | CoreAuth unique registration conflict | PostgreSQL username conflict only | ON CONFLICT(username) DO NOTHING maps zero insertion to409. Other uniqueness/internal SQL failures propagate. |
 | CoreAuth transactions | Login replacement/refresh/logout failure | Spring transaction rollback spans Session write and required event records. Missing invariant rows are failures, not fake defaults. |
 | SessionOutbox NATS status | Reconnecting/disconnected connection before batch | Keeps rows pending; next existing500ms tick checks status. No fake publication. |
-| SessionOutbox flush TimeoutException | Actual flush did not confirm publication | Cause preserved, transaction rolls back, worker fails/process exits1. No published_at update. |
+| SessionOutbox flush TimeoutException | Actual flush did not confirm publication | Cause preserved, transaction rolls back, same worker retries on the existing tick. No published_at update before flush confirmation. |
 | SessionOutbox flush InterruptedException | Flush interrupted | Restores interrupt, rollback and explicit worker failure. Normal close sets stopping and joins without interrupting an in-flight publish. |
 | SessionOutbox worker sleep InterruptedException | Unexpected interruption | Unless stopping, restores interrupt and fails; no blanket batch catch. Closed-NATS real-connection probe demonstrates pending SQL state. |
 | Gateway subscription InterruptedException | Explicit destroy interrupts blocking receive | Stops only when stopping flag is set; otherwise failure propagates. |
-| Gateway subscription IOException | Malformed committed event JSON or socket send I/O | Preserves cause in UncheckedIOException and worker fails. No silently dropped committed event or fabricated delivery success. |
+| Gateway subscription IOException | Malformed committed event JSON or failure serializing its outbound frame | Preserves cause in UncheckedIOException and worker fails. No silently dropped committed event or fabricated delivery success. |
 | Gateway malformed WebSocket JSON | Known JsonProcessingException from client frame | Closes BAD_DATA. Other implementation errors propagate through WebSocket failure path. |
 | Gateway bind ApiFailure | Known token/readonly Session rejection | Canonical auth.ack rejection then close. SQL/internal errors are not auth rejection. |
 | Gateway post-insert validation ApiFailure | Concurrent revocation/replacement during bind | Sends session.revoked and closes the registered binding; no stale cached authority. |
-| Gateway close cleanup | Revoke/reject or role destroy | Attempts actual socket close; failures remain failures. No normal-state fallback. |
+| Gateway revoked socket send/close | Peer transport IOException or closed-session IllegalStateException at send/close | Retire only the registered peer, attempt close, continue delivery. An open-session state failure propagates. Serialization is outside the transport catch. Resource cleanup preserves an unknown primary failure. |
+| Gateway close cleanup | Rejection or role destroy | Attempts actual socket close; failures remain failures. No normal-state fallback. |
 | Python readiness | Connection/URL transport unavailable during startup | Bounded60/120s retry; exited roles immediately fail; timeout fails. No live test skips. |
 | Python role cleanup | Exit/stop failure | Exit is checked for Go fixture host; Java owned processes terminate/wait; cleanup errors propagate. Original exceptions remain chained by Python. |
 | Fixture mutation controls | Deliberately changed expected code/input | Catch only AssertionError and require the intended mismatch reason; inability to detect mutation fails. |

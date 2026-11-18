@@ -58,6 +58,7 @@ def profile(name, build, folder, env, java, cp):
         if name=='java':
             subprocess.run([java,'-cp',cp,'im.platform.core.auth.OutboxFailureProbe',str(config_file)],env=env,check=True,timeout=15)
             subprocess.run([java,'-cp',cp,'im.platform.core.auth.OutboxRecoveryProbe',str(config_file)],env=env,check=True,timeout=30)
+            subprocess.run([java,'-cp',cp,'im.platform.tests.auth.RevocationDeliveryProbe',str(config_file)],env=env,check=True,timeout=30)
             for role,p in [('core',core_port),('gateway',gateway_port)]:
                 start([java,'-jar',str(build/'java-profile-1.0.0.jar'),role],dict(env,IM_CONFIG_FILE=str(config_file),IM_LISTEN_PORT=str(p)),ROOT)
             url=f'http://127.0.0.1:{gateway_port}'

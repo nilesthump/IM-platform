@@ -81,8 +81,33 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
     }
     private void revoke(String sid,String reason)throws IOException {
         for(var entry:bound.entrySet())if(entry.getValue().sessionId().equals(sid)){
-            WebSocketSession socket=entry.getKey();bound.remove(socket);
-            try{send(socket,frame("session.revoked",UUID.randomUUID().toString(),Map.of("sessionId",sid,"reason",reason)));}finally{socket.close();}
+            WebSocketSession socket=entry.getKey();
+            if(!bound.remove(socket,entry.getValue()))continue;
+            synchronized(socket){
+                try(java.io.Closeable retirement=()->closeRevoked(socket)){
+                    if(!socket.isOpen())continue;
+                    var message=new TextMessage(JSON.writeValueAsString(frame("session.revoked",UUID.randomUUID().toString(),Map.of("sessionId",sid,"reason",reason))));
+                    try{
+                        socket.sendMessage(message);
+                    }catch(IOException disconnected){
+                        // Delivery failed on this transport. Retirement closes it before the next peer.
+                        continue;
+                    }catch(IllegalStateException state){
+                        if(socket.isOpen())throw state;
+                        // The container observed a peer close between isOpen and sendMessage.
+                    }
+                }
+            }
+        }
+    }
+    private static void closeRevoked(WebSocketSession socket){
+        try{
+            socket.close();
+        }catch(IOException disconnected){
+            // The registry entry is retired and this transport cannot complete its closing handshake.
+            return;
+        }catch(IllegalStateException state){
+            if(socket.isOpen())throw state;
         }
     }
     private Map<String,Object> one(String sql,Object...args){var rows=db.queryForList(sql,args);if(rows.isEmpty())return null;if(rows.size()!=1)throw new IllegalStateException("Session uniqueness violated");return rows.getFirst();}

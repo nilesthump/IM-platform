@@ -2,18 +2,18 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/java_auth_fix2
+owner: /root/auth_fix_transport
 stage: S3
 gate: S3
 ---
 
 # Goal
 
-Implement Java register/login/refresh/logout, User lookup, three Session slots and Gateway auth.bind/revocation under the same canonical Auth/User/WSS fixtures as Go. Include only Session Outbox/NATS delivery required by canonical §7.3. Retain S1/S2 PASS; S3 remains OPEN.
+Implement Java register/login/refresh/logout, User lookup, three Session slots and Gateway auth.bind/revocation under the same canonical Auth/User/WSS fixtures as Go. Include only Session Outbox/NATS delivery required by canonical 搂7.3. Retain S1/S2 PASS; S3 remains OPEN.
 
 # Inputs
 
-Resolve/hash-check spec/architecture/README.md and baseline.md; read canonical §2.3, §3, §4.1, §6.1, §7, §10 SRC-01 through SRC-07, §11, §20 and Appendix B. Accepted ADR-0014 and its exact Human approvals, ADR-0004 scoped exception, execution-boundaries, minimality, independent-review, technology-selection, error-handling and research/README apply. Read spec/domain/auth-user-friend.md, spec/invariants/auth-user-friend.md, spec/acceptance/s0-auth-user-friend.md; contracts/http/auth-user-friend.openapi.json, contracts/errors/, contracts/websocket/, contracts/database/ and all applicable fixture documents. Go code supplies compatibility observations only, never overrides contracts or dictates Java layout.
+Resolve/hash-check spec/architecture/README.md and baseline.md; read canonical 搂2.3, 搂3, 搂4.1, 搂6.1, 搂7, 搂10 SRC-01 through SRC-07, 搂11, 搂20 and Appendix B. Accepted ADR-0014 and its exact Human approvals, ADR-0004 scoped exception, execution-boundaries, minimality, independent-review, technology-selection, error-handling and research/README apply. Read spec/domain/auth-user-friend.md, spec/invariants/auth-user-friend.md, spec/acceptance/s0-auth-user-friend.md; contracts/http/auth-user-friend.openapi.json, contracts/errors/, contracts/websocket/, contracts/database/ and all applicable fixture documents. Go code supplies compatibility observations only, never overrides contracts or dictates Java layout.
 
 # Technology Authorization
 
@@ -116,20 +116,10 @@ Record exact branch/SHA/range, commands/exits/timings, fixture IDs/results/exclu
 
 # Handoff
 
-Implementation candidate ready for fresh independent Review. Assigned managed root verified; all scoped changes owned by /root/java_auth_impl. Local Maven5tests, 28 canonical live Java+Go cases and mutation controls, sequential same-DB credentials, closed-NATS rollback, lost-event reconnect, persisted-hash corruption, sourceall, architecture99/CI38 controls, canonical verifiers and actual Java TLS13 smoke PASS. See implementation.md, error-handling.md, source-inventory.json and recorded-commands.json under task evidence. Prior local failures and incomplete Recorder capture are disclosed, not relabeled.
+Fix3 repairs the ordinary disconnected-peer revocation finding on rejected 3b8f79049e03f6934ba6b1f5b8056d761e3007ef. Ordinary peer delivery and cleanup are bounded to the retiring connection. New worker regression plus the live Java suite passed. See spec/progress/evidence/LOOP1-JAVA-AUTH-001/regular-review3.md and peer-fix.md for scope, present justification, limits and verification. Build outputs and Recorder remain external. No migrations or new dependencies. S1/S2 PASS, S3 OPEN.
 
-Regular Review: PENDING final committed SHA. Different error specialist: PENDING after regular PASS. Hosted exact-head CI, integration, actual-main verification and safe main sync: PENDING. No push before both fresh reviews PASS. Accepted base remains e4aee5ce2c4327904990d5c651267ca5eaae389d; S1/S2 PASS, S3 OPEN. Unknown original-main work untouched.
+The assigned branch task/LOOP1-JAVA-AUTH-001 contains fixer-owned changes only. Last accepted main is e4aee5ce2c4327904990d5c651267ca5eaae389d. Final-SHA regular review PENDING, different error specialist PENDING, hosted acceptance/integration/actual-main verification/safe main synchronization PENDING. Earlier failed reviews and test runs remain in task evidence and Git history.
 
 # Next Action
 
-2026-11-18 USER RESUME supersedes the historical stop below. Complete remaining Go suites/TLS and controls, commit Fix2 and clean Control Acceptance, then entirely new regular/error reviews. Fresh isolated services and canonical migrations are ready; Go suites passed. Resume evidence: spec/progress/evidence/LOOP1-JAVA-AUTH-001/fix2-resume-20261118.md. No publication before both final-SHA reviews PASS.
-
-User requested stop after the already-running bounded verification. No new tests, fixes, commit, push or reviews. HEAD remains rejected 4c178a90658d4367b822f4523e2957f8664ce616; accepted base e4aee5ce. Fix2 uncommitted scope and final observed results: spec/progress/evidence/LOOP1-JAVA-AUTH-001/fix2-stop.md. Resume only on user instruction: complete pending Go tests/TLS and final checks, commit/cleanControl, new regular and different error reviews, then hosted acceptance/integration/safe sync. Both reviews remain pending.
-
-Regular Review of 4c178a90658d4367b822f4523e2957f8664ce616: FAIL (CI Origin preparation, complete WSS JSON document validation, WSS-only credential disclosure coverage). Fresh Fix2 owns scoped repairs. Java focused tests pass; matching malformed-JSON negative exposed the same Go ReadJSON prefix behavior. Coordinator scope decision pending; no Go product edits yet. Both new final-SHA reviews and hosted acceptance remain pending.
-
-Coordinator delegates fresh regular Review of the committed candidate, then different fresh error specialist; any fix requires fresh contexts and both final-SHA reviews again. Only then hosted CI/integration/main sync. No product done claim.
-
-Fresh regular Review of 2e5ad53: FAIL. Fresh Fix /root/java_auth_fix1 now repairing five findings plus Go terminal-observation acceptance failure; task remains review throughout repair. No candidate publication. Both final-SHA reviews will restart.
-
-Fix1 completed local repairs and verification; see spec/progress/evidence/LOOP1-JAVA-AUTH-001/fix1.md and fix1-commands.json. Commit/clean Control then NEW regular and different error reviews finalSHA; prior FAIL immutable. No push or acceptance claim.
+Coordinator obtains a fresh independent regular review of the final committed SHA and then a different fresh error-handling review on that same SHA. Only after both PASS may hosted CI begin. Keep task in review until applicable independent acceptance, protected integration, actual-main and safe main synchronization are verified.
