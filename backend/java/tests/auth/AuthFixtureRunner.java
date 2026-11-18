@@ -72,10 +72,13 @@ public final class AuthFixtureRunner {
         });
     }
     Reply callHeaders(String method,String path,JsonNode body,Map<String,String> headers)throws Exception{
-        String query=URI.create(base+path).getRawQuery();
+        return callAt(base,method,path,body,headers);
+    }
+    Reply callAt(String endpoint,String method,String path,JsonNode body,Map<String,String> headers)throws Exception{
+        String query=URI.create(endpoint+path).getRawQuery();
         if(query!=null)for(String part:query.split("&")){String[] pair=part.split("=",2);if(pair.length==2&&Set.of("token","access_token","accessToken","refreshToken","password").contains(URLDecoder.decode(pair[0],java.nio.charset.StandardCharsets.UTF_8)))secrets.add(URLDecoder.decode(pair[1],java.nio.charset.StandardCharsets.UTF_8));}
         collect(body);headers.forEach((key,value)->{if(key.equalsIgnoreCase("Authorization"))secrets.add(value.replaceFirst("^Bearer ",""));if(key.equalsIgnoreCase("Cookie"))secrets.add(value.split("=",2)[1]);});
-        var request=HttpRequest.newBuilder(URI.create(base+path)).timeout(Duration.ofSeconds(10));
+        var request=HttpRequest.newBuilder(URI.create(endpoint+path)).timeout(Duration.ofSeconds(10));
         headers.forEach(request::header);
         if(body!=null)request.header("Content-Type","application/json");
         request.method(method,body==null?HttpRequest.BodyPublishers.noBody():HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(body)));
@@ -348,6 +351,72 @@ public final class AuthFixtureRunner {
         else{username=Files.readString(state);ObjectNode b=body(step(positive,"same-slot-login-replaces-only-that-slot",0).get("request").get("body"),username).put("password","profile-switch-password-"+"X".repeat(90));login(b);}
         System.out.println("PROFILE_CREDENTIAL "+profile+" "+mode+" PASS");
     }
+    void bindPeer(Socket peer,Reply credential)throws Exception{
+        ObjectNode request=frame("auth.bind",Map.of("accessToken",credential.token()));
+        peer.send(request);
+        JsonNode ack=peer.next();
+        require(ack.path("type").asText().equals("auth.ack")&&ack.path("requestId").equals(request.get("requestId"))
+                &&ack.path("payload").path("status").asText().equals("bound")
+                &&ack.path("payload").path("sessionId").equals(credential.body.path("session").get("sessionId")),
+                "Expected bound peer on issued Session");
+    }
+    Reply shortLogin(ObjectNode login,Config issuerConfig)throws Exception{
+        // Only this controller issues the initial short credential. The profile under
+        // test owns the Gateway, subsequent refresh/logout, and the only Session relay.
+        issuerConfig.accessTokenSeconds=12;
+        var issuer=new org.springframework.boot.SpringApplication(im.platform.core.auth.CoreAuth.class);
+        issuer.addInitializers(context->context.getBeanFactory().registerSingleton("runtimeConfig",issuerConfig));
+        issuer.setDefaultProperties(Map.of("server.address","127.0.0.1","server.port","0","server.shutdown","immediate",
+                "spring.main.banner-mode","off"));
+        try(var context=(org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext)issuer.run()){
+            String endpoint="http://127.0.0.1:"+context.getWebServer().getPort();
+            Reply reply=callAt(endpoint,"POST","/v1/auth/login",login,Map.of());
+            require(reply.status==200,"Short-lived login");
+            return reply;
+        }
+    }
+    void expiredPeer(Config issuerConfig)throws Exception{
+        String username="peer"+UUID.randomUUID().toString().replace("-","");
+        ObjectNode account=JSON.createObjectNode().put("username",username).put("password","peer-expiry-test-password").put("displayName","Peer");
+        require(call("POST","/v1/auth/register",account,null,null).status==201,"Peer account registration");
+        ObjectNode login=body(step(positive,"same-slot-login-replaces-only-that-slot",0).path("request").path("body"),username);
+        login.put("password",account.get("password").textValue());
+        try(Socket old=socket();Socket first=socket();Socket second=socket()){
+            Reply initial=shortLogin(login,issuerConfig);
+            Tokens.Claims claims=codec.parse(initial.token());
+            require(claims.expires()-claims.issued()==12,"Unexpected initial token lifetime");
+            bindPeer(old,initial);
+            ObjectNode refresh=login.deepCopy();refresh.remove(List.of("username","password"));
+            Reply fresh=call("POST","/v1/auth/refresh/web",refresh,null,initial.cookie());
+            require(fresh.status==200,"Live Session refresh");
+            rotation(initial,fresh);
+            require(codec.parse(fresh.token()).expires()>claims.expires(),"Refresh must outlive initial credential");
+            bindPeer(first,fresh);
+            bindPeer(second,fresh);
+            List<String> active=slots(claims.userId());
+            long wait=claims.expires()*1000-System.currentTimeMillis();
+            require(wait>0&&wait<=12000,"Peers must coexist before initial expiry");
+            Thread.sleep(wait+50);
+            if(profile.equals("java"))old.send(frame("auth.bind",Map.of("accessToken",fresh.token())));
+            old.closed(); // Go's idle validation watcher closes its peer without an inbound frame.
+            for(Socket peer:List.of(first,second)){
+                ObjectNode ping=frame("ping",Map.of());peer.send(ping);
+                JsonNode pong=peer.next();
+                require(pong.path("type").asText().equals("pong")&&pong.path("requestId").equals(ping.get("requestId")),"Refreshed peer unavailable");
+            }
+            require(active.equals(slots(claims.userId())),"Access expiry changed the Session");
+            require(call("GET","/v1/users/me",null,fresh.token(),null).status==200,"Refreshed credential lost authority");
+            require(call("POST","/v1/auth/logout",null,fresh.token(),null).status==204,"Peer logout");
+            for(Socket peer:List.of(first,second)){
+                JsonNode event=peer.next();
+                require(event.path("type").asText().equals("session.revoked")
+                        &&event.path("payload").path("sessionId").asText().equals(claims.sessionId())
+                        &&event.path("payload").path("reason").asText().equals("LOGOUT"),"Expected real Session logout");
+                peer.closed();
+            }
+        }
+        System.out.println("SESSION "+profile+" expired peer closes alone, logout retires both refreshed peers PASS");
+    }
     void durations()throws Exception{
         String username="ttl"+UUID.randomUUID().toString().replace("-","");
         ObjectNode registration=JSON.createObjectNode().put("username",username).put("password","duration-test-password").put("displayName","TTL");
@@ -371,7 +440,10 @@ public final class AuthFixtureRunner {
         require(args.length>=4,"base profile repository config required");AuthFixtureRunner run=new AuthFixtureRunner(args[0],args[1],Path.of(args[2]),Config.read(args[3]));
         try{
             if(args.length==5&&args[4].equals("ttl"))run.durations();
-            else if(args.length==7&&args[4].equals("fixtures"))run.execute(Files.readString(Path.of(args[5])),Files.readString(Path.of(args[6])));
+            else if(args.length==7&&args[4].equals("fixtures")){
+                run.execute(Files.readString(Path.of(args[5])),Files.readString(Path.of(args[6])));
+                run.expiredPeer(Config.read(args[3]));
+            }
             else if(args.length==6&&Set.of("create","login","issue").contains(args[4]))run.credentials(args[4],Path.of(args[5]));
             else throw new IllegalArgumentException("Missing fixture mode or prior-key credential");
         }finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}

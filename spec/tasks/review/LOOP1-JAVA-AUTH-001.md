@@ -2,7 +2,7 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/auth_exit_fix
+owner: /root/auth_expired_peer
 stage: S3
 gate: S3
 ---
@@ -49,8 +49,10 @@ Accepted ADR-0014: Spring Boot MVC/WebSocket, Spring JDBC/PostgreSQL driver, Jac
 - backend/java/shared/authsupport/** (config, connections, token/crypto/codecs only; no business workflows)
 - backend/java/plugin-host/Health.java (retain non-business health role required by existing Compose; no plugin execution)
 - backend/java/tests/auth/** (unit and same-fixture blackbox tests, JDBC state assertions and profile-switch credential checks)
-- backend/go/tests/java_auth_profile_test.go (explicit opt-in real Go Core/Gateway ephemeral test listeners for the shared blackbox runner; Coordinator authorized before edit, no Go product changes)
-- backend/go/gateway/gateway.go (Coordinator authorized Fix2 only: replace prefix-decoding ReadJSON with complete-message decoding at existing serve boundary; same canonical single JSON envelope, limits, frame handling and ACK semantics. Shared malformed-suffix failure is present evidence; no other Go product edits.)
+- backend/go/tests/java_auth_profile_test.go (explicit opt-in real Go Core/Gateway ephemeral test listeners for the shared blackbox runner; Coordinator authorized before edit, no Go product changes in the fixture host)
+- backend/go/gateway/gateway.go (Coordinator authorized Fix2 only: replace prefix-decoding ReadJSON with complete-message decoding at existing serve boundary; same canonical single JSON envelope, limits, frame handling and ACK semantics. Shared malformed-suffix failure is present evidence; no other Go product edits under Fix2. Human decision “本轮同时修复 Go 和 Java” on 2026-11-18 additionally authorizes the bound receive path and safety watcher to close only the connection whose access credential expired. Cover both profiles with ordinary login, refresh and logout.)
+- backend/go/gateway/watch_failure_test.go (2026-11-18 authorized corresponding test: watcher expiry alone closes without a Session event)
+- backend/go/tests/revocation_fallback_test.go (same decision: correct the old expiry-frame assertion, retain the independent database-unavailable case)
 - tools/verify_java_auth.py (bounded build/start/test/stop orchestration; standard library, no secret output)
 - .github/workflows/ci.yml (replace Java placeholder job with real build and mandatory migrated PostgreSQL/NATS tests; preserve existing jobs/gate)
 - tests/ci/test_java_auth_job.py (negative control rejects missing live tests or restored placeholder-only Java job)
@@ -82,11 +84,13 @@ No applicable runtime tests may be skipped due to unset variables. HTTPS/WSS ent
 
 No contract/schema/migration/security/ACK change, no Friend/Message/Sync business, no generic/message outbox framework, no ORM/authframework/new core library, no early plugin implementation, no permanent placeholder exception or unknown-main overwrite. No self-acceptance.
 
+The 2026-11-18 Human decision also permits only the Go expired-peer correction described above, under existing wire semantics.
+
 Fix2 narrow Go product exception above corrects existing acceptance of malformed JSON suffixes; it does not change the public contract or compatibility rules. Verify shared malformed suffix/legal whitespace controls on both profiles, applicable Go tests, Go TLS smoke and source-all boundaries.
 
 # Minimality
 
-Use direct role startup and small concrete Auth/Session methods. Transaction boundaries and Session Outbox exist for present canonical obligations. Avoid repository/service/factory hierarchies without current consumers. Shared contains primitives only. Use one fixture normalizer/runner for both profiles; retain existing Go tests without changing them to make Java pass.
+Use direct role startup and small concrete Auth/Session methods. Transaction boundaries and Session Outbox exist for present canonical obligations. Avoid repository/service/factory hierarchies without current consumers. Shared contains primitives only. Use one fixture normalizer/runner for both profiles; retain existing Go tests except the two explicitly authorized obsolete expiry-frame assertions above.
 
 # Error Handling Review
 
@@ -116,7 +120,7 @@ Record exact branch/SHA/range, commands/exits/timings, fixture IDs/results/exclu
 
 # Handoff
 
-The independent regular review passed 72f1a46e and the different error-handling specialist rejected it before publication. Reports and local repair evidence are under spec/progress/evidence/LOOP1-JAVA-AUTH-001/{regular-review5.md,error-review5.md,lifecycle-fix.md}. The repaired role process exits on worker failure after running Spring shutdown hooks. Both rejection paths preserve send and close failures. S1/S2 PASS, S3 OPEN. The assigned task branch is task/LOOP1-JAVA-AUTH-001 and the last accepted main is e4aee5ce2c4327904990d5c651267ca5eaae389d. No unknown main work was changed.
+Fresh regular review of 7679f24a848cf167a214311b3fbb83a5511ffdd5 failed on access expiry revoking other connections sharing an active Session. The Human authorized “本轮同时修复 Go 和 Java”. Both gateways now close the affected connection on credential expiry. The same real login/refresh exercise checks two refreshed connections survive and then receive the genuine logout before close. See spec/progress/evidence/LOOP1-JAVA-AUTH-001/regular-review6.md and peer-expiry-fix.md for scope and verification. Branch task/LOOP1-JAVA-AUTH-001 remains in review. Both final-candidate audits, hosted CI and main sync are pending. Accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d retains S1/S2 PASS; S3 OPEN.
 
 # Next Action
 

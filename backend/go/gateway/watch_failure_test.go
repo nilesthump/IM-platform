@@ -238,7 +238,7 @@ func TestWatchTransportClassificationKeepsEveryBranch(t *testing.T) {
 	}
 }
 
-func TestWatchKnownExpiryStillRevokes(t *testing.T) {
+func TestWatchExpiredCredentialClosesWithoutRevocation(t *testing.T) {
 	h, cl, token := watchFixture(t, nil)
 	h.auth.codec.Now = func() time.Time { return time.Now().Add(2 * time.Hour) }
 	returned := make(chan error, 1)
@@ -258,24 +258,11 @@ func TestWatchKnownExpiryStillRevokes(t *testing.T) {
 	}
 	defer peer.Close()
 	peer.SetReadDeadline(time.Now().Add(5 * time.Second))
-	var frame struct {
-		Type    string `json:"type"`
-		Payload struct {
-			SessionID string `json:"sessionId"`
-			Reason    string `json:"reason"`
-		} `json:"payload"`
-	}
-	if err = peer.ReadJSON(&frame); err != nil {
-		t.Fatal(err)
-	}
-	if frame.Type != "session.revoked" || frame.Payload.SessionID != cl.SessionID || frame.Payload.Reason != "REVOKED" {
-		t.Fatalf("known invalidation changed: %+v", frame)
+	if _, _, err = peer.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseAbnormalClosure, websocket.CloseNormalClosure) {
+		t.Fatalf("want connection closure without a Session event, got %v", err)
 	}
 	if err = <-returned; err != nil {
 		t.Fatal(err)
-	}
-	if _, _, err = peer.ReadMessage(); err == nil {
-		t.Fatal("known invalidated connection remained open")
 	}
 }
 

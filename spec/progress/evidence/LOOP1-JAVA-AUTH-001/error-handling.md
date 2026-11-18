@@ -24,7 +24,7 @@ This record explains present behavior for the mandatory fresh specialist. It doe
 | Gateway subscription IOException | Malformed committed event JSON or failure serializing its outbound frame | Preserves cause in UncheckedIOException and worker fails. No silently dropped committed event or fabricated delivery success. |
 | Gateway malformed WebSocket JSON | Known JsonProcessingException from client frame | Closes BAD_DATA. Other implementation errors propagate through WebSocket failure path. |
 | Gateway bind ApiFailure | Known token/readonly Session rejection | Canonical auth.ack rejection then close. SQL/internal errors are not auth rejection. |
-| Gateway post-insert validation ApiFailure | Concurrent revocation/replacement during bind | Sends session.revoked and closes the registered binding; no stale cached authority. |
+| Gateway post-insert validation ApiFailure | Concurrent Session invalidation or credential expiry during bind | Only the readonly Session revoked/stale outcomes retire the Session. Credential failure retires the affected binding without a Session event. An unexpected failure propagates. |
 | Gateway revoked socket send/close | Peer transport IOException or closed-session IllegalStateException at send/close | Retire only the registered peer, attempt close, continue delivery. An open-session state failure propagates. Serialization is outside the transport catch. Resource cleanup preserves an unknown primary failure. |
 | Gateway close cleanup | Rejection or role destroy | Attempts actual socket close; failures remain failures. No normal-state fallback. |
 | Python readiness | Connection/URL transport unavailable during startup | Bounded60/120s retry; exited roles immediately fail; timeout fails. No live test skips. |

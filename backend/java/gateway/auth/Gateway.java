@@ -121,6 +121,9 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         return c;
     }
     private final class Socket extends TextWebSocketHandler {
+        private void closeBinding(WebSocketSession socket,Tokens.Claims claims)throws IOException {
+            if(bound.remove(socket,claims))socket.close();
+        }
         @Override public void afterConnectionEstablished(WebSocketSession socket){socket.setTextMessageSizeLimit(65536);}
         @Override public void afterConnectionClosed(WebSocketSession socket,CloseStatus status){bound.remove(socket);}
         private void reject(WebSocketSession socket,String ack,String request,String code)throws IOException {
@@ -145,10 +148,14 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
                 bound.put(socket,c);
                 send(socket,frame("auth.ack",id,Map.of("status","bound","userId",c.userId(),"sessionId",c.sessionId(),"clientType",c.clientType(),"sessionEpoch",c.epoch())));
                 // Recheck after registry insertion so a concurrent committed revoke cannot be lost during bind.
-                try{validate(payload.get("accessToken").textValue());}catch(ApiFailure revoked){revoke(c.sessionId(),"REVOKED");}
+                try{validate(payload.get("accessToken").textValue());}
+                catch(ApiFailure rejected){
+                    if(rejected.code.equals("AUTH_SESSION_REVOKED")||rejected.code.equals("AUTH_SESSION_EPOCH_STALE"))revoke(c.sessionId(),"REVOKED");
+                    else closeBinding(socket,c);
+                }
                 return;
             }
-            if(current.expires()<=Instant.now().getEpochSecond()){revoke(current.sessionId(),"REVOKED");return;}
+            if(current.expires()<=Instant.now().getEpochSecond()){closeBinding(socket,current);return;}
             if(type.equals("auth.bind")){reject(socket,"auth.ack",id,"VALIDATION_FAILED");return;}
             socket.close(); // Message business belongs to the next task; no fabricated ACK.
         }
