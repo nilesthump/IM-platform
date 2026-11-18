@@ -55,7 +55,26 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
             catch(IOException failure){throw new UncheckedIOException(failure);}
         });events.start();
     }
-    @Override public void destroy()throws Exception{stopping=true;events.interrupt();events.join();for(var socket:bound.keySet())socket.close();nats.close();}
+    @Override public void destroy()throws Exception{
+        stopping=true;
+        events.interrupt();
+        try(nats; AutoCloseable peers=this::closeBoundPeers){
+            events.join();
+        }
+    }
+    private void closeBoundPeers()throws IOException{
+        Throwable first=null;
+        for(var socket:bound.keySet()){
+            try{socket.close();}
+            catch(IOException|RuntimeException|Error failure){
+                if(first==null)first=failure;
+                else if(first!=failure)first.addSuppressed(failure);
+            }
+        }
+        if(first instanceof IOException io)throw io;
+        if(first instanceof RuntimeException runtime)throw runtime;
+        if(first instanceof Error error)throw error;
+    }
     @RequestMapping("/__infra/health") public String health(){return "profile=java role=gateway";}
     @RequestMapping({"/v1/auth/**","/v1/users/**","/v1/friends"})
     public ResponseEntity<byte[]> proxy(HttpServletRequest r)throws IOException,InterruptedException {

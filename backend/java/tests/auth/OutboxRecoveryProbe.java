@@ -18,7 +18,8 @@ public final class OutboxRecoveryProbe {
         try(PongDelay proxy=new PongDelay(URI.create(original));var observer=Nats.connect(original)){
             var subscription=observer.subscribe("session.revoked");observer.flush(Duration.ofSeconds(2));
             config.natsUrl="nats://127.0.0.1:"+proxy.server.getLocalPort();
-            try(SessionOutbox worker=new SessionOutbox(config)){
+            try(AutoCloseable cleanup=()->db.update("DELETE FROM outbox_events WHERE event_id=?",event);
+                SessionOutbox worker=new SessionOutbox(config)){
                 proxy.delay=true;
                 db.update("INSERT INTO outbox_events(event_id,aggregate_type,aggregate_id,event_type,payload) VALUES(?,'session',?,'session.revoked',?::jsonb)",event,sid,"{\"sessionId\":\""+sid+"\",\"reason\":\"LOGOUT\"}");
                 if(!proxy.delayed.await(5,TimeUnit.SECONDS))throw new AssertionError("No real PONG intercepted");
@@ -31,7 +32,7 @@ public final class OutboxRecoveryProbe {
                 boolean delivered=false;while(System.nanoTime()<deadline){var message=subscription.nextMessage(Duration.ofMillis(100));if(message!=null&&new String(message.getData(),StandardCharsets.UTF_8).contains(sid.toString())){delivered=true;break;}}
                 if(!delivered)throw new AssertionError("Recovered event not delivered to real subscriber");
                 proxy.check();System.out.println("OUTBOX real delayed PONG rollback and next-tick delivery PASS");
-            }finally{db.update("DELETE FROM outbox_events WHERE event_id=?",event);}
+            }
         }
         // A non-publication failure must still reach the uncaught worker boundary.
         var mapper=new com.fasterxml.jackson.databind.ObjectMapper();
@@ -41,11 +42,13 @@ public final class OutboxRecoveryProbe {
         mapper.writeValue(file.toFile(),broken);CountDownLatch failed=new CountDownLatch(1);var errors=new ConcurrentLinkedQueue<Throwable>();
         var prior=Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((thread,error)->{errors.add(error);failed.countDown();});
-        try(SessionOutbox worker=new SessionOutbox(Config.read(file.toString()))){
+        try(AutoCloseable delete=()->java.nio.file.Files.delete(file);
+            AutoCloseable restore=()->Thread.setDefaultUncaughtExceptionHandler(prior);
+            SessionOutbox worker=new SessionOutbox(Config.read(file.toString()))){
             if(!failed.await(10,TimeUnit.SECONDS))throw new AssertionError("Unknown worker database failure was hidden");
             if(!(errors.peek() instanceof org.springframework.transaction.CannotCreateTransactionException))throw new AssertionError("Unexpected worker failure",errors.peek());
             System.out.println("OUTBOX non-publication failure reaches uncaught worker boundary PASS");
-        }finally{Thread.setDefaultUncaughtExceptionHandler(prior);java.nio.file.Files.delete(file);}
+        }
     }
     static final class PongDelay implements AutoCloseable{
         final ServerSocket server=new ServerSocket(0,1,InetAddress.getLoopbackAddress());
@@ -53,19 +56,45 @@ public final class OutboxRecoveryProbe {
         final ConcurrentLinkedQueue<Throwable> errors=new ConcurrentLinkedQueue<>();
         volatile boolean delay,closing;volatile Socket client,upstream;final Thread bridge;
         PongDelay(URI target)throws IOException{
-            bridge=Thread.ofPlatform().start(()->{
+            bridge=Thread.ofPlatform().uncaughtExceptionHandler((thread,error)->errors.add(error)).start(()->{
                 try{
-                    client=server.accept();upstream=new Socket(target.getHost(),target.getPort());
-                    Thread forward=Thread.ofPlatform().start(()->{try{client.getInputStream().transferTo(upstream.getOutputStream());}catch(IOException failure){if(!closing)errors.add(failure);}});
-                    try{
-                        var reader=new BufferedReader(new InputStreamReader(upstream.getInputStream(),StandardCharsets.US_ASCII));String line;
-                        while((line=reader.readLine())!=null){if(line.equals("PONG")&&delay){delayed.countDown();release.await();}client.getOutputStream().write((line+"\r\n").getBytes(StandardCharsets.US_ASCII));client.getOutputStream().flush();}
-                    }catch(IOException failure){if(!closing)errors.add(failure);}
-                    finally{closing=true;client.close();upstream.close();forward.join();}
-                }catch(IOException failure){if(!closing)errors.add(failure);}catch(InterruptedException failure){Thread.currentThread().interrupt();errors.add(failure);}
+                    try{client=server.accept();}
+                    catch(SocketException failure){if(closing && server.isClosed())return;throw failure;}
+                    upstream=new Socket(target.getHost(),target.getPort());
+                    Thread forward=Thread.ofPlatform().uncaughtExceptionHandler((thread,error)->errors.add(error)).start(()->{
+                        try{client.getInputStream().transferTo(upstream.getOutputStream());}
+                        catch(IOException failure){if(!closing || !(failure instanceof SocketException))errors.add(failure);}
+                    });
+                    try(AutoCloseable join=forward::join; Socket releaseUpstream=upstream; Socket releaseClient=client){
+                        try{
+                            var reader=new BufferedReader(new InputStreamReader(upstream.getInputStream(),StandardCharsets.US_ASCII));
+                            String line;
+                            while((line=reader.readLine())!=null){
+                                if(line.equals("PONG") && delay){delayed.countDown();release.await();}
+                                client.getOutputStream().write((line+"\r\n").getBytes(StandardCharsets.US_ASCII));
+                                client.getOutputStream().flush();
+                            }
+                        }catch(SocketException failure){if(!closing)throw failure;}
+                        finally{closing=true;}
+                    }
+                }catch(Exception failure){
+                    errors.add(failure);
+                    if(failure instanceof InterruptedException)Thread.currentThread().interrupt();
+                }
             });
         }
-        void check(){if(!errors.isEmpty())throw new AssertionError("NATS test proxy failed",errors.peek());}
-        public void close()throws Exception{closing=true;release.countDown();server.close();if(client!=null)client.close();if(upstream!=null)upstream.close();bridge.join(5000);if(bridge.isAlive())throw new AssertionError("NATS test proxy did not stop");check();}
+        void check(){
+            Throwable first=errors.poll();
+            if(first==null)return;
+            var failure=new AssertionError("NATS test proxy failed",first);
+            for(Throwable later;(later=errors.poll())!=null;)failure.addSuppressed(later);
+            throw failure;
+        }
+        public void close()throws Exception{
+            closing=true;release.countDown();
+            try(AutoCloseable inspect=this::check;
+                AutoCloseable join=()->{bridge.join(5000);if(bridge.isAlive())throw new AssertionError("NATS test proxy did not stop");};
+                Socket closeUpstream=upstream; Socket closeClient=client; ServerSocket listener=server){}
+        }
     }
 }

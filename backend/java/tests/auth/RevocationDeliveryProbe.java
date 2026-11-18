@@ -117,7 +117,7 @@ public final class RevocationDeliveryProbe {
     public static void main(String[] args) throws Exception {
         var config = Config.read(args[0]);
         var gateway = new Gateway(config);
-        try (var publisher = Nats.connect(config.natsUrl)) {
+        try (AutoCloseable shutdown = gateway::destroy; var publisher = Nats.connect(config.natsUrl)) {
             checkRejectionFailures(gateway);
             ((Connection)field(gateway, "nats")).flush(Duration.ofSeconds(2));
             var bound = (Map<WebSocketSession, Tokens.Claims>)field(gateway, "bound");
@@ -147,8 +147,24 @@ public final class RevocationDeliveryProbe {
             if (errors.poll(5, TimeUnit.SECONDS) != broken.internal) throw new AssertionError("Internal failure lost");
             broken.expect("close");
             System.out.println("GATEWAY disconnected peers retired, same and next revokes delivered, internal failure propagated PASS");
-        } finally {
-            gateway.destroy();
         }
+        var shutdownGateway = new Gateway(config);
+        var disconnected = new Peer(Outcome.DISCONNECT);
+        var healthy = new Peer(Outcome.DELIVER);
+        var primary = new AssertionError("fixture body failed");
+        var connection = (Connection)field(shutdownGateway, "nats");
+        try (AutoCloseable shutdown = shutdownGateway::destroy) {
+            var peers = (Map<WebSocketSession, Tokens.Claims>)field(shutdownGateway, "bound");
+            peers.put(disconnected.socket, claims());
+            peers.put(healthy.socket, claims());
+            throw primary;
+        } catch (AssertionError observed) {
+            if (observed != primary || observed.getSuppressed().length != 1 ||
+                !(observed.getSuppressed()[0] instanceof IOException)) throw observed;
+        }
+        disconnected.expect("close");
+        healthy.expect("close");
+        if(connection.getStatus()!=Connection.Status.CLOSED)throw new AssertionError("NATS cleanup skipped");
+        System.out.println("GATEWAY failed peer close preserves fixture error and completes shutdown PASS");
     }
 }

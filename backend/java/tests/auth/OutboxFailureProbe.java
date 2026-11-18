@@ -13,13 +13,22 @@ public class OutboxFailureProbe {
         var transaction=new TransactionTemplate(new DataSourceTransactionManager(config.database()));
         UUID event=UUID.randomUUID(),session=UUID.randomUUID();
         db.update("INSERT INTO outbox_events(event_id,aggregate_type,aggregate_id,event_type,payload) VALUES(?,'session',?,'session.revoked',?::jsonb)",event,session,"{\"sessionId\":\""+session+"\",\"reason\":\"LOGOUT\"}");
-        try{
+        try(AutoCloseable cleanup=()->db.update("DELETE FROM outbox_events WHERE event_id=?",event)){
             var connection=Nats.connect(config.natsUrl);connection.close();
             boolean failed=false;try{SessionOutbox.publishBatch(db,transaction,connection);}catch(IllegalStateException closed){if(!closed.getMessage().toLowerCase().contains("closed"))throw closed;failed=true;}
             if(!failed)throw new AssertionError("Closed NATS publication reported success");
+            var errors=new java.util.concurrent.LinkedBlockingQueue<Throwable>();
+            var prior=Thread.getDefaultUncaughtExceptionHandler();
+            Thread.setDefaultUncaughtExceptionHandler((thread,error)->errors.add(error));
+            try(AutoCloseable restore=()->Thread.setDefaultUncaughtExceptionHandler(prior);
+                var worker=new SessionOutbox(config,connection)){
+                var error=errors.poll(3,java.util.concurrent.TimeUnit.SECONDS);
+                if(!(error instanceof IllegalStateException)||!"Session Outbox NATS connection permanently closed".equals(error.getMessage()))
+                    throw new AssertionError("Terminal NATS connection did not fail the running relay",error);
+            }
             var row=db.queryForMap("SELECT published_at,attempts FROM outbox_events WHERE event_id=?",event);
             if(row.get("published_at")!=null||((Number)row.get("attempts")).intValue()!=0)throw new AssertionError("Failed publication changed outbox state");
             System.out.println("OUTBOX closed NATS leaves real PostgreSQL event pending PASS");
-        }finally{db.update("DELETE FROM outbox_events WHERE event_id=?",event);}
+        }
     }
 }

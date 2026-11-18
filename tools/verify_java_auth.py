@@ -62,6 +62,68 @@ def verify_role_exits(java, build, env, config, folder):
             print(f'ROLE_EXIT {role} {mode} exit={result.returncode} PASS')
 
 @contextlib.contextmanager
+def cleanup_scope():
+    """Run each registered teardown in reverse order, preserving every failure."""
+    callbacks = []
+    failures = []
+    def defer(action, *args, **kwargs):
+        callbacks.append((action, args, kwargs))
+    try:
+        yield defer
+    except BaseException as body_failure:
+        failures.append(body_failure)
+    for action, args, kwargs in reversed(callbacks):
+        try:
+            action(*args, **kwargs)
+        except BaseException as cleanup_failure:
+            failures.append(cleanup_failure)
+    if len(failures) == 1:
+        raise failures[0]
+    if failures:
+        raise BaseExceptionGroup("Fixture and teardown failures in occurrence order", failures)
+
+def stop_process(proc):
+    if proc.poll() is None:
+        with cleanup_scope() as defer:
+            def reap():
+                try:
+                    proc.wait(timeout=15)
+                except subprocess.TimeoutExpired:
+                    with cleanup_scope() as after_timeout:
+                        after_timeout(proc.wait, timeout=10)
+                        after_timeout(proc.kill)
+                        raise
+            defer(reap)
+            proc.terminate()
+
+def stop_go(proc, stop):
+    with cleanup_scope() as defer:
+        defer(stop_process, proc)
+        stop.touch()
+        code = proc.wait(timeout=10)
+        if code:
+            raise RuntimeError(f'Go fixture host failed: {code}')
+
+def check_disclosure(folder, logs):
+    sensitive=folder/'sensitive-values.json'
+    if sensitive.exists():
+        values=json.loads(sensitive.read_text(encoding='utf8'))
+        def check_log(text):
+            if any(value and value in text for value in values): raise AssertionError('Credential material in role log')
+        def check_log_file(path): check_log(path.read_text(encoding='utf8'))
+        for log in logs: check_log_file(Path(log.name))
+        # A separate captured-log mutation never modifies original role output.
+        # Cover every actual submitted/issued value, including WSS-only tokens.
+        mutation=folder/'disclosure-mutation.log'
+        for value in values:
+            mutation.write_text('EXPLICIT TEST MUTATION: '+value,encoding='utf8')
+            try: check_log_file(mutation)
+            except AssertionError as failure:
+                if str(failure)!='Credential material in role log': raise
+            else: raise AssertionError('Log disclosure mutation undetected')
+        print('DISCLOSURE role logs and injected leak control PASS')
+
+@contextlib.contextmanager
 def profile(name, build, folder, env, java, cp, binding=None):
     processes=[];logs=[];stop=folder/'stop';url_file=folder/'url'
     core_port,gateway_port=port(),port()
@@ -72,11 +134,16 @@ def profile(name, build, folder, env, java, cp, binding=None):
     config_file=folder/'config.json';config_file.write_text(json.dumps(config),encoding='utf8')
     def start(command,child_env,cwd):
         log=open(folder/f'role-{len(logs)}.log','w',encoding='utf8');logs.append(log)
+        defer(log.close)
         child=subprocess.Popen(command,cwd=cwd,env=child_env,stdout=log,stderr=subprocess.STDOUT);processes.append(child)
+        if name=="go": defer(stop_go,child,stop)
+        else: defer(stop_process,child)
     seed=[java,'-cp',cp,'im.platform.tests.auth.BindingFixture']
-    if binding:
-        subprocess.run([*seed,'prepare',str(config_file),str(binding)],env=env,check=True,timeout=30)
-    try:
+    with cleanup_scope() as defer:
+        defer(check_disclosure,folder,logs)
+        if binding:
+            subprocess.run([*seed,'prepare',str(config_file),str(binding)],env=env,check=True,timeout=30)
+            defer(subprocess.run,[*seed,'cleanup',str(config_file),str(binding)],env=env,check=True,timeout=30)
         if name=='java':
             if env.get('JAVA_AUTH_DURATION_PROBE')=='1':
                 verify_role_exits(java,build,env,config_file,folder)
@@ -94,38 +161,6 @@ def profile(name, build, folder, env, java, cp, binding=None):
         yield url,config_file
         for proc in processes:
             if proc.poll() is not None: raise RuntimeError(f'Live role failed: {proc.returncode}')
-    finally:
-        if name=='go' and processes:
-            stop.touch()
-            try:
-                code=processes[0].wait(timeout=10)
-                if code: raise RuntimeError(f'Go fixture host failed: {code}')
-            finally:
-                if processes[0].poll() is None: processes[0].terminate();processes[0].wait(timeout=10)
-        else:
-            for proc in reversed(processes):
-                if proc.poll() is None: proc.terminate()
-            for proc in reversed(processes): proc.wait(timeout=15)
-        for log in logs: log.close()
-        if binding:
-            subprocess.run([*seed,'cleanup',str(config_file),str(binding)],env=env,check=True,timeout=30)
-        sensitive=folder/'sensitive-values.json'
-        if sensitive.exists():
-            values=json.loads(sensitive.read_text(encoding='utf8'))
-            def check_log(text):
-                if any(value and value in text for value in values): raise AssertionError('Credential material in role log')
-            def check_log_file(path): check_log(path.read_text(encoding='utf8'))
-            for log in logs: check_log_file(Path(log.name))
-            # A separate captured-log mutation never modifies original role output.
-            # Cover every actual submitted/issued value, including WSS-only tokens.
-            mutation=folder/'disclosure-mutation.log'
-            for value in values:
-                mutation.write_text('EXPLICIT TEST MUTATION: '+value,encoding='utf8')
-                try: check_log_file(mutation)
-                except AssertionError as failure:
-                    if str(failure)!='Credential material in role log': raise
-                else: raise AssertionError('Log disclosure mutation undetected')
-            print('DISCLOSURE role logs and injected leak control PASS')
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--build-dir',type=Path,required=True)
@@ -161,13 +196,12 @@ def main():
         if args.profile=='java': run('java','ttl')
         previous=evidence/'previous-key-token'
         binding=evidence/'issuer-session-token'
-        try:
+        with cleanup_scope() as defer:
+            defer(binding.unlink,missing_ok=True)
+            defer(previous.unlink,missing_ok=True)
             run(args.profile,'issue',previous,db=issuer)
             env['JAVA_AUTH_SIGNING_KEY']=secrets.token_hex(32)
             run(args.profile,'issue',binding,db=issuer)
             run(args.profile,'fixtures',previous,binding=binding)
-        finally:
-            previous.unlink(missing_ok=True)
-            binding.unlink(missing_ok=True)
 
 if __name__=='__main__': main()

@@ -5,17 +5,17 @@ Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-JAVA-AUTH-001`
-Batch Status: PEER_EXPIRY_FIX_REVIEW_PENDING
+Batch Status: TERMINAL_CLEANUP_FIX_REVIEW_PENDING
 Current Task: `LOOP1-JAVA-AUTH-001`
 Current Task State: `review`
-Execution Status: Go and Java credential expiry correction pending fresh dual reviews
+Execution Status: Terminal Session relay and shutdown cleanup repair pending fresh dual reviews
 Assigned Worktree: H:/.codex/worktrees/j/IM-platform
 Task Branch: task/LOOP1-JAVA-AUTH-001
 Coordinator: /root
 
 ## Immediately Relevant Completed Work
 
-Regular review of 7679f24a found a false Session revocation when one bound access token expired. The Human authorized the corresponding Go and Java corrections. Each gateway now retires the expired peer and preserves refreshed connections through actual logout. S1/S2 PASS retained.
+Candidate a45e98e5 passed regular review and failed its independent error audit. Core now exposes terminal NATS loss, Gateway attempts every bound socket and client close, and verifier teardown preserves simultaneous failures. S1/S2 PASS retained.
 
 ## Current Blockers
 
@@ -25,15 +25,15 @@ Awaiting both independent final-SHA reviews, hosted CI, protected integration, a
 
 - Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
   - Result: PASS. Maven, packaged Core/Gateway normal and fatal exits, WSS send/close failure preservation, 28 fixtures per profile, profile switching and local architecture/CI/HTTP/WSS checks passed.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-AUTH-001/peer-expiry-fix.md`
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-AUTH-001/terminal-cleanup-fix.md`
 
 ## Changed Files or Migrations
 
-Java and Go Gateway expiry handling, Go expiry assertions, shared live regression and scoped handoff/evidence. No migration or dependency change.
+Java Session relay and Gateway shutdown, fixture cleanup and negative controls, existing Java CI step, task and review evidence. No migration or dependency change.
 
 ## Known Failures, Risks, and Assumptions
 
-See regular-review6.md and peer-expiry-fix.md. Prior role-shutdown evidence remains in lifecycle-fix.md. Two distinct disposable migrated databases are now required for live fixture verification. Captured response and role log checks are bounded to available observations.
+See regular-review7.md, error-review6.md and terminal-cleanup-fix.md. Prior role-shutdown evidence remains in lifecycle-fix.md. Two distinct disposable migrated databases are now required for live fixture verification. Captured response and role log checks are bounded to available observations.
 
 ## Next Exact Action
 
@@ -49,7 +49,7 @@ Coordinator delegates fresh regular review then different fresh error audit of t
 
 ## Uncommitted Changes / Ownership
 
-/root/auth_expired_peer owns the scoped task repair in the assigned j worktree. Unknown original main work remains untouched.
+/root/auth_nats_terminal owns the scoped task repair in the assigned j worktree. Unknown original main work remains untouched.
 
 ## Architecture Conflicts / ACP / ADR
 

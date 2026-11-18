@@ -216,8 +216,7 @@ public final class AuthFixtureRunner {
                 read.setObject(1,UUID.fromString(user));String original;try(var rows=read.executeQuery()){require(rows.next(),"Corruption probe user");original=rows.getString(1);}
                 try(var update=db.prepareStatement("UPDATE users SET password_hash=? WHERE user_id=?")){
                     update.setString(1,"invalid-stored-bcrypt");update.setObject(2,UUID.fromString(user));require(update.executeUpdate()==1,"Corruption setup");
-                    try{Reply failure=call("POST","/v1/auth/login",login,null,null);require(failure.status==500,"Persisted hash corruption was hidden as credential rejection");}
-                    finally{update.setString(1,original);require(update.executeUpdate()==1,"Corruption restoration");}
+                    try(AutoCloseable restore=()->{update.setString(1,original);require(update.executeUpdate()==1,"Corruption restoration");}){Reply failure=call("POST","/v1/auth/login",login,null,null);require(failure.status==500,"Persisted hash corruption was hidden as credential rejection");}
                 }
             }
             System.out.println("INVARIANT java malformed persisted BCrypt produces HTTP500 PASS");
@@ -438,7 +437,7 @@ public final class AuthFixtureRunner {
     }
     public static void main(String[] args)throws Exception{
         require(args.length>=4,"base profile repository config required");AuthFixtureRunner run=new AuthFixtureRunner(args[0],args[1],Path.of(args[2]),Config.read(args[3]));
-        try{
+        try(AutoCloseable capture=()->Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets))){
             if(args.length==5&&args[4].equals("ttl"))run.durations();
             else if(args.length==7&&args[4].equals("fixtures")){
                 run.execute(Files.readString(Path.of(args[5])),Files.readString(Path.of(args[6])));
@@ -446,7 +445,7 @@ public final class AuthFixtureRunner {
             }
             else if(args.length==6&&Set.of("create","login","issue").contains(args[4]))run.credentials(args[4],Path.of(args[5]));
             else throw new IllegalArgumentException("Missing fixture mode or prior-key credential");
-        }finally{Files.writeString(Path.of(args[3]).getParent().resolve("sensitive-values.json"),JSON.writeValueAsString(run.secrets));}
+        }
     }
     void execute(String previousKeyToken,String bindingToken)throws Exception{
         AuthFixtureRunner run=this;

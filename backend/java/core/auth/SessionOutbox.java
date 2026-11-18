@@ -14,13 +14,18 @@ public final class SessionOutbox implements AutoCloseable {
     private final Thread worker;
     private volatile boolean stopping;
     public SessionOutbox(Config config)throws java.io.IOException,InterruptedException {
-        nats=Nats.connect(config.natsUrl);
+        this(config,Nats.connect(config.natsUrl));
+    }
+    SessionOutbox(Config config,Connection nats){
+        this.nats=nats;
         JdbcTemplate db=new JdbcTemplate(config.database());
         TransactionTemplate transaction=new TransactionTemplate(new DataSourceTransactionManager(config.database()));
         worker=Thread.ofPlatform().name("session-outbox").unstarted(()->{
             try{
                 while(!stopping){
-                    if(nats.getStatus()==Connection.Status.CONNECTED){
+                    var status=nats.getStatus();
+                    if(status==Connection.Status.CLOSED)throw new IllegalStateException("Session Outbox NATS connection permanently closed");
+                    if(status==Connection.Status.CONNECTED){
                         try{publishBatch(db,transaction,nats);}
                         catch(PublicationTimeout timeout){System.err.println("Session publication timed out; transaction rolled back; retrying next tick");}
                     }
@@ -43,5 +48,5 @@ public final class SessionOutbox implements AutoCloseable {
             }
         });
     }
-    @Override public void close()throws InterruptedException {stopping=true;worker.join();nats.close();}
+    @Override public void close()throws InterruptedException {stopping=true;try(nats){worker.join();}}
 }

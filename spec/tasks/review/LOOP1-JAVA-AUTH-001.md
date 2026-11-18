@@ -2,7 +2,7 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/auth_expired_peer
+owner: /root/auth_nats_terminal
 stage: S3
 gate: S3
 ---
@@ -120,8 +120,8 @@ Record exact branch/SHA/range, commands/exits/timings, fixture IDs/results/exclu
 
 # Handoff
 
-Fresh regular review of 7679f24a848cf167a214311b3fbb83a5511ffdd5 failed on access expiry revoking other connections sharing an active Session. The Human authorized “本轮同时修复 Go 和 Java”. Both gateways now close the affected connection on credential expiry. The same real login/refresh exercise checks two refreshed connections survive and then receive the genuine logout before close. See spec/progress/evidence/LOOP1-JAVA-AUTH-001/regular-review6.md and peer-expiry-fix.md for scope and verification. Branch task/LOOP1-JAVA-AUTH-001 remains in review. Both final-candidate audits, hosted CI and main sync are pending. Accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d retains S1/S2 PASS; S3 OPEN.
+Candidate a45e98e55df922c9a1be31ab3031ae0b220cfcea passed regular review and failed the separate error audit. The repair distinguishes terminal NATS closure from transient reconnection and preserves primary and secondary failures across role and verifier cleanup. Durable evidence, local commands, results and source of the independent findings are in spec/progress/evidence/LOOP1-JAVA-AUTH-001/terminal-cleanup-fix.md. Production sources, tests, Java CI wiring and scoped records are owned by /root/auth_nats_terminal. Branch task/LOOP1-JAVA-AUTH-001 remains in review. Last accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d retains S1/S2 PASS. S3 remains OPEN.
 
 # Next Action
 
-Coordinator delegates fresh regular review of the commit containing this handoff, then a different fresh error-handling specialist for that exact SHA. Both are pending. Exact-head hosted CI, protected integration, actual-main verification and safe synchronization are pending. Retain review state until independent acceptance and synchronization complete.
+Coordinator delegates fresh regular review of the commit containing this handoff followed by a different fresh error specialist on the same SHA. Both are pending. Exact-head hosted CI, protected integration, actual-main verification, and safe synchronization to H:/IM-platform are pending. Retain review state until independent acceptance and synchronization complete.
