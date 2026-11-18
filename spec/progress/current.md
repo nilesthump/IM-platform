@@ -23,7 +23,9 @@ Awaiting both independent final-SHA reviews, hosted CI, protected integration, a
 
 ## Verification
 
-Local Maven, both live profiles (28 each), profile-switch, deployment smoke and structural checks are recorded in `spec/progress/evidence/LOOP1-JAVA-AUTH-001/fixture-fix.md`. The external Recorder retains command exits and durations.
+- Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
+  - Result: PASS. Maven, 28 scenarios per profile, profile-switch, architecture/CI/HTTP/WSS controls and Java TLS smoke passed locally.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-AUTH-001/fixture-fix.md`
 
 ## Changed Files or Migrations
 
