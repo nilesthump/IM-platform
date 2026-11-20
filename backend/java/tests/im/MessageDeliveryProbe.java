@@ -15,7 +15,7 @@ import static im.platform.tests.im.GroupFixtures.*;
 /** Exercise the committed notification boundary with a real bound peer. */
 final class MessageDeliveryProbe {
     @SuppressWarnings("unchecked")
-    static void check(Gateway gateway,Tokens.Claims claims,WebSocketSession healthy,List<JsonNode> sent)throws Exception {
+    static void check(Gateway gateway,Tokens.Claims claims,WebSocketSession healthy,List<JsonNode> sent,JsonNode timestamps)throws Exception {
         var deliver=Gateway.class.getDeclaredMethod("deliver",String.class,JsonNode.class);
         deliver.setAccessible(true);
         var registry=Gateway.class.getDeclaredField("bound");
@@ -50,6 +50,16 @@ final class MessageDeliveryProbe {
                 default -> throw new AssertionError(field);
             }
             reject(deliver,gateway,recipient,malformed);
+        }
+        for(var entry:timestamps.properties()) {
+            var candidate=event.deepCopy();
+            ((ObjectNode)candidate.get("payload")).put("createdAt",entry.getKey());
+            if(entry.getValue().booleanValue()) {
+                deliver.invoke(gateway,recipient,candidate);
+                require(sent.size()==1 && sent.removeFirst().equals(candidate),"event timestamp "+entry.getKey());
+            } else {
+                reject(deliver,gateway,recipient,candidate);
+            }
         }
         var defect=new IllegalStateException("fixture serialization failure");
         var broken=new ObjectNode(JSON.getNodeFactory()){

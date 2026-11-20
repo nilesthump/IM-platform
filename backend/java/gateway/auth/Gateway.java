@@ -125,24 +125,35 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
     private static String originKey(JsonNode payload,String request) {
         return payload.path("conversationId").asText("").toLowerCase(Locale.ROOT)+":"+request.toLowerCase(Locale.ROOT);
     }
-    private static boolean committedId(JsonNode id) {
-        return validId(id) && id.textValue().equals(id.textValue().toLowerCase(Locale.ROOT));
+    private static final java.util.regex.Pattern WIRE_TIMESTAMP = java.util.regex.Pattern.compile(
+        "(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt](?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]" +
+        "(?:[.][0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])");
+
+    private static void checkCommittedTimestamp(JsonNode value) {
+        String timestamp=value.textValue();
+        if(timestamp==null || !WIRE_TIMESTAMP.matcher(timestamp).matches())
+            throw new IllegalStateException("Invalid committed message timestamp");
+        java.time.LocalDate.parse(timestamp.substring(0,10));
+    }
+
+    private static boolean canonicalId(JsonNode id) {
+        return id.isTextual() && id.textValue().matches("[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}");
     }
     private static void checkCommittedMessage(JsonNode event) {
-        if(event==null || !event.isObject() || event.size()!=4 || !committedId(event.path("requestId")) ||
+        if(event==null || !event.isObject() || event.size()!=4 || !canonicalId(event.path("requestId")) ||
             !"message.created".equals(event.path("type").textValue()) || !"1.0".equals(event.path("protocolVersion").textValue()))
             throw new IllegalStateException("Invalid committed message envelope");
         var payload=event.path("payload");
         var content=payload.path("content");
         String text=content.path("text").textValue();
-        if(!payload.isObject() || payload.size()!=6 || !committedId(payload.path("conversationId")) ||
-            !committedId(payload.path("messageId")) || !committedId(payload.path("senderId")) ||
+        if(!payload.isObject() || payload.size()!=6 || !canonicalId(payload.path("conversationId")) ||
+            !canonicalId(payload.path("messageId")) || !canonicalId(payload.path("senderId")) ||
             !payload.path("seq").isIntegralNumber() || payload.get("seq").bigIntegerValue().signum()<=0 ||
-            !payload.path("createdAt").isTextual() || !content.isObject() || content.size()!=2 ||
+            !content.isObject() || content.size()!=2 ||
             !"TEXT".equals(content.path("kind").textValue()) || text==null || text.isEmpty() ||
             text.codePointCount(0,text.length())>4096)
             throw new IllegalStateException("Invalid committed message payload");
-        java.time.OffsetDateTime.parse(payload.get("createdAt").textValue());
+        checkCommittedTimestamp(payload.path("createdAt"));
     }
     private void deliver(String recipient,JsonNode event)throws IOException {
         checkCommittedMessage(event);
@@ -224,21 +235,18 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         if(((Number)row.get("session_epoch")).longValue()!=c.epoch())throw new ApiFailure(401,"AUTH_SESSION_EPOCH_STALE","Access token carries a stale session epoch.");
         if(!c.sessionId().equals(row.get("session_id").toString())){var actual=one("SELECT client_type FROM sessions WHERE user_id=? AND session_id=?",user,session);if(actual!=null&&!c.clientType().equals(actual.get("client_type")))throw new ApiFailure(401,"AUTH_CLIENT_TYPE_MISMATCH","Access token does not match the active client session.");throw new ApiFailure(401,"AUTH_TOKEN_INVALID","Access token and session binding disagree.");}
     }
-    private static boolean validId(JsonNode id) {
-        return id.isTextual() && id.textValue().matches("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}");
-    }
     private static void checkMessageAck(JsonNode ack,String id,JsonNode sent) {
         if(ack==null || !ack.isObject() || ack.size()!=4 || !"1.0".equals(ack.path("protocolVersion").textValue()) ||
-            !"message.ack".equals(ack.path("type").textValue()) || !id.equals(ack.path("requestId").textValue()))
+            !"message.ack".equals(ack.path("type").textValue()) || !canonicalId(ack.path("requestId")) || !id.equals(ack.path("requestId").textValue()))
             throw new IllegalStateException("Invalid Core message acknowledgement envelope");
         var body=ack.path("payload");
         if("committed".equals(body.path("status").textValue())) {
-            if(body.size()!=5 || !validId(body.path("conversationId")) ||
-                !body.get("conversationId").textValue().equalsIgnoreCase(sent.path("conversationId").textValue()) ||
-                !validId(body.path("messageId")) || !body.path("seq").isIntegralNumber() ||
-                body.get("seq").bigIntegerValue().signum()<=0 || !body.path("createdAt").isTextual())
+            if(body.size()!=5 || !canonicalId(body.path("conversationId")) ||
+                !body.get("conversationId").textValue().equals(sent.path("conversationId").textValue()) ||
+                !canonicalId(body.path("messageId")) || !body.path("seq").isIntegralNumber() ||
+                body.get("seq").bigIntegerValue().signum()<=0)
                 throw new IllegalStateException("Incomplete or unrelated Core commit confirmation");
-            Instant.parse(body.get("createdAt").textValue());
+            checkCommittedTimestamp(body.path("createdAt"));
             return;
         }
         var error=body.path("error");
@@ -263,6 +271,7 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
             JsonNode e;try{e=JSON.readTree(message.getPayload());}catch(com.fasterxml.jackson.core.JsonProcessingException malformed){socket.close(CloseStatus.BAD_DATA);return;}
             if(e==null||!e.isObject()||e.size()!=4||!e.path("protocolVersion").isTextual()||!e.path("protocolVersion").textValue().equals("1.0")||!e.path("requestId").isTextual()||!e.path("requestId").textValue().matches("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}")||!e.path("type").isTextual()||!e.path("payload").isObject()){socket.close(CloseStatus.BAD_DATA);return;}
             String type=e.get("type").textValue(),id=e.get("requestId").textValue();JsonNode payload=e.get("payload");
+            if(type.equals("message.send") && !canonicalId(e.get("requestId"))){socket.close(CloseStatus.BAD_DATA);return;}
             if(type.equals("ping")||type.equals("pong")){if(payload.size()!=0){socket.close(CloseStatus.BAD_DATA);return;}if(type.equals("ping"))send(socket,frame("pong",id,Map.of()));return;}
             Tokens.Claims current=bound.get(socket);
             if(current==null){

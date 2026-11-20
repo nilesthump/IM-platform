@@ -20,8 +20,8 @@ public final class Messages {
         String conversation=payload.path("conversationId").textValue();
         String text=content.path("text").textValue();
         if(!envelope.isObject()||envelope.size()!=4||!"message.send".equals(envelope.path("type").textValue())||
-            !"1.0".equals(envelope.path("protocolVersion").textValue())||request==null||!Groups.validId(request.toLowerCase(Locale.ROOT))||
-            payload.size()!=2||conversation==null||!Groups.validId(conversation.toLowerCase(Locale.ROOT))||
+            !"1.0".equals(envelope.path("protocolVersion").textValue())||!Groups.validId(request)||
+            payload.size()!=2||!Groups.validId(conversation)||
             content.size()!=2||!"TEXT".equals(content.path("kind").textValue())||text==null||text.isEmpty()||text.codePointCount(0,text.length())>4096)
             throw new ApiFailure(400,"VALIDATION_FAILED","Request rejected");
         UUID conv=UUID.fromString(conversation),id=UUID.fromString(request);

@@ -82,6 +82,8 @@ Accepted main remains 18597c06f15c6ba5d50e055a88890a54f737fd52. The regular revi
 
 Fresh regular review PASS and different fresh specialist FAIL at 86ebf3510450013943c22311abb5d5a00c526457 are preserved under the task evidence directory. /root/fix4 corrected both committed-message fan-out findings and added regression coverage. See fix4.md for the per-path recovery, real verification results and Recorder run. The current replacement requires both fresh reviews and exact-head hosted acceptance. Accepted main remains 18597c06f15c6ba5d50e055a88890a54f737fd52.
 
+The fresh regular review of 57b98c54c2da2d6bf4dcfedb8e9ff740c8981301 failed on an extended signed year. See 57b98c5-regular-fail.md and fix5.md. /root/fix5 corrected the Java committed ACK and event validators and verified the real Java/Go/Java fixtures. The separate UUID comparison found an unresolved cross-profile divergence for an uppercase message.send request ID. BLOCKED_BY_ARCHITECTURE pending the compatibility decision recorded in fix5.md. The task stays in review, Gate S3 OPEN. The final replacement has no independent reviews or hosted acceptance.
+
 # Next Action
 
-Delegate a fresh regular review on the committed replacement HEAD. After regular PASS, delegate a different fresh error specialist on that exact HEAD. Record both results before submission for exact-head hosted CI, protected integration, actual-main verification and guarded main synchronization.
+Human/Architect to decide whether to scope a separate Go change to enforce the existing machine verifier, or authorize a compatibility/contract decision for mixed-case UUID input. Resume fresh regular and separate specialist reviews and exact-head hosted acceptance only after resolution.

@@ -35,9 +35,21 @@ def main():
             with profile(name, build, folder, env, java, cp) as (url, config):
                 if index == 0:
                     ack = folder / "replayed-message-ack.json"
-                    subprocess.run([java, "-cp", cp, "im.platform.tests.im.MessageOutcomeProbe",
-                                    str(config), url, str(ack)], check=True, timeout=35)
                     contract = runpy.run_path(str(ROOT / "contracts/websocket/verify.py"))
+                    timestamp_cases = {}
+                    for value in ("2026-01-01T00:00:00Z", "2024-02-29T23:59:59.1234567891-23:59",
+                                  "+02026-01-01T00:00:00Z", "0000-01-01T00:00:00Z",
+                                  "2025-02-29T00:00:00Z", "2026-01-01T24:00:00Z",
+                                  "2026-01-01T00:00:60Z", "2026-01-01T00:00:00z"):
+                        try:
+                            contract["validate"](value, contract["SCHEMA"]["$defs"]["Timestamp"])
+                            timestamp_cases[value] = True
+                        except contract["Invalid"]:
+                            timestamp_cases[value] = False
+                    timestamps = folder / "timestamp-cases.json"
+                    timestamps.write_text(json.dumps(timestamp_cases), encoding="utf8")
+                    subprocess.run([java, "-cp", cp, "im.platform.tests.im.MessageOutcomeProbe",
+                                    str(config), url, str(ack), str(timestamps)], check=True, timeout=35)
                     contract["validate"](json.loads(ack.read_text(encoding="utf8")), contract["SCHEMA"])
                 if index < 2:
                     subprocess.run([java, "-cp", cp, "im.platform.tests.im.GroupFixtures",

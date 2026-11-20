@@ -32,6 +32,7 @@ public final class MessageOutcomeProbe {
         var conv=f.conversation();
         f.seedGroup(actor,UUID.randomUUID().toString(),conv,List.of(actor,f.user(2)));
         var original=new AtomicReference<JsonNode>();
+        var timestamps=JSON.readTree(Path.of(args[3]).toFile());
         var fault=new AtomicReference<String>();
         URI upstream=URI.create(config.coreUrl+"/__core/message");
         var relay=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
@@ -52,6 +53,8 @@ public final class MessageOutcomeProbe {
                 if("lost".equals(damage)) return;
                 if("protocolVersion".equals(damage)) ack.remove(damage);
                 else if("conversationId".equals(damage)) ((ObjectNode)ack.get("payload")).put(damage,UUID.randomUUID().toString());
+                else if(damage!=null && timestamps.has(damage)) ((ObjectNode)ack.get("payload")).put("createdAt",damage);
+                else if("uppercaseId".equals(damage)) ((ObjectNode)ack.get("payload")).put("messageId","ABCDEFAB-0000-0000-0000-000000000000");
                 else if(damage!=null) ((ObjectNode)ack.get("payload")).remove(damage);
                 byte[] body=JSON.writeValueAsBytes(ack);
                 exchange.sendResponseHeaders(200,body.length);
@@ -68,6 +71,7 @@ public final class MessageOutcomeProbe {
                 var handler=(WebSocketHandler)ctor.newInstance(gateway);
                 var attributes=new HashMap<String,Object>();
                 var sent=new ArrayList<JsonNode>();
+                var closes=new ArrayList<CloseStatus>();
                 var socket=(WebSocketSession)Proxy.newProxyInstance(WebSocketSession.class.getClassLoader(),
                     new Class<?>[]{WebSocketSession.class},(peer,method,values)->switch(method.getName()){
                         case "hashCode" -> System.identityHashCode(peer);
@@ -75,7 +79,7 @@ public final class MessageOutcomeProbe {
                         case "getAttributes" -> attributes;
                         case "isOpen" -> true;
                         case "sendMessage" -> {sent.add(JSON.readTree(((TextMessage)values[0]).getPayload()));yield null;}
-                        case "close" -> null;
+                        case "close" -> {if(values!=null) closes.add((CloseStatus)values[0]);yield null;}
                         default -> throw new AssertionError(method.getName());
                     });
                 var bind=MessageFixtures.frame("auth.bind",UUID.randomUUID().toString(),Map.of("accessToken",f.tokens.get(actor)));
@@ -84,15 +88,27 @@ public final class MessageOutcomeProbe {
                 String id=UUID.randomUUID().toString();
                 var frame=MessageFixtures.frame("message.send",id,Map.of("conversationId",conv,"content",Map.of("kind","TEXT","text","test")));
                 var send=new TextMessage(frame.toString());
-                for(var damage:List.of("lost","protocolVersion","conversationId","messageId","seq","createdAt")) {
+                for(var damage:List.of("lost","protocolVersion","conversationId","messageId","seq","createdAt","uppercaseId")) {
                     fault.set(damage);
                     try {handler.handleMessage(socket,send);throw new AssertionError("Confirmed "+damage);}
                     catch(java.io.IOException lost){if(!damage.equals("lost")) throw lost;}
                     catch(IllegalStateException invalid){
                         if(damage.equals("lost") || !(invalid.getMessage().equals("Invalid Core message acknowledgement envelope") ||
+                            invalid.getMessage().equals("Invalid committed message timestamp") ||
                             invalid.getMessage().equals("Incomplete or unrelated Core commit confirmation"))) throw invalid;
                     }
                     require(sent.isEmpty(),"unconfirmed outcome");
+                }
+                for(var entry:timestamps.properties()) {
+                    fault.set(entry.getKey());
+                    try {handler.handleMessage(socket,send);}
+                    catch(IllegalStateException | java.time.format.DateTimeParseException invalid) {
+                        if(entry.getValue().booleanValue()) throw invalid;
+                        require(sent.isEmpty(),"invalid timestamp confirmed");
+                        continue;
+                    }
+                    require(entry.getValue().booleanValue() && sent.size()==1 &&
+                        entry.getKey().equals(sent.removeFirst().at("/payload/createdAt").textValue()),"ACK timestamp "+entry.getKey());
                 }
                 fault.set(null);
                 handler.handleMessage(socket,send);
@@ -101,7 +117,12 @@ public final class MessageOutcomeProbe {
                 require(f.db.queryForObject("SELECT count(*) FROM messages WHERE conversation_id=?::uuid AND request_id=?::uuid",
                     Integer.class,conv,id)==1 && f.db.queryForObject("SELECT count(*) FROM outbox_events WHERE conversation_id=?::uuid AND event_type='message.created'",
                     Integer.class,conv)==1,"one durable message and event");
-                MessageDeliveryProbe.check(gateway,f.codec.parse(f.tokens.get(actor)),socket,sent);
+                MessageDeliveryProbe.check(gateway,f.codec.parse(f.tokens.get(actor)),socket,sent,timestamps);
+                var malformed=(ObjectNode)frame.deepCopy();
+                malformed.put("requestId","ABCDEFAB-0000-0000-0000-000000000000");
+                sent.clear();
+                handler.handleMessage(socket,new TextMessage(malformed.toString()));
+                require(sent.isEmpty() && closes.equals(List.of(CloseStatus.BAD_DATA)),"invalid correlation closes before forwarding");
             }
         } finally {relay.stop(0);}
         unknownDatabaseCommit(config,f,actor,conv);
