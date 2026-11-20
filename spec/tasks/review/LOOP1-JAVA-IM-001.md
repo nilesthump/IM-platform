@@ -25,6 +25,7 @@ LOOP1-JAVA-AUTH-001, LOOP1-CONTRACT-001, LOOP1-CONTRACT-002, LOOP1-CONTRACT-003,
 
 # Allowed Paths
 
+- contracts/websocket/verify.py (Human-approved WSS timestamp hour validation and regression controls only.)
 - backend/go/core/message.go (Human-approved message.send UUID validation only.)
 - backend/go/gateway/gateway.go (Human-approved message.send correlation validation only.)
 - backend/java/core/im/** (Friend, Group and snapshots, Message and Sync.)
@@ -58,7 +59,7 @@ Use identical applicable contract fixtures on both real profiles and check durab
 
 # Forbidden
 
-No public contract, migration, client, plugin runtime, ACK semantics or security change. Go changes are limited to the Human-approved message.send UUID validation and its shared regression. Later LOOP1-PARITY-001 and S3 Gate are separate.
+The sole public contract verifier exception is the Human-approved WSS timestamp hour correction. No schema, fixture, migration, client, plugin runtime, ACK semantics or security change. Go changes are limited to the Human-approved message.send UUID validation and its shared regression. Later LOOP1-PARITY-001 and S3 Gate are separate.
 
 # Minimality
 
@@ -87,6 +88,8 @@ Fresh regular review PASS and different fresh specialist FAIL at 86ebf3510450013
 The fresh regular review of 57b98c54c2da2d6bf4dcfedb8e9ff740c8981301 failed on an extended signed year. See 57b98c5-regular-fail.md and fix5.md. /root/fix5 corrected the Java committed ACK and event validators and verified the real Java/Go/Java fixtures. Before the Human decision the separate UUID comparison found a cross-profile divergence for an uppercase message.send request ID. The historical BLOCKED_BY_ARCHITECTURE question recorded in fix5.md was resolved by the subsequent decision in go-uuid-conformance.md. The task stays in review, Gate S3 OPEN. The final replacement has no independent reviews or hosted acceptance.
 
 Human decision: “沿用小写契约，授权本轮仅修复 Go 的 message.send 校验并补双后端回归”. /root/fix5 implemented the scoped Go message.send conformance change and shared public TLS regression. See go-uuid-conformance.md for the exact decision, source scope and verification. The old divergence and failed review remain historical evidence.
+
+Human decision: “授权修正验证器，00–23 保持有效，24:00:00 拒绝”. The independent regular and specialist reviews both passed on 7ff6d1ed. PR107 then failed its Java job in both exact-head hosted runs. /root/hostedfix reproduced the single divergent oracle result with CPython 3.13.14 and 3.14.3, corrected the WSS hour check and added direct and live controls. The original reports and CI links are preserved beside hosted-hour-fix.md. The local WSS suite passed on both versions and Java/Go/Java passed on 3.14.3. Current replacement still needs both independent reviews. Last accepted main 18597c06f15c6ba5d50e055a88890a54f737fd52. Recorder R-20261120T140058Z-42474367-714e-468e-b2ed-4818eba96fac.
 
 # Next Action
 
