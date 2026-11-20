@@ -19,13 +19,13 @@ Java Auth product PR105 and closure PR106 are integrated. Java IM product commit
 
 ## Current Blockers
 
-Three regular reviews failed. The third review of a7e85f34 passed the live fixtures and found a malformed evidence path in this record. The replacement candidate corrects that path. Both fresh reviews of the replacement candidate, hosted CI, protected integration and verified main synchronization are pending.
+Fresh regular review passed on 86ebf351, followed by a specialist FAIL on committed message validation and serialization failure classification. Both defects are fixed on the replacement candidate. Both fresh reviews, exact-head hosted CI, protected integration and verified synchronization remain pending.
 
 ## Verification
 
 - Command: `python -Xutf8 -B tools/verify_java_im.py --build-dir EXTERNAL`
-  - Result: The second fix passed in 71.109 seconds on real PostgreSQL/NATS, including same-slot login during WSS send, concurrent ADD/send, lost confirmation, missed retirement and bidirectional Java/Go continuity.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/fix2.md`
+  - Result: The fourth fix passed in 71.719 seconds against PostgreSQL/NATS on Java and Go, including malformed committed events, serializer failure isolation and disconnected-peer retirement.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/fix4.md`
 
 ## Changed Files or Migrations
 
@@ -49,7 +49,7 @@ Review the final committed candidate from a clean checkout. After regular PASS, 
 
 ## Uncommitted Changes / Ownership
 
-Initial product and control changes belong to /root/java_im. First fix, tests and evidence belong to /root/fix1. The second fix, regression and evidence belong to /root/fix2. /root/fix3 owns the third recovery-record correction and preserved /root/regular3 report. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
+Initial product and control changes belong to /root/java_im. First fix, tests and evidence belong to /root/fix1. The second fix, regression and evidence belong to /root/fix2. /root/fix3 owns the third recovery-record correction and preserved /root/regular3 report. /root/fix4 owns the committed message validation, delivery regressions and preserved regular/specialist reports for 86ebf351. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
 
 ## Architecture Conflicts / ACP / ADR
 

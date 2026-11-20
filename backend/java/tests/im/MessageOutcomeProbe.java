@@ -101,6 +101,7 @@ public final class MessageOutcomeProbe {
                 require(f.db.queryForObject("SELECT count(*) FROM messages WHERE conversation_id=?::uuid AND request_id=?::uuid",
                     Integer.class,conv,id)==1 && f.db.queryForObject("SELECT count(*) FROM outbox_events WHERE conversation_id=?::uuid AND event_type='message.created'",
                     Integer.class,conv)==1,"one durable message and event");
+                MessageDeliveryProbe.check(gateway,f.codec.parse(f.tokens.get(actor)),socket,sent);
             }
         } finally {relay.stop(0);}
         unknownDatabaseCommit(config,f,actor,conv);

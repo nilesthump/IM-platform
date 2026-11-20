@@ -125,9 +125,28 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
     private static String originKey(JsonNode payload,String request) {
         return payload.path("conversationId").asText("").toLowerCase(Locale.ROOT)+":"+request.toLowerCase(Locale.ROOT);
     }
+    private static boolean committedId(JsonNode id) {
+        return validId(id) && id.textValue().equals(id.textValue().toLowerCase(Locale.ROOT));
+    }
+    private static void checkCommittedMessage(JsonNode event) {
+        if(event==null || !event.isObject() || event.size()!=4 || !committedId(event.path("requestId")) ||
+            !"message.created".equals(event.path("type").textValue()) || !"1.0".equals(event.path("protocolVersion").textValue()))
+            throw new IllegalStateException("Invalid committed message envelope");
+        var payload=event.path("payload");
+        var content=payload.path("content");
+        String text=content.path("text").textValue();
+        if(!payload.isObject() || payload.size()!=6 || !committedId(payload.path("conversationId")) ||
+            !committedId(payload.path("messageId")) || !committedId(payload.path("senderId")) ||
+            !payload.path("seq").isIntegralNumber() || payload.get("seq").bigIntegerValue().signum()<=0 ||
+            !payload.path("createdAt").isTextual() || !content.isObject() || content.size()!=2 ||
+            !"TEXT".equals(content.path("kind").textValue()) || text==null || text.isEmpty() ||
+            text.codePointCount(0,text.length())>4096)
+            throw new IllegalStateException("Invalid committed message payload");
+        java.time.OffsetDateTime.parse(payload.get("createdAt").textValue());
+    }
     private void deliver(String recipient,JsonNode event)throws IOException {
-        if(!"message.created".equals(event.path("type").textValue()) || !"1.0".equals(event.path("protocolVersion").textValue()))
-            throw new IllegalStateException("Invalid committed message event");
+        checkCommittedMessage(event);
+        var message=new TextMessage(JSON.writeValueAsString(event));
         var payload=event.get("payload");
         String key=originKey(payload,event.get("requestId").textValue());
         for(var entry:bound.entrySet()) {
@@ -137,7 +156,7 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
             synchronized(socket) {
                 if(!claims.equals(bound.get(socket)) || claims.expires()<=Instant.now().getEpochSecond() || !socket.isOpen()) continue;
                 if(recipient.equals(payload.get("senderId").textValue()) && origins(socket).contains(key)) continue;
-                try {send(socket,event);}
+                try {socket.sendMessage(message);}
                 catch(IOException disconnected) {
                     bound.remove(socket,claims);
                     closeRevoked(socket);
