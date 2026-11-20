@@ -26,8 +26,14 @@ public final class Messages {
             throw new ApiFailure(400,"VALIDATION_FAILED","Request rejected");
         UUID conv=UUID.fromString(conversation),id=UUID.fromString(request);
         checkSession.run();
-        if(db.queryForList("SELECT user_id FROM conversation_members WHERE conversation_id=? AND user_id=? AND left_at IS NULL FOR SHARE",conv,actor).isEmpty()) throw Groups.denied();
-        long seq=db.queryForObject("SELECT next_seq FROM conversations WHERE conversation_id=? FOR UPDATE",Long.class,conv);
+        // Acquire conversation then membership, in the same order as group ADD.
+        var sequences=db.queryForList("""
+            SELECT c.next_seq FROM conversations c JOIN conversation_members m USING(conversation_id)
+            WHERE c.conversation_id=? AND m.user_id=? AND m.left_at IS NULL
+            FOR UPDATE OF c FOR SHARE OF m
+            """,Long.class,conv,actor);
+        if(sequences.isEmpty()) throw Groups.denied();
+        long seq=sequences.getFirst();
         var rows=db.queryForList("SELECT sender_id,seq,server_message_id,text_body,created_at FROM messages WHERE conversation_id=? AND request_id=?",conv,id);
         UUID message;
         java.sql.Timestamp stamp;

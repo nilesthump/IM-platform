@@ -8,7 +8,7 @@ Current Batch: `LOOP1-JAVA-IM-001`
 Batch Status: REVIEW
 Current Task: `LOOP1-JAVA-IM-001`
 Current Task State: `review`
-Execution Status: Java IM candidate awaiting independent reviews
+Execution Status: Java IM fix candidate awaiting fresh independent reviews
 Assigned Worktree: H:/.codex/worktrees/java-im/IM-platform
 Task Branch: task/LOOP1-JAVA-IM-001
 Coordinator: /root
@@ -19,13 +19,13 @@ Java Auth product PR105 and closure PR106 are integrated. Java IM product commit
 
 ## Current Blockers
 
-Regular and specialist review, hosted CI, protected integration and verified main synchronization are pending.
+Regular review of 8974560b failed. Both fresh reviews of the replacement candidate, hosted CI, protected integration and verified main synchronization are pending.
 
 ## Verification
 
 - Command: `python -Xutf8 -B tools/verify_java_im.py --build-dir EXTERNAL`
-  - Result: PASS in 73.468 seconds on local PostgreSQL/NATS with Java/Go fixtures and bidirectional continuity.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/implementation.md`
+  - Result: Fix verification passed in 75.484 seconds on real PostgreSQL/NATS with Java/Go fixtures, lost commit confirmation, missed retirement notification, concurrent ADD/send, and bidirectional continuity.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/fix1.md`
 
 ## Changed Files or Migrations
 
@@ -49,7 +49,7 @@ Review the final committed candidate from a clean checkout. After regular PASS, 
 
 ## Uncommitted Changes / Ownership
 
-Product and control changes belong to /root/java_im. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
+Initial product and control changes belong to /root/java_im. Current fix, tests and fix evidence belong to /root/fix1. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
 
 ## Architecture Conflicts / ACP / ADR
 

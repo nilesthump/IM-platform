@@ -117,8 +117,11 @@ public final class RevocationDeliveryProbe {
         nats.publish("session.revoked", JSON.writeValueAsBytes(Map.of("sessionId", sid, "reason", "LOGOUT")));
         nats.flush(Duration.ofSeconds(2));
     }
-    private static Tokens.Claims claims() {
-        return new Tokens.Claims(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "WEB", 1, 1, 2);
+    private static Tokens.Claims claims(Config config)throws Exception {
+        UUID uid=UUID.randomUUID(),sid=UUID.randomUUID();
+        try(var db=config.database().getConnection()){BindingFixture.insert(db,uid,sid);}
+        long now=java.time.Instant.now().getEpochSecond();
+        return new Tokens.Claims(uid.toString(),sid.toString(),"WEB",1,now,now+60);
     }
     // Force logout to commit at ACK delivery; hold back its NATS event until
     // the bind handler returns. The first notification must carry the real reason.
@@ -131,7 +134,14 @@ public final class RevocationDeliveryProbe {
         constructor.setAccessible(true);
         var handler = (org.springframework.web.socket.WebSocketHandler)constructor.newInstance(gateway);
         try (var db = config.database().getConnection();
-             var logout = db.prepareStatement("UPDATE sessions SET status='REVOKED', refresh_token_hash=NULL WHERE session_id=? AND status='ACTIVE'")) {
+             var logout = db.prepareStatement("""
+                 WITH retired AS (
+                   UPDATE sessions SET status='REVOKED',refresh_token_hash=NULL WHERE session_id=? AND status='ACTIVE'
+                   RETURNING user_id,session_id
+                 )
+                 INSERT INTO user_sync_events(user_id,event_type,payload)
+                 SELECT user_id,'session.revoked',jsonb_build_object('sessionId',session_id,'reason','LOGOUT') FROM retired
+                 """)) {
             BindingFixture.insert(db, user, sid);
             logout.setObject(1, sid);
             var peer = new Peer(Outcome.DELIVER, logout);
@@ -155,7 +165,7 @@ public final class RevocationDeliveryProbe {
             logoutAtBindAck(config, gateway, publisher);
             var errors = new LinkedBlockingQueue<Throwable>();
             ((Thread)field(gateway, "events")).setUncaughtExceptionHandler((thread, error) -> errors.add(error));
-            var first = claims();
+            var first = claims(config);
             var lost = new Peer(Outcome.DISCONNECT);
             var closed = new Peer(Outcome.CLOSE_RACE);
             var survivor = new Peer(Outcome.DELIVER);
@@ -166,7 +176,7 @@ public final class RevocationDeliveryProbe {
                 peer.expect("close");
             }
             survivor.expectDelivery(first.sessionId());
-            var next = claims();
+            var next = claims(config);
             var later = new Peer(Outcome.DELIVER);
             bound.put(later.socket, next);
             publish(publisher, next.sessionId());
@@ -187,8 +197,8 @@ public final class RevocationDeliveryProbe {
         var connection = (Connection)field(shutdownGateway, "nats");
         try (AutoCloseable shutdown = shutdownGateway::destroy) {
             var peers = (Map<WebSocketSession, Tokens.Claims>)field(shutdownGateway, "bound");
-            peers.put(disconnected.socket, claims());
-            peers.put(healthy.socket, claims());
+            peers.put(disconnected.socket, claims(config));
+            peers.put(healthy.socket, claims(config));
             throw primary;
         } catch (AssertionError observed) {
             if (observed != primary || observed.getSuppressed().length != 1 ||

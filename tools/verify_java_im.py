@@ -1,5 +1,7 @@
 """Execute the same group contract exchanges on real Java and Go services."""
 import argparse
+import json
+import runpy
 import os
 from pathlib import Path
 import secrets
@@ -31,6 +33,12 @@ def main():
             folder = Path(directory) / f"{index}-{name}"
             folder.mkdir()
             with profile(name, build, folder, env, java, cp) as (url, config):
+                if index == 0:
+                    ack = folder / "replayed-message-ack.json"
+                    subprocess.run([java, "-cp", cp, "im.platform.tests.im.MessageOutcomeProbe",
+                                    str(config), url, str(ack)], check=True, timeout=35)
+                    contract = runpy.run_path(str(ROOT / "contracts/websocket/verify.py"))
+                    contract["validate"](json.loads(ack.read_text(encoding="utf8")), contract["SCHEMA"])
                 if index < 2:
                     subprocess.run([java, "-cp", cp, "im.platform.tests.im.GroupFixtures",
                                     url, str(ROOT), str(config)], check=True, timeout=150)

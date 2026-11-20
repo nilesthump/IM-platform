@@ -58,8 +58,13 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         var deliveries=nats.subscribe("message.created.*");
         messages=Thread.ofPlatform().name("message-notifications").unstarted(()->{
             try {
+                long lastCheck=System.nanoTime();
                 while(!stopping) {
                     var message=deliveries.nextMessage(Duration.ofSeconds(1));
+                    if(System.nanoTime()-lastCheck>=Duration.ofSeconds(1).toNanos()) {
+                        reconcileSessions();
+                        lastCheck=System.nanoTime();
+                    }
                     if(message!=null) deliver(message.getSubject().substring("message.created.".length()),JSON.readTree(message.getData()));
                 }
             } catch(InterruptedException interrupted) {
@@ -143,6 +148,23 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
             }
         }
     }
+    private void reconcileSessions()throws IOException {
+        for(var claims:new HashSet<>(bound.values())) {
+            try {
+                validateSession(claims);
+            } catch(ApiFailure retired) {
+                var rows=db.queryForList("""
+                    SELECT payload->>'reason' FROM user_sync_events
+                    WHERE user_id=? AND event_type='session.revoked' AND payload->>'sessionId'=?
+                    ORDER BY cursor_id DESC LIMIT 1
+                    """,String.class,UUID.fromString(claims.userId()),claims.sessionId());
+                String reason=rows.isEmpty()?"REVOKED":rows.getFirst();
+                if(!Set.of("REPLACED","LOGOUT","REVOKED").contains(reason))
+                    throw new IllegalStateException("Invalid persisted session revocation reason");
+                revoke(claims.sessionId(),reason);
+            }
+        }
+    }
     private void revoke(String sid,String reason)throws IOException {
         for(var entry:bound.entrySet())if(entry.getValue().sessionId().equals(sid)){
             WebSocketSession socket=entry.getKey();
@@ -182,6 +204,30 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         if(!"ACTIVE".equals(row.get("status"))||!((Timestamp)row.get("expires_at")).toInstant().isAfter(Instant.now()))throw new ApiFailure(401,"AUTH_SESSION_REVOKED","Session has been revoked.");
         if(((Number)row.get("session_epoch")).longValue()!=c.epoch())throw new ApiFailure(401,"AUTH_SESSION_EPOCH_STALE","Access token carries a stale session epoch.");
         if(!c.sessionId().equals(row.get("session_id").toString())){var actual=one("SELECT client_type FROM sessions WHERE user_id=? AND session_id=?",user,session);if(actual!=null&&!c.clientType().equals(actual.get("client_type")))throw new ApiFailure(401,"AUTH_CLIENT_TYPE_MISMATCH","Access token does not match the active client session.");throw new ApiFailure(401,"AUTH_TOKEN_INVALID","Access token and session binding disagree.");}
+    }
+    private static boolean validId(JsonNode id) {
+        return id.isTextual() && id.textValue().matches("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}");
+    }
+    private static void checkMessageAck(JsonNode ack,String id,JsonNode sent) {
+        if(ack==null || !ack.isObject() || ack.size()!=4 || !"1.0".equals(ack.path("protocolVersion").textValue()) ||
+            !"message.ack".equals(ack.path("type").textValue()) || !id.equals(ack.path("requestId").textValue()))
+            throw new IllegalStateException("Invalid Core message acknowledgement envelope");
+        var body=ack.path("payload");
+        if("committed".equals(body.path("status").textValue())) {
+            if(body.size()!=5 || !validId(body.path("conversationId")) ||
+                !body.get("conversationId").textValue().equalsIgnoreCase(sent.path("conversationId").textValue()) ||
+                !validId(body.path("messageId")) || !body.path("seq").isIntegralNumber() ||
+                body.get("seq").bigIntegerValue().signum()<=0 || !body.path("createdAt").isTextual())
+                throw new IllegalStateException("Incomplete or unrelated Core commit confirmation");
+            Instant.parse(body.get("createdAt").textValue());
+            return;
+        }
+        var error=body.path("error");
+        if(!"rejected".equals(body.path("status").textValue()) || body.size()!=2 || error.size()!=2 ||
+            !Set.of("VALIDATION_FAILED","AUTH_REQUIRED","AUTH_SESSION_REVOKED","AUTHORIZATION_DENIED",
+                "MESSAGE_REQUEST_CONFLICT","MESSAGE_COMMIT_FAILED").contains(error.path("code").asText("")) ||
+            error.path("message").asText("").isEmpty() || !error.path("message").isTextual())
+            throw new IllegalStateException("Invalid Core message rejection");
     }
     private final class Socket extends TextWebSocketHandler {
         private void closeBinding(WebSocketSession socket,Tokens.Claims claims)throws IOException {
@@ -249,9 +295,7 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
             var response=client.send(forward,HttpResponse.BodyHandlers.ofByteArray());
             if(response.statusCode()!=200) throw new IOException("Core did not confirm message outcome: "+response.statusCode());
             var ack=JSON.readTree(response.body());
-            if(ack==null||!"message.ack".equals(ack.path("type").textValue())||!id.equals(ack.path("requestId").textValue())||
-                !Set.of("committed","rejected").contains(ack.path("payload").path("status").asText("")))
-                throw new IllegalStateException("Invalid Core message acknowledgement");
+            checkMessageAck(ack,id,payload);
             if(ack.get("payload").get("status").textValue().equals("rejected") && newOrigin) origins(socket).remove(key);
             synchronized(socket){if(current.equals(bound.get(socket)) && socket.isOpen()) send(socket,ack);}
         }
