@@ -2,6 +2,7 @@ FROM maven:3.9.15-eclipse-temurin-25 AS build
 WORKDIR /src
 COPY pom.xml Main.java ./
 COPY core/auth/*.java core/auth/
+COPY core/im/*.java core/im/
 COPY gateway/auth/*.java gateway/auth/
 COPY plugin-host/*.java plugin-host/
 COPY shared/authsupport/*.java shared/authsupport/

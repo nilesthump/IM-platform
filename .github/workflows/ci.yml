@@ -243,6 +243,12 @@ jobs:
           python3 -B tools/verify_java_auth.py --build-dir "$RUNNER_TEMP/java-build" --profile java
           python3 -B tools/verify_java_auth.py --build-dir "$RUNNER_TEMP/java-build" --profile go
           python3 -B tools/verify_java_auth.py --build-dir "$RUNNER_TEMP/java-build" --profile-switch
+      - name: Live Java and Go IM contract fixtures
+        run: python3 -B tools/verify_java_im.py --build-dir "$RUNNER_TEMP/java-build"
+      - name: Java TLS messaging and durable ACK
+        run: python3 -B tests/e2e/go_tls_messaging.py --profile java
+      - name: Java TLS Sync and cursor recovery
+        run: python3 -B tools/verify_sync_runtime.py --profile java
 
   web:
     needs: classify

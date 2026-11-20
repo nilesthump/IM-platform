@@ -41,6 +41,7 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
     private final Map<WebSocketSession,Tokens.Claims> bound=new ConcurrentHashMap<>();
     private final Connection nats;
     private final Thread events;
+    private final Thread messages;
     private volatile boolean stopping;
     public Gateway(Config config)throws IOException,InterruptedException {
         this.config=config;db=new JdbcTemplate(config.database());tokens=new Tokens(config.signingKey());
@@ -53,13 +54,26 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
                 }
             }}catch(InterruptedException interrupted){if(!stopping){Thread.currentThread().interrupt();throw new IllegalStateException(interrupted);}}
             catch(IOException failure){throw new UncheckedIOException(failure);}
-        });events.start();
+        });
+        var deliveries=nats.subscribe("message.created.*");
+        messages=Thread.ofPlatform().name("message-notifications").unstarted(()->{
+            try {
+                while(!stopping) {
+                    var message=deliveries.nextMessage(Duration.ofSeconds(1));
+                    if(message!=null) deliver(message.getSubject().substring("message.created.".length()),JSON.readTree(message.getData()));
+                }
+            } catch(InterruptedException interrupted) {
+                if(!stopping){Thread.currentThread().interrupt();throw new IllegalStateException(interrupted);}
+            } catch(IOException failure){throw new UncheckedIOException(failure);}
+        });
+        messages.start();
+        events.start();
     }
     @Override public void destroy()throws Exception{
         stopping=true;
-        events.interrupt();
+        events.interrupt(); messages.interrupt();
         try(nats; AutoCloseable peers=this::closeBoundPeers){
-            events.join();
+            events.join(); messages.join();
         }
     }
     private void closeBoundPeers()throws IOException{
@@ -76,11 +90,12 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         if(first instanceof Error error)throw error;
     }
     @RequestMapping("/__infra/health") public String health(){return "profile=java role=gateway";}
-    @RequestMapping({"/v1/auth/**","/v1/users/**","/v1/friends"})
+    @RequestMapping({"/v1/auth/**","/v1/users/**","/v1/friends","/v1/friends/*","/v1/groups","/v1/groups/*/members","/v1/conversations","/v1/sync/user","/v1/sync/conversation"})
     public ResponseEntity<byte[]> proxy(HttpServletRequest r)throws IOException,InterruptedException {
         URI target=URI.create(config.coreUrl+r.getRequestURI()+(r.getQueryString()==null?"":"?"+r.getQueryString()));
-        byte[] body=r.getInputStream().readNBytes(65537);
-        HttpRequest.Builder request=HttpRequest.newBuilder(target).timeout(Duration.ofSeconds(10)).method(r.getMethod(),HttpRequest.BodyPublishers.ofByteArray(body));
+        var stream=r.getInputStream();
+        var body=HttpRequest.BodyPublishers.ofInputStream(()->stream);
+        HttpRequest.Builder request=HttpRequest.newBuilder(target).timeout(Duration.ofSeconds(10)).method(r.getMethod(),body);
         for(String h:List.of("Authorization","Cookie","Content-Type"))if(r.getHeader(h)!=null)request.header(h,r.getHeader(h));
         var result=client.send(request.build(),HttpResponse.BodyHandlers.ofByteArray());
         var response=ResponseEntity.status(result.statusCode());
@@ -97,6 +112,36 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
     private static void send(WebSocketSession socket,Object value)throws IOException {
         String json=JSON.writeValueAsString(value);
         synchronized(socket){socket.sendMessage(new TextMessage(json));}
+    }
+    @SuppressWarnings("unchecked")
+    private static Set<String> origins(WebSocketSession socket) {
+        return (Set<String>)socket.getAttributes().get("im.origins");
+    }
+    private static String originKey(JsonNode payload,String request) {
+        return payload.path("conversationId").asText("").toLowerCase(Locale.ROOT)+":"+request.toLowerCase(Locale.ROOT);
+    }
+    private void deliver(String recipient,JsonNode event)throws IOException {
+        if(!"message.created".equals(event.path("type").textValue()) || !"1.0".equals(event.path("protocolVersion").textValue()))
+            throw new IllegalStateException("Invalid committed message event");
+        var payload=event.get("payload");
+        String key=originKey(payload,event.get("requestId").textValue());
+        for(var entry:bound.entrySet()) {
+            var socket=entry.getKey();
+            var claims=entry.getValue();
+            if(!recipient.equals(claims.userId())) continue;
+            synchronized(socket) {
+                if(!claims.equals(bound.get(socket)) || claims.expires()<=Instant.now().getEpochSecond() || !socket.isOpen()) continue;
+                if(recipient.equals(payload.get("senderId").textValue()) && origins(socket).contains(key)) continue;
+                try {send(socket,event);}
+                catch(IOException disconnected) {
+                    bound.remove(socket,claims);
+                    closeRevoked(socket);
+                } catch(IllegalStateException closed) {
+                    if(socket.isOpen()) throw closed;
+                    bound.remove(socket,claims);
+                }
+            }
+        }
     }
     private void revoke(String sid,String reason)throws IOException {
         for(var entry:bound.entrySet())if(entry.getValue().sessionId().equals(sid)){
@@ -183,6 +228,8 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
                         }
                         send(socket, frame("auth.ack", id, Map.of("status", "bound", "userId", claims.userId(),
                             "sessionId", claims.sessionId(), "clientType", claims.clientType(), "sessionEpoch", claims.epoch())));
+                        socket.getAttributes().put("im.token",payload.get("accessToken").textValue());
+                        socket.getAttributes().put("im.origins",ConcurrentHashMap.<String>newKeySet());
                         acknowledged = true;
                     } finally {
                         if (!acknowledged) bound.remove(socket, claims);
@@ -192,7 +239,21 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
             }
             if(current.expires()<=Instant.now().getEpochSecond()){closeBinding(socket,current);return;}
             if(type.equals("auth.bind")){reject(socket,"auth.ack",id,"VALIDATION_FAILED");return;}
-            socket.close(); // Message business belongs to the next task; no fabricated ACK.
+            if(!type.equals("message.send")) {socket.close();return;}
+            String key=originKey(payload,id);
+            boolean newOrigin=origins(socket).add(key);
+            var forward=HttpRequest.newBuilder(URI.create(config.coreUrl+"/__core/message"))
+                .timeout(Duration.ofSeconds(10)).header("Content-Type","application/json")
+                .header("Authorization","Bearer "+socket.getAttributes().get("im.token"))
+                .POST(HttpRequest.BodyPublishers.ofString(message.getPayload())).build();
+            var response=client.send(forward,HttpResponse.BodyHandlers.ofByteArray());
+            if(response.statusCode()!=200) throw new IOException("Core did not confirm message outcome: "+response.statusCode());
+            var ack=JSON.readTree(response.body());
+            if(ack==null||!"message.ack".equals(ack.path("type").textValue())||!id.equals(ack.path("requestId").textValue())||
+                !Set.of("committed","rejected").contains(ack.path("payload").path("status").asText("")))
+                throw new IllegalStateException("Invalid Core message acknowledgement");
+            if(ack.get("payload").get("status").textValue().equals("rejected") && newOrigin) origins(socket).remove(key);
+            synchronized(socket){if(current.equals(bound.get(socket)) && socket.isOpen()) send(socket,ack);}
         }
     }
 }

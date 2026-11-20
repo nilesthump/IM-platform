@@ -26,6 +26,7 @@ public final class RevocationDeliveryProbe {
     static final class Peer {
         final LinkedBlockingQueue<String> calls = new LinkedBlockingQueue<>();
         final IllegalStateException internal = new IllegalStateException("open transport invariant");
+        final Map<String,Object> attributes = new java.util.concurrent.ConcurrentHashMap<>();
         boolean open = true;
         final WebSocketSession socket;
 
@@ -35,6 +36,7 @@ public final class RevocationDeliveryProbe {
                 new Class<?>[]{WebSocketSession.class}, (proxy, method, args) -> switch (method.getName()) {
                     case "hashCode" -> System.identityHashCode(proxy);
                     case "equals" -> proxy == args[0];
+                    case "getAttributes" -> attributes;
                     case "isOpen" -> open;
                     case "sendMessage" -> {
                         if (outcome == Outcome.INTERNAL) throw internal;

@@ -39,6 +39,10 @@ def classify(paths):
         )
         if parts[:3] in (["tests", "clients", "sqlite"], ["tests", "clients", "send"]) or path in {"tools/verify-client-sqlite.ps1", "tools/verify_client_sqlite.py", "tools/verify_client_send.py"}:
             selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
+        if path in {"tools/verify_java_im.py", "tests/e2e/go_tls_messaging.py", "tools/verify_sync_runtime.py"}:
+            selected.add("java")
+        if path == "tools/verify_sync_runtime.py":
+            selected.add("deploy")
         if parts[0] == "clients":
             selected.add("architecture")
         if path in {"package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "tsconfig.json"}:

@@ -1,6 +1,7 @@
 package im.platform.core.auth;
 
 import im.platform.shared.authsupport.*;
+import im.platform.core.im.*;
 import com.fasterxml.jackson.databind.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.SpringBootConfiguration;
@@ -27,7 +28,7 @@ public class CoreAuth {
     private final Config config;
     public CoreAuth(Config config){this.config=config;db=new JdbcTemplate(config.database());tx=new TransactionTemplate(new DataSourceTransactionManager(config.database()));tokens=new Tokens(config.signingKey());}
     @ExceptionHandler(ApiFailure.class)
-    public ResponseEntity<?> rejection(ApiFailure error){return ResponseEntity.status(error.status).header("Cache-Control","no-store").body(Map.of("error",Map.of("code",error.code,"message",error.publicMessage),"requestId",UUID.randomUUID().toString()));}
+    public ResponseEntity<?> rejection(ApiFailure error,HttpServletRequest request){return ResponseEntity.status(error.status).header("Cache-Control","no-store").body(Map.of("error",Map.of("code",error.code,"message",error.publicMessage),"requestId",Objects.requireNonNullElseGet(request.getAttribute("im.correlation"),()->UUID.randomUUID().toString())));}
     private static ApiFailure invalid(String message){return new ApiFailure(400,"VALIDATION_FAILED",message);}
     private static String field(JsonNode b,String f){JsonNode n=b.get(f);if(n==null||!n.isTextual())throw invalid("Request body is invalid.");return n.textValue();}
     private static void fields(JsonNode b,String...allowed){Set<String> names=Set.of(allowed);b.fieldNames().forEachRemaining(n->{if(!names.contains(n))throw invalid("Request body is invalid.");});}
@@ -79,11 +80,101 @@ public class CoreAuth {
         else{result.put("refreshToken",s.refresh);result.put("refreshTokenExpiresInSeconds",config.refreshTokenSeconds);result.put("refreshTokenDelivery","RESPONSE_BODY_FOR_OS_SECURE_STORAGE");}
         return response.body(Map.of("session",Map.of("sessionId",s.id.toString(),"userId",s.user.toString(),"clientType",s.type,"sessionEpoch",s.epoch,"status","ACTIVE"),"tokens",result,"replacedExistingSession",s.replaced));
     }
+    private Runnable sessionCheck(String token, Tokens.Claims claims) {
+        return () -> {
+            db.queryForList("SELECT session_id FROM sessions WHERE user_id=? AND client_type=? FOR SHARE",uuid(claims.userId()),claims.clientType());
+            authenticate(token);
+        };
+    }
+
+    private ResponseEntity<?> sync(HttpServletRequest request, boolean conversation)throws java.io.IOException {
+        var body=Sync.read(request.getInputStream());
+        String id=body.path("requestId").textValue();
+        if(id==null||!Groups.validId(id.toLowerCase(Locale.ROOT))) throw invalid("Sync request is invalid.");
+        request.setAttribute("im.correlation",id);
+        if(request.getQueryString()!=null) throw invalid("Sync request is invalid.");
+        String token=bearer(request);
+        var claims=authenticate(token);
+        return new Sync(db,tx,config.signingKey()).page(uuid(claims.userId()),id,body,conversation,sessionCheck(token,claims));
+    }
+
+    private static boolean isGroupJson(String raw) {
+        try {
+            var media=org.springframework.http.MediaType.parseMediaType(raw);
+            return media.getType().equalsIgnoreCase("application") && media.getSubtype().equalsIgnoreCase("json");
+        } catch(org.springframework.http.InvalidMediaTypeException malformed) {
+            return false;
+        }
+    }
+
+    private ResponseEntity<?> group(HttpServletRequest request,String conversation)throws java.io.IOException {
+        byte[] bytes=request.getInputStream().readNBytes(16385);
+        JsonNode body;
+        try {
+            var text=StandardCharsets.UTF_8.newDecoder().decode(java.nio.ByteBuffer.wrap(bytes)).toString();
+            body=JSON.reader().with(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY).readTree(text);
+        } catch(java.nio.charset.CharacterCodingException|com.fasterxml.jackson.core.JsonProcessingException malformed) {
+            throw invalid("Group request is invalid.");
+        }
+        if(body==null || body.isMissingNode()) throw invalid("Group request is invalid.");
+        if(Groups.validId(body.path("requestId").textValue())) request.setAttribute("im.correlation",body.get("requestId").textValue());
+        if(bytes.length>16384 || request.getQueryString()!=null || request.getContentType()==null ||
+            !isGroupJson(request.getContentType())) throw invalid("Group request is invalid.");
+        String token=bearer(request);
+        var claims=authenticate(token);
+        return new Groups(db,tx).mutate(uuid(claims.userId()),conversation,body,sessionCheck(token,claims));
+    }
+
+    private ResponseEntity<?> conversations(HttpServletRequest request)throws java.io.IOException {
+        String id=request.getParameter("requestId");
+        if(Groups.validId(id) && request.getParameterValues("requestId").length==1) request.setAttribute("im.correlation",id);
+        for(var entry:request.getParameterMap().entrySet())
+            if(entry.getValue().length!=1 || !Set.of("requestId","limit","afterConversationId","afterMemberUserId").contains(entry.getKey()))
+                throw invalid("Conversation parameters are invalid.");
+        if(request.getInputStream().read()!=-1) throw invalid("Request body is invalid.");
+        String token=bearer(request);
+        var claims=authenticate(token);
+        return new Groups(db,tx).snapshot(uuid(claims.userId()),id,request.getParameter("limit"),request.getParameter("afterConversationId"),
+            request.getParameter("afterMemberUserId"),sessionCheck(token,claims));
+    }
+
+    @PostMapping("/__core/message")
+    public Object message(HttpServletRequest request)throws java.io.IOException {
+        JsonNode envelope=body(request);
+        String id=envelope.path("requestId").asText("");
+        try {
+            String token=bearer(request);
+            var claims=authenticate(token);
+            return tx.execute(s -> Messages.send(db,uuid(claims.userId()),envelope,sessionCheck(token,claims)));
+        } catch(ApiFailure rejected) {
+            String code=rejected.status==401 && !rejected.code.equals("AUTH_REQUIRED")?"AUTH_SESSION_REVOKED":rejected.code;
+            return Messages.frame("message.ack",id,Map.of("status","rejected","error",Map.of("code",code,"message","Request rejected")));
+        } catch(org.springframework.dao.DataAccessException|org.springframework.transaction.TransactionException failure) {
+            // PostgreSQL's deferred trigger RAISE EXCEPTION confirms rollback.
+            // A missing commit reply or an unexpected defect must remain unconfirmed.
+            for(Throwable cause=failure;cause!=null;cause=cause.getCause()) {
+                if(cause instanceof java.sql.SQLException sql && "P0001".equals(sql.getSQLState()))
+                    return Messages.frame("message.ack",id,Map.of("status","rejected","error",Map.of("code","MESSAGE_COMMIT_FAILED","message","Request rejected")));
+            }
+            throw failure;
+        }
+    }
+
     @RequestMapping("/__infra/health") public String health(){return "profile=java role=core";}
     @RequestMapping("/v1/**")
     public ResponseEntity<?> request(HttpServletRequest request)throws java.io.IOException {
-        for(String key:request.getParameterMap().keySet())if(key.toLowerCase(Locale.ROOT).matches(".*(token|password|secret).*|authorization|cookie"))throw invalid("Authentication material is forbidden in query parameters.");
         String route=request.getMethod()+" "+request.getRequestURI();
+        if(route.equals("POST /v1/sync/user") || route.equals("POST /v1/sync/conversation")) return sync(request,route.endsWith("/conversation"));
+        if(route.equals("POST /v1/groups")) return group(request,null);
+        if(route.matches("POST /v1/groups/[^/]+/members")) return group(request,request.getRequestURI().split("/")[3]);
+        if(route.equals("GET /v1/conversations")) return conversations(request);
+        for(String key:request.getParameterMap().keySet())if(key.toLowerCase(Locale.ROOT).matches(".*(token|password|secret).*|authorization|cookie"))throw invalid("Authentication material is forbidden in query parameters.");
+        if (route.startsWith("PUT /v1/friends/") && route.indexOf('/', "PUT /v1/friends/".length()) < 0) {
+            String token = bearer(request);
+            Tokens.Claims claims = authenticate(token);
+            UUID user = uuid(claims.userId());
+            return tx.execute(status -> new Social(db).add(user, route.substring("PUT /v1/friends/".length()),sessionCheck(token,claims)));
+        }
         return switch(route){
             case "POST /v1/auth/register" -> register(body(request));
             case "POST /v1/auth/login" -> login(body(request));
@@ -92,7 +183,7 @@ public class CoreAuth {
             case "POST /v1/auth/logout" -> logout(request);
             case "GET /v1/users/me" -> me(request);
             case "GET /v1/users/search" -> search(request);
-            case "GET /v1/friends" -> {authenticate(bearer(request));yield ResponseEntity.notFound().build();}
+            case "GET /v1/friends" -> new Social(db).list(uuid(authenticate(bearer(request)).userId()));
             default -> ResponseEntity.notFound().build();
         };
     }
