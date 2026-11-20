@@ -101,8 +101,8 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
     private void revoke(String sid,String reason)throws IOException {
         for(var entry:bound.entrySet())if(entry.getValue().sessionId().equals(sid)){
             WebSocketSession socket=entry.getKey();
-            if(!bound.remove(socket,entry.getValue()))continue;
             synchronized(socket){
+                if(!bound.remove(socket,entry.getValue()))continue;
                 try(java.io.Closeable retirement=()->closeRevoked(socket)){
                     if(!socket.isOpen())continue;
                     var message=new TextMessage(JSON.writeValueAsString(frame("session.revoked",UUID.randomUUID().toString(),Map.of("sessionId",sid,"reason",reason))));
@@ -130,14 +130,13 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
         }
     }
     private Map<String,Object> one(String sql,Object...args){var rows=db.queryForList(sql,args);if(rows.isEmpty())return null;if(rows.size()!=1)throw new IllegalStateException("Session uniqueness violated");return rows.getFirst();}
-    private Tokens.Claims validate(String token){
-        Tokens.Claims c=tokens.parse(token);UUID user=UUID.fromString(c.userId()),session=UUID.fromString(c.sessionId());
+    private void validateSession(Tokens.Claims c){
+        UUID user=UUID.fromString(c.userId()),session=UUID.fromString(c.sessionId());
         var row=one("SELECT session_id,client_type,session_epoch,status,expires_at FROM sessions WHERE user_id=? AND client_type=?",user,c.clientType());
         if(row==null){var actual=one("SELECT client_type FROM sessions WHERE user_id=? AND session_id=?",user,session);if(actual!=null&&!c.clientType().equals(actual.get("client_type")))throw new ApiFailure(401,"AUTH_CLIENT_TYPE_MISMATCH","Access token does not match the active client session.");throw new ApiFailure(401,"AUTH_SESSION_REVOKED","Session has been revoked.");}
         if(!"ACTIVE".equals(row.get("status"))||!((Timestamp)row.get("expires_at")).toInstant().isAfter(Instant.now()))throw new ApiFailure(401,"AUTH_SESSION_REVOKED","Session has been revoked.");
         if(((Number)row.get("session_epoch")).longValue()!=c.epoch())throw new ApiFailure(401,"AUTH_SESSION_EPOCH_STALE","Access token carries a stale session epoch.");
         if(!c.sessionId().equals(row.get("session_id").toString())){var actual=one("SELECT client_type FROM sessions WHERE user_id=? AND session_id=?",user,session);if(actual!=null&&!c.clientType().equals(actual.get("client_type")))throw new ApiFailure(401,"AUTH_CLIENT_TYPE_MISMATCH","Access token does not match the active client session.");throw new ApiFailure(401,"AUTH_TOKEN_INVALID","Access token and session binding disagree.");}
-        return c;
     }
     private final class Socket extends TextWebSocketHandler {
         private void closeBinding(WebSocketSession socket,Tokens.Claims claims)throws IOException {
@@ -163,14 +162,31 @@ public class Gateway implements WebSocketConfigurer,DisposableBean {
                     return;
                 }
                 if(payload.size()!=1||!payload.path("accessToken").isTextual()||payload.path("accessToken").textValue().isEmpty()){reject(socket,"auth.ack",id,"VALIDATION_FAILED");return;}
-                Tokens.Claims c;try{c=validate(payload.get("accessToken").textValue());}catch(ApiFailure rejected){reject(socket,"auth.ack",id,rejected.code);return;}
-                bound.put(socket,c);
-                send(socket,frame("auth.ack",id,Map.of("status","bound","userId",c.userId(),"sessionId",c.sessionId(),"clientType",c.clientType(),"sessionEpoch",c.epoch())));
-                // Recheck after registry insertion so a concurrent committed revoke cannot be lost during bind.
-                try{validate(payload.get("accessToken").textValue());}
-                catch(ApiFailure rejected){
-                    if(rejected.code.equals("AUTH_SESSION_REVOKED")||rejected.code.equals("AUTH_SESSION_EPOCH_STALE"))revoke(c.sessionId(),"REVOKED");
-                    else closeBinding(socket,c);
+                // Register before reading the Session so a committed revoke is either
+                // visible to the read or delivered after the successful bind ACK.
+                synchronized (socket) {
+                    Tokens.Claims claims;
+                    try {
+                        claims = tokens.parse(payload.get("accessToken").textValue());
+                    } catch (ApiFailure rejected) {
+                        reject(socket, "auth.ack", id, rejected.code);
+                        return;
+                    }
+                    bound.put(socket, claims);
+                    boolean acknowledged = false;
+                    try {
+                        try {
+                            validateSession(claims);
+                        } catch (ApiFailure rejected) {
+                            reject(socket, "auth.ack", id, rejected.code);
+                            return;
+                        }
+                        send(socket, frame("auth.ack", id, Map.of("status", "bound", "userId", claims.userId(),
+                            "sessionId", claims.sessionId(), "clientType", claims.clientType(), "sessionEpoch", claims.epoch())));
+                        acknowledged = true;
+                    } finally {
+                        if (!acknowledged) bound.remove(socket, claims);
+                    }
                 }
                 return;
             }

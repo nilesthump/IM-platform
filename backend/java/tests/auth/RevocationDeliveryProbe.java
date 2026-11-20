@@ -29,7 +29,8 @@ public final class RevocationDeliveryProbe {
         boolean open = true;
         final WebSocketSession socket;
 
-        Peer(Outcome outcome) {
+        Peer(Outcome outcome) { this(outcome, null); }
+        Peer(Outcome outcome, java.sql.PreparedStatement logoutAtAck) {
             socket = (WebSocketSession) Proxy.newProxyInstance(WebSocketSession.class.getClassLoader(),
                 new Class<?>[]{WebSocketSession.class}, (proxy, method, args) -> switch (method.getName()) {
                     case "hashCode" -> System.identityHashCode(proxy);
@@ -43,7 +44,11 @@ public final class RevocationDeliveryProbe {
                             if (outcome == Outcome.CLOSE_RACE) throw new IllegalStateException("closed");
                             throw new IOException("peer disconnected");
                         }
-                        calls.add(((TextMessage)args[0]).getPayload());
+                        String payload = ((TextMessage)args[0]).getPayload();
+                        if (logoutAtAck != null && JSON.readTree(payload).path("type").asText().equals("auth.ack")) {
+                            if (logoutAtAck.executeUpdate() != 1) throw new AssertionError("Fixture logout missed its session");
+                        }
+                        calls.add(payload);
                         yield null;
                     }
                     case "close" -> {
@@ -113,6 +118,30 @@ public final class RevocationDeliveryProbe {
     private static Tokens.Claims claims() {
         return new Tokens.Claims(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "WEB", 1, 1, 2);
     }
+    // Force logout to commit at ACK delivery; hold back its NATS event until
+    // the bind handler returns. The first notification must carry the real reason.
+    private static void logoutAtBindAck(Config config, Gateway gateway, Connection publisher) throws Exception {
+        UUID user = UUID.randomUUID(), sid = UUID.randomUUID();
+        long now = java.time.Instant.now().getEpochSecond();
+        var claims = new Tokens.Claims(user.toString(), sid.toString(), "WEB", 1, now, now + 60);
+        String token = new Tokens(config.signingKey()).sign(claims);
+        var constructor = Class.forName(Gateway.class.getName() + "$Socket").getDeclaredConstructor(Gateway.class);
+        constructor.setAccessible(true);
+        var handler = (org.springframework.web.socket.WebSocketHandler)constructor.newInstance(gateway);
+        try (var db = config.database().getConnection();
+             var logout = db.prepareStatement("UPDATE sessions SET status='REVOKED', refresh_token_hash=NULL WHERE session_id=? AND status='ACTIVE'")) {
+            BindingFixture.insert(db, user, sid);
+            logout.setObject(1, sid);
+            var peer = new Peer(Outcome.DELIVER, logout);
+            var frame = Map.of("protocolVersion", "1.0", "requestId", UUID.randomUUID().toString(), "type", "auth.bind",
+                "payload", Map.of("accessToken", token));
+            handler.handleMessage(peer.socket, new TextMessage(JSON.writeValueAsString(frame)));
+            if (!"bound".equals(JSON.readTree(peer.next()).at("/payload/status").asText())) throw new AssertionError("Fixture bind failed");
+            publish(publisher, sid.toString());
+            peer.expectDelivery(sid.toString());
+        }
+        System.out.println("GATEWAY logout committed during bind ACK preserves LOGOUT before close PASS");
+    }
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         var config = Config.read(args[0]);
@@ -121,6 +150,7 @@ public final class RevocationDeliveryProbe {
             checkRejectionFailures(gateway);
             ((Connection)field(gateway, "nats")).flush(Duration.ofSeconds(2));
             var bound = (Map<WebSocketSession, Tokens.Claims>)field(gateway, "bound");
+            logoutAtBindAck(config, gateway, publisher);
             var errors = new LinkedBlockingQueue<Throwable>();
             ((Thread)field(gateway, "events")).setUncaughtExceptionHandler((thread, error) -> errors.add(error));
             var first = claims();

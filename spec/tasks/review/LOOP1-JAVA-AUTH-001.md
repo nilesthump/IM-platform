@@ -2,7 +2,7 @@
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
 status: review
-owner: /root/auth_nats_terminal
+owner: /root/hosted_auth_fix
 stage: S3
 gate: S3
 ---
@@ -29,6 +29,8 @@ Accepted ADR-0014: Spring Boot MVC/WebSocket, Spring JDBC/PostgreSQL driver, Jac
 - LOOP1-CI-001
 
 # Allowed Paths
+
+- tests/contract/group/test_verification_failures.py (isolated transport fixture for the approved Java Auth smoke probe; Coordinator authorized before edits following PR105 CI)
 
 - spec/progress/checkpoints/2026-11-13-java-authority.md (one-time accepted prerequisite closure)
 
@@ -120,8 +122,8 @@ Record exact branch/SHA/range, commands/exits/timings, fixture IDs/results/exclu
 
 # Handoff
 
-Candidate a45e98e55df922c9a1be31ab3031ae0b220cfcea passed regular review and failed the separate error audit. The repair distinguishes terminal NATS closure from transient reconnection and preserves primary and secondary failures across role and verifier cleanup. Durable evidence, local commands, results and source of the independent findings are in spec/progress/evidence/LOOP1-JAVA-AUTH-001/terminal-cleanup-fix.md. Production sources, tests, Java CI wiring and scoped records are owned by /root/auth_nats_terminal. Branch task/LOOP1-JAVA-AUTH-001 remains in review. Last accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d retains S1/S2 PASS. S3 remains OPEN.
+PR105 candidate 2b8bcad24b5dddb82495a3e72b69ef045f73e899 passed independent regular and error reviews, then failed the Java and shared hosted jobs. The new fix serializes the authoritative bind read and acknowledgement with revocation delivery on each socket, and updates the isolated smoke test double. Evidence, tests, known failures and scope in spec/progress/evidence/LOOP1-JAVA-AUTH-001/hosted-bind-fix.md. Owner /root/hosted_auth_fix. Last accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d; S3 OPEN.
 
 # Next Action
 
-Coordinator delegates fresh regular review of the commit containing this handoff followed by a different fresh error specialist on the same SHA. Both are pending. Exact-head hosted CI, protected integration, actual-main verification, and safe synchronization to H:/IM-platform are pending. Retain review state until independent acceptance and synchronization complete.
+Fresh regular review, then a different fresh error audit of this fix commit. Publish only after both pass. Exact-head hosted CI, protected integration, actual-main verification and safe main synchronization are pending.
