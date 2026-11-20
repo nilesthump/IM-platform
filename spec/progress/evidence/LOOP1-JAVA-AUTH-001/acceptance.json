@@ -1,0 +1,1651 @@
+{
+  "result": "PASS",
+  "task": "LOOP1-JAVA-AUTH-001",
+  "pr": 105,
+  "branch": "task/LOOP1-JAVA-AUTH-001",
+  "candidateSHA": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+  "integratedMainSHA": "6565f4fe72d5a0c2bdfa1d7cba777bafcf8c2099",
+  "mainSyncResult": "PASS",
+  "proofs": {
+    "final-regular-review.md": "c0ec1bc56d58cbc2c9cb98e71ffda5cc41b1bf14cbe58fcd317879adcd0c5175",
+    "final-error-review.md": "829066b6ce58cde5407b447c6f5827f4fa7e84cdb7305bb475b0613c1a0471cf",
+    "final-error-inventory.json": "50651c34c325cec71716aa4fafe0eb273b462b894513ea431aeebc3e7a4d62da",
+    "actual-main.json": "2971a66ff8a5a23b3e76bcb83379faf4715ed2b9e755c6047388f277084719c6",
+    "main-sync.json": "bca56b4e10ad5d882773164076a6f4203eaa2b6e87990305c82c2cf705561027"
+  },
+  "hosted": [
+    {
+      "runId": 44711275252,
+      "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252",
+      "head": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+      "event": "push",
+      "branch": "task/LOOP1-JAVA-AUTH-001",
+      "conclusion": "success",
+      "sourceReceiptSHA256": "bbf2f954c54ed38652772eaca3c1b36af856910e285e11548276ab0c7af69fac",
+      "jobs": [
+        {
+          "name": "classify",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203312014",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Diagnose checkout status",
+              "verdict": "success"
+            },
+            {
+              "name": "Verify clean repository recovery",
+              "verdict": "success"
+            },
+            {
+              "name": "Test path matrix",
+              "verdict": "success"
+            },
+            {
+              "name": "Classify full diff, including deletions",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "source_go",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203634234",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Real Go source ownership and AST dependency graph",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "java",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203634391",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Build Java Auth and canonical runner",
+              "verdict": "success"
+            },
+            {
+              "name": "Independently migrate disposable database",
+              "verdict": "success"
+            },
+            {
+              "name": "Same canonical live Auth fixtures on Java and Go",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Stop containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "deploy",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203634569",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Prepare disposable Go profile configuration",
+              "verdict": "success"
+            },
+            {
+              "name": "Validate both Compose profiles",
+              "verdict": "success"
+            },
+            {
+              "name": "Prepare disposable Java profile configuration",
+              "verdict": "success"
+            },
+            {
+              "name": "Frozen architecture integrity",
+              "verdict": "success"
+            },
+            {
+              "name": "Go transport smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Go Auth actual roles and TLS event smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Current shared Sync client actual Go TLS runtime",
+              "verdict": "success"
+            },
+            {
+              "name": "Go public Sync strict TLS runtime",
+              "verdict": "success"
+            },
+            {
+              "name": "Go S1 strict TLS messaging E2E",
+              "verdict": "success"
+            },
+            {
+              "name": "Java transport smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "source_java",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203634594",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Java current source and explicit placeholder boundary",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "architecture",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203634960",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Canonical integrity and authority structure",
+              "verdict": "success"
+            },
+            {
+              "name": "Current governance references and task scopes",
+              "verdict": "success"
+            },
+            {
+              "name": "Active client technology/source/dependency/configuration guard",
+              "verdict": "success"
+            },
+            {
+              "name": "Checker positive and negative controls",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "go",
+          "verdict": "skipped",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203636136",
+          "steps": []
+        },
+        {
+          "name": "compatibility",
+          "verdict": "skipped",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203636205",
+          "steps": []
+        },
+        {
+          "name": "web",
+          "verdict": "skipped",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203636232",
+          "steps": []
+        },
+        {
+          "name": "shared",
+          "verdict": "skipped",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203636884",
+          "steps": []
+        },
+        {
+          "name": "desktop",
+          "verdict": "skipped",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203637222",
+          "steps": []
+        },
+        {
+          "name": "mobile",
+          "verdict": "skipped",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136203637234",
+          "steps": []
+        },
+        {
+          "name": "gate",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711275252/job/136205551888",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Require every selected job to pass",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "runId": 44711287304,
+      "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304",
+      "head": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+      "event": "pull_request",
+      "branch": "task/LOOP1-JAVA-AUTH-001",
+      "conclusion": "success",
+      "sourceReceiptSHA256": "898b0bc18f32fcf70820328deffa97474fb64755971c6f72677b2f654058bd77",
+      "jobs": [
+        {
+          "name": "classify",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203348354",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Diagnose checkout status",
+              "verdict": "success"
+            },
+            {
+              "name": "Verify clean repository recovery",
+              "verdict": "success"
+            },
+            {
+              "name": "Test path matrix",
+              "verdict": "success"
+            },
+            {
+              "name": "Classify full diff, including deletions",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "go",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680161",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Install PostgreSQL client",
+              "verdict": "success"
+            },
+            {
+              "name": "Migrate canonical schema",
+              "verdict": "success"
+            },
+            {
+              "name": "Go Auth build, integration and contract verification",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Stop containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "compatibility",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680185",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Install PostgreSQL client",
+              "verdict": "success"
+            },
+            {
+              "name": "Shared fixture compatibility and migration",
+              "verdict": "success"
+            },
+            {
+              "name": "Current client source and actual Web verification",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Stop containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "source_go",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680201",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Real Go source ownership and AST dependency graph",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "architecture",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680208",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Canonical integrity and authority structure",
+              "verdict": "success"
+            },
+            {
+              "name": "Current governance references and task scopes",
+              "verdict": "success"
+            },
+            {
+              "name": "Active client technology/source/dependency/configuration guard",
+              "verdict": "success"
+            },
+            {
+              "name": "Checker positive and negative controls",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "desktop (ubuntu-latest)",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680238",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Native Tauri prerequisites and approved Rust compiler",
+              "verdict": "success"
+            },
+            {
+              "name": "Actual TypeScript Repository on SQLx SQLite",
+              "verdict": "success"
+            },
+            {
+              "name": "Approved Windows GUI assembly and auth controls",
+              "verdict": "skipped"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "web",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680239",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Web prerequisite and product verification negative controls",
+              "verdict": "success"
+            },
+            {
+              "name": "Actual locked Web build, behavior, appearance and source verification",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "desktop (windows-latest)",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680264",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Native Tauri prerequisites and approved Rust compiler",
+              "verdict": "skipped"
+            },
+            {
+              "name": "Actual TypeScript Repository on SQLx SQLite",
+              "verdict": "skipped"
+            },
+            {
+              "name": "Approved Windows GUI assembly and auth controls",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "source_java",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680265",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Java current source and explicit placeholder boundary",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "deploy",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680270",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Prepare disposable Go profile configuration",
+              "verdict": "success"
+            },
+            {
+              "name": "Validate both Compose profiles",
+              "verdict": "success"
+            },
+            {
+              "name": "Prepare disposable Java profile configuration",
+              "verdict": "success"
+            },
+            {
+              "name": "Frozen architecture integrity",
+              "verdict": "success"
+            },
+            {
+              "name": "Go transport smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Go Auth actual roles and TLS event smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Current shared Sync client actual Go TLS runtime",
+              "verdict": "success"
+            },
+            {
+              "name": "Go public Sync strict TLS runtime",
+              "verdict": "success"
+            },
+            {
+              "name": "Go S1 strict TLS messaging E2E",
+              "verdict": "success"
+            },
+            {
+              "name": "Java transport smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "mobile",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680280",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run android-actions/setup-android@v3",
+              "verdict": "success"
+            },
+            {
+              "name": "Enable hosted Linux KVM permissions",
+              "verdict": "success"
+            },
+            {
+              "name": "Run reactivecircus/android-emulator-runner@v2",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "shared",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680331",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Actual shared TypeScript storage compile",
+              "verdict": "success"
+            },
+            {
+              "name": "HTTP, WSS, Sync and Plugin contracts",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "java",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136203680336",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Build Java Auth and canonical runner",
+              "verdict": "success"
+            },
+            {
+              "name": "Independently migrate disposable database",
+              "verdict": "success"
+            },
+            {
+              "name": "Same canonical live Auth fixtures on Java and Go",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Stop containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "gate",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44711287304/job/136212781030",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Require every selected job to pass",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "runId": 44714247655,
+      "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655",
+      "head": "6565f4fe72d5a0c2bdfa1d7cba777bafcf8c2099",
+      "event": "push",
+      "branch": "main",
+      "conclusion": "success",
+      "sourceReceiptSHA256": "7a9c7ac1da93e33d0f6a29e87d64d51612e4686a786d4c57c43efdedc40621c7",
+      "jobs": [
+        {
+          "name": "classify",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213437164",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Diagnose checkout status",
+              "verdict": "success"
+            },
+            {
+              "name": "Verify clean repository recovery",
+              "verdict": "success"
+            },
+            {
+              "name": "Test path matrix",
+              "verdict": "success"
+            },
+            {
+              "name": "Classify full diff, including deletions",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "java",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213736899",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Build Java Auth and canonical runner",
+              "verdict": "success"
+            },
+            {
+              "name": "Independently migrate disposable database",
+              "verdict": "success"
+            },
+            {
+              "name": "Same canonical live Auth fixtures on Java and Go",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Stop containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "source_java",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213736911",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Java current source and explicit placeholder boundary",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "deploy",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213736927",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Prepare disposable Go profile configuration",
+              "verdict": "success"
+            },
+            {
+              "name": "Validate both Compose profiles",
+              "verdict": "success"
+            },
+            {
+              "name": "Prepare disposable Java profile configuration",
+              "verdict": "success"
+            },
+            {
+              "name": "Frozen architecture integrity",
+              "verdict": "success"
+            },
+            {
+              "name": "Go transport smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Go Auth actual roles and TLS event smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Current shared Sync client actual Go TLS runtime",
+              "verdict": "success"
+            },
+            {
+              "name": "Go public Sync strict TLS runtime",
+              "verdict": "success"
+            },
+            {
+              "name": "Go S1 strict TLS messaging E2E",
+              "verdict": "success"
+            },
+            {
+              "name": "Java transport smoke",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "architecture",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213736929",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Canonical integrity and authority structure",
+              "verdict": "success"
+            },
+            {
+              "name": "Current governance references and task scopes",
+              "verdict": "success"
+            },
+            {
+              "name": "Active client technology/source/dependency/configuration guard",
+              "verdict": "success"
+            },
+            {
+              "name": "Checker positive and negative controls",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "web",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213736937",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Web prerequisite and product verification negative controls",
+              "verdict": "success"
+            },
+            {
+              "name": "Actual locked Web build, behavior, appearance and source verification",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "compatibility",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213736943",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Install PostgreSQL client",
+              "verdict": "success"
+            },
+            {
+              "name": "Shared fixture compatibility and migration",
+              "verdict": "success"
+            },
+            {
+              "name": "Current client source and actual Web verification",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Stop containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "desktop (windows-latest)",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213737005",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Native Tauri prerequisites and approved Rust compiler",
+              "verdict": "skipped"
+            },
+            {
+              "name": "Actual TypeScript Repository on SQLx SQLite",
+              "verdict": "skipped"
+            },
+            {
+              "name": "Approved Windows GUI assembly and auth controls",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "go",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213737020",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Install PostgreSQL client",
+              "verdict": "success"
+            },
+            {
+              "name": "Migrate canonical schema",
+              "verdict": "success"
+            },
+            {
+              "name": "Go Auth build, integration and contract verification",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Stop containers",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "desktop (ubuntu-latest)",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213737028",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Native Tauri prerequisites and approved Rust compiler",
+              "verdict": "success"
+            },
+            {
+              "name": "Actual TypeScript Repository on SQLx SQLite",
+              "verdict": "success"
+            },
+            {
+              "name": "Approved Windows GUI assembly and auth controls",
+              "verdict": "skipped"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "mobile",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213737043",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run android-actions/setup-android@v3",
+              "verdict": "success"
+            },
+            {
+              "name": "Enable hosted Linux KVM permissions",
+              "verdict": "success"
+            },
+            {
+              "name": "Run reactivecircus/android-emulator-runner@v2",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-java@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "source_go",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213737161",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Real Go source ownership and AST dependency graph",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "shared",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136213737193",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Actual shared TypeScript storage compile",
+              "verdict": "success"
+            },
+            {
+              "name": "HTTP, WSS, Sync and Plugin contracts",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        },
+        {
+          "name": "gate",
+          "verdict": "success",
+          "url": "https://github.com/nilesthump/IM-platform/actions/runs/44714247655/job/136217235594",
+          "steps": [
+            {
+              "name": "Set up job",
+              "verdict": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Require every selected job to pass",
+              "verdict": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "verdict": "success"
+            },
+            {
+              "name": "Complete job",
+              "verdict": "success"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "originalEvidenceSHA256": {
+    "final-regular-review.md": "c0ec1bc56d58cbc2c9cb98e71ffda5cc41b1bf14cbe58fcd317879adcd0c5175",
+    "final-error-review.md": "829066b6ce58cde5407b447c6f5827f4fa7e84cdb7305bb475b0613c1a0471cf",
+    "final-error-inventory.json": "f2e92c510daeec3a4f7984a746002026e088b65a2fd268b272614ec91e707de3",
+    "actual-main.json": "e4f62880d896b19291cc6e547768a6c03741ff0674473c4bad00b5fac204bf77",
+    "main-sync.json": "74484d8bdd2f922b06d9b964ca2c8c89d215d3f89fcbe346093a330cfed5b037"
+  }
+}
