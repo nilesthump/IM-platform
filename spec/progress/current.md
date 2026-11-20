@@ -8,7 +8,7 @@ Current Batch: `LOOP1-JAVA-IM-001`
 Batch Status: REVIEW
 Current Task: `LOOP1-JAVA-IM-001`
 Current Task State: `review`
-Execution Status: BLOCKED_BY_ARCHITECTURE pending message.send UUID compatibility decision
+Execution Status: Java and Go message.send UUID agreement restored, awaiting independent reviews
 Assigned Worktree: H:/.codex/worktrees/java-im/IM-platform
 Task Branch: task/LOOP1-JAVA-IM-001
 Coordinator: /root
@@ -19,25 +19,25 @@ Java Auth product PR105 and closure PR106 are integrated. Java IM product commit
 
 ## Current Blockers
 
-Go commits and echoes an uppercase message.send request ID rejected by the frozen WSS verifier. Java now closes that invalid request before forwarding. Go product and compatibility changes are forbidden in this task. See fix5.md and uuid-case-observations.json in the task evidence directory.
+The Human resolved the earlier UUID compatibility question by authorizing Go conformance to the existing lowercase contract. Fresh final-SHA regular and specialist reviews, hosted CI, protected integration and main synchronization are pending.
 
 ## Verification
 
-- Command: `python -Xutf8 -B tools/verify_java_im.py --build-dir EXTERNAL`
-  - Result: Final Java/Go/Java suite passed in 72.422 seconds, including both committed timestamp boundaries. Separate live comparison confirmed the UUID divergence.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/fix5.md`
+- Command: `python -Xutf8 -B tests/e2e/go_tls_messaging.py --profile go`
+  - Result: PASS on Go in 35.297 seconds. The same HTTPS/WSS regression passed on Java in 150.906 seconds. Both reject uppercase inputs before durable writes and deliver the canonical control.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/go-uuid-conformance.md`
 
 ## Changed Files or Migrations
 
-Java Core/Gateway, Docker build inputs, hosted Java checks, fixture drivers and task records. The migration baseline remains 0001/0002.
+Go message.send Gateway/Core checks, Java Core/Gateway, Docker build inputs, hosted Java checks, fixture drivers and task records. The migration baseline remains 0001/0002.
 
 ## Known Failures, Risks, and Assumptions
 
-Regular review failed on 57b98c54. The final Java repair passed local fixtures. A canonical lowercase request committed once on each profile. The uppercase request committed only on Go. No reviews or hosted acceptance of this replacement.
+Regular review failed on 57b98c54. Its report and the historical divergence observed before the Human decision are preserved. Local fixes pass shared regressions. Independent reviews and hosted acceptance of the replacement are outstanding.
 
 ## Next Exact Action
 
-Obtain Human/Architect decision on a separate Go conformance change versus a compatibility/contract decision for mixed-case UUIDs. Then resume independent regular and specialist reviews, hosted CI and protected integration as applicable.
+Delegate a fresh regular review on final committed HEAD, then a different fresh error-handling specialist on the same SHA. Submit to hosted CI only after both pass.
 
 ## Last Known Good Commit
 
@@ -49,8 +49,8 @@ Obtain Human/Architect decision on a separate Go conformance change versus a com
 
 ## Uncommitted Changes / Ownership
 
-Initial product and control changes belong to /root/java_im. First fix, tests and evidence belong to /root/fix1. The second fix, regression and evidence belong to /root/fix2. /root/fix3 owns the third recovery-record correction and preserved /root/regular3 report. /root/fix4 owns the committed message validation, delivery regressions and preserved regular/specialist reports for 86ebf351. /root/fix5 owns the fifth Java repair, tests, preserved review and UUID evidence. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
+Initial product and control changes belong to /root/java_im. First fix, tests and evidence belong to /root/fix1. The second fix, regression and evidence belong to /root/fix2. /root/fix3 owns the third recovery-record correction and preserved /root/regular3 report. /root/fix4 owns the committed message validation, delivery regressions and preserved regular/specialist reports for 86ebf351. /root/fix5 owns the fifth Java repair, the approved Go conformance fix, shared tests, preserved review and UUID evidence. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
 
 ## Architecture Conflicts / ACP / ADR
 
-BLOCKED_BY_ARCHITECTURE on the message.send UUID compatibility decision above. ADR-0004 remains applicable. S1 and S2 accepted; S3 OPEN.
+Human resolved the UUID divergence in favor of existing lowercase contract conformance. No open architecture conflict. ADR-0004 remains applicable. S1 and S2 accepted; S3 OPEN.

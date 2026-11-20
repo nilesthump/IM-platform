@@ -319,8 +319,26 @@ def main():
             durable = fixture(wss_fixture, 'durable-send-and-created')['steps'][0]
             oracle = Oracle({'30000000-0000-4000-8000-000000000001': conv, '10000000-0000-4000-8000-000000000001': users[0]})
             send = copy.deepcopy(durable['in']); send['payload']['conversationId'] = conv
+            send['requestId'] = 'abcdefab-0000-4000-8000-000000000001'
+            invalid_peer, bound = bind(tokens[0])
+            require(bound['payload']['status'] == 'bound', 'UUID check requires authenticated member')
+            invalid_request = dict(send, requestId=send['requestId'].upper())
+            invalid_peer.send(invalid_request)
+            invalid_peer.closed()
+            invalid_conversation = copy.deepcopy(send)
+            invalid_conversation['payload']['conversationId'] = conv.upper() if conv.upper() != conv else invalid_request['requestId']
+            sender.send(invalid_conversation)
+            rejection = sender.read()
+            require(rejection['type'] == 'message.ack' and rejection['requestId'] == send['requestId'] and
+                    rejection['payload']['status'] == 'rejected' and rejection['payload']['error']['code'] == 'VALIDATION_FAILED',
+                    'invalid conversation UUID must yield a correlated validation rejection')
+            require(sql(f"SELECT count(*) FROM messages WHERE conversation_id='{conv}'") == '0' and
+                    sql(f"SELECT count(*) FROM outbox_events WHERE conversation_id='{conv}' AND event_type='message.created'") == '0' and
+                    sql(f"SELECT next_seq FROM conversations WHERE conversation_id='{conv}'") == '1',
+                    'invalid UUID advanced durable state')
             sender.send(send)
             ack = sender.read()
+            require(ack['requestId'] == send['requestId'], 'canonical request ID spelling changed')
             oracle.check(durable['out'][0], ack)
 
             def durable_rows():
@@ -336,7 +354,7 @@ def main():
             sender.send(send)
             oracle.check(fixture(wss_fixture, 'idempotent-retry')['steps'][1]['out'][0], sender.read())
             conflict = copy.deepcopy(fixture(wss_fixture, 'conflicting-retry')['steps'][1]['in'])
-            conflict['payload']['conversationId'] = conv
+            conflict['requestId'] = send['requestId']; conflict['payload']['conversationId'] = conv
             sender.send(conflict)
             oracle.check(fixture(wss_fixture, 'conflicting-retry')['steps'][1]['out'][0], sender.read())
             rejected = copy.deepcopy(fixture(wss_fixture, 'non-member-send')['steps'][0]['in'])
