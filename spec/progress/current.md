@@ -5,39 +5,39 @@ Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-JAVA-IM-001`
-Batch Status: ACTIVE
+Batch Status: REVIEW
 Current Task: `LOOP1-JAVA-IM-001`
-Current Task State: `active`
-Execution Status: Java IM implementation
+Current Task State: `review`
+Execution Status: Java IM candidate awaiting independent reviews
 Assigned Worktree: H:/.codex/worktrees/java-im/IM-platform
 Task Branch: task/LOOP1-JAVA-IM-001
 Coordinator: /root
 
 ## Immediately Relevant Completed Work
 
-Java Auth product PR105 and closure PR106 are integrated. Java IM task scope and dependencies are recorded.
+Java Auth product PR105 and closure PR106 are integrated. Java IM product commit 54fa46a6351c82bc4ac1d8f44adc8ba7021aa487 implements the approved Friend, Group, Message, Outbox, NATS and Sync responsibilities and live tests.
 
 ## Current Blockers
 
-None identified at activation. Implementation and acceptance pending.
+Regular and specialist review, hosted CI, protected integration and verified main synchronization are pending.
 
 ## Verification
 
-- Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: PASS on baseline.
-  - Evidence: Java IM Task Spec and Recorder.
+- Command: `python -Xutf8 -B tools/verify_java_im.py --build-dir EXTERNAL`
+  - Result: PASS in 73.468 seconds on local PostgreSQL/NATS with Java/Go fixtures and bidirectional continuity.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/implementation.md`
 
 ## Changed Files or Migrations
 
-Task activation and current progress.
+Java Core/Gateway, Docker build inputs, hosted Java checks, fixture drivers and task records. The migration baseline remains 0001/0002.
 
 ## Known Failures, Risks, and Assumptions
 
-Final candidate regular and error reviews and hosted verification pending.
+Earlier setup and fixture regressions are retained in implementation evidence. Final regular review, different fresh specialist review, exact-head hosted CI and main verification remain pending.
 
 ## Next Exact Action
 
-Implement and verify the Java IM endpoints, committed delivery and authenticated Sync in the assigned worktree.
+Review the final committed candidate from a clean checkout. After regular PASS, delegate a different fresh error specialist, then submit to hosted CI.
 
 ## Last Known Good Commit
 
@@ -49,7 +49,7 @@ Implement and verify the Java IM endpoints, committed delivery and authenticated
 
 ## Uncommitted Changes / Ownership
 
-/root/java_im owns task changes in the assigned worktree. Main recovery changes remain with their original owners.
+Product and control changes belong to /root/java_im. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
 
 ## Architecture Conflicts / ACP / ADR
 
