@@ -1,0 +1,600 @@
+[
+  {
+    "path": ".github/workflows/ci.yml",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "1582dc096fecffd0bdb4529d42cf9f3a65dec4a7eb39571b534d570004e2f5b3",
+    "worktree_sha256": "1582dc096fecffd0bdb4529d42cf9f3a65dec4a7eb39571b534d570004e2f5b3",
+    "prior_match": true,
+    "inspection": "Java job runs the real cleanup control and mandatory migrated live fixtures.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/go/gateway/gateway.go",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "e09ec2fc8bf116c6a9ef7fcccdaf7824c6c158388535731c9f5c06daabd916f7",
+    "worktree_sha256": "e09ec2fc8bf116c6a9ef7fcccdaf7824c6c158388535731c9f5c06daabd916f7",
+    "prior_match": true,
+    "inspection": "Full-message JSON errors retire input socket. Bound expiration returns through own remove and close defers. watch distinguishes domain failures from non-domain errors: credential-local refusal retires this socket, stale/revoked Session broadcasts, other errors return to transport classifier or panic. No change in heartbeat policy.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/go/gateway/watch_failure_test.go",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "3dc0c102cf53cbbcc106bddbd189b8fd0741febd15e01fa6406bc03a0fd8aa74",
+    "worktree_sha256": "3dc0c102cf53cbbcc106bddbd189b8fd0741febd15e01fa6406bc03a0fd8aa74",
+    "prior_match": true,
+    "inspection": "Real client must receive a close code; timeout or an event fails and unexpected watcher error fails.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/go/tests/java_auth_profile_test.go",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "71ca307c023277189ad694869072dfce2bb4a279236738dedc15ee82bbf2a92c",
+    "worktree_sha256": "71ca307c023277189ad694869072dfce2bb4a279236738dedc15ee82bbf2a92c",
+    "prior_match": true,
+    "inspection": "Ordinary Go suite skips only opt-in host. Explicit runner enables it. PostgreSQL, NATS, serving, stop-file or relay failure fails test. Cancelled relay on explicit stop is expected.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/go/tests/revocation_fallback_test.go",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "88e62e30c753154a4f98cc367b543a78cad90dd91d07f796cd426a416c269c68",
+    "worktree_sha256": "88e62e30c753154a4f98cc367b543a78cad90dd91d07f796cd426a416c269c68",
+    "prior_match": true,
+    "inspection": "Same close-code assertion for independently unavailable database and expiry; no fabricated event or read timeout can satisfy it. Existing committed logout/replacement checks stay.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/Dockerfile",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "8b4eb947da07196ff56a688f2c99818ce151c710151f9644aa5c3a930e146532",
+    "worktree_sha256": "8b4eb947da07196ff56a688f2c99818ce151c710151f9644aa5c3a930e146532",
+    "prior_match": true,
+    "inspection": "Multi-stage role build copies explicit sources and invokes Maven; nonzero build aborts image creation.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/InfraPlaceholder.java",
+    "ref": "e4aee5ce2c4327904990d5c651267ca5eaae389d",
+    "git_sha256": "257f6882ccb3ba13a8489222f4d463f44b7c75a6c5e90a32c81031197f889290",
+    "worktree_sha256": null,
+    "prior_match": true,
+    "inspection": "Deleted at first business transition; baseline bytes hashed for removal.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/Main.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "a826489d92f0d69d142f16846d154376dd63c4169cb19be0e57085a7baac214a",
+    "worktree_sha256": "a826489d92f0d69d142f16846d154376dd63c4169cb19be0e57085a7baac214a",
+    "prior_match": true,
+    "inspection": "Default uncaught handler emits class only, requests nonzero exit on a new non-daemon thread so JVM shutdown hook can join the original failed thread. Shutdown interruption restores flag and retains cause.",
+    "catch_sites": [
+      {
+        "line": 24,
+        "code": "if(args[0].equals(\"core\")){SessionOutbox outbox=new SessionOutbox(config);context.addApplicationListener(event->{if(event instanceof org.springframework.context.event.ContextClosedEvent){try{outbox.close();}catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException(interrupted);}}});}",
+        "assessment": "Interrupted context-close join restores flag and rethrows with original cause."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/README.md",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "407572b40faac1436453461dc498b81b098acac8de2805544796e96860cfda75",
+    "worktree_sha256": "407572b40faac1436453461dc498b81b098acac8de2805544796e96860cfda75",
+    "prior_match": true,
+    "inspection": "Operator startup/config instructions; no executable fallback.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/config.example.json",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "06c8ed805ae436e07d42e48d18159abd587c73b1b92dc176189894da18ecf3b1",
+    "worktree_sha256": "06c8ed805ae436e07d42e48d18159abd587c73b1b92dc176189894da18ecf3b1",
+    "prior_match": true,
+    "inspection": "Declared operator inputs; no dummy success on read failure.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/core/auth/CoreAuth.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "f6591a8cf9e5012ad6bd18007a75c4611740acd16731fd3d2d646a077c4889e5",
+    "worktree_sha256": "f6591a8cf9e5012ad6bd18007a75c4611740acd16731fd3d2d646a077c4889e5",
+    "prior_match": true,
+    "inspection": "ApiFailure-only controller advice projects explicit public failures. Body read malformed JSON is validation failure; I/O reading stream propagates. Empty lookup permits missing user/slot only; nonunique result or missing required row/field fails. Username-specific ON CONFLICT does not suppress unrelated errors. Spring transaction encompasses session/revocation and outbox. Exceptions roll back.",
+    "catch_sites": [
+      {
+        "line": 39,
+        "code": "JsonNode b;try{b=JSON.readTree(raw);}catch(com.fasterxml.jackson.core.JsonProcessingException malformed){throw invalid(\"Request body is invalid.\");}",
+        "assessment": "Malformed JSON only projects public validation rejection; IO/DB faults propagate."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/core/auth/SessionOutbox.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "ffd3fa135f2f737c8fc765a462b9cba6bac8b0909e9169b3a083e895c815fc20",
+    "worktree_sha256": "ffd3fa135f2f737c8fc765a462b9cba6bac8b0909e9169b3a083e895c815fc20",
+    "prior_match": true,
+    "inspection": "Core Session-only transaction publisher, CLOSED fails worker, transient reconnect keeps rows pending, successful flush precedes committed state update.",
+    "catch_sites": [
+      {
+        "line": 30,
+        "code": "catch(PublicationTimeout timeout){System.err.println(\"Session publication timed out; transaction rolled back; retrying next tick\");}",
+        "assessment": "Only publication ACK deadline caught after transaction rollback. Retry next tick; terminal connection explicitly fails outside this catch."
+      },
+      {
+        "line": 34,
+        "code": "}catch(InterruptedException interrupted){if(!stopping){Thread.currentThread().interrupt();throw new IllegalStateException(interrupted);}}",
+        "assessment": "Thread sleep interrupted: return for requested shutdown, otherwise restore interrupt and propagate cause."
+      },
+      {
+        "line": 45,
+        "code": "catch(java.util.concurrent.TimeoutException failure){throw new PublicationTimeout(failure);}",
+        "assessment": "Flush deadline throws typed failure retaining cause, forcing rollback of row updates."
+      },
+      {
+        "line": 46,
+        "code": "catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException(interrupted);}",
+        "assessment": "Flush interruption restores flag and forces transaction and worker failure with cause."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/gateway/auth/Gateway.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "6becfd303bdc21450ec3817950aafbfe4d121b86ad4cfcfdf9d1acf7e9c8897f",
+    "worktree_sha256": "6becfd303bdc21450ec3817950aafbfe4d121b86ad4cfcfdf9d1acf7e9c8897f",
+    "prior_match": false,
+    "inspection": "Per-socket registration and readonly session validation ordered with published notification retirement. Failed provisional binds remove exact mapping and expose non-domain failures.",
+    "catch_sites": [
+      {
+        "line": 54,
+        "code": "}}catch(InterruptedException interrupted){if(!stopping){Thread.currentThread().interrupt();throw new IllegalStateException(interrupted);}}",
+        "assessment": "Subscription wait interrupted during shutdown exits, unexpected interrupt restores flag and fails worker."
+      },
+      {
+        "line": 55,
+        "code": "catch(IOException failure){throw new UncheckedIOException(failure);}",
+        "assessment": "Subscriber IO/serialization failure escapes worker with original cause."
+      },
+      {
+        "line": 69,
+        "code": "catch(IOException|RuntimeException|Error failure){",
+        "assessment": "One failed close must not skip independent peers. Save first exception/error, suppress distinct successors and rethrow first after loop."
+      },
+      {
+        "line": 111,
+        "code": "}catch(IOException disconnected){",
+        "assessment": "Revocation send IO on this transport retires its registry entry and closes peer, then continue serving other peers."
+      },
+      {
+        "line": 114,
+        "code": "}catch(IllegalStateException state){",
+        "assessment": "State exception after peer closed is a transport race. Open peer rethrows the original failure."
+      },
+      {
+        "line": 125,
+        "code": "}catch(IOException disconnected){",
+        "assessment": "Peer closing handshake IO after registry removal cannot complete; remaining peers keep receiving."
+      },
+      {
+        "line": 128,
+        "code": "}catch(IllegalStateException state){",
+        "assessment": "Concurrent peer close tolerated only if socket is closed; an open-socket defect propagates."
+      },
+      {
+        "line": 153,
+        "code": "JsonNode e;try{e=JSON.readTree(message.getPayload());}catch(com.fasterxml.jackson.core.JsonProcessingException malformed){socket.close(CloseStatus.BAD_DATA);return;}",
+        "assessment": "Malformed incoming JSON closes BAD_DATA, unrelated transport errors escape."
+      },
+      {
+        "line": 171,
+        "code": "} catch (ApiFailure rejected) {",
+        "assessment": "Only a token parser domain rejection projects rejected auth.ack and close. Other failures escape."
+      },
+      {
+        "line": 180,
+        "code": "} catch (ApiFailure rejected) {",
+        "assessment": "Only authoritative read domain refusal projects rejected bind. Socket writes and JDBC defects escape; finally removes provisional entry. No locally invented session-wide reason."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/plugin-host/Health.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "9eaab7b55ed14e61c94990c1f9da7d9d00486fc2257f897b25cd8ca5e2a49f29",
+    "worktree_sha256": "9eaab7b55ed14e61c94990c1f9da7d9d00486fc2257f897b25cd8ca5e2a49f29",
+    "prior_match": true,
+    "inspection": "Static role health endpoint; no catch or substitute.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/pom.xml",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "15bef7042235c2a3008a84d4fcbd7d61327839c3b5d525b726114b39cdeeafee",
+    "worktree_sha256": "15bef7042235c2a3008a84d4fcbd7d61327839c3b5d525b726114b39cdeeafee",
+    "prior_match": true,
+    "inspection": "Approved dependency set, compiler/test inputs and external build directory. No ignored test failures.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/shared/authsupport/ApiFailure.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "6d6436c9419d6ad0283a62581dff74c4c9b6afc6de993ac7c9a824102bc49f69",
+    "worktree_sha256": "6d6436c9419d6ad0283a62581dff74c4c9b6afc6de993ac7c9a824102bc49f69",
+    "prior_match": true,
+    "inspection": "Typed projection of authored canonical refusals only. No blanket handler.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/shared/authsupport/Config.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "f74a444c3345b7e29cb49752034ac648917d00441fe1b69c77a3bb760edbc5cb",
+    "worktree_sha256": "f74a444c3345b7e29cb49752034ac648917d00441fe1b69c77a3bb760edbc5cb",
+    "prior_match": true,
+    "inspection": "Rejects missing/invalid file fields, origin, durations and credentials. File and JSON failures propagate. Default token lifetimes configure absent knobs.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/shared/authsupport/PasswordHash.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "fdb7fc23f9847d0fe72680cbc97d78d6bfc967866f481c476e08ea818e2799bb",
+    "worktree_sha256": "fdb7fc23f9847d0fe72680cbc97d78d6bfc967866f481c476e08ea818e2799bb",
+    "prior_match": true,
+    "inspection": "Approved BCrypt call returns mismatch for wrong credentials; malformed salt errors propagate. No fallback.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/shared/authsupport/Tokens.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "6b8e73640e43a96e43423a839819fe0c13113acca11e140afecf361ab92cef24",
+    "worktree_sha256": "6b8e73640e43a96e43423a839819fe0c13113acca11e140afecf361ab92cef24",
+    "prior_match": true,
+    "inspection": "SHA-256 unavailable and HMAC initialization failure each preserve cause in IllegalStateException. Invalid base64 encoding solely around decode produces canonical invalid reason. Jackson malformed claims JSON is invalid input; otherwise IOException is wrapped with cause. Mandatory claims/expiry refusal explicit, no fallback key.",
+    "catch_sites": [
+      {
+        "line": 23,
+        "code": "catch(java.security.NoSuchAlgorithmException error){throw new IllegalStateException(error);}",
+        "assessment": "Missing required SHA-256 algorithm fails with cause."
+      },
+      {
+        "line": 28,
+        "code": "catch(java.security.GeneralSecurityException error){throw new IllegalStateException(error);}",
+        "assessment": "HMAC initialization/algorithm failures fail with cause."
+      },
+      {
+        "line": 39,
+        "code": "catch(IllegalArgumentException malformed){throw invalid();}",
+        "assessment": "Malformed external Base64 maps to canonical invalid-token rejection."
+      },
+      {
+        "line": 42,
+        "code": "catch(com.fasterxml.jackson.core.JsonProcessingException malformed){throw invalid();}",
+        "assessment": "Malformed external JSON maps to canonical invalid-token rejection."
+      },
+      {
+        "line": 43,
+        "code": "catch(java.io.IOException internal){throw new java.io.UncheckedIOException(internal);}",
+        "assessment": "Other JSON IO is internal; unchecked propagation preserves cause."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/tests/auth/AuthFixtureRunner.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "12a63d1e6326fb8724e1e284a08b20befa2146d6c2b299dbef2330c35f837f4e",
+    "worktree_sha256": "12a63d1e6326fb8724e1e284a08b20befa2146d6c2b299dbef2330c35f837f4e",
+    "prior_match": true,
+    "inspection": "HTTP and WSS canonical fixture assertions and isolated peer expiry. Resource scopes restore intentionally altered hash and capture test-only values even on body failure.",
+    "catch_sites": [
+      {
+        "line": 210,
+        "code": "boolean detected=false;try{checkDisclosure(leaked,refreshed.headers);}catch(AssertionError expected){detected=true;}require(detected,\"Response disclosure mutation undetected\");",
+        "assessment": "Injected disclosure must trigger assertion in isolated disclosure checker; later targeted controls require specific message."
+      },
+      {
+        "line": 228,
+        "code": "boolean rejected=false;try{step(changedExpected,n,null,null,null);}catch(AssertionError mismatch){require(mismatch.getMessage().contains(\"body.error.code\"),\"Mutation failed for unrelated reason\");rejected=true;}",
+        "assessment": "Mutated expected error code must fail at body.error.code; unrelated mismatch fails."
+      },
+      {
+        "line": 231,
+        "code": "rejected=false;try{step(changedInput,n,null,null,null);}catch(AssertionError mismatch){require(mismatch.getMessage().contains(\"status=400\"),\"Input mutation failed for unrelated reason\");rejected=true;}",
+        "assessment": "Mutated input must cause expected status mismatch; unrelated assertion fails."
+      },
+      {
+        "line": 273,
+        "code": "catch(java.net.SocketException reset){require(!tcp.isClosed(),\"Test closed socket before server closure\");}",
+        "assessment": "Peer TCP reset accepted as terminal only on still locally open socket; timeout and wrong event fail."
+      },
+      {
+        "line": 275,
+        "code": "void afterRevoke(JsonNode frame)throws Exception{try{send(frame);}catch(java.net.SocketException disconnected){/* Read must independently observe terminal EOF/close. */}closed();}",
+        "assessment": "Peer may reset post-revocation write; separate terminal read is mandatory."
+      },
+      {
+        "line": 324,
+        "code": "try{receivedFrame(leakedFrame.toString());}catch(AssertionError expected){require(expected.getMessage().equals(\"Credential material leaked\"),\"Unrelated frame mutation failure\");detected=true;}",
+        "assessment": "Exact disclosure assertion required on injected WSS mutation."
+      },
+      {
+        "line": 327,
+        "code": "try{checkDisclosure(leakedReply,HttpHeaders.of(Map.of(),(a,b)->true));}catch(AssertionError expected){require(expected.getMessage().equals(\"Credential material leaked\"),\"Unrelated response mutation failure\");detected=true;}",
+        "assessment": "Exact disclosure assertion required on injected HTTP response mutation."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/tests/auth/BindingFixture.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "6be5b5be232c345d02ceb309c24e81eab42f9b30bbca0aa84ddd0505aa7d8bea",
+    "worktree_sha256": "6be5b5be232c345d02ceb309c24e81eab42f9b30bbca0aa84ddd0505aa7d8bea",
+    "prior_match": true,
+    "inspection": "Disposable fixture rows prepared/verified/cleaned in JDBC transaction; missing ownership fails, no runtime role changes or catch.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/tests/auth/CryptoTest.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "3375ce06961bb310fb3a304ea86a59dc8fc171225ad5f6687855e118b202c989",
+    "worktree_sha256": "3375ce06961bb310fb3a304ea86a59dc8fc171225ad5f6687855e118b202c989",
+    "prior_match": true,
+    "inspection": "Requires explicit canonical refusals, malformed stored BCrypt exception, hash equivalence.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/tests/auth/FixtureSensitivityTest.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "f90bb6ca414492e5ad495629154cd7460acd2597b650d0e259bf6c50527cf74e",
+    "worktree_sha256": "f90bb6ca414492e5ad495629154cd7460acd2597b650d0e259bf6c50527cf74e",
+    "prior_match": true,
+    "inspection": "Explicit assertThrows exercises intentional mismatched canonical response values.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/tests/auth/OutboxFailureProbe.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "750f13632270abc6acc8715ab811c39e3a84e58f85d6d761349ee8a4b63ecb78",
+    "worktree_sha256": "750f13632270abc6acc8715ab811c39e3a84e58f85d6d761349ee8a4b63ecb78",
+    "prior_match": true,
+    "inspection": "Direct Closed publish and running terminal worker failure plus real database row check. Restore handler and delete seed even when assertion fails.",
+    "catch_sites": [
+      {
+        "line": 18,
+        "code": "boolean failed=false;try{SessionOutbox.publishBatch(db,transaction,connection);}catch(IllegalStateException closed){if(!closed.getMessage().toLowerCase().contains(\"closed\"))throw closed;failed=true;}",
+        "assessment": "Only explicit IllegalStateException mentioning closed counts for closed-connection control; transaction row must remain unchanged, unexpected error rethrows."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/tests/auth/OutboxRecoveryProbe.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "f0ee1feae5194dac9aa3739054d725032bf741454ea98f12ab68692f213c7b66",
+    "worktree_sha256": "f0ee1feae5194dac9aa3739054d725032bf741454ea98f12ab68692f213c7b66",
+    "prior_match": true,
+    "inspection": "Delayed acknowledgement exercises real rollback, pending row and next-tick publication. Broken database must reach uncaught boundary. Resource scopes ensure socket closes, joins, seed deletion, handler restore and config deletion.",
+    "catch_sites": [
+      {
+        "line": 62,
+        "code": "catch(SocketException failure){if(closing && server.isClosed())return;throw failure;}",
+        "assessment": "Closed listening socket during requested teardown ends accept; unrelated accept failures propagate."
+      },
+      {
+        "line": 66,
+        "code": "catch(IOException failure){if(!closing || !(failure instanceof SocketException))errors.add(failure);}",
+        "assessment": "Only intentional shutdown socket exceptions from copy are ignored. Other IO enters failure queue, surfaced by check."
+      },
+      {
+        "line": 77,
+        "code": "}catch(SocketException failure){if(!closing)throw failure;}",
+        "assessment": "Socket operation during intentional close ends transfer; unexpected socket failure is queued through outer catch."
+      },
+      {
+        "line": 80,
+        "code": "}catch(Exception failure){",
+        "assessment": "Bridge failures including cleanup are retained for check, interruption restores flag; check combines additional errors."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/tests/auth/RevocationDeliveryProbe.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "c22d2c4e193d39e8f322459a9ca551b896d9aae567c03c2f2f7230cf4423f4cd",
+    "worktree_sha256": "c22d2c4e193d39e8f322459a9ca551b896d9aae567c03c2f2f7230cf4423f4cd",
+    "prior_match": false,
+    "inspection": "Actual Gateway deterministic ACK-bound logout, original typed negative controls plus real peer retirement and shutdown failure propagation.",
+    "catch_sites": [
+      {
+        "line": 99,
+        "code": "} catch (IllegalStateException observed) {",
+        "assessment": "Negative control requires exact injected send failure identity and suppressed close failure; different failures rethrow."
+      },
+      {
+        "line": 191,
+        "code": "} catch (AssertionError observed) {",
+        "assessment": "Requires exact primary assertion with suppressed peer close IO; subsequently verifies all peers and NATS closed."
+      }
+    ]
+  },
+  {
+    "path": "backend/java/tests/auth/RoleExitProbe.java",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "5054a1aa1daa22acf5429c14d3a8752bded0b010307caf68a7046f4a3d483930",
+    "worktree_sha256": "5054a1aa1daa22acf5429c14d3a8752bded0b010307caf68a7046f4a3d483930",
+    "prior_match": true,
+    "inspection": "Starts packaged Main, verifies role worker present, ordinary process close or unexpected interruption; readiness marker required and actual exit checked by external verifier.",
+    "catch_sites": []
+  },
+  {
+    "path": "backend/java/tests/auth/test_profile_cleanup.py",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "db6ad0503b9d5a610cc4136a1e3a883c8013a7a65b18a2a497ab077464403ace",
+    "worktree_sha256": "db6ad0503b9d5a610cc4136a1e3a883c8013a7a65b18a2a497ab077464403ace",
+    "prior_match": true,
+    "inspection": "Go nonzero exit and Java wait deadline each run together with a failing fixture assertion. Verifies exception identity/order and remaining independent cleanup.",
+    "catch_sites": []
+  },
+  {
+    "path": "ci/check_architecture.py",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "cffdcb4dbfbfcc35ce5fe2d7ef99c6d3568d7b17da10855e7eed310ec4d8b9c5",
+    "worktree_sha256": "cffdcb4dbfbfcc35ce5fe2d7ef99c6d3568d7b17da10855e7eed310ec4d8b9c5",
+    "prior_match": true,
+    "inspection": "Scoped external org.springframework.jdbc handling; actual declared source keeps ownership checks. No new exception swallowing.",
+    "catch_sites": [
+      {
+        "line": 105,
+        "code": "except OSError as error:",
+        "assessment": "Missing Go parser creates failing architecture error."
+      },
+      {
+        "line": 271,
+        "code": "except (OSError, ValueError, AttributeError) as error:",
+        "assessment": "Unreadable or invalid client authority creates explicit failing result."
+      },
+      {
+        "line": 336,
+        "code": "except (ValueError, TypeError, AttributeError):",
+        "assessment": "Invalid Android version catalogue accumulates failing diagnostic."
+      },
+      {
+        "line": 456,
+        "code": "except (OSError, ValueError, KeyError):",
+        "assessment": "Unverifiable optional language authority disables its product permissions."
+      },
+      {
+        "line": 610,
+        "code": "except UnicodeError:",
+        "assessment": "Nontext configuration is reported as unsupported and fails checker."
+      },
+      {
+        "line": 626,
+        "code": "except (ValueError, AttributeError, TypeError):",
+        "assessment": "Invalid dependency manifest creates failing diagnostic."
+      },
+      {
+        "line": 642,
+        "code": "except (ValueError, AttributeError, TypeError):",
+        "assessment": "Invalid Rust manifest creates failing diagnostic."
+      },
+      {
+        "line": 740,
+        "code": "except ValueError as error:",
+        "assessment": "Invalid allowed path produces failing SRC-07 diagnostic."
+      }
+    ]
+  },
+  {
+    "path": "deploy/compose.yaml",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "3c9165b19f8114ae30ff1facbca9096196bbda730392aff4baccdfb4122b2a1b",
+    "worktree_sha256": "3c9165b19f8114ae30ff1facbca9096196bbda730392aff4baccdfb4122b2a1b",
+    "prior_match": true,
+    "inspection": "Role dependency/mount declarations, configured operator inputs. No fallback runtime secret.",
+    "catch_sites": []
+  },
+  {
+    "path": "tests/architecture/test_source_boundaries.py",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "7c20f4c53f2764e35f1e14bc8f4f9c4439e556cbfda2ab174b98cdc1bbb3a638",
+    "worktree_sha256": "7c20f4c53f2764e35f1e14bc8f4f9c4439e556cbfda2ab174b98cdc1bbb3a638",
+    "prior_match": true,
+    "inspection": "Positive external JDBC case and negative locally declared lookalike. Assertions continue to fail on mismatch.",
+    "catch_sites": []
+  },
+  {
+    "path": "tests/ci/test_java_auth_job.py",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "342d86f0525c84710514d84ae132debd3d2fe45391dc5da1b6f1cc9736d520f0",
+    "worktree_sha256": "342d86f0525c84710514d84ae132debd3d2fe45391dc5da1b6f1cc9736d520f0",
+    "prior_match": true,
+    "inspection": "Mandatory Java live CI commands enforced. Placeholder-only behavior rejected.",
+    "catch_sites": []
+  },
+  {
+    "path": "tests/ci/test_s0_boundary.py",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "e4cb79e42a42c55ebeb70aa5c4052e02dbf0c43e50be8103d73920960506547b",
+    "worktree_sha256": "e4cb79e42a42c55ebeb70aa5c4052e02dbf0c43e50be8103d73920960506547b",
+    "prior_match": true,
+    "inspection": "Historical placeholder assertions updated for real business transition, existing rejection assertions retained.",
+    "catch_sites": [
+      {
+        "line": 64,
+        "code": "except (OSError, NotImplementedError) as error:",
+        "assessment": "Existing platform-specific symlink capability case skips explicitly on unsupported symlink creation; no runtime Auth test uses this path."
+      }
+    ]
+  },
+  {
+    "path": "tests/contract/group/test_verification_failures.py",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "59715ed14aa0cb2dd458567cdc7fac5ae2de6f5280fb8ca53cce8210ef3e3b77",
+    "worktree_sha256": "59715ed14aa0cb2dd458567cdc7fac5ae2de6f5280fb8ca53cce8210ef3e3b77",
+    "prior_match": false,
+    "inspection": "Isolated verifier double checks invocation and profile selection. Existing driver exercises actual script exit, diagnostic and environment restoration.",
+    "catch_sites": [
+      {
+        "line": 144,
+        "code": "catch { [Console]::Error.WriteLine($_.ToString()); $code = 1 }",
+        "assessment": "PowerShell test-observation wrapper captures a thrown smoke error, retains stderr and explicitly exits nonzero after observing environment."
+      }
+    ]
+  },
+  {
+    "path": "tests/infrastructure/smoke.ps1",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "2d836603ae0f0b09d52524f5b48c9c39516502403b77f5b634977e53ed09f585",
+    "worktree_sha256": "2d836603ae0f0b09d52524f5b48c9c39516502403b77f5b634977e53ed09f585",
+    "prior_match": false,
+    "inspection": "Separate real HTTPS/WSS Auth probe, unchanged primary/release failure paths and actual Docker deployment checks.",
+    "catch_sites": [
+      {
+        "line": 127,
+        "code": "} catch {",
+        "assessment": "Primary smoke failure is retained and rethrown before finally."
+      },
+      {
+        "line": 133,
+        "code": "} catch {",
+        "assessment": "Standalone teardown failure propagates; simultaneous failure prints original cleanup while original primary propagates."
+      }
+    ]
+  },
+  {
+    "path": "tools/verify_java_auth.py",
+    "ref": "0e0762d3f638b9f6c23d86ae272aaf2be4f790d0",
+    "git_sha256": "945106fdf00325b9e2a91faec5b657981e89af24cb1efec98a622badb32bcf15",
+    "worktree_sha256": "945106fdf00325b9e2a91faec5b657981e89af24cb1efec98a622badb32bcf15",
+    "prior_match": true,
+    "inspection": "Starts and owns live processes, readiness, test data, and logs. Acquired resources register cleanup individually, Go stop and Java waits stay bounded, failed teardown propagates and both issuer files get removal attempts.",
+    "catch_sites": [
+      {
+        "line": 42,
+        "code": "except (ConnectionError,urllib.error.URLError,TimeoutError):",
+        "assessment": "Connection/URL/timeout errors during startup yield another poll bounded by deadline and process checks."
+      },
+      {
+        "line": 73,
+        "code": "except BaseException as body_failure:",
+        "assessment": "Retain original body BaseException through all independent teardown callbacks and rethrow singly or first in group."
+      },
+      {
+        "line": 78,
+        "code": "except BaseException as cleanup_failure:",
+        "assessment": "Retain each callback failure; remaining callbacks still execute, then raise all observed errors."
+      },
+      {
+        "line": 91,
+        "code": "except subprocess.TimeoutExpired:",
+        "assessment": "Expired wait triggers kill and bounded reap while original timeout remains visible."
+      },
+      {
+        "line": 121,
+        "code": "except AssertionError as failure:",
+        "assessment": "Assert the exact expected disclosure error for a captured-log mutation; other failures propagate."
+      }
+    ]
+  }
+]

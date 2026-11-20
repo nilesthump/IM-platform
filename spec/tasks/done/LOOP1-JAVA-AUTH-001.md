@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-JAVA-AUTH-001
 title: Java Auth and Session equivalence
-status: review
+status: done
 owner: /root/hosted_auth_fix
 stage: S3
 gate: S3
@@ -122,8 +122,20 @@ Record exact branch/SHA/range, commands/exits/timings, fixture IDs/results/exclu
 
 # Handoff
 
-PR105 candidate 2b8bcad24b5dddb82495a3e72b69ef045f73e899 passed independent regular and error reviews, then failed the Java and shared hosted jobs. The new fix serializes the authoritative bind read and acknowledgement with revocation delivery on each socket, and updates the isolated smoke test double. Evidence, tests, known failures and scope in spec/progress/evidence/LOOP1-JAVA-AUTH-001/hosted-bind-fix.md. Owner /root/hosted_auth_fix. Last accepted main e4aee5ce2c4327904990d5c651267ca5eaae389d; S3 OPEN.
+PR 105 integrated candidate 0e0762d3f638b9f6c23d86ae272aaf2be4f790d0 on branch task/LOOP1-JAVA-AUTH-001 as main 6565f4fe72d5a0c2bdfa1d7cba777bafcf8c2099. Independent regular and error-handling reviews passed on the candidate. GitHub runs 44711275252, 44711287304, 44714247655 passed the selected jobs and steps. Both full matrices passed 14 jobs. Independent actual-main verification confirmed the same product tree. Guarded main synchronization preserved the recovery branch and 782 existing local files, index state and working changes.
+
+The November 20 repair and both previous CI failures remain documented in spec/progress/evidence/LOOP1-JAVA-AUTH-001/hosted-bind-fix.md. The two final reviews, independent main verification, hosted step results and synchronization checks are indexed in spec/progress/evidence/LOOP1-JAVA-AUTH-001/acceptance.json. The checkpoint is spec/progress/checkpoints/2026-11-20-java-auth.md.
 
 # Next Action
 
-Fresh regular review, then a different fresh error audit of this fix commit. Publish only after both pass. Exact-head hosted CI, protected integration, actual-main verification and safe main synchronization are pending.
+Publish the accepted product record through its independent reviews, hosted CI and protected integration. On resuming S3, resolve or create the Task Spec for LOOP1-JAVA-IM-001 and verify its dependencies before activation.
+
+# Completion Metadata
+
+acceptance_result: PASS
+accepted_candidate_sha: 0e0762d3f638b9f6c23d86ae272aaf2be4f790d0
+integrated_main_sha: 6565f4fe72d5a0c2bdfa1d7cba777bafcf8c2099
+main_sync_result: PASS
+independent_review_evidence: spec/progress/evidence/LOOP1-JAVA-AUTH-001/acceptance.json
+hosted_acceptance_evidence: spec/progress/evidence/LOOP1-JAVA-AUTH-001/acceptance.json
+main_sync_evidence: spec/progress/evidence/LOOP1-JAVA-AUTH-001/main-sync.json
