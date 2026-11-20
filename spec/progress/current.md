@@ -19,13 +19,13 @@ Java Auth product PR105 and closure PR106 are integrated. Java IM product commit
 
 ## Current Blockers
 
-Regular reviews of 8974560b and 6fd25b03 failed. The second fix locks the sender before the Session and verifies simultaneous public WSS send and same-slot login. Both fresh reviews of the replacement candidate, hosted CI, protected integration and verified main synchronization are pending.
+Three regular reviews failed. The third review of a7e85f34 passed the live fixtures and found a malformed evidence path in this record. The replacement candidate corrects that path. Both fresh reviews of the replacement candidate, hosted CI, protected integration and verified main synchronization are pending.
 
 ## Verification
 
 - Command: `python -Xutf8 -B tools/verify_java_im.py --build-dir EXTERNAL`
   - Result: The second fix passed in 71.109 seconds on real PostgreSQL/NATS, including same-slot login during WSS send, concurrent ADD/send, lost confirmation, missed retirement and bidirectional Java/Go continuity.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/fix1.md` and `spec/progress/evidence/LOOP1-JAVA-IM-001/fix2.md`
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/fix2.md`
 
 ## Changed Files or Migrations
 
@@ -49,7 +49,7 @@ Review the final committed candidate from a clean checkout. After regular PASS, 
 
 ## Uncommitted Changes / Ownership
 
-Initial product and control changes belong to /root/java_im. First fix, tests and evidence belong to /root/fix1. The second fix, regression and evidence belong to /root/fix2. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
+Initial product and control changes belong to /root/java_im. First fix, tests and evidence belong to /root/fix1. The second fix, regression and evidence belong to /root/fix2. /root/fix3 owns the third recovery-record correction and preserved /root/regular3 report. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
 
 ## Architecture Conflicts / ACP / ADR
 
