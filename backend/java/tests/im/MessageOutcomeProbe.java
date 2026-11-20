@@ -105,6 +105,7 @@ public final class MessageOutcomeProbe {
         } finally {relay.stop(0);}
         unknownDatabaseCommit(config,f,actor,conv);
         overlap(new GroupFixtures(config,args[1]));
+        sameSlotLogin(f,actor,conv);
         // Persist the authoritative retirement with no live notification.
         var idle=f.user(4);
         try(var receiver=new MessageFixtures.Peer(f.base,f.tokens.get(idle));
@@ -177,12 +178,7 @@ public final class MessageOutcomeProbe {
         f.friendship(owner,member,UUID.randomUUID().toString());
         try(var peer=new MessageFixtures.Peer(f.base,f.tokens.get(member));
             var fence=f.db.getDataSource().getConnection();var pool=Executors.newSingleThreadExecutor()) {
-            fence.setAutoCommit(false);
-            int pid;
-            try(var q=fence.prepareStatement("SELECT pg_backend_pid() FROM conversations WHERE conversation_id=?::uuid FOR UPDATE")) {
-                q.setString(1,conv);
-                try(var row=q.executeQuery()){require(row.next(),"fixture group");pid=row.getInt(1);}
-            }
+            int pid=lockConversation(fence,conv);
             var add=pool.submit(()->f.call("/v1/groups/"+conv+"/members",
                 GroupTransactions.mutation(UUID.randomUUID().toString(),List.of(member)),f.tokens.get(owner)));
             try {
@@ -194,6 +190,42 @@ public final class MessageOutcomeProbe {
             var response=add.get(10,TimeUnit.SECONDS);
             require(response.statusCode()==200 && JSON.readTree(response.body()).get("addedMemberUserIds").isEmpty(),"no-op add");
             require("committed".equals(peer.next().at("/payload/status").asText()),"overlapping send");
+        }
+    }
+
+    private static int lockConversation(java.sql.Connection fence,String conv)throws Exception {
+        fence.setAutoCommit(false);
+        try(var q=fence.prepareStatement("SELECT pg_backend_pid() FROM conversations WHERE conversation_id=?::uuid FOR UPDATE")) {
+            q.setString(1,conv);
+            try(var row=q.executeQuery()){require(row.next(),"fixture group");return row.getInt(1);}
+        }
+    }
+
+    private static void sameSlotLogin(GroupFixtures f,String actor,String conv)throws Exception {
+        String password=UUID.randomUUID().toString();
+        String username=f.db.queryForObject("UPDATE users SET password_hash=? WHERE user_id=?::uuid RETURNING username",
+            String.class,im.platform.shared.authsupport.PasswordHash.create(password),actor);
+        String credentials=JSON.writeValueAsString(Map.of("username",username,"password",password,"clientType","WEB",
+            "deviceId","replacement","clientVersion","1","protocolVersion","1"));
+        String id=UUID.randomUUID().toString();
+        try(var sender=new MessageFixtures.Peer(f.base,f.tokens.get(actor));
+            var fence=f.db.getDataSource().getConnection();var pool=Executors.newSingleThreadExecutor()) {
+            int pid=lockConversation(fence,conv);
+            Future<HttpResponse<String>> login;
+            try {
+                sender.send(MessageFixtures.frame("message.send",id,Map.of("conversationId",conv,
+                    "content",Map.of("kind","TEXT","text","before same-slot replacement"))));
+                awaitWaiters(f,pid,1);
+                login=pool.submit(()->f.call("/v1/auth/login",credentials,null));
+                awaitWaiters(f,pid,2);
+            } finally {fence.rollback();}
+            var response=login.get(10,TimeUnit.SECONDS);
+            require(response.statusCode()==200 && JSON.readTree(response.body()).path("replacedExistingSession").asBoolean(),
+                "same-slot login must replace the sending session");
+            require(f.db.queryForObject("""
+                SELECT count(*) FROM messages m JOIN outbox_events e ON e.message_id=m.server_message_id
+                WHERE m.conversation_id=?::uuid AND m.request_id=?::uuid AND e.event_type='message.created'
+                """,Integer.class,conv,id)==1,"overlapping send must commit before replacement");
         }
     }
 

@@ -78,7 +78,7 @@ Exact SHA/range, selected jobs and steps, independent reviews, actual-main verif
 
 # Handoff
 
-Accepted main remains 18597c06f15c6ba5d50e055a88890a54f737fd52. The regular review of 8974560b75644d1417a8ea37c226d0f5f201cd1c failed. Its report and fix evidence are in spec/progress/evidence/LOOP1-JAVA-IM-001/. /root/fix1 addressed the findings on task/LOOP1-JAVA-IM-001 at the assigned Git root. The replacement candidate requires both fresh reviews. Error specialist, hosted CI, protected integration and main synchronization remain pending. S3 OPEN.
+Accepted main remains 18597c06f15c6ba5d50e055a88890a54f737fd52. The regular review of 8974560b75644d1417a8ea37c226d0f5f201cd1c failed. Its report and fix evidence are in spec/progress/evidence/LOOP1-JAVA-IM-001/. /root/fix1 addressed the findings on task/LOOP1-JAVA-IM-001 at the assigned Git root. The second regular review failed on 6fd25b03834a38fdb31af5e6517d5c0f8d32ce32. Its original report is preserved in 6fd25b0-regular-fail.md. /root/fix2 aligned message sender and Session lock acquisition and added a real overlapping login/send regression on this branch. See fix2.md. Both independent reviews must run on the new committed candidate. Error specialist, hosted CI, protected integration and main synchronization remain pending. S3 OPEN.
 
 # Next Action
 

@@ -25,6 +25,8 @@ public final class Messages {
             content.size()!=2||!"TEXT".equals(content.path("kind").textValue())||text==null||text.isEmpty()||text.codePointCount(0,text.length())>4096)
             throw new ApiFailure(400,"VALIDATION_FAILED","Request rejected");
         UUID conv=UUID.fromString(conversation),id=UUID.fromString(request);
+        // Take the message sender FK lock before locking the Session, as same-slot login locks the user first.
+        db.queryForObject("SELECT user_id FROM users WHERE user_id=? FOR KEY SHARE",UUID.class,actor);
         checkSession.run();
         // Acquire conversation then membership, in the same order as group ADD.
         var sequences=db.queryForList("""
