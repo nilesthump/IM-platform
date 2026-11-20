@@ -8,7 +8,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-/** Session-only delivery. The DB transaction remains pending if publication fails. */
+/** Session and Message delivery. The DB transaction remains pending if publication fails. */
 public final class SessionOutbox implements AutoCloseable {
     private final Connection nats;
     private final Thread worker;
@@ -38,8 +38,15 @@ public final class SessionOutbox implements AutoCloseable {
     private static final class PublicationTimeout extends RuntimeException { PublicationTimeout(java.util.concurrent.TimeoutException cause){super(cause);} }
     static void publishBatch(JdbcTemplate db,TransactionTemplate transaction,Connection nats){
         transaction.executeWithoutResult(status->{
-            var rows=db.queryForList("SELECT event_id,payload::text AS payload FROM outbox_events WHERE event_type='session.revoked' AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED");
-            for(var row:rows)nats.publish("session.revoked",row.get("payload").toString().getBytes(StandardCharsets.UTF_8));
+            var rows=db.queryForList("SELECT event_id,event_type,conversation_id,payload::text AS payload FROM outbox_events WHERE event_type IN ('session.revoked','message.created') AND published_at IS NULL ORDER BY created_at,event_id LIMIT 32 FOR UPDATE SKIP LOCKED");
+            for(var row:rows) {
+                byte[] data=row.get("payload").toString().getBytes(StandardCharsets.UTF_8);
+                if("session.revoked".equals(row.get("event_type"))) nats.publish("session.revoked",data);
+                else {
+                    var users=db.queryForList("SELECT user_id FROM conversation_members WHERE conversation_id=? AND left_at IS NULL",java.util.UUID.class,row.get("conversation_id"));
+                    for(var user:users) nats.publish("message.created."+user,data);
+                }
+            }
             if(!rows.isEmpty()){
                 try{nats.flush(Duration.ofSeconds(2));}
                 catch(java.util.concurrent.TimeoutException failure){throw new PublicationTimeout(failure);}

@@ -143,6 +143,9 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 		if json.Unmarshal(b, &e) != nil || e.ProtocolVersion != "1.0" || !validUUID(e.RequestID) || len(e.Payload) == 0 {
 			return
 		}
+		if e.Type == "message.send" && e.RequestID != strings.ToLower(e.RequestID) {
+			return
+		}
 		if e.Type == "ping" || e.Type == "pong" {
 			var p map[string]any
 			if json.Unmarshal(e.Payload, &p) != nil || len(p) != 0 {
@@ -345,7 +348,7 @@ func (h *hub) forward(ctx context.Context, c *connection, e envelope) {
 	}
 	defer response.Body.Close()
 	var ack envelope
-	if response.StatusCode != 200 || json.NewDecoder(io.LimitReader(response.Body, 65536)).Decode(&ack) != nil || ack.ProtocolVersion != "1.0" || ack.Type != "message.ack" || !strings.EqualFold(ack.RequestID, e.RequestID) {
+	if response.StatusCode != 200 || json.NewDecoder(io.LimitReader(response.Body, 65536)).Decode(&ack) != nil || ack.ProtocolVersion != "1.0" || ack.Type != "message.ack" || ack.RequestID != e.RequestID {
 		// Preserve the uncertain origin; client timeout/retry/Sync resolves it.
 		return
 	}

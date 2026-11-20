@@ -92,9 +92,9 @@ class PathMatrixTests(unittest.TestCase):
                 self.assert_jobs(path, {"deploy"})
 
     def test_e2e_paths_select_go_deploy_and_boundaries(self):
-        for path in ("tests/e2e/go_tls_messaging.py", "tests/e2e/README.md"):
-            with self.subTest(path=path):
-                self.assert_jobs(path, {"go", "deploy", "architecture", "source_go"})
+        expected = {"go", "deploy", "architecture", "source_go"}
+        self.assert_jobs("tests/e2e/go_tls_messaging.py", expected | {"java"})
+        self.assert_jobs("tests/e2e/README.md", expected)
 
     def test_deleted_e2e_path_still_selects_live_checks(self):
         with tempfile.TemporaryDirectory() as temp:

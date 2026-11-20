@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Real public Sync through existing Compose TLS -> Gateway -> Core/PostgreSQL."""
 import importlib.util
+import argparse
 import json
 import os
 from pathlib import Path
@@ -22,13 +23,16 @@ require = harness.require
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--profile", choices=("go", "java"), default="go")
+    profile = parser.parse_args().profile
     project = "im-sync-runtime-" + str(os.getpid()) + "-" + secrets.token_hex(4)
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
         port = reservation.getsockname()[1]
     env = os.environ.copy()
     env.update(IM_HTTPS_PORT=str(port), COMPOSE_PROGRESS="quiet")
-    command = ["docker", "compose", "-f", str(ROOT / "deploy/compose.yaml"), "-p", project, "--profile", "go"]
+    command = ["docker", "compose", "-f", str(ROOT / "deploy/compose.yaml"), "-p", project, "--profile", profile]
 
     def docker(args, data=None):
         result = subprocess.run(args, env=env, input=data, capture_output=True, timeout=600)
@@ -45,15 +49,15 @@ def main():
     with tempfile.TemporaryDirectory(prefix="im-sync-runtime-") as temp:
         config = Path(temp) / "config"
         config.mkdir()
-        env["IM_GO_CONFIG_DIR"] = str(config)
-        (config / "config.json").write_bytes((ROOT / "backend/go/config.example.json").read_bytes())
+        env[f"IM_{profile.upper()}_CONFIG_DIR"] = str(config)
+        (config / "config.json").write_bytes((ROOT / f"backend/{profile}/config.example.json").read_bytes())
         (config / "pg_password").write_text("local-development-only", encoding="utf-8")
         (config / "jwt_key").write_text(secrets.token_urlsafe(48), encoding="utf-8")
         ws = None
         try:
             compose("config", "--quiet")
             compose("up", "-d", "--build")
-            tls_id = compose("ps", "-q", "tls-go").decode().strip()
+            tls_id = compose("ps", "-q", f"tls-{profile}").decode().strip()
             require(bool(tls_id), "TLS role missing")
             ca = Path(temp) / "root.crt"
             for _ in range(60):
@@ -88,7 +92,7 @@ def main():
             for _ in range(60):
                 try:
                     with urllib.request.urlopen("https://localhost:" + str(port) + "/__infra/health", context=context, timeout=2) as response:
-                        require(response.read().strip() == b"profile=go role=gateway", "Wrong HTTPS role")
+                        require(response.read().strip() == f"profile={profile} role=gateway".encode(), "Wrong HTTPS role")
                     break
                 except OSError:
                     time.sleep(.5)

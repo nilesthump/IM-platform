@@ -6,6 +6,7 @@ import copy
 import datetime as dt
 import json
 import pathlib
+import re
 import sys
 import uuid
 
@@ -128,6 +129,13 @@ def validate(value, schema, path="$", root=SCHEMA):
         if schema.get("format") == "date-time":
             try:
                 parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+                # Python 3.14 normalizes ISO end-of-day to the next date.
+                # Check the input hour, including basic and week-date spellings.
+                if parsed.hour == 0 and re.match(
+                    r"(?:[0-9]{4}-?[0-9]{2}-?[0-9]{2}|[0-9]{4}-?W[0-9]{2}(?:-?[1-7])?).24",
+                    value, re.DOTALL,
+                ):
+                    raise ValueError("WSS timestamp hour exceeds 23")
                 if parsed.tzinfo is None:
                     raise ValueError()
             except ValueError as exc:
@@ -504,6 +512,13 @@ def negative_schema_controls():
         changed = copy.deepcopy(base)
         modify(changed)
         mutations.append(changed)
+    for timestamp in ("2026-01-01T00:00:00Z", "2026-12-31t23:59:59.999+05:30"):
+        ack(created=timestamp)
+    for timestamp in ("2026-01-01T24:00:00Z", "2026-12-31t24:00:00.000+05:30",
+                      "2026-01-01T24:00:00-07:00", "20260101T240000Z", "2026-W01-4T24:00:00Z"):
+        bad_ack = ack()
+        bad_ack["payload"]["createdAt"] = timestamp
+        mutations.append(bad_ack)
     bad_ack = ack()
     bad_ack["payload"].pop("messageId")
     mutations.append(bad_ack)

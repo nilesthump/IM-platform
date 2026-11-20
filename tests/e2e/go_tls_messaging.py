@@ -3,6 +3,7 @@ import base64
 import copy
 import datetime
 import hashlib
+import argparse
 import json
 import os
 from pathlib import Path
@@ -134,13 +135,16 @@ def frame(kind, payload):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--profile", choices=("go", "java"), default="go")
+    profile = parser.parse_args().profile
     project = 'im-s1-e2e-' + str(os.getpid()) + '-' + secrets.token_hex(4)
     with socket.socket() as reservation:
         reservation.bind(('127.0.0.1', 0))
         port = reservation.getsockname()[1]
     env = os.environ.copy()
     env.update(IM_HTTPS_PORT=str(port), COMPOSE_PROGRESS='quiet')
-    command = ['docker', 'compose', '-f', str(ROOT / 'deploy/compose.yaml'), '-p', project, '--profile', 'go']
+    command = ['docker', 'compose', '-f', str(ROOT / 'deploy/compose.yaml'), '-p', project, '--profile', profile]
     sockets = []
 
     def docker(args, *, data=None):
@@ -173,14 +177,14 @@ def main():
     with tempfile.TemporaryDirectory(prefix='im-s1-e2e-') as temp:
         config = Path(temp) / 'config'
         config.mkdir()
-        env['IM_GO_CONFIG_DIR'] = str(config)
-        (config / 'config.json').write_bytes((ROOT / 'backend/go/config.example.json').read_bytes())
+        env[f'IM_{profile.upper()}_CONFIG_DIR'] = str(config)
+        (config / 'config.json').write_bytes((ROOT / f'backend/{profile}/config.example.json').read_bytes())
         (config / 'pg_password').write_text('local-development-only', encoding='utf-8')
         (config / 'jwt_key').write_text(secrets.token_urlsafe(48), encoding='utf-8')
         try:
             compose('config', '--quiet')
             compose('up', '-d', '--build')
-            tls_id = compose('ps', '-q', 'tls-go').decode().strip()
+            tls_id = compose('ps', '-q', f'tls-{profile}').decode().strip()
             require(bool(tls_id), 'TLS role missing')
             ca = Path(temp) / 'root.crt'
             # Retrieve only the generated PUBLIC root CA, never a private key.
@@ -207,7 +211,7 @@ def main():
             for _ in range(60):
                 try:
                     with urllib.request.urlopen(f'https://localhost:{port}/__infra/health', context=context, timeout=2) as response:
-                        require(response.read().strip() == b'profile=go role=gateway', 'wrong HTTPS role')
+                        require(response.read().strip() == f'profile={profile} role=gateway'.encode(), 'wrong HTTPS role')
                     break
                 except OSError:
                     time.sleep(.5)
@@ -224,7 +228,7 @@ def main():
             # Default Caddy rejects unknown SNI before serving a certificate.
             # Temporarily serve its existing localhost certificate for this negative
             # handshake, then restore the exact original policy before business E2E.
-            original_config = json.loads(compose('exec', '-T', 'tls-go', 'wget', '-qO-', 'http://127.0.0.1:2019/config/'))
+            original_config = json.loads(compose('exec', '-T', f'tls-{profile}', 'wget', '-qO-', 'http://127.0.0.1:2019/config/'))
             negative_config = copy.deepcopy(original_config)
             servers = negative_config['apps']['http']['servers']
             tls_servers = [server for server in servers.values() if ':443' in server['listen']]
@@ -234,7 +238,7 @@ def main():
             policies[0]['fallback_sni'] = 'localhost'
 
             def load_caddy(configuration):
-                docker(command + ['exec', '-T', 'tls-go', 'wget', '-qO-', '--header=Content-Type: application/json', '--post-file=/dev/stdin', 'http://127.0.0.1:2019/load'], data=json.dumps(configuration).encode())
+                docker(command + ['exec', '-T', f'tls-{profile}', 'wget', '-qO-', '--header=Content-Type: application/json', '--post-file=/dev/stdin', 'http://127.0.0.1:2019/load'], data=json.dumps(configuration).encode())
 
             try:
                 load_caddy(negative_config)
@@ -248,12 +252,12 @@ def main():
                     raise AssertionError('wrong certificate hostname accepted')
             finally:
                 load_caddy(original_config)
-                restored = json.loads(compose('exec', '-T', 'tls-go', 'wget', '-qO-', 'http://127.0.0.1:2019/config/'))
+                restored = json.loads(compose('exec', '-T', f'tls-{profile}', 'wget', '-qO-', 'http://127.0.0.1:2019/config/'))
                 require(restored == original_config, 'original Caddy configuration not restored')
             print('PASS TLS: trusted CA/CERT_REQUIRED/hostname HTTPS+WSS; untrusted CA and certificate name mismatch rejected', flush=True)
             require(json.loads(sql('SELECT json_agg(version ORDER BY version) FROM schema_migrations')) == ['0001_initial', '0002_group_operations'], 'canonical migration missing')
             for role in ['core', 'gateway', 'plugin-host']:
-                require(compose('exec', '-T', role + '-go', 'wget', '-qO-', 'http://localhost:8080/__infra/health').strip() == f'profile=go role={role}'.encode(), 'real role missing')
+                require(compose('exec', '-T', f'{role}-{profile}', 'wget', '-qO-', 'http://localhost:8080/__infra/health').strip() == f'profile={profile} role={role}'.encode(), 'real role missing')
 
             http_fixture = 'contracts/fixtures/auth-user-friend/positive.json'
             registration = fixture(http_fixture, 'registration-and-authorized-user-search')['steps'][0]
@@ -315,8 +319,26 @@ def main():
             durable = fixture(wss_fixture, 'durable-send-and-created')['steps'][0]
             oracle = Oracle({'30000000-0000-4000-8000-000000000001': conv, '10000000-0000-4000-8000-000000000001': users[0]})
             send = copy.deepcopy(durable['in']); send['payload']['conversationId'] = conv
+            send['requestId'] = 'abcdefab-0000-4000-8000-000000000001'
+            invalid_peer, bound = bind(tokens[0])
+            require(bound['payload']['status'] == 'bound', 'UUID check requires authenticated member')
+            invalid_request = dict(send, requestId=send['requestId'].upper())
+            invalid_peer.send(invalid_request)
+            invalid_peer.closed()
+            invalid_conversation = copy.deepcopy(send)
+            invalid_conversation['payload']['conversationId'] = conv.upper() if conv.upper() != conv else invalid_request['requestId']
+            sender.send(invalid_conversation)
+            rejection = sender.read()
+            require(rejection['type'] == 'message.ack' and rejection['requestId'] == send['requestId'] and
+                    rejection['payload']['status'] == 'rejected' and rejection['payload']['error']['code'] == 'VALIDATION_FAILED',
+                    'invalid conversation UUID must yield a correlated validation rejection')
+            require(sql(f"SELECT count(*) FROM messages WHERE conversation_id='{conv}'") == '0' and
+                    sql(f"SELECT count(*) FROM outbox_events WHERE conversation_id='{conv}' AND event_type='message.created'") == '0' and
+                    sql(f"SELECT next_seq FROM conversations WHERE conversation_id='{conv}'") == '1',
+                    'invalid UUID advanced durable state')
             sender.send(send)
             ack = sender.read()
+            require(ack['requestId'] == send['requestId'], 'canonical request ID spelling changed')
             oracle.check(durable['out'][0], ack)
 
             def durable_rows():
@@ -332,7 +354,7 @@ def main():
             sender.send(send)
             oracle.check(fixture(wss_fixture, 'idempotent-retry')['steps'][1]['out'][0], sender.read())
             conflict = copy.deepcopy(fixture(wss_fixture, 'conflicting-retry')['steps'][1]['in'])
-            conflict['payload']['conversationId'] = conv
+            conflict['requestId'] = send['requestId']; conflict['payload']['conversationId'] = conv
             sender.send(conflict)
             oracle.check(fixture(wss_fixture, 'conflicting-retry')['steps'][1]['out'][0], sender.read())
             rejected = copy.deepcopy(fixture(wss_fixture, 'non-member-send')['steps'][0]['in'])

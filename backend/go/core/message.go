@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
+	"regexp"
 	"time"
 	"unicode/utf8"
 
@@ -61,16 +61,24 @@ func committedMessage(m storedMessage) any {
 func createdMessage(m storedMessage) any {
 	return messageFrame("message.created", m.RequestID, map[string]any{"conversationId": m.ConversationID, "messageId": m.MessageID, "senderId": m.SenderID, "seq": m.Seq, "createdAt": m.CreatedAt, "content": m.Content})
 }
+
+var messageUUID = regexp.MustCompile(`^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$`)
+
 func (v sendFrame) valid() bool {
 	n := utf8.RuneCountInString(v.Payload.Content.Text)
-	return v.ProtocolVersion == "1.0" && v.Type == "message.send" && socialUUIDPattern.MatchString(v.RequestID) && socialUUIDPattern.MatchString(v.Payload.ConversationID) && v.Payload.Content.Kind == "TEXT" && n >= 1 && n <= 4096
+	return v.ProtocolVersion == "1.0" && v.Type == "message.send" && messageUUID.MatchString(v.Payload.ConversationID) && v.Payload.Content.Kind == "TEXT" && n >= 1 && n <= 4096
 }
 
 // This private adapter reuses the canonical frame and bound bearer. It is never
 // registered under the Gateway's public /v1 reverse proxy.
 func (s *authService) sendMessage(w http.ResponseWriter, r *http.Request) {
 	var v sendFrame
-	if decode(r, &v) != nil || !v.valid() || r.URL.RawQuery != "" {
+	decodeErr := decode(r, &v)
+	if !messageUUID.MatchString(v.RequestID) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if decodeErr != nil || !v.valid() || r.URL.RawQuery != "" {
 		writeJSON(w, 200, rejectedMessage(v.RequestID, "VALIDATION_FAILED"))
 		return
 	}
@@ -99,7 +107,6 @@ func (s *authService) sendMessage(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, rejectedMessage(v.RequestID, code))
 		return
 	}
-	m.RequestID = v.RequestID // ACK echoes the request spelling; storage identity is UUID-normalized.
 	writeJSON(w, 200, committedMessage(m))
 }
 
@@ -133,8 +140,8 @@ func (s *authService) commitMessage(ctx context.Context, c claims, v sendFrame) 
 		return m, err
 	}
 	defer tx.Rollback(ctx)
-	conversation := strings.ToLower(v.Payload.ConversationID)
-	request := strings.ToLower(v.RequestID)
+	conversation := v.Payload.ConversationID
+	request := v.RequestID
 	if err = s.authorizeMessage(ctx, tx, c, conversation); err != nil {
 		return m, err
 	}
