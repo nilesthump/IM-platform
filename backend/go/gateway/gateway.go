@@ -125,7 +125,11 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 	ws.SetReadLimit(65536)
 	for {
 		var raw map[string]json.RawMessage
-		if err := ws.ReadJSON(&raw); err != nil {
+		_, frameBytes, err := ws.ReadMessage()
+		if err != nil {
+			return
+		}
+		if err := json.Unmarshal(frameBytes, &raw); err != nil {
 			return
 		}
 		if len(raw) != 4 {
@@ -206,7 +210,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 		// NATS revocation registry. PostgreSQL is checked on bind/reconnect and
 		// by the existing safety watch, never in the message operation path.
 		if h.auth.now().Unix() >= c.bound.ExpiresAt {
-			h.revoke(c.bound.SessionID, "REVOKED")
+			// Only this connection used the expired access credential.
 			return
 		}
 		if e.Type == "auth.bind" {
@@ -237,9 +241,14 @@ func (h *hub) watch(c *connection, cl shared.Claims) error {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			_, err := h.auth.authenticate(ctx, c.token)
 			if err != nil {
-				if _, known := err.(shared.Error); !known {
+				failure, known := err.(shared.Error)
+				if !known {
 					cancel()
 					return err
+				}
+				if failure.Code != "AUTH_SESSION_REVOKED" && failure.Code != "AUTH_SESSION_EPOCH_STALE" {
+					cancel()
+					return nil // The deferred close retires this credential only.
 				}
 				reason := h.auth.revocationReason(ctx, cl, err)
 				cancel()

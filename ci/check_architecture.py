@@ -215,6 +215,11 @@ def check_java(root):
         for dependency in references:
             # Unresolved project service imports are rejected too; renaming/deleting
             # the destination cannot erase a prohibited dependency classification.
+            # Spring JDBC's framework package is not the application's Core. All
+            # locally declared types, including lookalikes in this namespace, have
+            # already gone through physical ownership checks above.
+            if dependency.startswith("org.springframework.jdbc.core."):
+                continue
             for segment in dependency.split("."):
                 target = "plugin-host" if segment in {"pluginhost", "plugin_host"} else segment
                 if target in SERVICES:

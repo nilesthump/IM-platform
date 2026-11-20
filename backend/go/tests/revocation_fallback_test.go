@@ -118,8 +118,7 @@ func TestPostgresRevocationFallbackWithoutNATS(t *testing.T) {
 	}
 }
 
-// Token expiry retains its known invalidation frame. Database transport failure
-// closes the unverified connection without inventing a Session revocation fact.
+// Neither credential expiry nor an unavailable database proves Session revocation.
 func TestPostgresFallbackExpiryAndDatabaseFailureClose(t *testing.T) {
 	if os.Getenv("DB_TEST_ENABLE") != "1" {
 		t.Skip("set DB_TEST_ENABLE=1 with migrated disposable PostgreSQL")
@@ -214,23 +213,8 @@ func TestPostgresFallbackExpiryAndDatabaseFailureClose(t *testing.T) {
 				gatewayDB.Reset()
 			}
 			_ = conn.SetReadDeadline(time.Now().Add(4 * time.Second))
-			if cause == "database" {
-				if err = conn.ReadJSON(&event); err == nil {
-					t.Fatalf("unavailable database invented a frame: %v", event)
-				}
-				if failure, ok := err.(net.Error); ok && failure.Timeout() {
-					t.Fatal("unverified socket remained open")
-				}
-				return
-			}
-			if err = conn.ReadJSON(&event); err != nil {
-				t.Fatal(err)
-			}
-			if event["type"] != "session.revoked" || event["payload"].(map[string]any)["reason"] != "REVOKED" {
-				t.Fatalf("unsafe cause %s: %v", cause, event)
-			}
-			if err = conn.ReadJSON(&event); err == nil {
-				t.Fatal("unsafe socket remained open")
+			if _, _, err = conn.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseAbnormalClosure, websocket.CloseNormalClosure) {
+				t.Fatalf("%s: want connection closure without a Session event, got %v", cause, err)
 			}
 		})
 	}

@@ -116,7 +116,12 @@ function docker {
 }
 function Read-TlsResponse([string]$Path, [string[]]$Headers) {
     if ($Path -eq '/__infra/health') { return @{ Status='HTTP/1.1 200 OK'; Body="profile=$Profile role=gateway"; Protocol='isolated-probe'; Headers=@{} } }
+    if ('Origin: https://foreign.invalid' -in $Headers) { return @{ Status='HTTP/1.1 403 Forbidden' } }
     return @{ Status='HTTP/1.1 101 Switching Protocols'; Headers=@{'sec-websocket-accept'='s3pPLMBiTxaQ9kYGzzhZRbK+xOo='}; Body=''; Protocol='isolated-probe' }
+}
+function Test-JavaAuthTransport([string]$base, [int]$port) {
+    if ($base -ne "https://localhost:$port" -or $port -ne 18444) { throw 'Unexpected Java Auth smoke target' }
+    Write-Output 'ISOLATED_JAVA_AUTH_TRANSPORT'
 }
 '''
         for key, value in (('PYTHON', quote(sys.executable)), ('CLEANUP', str(cleanup)), ('PRIMARY', str(primary)), ('PLAIN', quote(plain)), ('AGGREGATE', quote(aggregate)), ('LEDGER', str(ledger_exit))):
@@ -152,6 +157,7 @@ exit $code
                     self.assertIn('ENV_CLEAN=True', result.stdout)
                     self.assertEqual(result.returncode == 0, primary == cleanup == 0, result.stdout + result.stderr)
                     self.assertEqual('PASS:' in result.stdout, primary == cleanup == 0, result.stdout + result.stderr)
+                    self.assertEqual('ISOLATED_JAVA_AUTH_TRANSPORT' in result.stdout, profile == 'java' and primary == 0)
                     if primary:
                         self.assertIn('PRIMARY_NATIVE_SENTINEL', result.stderr)
                         self.assertIn('23', result.stderr)

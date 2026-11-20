@@ -1,0 +1,17 @@
+# Fix2 interrupted recovery
+
+User requested: 完成当前不可中断的小任务后停止. Fresh fixer `/root/java_auth_fix2` stops after its already-running bounded command and cleanup. No commit or push. Rejected HEAD remains `4c178a90658d4367b822f4523e2957f8664ce616`; accepted base is `e4aee5ce2c4327904990d5c651267ca5eaae389d`. Managed worktree `H:/.codex/worktrees/j/IM-platform`, branch `task/LOOP1-JAVA-AUTH-001`.
+
+Owned uncommitted files: `.github/workflows/ci.yml`, `backend/java/gateway/auth/Gateway.java`, `backend/java/tests/auth/AuthFixtureRunner.java`, `tools/verify_java_auth.py`, `tests/ci/test_java_auth_job.py`, `backend/go/gateway/gateway.go`, current Task, current progress, and this evidence. Main unknown files are untouched.
+
+Repairs: exact CI preparation sets the smoke Origin18444; Java parses a complete JSON document; HTTP/query/WSS submitted secrets are collected, received frames/upgrade/close bytes checked, and every actual secret exercises a separate marked captured-log mutation. Shared negative controls exposed Go ReadJSON accepting JSON prefixes. Coordinator explicitly authorized only gateway.go's existing read boundary before the edit: ReadMessage then complete-byte json.Unmarshal, preserving limits/frame semantics and existing validation. Task allowed path and exception record this narrow current-contract correction. No schema/contract/ACK changes.
+
+Observed before stop: Maven5 PASS, Java28 plus new malformed-trailer/valid-whitespace/disclosure controls PASS, CI39 PASS(4 platform skips). First combined run FAILED on Go malformed suffix; failure retained, narrow Go correction follows. Final harness rebuild PASS. Coordinator exact committed workflow preparation followed by actual Java TLS smoke PASS, external `auth-ci-prep-smoke-c861e87a/receipt.json`; no external Origin rewrite. Existing combined final command session3139 was already running at stop and its final result is recorded below when available.
+
+Pending: explicit Go unit/integration suites and Go TLS after Go product correction, final clean Control Acceptance, candidate commit, wholly new regular Review and different error specialist, hosted CI/integration/actual-main/safe sync. S3 OPEN. No partial/local result is acceptance.
+
+Recorder `java-auth-fix2/research/runs/R-JAVA-FIX2` under external visualization root. Early direct reads/edits incompletely captured. Direct Python recovery-metadata write was denied before modification; apply_patch wrote the mandatory checkpoint instead. Prior failures remain immutable. Root subsequently verified exact IDs/names/task labels and removed only its two disposable PG/NATS containers; receipt `auth-services-cleanup.json` is in the external evidence root. Resume must reprovision and run canonical migrations before runtime verification.
+
+Next action only after user resumes: read this handoff/current/task, verify worktree and owned diff, restore isolated migrated services, finish pending checks and fix any failure, commit and clean Control, then fresh dual reviews before publication.
+
+Already-running session3139 finished exit0: final Java28 with new trailing-document/disclosure controls, PONG recovery/unknown worker visibility/nondefaultTTL; Go28 twice; same-DB credential switch both directions; source-all, architecture99(1 platform skip), CI39(4 platform skips), frozen and WSS checks PASS. All harness role processes cleaned. No new verification launched after stop. Explicit Go suites and Go TLS remain pending as above. Recorder finishes CANCELLED to reflect user-interrupted task, not product completion.

@@ -89,6 +89,13 @@ services:
     build:
       context: ../backend/java
     command: ["gateway"]
+    volumes:
+      - type: bind
+        source: ${IM_JAVA_CONFIG_DIR:-../../im-java-local-config}
+        target: /run/im-config
+        read_only: true
+        bind:
+          create_host_path: false
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -100,6 +107,13 @@ services:
     build:
       context: ../backend/java
     command: ["core"]
+    volumes:
+      - type: bind
+        source: ${IM_JAVA_CONFIG_DIR:-../../im-java-local-config}
+        target: /run/im-config
+        read_only: true
+        bind:
+          create_host_path: false
     depends_on:
       migrate:
         condition: service_completed_successfully

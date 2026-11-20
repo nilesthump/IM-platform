@@ -1,0 +1,219 @@
+[
+  {
+    "path": ".github/workflows/ci.yml",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "90c58d78a2235aeb18e6c8e20ce68c5f2bcf4dd56284b92474056a6d9f350250",
+    "working_input_sha256": "90c58d78a2235aeb18e6c8e20ce68c5f2bcf4dd56284b92474056a6d9f350250",
+    "inspection": "Explicit Java build, live profiles, switch and migrated fixtures. Failed child commands fail jobs."
+  },
+  {
+    "path": "backend/go/gateway/gateway.go",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "d49596c649a6755e81b386748714ae9eeb4d4991f667e408db6e7bd44bad389a",
+    "working_input_sha256": "d49596c649a6755e81b386748714ae9eeb4d4991f667e408db6e7bd44bad389a",
+    "inspection": "At the changed serve boundary ReadMessage failure terminates connection processing. Unmarshal of full bounded message rejects malformed JSON and trailing data. Existing deferred retirement/close runs on return."
+  },
+  {
+    "path": "backend/go/tests/java_auth_profile_test.go",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "71ca307c023277189ad694869072dfce2bb4a279236738dedc15ee82bbf2a92c",
+    "working_input_sha256": "71ca307c023277189ad694869072dfce2bb4a279236738dedc15ee82bbf2a92c",
+    "inspection": "Ordinary Go suite skips only opt-in host. Explicit runner enables it. PostgreSQL, NATS, serving, stop-file or relay failure fails test. Cancelled relay on explicit stop is expected."
+  },
+  {
+    "path": "backend/java/Dockerfile",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "8b4eb947da07196ff56a688f2c99818ce151c710151f9644aa5c3a930e146532",
+    "working_input_sha256": "8b4eb947da07196ff56a688f2c99818ce151c710151f9644aa5c3a930e146532",
+    "inspection": "Multi-stage role build copies explicit sources and invokes Maven; nonzero build aborts image creation."
+  },
+  {
+    "path": "backend/java/InfraPlaceholder.java",
+    "ref": "e4aee5ce2c4327904990d5c651267ca5eaae389d",
+    "git_blob_bytes_sha256": "257f6882ccb3ba13a8489222f4d463f44b7c75a6c5e90a32c81031197f889290",
+    "working_input_sha256": null,
+    "inspection": "Deleted at first business transition; baseline bytes hashed for removal."
+  },
+  {
+    "path": "backend/java/Main.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "65892967f3cf8456a90468c22b610a819a44ce39ba66a8a47f8cf8758401e9f1",
+    "working_input_sha256": "65892967f3cf8456a90468c22b610a819a44ce39ba66a8a47f8cf8758401e9f1",
+    "inspection": "14 fatal handler prints class then calls synchronous exit on dying thread (F1). 20 checked InterruptedException during outbox shutdown restores status and propagates with cause. Unsupported role/config/startup throws."
+  },
+  {
+    "path": "backend/java/README.md",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "407572b40faac1436453461dc498b81b098acac8de2805544796e96860cfda75",
+    "working_input_sha256": "407572b40faac1436453461dc498b81b098acac8de2805544796e96860cfda75",
+    "inspection": "Operator startup/config instructions; no executable fallback."
+  },
+  {
+    "path": "backend/java/config.example.json",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "06c8ed805ae436e07d42e48d18159abd587c73b1b92dc176189894da18ecf3b1",
+    "working_input_sha256": "06c8ed805ae436e07d42e48d18159abd587c73b1b92dc176189894da18ecf3b1",
+    "inspection": "Declared operator inputs; no dummy success on read failure."
+  },
+  {
+    "path": "backend/java/core/auth/CoreAuth.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "f6591a8cf9e5012ad6bd18007a75c4611740acd16731fd3d2d646a077c4889e5",
+    "working_input_sha256": "f6591a8cf9e5012ad6bd18007a75c4611740acd16731fd3d2d646a077c4889e5",
+    "inspection": "ApiFailure-only controller advice projects explicit public failures. Body read malformed JSON is validation failure; I/O reading stream propagates. Empty lookup permits missing user/slot only; nonunique result or missing required row/field fails. Username-specific ON CONFLICT does not suppress unrelated errors. Spring transaction encompasses session/revocation and outbox. Exceptions roll back."
+  },
+  {
+    "path": "backend/java/core/auth/SessionOutbox.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "e18172f704fcdb71f1207752d8145a8a63b9c2f49c840089b7ca45815f56afe2",
+    "working_input_sha256": "e18172f704fcdb71f1207752d8145a8a63b9c2f49c840089b7ca45815f56afe2",
+    "inspection": "25 only flush deadline retry after rollback; disconnected status skips DB batch until next tick. 29 interrupted sleep is fatal unless orderly stopping. 40 NATS timeout wrapped with cause to trigger rollback, then 25 retries. 41 flush interruption restores interrupt, preserving cause on failure. Unrelated DB/publish failure reaches uncaught handler. 46 worker.join creates F1 with Main exit."
+  },
+  {
+    "path": "backend/java/gateway/auth/Gateway.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "d267c3c0e321b500369835a49d073d525776e842d60e4286b0476142850aa780",
+    "working_input_sha256": "d267c3c0e321b500369835a49d073d525776e842d60e4286b0476142850aa780",
+    "inspection": "54 interrupted subscription exits on requested stop and otherwise rethrows with original cause/status. 55 JSON/event IOException wraps cause and stops worker; see F1. 58 destroy joins worker (F1). 92 send transport IOException retires peer, attempts close, continues other peers. 95 send state failure only handled after observed peer closure; open state error propagates. 106 close IOException means failed closing handshake on retired peer. 109 closed-state close race stops only for already closed socket. 126/134 reject-close finalizers mask primary failure (F2). 128 malformed external JSON closes BAD_DATA; 136 known ApiFailure emits refusal and closes; 140 post-registration session rejection revokes racing binding. Mandatory SQL/serialization failure propagates."
+  },
+  {
+    "path": "backend/java/plugin-host/Health.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "9eaab7b55ed14e61c94990c1f9da7d9d00486fc2257f897b25cd8ca5e2a49f29",
+    "working_input_sha256": "9eaab7b55ed14e61c94990c1f9da7d9d00486fc2257f897b25cd8ca5e2a49f29",
+    "inspection": "Static role health endpoint; no catch or substitute."
+  },
+  {
+    "path": "backend/java/pom.xml",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "15bef7042235c2a3008a84d4fcbd7d61327839c3b5d525b726114b39cdeeafee",
+    "working_input_sha256": "15bef7042235c2a3008a84d4fcbd7d61327839c3b5d525b726114b39cdeeafee",
+    "inspection": "Approved dependency set, compiler/test inputs and external build directory. No ignored test failures."
+  },
+  {
+    "path": "backend/java/shared/authsupport/ApiFailure.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "6d6436c9419d6ad0283a62581dff74c4c9b6afc6de993ac7c9a824102bc49f69",
+    "working_input_sha256": "6d6436c9419d6ad0283a62581dff74c4c9b6afc6de993ac7c9a824102bc49f69",
+    "inspection": "Typed projection of authored canonical refusals only. No blanket handler."
+  },
+  {
+    "path": "backend/java/shared/authsupport/Config.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "f74a444c3345b7e29cb49752034ac648917d00441fe1b69c77a3bb760edbc5cb",
+    "working_input_sha256": "f74a444c3345b7e29cb49752034ac648917d00441fe1b69c77a3bb760edbc5cb",
+    "inspection": "Rejects missing/invalid file fields, origin, durations and credentials. File and JSON failures propagate. Default token lifetimes configure absent knobs."
+  },
+  {
+    "path": "backend/java/shared/authsupport/PasswordHash.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "fdb7fc23f9847d0fe72680cbc97d78d6bfc967866f481c476e08ea818e2799bb",
+    "working_input_sha256": "fdb7fc23f9847d0fe72680cbc97d78d6bfc967866f481c476e08ea818e2799bb",
+    "inspection": "Approved BCrypt call returns mismatch for wrong credentials; malformed salt errors propagate. No fallback."
+  },
+  {
+    "path": "backend/java/shared/authsupport/Tokens.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "6b8e73640e43a96e43423a839819fe0c13113acca11e140afecf361ab92cef24",
+    "working_input_sha256": "6b8e73640e43a96e43423a839819fe0c13113acca11e140afecf361ab92cef24",
+    "inspection": "SHA-256 unavailable and HMAC initialization failure each preserve cause in IllegalStateException. Invalid base64 encoding solely around decode produces canonical invalid reason. Jackson malformed claims JSON is invalid input; otherwise IOException is wrapped with cause. Mandatory claims/expiry refusal explicit, no fallback key."
+  },
+  {
+    "path": "backend/java/tests/auth/AuthFixtureRunner.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "91cdb55501bf74f080112acae5fd121b8d6b4f2ce31e1e631c3238d7d4d50a49",
+    "working_input_sha256": "91cdb55501bf74f080112acae5fd121b8d6b4f2ce31e1e631c3238d7d4d50a49",
+    "inspection": "207 intentional credential disclosure assertion; 226/229 mismatch reason checked for expected/input mutations. 271 remote TCP terminal socket error accepted only if local socket has not been closed, timeout propagates. 273 known post-revocation send disconnect still requires separate close observation. 322 and 325 require specific disclosure assertion for mutated WSS/HTTP. 217 restores intentionally changed test row, 377 writes credential-scan inputs for verifier."
+  },
+  {
+    "path": "backend/java/tests/auth/BindingFixture.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "6be5b5be232c345d02ceb309c24e81eab42f9b30bbca0aa84ddd0505aa7d8bea",
+    "working_input_sha256": "6be5b5be232c345d02ceb309c24e81eab42f9b30bbca0aa84ddd0505aa7d8bea",
+    "inspection": "Disposable fixture rows prepared/verified/cleaned in JDBC transaction; missing ownership fails, no runtime role changes or catch."
+  },
+  {
+    "path": "backend/java/tests/auth/CryptoTest.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "3375ce06961bb310fb3a304ea86a59dc8fc171225ad5f6687855e118b202c989",
+    "working_input_sha256": "3375ce06961bb310fb3a304ea86a59dc8fc171225ad5f6687855e118b202c989",
+    "inspection": "Requires explicit canonical refusals, malformed stored BCrypt exception, hash equivalence."
+  },
+  {
+    "path": "backend/java/tests/auth/FixtureSensitivityTest.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "f90bb6ca414492e5ad495629154cd7460acd2597b650d0e259bf6c50527cf74e",
+    "working_input_sha256": "f90bb6ca414492e5ad495629154cd7460acd2597b650d0e259bf6c50527cf74e",
+    "inspection": "Explicit assertThrows exercises intentional mismatched canonical response values."
+  },
+  {
+    "path": "backend/java/tests/auth/OutboxFailureProbe.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "90c661bbaa8a1612155e01f8b5dedc957f95c8a319d136fd659e45fb9c9de11f",
+    "working_input_sha256": "90c661bbaa8a1612155e01f8b5dedc957f95c8a319d136fd659e45fb9c9de11f",
+    "inspection": "18 recognizes closed NATS failure, rethrows unrelated state exceptions; confirms unpublished row/no attempts. 23 removes test event."
+  },
+  {
+    "path": "backend/java/tests/auth/OutboxRecoveryProbe.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "9e8e07eb1f5224ef8d548e629d9b861521573177a3ae64d741e7aa72ed45f853",
+    "working_input_sha256": "9e8e07eb1f5224ef8d548e629d9b861521573177a3ae64d741e7aa72ed45f853",
+    "inspection": "59/63/65 each forwarding/read/accept I/O failure collected unless test explicitly closing bridge; 65 interruption preserves interrupt and records error. check()/close() assert worker completion and propagate collected cause. Actual PONG timeout keeps pending row and later publishes. 43\u201348 replaces fatal handler temporarily and tests error arrival, so cannot establish real fatal shutdown."
+  },
+  {
+    "path": "backend/java/tests/auth/RevocationDeliveryProbe.java",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "53cadfb2d0876c5b5ee7abfcff3cb68a55e9f69e8fb92171eb0ec7701ae44421",
+    "working_input_sha256": "53cadfb2d0876c5b5ee7abfcff3cb68a55e9f69e8fb92171eb0ec7701ae44421",
+    "inspection": "Real subscription plus synthetic sockets require close, later event and exact identity of internal error. Overrides worker uncaught handler, so cannot establish process exit. Finally destroys gateway."
+  },
+  {
+    "path": "ci/check_architecture.py",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "cffdcb4dbfbfcc35ce5fe2d7ef99c6d3568d7b17da10855e7eed310ec4d8b9c5",
+    "working_input_sha256": "cffdcb4dbfbfcc35ce5fe2d7ef99c6d3568d7b17da10855e7eed310ec4d8b9c5",
+    "inspection": "Scoped external org.springframework.jdbc handling; actual declared source keeps ownership checks. No new exception swallowing."
+  },
+  {
+    "path": "deploy/compose.yaml",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "3c9165b19f8114ae30ff1facbca9096196bbda730392aff4baccdfb4122b2a1b",
+    "working_input_sha256": "3c9165b19f8114ae30ff1facbca9096196bbda730392aff4baccdfb4122b2a1b",
+    "inspection": "Role dependency/mount declarations, configured operator inputs. No fallback runtime secret."
+  },
+  {
+    "path": "tests/architecture/test_source_boundaries.py",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "7c20f4c53f2764e35f1e14bc8f4f9c4439e556cbfda2ab174b98cdc1bbb3a638",
+    "working_input_sha256": "7c20f4c53f2764e35f1e14bc8f4f9c4439e556cbfda2ab174b98cdc1bbb3a638",
+    "inspection": "Positive external JDBC case and negative locally declared lookalike. Assertions continue to fail on mismatch."
+  },
+  {
+    "path": "tests/ci/test_java_auth_job.py",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "342d86f0525c84710514d84ae132debd3d2fe45391dc5da1b6f1cc9736d520f0",
+    "working_input_sha256": "342d86f0525c84710514d84ae132debd3d2fe45391dc5da1b6f1cc9736d520f0",
+    "inspection": "Mandatory Java live CI commands enforced. Placeholder-only behavior rejected."
+  },
+  {
+    "path": "tests/ci/test_s0_boundary.py",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "e4cb79e42a42c55ebeb70aa5c4052e02dbf0c43e50be8103d73920960506547b",
+    "working_input_sha256": "e4cb79e42a42c55ebeb70aa5c4052e02dbf0c43e50be8103d73920960506547b",
+    "inspection": "Historical placeholder assertions updated for real business transition, existing rejection assertions retained."
+  },
+  {
+    "path": "tests/infrastructure/smoke.ps1",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "ce4dda7840f3391284fb08886f0fc76bd7a3f96903d8cadc39baa97bf7826d23",
+    "working_input_sha256": "ce4dda7840f3391284fb08886f0fc76bd7a3f96903d8cadc39baa97bf7826d23",
+    "inspection": "TLS resources, WSS socket and timeout disposed. Primary catch rethrows. Compose cleanup alone fails job; on simultaneous primary failure cleanup reported separately. Only fixture-local self-signed endpoint cert bypass; TLS negotiation asserted."
+  },
+  {
+    "path": "tools/verify_java_auth.py",
+    "ref": "HEAD",
+    "git_blob_bytes_sha256": "6610a04676a19bcb77693fb6f3d75d946ca541c342a141402ef06aa14042caf1",
+    "working_input_sha256": "6610a04676a19bcb77693fb6f3d75d946ca541c342a141402ef06aa14042caf1",
+    "inspection": "health probe retries connection/URL/timeout in bounded wait; child exit and deadline fail readiness. Previously exited roles detected after runner. Go stop failures propagate; owned roles reaped, seeded rows cleaned. Catch AssertionError for intentional role log fixture mutation requires exact message. Required inputs and distinct DB explicitly enforced."
+  }
+]

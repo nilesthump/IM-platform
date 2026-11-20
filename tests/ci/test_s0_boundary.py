@@ -19,10 +19,7 @@ spec.loader.exec_module(boundary)
 
 class S0BoundaryTests(unittest.TestCase):
     def test_committed_skeleton_contains_no_unexpected_source(self):
-        for profile in ("java",):
-            with self.subTest(profile=profile):
-                self.assertEqual(boundary.unexpected_files(ROOT, profile), [])
-        for profile in ("desktop", "mobile"):
+        for profile in ("java", "desktop", "mobile"):
             self.assertTrue(boundary.unexpected_files(ROOT, profile))
 
     def test_empty_markers_are_ignored_but_new_source_is_rejected(self):
@@ -99,7 +96,8 @@ class S0BoundaryTests(unittest.TestCase):
         self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py go"), 0)
         self.assertIn("go test -count=1 ./...", workflow)
         self.assertIn("contracts/http/verify-auth-user-friend.ps1", workflow)
-        self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py java"), 1)
+        self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py java"), 0)
+        self.assertIn('tools/verify_java_auth.py --build-dir "$RUNNER_TEMP/java-build" --profile java', workflow)
         self.assertEqual(workflow.count("python3 ci/check_s0_boundary.py web"), 0)
         self.assertEqual(workflow.count("python3 -B tests/clients/web/verify.py"), 2)
         self.assertIn("python3 -B -m unittest discover -s tests/clients/web -v", workflow)

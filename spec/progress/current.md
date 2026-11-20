@@ -4,57 +4,53 @@ Current Loop: `Loop 1`
 Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
-Current Batch: `LOOP1-JAVA-ARCH-001`
-Batch Status: AUTHORITY_FREEZE_REVIEW_PENDING
-Current Task: `LOOP1-JAVA-ARCH-001`
+Current Batch: `LOOP1-JAVA-AUTH-001`
+Batch Status: HOSTED_BIND_FIX_REVIEW_PENDING
+Current Task: `LOOP1-JAVA-AUTH-001`
 Current Task State: `review`
-Execution Status: Human-approved Java freeze candidate; product not activated
+Execution Status: PR105 Java bind/logout and isolated smoke repair pending fresh dual reviews
 Assigned Worktree: H:/.codex/worktrees/j/IM-platform
-Task Branch: task/LOOP1-JAVA-ARCH-001
+Task Branch: task/LOOP1-JAVA-AUTH-001
 Coordinator: /root
 
 ## Immediately Relevant Completed Work
 
-S1/S2 PASS retained. S2 final publication independently accepted at main98e0659673aa8a3bf54fb2a9936a26a5fae7d000; external seal discharges old pending-at-commit notes. Human authorized Java stage and explicit minimal stack plus BCrypt-only compatibility supplement. Candidate authority and bounded positive/negative controls complete; independent acceptance pending.
+Candidate 2b8bcad2 passed dual reviews and failed Java and shared hosted CI. The new fix addresses both. S1/S2 PASS retained.
 
 ## Current Blockers
 
-Original5f008172 error specialist FAIL (phase conflict and XML verification gap). Latest Human supplement resolves Auth Session notification authority; fresh fixes pending new two reviews. JAVA-AUTH remains backlog.
+Awaiting both independent final-SHA reviews, hosted CI, protected integration, actual-main verification and safe main synchronization.
 
 ## Verification
 
-- Command: `python -Xutf8 -B tools/verify_frozen_architecture.py`
-  - Result: Fix 1 frozen/sourceall/Control Development PASS; architecture97 tests with1 existing skip; CI35 tests with4 existing skips. Local evidence only.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-ARCH-001/fix1.md`
+- Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
+  - Result: PASS. Maven, packaged Core/Gateway normal and fatal exits, WSS send/close failure preservation, 28 fixtures per profile, profile switching and local architecture/CI/HTTP/WSS checks passed.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-AUTH-001/hosted-bind-fix.md`
 
 ## Changed Files or Migrations
 
-Authority/ADR/manifest/resolver, Java static guard/tests, task/current/evidence only. No product or migrations.
+Java Gateway bind/revoke ordering, deterministic regression probe, Java smoke transport seam and isolated test double, task and review evidence. No migration or dependency change.
 
 ## Known Failures, Risks, and Assumptions
 
-Recorder GBK output failure preserved; UTF8 retry sourceall PASS. Initial startup before Recorder incomplete. Baseline Go fixture failure resolved with writable process GOCACHE; original failure retained. No local/Recorder PASS substitutes acceptance. Regular Review and different error audit final SHA PENDING; hosted/integration/sync PENDING.
+See regular-review8.md, error-review7.md and hosted-bind-fix.md. Prior role-shutdown evidence remains in lifecycle-fix.md. Two distinct disposable migrated databases are now required for live fixture verification. Captured response and role log checks are bounded to available observations.
 
 ## Next Exact Action
 
-Fresh regular Review of committed candidate, then different fresh error review on same SHA; only after both PASS submit exact-head hosted CI.
+Coordinator delegates fresh regular review then different fresh error audit of the same final candidate. Publish only after both PASS. Verify required hosted jobs, protected integration, actual-main and safe main sync before closure.
 
 ## Last Known Good Commit
 
-`98e0659673aa8a3bf54fb2a9936a26a5fae7d000` — S2 final publication independently accepted and synchronized.
+`e4aee5ce2c4327904990d5c651267ca5eaae389d` (accepted Java authority main).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-11-13-s2-gate.md`
+`spec/progress/checkpoints/2026-11-13-java-authority.md`
 
 ## Uncommitted Changes / Ownership
 
-/root/java_auth owns only fresh Fix 1 changes in assigned managed j worktree. Main unknown tracked/untracked files, index and branch untouched.
+/root/hosted_auth_fix owns the scoped task repair in the assigned j worktree. Unknown original main work remains untouched.
 
 ## Architecture Conflicts / ACP / ADR
 
-Human approved required stack and BCrypt-only supplement; ADR-0014 candidate awaits freeze acceptance. No Java product activation.
-
-## Fresh Fix 1
-
-See spec/progress/evidence/LOOP1-JAVA-ARCH-001/fix1.md. Original regular PASS/error FAIL retained; both reviews PENDING on final fixed SHA. No push/CI before new two-review PASS.
+None. ADR-0014 remains the accepted Java authority.
