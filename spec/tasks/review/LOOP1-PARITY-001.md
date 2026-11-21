@@ -60,6 +60,16 @@ Inspect all new runner and test paths and existing paths affected by refactoring
 
 Baseline: python -Xutf8 -B ci/check_architecture.py --scope all --json (PASS at 3a5a54ab). Run CI classification tests, architecture checks, the locked Web build and dual-profile TLS parity with real Compose services. Require exact-head hosted CI, protected integration, actual-main CI and verified main synchronization.
 
-# Evidence and Handoff
+Run `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` from a clean committed checkout with Python 3 first on PATH.
 
-Both profiles passed the identical Web artifact test, strict TLS message goldens and separate Sync runtime checks. Local commands, results and scope are in spec/progress/evidence/LOOP1-PARITY-001/implementation.md. Branch task/LOOP1-PARITY-001 in H:/.codex/worktrees/p/IM-platform, baseline 3a5a54abff6410762d2039c4acf880abbe3269a5. The implementation writer owns these test and task changes. Regular review and different fresh error audit PENDING on the resulting commit. Next run both reviews, applicable exact-head hosted CI, protected integration, actual-main verification and safe synchronization. S3 remains OPEN.
+# Evidence
+
+`spec/progress/evidence/LOOP1-PARITY-001/implementation.md` records both live profiles, the shared Web artifact and Sync checks. `spec/progress/evidence/LOOP1-PARITY-001/regular-review-8efead86.md` preserves the independent FAIL and commands for the first candidate.
+
+# Handoff
+
+Branch `task/LOOP1-PARITY-001` in `H:/.codex/worktrees/p/IM-platform` starts from accepted main `3a5a54abff6410762d2039c4acf880abbe3269a5`. /root/fix1 corrected the recovery sections and CI selection for shared deployment inputs. Both independent reviews of the resulting candidate are PENDING. S3 remains OPEN.
+
+# Next Action
+
+Delegate fresh regular review on the committed fix, then a different fresh error-handling review of that SHA. After both pass, verify hosted push and PR checks, protected integration, actual-main CI and safe main synchronization.

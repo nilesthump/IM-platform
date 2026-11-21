@@ -17,9 +17,19 @@ Coordinator: /root
 
 PR108 finalized Java IM closure. Both profiles passed the local identical Web artifact run and the same live TLS messaging, retry, rollback, Sync and revocation checks. The Web application and both backend implementations retain their accepted source bytes.
 
-## Verification and Evidence
+## Current Blockers
 
-`python -Xutf8 -B tests/e2e/parity.py` passed on Go and Java. Each verified Web artifact digest `58bc0ef831639eecea2a71fec77db588a5b32a93e13efe05b96aebcb6b017577`. Frozen integrity, architecture, CI routing, Web build regressions and both live Sync runs passed locally. See `spec/progress/evidence/LOOP1-PARITY-001/implementation.md`.
+Candidate 8efead86 failed regular review on recovery record formatting and Java CI routing for two deployment inputs. The fixes await a new independent review.
+
+## Verification
+
+- Command: `python -Xutf8 -B tests/e2e/parity.py`
+  - Result: PASS on Go and Java with the same built Web artifact.
+  - Evidence: `spec/progress/evidence/LOOP1-PARITY-001/implementation.md`
+
+## Changed Files or Migrations
+
+The task changes the dual-profile TLS tests, the Web build helper, CI routing and workflow, and task records. The fix adds both shared deployment inputs to Java parity routing and regression coverage. Database migrations remain 0001/0002.
 
 ## Known Failures, Risks, and Assumptions
 
@@ -39,7 +49,7 @@ Obtain fresh independent regular review on the committed task candidate, then a 
 
 ## Uncommitted Changes / Ownership
 
-Implementation writer owns the parity test/CI changes and its task/evidence. Each Recorder run owns its local research files. The H:/IM-platform checkout retains its pre-existing files.
+The implementation writer owns the original parity candidate. /root/fix1 owns the review fixes and retained report. Each Recorder run owns its local research files. The H:/IM-platform checkout retains its pre-existing files.
 
 ## Architecture Conflicts / ACP / ADR
 

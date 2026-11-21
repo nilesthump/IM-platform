@@ -87,7 +87,9 @@ class PathMatrixTests(unittest.TestCase):
         self.assert_jobs('docs/unrelated.md', set())
 
     def test_deploy_changes_run_deploy_validation(self):
-        self.assert_jobs("deploy/compose.yaml", {"java", "deploy"})
+        for path in ("deploy/compose.yaml", "deploy/Caddyfile", "deploy/migrate.Dockerfile"):
+            with self.subTest(path=path):
+                self.assert_jobs(path, {"java", "deploy"})
         self.assert_jobs("tests/infrastructure/smoke.ps1", {"deploy"})
 
     def test_e2e_paths_select_go_deploy_and_boundaries(self):
