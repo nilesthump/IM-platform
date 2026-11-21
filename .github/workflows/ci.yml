@@ -245,8 +245,15 @@ jobs:
           python3 -B tools/verify_java_auth.py --build-dir "$RUNNER_TEMP/java-build" --profile-switch
       - name: Live Java and Go IM contract fixtures
         run: python3 -B tools/verify_java_im.py --build-dir "$RUNNER_TEMP/java-build"
-      - name: Java TLS messaging and durable ACK
-        run: python3 -B tests/e2e/go_tls_messaging.py --profile java
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Parity runner failure handling
+        run: python3 -B tests/e2e/test_parity_failures.py
+      - name: Both TLS messaging goldens and identical Web client on Go and Java
+        run: python3 -B tests/e2e/parity.py
+      - name: Go TLS Sync and cursor recovery on the same vectors
+        run: python3 -B tools/verify_sync_runtime.py --profile go
       - name: Java TLS Sync and cursor recovery
         run: python3 -B tools/verify_sync_runtime.py --profile java
 

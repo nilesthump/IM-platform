@@ -1,5 +1,6 @@
 """Real Go Compose HTTPS/WSS slice; only stdlib and canonical fixture oracles."""
 import base64
+from contextlib import ExitStack
 import copy
 import datetime
 import hashlib
@@ -14,6 +15,7 @@ import struct
 import subprocess
 import tempfile
 import time
+import urllib.error
 import urllib.request
 import uuid
 
@@ -137,7 +139,30 @@ def frame(kind, payload):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=("go", "java"), default="go")
-    profile = parser.parse_args().profile
+    run_profile(parser.parse_args().profile)
+
+
+def wait_for_startup(check, transient, label):
+    for attempt in range(60):
+        try:
+            check()
+            return
+        except (RuntimeError, OSError) as error:
+            if not transient(error):
+                raise
+            if attempt == 59:
+                raise RuntimeError(f'{label} unavailable after 60 attempts') from error
+            time.sleep(.5)
+
+
+def gateway_starting(error):
+    if isinstance(error, urllib.error.HTTPError):
+        return error.code in (502, 503)
+    reason = error.reason if isinstance(error, urllib.error.URLError) else error
+    return isinstance(reason, (ConnectionRefusedError, ConnectionResetError, TimeoutError))
+
+
+def run_profile(profile, client_artifact=None):
     project = 'im-s1-e2e-' + str(os.getpid()) + '-' + secrets.token_hex(4)
     with socket.socket() as reservation:
         reservation.bind(('127.0.0.1', 0))
@@ -145,7 +170,6 @@ def main():
     env = os.environ.copy()
     env.update(IM_HTTPS_PORT=str(port), COMPOSE_PROGRESS='quiet')
     command = ['docker', 'compose', '-f', str(ROOT / 'deploy/compose.yaml'), '-p', project, '--profile', profile]
-    sockets = []
 
     def docker(args, *, data=None):
         result = subprocess.run(args, env=env, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=300)
@@ -181,21 +205,22 @@ def main():
         (config / 'config.json').write_bytes((ROOT / f'backend/{profile}/config.example.json').read_bytes())
         (config / 'pg_password').write_text('local-development-only', encoding='utf-8')
         (config / 'jwt_key').write_text(secrets.token_urlsafe(48), encoding='utf-8')
-        try:
+        with ExitStack() as resources:
+            resources.callback(cleanup)
             compose('config', '--quiet')
             compose('up', '-d', '--build')
             tls_id = compose('ps', '-q', f'tls-{profile}').decode().strip()
             require(bool(tls_id), 'TLS role missing')
             ca = Path(temp) / 'root.crt'
             # Retrieve only the generated PUBLIC root CA, never a private key.
-            for _ in range(60):
-                try:
-                    docker(['docker', 'cp', tls_id + ':/data/caddy/pki/authorities/local/root.crt', str(ca)])
-                    break
-                except RuntimeError:
-                    time.sleep(.5)
-            else:
-                raise RuntimeError('Caddy public root CA unavailable')
+            ca_path = '/data/caddy/pki/authorities/local/root.crt'
+            missing_ca = f'Could not find the file {ca_path} in container {tls_id}'
+
+            def copy_ca():
+                docker(['docker', 'cp', tls_id + ':' + ca_path, str(ca)])
+
+            wait_for_startup(copy_ca, lambda error: isinstance(error, RuntimeError)
+                             and str(error).rstrip().endswith(missing_ca), 'Caddy public root CA')
             context = ssl.create_default_context(cafile=str(ca))
             require(context.check_hostname and context.verify_mode == ssl.CERT_REQUIRED, 'TLS verification disabled')
 
@@ -208,15 +233,11 @@ def main():
                 with urllib.request.urlopen(request, context=context, timeout=10) as response:
                     return response.status, json.loads(response.read() or b'{}')
 
-            for _ in range(60):
-                try:
-                    with urllib.request.urlopen(f'https://localhost:{port}/__infra/health', context=context, timeout=2) as response:
-                        require(response.read().strip() == f'profile={profile} role=gateway'.encode(), 'wrong HTTPS role')
-                    break
-                except OSError:
-                    time.sleep(.5)
-            else:
-                raise RuntimeError('verified TLS Gateway unavailable')
+            def check_health():
+                with urllib.request.urlopen(f'https://localhost:{port}/__infra/health', context=context, timeout=2) as response:
+                    require(response.read().strip() == f'profile={profile} role=gateway'.encode(), 'wrong HTTPS role')
+
+            wait_for_startup(check_health, gateway_starting, 'verified TLS Gateway')
             # Exact negative controls: generic TLS failures cannot prove name checking.
             try:
                 with socket.create_connection(('localhost', port), timeout=5) as raw:
@@ -305,7 +326,7 @@ def main():
 
             def bind(token):
                 ws = WS(context, port)
-                sockets.append(ws)
+                resources.callback(ws.close)
                 request = frame('auth.bind', {'accessToken': token})
                 ws.send(request)
                 ack = ws.read()
@@ -395,11 +416,11 @@ def main():
             current.closed()
             require(json.loads(durable_rows()) == {'messages': 1, 'outbox': 1, 'nextSeq': 2}, 'revocation changed messaging rows')
             print('PASS revocation: replacement epoch/revoked then close/stale token reject/logout then close; no runtime skips', flush=True)
+            if client_artifact is not None:
+                subprocess.run(['node', str(ROOT / 'tests/e2e/parity.mjs'), str(client_artifact),
+                                f'https://localhost:{port}'], check=True, timeout=120,
+                               env=dict(env, NODE_EXTRA_CA_CERTS=str(ca)))
             print('DEFERRED_BY_HUMAN: friend-add-authorization-denied only (ADR-0004); not counted PASS', flush=True)
-        finally:
-            for ws in sockets:
-                ws.close()
-            cleanup()
 
 
 if __name__ == '__main__':

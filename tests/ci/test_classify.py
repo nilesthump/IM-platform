@@ -18,9 +18,9 @@ class PathMatrixTests(unittest.TestCase):
 
     def test_profile_and_client_changes_are_local(self):
         for path, job in (
-            ("backend/go/main.go", {"go", "architecture", "source_go"}),
+            ("backend/go/main.go", {"go", "java", "architecture", "source_go"}),
             ("backend/java/App.java", {"java", "architecture", "source_java"}),
-            ("clients/web/src/App.tsx", {"web", "architecture"}),
+            ("clients/web/src/App.tsx", {"web", "java", "architecture"}),
             ("clients/desktop/db/schema.sql", {"desktop", "architecture"}),
             ("clients/mobile/app.kt", {"mobile", "architecture"}),
         ):
@@ -87,13 +87,17 @@ class PathMatrixTests(unittest.TestCase):
         self.assert_jobs('docs/unrelated.md', set())
 
     def test_deploy_changes_run_deploy_validation(self):
-        for path in ("deploy/compose.yaml", "tests/infrastructure/smoke.ps1"):
+        for path in ("deploy/compose.yaml", "deploy/Caddyfile", "deploy/migrate.Dockerfile"):
             with self.subTest(path=path):
-                self.assert_jobs(path, {"deploy"})
+                self.assert_jobs(path, {"java", "deploy"})
+        self.assert_jobs("tests/infrastructure/smoke.ps1", {"deploy"})
 
     def test_e2e_paths_select_go_deploy_and_boundaries(self):
         expected = {"go", "deploy", "architecture", "source_go"}
-        self.assert_jobs("tests/e2e/go_tls_messaging.py", expected | {"java"})
+        self.assert_jobs("tests/e2e/go_tls_messaging.py", expected | {"java", "shared"})
+        self.assert_jobs("tests/contract/group/test_verification_failures.py", {"shared"})
+        for path in ("tests/e2e/parity.py", "tests/e2e/parity.mjs", "tests/e2e/test_parity_failures.py"):
+            self.assert_jobs(path, expected | {"java"})
         self.assert_jobs("tests/e2e/README.md", expected)
 
     def test_deleted_e2e_path_still_selects_live_checks(self):
@@ -125,7 +129,7 @@ class PathMatrixTests(unittest.TestCase):
 
     def test_union_and_deleted_paths(self):
         result = classify_module.classify(["backend/go/old.go", "clients/web/new.ts"])
-        self.assertEqual({key for key, value in result.items() if value}, {"go", "web", "architecture", "source_go"})
+        self.assertEqual({key for key, value in result.items() if value}, {"go", "java", "web", "architecture", "source_go"})
 
     def test_client_changes_always_select_architecture(self):
         for path, job in [('clients/web/view.tsx','web'), ('clients/desktop/src-tauri/main.rs','desktop'), ('clients/mobile/adapter.ts','mobile'), ('clients/shared/deleted.ts','shared')]:

@@ -200,11 +200,11 @@ exit $code
         import types
         path = ROOT / 'tests/e2e/go_tls_messaging.py'
         tree = ast.parse(path.read_text(encoding='utf-8'))
-        main = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'main')
-        helpers = [next(node for node in main.body if isinstance(node, ast.FunctionDef) and node.name == name)
+        run_profile = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'run_profile')
+        helpers = [next(node for node in run_profile.body if isinstance(node, ast.FunctionDef) and node.name == name)
                    for name in ('docker', 'compose', 'sql')]
         require = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'require')
-        assertions = [node for node in ast.walk(main) if isinstance(node, ast.Expr)
+        assertions = [node for node in ast.walk(run_profile) if isinstance(node, ast.Expr)
                       and isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name)
                       and node.value.func.id == 'require' and len(node.value.args) == 2
                       and isinstance(node.value.args[1], ast.Constant)

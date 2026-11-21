@@ -41,6 +41,13 @@ def classify(paths):
             selected.update({"architecture", "desktop", "mobile", "shared", "compatibility"})
         if path in {"tools/verify_java_im.py", "tests/e2e/go_tls_messaging.py", "tools/verify_sync_runtime.py"}:
             selected.add("java")
+        if path in {"tests/e2e/go_tls_messaging.py", "tests/contract/group/test_verification_failures.py"}:
+            selected.add("shared")
+        if parts[:2] in (["clients", "web"], ["backend", "go"]) or path in {
+            "tests/e2e/parity.py", "tests/e2e/parity.mjs", "tests/e2e/test_parity_failures.py", "tests/clients/web/verify.py",
+            "deploy/compose.yaml", "deploy/Caddyfile", "deploy/migrate.Dockerfile",
+        }:
+            selected.add("java")
         if path == "tools/verify_sync_runtime.py":
             selected.add("deploy")
         if parts[0] == "clients":
