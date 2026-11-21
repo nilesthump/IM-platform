@@ -42,7 +42,7 @@ def classify(paths):
         if path in {"tools/verify_java_im.py", "tests/e2e/go_tls_messaging.py", "tools/verify_sync_runtime.py"}:
             selected.add("java")
         if parts[:2] in (["clients", "web"], ["backend", "go"]) or path in {
-            "tests/e2e/parity.py", "tests/e2e/parity.mjs", "tests/clients/web/verify.py",
+            "tests/e2e/parity.py", "tests/e2e/parity.mjs", "tests/e2e/test_parity_failures.py", "tests/clients/web/verify.py",
             "deploy/compose.yaml", "deploy/Caddyfile", "deploy/migrate.Dockerfile",
         }:
             selected.add("java")

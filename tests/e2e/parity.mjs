@@ -5,8 +5,12 @@ import {pathToFileURL} from 'node:url';
 
 const [artifact, origin] = process.argv.slice(2);
 const {WebClient} = await import(pathToFileURL(join(artifact, 'web/src/application/client.js')));
-const alice = new WebClient(origin);
-const bob = new WebClient(origin);
+const clients = [];
+function openClient() {
+  const client = new WebClient(origin);
+  clients.push(client);
+  return client;
+}
 
 // The Web UI has no registration action. Bootstrap two disposable accounts with
 // the canonical registration input; WebClient owns all subsequent protocol I/O.
@@ -30,7 +34,7 @@ async function until(label, predicate) {
   }
 }
 
-async function exchange(conversation, text, senderId) {
+async function exchange(alice, bob, conversation, text, senderId) {
   alice.open(conversation);
   bob.open(conversation);
   assert.equal(bob.view().selected, conversation);
@@ -49,10 +53,14 @@ async function exchange(conversation, text, senderId) {
   await until('conversation Sync', () => bob.view().sync === '本页在线消息已同步 · 不补历史');
 }
 
+const failures = [];
 try {
+  const alice = openClient();
+  const bob = openClient();
   const a = await register();
   const b = await register();
-  await Promise.all([alice.login(a.username, a.password), bob.login(b.username, b.password)]);
+  await alice.login(a.username, a.password);
+  await bob.login(b.username, b.password);
   await until('authenticated WSS and profile', () =>
     alice.view().user?.userId === a.id && bob.view().user?.userId === b.id &&
     [alice, bob].every(client => client.view().connection === 'ready'));
@@ -63,21 +71,30 @@ try {
   assert.ok(direct);
   await until('friend metadata Sync', () => bob.view().friends.some(friend =>
     friend.user.userId === a.id && friend.directConversationId === direct));
-  await exchange(direct, 'direct parity', a.id);
+  await exchange(alice, bob, direct, 'direct parity', a.id);
   await alice.createGroup([b.id]);
   assert.equal(alice.view().groupStatus, 'success');
   const group = alice.view().selected;
   assert.ok(group && group !== direct);
   await until('group membership Sync', () => bob.view().groups.some(row =>
     row.kind === 'GROUP' && row.conversationId === group && row.member.user.userId === b.id));
-  await exchange(group, 'group parity', a.id);
-  await Promise.all([alice.logout(), bob.logout()]);
+  await exchange(alice, bob, group, 'group parity', a.id);
+  await alice.logout();
+  await bob.logout();
   for (const client of [alice, bob]) {
     assert.equal(client.view().session, false);
     assert.equal(client.view().notice, '已退出登录。');
   }
-  console.log('PASS unchanged WebClient login, friend, DIRECT, group, delivery, Sync and logout');
-} finally {
-  alice.dispose();
-  bob.dispose();
+} catch (error) {
+  failures.push(error);
 }
+for (const client of clients) {
+  try {
+    client.dispose();
+  } catch (error) {
+    failures.push(error);
+  }
+}
+if (failures.length === 1) throw failures[0];
+if (failures.length > 1) throw new AggregateError(failures, 'Web parity and client cleanup failures');
+console.log('PASS unchanged WebClient login, friend, DIRECT, group, delivery, Sync and logout');

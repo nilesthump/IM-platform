@@ -28,6 +28,7 @@ S1 and S2 PASS. LOOP1-JAVA-AUTH-001 and LOOP1-JAVA-IM-001 are done. PR108 closur
 - tests/e2e/go_tls_messaging.py
 - tests/e2e/parity.py
 - tests/e2e/parity.mjs
+- tests/e2e/test_parity_failures.py
 - tests/clients/web/verify.py
 - ci/classify.py
 - tests/ci/test_classify.py
@@ -68,7 +69,7 @@ Run `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` from a clean committed ch
 
 # Handoff
 
-Branch `task/LOOP1-PARITY-001` in `H:/.codex/worktrees/p/IM-platform` starts from accepted main `3a5a54abff6410762d2039c4acf880abbe3269a5`. /root/fix1 corrected the recovery sections and CI selection for shared deployment inputs. Both independent reviews of the resulting candidate are PENDING. S3 remains OPEN.
+Branch `task/LOOP1-PARITY-001` in `H:/.codex/worktrees/p/IM-platform` starts from accepted main `3a5a54abff6410762d2039c4acf880abbe3269a5`. /root/fix1 corrected the recovery sections and CI selection for shared deployment inputs. Candidate 58e878271b94e4aee96e347718156104ba112aa9 received regular PASS and error-handling FAIL. The two reports are preserved verbatim under task evidence. /root/fix2 repaired causal error reporting, per-client and per-socket cleanup, Compose teardown and readiness classification, and added the targeted regression to Java CI. Both independent reviews of the new candidate are PENDING. S3 remains OPEN.
 
 # Next Action
 

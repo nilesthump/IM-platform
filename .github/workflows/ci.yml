@@ -248,6 +248,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Parity runner failure handling
+        run: python3 -B tests/e2e/test_parity_failures.py
       - name: Both TLS messaging goldens and identical Web client on Go and Java
         run: python3 -B tests/e2e/parity.py
       - name: Go TLS Sync and cursor recovery on the same vectors

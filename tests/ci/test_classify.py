@@ -95,7 +95,7 @@ class PathMatrixTests(unittest.TestCase):
     def test_e2e_paths_select_go_deploy_and_boundaries(self):
         expected = {"go", "deploy", "architecture", "source_go"}
         self.assert_jobs("tests/e2e/go_tls_messaging.py", expected | {"java"})
-        for path in ("tests/e2e/parity.py", "tests/e2e/parity.mjs"):
+        for path in ("tests/e2e/parity.py", "tests/e2e/parity.mjs", "tests/e2e/test_parity_failures.py"):
             self.assert_jobs(path, expected | {"java"})
         self.assert_jobs("tests/e2e/README.md", expected)
 
