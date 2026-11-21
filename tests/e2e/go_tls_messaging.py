@@ -137,7 +137,10 @@ def frame(kind, payload):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=("go", "java"), default="go")
-    profile = parser.parse_args().profile
+    run_profile(parser.parse_args().profile)
+
+
+def run_profile(profile, client_artifact=None):
     project = 'im-s1-e2e-' + str(os.getpid()) + '-' + secrets.token_hex(4)
     with socket.socket() as reservation:
         reservation.bind(('127.0.0.1', 0))
@@ -395,6 +398,10 @@ def main():
             current.closed()
             require(json.loads(durable_rows()) == {'messages': 1, 'outbox': 1, 'nextSeq': 2}, 'revocation changed messaging rows')
             print('PASS revocation: replacement epoch/revoked then close/stale token reject/logout then close; no runtime skips', flush=True)
+            if client_artifact is not None:
+                subprocess.run(['node', str(ROOT / 'tests/e2e/parity.mjs'), str(client_artifact),
+                                f'https://localhost:{port}'], check=True, timeout=120,
+                               env=dict(env, NODE_EXTRA_CA_CERTS=str(ca)))
             print('DEFERRED_BY_HUMAN: friend-add-authorization-denied only (ADR-0004); not counted PASS', flush=True)
         finally:
             for ws in sockets:

@@ -22,7 +22,8 @@ class JavaImJobTest(unittest.TestCase):
         java = workflow.split("\n  java:\n", 1)[1].split("\n  web:\n", 1)[0]
         deploy = workflow.split("\n  deploy:\n", 1)[1].split("\n  gate:\n", 1)[0]
         self.assertIn('run: python3 -B tools/verify_java_im.py --build-dir "$RUNNER_TEMP/java-build"', java)
+        self.assertIn("run: python3 -B tests/e2e/parity.py\n", java)
+        self.assertIn("run: python3 -B tools/verify_sync_runtime.py --profile java\n", java)
         for path in RUNNERS[1:]:
-            self.assertIn(f"run: python3 -B {path} --profile java\n", java)
             self.assertIn(f"run: python3 -B {path}\n", deploy)
 

@@ -90,6 +90,22 @@ def run(command, *, cwd, env=None):
     subprocess.run(command, cwd=cwd, env=env, check=True)
 
 
+def build_web(root, stage, *, runner=run):
+    npm = shutil.which('npm.cmd' if os.name == 'nt' else 'npm')
+    if not npm:
+        raise ValueError('npm required to build the Web client')
+    shutil.copytree(root/'clients/web', stage/'clients/web', ignore=shutil.ignore_patterns('node_modules', 'dist', 'build'))
+    shutil.copytree(root/'clients/shared', stage/'clients/shared', ignore=shutil.ignore_patterns('node_modules', 'dist', 'build'))
+    artifact = stage/'web-build'
+    env = os.environ.copy()
+    env['WEB_BUILD_DIR'] = str(artifact)
+    runner([npm, '--prefix', str(stage/'clients/web'), 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], cwd=root, env=env)
+    runner([npm, '--prefix', str(stage/'clients/web'), 'run', 'build'], cwd=root, env=env)
+    if not (artifact/'index.html').is_file() or not list(artifact.rglob('*.js')):
+        raise ValueError('Actual Web build artifacts missing; no skeleton fallback')
+    return artifact
+
+
 def verify(root=ROOT, *, runner=run):
     web = root/'clients/web'
     if (root/'clients').is_symlink() or web.is_symlink() or not web.is_dir():
@@ -117,15 +133,8 @@ def verify(root=ROOT, *, runner=run):
         raise ValueError('Actual npm/Node tooling unavailable; never skipped')
     with tempfile.TemporaryDirectory(prefix='web-verification-') as temp:
         stage = Path(temp)
-        shutil.copytree(web, stage/'clients/web', ignore=shutil.ignore_patterns('node_modules', 'dist', 'build'))
-        shutil.copytree(root/'clients/shared', stage/'clients/shared', ignore=shutil.ignore_patterns('node_modules', 'dist', 'build'))
-        artifact = stage/'web-build'
-        env = os.environ.copy()
-        env['WEB_BUILD_DIR'] = str(artifact)
-        runner([npm, '--prefix', str(stage/'clients/web'), 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], cwd=root, env=env)
-        runner([npm, '--prefix', str(stage/'clients/web'), 'run', 'build'], cwd=root, env=env)
-        if not (artifact/'index.html').is_file() or not list(artifact.rglob('*.js')):
-            raise ValueError('Actual Web build artifacts missing; no skeleton fallback')
+        artifact = build_web(root, stage, runner=runner)
+        env = dict(os.environ, WEB_BUILD_DIR=str(artifact))
         for test in BEHAVIOR:
             runner([node, str(root/test)], cwd=root, env=env)
     print('PASS: actual locked Web build, behavior, appearance and source verification; GUI screenshots remain independent.')
