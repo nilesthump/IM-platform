@@ -8,7 +8,7 @@ Current Batch: `LOOP1-PARITY-001`
 Batch Status: OPEN
 Current Task: `LOOP1-PARITY-001`
 Current Task State: `review`
-Execution Status: Local parity verified, independent reviews pending
+Execution Status: PR109 shared contract regression repaired locally, fresh independent reviews pending
 Assigned Worktree: H:/.codex/worktrees/p/IM-platform
 Task Branch: task/LOOP1-PARITY-001
 Coordinator: /root
@@ -19,9 +19,13 @@ PR108 finalized Java IM closure. Both profiles passed the local identical Web ar
 
 ## Current Blockers
 
-The regular reviewer passed 58e878271b94e4aee96e347718156104ba112aa9. The error-handling reviewer failed that candidate on disposal, readiness classification and socket/Compose cleanup. The repair awaits fresh independent regular and specialist reviews.
+PR109 push and pull-request runs on d990c045 failed the shared contract job and its dependent required gate. The repaired candidate requires fresh independent reviews and hosted verification.
 
 ## Verification
+
+- Command: `python -Xutf8 -B -m unittest discover -s tests/contract/group -p "test_*.py" -v`
+  - Result: All 29 tests passed after reproducing and repairing PR109's shared job failure.
+  - Evidence: `spec/progress/evidence/LOOP1-PARITY-001/hosted-fix-d990c045.md`
 
 - Command: `python -Xutf8 -B tests/e2e/parity.py`
   - Result: PASS on Go and Java with the same built Web artifact.
@@ -37,7 +41,7 @@ ADR-0004's single Friend authorization deferral remains. The Web application cod
 
 ## Next Exact Action
 
-Obtain fresh independent regular review on the committed task candidate, then a different fresh error-handling review of the same SHA. Both are PENDING. Hosted candidate/PR/actual-main checks, protected integration and safe main synchronization are pending.
+Delegate fresh regular review of the committed repair, then a different fresh error-handling review on the same SHA. Verify the hosted push and PR109 runs, protected integration, actual-main CI and safe main synchronization.
 
 ## Last Known Good Commit
 
@@ -49,7 +53,7 @@ Obtain fresh independent regular review on the committed task candidate, then a 
 
 ## Uncommitted Changes / Ownership
 
-The implementation writer owns the original parity candidate. /root/fix1 owns the earlier routing/recovery fixes. /root/fix2 owns the runner repairs, fault regressions and retained second-round reports. Each Recorder run owns its local research files. The H:/IM-platform checkout retains its pre-existing files.
+The implementation writer owns the original parity candidate. /root/fix1 owns the earlier routing/recovery fixes. /root/fix2 owns the runner repairs, fault regressions and retained second-round reports. /root/hostedfix owns the shared regression repair and recovery updates. /root owns the retained d990c045 review reports. Each Recorder run owns its local research files. The H:/IM-platform checkout retains its pre-existing files.
 
 ## Architecture Conflicts / ACP / ADR
 
