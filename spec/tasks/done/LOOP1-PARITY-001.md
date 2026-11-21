@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-PARITY-001
 title: Golden parity and unchanged client profile switch
-status: review
+status: done
 owner: /root/implementation
 stage: S3
 gate: S3
@@ -66,12 +66,24 @@ Run `tools/verify-loop1-ctrl-002.ps1 -Mode Acceptance` from a clean committed ch
 
 # Evidence
 
-`spec/progress/evidence/LOOP1-PARITY-001/implementation.md` records both live profiles, the shared Web artifact and Sync checks. `spec/progress/evidence/LOOP1-PARITY-001/regular-review-8efead86.md` preserves the independent FAIL and commands for the first candidate.
+The acceptance index `spec/progress/evidence/LOOP1-PARITY-001/acceptance.json` binds the final reviews, candidate CI, actual-main audit and sync receipt. Earlier failed reviews and the failed shared job on d990c045 remain in the same directory.
 
 # Handoff
 
-Branch `task/LOOP1-PARITY-001` in `H:/.codex/worktrees/p/IM-platform` starts from accepted main `3a5a54abff6410762d2039c4acf880abbe3269a5`. /root/fix1 corrected the recovery sections and CI selection for shared deployment inputs. Candidate 58e878271b94e4aee96e347718156104ba112aa9 received regular PASS and error-handling FAIL. The two reports are preserved verbatim under task evidence. /root/fix2 repaired causal error reporting, per-client and per-socket cleanup, Compose teardown and readiness classification, and added the targeted regression to Java CI. Both independent reviews passed d990c045. Following authorized publication, its hosted push and PR109 runs failed the shared migration ledger regression and dependent gate. /root/hostedfix updated the regression to follow the extracted run_profile entry point and retained all ten cases. Fresh independent reviews of this repair are PENDING. See spec/progress/evidence/LOOP1-PARITY-001/hosted-fix-d990c045.md and the two d990c045 review reports there. S3 remains OPEN.
+PR 109 integrated candidate `dfd046dc29e16bf8531723539e5652b34d9e5f65` into main `d91d89ad74f9cb2d97cf5fc9984993d0175049a8`. Fresh independent regular and error-handling reviews both passed on that candidate. Candidate push 44894997629, PR 44895000470 and actual-main 44895739120 each passed all 14 jobs. H:/IM-platform was synchronized. The recovery branch and 782 pre-existing local files were preserved.
+
+The same locked Web application build passed login, DIRECT and GROUP messaging, Sync and logout over HTTPS/WSS against Go and Java. Both profiles passed durable ACK, Outbox, retry, rollback and revocation checks. The accepted artifact digest was `58bc0ef831639eecea2a71fec77db588a5b32a93e13efe05b96aebcb6b017577` for each profile. The Web application ran in Node using its production transports. ADR-0004's single deferred Friend authorization case and the S4 plugin permission checks retain their existing scope. S3 remains OPEN.
+
+The assigned worktree is H:/.codex/worktrees/p/IM-platform on `task/LOOP1-PARITY-001`. The earlier implementation, fixes and reviews are committed. Each Research Recorder run owns its local instrumentation.
+
+acceptance_result: PASS
+accepted_candidate_sha: dfd046dc29e16bf8531723539e5652b34d9e5f65
+integrated_main_sha: d91d89ad74f9cb2d97cf5fc9984993d0175049a8
+main_sync_result: PASS
+independent_review_evidence: spec/progress/evidence/LOOP1-PARITY-001/acceptance.json
+hosted_acceptance_evidence: spec/progress/evidence/LOOP1-PARITY-001/acceptance.json
+main_sync_evidence: spec/progress/evidence/LOOP1-PARITY-001/main-sync.json
 
 # Next Action
 
-Delegate fresh regular review on the committed fix, then a different fresh error-handling review of that SHA. After both pass, verify hosted push and PR checks, protected integration, actual-main CI and safe main synchronization.
+Evaluate the S3 Gate separately against the frozen architecture and accepted S3 task evidence.
