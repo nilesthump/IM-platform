@@ -5,52 +5,52 @@ Current Stage: `S3`
 Current Gate: `S3`
 Gate Status: `OPEN`
 Current Batch: `LOOP1-JAVA-IM-001`
-Batch Status: REVIEW
+Batch Status: PASS
 Current Task: `LOOP1-JAVA-IM-001`
-Current Task State: `review`
-Execution Status: WSS timestamp hour verifier repaired after hosted Java failure, awaiting both independent reviews
+Current Task State: `done`
+Execution Status: Java IM product accepted and synchronized
 Assigned Worktree: H:/.codex/worktrees/java-im/IM-platform
 Task Branch: task/LOOP1-JAVA-IM-001
 Coordinator: /root
 
 ## Immediately Relevant Completed Work
 
-Java Auth product PR105 and closure PR106 are integrated. Java IM product commit 54fa46a6351c82bc4ac1d8f44adc8ba7021aa487 implements the approved Friend, Group, Message, Outbox, NATS and Sync responsibilities and live tests.
+PR 107 integrated candidate 17471665fdbf7c5c5820c150c84823ee37e7398b into main e809cc83ed0288fb3070ac27ba8fcb6bc0ffa785. Fresh regular and error-handling reviews passed on this candidate. Candidate push 44752847965 passed all 13 selected jobs, PR 44752860335 and actual-main 44754507275 each passed all 14 jobs. Independent verification confirmed identical Git trees. H:/IM-platform was synchronized while preserving the recovery branch and 782 pre-existing local files.
 
 ## Current Blockers
 
-The Human authorized the WSS verifier hour correction after the prior candidate failed CI. Fresh regular and specialist reviews of the replacement, hosted CI, protected integration and main synchronization are pending.
+None for Java IM. S3 parity acceptance remains ahead.
 
 ## Verification
 
-- Command: `python -Xutf8 -B contracts/websocket/verify.py`
-  - Result: PASS on CPython 3.13.14 and 3.14.3. Java/Go/Java live IM also passed under 3.14.3.
-  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/hosted-hour-fix.md`
+- Command: `python -Xutf8 -B ci/check_architecture.py --scope all --json`
+  - Result: PASS. The independent reports and hosted receipts record the commands, selected jobs, steps and results.
+  - Evidence: `spec/progress/evidence/LOOP1-JAVA-IM-001/acceptance.json`
 
 ## Changed Files or Migrations
 
-WSS timestamp verifier and live controls, Go message.send Gateway/Core checks, Java Core/Gateway, Docker build inputs, hosted Java checks, fixture drivers and task records. The migration baseline remains 0001/0002.
+Java Core/Gateway IM operations, live cross-profile tests and CI integration. The Human authorized the Go message.send lowercase UUID check and the WSS timestamp verifier hour correction. Database migrations remain 0001/0002.
 
 ## Known Failures, Risks, and Assumptions
 
-Regular and specialist reviews passed on 7ff6d1ed. The push and PR Java jobs both failed on that SHA because Python 3.14 accepted hour 24. The exact reports and failure evidence are retained. Independent reviews and hosted acceptance of the replacement are outstanding.
+PR 107's first candidate failed the Java job under CPython 3.14. The retained hosted-hour-fix record documents the divergent timestamp, original failures and repaired cross-version results. ADR-0004's single deferred Friend case remains in force.
 
 ## Next Exact Action
 
-Delegate a fresh regular review on final committed HEAD, then a different fresh error-handling specialist on the same SHA. Submit to hosted CI only after both pass.
+Publish the local administrative closure through fresh independent reviews, hosted CI and protected integration when work resumes. LOOP1-PARITY-001 is the next S3 product task.
 
 ## Last Known Good Commit
 
-`18597c06f15c6ba5d50e055a88890a54f737fd52` (Java Auth closure).
+`e809cc83ed0288fb3070ac27ba8fcb6bc0ffa785` (accepted and synchronized Java IM product).
 
 ## Latest Checkpoint
 
-`spec/progress/checkpoints/2026-11-20-java-auth.md`
+`spec/progress/checkpoints/2026-11-20-java-im.md`
 
 ## Uncommitted Changes / Ownership
 
-Initial product and control changes belong to /root/java_im. First fix, tests and evidence belong to /root/fix1. The second fix, regression and evidence belong to /root/fix2. /root/fix3 owns the third recovery-record correction and preserved /root/regular3 report. /root/fix4 owns the committed message validation, delivery regressions and preserved regular/specialist reports for 86ebf351. /root/fix5 owns the fifth Java repair, the approved Go conformance fix, shared tests, preserved review and UUID evidence. /root/hostedfix owns the WSS verifier repair, live regression and review/failure records. Recorder and test-generated artifacts remain owned by their creating runs. Main recovery changes remain with their original owners.
+The coordinator owns this local closure record. Research artifacts and generated local files in the assigned worktree remain with their creating runs. The separate H:/IM-platform checkout retains its pre-existing local changes.
 
 ## Architecture Conflicts / ACP / ADR
 
-Human resolved both the UUID divergence and the WSS timestamp hour boundary. No open architecture conflict. ADR-0004 remains applicable. S1 and S2 accepted; S3 OPEN.
+The Human resolved both the UUID divergence and the WSS timestamp hour boundary. S1 and S2 remain accepted. S3 is OPEN.
