@@ -1,0 +1,18 @@
+# S3 Gate evaluation at PR110
+
+Evaluation base `9dffa06848bf07fa120420cf1be11ef6dbbeff38` includes the accepted S3 product and parity closure. The frozen Markdown matches `a52e871d4f48708c1fa7e06ea2e4ffae3922a93a9be6128cb79b3292b6b36bef` and historical PDF matches the baseline manifest. §15, §20 and Appendix B require Java core equivalence, shared golden tests and a client profile switch without code changes. S2 acceptance is sealed in [the S2 receipt](../LOOP1-S2-GATE-001/final-status-receipt.json); [Java authority](../LOOP1-JAVA-ARCH-001/acceptance.json) binds ADR-0014.
+
+| Obligation | Observed behavior | Independent evidence |
+|---|---|---|
+| Java Auth, Session and User | The same live canonical Auth fixtures exercise Java and Go against the independently migrated database. | [PR105 acceptance](../LOOP1-JAVA-AUTH-001/acceptance.json), candidate 0e0762d3, main 6565f4fe, runs 44711275252 / 44711287304 / 44714247655. |
+| Friend/DIRECT uniqueness, GROUP idempotency, Conversation, Message, Sync, Outbox and NATS | Java IM and Go share the public fixtures and real TLS deployment checks. They exercise committed ACK, rollback, retry, duplicate handling, event delivery and Sync recovery. | [PR107 acceptance](../LOOP1-JAVA-IM-001/acceptance.json), candidate 17471665, main e809cc83, runs 44752847965 / 44752860335 / 44754507275. |
+| Golden parity including errors and version negotiation | The dual-profile suite runs against shared canonical expectations. The final CI ran both Auth profiles, real group and Sync fixtures, and the TLS parity runner. | [PR109 acceptance](../LOOP1-PARITY-001/acceptance.json), [candidate hosted jobs](../LOOP1-PARITY-001/candidate-hosted.json) and [actual-main audit](../LOOP1-PARITY-001/actual-main-audit.json). Candidate dfd046dc, main d91d89ad, runs 44894997629 / 44895000470 / 44895739120. |
+| Unchanged Web client | One locked build used its production HTTPS/WSS transports for login, DIRECT and GROUP exchanges, Sync and logout on both profiles. Each run measured SHA-256 `58bc0ef831639eecea2a71fec77db588a5b32a93e13efe05b96aebcb6b017577`. The harness executed compiled Web code in Node. | [Independent live rerun](../LOOP1-PARITY-001/regular-review-dfd046dc.md) and [separate specialist review](../LOOP1-PARITY-001/specialist-review-dfd046dc.md). |
+
+The three product acceptance indexes bind candidate reviews, hosted runs, actual-main results and guarded main synchronization. All 15 named proof file digests in their proofs maps match checkout bytes. The linked run pairs identify push and PR checks, followed by actual-main. PR110 recorded parity acceptance on the same product tree. Its actual-main run [44897870848](https://github.com/nilesthump/IM-platform/actions/runs/44897870848) selected classify, architecture, source_go, source_java and gate.
+
+ADR-0004 defers only `friend-add-authorization-denied`. Section 11.3 includes plugin permissions in the shared vector catalogue; live plugin permissions belong to S4 under §§15/20. The candidate retains the prior failed reviews and CI results alongside each final acceptance. S3 evidence supports a positive decision, pending independent Gate acceptance.
+
+## Local checks
+
+At the baseline, `python -Xutf8 -B ci/check_architecture.py --scope all --json` passed. Git ancestry checks bind the integrated task commits to PR110. The product diff from accepted parity main through PR110 is empty outside spec/progress and spec/tasks. Writer Recorder R-S3-GATE-WRITER-20261122 follows coordinator R-S3-GATE-COORD-20261122. Initial startup inspection preceded recording. Registration required a separate prompt ID; the first Recorder output failed in the GBK console. The architecture command was rerun using a UTF-8 Recorder process.
