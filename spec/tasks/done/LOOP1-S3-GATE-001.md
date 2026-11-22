@@ -1,7 +1,7 @@
 ---
 task_id: LOOP1-S3-GATE-001
 title: S3 Java equivalence Gate evaluation
-status: review
+status: done
 owner: /root/gate_writer
 stage: S3
 gate: S3
@@ -58,8 +58,20 @@ spec/progress/evidence/LOOP1-S3-GATE-001/evaluation.md
 
 # Handoff
 
-The evidence matrix and proposed checkpoint cover the S3 conditions at main 9dffa06848bf07fa120420cf1be11ef6dbbeff38. The local architecture baseline passed. See the matrix for scope, commands and historical exceptions. Writer /root/gate_writer owns the Gate candidate in H:/.codex/worktrees/s3/IM-platform on task/LOOP1-S3-GATE-001. S3 OPEN. Both candidate reviews and hosted/main synchronization pending.
+Independent Gate reviewer /root/main_audit verified S3 PASS on PR111 actual main `3292358de67443712118d3ed829e45e86f6a96ce` after synchronization to H:/IM-platform. Both independent reviews passed on candidate `79afbf9e1dea5fa11aabd2a2d4487e917397541b`. Candidate push 45005166038, PR 45005280496 and actual-main 45005917358 passed their required jobs. The recovery branch and all 782 pre-existing local paths were preserved.
+
+The accepted checkpoint covers Java equivalence, Go/Java golden tests and the unchanged compiled Web client. ADR-0004 retains its single Friend authorization deferral. Live plugin permissions belong to S4. The immutable seal at `spec/progress/evidence/LOOP1-S3-GATE-001/s3-gate-seal.json` has SHA-256 `9ded2d701fb513097de3f610d84d72e7061d27b106d786770a2dbee0e66f8a5a`. This closure writer owns only the status publication on task/LOOP1-S3-GATE-001 in H:/.codex/worktrees/s3/IM-platform. Its own reviews, hosted checks and synchronization are pending. Recorder R-S3-GATE-CLOSURE-20261122.
+
+# Completion Metadata
+
+acceptance_result: PASS
+accepted_candidate_sha: 79afbf9e1dea5fa11aabd2a2d4487e917397541b
+integrated_main_sha: 3292358de67443712118d3ed829e45e86f6a96ce
+main_sync_result: PASS
+independent_review_evidence: spec/progress/evidence/LOOP1-S3-GATE-001/s3-gate-seal.json
+hosted_acceptance_evidence: spec/progress/evidence/LOOP1-S3-GATE-001/s3-gate-seal.json
+main_sync_evidence: spec/progress/evidence/LOOP1-S3-GATE-001/sync111.json
 
 # Next Action
 
-Perform fresh regular review on the committed candidate SHA, then a different fresh error-handling review on the same SHA before publication.
+Publish this status record through fresh regular and separate error-handling reviews, applicable exact-head hosted CI, protected integration, actual-main verification and guarded synchronization, then stop at S3 PASS.

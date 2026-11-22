@@ -1,0 +1,663 @@
+{
+  "result": "PASS",
+  "event": "push",
+  "sha": "79afbf9e1dea5fa11aabd2a2d4487e917397541b",
+  "base": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  "run": 45005166038,
+  "attempt": 1,
+  "url": "https://github.com/nilesthump/IM-platform/actions/runs/45005166038",
+  "expected": {
+    "classify": "success",
+    "gate": "success",
+    "architecture": "success",
+    "source_go": "success",
+    "source_java": "success",
+    "go": "success",
+    "java": "success",
+    "web": "success",
+    "desktop (ubuntu-latest)": "success",
+    "desktop (windows-latest)": "success",
+    "mobile": "success",
+    "shared": "success",
+    "compatibility": "success",
+    "deploy": "success"
+  },
+  "jobs": [
+    {
+      "name": "classify",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Diagnose checkout status",
+          "success"
+        ],
+        [
+          "Verify clean repository recovery",
+          "success"
+        ],
+        [
+          "Test path matrix",
+          "success"
+        ],
+        [
+          "Classify full diff, including deletions",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "source_java",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Java current source and explicit placeholder boundary",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "web",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Web prerequisite and product verification negative controls",
+          "success"
+        ],
+        [
+          "Actual locked Web build, behavior, appearance and source verification",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "go",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Initialize containers",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Install PostgreSQL client",
+          "success"
+        ],
+        [
+          "Migrate canonical schema",
+          "success"
+        ],
+        [
+          "Go Auth build, integration and contract verification",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Stop containers",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "java",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Initialize containers",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-java@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Build Java Auth and canonical runner",
+          "success"
+        ],
+        [
+          "Independently migrate disposable database",
+          "success"
+        ],
+        [
+          "Same canonical live Auth fixtures on Java and Go",
+          "success"
+        ],
+        [
+          "Live Java and Go IM contract fixtures",
+          "success"
+        ],
+        [
+          "Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Parity runner failure handling",
+          "success"
+        ],
+        [
+          "Both TLS messaging goldens and identical Web client on Go and Java",
+          "success"
+        ],
+        [
+          "Go TLS Sync and cursor recovery on the same vectors",
+          "success"
+        ],
+        [
+          "Java TLS Sync and cursor recovery",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-java@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Stop containers",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "desktop (windows-latest)",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Native Tauri prerequisites and approved Rust compiler",
+          "skipped"
+        ],
+        [
+          "Actual TypeScript Repository on SQLx SQLite",
+          "skipped"
+        ],
+        [
+          "Approved Windows GUI assembly and auth controls",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "architecture",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Run actions/setup-java@v4",
+          "success"
+        ],
+        [
+          "Canonical integrity and authority structure",
+          "success"
+        ],
+        [
+          "Current governance references and task scopes",
+          "success"
+        ],
+        [
+          "Active client technology/source/dependency/configuration guard",
+          "success"
+        ],
+        [
+          "Checker positive and negative controls",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-java@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "shared",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Actual shared TypeScript storage compile",
+          "success"
+        ],
+        [
+          "HTTP, WSS, Sync and Plugin contracts",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "source_go",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Real Go source ownership and AST dependency graph",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-go@v5",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "mobile",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-java@v4",
+          "success"
+        ],
+        [
+          "Run android-actions/setup-android@v3",
+          "success"
+        ],
+        [
+          "Enable hosted Linux KVM permissions",
+          "success"
+        ],
+        [
+          "Run reactivecircus/android-emulator-runner@v2",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-java@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "desktop (ubuntu-latest)",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Native Tauri prerequisites and approved Rust compiler",
+          "success"
+        ],
+        [
+          "Actual TypeScript Repository on SQLx SQLite",
+          "success"
+        ],
+        [
+          "Approved Windows GUI assembly and auth controls",
+          "skipped"
+        ],
+        [
+          "Post Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "compatibility",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Initialize containers",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Install PostgreSQL client",
+          "success"
+        ],
+        [
+          "Shared fixture compatibility and migration",
+          "success"
+        ],
+        [
+          "Current client source and actual Web verification",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Stop containers",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "deploy",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Prepare disposable Go profile configuration",
+          "success"
+        ],
+        [
+          "Validate both Compose profiles",
+          "success"
+        ],
+        [
+          "Prepare disposable Java profile configuration",
+          "success"
+        ],
+        [
+          "Frozen architecture integrity",
+          "success"
+        ],
+        [
+          "Go transport smoke",
+          "success"
+        ],
+        [
+          "Go Auth actual roles and TLS event smoke",
+          "success"
+        ],
+        [
+          "Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Current shared Sync client actual Go TLS runtime",
+          "success"
+        ],
+        [
+          "Go public Sync strict TLS runtime",
+          "success"
+        ],
+        [
+          "Go S1 strict TLS messaging E2E",
+          "success"
+        ],
+        [
+          "Java transport smoke",
+          "success"
+        ],
+        [
+          "Post Run actions/setup-node@v4",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    },
+    {
+      "name": "gate",
+      "conclusion": "success",
+      "steps": [
+        [
+          "Set up job",
+          "success"
+        ],
+        [
+          "Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Require every selected job to pass",
+          "success"
+        ],
+        [
+          "Post Run actions/checkout@v4",
+          "success"
+        ],
+        [
+          "Complete job",
+          "success"
+        ]
+      ]
+    }
+  ]
+}
